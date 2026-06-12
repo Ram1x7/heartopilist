@@ -1,1 +1,725 @@
-
+// 虫
+const bugData = [
+{
+ name:"キアゲハ",
+ level:1,
+ price:30,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林",
+ img:"bugs/001.PNG"
+},
+{
+ name:"クモマツマキチョウ",
+ level:1,
+ price:30,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"中心街",
+ img:"bugs/002.PNG"
+},
+{
+ name:"ヤマキチョウ",
+ level:1,
+ price:30,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"郊外",
+ img:"bugs/003.PNG"
+},
+{
+ name:"モンシロチョウ",
+ level:1,
+ price:30,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"漁村",
+ img:"bugs/004.PNG"
+},
+{
+ name:"アポロウスバシロチョウ",
+ level:1,
+ price:30,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫コイコイクエスト",
+ img:"bugs/005.PNG"
+},
+{
+ name:"ベニモンアゲハ",
+ level:1,
+ price:30,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫コイコイクエスト",
+ img:"bugs/006.PNG"
+},
+{
+ name:"スルコウスキーモルフォ",
+ level:1,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"エアーミツバチ虫寄せ装置",
+ img:"bugs/007.PNG"
+},
+{
+ name:"アスバラカズハムシ", 
+ level:1,
+ price:55,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"花畑",
+ img:"bugs/008.PNG"
+},
+{
+ name:"クリソクラオン",
+ level:1,
+ price:45,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"温泉山",
+ img:"bugs/009.PNG"
+},
+{
+ name:"コバネアカホシカメムシ",
+ level:1,
+ price:35,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"ホーム",
+ img:"bugs/010.PNG"
+},
+{
+ name:"アカイトトンボ",
+ level:1,
+ price:35,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"水辺",
+ img:"bugs/011.PNG"
+},
+{
+ name:"イカルスヒメシジミ",
+ level:2,
+ price:105,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"中心街",
+ img:"bugs/012.PNG"
+},
+{
+ name:"ミドリニワハンミョウ",
+ level:2,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"温泉山",
+ img:"bugs/013.PNG"
+},
+{
+ name:"コウホウトラカミキリ",
+ level:2,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林",
+ img:"bugs/014.PNG"
+},
+{
+ name:"アオホシハナムグリ",
+ level:2,
+ price:165,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"ホーム",
+ img:"bugs/015.PNG"
+},
+{
+ name:"シベリアヒナバッタ",
+ level:2,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"漁村",
+ img:"bugs/016.PNG"
+},
+{
+ name:"ナナホシテントウ",
+ level:2,
+ price:110,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"郊外",
+ img:"bugs/017.PNG"
+},
+{
+ name:"ヨツボシトンボ",
+ level:2,
+ price:75,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"郊外の湖畔",
+ img:"bugs/018.PNG"
+},
+{
+ name:"クマバチ",
+ level:2,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"花畑",
+ img:"bugs/019.PNG"
+},
+{
+ name:"イリスコムラサキ",
+ level:3,
+ price:90,
+ weather:["晴れ","虹"],
+ time:["12-18","18-0","0-6"],
+ location:"花畑-クジラ山",
+ img:"bugs/020.PNG"
+},
+{
+ name:"アカエリトリバネアゲハ",
+ level:3,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","18-0","0-6"],
+ location:"ホーム",
+ img:"bugs/021.PNG"
+},
+{
+ name:"ヒメオナガミズアオ",
+ level:3,
+ price:105,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0"],
+ location:"郊外",
+ img:"bugs/022.PNG"
+},
+{
+ name:"アカハネムシ",
+ level:3,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"温泉山-温泉",
+ img:"bugs/024.PNG"
+},
+{
+ name:"ピンクタイワンクツワムシ",
+ level:3,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫コイコイクエスト",
+ img:"bugs/023.PNG"
+},
+{
+ name:"キリギリス",
+ level:3,
+ price:180,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"花畑-パープルビーチ",
+ img:"bugs/025.PNG"
+},
+{
+ name:"シロマダラオバチ",
+ level:3,
+ price:165,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0"],
+ location:"森林-コジカ塔",
+ img:"bugs/026.PNG"
+},
+{
+ name:"アリ",
+ level:3,
+ price:220,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"漁村-漁村広場",
+ img:"bugs/027.PNG"
+},
+{
+ name:"ツマグロヒョウモン",
+ level:4,
+ price:90,
+ weather:["雨","虹"],
+ time:["6-12","18-0","0-6"],
+ location:"漁村-波止場",
+ img:"bugs/028.PNG"
+},
+{
+ name:"アルキプテラフスカ",
+ level:4,
+ price:140,
+ weather:["晴れ","雨","虹"],
+ time:["12-18","18-0","0-6"],
+ location:"郊外",
+ img:"bugs/029.PNG"
+},
+{
+ name:"ヨツボシテントウ",
+ level:4,
+ price:165,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"温泉山-火山湖",
+ img:"bugs/030.PNG"
+},
+{
+ name:"セミ",
+ level:4,
+ price:220,
+ weather:["晴れ","雨","虹"],
+ time:["12-18","18-0","0-6"],
+ location:"森林-不思議な松林",
+ img:"bugs/031.PNG"
+},
+{
+ name:"シオカラトンボ",
+ level:4,
+ price:75,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"川辺",
+ img:"bugs/032.PNG"
+},
+{
+ name:"ニジイロカマキリ",
+ level:4,
+ price:195,
+ weather:["晴れ","虹"],
+ time:["12-18","18-0","0-6"],
+ location:"温泉山-石海岸の崖",
+ img:"bugs/033.PNG"
+},
+{
+ name:"クジャクチョウ",
+ level:5,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"花畑-風車の花畑",
+ img:"bugs/034.PNG"
+},
+{
+ name:"キベリタテハ",
+ level:5,
+ price:90,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","0-6"],
+ location:"温泉山-温泉",
+ img:"bugs/035.PNG"
+},
+{
+ name:"ナンベイオオヤガ",
+ level:5,
+ price:90,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫コイコイクエスト",
+ img:"bugs/036.PNG"
+},
+{
+ name:"タケウチトゲムネカミキリ",
+ level:5,
+ price:165,
+ weather:["虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-森の島",
+ img:"bugs/037.PNG"
+},
+{
+ name:"ナミテントウ",
+ level:5,
+ price:165,
+ weather:["雨","虹"],
+ time:["12-18","18-0","0-6"],
+ location:"森林-コジカ塔",
+ img:"bugs/038.PNG"
+},
+{
+ name:"パプアハラビロカマキリ",
+ level:5,
+ price:390,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"温泉山-遺跡",
+ img:"bugs/039.PNG"
+},
+{
+ name:"ムラサキクマバチ",
+ level:5,
+ price:165,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"花畑-クジラ山",
+ img:"bugs/040.PNG"
+},
+{
+ name:"オオミドリトリバネアゲハ",
+ level:6,
+ price:150,
+ weather:["晴れ","雨","虹"],
+ time:["18-0","0-6"],
+ location:"郊外",
+ img:"bugs/041.PNG"
+},
+{
+ name:"ミヤマクワガタ",
+ level:6,
+ price:275,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0"],
+ location:"森林-ジャンプステージ",
+ img:"bugs/042.PNG"
+},
+{
+ name:"シルバージュエルコガネ",
+ level:6,
+ price:165,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","0-6"],
+ location:"温泉山-石海岸の崖",
+ img:"bugs/043.PNG"
+},
+{
+ name:"ルリクチブトカメムシ",
+ level:6,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18"],
+ location:"漁村-灯台",
+ img:"bugs/044.PNG"
+},
+{
+ name:"アオハダトンボ",
+ level:6,
+ price:110,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森の湖畔",
+ img:"bugs/045.PNG"
+},
+{
+ name:"メネラウスモルフォ",
+ level:7,
+ price:150,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0"],
+ location:"森林-不思議な松林",
+ img:"bugs/046.PNG"
+},
+{
+ name:"アサギマダラ",
+ level:7,
+ price:150,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫コイコイクエスト",
+ img:"bugs/047.PNG"
+},
+{
+ name:"ミノタウロスコガネ",
+ level:7,
+ price:275,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","0-6"],
+ location:"温泉山-遺跡",
+ img:"bugs/048.PNG"
+},
+{
+ name:"ビューティースペキオーサ",
+ level:7,
+ price:275,
+ weather:["雨","虹"],
+ time:["6-12","12-18"],
+ location:"花畑-クジラ山",
+ img:"bugs/049.PNG"
+},
+{
+ name:"ゴールドジュエルコガネ",
+ level:7,
+ price:275,
+ weather:["晴れ","虹"],
+ time:["12-18","18-0"],
+ location:"森林-ジャンプステージ",
+ img:"bugs/050.PNG"
+},
+{
+ name:"ロサトンボ",
+ level:7,
+ price:185,
+ weather:["虹"],
+ time:["12-18","18-0","0-6"],
+ location:"温泉山の湖畔",
+ img:"bugs/051.PNG"
+},
+{
+ name:"イザベラミズアオ",
+ level:8,
+ price:150,
+ weather:["晴れ","虹"],
+ time:["12-18","18-0"],
+ location:"森林-不思議な松林",
+ img:"bugs/052.PNG"
+},
+{
+ name:"マダガスカルムーンモス",
+ level:8,
+ price:240,
+ weather:["晴れ","虹"],
+ time:["18-0","0-6"],
+ location:"郊外",
+ img:"bugs/053.PNG"
+},
+{
+ name:"カブトムシ",
+ level:8,
+ price:275,
+ weather:["晴れ","虹"],
+ time:["18-0","0-6"],
+ location:"漁村-漁村東桟橋",
+ img:"bugs/054.PNG"
+},
+{
+ name:"ピカソバグ",
+ level:8,
+ price:185,
+ weather:["晴れ","虹"],
+ time:["18-0","0-6"],
+ location:"花畑-パープルビーチ",
+ img:"bugs/055.PNG"
+},
+{
+ name:"シンジュタテハ",
+ level:9,
+ price:240,
+ weather:["雨","虹"],
+ time:["6-12","0-6"],
+ location:"花畑-風車の花畑",
+ img:"bugs/056.PNG"
+},
+{
+ name:"オウゴンオニクワガタ",
+ level:9,
+ price:440,
+ weather:["雨","虹"],
+ time:["18-0","0-6"],
+ location:"森林-不思議な松林",
+ img:"bugs/057.PNG"
+},
+{
+ name:"ニジイロクワガタ",
+ level:9,
+ price:440,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫コイコイクエスト-遺跡(追加段階)",
+ img:"bugs/058.PNG"
+},
+{
+ name:"ヨウカイカマキリ",
+ level:9,
+ price:515,
+ weather:["雨","虹"],
+ time:["12-18","18-0"],
+ location:"温泉山-遺跡",
+ img:"bugs/059.PNG"
+},
+{
+ name:"青いクマバチ",
+ level:9,
+ price:440,
+ weather:["虹"],
+ time:["18-0","0-6"],
+ location:"漁村-漁村広場",
+ img:"bugs/060.PNG"
+},
+{
+ name:"ヘレナモルフォ",
+ level:10,
+ price:240,
+ weather:["虹"],
+ time:["6-12","12-18"],
+ location:"花畑-パープルビーチ",
+ img:"bugs/061.PNG"
+},
+{
+ name:"タイヨウモルフォ",
+ level:10,
+ price:240,
+ weather:["虹"],
+ time:["6-12","12-18"],
+ location:"森林-コジカ塔",
+ img:"bugs/062.PNG"
+},
+{
+ name:"ヘラクレスオオカブト",
+ level:10,
+ price:440,
+ weather:["晴れ","虹"],
+ time:["12-18","18-0"],
+ location:"温泉山-火山湖",
+ img:"bugs/063.PNG"
+},
+{
+ name:"クロツヤミノガ",
+ level:10,
+ price:440,
+ weather:["晴れ","虹"],
+ time:["18-0","0-6"],
+ location:"森林-コジカ塔",
+ img:"bugs/064.PNG"
+},
+{
+ name:"アレクサンドラトリバネアゲハ",
+ level:11,
+ weather:["晴れ","虹"],
+ time:["18-0","0-6"],
+ location:"郊外の湖",
+ img:"images/000.PNG"
+}, 
+{
+ name:"アトラスオオカブト",
+ level:11,
+ weather:["虹"],
+ time:["18-0","0-6"],
+ location:"森林-不思議な松林",
+ img:"images/000.PNG"
+}, 
+{
+ name:"ジュウサンホシテントウ",
+ level:11,
+ weather:["虹"],
+ time:["12-18","18-0"],
+ location:"花畑-クジラ山",
+ img:"images/000.PNG"
+}, 
+{
+ name:"ハナカマキリ",
+ level:11,
+ weather:["雨","虹"],
+ time:["6-12","12-18"],
+ location:"温泉山-遺跡",
+ img:"images/000.PNG"
+}, 
+{
+ name:"ミイロタイマイ",
+ level:12,
+ weather:["雨","虹"],
+ time:["6-12","18-0"],
+ location:"花畑-風車の花畑",
+ img:"images/000.PNG"
+},
+{
+ name:"オオサマゴライアス",
+ level:12,
+ weather:["虹"],
+ time:["18-0","0-6"],
+ location:"森林-コジカ塔",
+ img:"images/000.PNG"
+},
+{
+ name:"トウワタバッタ",
+ level:12,
+ weather:["雨","虹"],
+ time:["6-12","12-18"],
+ location:"温泉山-温泉",
+ img:"images/000.PNG"
+},
+{
+ name:"アメイロトンボ(?)",
+ level:12,
+ weather:["虹"],
+ time:["6-12","12-18"],
+ location:"草原の湖",
+ img:"images/000.PNG"
+},
+{
+ name:"デイダミアモルフォ(?)",
+ level:13,
+ weather:["虹"],
+ time:["12-18","18-0"],
+ location:"温泉山-火山湖",
+ img:"images/000.PNG"
+},
+{
+ name:"ミドリカワトンボ(?)",
+ level:13,
+ weather:["雨","虹"],
+ time:["12-18","18-0"],
+ location:"郊外の湖",
+ img:"images/000.PNG"
+},
+{
+ name:"ツマジロスカシマダラ(?)",
+ level:14,
+ weather:["雨","虹"],
+ time:["12-18","18-0"],
+ location:"花畑-クジラ山",
+ img:"images/000.PNG"
+},
+{
+ name:"ミドリパプア(?)",
+ level:14,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-森の島",
+ img:"images/000.PNG"
+},
+{
+ name:"積み木アカイトトンボ(ピンク)",
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-ジャンプステージ",
+ img:"bugs/1001.PNG"
+},
+{
+ name:"積み木アカイトトンボ(黄)",
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-不思議な松林",
+ img:"bugs/1002.PNG"
+},
+{
+ name:"積み木アカイトトンボ(青)",
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-コジカ塔",
+ img:"bugs/1003.PNG"
+},
+{
+ name:"積み木アカイトトンボ(紫)",
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-森の島",
+ img:"bugs/1004.PNG"
+},
+{
+ name:"積み木アカイトトンボ(虹)",
+ level:1,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"特殊積み木虫クエスト",
+ img:"bugs/1005.PNG"
+}
+ // ここに追加していく
+].map((c,i) => ({
+  ...c,
+  type:"bug",
+  bookIndex:i
+}));
