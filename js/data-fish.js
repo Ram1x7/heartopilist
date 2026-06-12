@@ -931,7 +931,7 @@ const fishData = [
  img:"images/000.PNG"
 },
 {
- name:"スジクロハギ(?)",
+ name:"ニザダイ",
  level:13,
  shadow:"中",
  weather:["雨","虹"],
@@ -940,7 +940,7 @@ const fishData = [
  img:"images/000.PNG"
 },
 {
- name:"ミノカサゴ(?)",
+ name:"ミノカサゴ",
  level:13,
  shadow:"中",
  weather:["雨","虹"],
@@ -949,7 +949,7 @@ const fishData = [
  img:"images/000.PNG"
 },
 {
- name:"ロイヤルデムワーゼル(?)",
+ name:"シリキルリスズメダイ",
  level:14,
  shadow:"小",
  weather:["晴れ","虹"],
@@ -958,7 +958,7 @@ const fishData = [
  img:"images/000.PNG"
 },
 {
- name:"レナーズラス(?)",
+ name:"レナーズラス",
  level:14,
  shadow:"中",
  weather:["晴れ","虹"],
