@@ -633,7 +633,7 @@ const bugData = [
  img:"images/000.PNG"
 },
 {
- name:"アメイロトンボ(?)",
+ name:"ベニトンボ",
  level:12,
  weather:["虹"],
  time:["6-12","12-18"],
@@ -641,7 +641,7 @@ const bugData = [
  img:"images/000.PNG"
 },
 {
- name:"デイダミアモルフォ(?)",
+ name:"デイダミアモルフォ",
  level:13,
  weather:["虹"],
  time:["12-18","18-0"],
@@ -649,7 +649,7 @@ const bugData = [
  img:"images/000.PNG"
 },
 {
- name:"ミドリカワトンボ(?)",
+ name:"ミドリカワトンボ",
  level:13,
  weather:["雨","虹"],
  time:["12-18","18-0"],
@@ -657,7 +657,7 @@ const bugData = [
  img:"images/000.PNG"
 },
 {
- name:"ツマジロスカシマダラ(?)",
+ name:"グラスウィングバタフライ",
  level:14,
  weather:["雨","虹"],
  time:["12-18","18-0"],
@@ -665,7 +665,7 @@ const bugData = [
  img:"images/000.PNG"
 },
 {
- name:"ミドリパプア(?)",
+ name:"アオミオカタニシ",
  level:14,
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
