@@ -1,1 +1,4 @@
+User-agent: *
+Allow: /
 
+Sitemap: https://ram1x7.github.io/heartopilist/sitemap.xml
