@@ -1,14 +1,14 @@
 {
   "name": "はとぴ図鑑",
   "short_name": "はとぴ図鑑",
-  "start_url": "./",
-  "scope": "/guide-tool/",
+  "start_url": "/heartopilist/",
+  "scope": "/heartopilist/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#38bdf8",
+  "background_color": "#ffd6ea",
+  "theme_color": "#ffd6ea",
   "icons": [
     {
-      "src": "images/list.PNG",
+      "src": "/heartopilist/apple-touch-icon.png",
       "sizes": "180x180",
       "type": "image/png"
     }
