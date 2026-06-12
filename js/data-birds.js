@@ -712,7 +712,7 @@ const birdData = [
  img:"images/000.PNG"
 },
 {
- name:"オオハクチョウ(?)",
+ name:"オオハクチョウ",
  level:13,
  star5:"虹 / 12〜18",
  weather:["晴れ","雨","虹"],
@@ -721,7 +721,7 @@ const birdData = [
  img:"images/000.PNG"
 },
 {
- name:"コクチョウ(?)",
+ name:"コクチョウ",
  level:13,
  star5:"虹 / 12〜18",
  weather:["雨","虹"],
@@ -730,7 +730,7 @@ const birdData = [
  img:"images/000.PNG"
 },
 {
- name:"クロクジャク(?)",
+ name:"クロクジャク",
  level:13,
  star5:"虹 / 12〜18",
  weather:["晴れ","雨","虹"],
@@ -739,7 +739,7 @@ const birdData = [
  img:"images/000.PNG"
 },
 {
- name:"ナベコウ(?)",
+ name:"ナベコウ",
  level:14,
  star5:"虹 / 12〜18",
  weather:["晴れ","雨","虹"],
@@ -748,7 +748,7 @@ const birdData = [
  img:"images/000.PNG"
 },
 {
- name:"メガネフクロウ(?)",
+ name:"メガネフクロウ",
  level:14,
  star5:"虹 / 6〜12",
  weather:["晴れ","雨","虹"],
