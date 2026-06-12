@@ -1,3 +1,15 @@
+window.onerror = function(message, source, lineno, colno) {
+  alert(
+    message + "\n" +
+    "line:" + lineno
+  );
+};window.onerror = function(message, source, lineno, colno) {
+  alert(
+    message + "\n" +
+    "line:" + lineno
+  );
+};
+
 const APP_VERSION = "1.1.6";
 
 let currentFilter="all";
