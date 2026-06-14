@@ -755,7 +755,7 @@ function shareToX(){
   const stats = getStats();
   const percent = Math.floor(stats.done/stats.total*100);
   const text = encodeURIComponent(
-    `はとぴ図鑑 コンプ率 ${percent}%！\n認証マスター ${stats.authCount}種獲得！\n#ハートピア\n#ハートピアスローライフ\n#Heartopia#はとぴ図鑑`
+    `はとぴ図鑑 コンプ率 ${percent}%！\n認証マスター ${stats.authCount}種獲得！\n#ハートピア\n#ハートピアスローライフ\n#Heartopia\n#はとぴ図鑑`
   );
   window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
 }
