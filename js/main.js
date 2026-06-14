@@ -1,15 +1,5 @@
 const APP_VERSION = "1.1.6";
 
-const params = new URLSearchParams(location.search);
-const imported = params.get("import");
-if(imported){
-  localStorage.setItem(
-    "checkedData",
-    imported
-  );
-  alert("⭐チェックデータを移行しました！");
-}
-
 let currentFilter="all";
 let currentSort = "book";
 let weatherMode = "current"; 
