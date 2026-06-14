@@ -646,6 +646,121 @@ function bulkUncheck(){
   render();
 }
 
+const shareBtn = document.getElementById("shareBtn");
+const shareModal = document.getElementById("shareModal");
+const shareCanvas = document.getElementById("shareCanvas");
+
+shareBtn.onclick = ()=>{
+  drawShareCard();
+  shareModal.style.display = "block";
+};
+
+function closeShareModal(){
+  shareModal.style.display = "none";
+}
+
+shareModal.onclick = (e)=>{
+  if(e.target === shareModal) closeShareModal();
+};
+
+// 集計
+function getStats(){
+  const total = creatures.length;
+  const done = creatures.filter(c=>checkedData[c.name]).length;
+  const byType = {fish:0,bug:0,bird:0};
+  const totalByType = {fish:0,bug:0,bird:0};
+  creatures.forEach(c=>{
+    totalByType[c.type]++;
+    if(checkedData[c.name]) byType[c.type]++;
+  });
+  const authCount =
+    creatures.filter(c=>authData[c.name]).length;
+  return {total, done, byType, totalByType, authCount};
+}
+
+// 画像生成
+function drawShareCard(){
+  const stats = getStats();
+  const ctx = shareCanvas.getContext("2d");
+  const w = shareCanvas.width;
+  const h = shareCanvas.height;
+
+  const grad = ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,"#f7f2e7");
+  grad.addColorStop(1,"#ece2cf");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#3c5a6e";
+  ctx.font = "bold 40px sans-serif";
+  ctx.fillText("はとぴ図鑑 コンプ状況", w/2, 80);
+
+  const percent = Math.floor(stats.done/stats.total*100);
+  ctx.font = "bold 70px sans-serif";
+  ctx.fillStyle = "#b1503b";
+  ctx.fillText(`${percent}%`, w/2, 200);
+
+  ctx.font = "24px sans-serif";
+  ctx.fillStyle = "#34302b";
+  ctx.fillText(`コンプリート ${stats.done} / ${stats.total}`, w/2, 250);
+
+  const types = [
+    {key:"fish", label:"魚"},
+    {key:"bug", label:"虫"},
+    {key:"bird", label:"野鳥"}
+  ];
+  ctx.textAlign = "left";
+  types.forEach((t,i)=>{
+    ctx.fillText(
+      `${t.label}：${stats.byType[t.key]} / ${stats.totalByType[t.key]}`,
+      80, 320 + i*40
+    );
+  });
+
+  ctx.textAlign = "center";
+  ctx.font = "bold 28px sans-serif";
+  ctx.fillStyle = "#c8a86b";
+  ctx.fillText(`認証マスター：${stats.authCount} 種`, w/2, 480);
+
+  ctx.font = "16px sans-serif";
+  ctx.fillStyle = "#7a7164";
+  ctx.fillText(new Date().toLocaleDateString(), w/2, h-40);
+}
+
+// 画像を保存・共有(Web Share API)
+async function shareImage(){
+  shareCanvas.toBlob(async (blob)=>{
+    const file = new File([blob], "hatopi-comp.png", {type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({
+          files:[file],
+          title:"はとぴ図鑑 コンプ状況",
+          text:"はとぴ図鑑のコンプ状況をシェア！"
+        });
+      }catch(e){}
+    }else{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "hatopi-comp.png";
+      a.click();
+    }
+  });
+}
+
+// Xへテキスト投稿(画像は別途手動添付)
+function shareToX(){
+  const stats = getStats();
+  const percent = Math.floor(stats.done/stats.total*100);
+  const text = encodeURIComponent(
+    `はとぴ図鑑 コンプ率 ${percent}%！\n認証マスター ${stats.authCount}種獲得！\n#はとぴ図鑑`
+  );
+  window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
+}
+
+
 const levelMin = document.getElementById("levelMin");
 const levelMax = document.getElementById("levelMax");
 const levelRangeText =
