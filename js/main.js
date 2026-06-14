@@ -16,6 +16,9 @@ let maxLevel = 12;
   // チェック保存
 let checkedData =
   JSON.parse(localStorage.getItem("checkedData") || "{}");
+// 認証マスター記録
+let authData =
+  JSON.parse(localStorage.getItem("authData") || "{}");
 
 // 天気(毎日入力する) 
 const weatherData = {
@@ -341,6 +344,14 @@ return a.bookIndex - b.bookIndex;
     ${checkedData[c.name] ? "⭐️" : ""}
   </button>
 
+  <button class="
+  auth-btn
+  ${authData[c.name] ? "checked" : ""}
+">
+  ${authData[c.name] ? "🎖" : ""}
+</button>
+
+
   <img src="${c.img}" loading="lazy" decoding="async">
 
 </div>
@@ -380,6 +391,17 @@ checkBtn.onclick = (e)=>{
   );
   render();
 };
+
+const authBtn = div.querySelector(".auth-btn");
+
+authBtn.onclick = (e)=>{
+  e.stopPropagation();
+  if(multiSelectMode) return;
+  authData[c.name] = !authData[c.name];
+  localStorage.setItem("authData", JSON.stringify(authData));
+  render();
+};
+
 
 el.appendChild(div);
  });
