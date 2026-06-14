@@ -1,30 +1,51 @@
+:root{
+  /* 生成り（和紙）ベース */
+  --bg-top:#f7f2e7;
+  --bg-bottom:#ece2cf;
+
+  /* 墨色テキスト */
+  --text:#34302b;
+  --text-sub:#7a7164;
+
+  /* 藍・朱・金 アクセント */
+  --indigo:#3c5a6e;
+  --indigo-soft:#5a7d92;
+  --vermillion:#b1503b;
+  --vermillion-soft:#c97058;
+  --gold:#c8a86b;
+
+  --card:#fffdf7;
+  --card-sub:#f3ecdc;
+  --border:#e4d9c2;
+}
+
 body{
   margin:0;
   padding:12px;
-  font-family:'Mochiy Pop One', sans-serif;
+  font-family:'Zen Maru Gothic', sans-serif;
   background:
     linear-gradient(
       180deg,
-      #ffd6ea 0%,
-      #c7dcff 100%
+      var(--bg-top) 0%,
+      var(--bg-bottom) 100%
     );
-  color:#334155;
+  color:var(--text);
   overflow-x:hidden;
   position:relative;
   background-attachment:fixed;
 }
 
-/* 背景のふわふわ */
+/* 背景のぼかし（控えめに） */
 body::before{
   content:"";
   position:fixed;
   width:320px;
   height:320px;
-  background:rgba(255,255,255,0.28);
+  background:rgba(200,168,107,0.12);
   border-radius:50%;
   top:-120px;
   right:-100px;
-  filter:blur(45px);
+  filter:blur(60px);
   z-index:-1;
 }
 
@@ -33,23 +54,31 @@ body::after{
   position:fixed;
   width:260px;
   height:260px;
-  background:rgba(255,255,255,0.18);
+  background:rgba(60,90,110,0.08);
   border-radius:50%;
   bottom:-100px;
   left:-80px;
-  filter:blur(45px);
+  filter:blur(60px);
   z-index:-1;
 }
 
-/* ダークモード */
+/* ダークモード（墨色ベース） */
 body.dark{
   background:
     linear-gradient(
       180deg,
-      #1e293b 0%,
-      #0f172a 100%
+      #25221d 0%,
+      #1a1814 100%
     );
-  color:#e2e8f0;
+  color:#ece4d4;
+}
+
+body.dark::before{
+  background:rgba(200,168,107,0.08);
+}
+
+body.dark::after{
+  background:rgba(143,180,201,0.06);
 }
 
 /* タイトルエリア */
@@ -62,7 +91,6 @@ body.dark{
   min-height:40px;
 }
 
-/* タイトル */
 .title-bar h1{
   margin:0 auto;
 }
@@ -70,21 +98,14 @@ body.dark{
 /* ダークモードボタン */
 #darkToggle{
   position:static;
-  border:none;
+  border:1px solid var(--border);
   border-radius:999px;
   padding:8px 14px;
   font-size:11px;
-  font-family:'Mochiy Pop One', sans-serif;
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #edf5ff 100%
-    );
-  color:#334155;
-  box-shadow:
-    0 5px 12px rgba(0,0,0,0.08),
-    inset 0 2px 5px rgba(255,255,255,0.9);
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
   transition:0.2s;
 }
 
@@ -97,59 +118,42 @@ body.dark .card,
 body.dark .item,
 body.dark .modal-box,
 body.dark .sticky{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(30,41,59,0.96) 0%,
-      rgba(15,23,42,0.96) 100%
-    );
-  color:#e2e8f0;
-  border:none;
+  background:#2c2823;
+  color:#ece4d4;
+  border:1px solid #46423b;
 }
 
 /* ダーク時画像背景 */
 body.dark .item img,
 body.dark .modal-box img{
-  background:
-    linear-gradient(
-      180deg,
-      #334155 0%,
-      #1e293b 100%
-    );
+  background:#383329;
 }
 
 /* ダーク時入力 */
-body.dark .search{
-  background:
-    linear-gradient(
-      180deg,
-      #334155 0%,
-      #1e293b 100%
-    );
-  color:white;
+body.dark .search,
+body.dark .mini-search{
+  background:#383329;
+  color:#ece4d4;
+  box-shadow:none;
+  border:1px solid #46423b;
 }
 
 /* ダーク時ボタン */
 body.dark .filter button,
 body.dark .modal-box button,
-body.dark #darkToggle{
-  background:
-    linear-gradient(
-      180deg,
-      #334155 0%,
-      #1e293b 100%
-    );
-  color:white;
+body.dark #darkToggle,
+body.dark #helpBtn,
+body.dark #minimizeBtn{
+  background:#383329;
+  color:#ece4d4;
+  border:1px solid #46423b;
 }
 
-/* ダーク時ONボタン */
+/* ダーク時ONボタン（藍色） */
 body.dark .active{
-  background:
-    linear-gradient(
-      180deg,
-      #38bdf8 0%,
-      #0ea5e9 100%
-    ) !important;
+  background:var(--indigo-soft) !important;
+  color:#fdf9ef !important;
+  border-color:var(--indigo-soft) !important;
 }
 
 /* タイトル右側ボタン群 */
@@ -164,21 +168,14 @@ body.dark .active{
 
 /* ヘルプボタン */
 #helpBtn{
-  border:none;
+  border:1px solid var(--border);
   border-radius:999px;
   padding:8px 14px;
   font-size:11px;
-  font-family:'Mochiy Pop One', sans-serif;
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #edf5ff 100%
-    );
-  color:#334155;
-  box-shadow:
-    0 5px 12px rgba(0,0,0,0.08),
-    inset 0 2px 5px rgba(255,255,255,0.9);
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
   transition:0.2s;
 }
 
@@ -186,66 +183,46 @@ body.dark .active{
   transform:scale(0.96);
 }
 
-body.dark #helpBtn{
-  background:
-    linear-gradient(
-      180deg,
-      #334155 0%,
-      #1e293b 100%
-    );
-  color:white;
-}
-  
 /* ダーク時文字 */
 body.dark .weather,
 body.dark .time,
 body.dark a,
 body.dark p,
 body.dark h3{
-  color:#e2e8f0;
+  color:#ece4d4;
 }
 
 .dark body::before,
 .dark body::after{
-  opacity:0.35;
+  opacity:0.6;
 }
 
 /* タイトル */
 h1{
   text-align:center;
-  font-size:24px;
-  color:#1e293b;
-  text-shadow:
-    0 2px 0 rgba(255,255,255,0.3),
-    0 4px 12px rgba(255,255,255,0.45);
+  font-size:23px;
+  font-family:'Shippori Mincho', serif;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.18em;
+  text-shadow:none;
   margin-bottom:10px;
 }
 
-/* ダークモード時だけ白 */
+/* ダークモード時 */
 body.dark h1{
-  color:white;
-  text-shadow:
-    0 2px 0 rgba(0,0,0,0.3),
-    0 4px 12px rgba(0,0,0,0.45);
+  color:#e8d2a8;
+  text-shadow:none;
 }
 
 /* カード */
 .card{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.96) 0%,
-      rgba(255,255,255,0.88) 100%
-    );
-  backdrop-filter:blur(12px);
-  border-radius:30px;
+  background:var(--card);
+  border-radius:18px;
   padding:14px;
   margin-top:12px;
-  border:2px solid rgba(255,255,255,0.65);
-  box-shadow:
-    0 12px 30px rgba(0,0,0,0.12),
-    inset 0 2px 8px rgba(255,255,255,0.95),
-    inset 0 -3px 8px rgba(0,0,0,0.05);
+  border:1px solid var(--border);
+  box-shadow:0 8px 22px rgba(52,48,43,0.07);
 }
 
 /* sticky */
@@ -255,12 +232,7 @@ body.dark h1{
   z-index:100;
   width:100%;
   box-sizing:border-box;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.95) 0%,
-      rgba(255,255,255,0.88) 100%
-    );
+  background:var(--card);
 }
 
 /* 天気 */
@@ -268,7 +240,7 @@ body.dark h1{
   text-align:center;
   font-size:18px;
   margin-bottom:6px;
-  color:#475569;
+  color:var(--text-sub);
 }
 
 /* 天気全体 */
@@ -283,57 +255,58 @@ body.dark h1{
 /* 今の天気 */
 .weather-now{
   font-size:18px;
-  color:#475569;
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
 }
 
 /* 次の天気 */
 .weather-next{
   font-size:11px;
-  opacity:0.7;
-  color:#64748b;
+  opacity:0.8;
+  color:var(--text-sub);
   margin-bottom:2px;
 }
 
 /* ダークモード */
 body.dark .weather-now{
-  color:#e2e8f0;
+  color:#e8d2a8;
 }
 
 body.dark .weather-next{
-  color:#94a3b8;
+  color:#b3a89a;
 }
 
 /* 時間 */
 .time{
   text-align:center;
   font-size:28px;
+  font-family:'Shippori Mincho', serif;
+  letter-spacing:0.06em;
   margin-bottom:10px;
-  color:#1e293b;
+  color:var(--indigo);
 }
 
 /* 検索 */
 .search{
   width:100%;
   padding:12px 16px;
-  border:none;
+  border:1px solid var(--border);
   outline:none;
   border-radius:999px;
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #edf5ff 100%
-    );
-  box-shadow:
-    inset 0 2px 5px rgba(255,255,255,0.95),
-    inset 0 -2px 6px rgba(0,0,0,0.05),
-    0 5px 12px rgba(0,0,0,0.06);
-  font-family:'Mochiy Pop One', sans-serif;
+  background:var(--card);
+  box-shadow:inset 0 1px 3px rgba(52,48,43,0.05);
+  font-family:'Zen Maru Gothic', sans-serif;
   box-sizing:border-box;
   font-size:13px;
+  color:var(--text);
 }
 
-  /* 画像ラッパー */
+.search:focus,
+.mini-search:focus{
+  border-color:var(--indigo-soft);
+}
+
+/* 画像ラッパー */
 .img-wrap{
   position:relative;
   width:100%;
@@ -345,19 +318,12 @@ body.dark .weather-next{
   top:6px;
   left:6px;
   z-index:5;
-  padding:1px 4px;
+  padding:1px 5px;
   border-radius:999px;
   font-size:6px;
-  color:white;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(0,0,0,0.7) 0%,
-      rgba(0,0,0,0.5) 100%
-    );
+  color:#fdf9ef;
+  background:rgba(52,48,43,0.75);
   backdrop-filter:blur(4px);
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.2);
 }
 
 .shadow-badge{
@@ -368,22 +334,17 @@ body.dark .weather-next{
   padding:2px 5px;
   border-radius:999px;
   font-size:7px;
-  color:white;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(0,0,0,0.65) 0%,
-      rgba(0,0,0,0.45) 100%
-    );
+  color:#fdf9ef;
+  background:rgba(52,48,43,0.7);
 }
 
 .shadow-gold{
   background:
     linear-gradient(
       180deg,
-      #ffe27a 0%,
-      #ffb700 100%
-    );    
+      #f0d199 0%,
+      var(--gold) 100%
+    );
   color:#5c4300;
 }
 
@@ -391,10 +352,10 @@ body.dark .weather-next{
   background:
     linear-gradient(
       180deg,
-      #6fdcff 0%,
-      #2196f3 100%
+      var(--indigo-soft) 0%,
+      var(--indigo) 100%
     );
-  color:white;
+  color:#fdf9ef;
 }
 
 /* チェックボタン */
@@ -405,31 +366,21 @@ body.dark .weather-next{
   width:22px;
   height:22px;
   border-radius:50%;
-  border:none;
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,0.95) 0%,
-      rgba(240,240,240,0.95) 100%
-    );
+  border:1px solid var(--border);
+  background:var(--card);
   font-size:12px;
   display:flex;
   align-items:center;
   justify-content:center;
-  box-shadow:
-    0 2px 6px rgba(0,0,0,0.15);
+  box-shadow:0 2px 6px rgba(52,48,43,0.1);
   z-index:10;
 }
 
-/* ON状態 */
+/* ON状態（朱色） */
 .check-btn.checked{
-  background:
-    linear-gradient(
-      180deg,
-      #73d8ff 0%,
-      #49beff 100%
-    );
-  color:white;
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
 }
 
 /* 名前 */
@@ -439,6 +390,7 @@ body.dark .weather-next{
   align-items:center;
   justify-content:center;
   line-height:1.2;
+  font-size:11px;
 }
 
 /* ×ボタン */
@@ -447,16 +399,15 @@ body.dark .weather-next{
   right:12px;
   top:50%;
   transform:translateY(-50%);
-  border:none;
+  border:1px solid var(--border);
   width:28px;
   height:28px;
   border-radius:50%;
-  background:white;
-  box-shadow:
-    0 4px 8px rgba(0,0,0,0.08),
-    inset 0 2px 3px rgba(255,255,255,0.9);
+  background:var(--card);
+  box-shadow:0 2px 6px rgba(52,48,43,0.08);
   font-size:15px;
   display:none;
+  color:var(--text-sub);
 }
 
 /* フィルター */
@@ -470,22 +421,14 @@ body.dark .weather-next{
 .filter button,
 .modal-box button{
   flex:1;
-  border:none;
+  border:1px solid var(--border);
   border-radius:999px;
   padding:10px;
-  font-family:'Mochiy Pop One', sans-serif;
+  font-family:'Zen Maru Gothic', sans-serif;
   font-size:11px;
-  background:
-    linear-gradient(
-      180deg,
-      #e2f5ff 0%,
-      #bde7ff 100%
-    );
-  color:#245;
-  box-shadow:
-    0 7px 14px rgba(0,0,0,0.08),
-    inset 0 2px 5px rgba(255,255,255,0.85),
-    inset 0 -2px 4px rgba(0,0,0,0.05);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  box-shadow:none;
   transition:0.15s;
 }
 
@@ -493,24 +436,17 @@ body.dark .weather-next{
 .filter button:active,
 .modal-box button:active{
   transform:
-    translateY(2px)
+    translateY(1px)
     scale(0.97);
-  box-shadow:
-    inset 0 2px 5px rgba(0,0,0,0.08);
 }
 
-/* ON状態 */
+/* ON状態（藍色） */
 .active{
-  background:
-    linear-gradient(
-      180deg,
-      #73d8ff 0%,
-      #49beff 100%
-    ) !important;
-  color:white;
-  box-shadow:
-    0 10px 18px rgba(73,190,255,0.45),
-    inset 0 2px 5px rgba(255,255,255,0.65);
+  background:var(--indigo) !important;
+  color:#fdf9ef !important;
+  border-color:var(--indigo) !important;
+  font-weight:700;
+  box-shadow:0 4px 10px rgba(60,90,110,0.25);
 }
 
 /* グリッド */
@@ -524,20 +460,13 @@ body.dark .weather-next{
 
 /* アイテム */
 .item{
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #f5f9ff 100%
-    );
-  border-radius:24px;
+  background:var(--card);
+  border-radius:18px;
   padding:10px;
   text-align:center;
   font-size:11px;
-  box-shadow:
-    0 10px 20px rgba(0,0,0,0.08),
-    inset 0 2px 6px rgba(255,255,255,0.95),
-    inset 0 -2px 6px rgba(0,0,0,0.04);
+  border:1px solid var(--border);
+  box-shadow:0 6px 16px rgba(52,48,43,0.06);
   transition:0.15s;
   position:relative;
   overflow:hidden;
@@ -546,6 +475,7 @@ body.dark .weather-next{
 /* hover */
 .item:hover{
   transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(52,48,43,0.1);
 }
 
 /* 押した時 */
@@ -553,27 +483,20 @@ body.dark .weather-next{
   transform:scale(0.96);
 }
 
+/* 複数選択中 */
 .item.selected{
-  outline:4px solid #49beff;
-  outline-offset:-4px;
+  outline:3px solid var(--vermillion-soft);
+  outline-offset:-3px;
 }
 
 .item img{
   width:100%;
   aspect-ratio:1/1;
   object-fit:contain;
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #eef5ff 100%
-    );
-  border-radius:18px;
+  background:var(--card-sub);
+  border-radius:14px;
   padding:2px;
   box-sizing:border-box;
-  box-shadow:
-    inset 0 2px 5px rgba(255,255,255,0.95),
-    inset 0 -2px 5px rgba(0,0,0,0.05);
   margin-bottom:6px;
   display:block;
 }
@@ -583,39 +506,39 @@ body.dark .weather-next{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.35);
+  background:rgba(40,36,30,0.5);
   backdrop-filter:blur(5px);
   z-index:999;
 }
 
 .modal-box{
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #f4f9ff 100%
-    );
+  background:var(--card);
   margin:60px auto;
   padding:18px;
   width:90%;
   max-width:320px;
-  border-radius:32px;
+  border-radius:22px;
   text-align:center;
-  border:2px solid rgba(255,255,255,0.7);
-  box-shadow:
-    0 25px 45px rgba(0,0,0,0.18),
-    inset 0 2px 8px rgba(255,255,255,0.95);
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
 /* モーダル画像 */
 .modal-box img{
-  background:white;
-  border-radius:20px;
+  background:var(--card-sub);
+  border-radius:14px;
   padding:8px;
   margin-bottom:10px;
-  box-shadow:
-    inset 0 2px 5px rgba(255,255,255,0.9),
-    inset 0 -2px 5px rgba(0,0,0,0.05);
+}
+
+#m_name{
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+}
+
+body.dark #m_name{
+  color:#e8d2a8;
 }
 
 /* モーダル情報横並び */
@@ -624,6 +547,11 @@ body.dark .weather-next{
   justify-content:center;
   align-items:flex-start;
   margin-top:10px;
+  color:var(--text-sub);
+}
+
+body.dark .modal-info-row{
+  color:#b3a89a;
 }
 
 /* 左 */
@@ -634,7 +562,7 @@ body.dark .weather-next{
 
 #m_time{
   white-space:nowrap;
- }
+}
 
 /* 右 */
 .modal-right{
@@ -645,81 +573,70 @@ body.dark .weather-next{
   margin-left:60px;
 }
 
-  /* 最小化 */
+/* 最小化 */
 .minimized .top-content{
   display:none;
 }
 
 .update-popup-box{
-  background:white;
-  color:#334155;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--gold);
 }
 
 body.dark .update-popup-box{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(30,41,59,0.96) 0%,
-      rgba(15,23,42,0.96) 100%
-    );
-  color:#e2e8f0;
+  background:#2c2823;
+  color:#ece4d4;
+  border:1px solid #46423b;
 }
 
 body.dark .update-popup-box p,
 body.dark .update-popup-box h3{
-  color:#e2e8f0;
+  color:#ece4d4;
 }
 
 /* ヘルプモーダル */
 .help-modal-box{
-  background:white;
-  color:#334155;
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--gold);
 }
 
 /* ダークモード */
 body.dark .help-modal-box{
-  background:
-    linear-gradient(
-      180deg,
-      rgba(30,41,59,0.96) 0%,
-      rgba(15,23,42,0.96) 100%
-    );
-  color:#e2e8f0;
+  background:#2c2823;
+  color:#ece4d4;
+  border:1px solid #46423b;
 }
 
 /* ヘルプ内の文字 */
 body.dark .help-modal-box p,
 body.dark .help-modal-box h3,
 body.dark .help-modal-box strong{
-  color:#e2e8f0;
+  color:#ece4d4;
+}
+
+h3{
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
+  letter-spacing:0.06em;
+}
+
+body.dark h3{
+  color:#e8d2a8;
 }
 
 /* ボタン */
 #minimizeBtn{
-  border:none;
+  border:1px solid var(--border);
   border-radius:999px;
   width:32px;
   height:32px;
   font-size:18px;
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #edf5ff 100%
-    );
-  box-shadow:
-    0 4px 10px rgba(0,0,0,0.08);
-  font-family:'Mochiy Pop One', sans-serif;
-}
-  
-body.dark #minimizeBtn{
-  background:
-    linear-gradient(
-      180deg,
-      #334155 0%,
-      #1e293b 100%
-    );
-  color:white;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  font-family:'Zen Maru Gothic', sans-serif;
 }
 
 /* 最小化時の情報 */
@@ -757,13 +674,25 @@ body.dark #minimizeBtn{
   text-align:right;
   white-space:nowrap;
   font-size:11px;
+  color:var(--text-sub);
 }
 
 #miniTime{
   font-size:14px;
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
 }
 
 #miniWeather{
   font-size:10px;
   opacity:0.8;
+}
+
+body.dark #miniTime{
+  color:#e8d2a8;
+}
+
+/* リンク色 */
+a{
+  color:var(--vermillion);
 }
