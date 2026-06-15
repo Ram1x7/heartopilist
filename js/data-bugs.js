@@ -679,7 +679,8 @@ const bugData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
- img:"bugs/1001.PNG"
+ img:"bugs/1001.PNG",
+ auth:false
 },
 {
  name:"積み木アカイトトンボ(黄)",
@@ -688,7 +689,8 @@ const bugData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
- img:"bugs/1002.PNG"
+ img:"bugs/1002.PNG",
+ auth:false
 },
 {
  name:"積み木アカイトトンボ(青)",
@@ -697,7 +699,8 @@ const bugData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
- img:"bugs/1003.PNG"
+ img:"bugs/1003.PNG",
+ auth:false
 },
 {
  name:"積み木アカイトトンボ(紫)",
@@ -706,7 +709,8 @@ const bugData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
- img:"bugs/1004.PNG"
+ img:"bugs/1004.PNG",
+ auth:false
 },
 {
  name:"積み木アカイトトンボ(虹)",
@@ -715,7 +719,8 @@ const bugData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"特殊積み木虫クエスト",
- img:"bugs/1005.PNG"
+ img:"bugs/1005.PNG",
+ auth:false
 }
  // ここに追加していく
 ].map((c,i) => ({
