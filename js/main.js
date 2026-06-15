@@ -344,13 +344,14 @@ return a.bookIndex - b.bookIndex;
     ${checkedData[c.name] ? "⭐️" : ""}
   </button>
 
+  ${c.auth !== false ? `
   <button class="
-  auth-btn
-  ${authData[c.name] ? "checked" : ""}
-">
-  ${authData[c.name] ? "🎖" : ""}
-</button>
-
+    auth-btn
+    ${authData[c.name] ? "checked" : ""}
+  ">
+    ${authData[c.name] ? "🎖" : ""}
+  </button>
+` : ""}
 
   <img src="${c.img}" loading="lazy" decoding="async">
 
@@ -394,14 +395,15 @@ checkBtn.onclick = (e)=>{
 
 const authBtn = div.querySelector(".auth-btn");
 
-authBtn.onclick = (e)=>{
-  e.stopPropagation();
-  if(multiSelectMode) return;
-  authData[c.name] = !authData[c.name];
-  localStorage.setItem("authData", JSON.stringify(authData));
-  render();
-};
-
+if(authBtn){
+  authBtn.onclick = (e)=>{
+    e.stopPropagation();
+    if(multiSelectMode) return;
+    authData[c.name] = !authData[c.name];
+    localStorage.setItem("authData", JSON.stringify(authData));
+    render();
+  };
+}
 
 el.appendChild(div);
  });
@@ -673,10 +675,17 @@ function getStats(){
     totalByType[c.type]++;
     if(checkedData[c.name]) byType[c.type]++;
   });
+
+  const authEligible =
+    creatures.filter(c => c.auth !== false);
+
   const authCount =
-    creatures.filter(c=>authData[c.name]).length;
-  return {total, done, byType, totalByType, authCount};
+    authEligible.filter(c => authData[c.name]).length;
+  const authTotal = authEligible.length;
+
+  return {total, done, byType, totalByType, authCount, authTotal};
 }
+
 
 // 画像生成
 function drawShareCard(){
@@ -721,7 +730,8 @@ function drawShareCard(){
   ctx.textAlign = "center";
   ctx.font = "bold 28px sans-serif";
   ctx.fillStyle = "#c8a86b";
-  ctx.fillText(`認証マスター：${stats.authCount} 種`, w/2, 480);
+  ctx.fillText(`認証マスター：${stats.authCount} / ${stats.authTotal} 種`, w/2, 480);
+
 
   ctx.font = "16px sans-serif";
   ctx.fillStyle = "#7a7164";
