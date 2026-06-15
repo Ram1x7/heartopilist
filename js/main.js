@@ -303,29 +303,33 @@ return a.bookIndex - b.bookIndex;
 }
 
 if(currentSort === "unauth"){
-  list.sort((a,b)=>{
+  list = list
+    .map((c, i) => ({ c, i }))
+    .sort((a, b) => {
 
-    // 認証マスターの仕様が無い生き物は後ろへ
-    const aEligible = a.auth !== false ? 0 : 1;
-    const bEligible = b.auth !== false ? 0 : 1;
-    if(aEligible !== bEligible){
-      return aEligible - bEligible;
-    }
+      // 認証マスターの仕様が無い生き物は後ろへ
+      const aEligible = a.c.auth !== false ? 0 : 1;
+      const bEligible = b.c.auth !== false ? 0 : 1;
+      if(aEligible !== bEligible){
+        return aEligible - bEligible;
+      }
 
-    // 未認証優先
-    const aAuth = authData[a.name] ? 1 : 0;
-    const bAuth = authData[b.name] ? 1 : 0;
-    if(aAuth !== bAuth){
-      return aAuth - bAuth;
-    }
+      // 未認証優先
+      const aAuth = authData[a.c.name] ? 1 : 0;
+      const bAuth = authData[b.c.name] ? 1 : 0;
+      if(aAuth !== bAuth){
+        return aAuth - bAuth;
+      }
 
-    const typeOrder = { fish:0, bug:1, bird:2 };
-    if(typeOrder[a.type] !== typeOrder[b.type]){
-      return typeOrder[a.type] - typeOrder[b.type];
-    }
+      const typeOrder = { fish:0, bug:1, bird:2 };
+      if(typeOrder[a.c.type] !== typeOrder[b.c.type]){
+        return typeOrder[a.c.type] - typeOrder[b.c.type];
+      }
 
-    return a.bookIndex - b.bookIndex;
-  });
+      // 元の表示順を保持
+      return a.i - b.i;
+    })
+    .map(x => x.c);
 }
 
  const el=document.getElementById("list");
