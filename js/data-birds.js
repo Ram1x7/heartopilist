@@ -128,7 +128,8 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"ブランクの頭上",
- img:"birds/013.PNG"
+ img:"birds/013.PNG",
+ auth:false
 },
 {
  name:"ゴジュウカラ",
@@ -764,7 +765,8 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-石海岸の崖",
- img:"birds/1001.PNG"
+ img:"birds/1001.PNG",
+ auth:false
 },
 {
  name:"積み木スズメ(青)",
@@ -774,7 +776,8 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-温泉",
- img:"birds/1002.PNG"
+ img:"birds/1002.PNG",
+ auth:false
 },
 {
  name:"積み木スズメ(緑)",
@@ -784,7 +787,8 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-火山湖",
- img:"birds/1003.PNG"
+ img:"birds/1003.PNG",
+ auth:false
 },
 {
  name:"積み木スズメ(紫)",
@@ -794,7 +798,8 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-遺跡",
- img:"birds/1004.PNG"
+ img:"birds/1004.PNG",
+ auth:false
 },
 {
  name:"積み木スズメ(虹)",
@@ -804,7 +809,8 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"特殊積み木鳥クエスト",
- img:"birds/1005.PNG"
+ img:"birds/1005.PNG",
+ auth:false
 }
  // ここに追加していく
 ].map((c,i) => ({
