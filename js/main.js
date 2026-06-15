@@ -281,6 +281,33 @@ if(currentSort === "unchecked"){
     const aChecked = checkedData[a.name] ? 1 : 0;
     const bChecked = checkedData[b.name] ? 1 : 0;
 
+if(currentSort === "unauth"){
+  list.sort((a,b)=>{
+
+    // 認証マスターの仕様が無い生き物は後ろへ
+    const aEligible = a.auth !== false ? 0 : 1;
+    const bEligible = b.auth !== false ? 0 : 1;
+    if(aEligible !== bEligible){
+      return aEligible - bEligible;
+    }
+
+    // 未認証優先
+    const aAuth = authData[a.name] ? 1 : 0;
+    const bAuth = authData[b.name] ? 1 : 0;
+    if(aAuth !== bAuth){
+      return aAuth - bAuth;
+    }
+
+    const typeOrder = { fish:0, bug:1, bird:2 };
+    if(typeOrder[a.type] !== typeOrder[b.type]){
+      return typeOrder[a.type] - typeOrder[b.type];
+    }
+
+    return a.bookIndex - b.bookIndex;
+  });
+}
+
+
 // まず未コンプ優先
 if(aChecked !== bChecked){
   return aChecked - bChecked;
@@ -500,12 +527,13 @@ function setFilter(t){
 function setSort(type){
   currentSort = type;
   localStorage.setItem("currentSort", type);
-  ["book","level","unchecked"].forEach(x=>{
+  ["book","level","unchecked","unauth"].forEach(x=>{
     document.getElementById("s_"+x).classList.remove("active");
   });
   document.getElementById("s_"+type).classList.add("active");
   render();
 }
+
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");
