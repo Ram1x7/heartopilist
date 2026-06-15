@@ -974,7 +974,8 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
- img:"fish/1001.PNG"
+ img:"fish/1001.PNG",
+ auth:false
 },
 {
  name:"積み木カクレクマノミ(赤)",
@@ -984,7 +985,8 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
- img:"fish/1002.PNG"
+ img:"fish/1002.PNG",
+ auth:false
 },
 {
  name:"積み木カクレクマノミ(青緑)",
@@ -994,7 +996,8 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
- img:"fish/1003.PNG"
+ img:"fish/1003.PNG",
+ auth:false
 },
 {
  name:"積み木カクレクマノミ(紫)",
@@ -1004,7 +1007,8 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
- img:"fish/1004.PNG"
+ img:"fish/1004.PNG",
+ auth:false
 },
 {
  name:"積み木カクレクマノミ(虹)",
@@ -1014,7 +1018,8 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
- img:"fish/1005.PNG"
+ img:"fish/1005.PNG",
+ auth:false
 }
   // ここに追加していく
 ].map((c,i) => ({
