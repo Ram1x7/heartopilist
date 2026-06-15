@@ -755,3 +755,20 @@ body.dark #shareBtn{
   border:1px solid var(--border);
   margin-bottom:10px;
 }
+
+/* 画面幅が狭い場合（iPhoneなど）の調整 */
+@media (max-width:430px){
+  .title-bar h1{
+    font-size:18px;
+    letter-spacing:0.06em;
+  }
+
+  .title-buttons{
+    gap:4px;
+  }
+
+  .title-buttons button{
+    padding:6px 10px;
+    font-size:13px;
+  }
+}
