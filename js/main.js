@@ -281,6 +281,27 @@ if(currentSort === "unchecked"){
     const aChecked = checkedData[a.name] ? 1 : 0;
     const bChecked = checkedData[b.name] ? 1 : 0;
 
+// まず未コンプ優先
+if(aChecked !== bChecked){
+  return aChecked - bChecked;
+}
+
+const typeOrder = {
+  fish:0,
+  bug:1,
+  bird:2
+};
+
+// 次に種類順
+if(typeOrder[a.type] !== typeOrder[b.type]){
+  return typeOrder[a.type] - typeOrder[b.type];
+}
+
+// 最後に図鑑順
+return a.bookIndex - b.bookIndex;
+  });
+}
+
 if(currentSort === "unauth"){
   list.sort((a,b)=>{
 
@@ -304,28 +325,6 @@ if(currentSort === "unauth"){
     }
 
     return a.bookIndex - b.bookIndex;
-  });
-}
-
-
-// まず未コンプ優先
-if(aChecked !== bChecked){
-  return aChecked - bChecked;
-}
-
-const typeOrder = {
-  fish:0,
-  bug:1,
-  bird:2
-};
-
-// 次に種類順
-if(typeOrder[a.type] !== typeOrder[b.type]){
-  return typeOrder[a.type] - typeOrder[b.type];
-}
-
-// 最後に図鑑順
-return a.bookIndex - b.bookIndex;
   });
 }
 
