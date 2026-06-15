@@ -419,6 +419,11 @@ body.dark .weather-next{
   margin-top:8px;
 }
 
+.filter-4 button{
+  padding:8px 4px;
+  font-size:10px;
+}
+
 /* ボタン */
 .filter button,
 .modal-box button{
