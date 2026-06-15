@@ -614,6 +614,8 @@ function toggleMultiSelect(){
     multiSelectMode ? "block" : "none";
   document.getElementById("bulkUncheckBtn").style.display =
     multiSelectMode ? "block" : "none";
+  document.getElementById("authBulkRow").style.display =
+    multiSelectMode ? "flex" : "none";
   if(!multiSelectMode){
     selectedItems = {};
   }
@@ -647,6 +649,35 @@ function bulkUncheck(){
   selectedItems = {};
   render();
 }
+
+function bulkAuthCheck(){
+  Object.keys(selectedItems).forEach(name=>{
+    if(selectedItems[name]){
+      const c = creatures.find(c => c.name === name);
+      if(c && c.auth !== false){
+        authData[name] = true;
+      }
+    }
+  });
+  localStorage.setItem("authData", JSON.stringify(authData));
+  selectedItems = {};
+  render();
+}
+
+function bulkAuthUncheck(){
+  Object.keys(selectedItems).forEach(name=>{
+    if(selectedItems[name]){
+      const c = creatures.find(c => c.name === name);
+      if(c && c.auth !== false){
+        authData[name] = false;
+      }
+    }
+  });
+  localStorage.setItem("authData", JSON.stringify(authData));
+  selectedItems = {};
+  render();
+}
+
 
 const shareBtn = document.getElementById("shareBtn");
 const shareModal = document.getElementById("shareModal");
