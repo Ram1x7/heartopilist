@@ -447,8 +447,6 @@ body.dark .receive-btn.received{
   <p>コードをタップしてコピーできます</p>
 </div>
 
-  <div id="debug" style="font-size:10px; color:red; padding:8px;"></div>
-
 <div class="tabs">
   <button class="tab active" id="tab-active" onclick="setTab('active')">有効なコード</button>
   <button class="tab" id="tab-expired" onclick="setTab('expired')">期限切れ</button>
@@ -465,15 +463,6 @@ body.dark .receive-btn.received{
 
 <script src="js/data-codes.js"></script>
 <script>
-  // scriptの先頭に追加
-try{
-  document.getElementById("debug").textContent =
-    "codesData件数: " + codesData.length;
-}catch(e){
-  document.getElementById("debug").textContent =
-    "エラー: " + e.message;
-}
-
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");
 const savedDark = localStorage.getItem("darkMode");
