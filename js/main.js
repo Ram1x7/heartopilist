@@ -12,7 +12,7 @@ let currentZone="";
 let currentWeather="";
 
 let minLevel = 1;
-let maxLevel = 12;
+let maxLevel = 13;
   // チェック保存
 let checkedData =
   JSON.parse(localStorage.getItem("checkedData") || "{}");
@@ -28,7 +28,7 @@ const weatherData = {
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
-  "2026-06-16": {
+  "2026-06-19": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -945,7 +945,7 @@ clearBtn.style.display =
 levelMin.value =
   localStorage.getItem("minLevel") || 1;
 levelMax.value =
-  localStorage.getItem("maxLevel") || 12;
+  localStorage.getItem("maxLevel") || 13;
 updateLevelRange();
 setFilter(
   localStorage.getItem("currentFilter") || "all"
