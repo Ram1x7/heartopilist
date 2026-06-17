@@ -7,7 +7,7 @@ const codesData = [
     code: "heartopia0108",
     reward: "月の水晶×100",
     expiry: null,
-    active: true,
+    active: false,
   },
   {
     code: "dcthx4u",
@@ -19,7 +19,7 @@ const codesData = [
     code: "letsparty",
     reward: "願い星×15，コイン×5000，修理箱×3",
     expiry: null,
-    active: true,
+    active: false,
   },
   {
     code: "true5mthks",
