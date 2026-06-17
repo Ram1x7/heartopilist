@@ -25,19 +25,19 @@ const codesData = [
     code: "true5mthks",
     reward: "シェフ特製サラダ×2，良質木材×10，低木の枝×20",
     expiry: null,
-    active: true,
+    active: false,
   },
   {
     code: "letsdressup",
     reward: "願い星×15，コイン×5000，栄養剤×10",
     expiry: null,
-    active: true,
+    active: false,
   },
   {
     code: "HAPPY2026",
     reward: "月の水晶×10，コイン×8888",
     expiry: null,
-    active: true,
+    active: false,
   },
   {
     code: "lifewithline",
