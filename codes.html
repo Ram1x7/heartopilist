@@ -325,15 +325,113 @@ body.dark .code-reward{
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
+
+  /* ナビゲーションバー */
+.site-nav{
+  display:flex;
+  gap:6px;
+  margin-bottom:10px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.site-nav::-webkit-scrollbar{
+  display:none;
+}
+
+.site-nav-item{
+  flex-shrink:0;
+  padding:7px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  text-decoration:none;
+  transition:0.15s;
+}
+
+.site-nav-item.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .site-nav-item{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .site-nav-item.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+  /* 受け取り済みカード */
+.code-card.received{
+  border-color:var(--green);
+  background:var(--green-soft);
+}
+
+body.dark .code-card.received{
+  border-color:#4a7c59;
+  background:var(--green-soft);
+}
+
+/* 受取ボタン */
+.receive-btn{
+  padding:6px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  white-space:nowrap;
+}
+
+.receive-btn.received{
+  background:var(--green-soft);
+  border-color:var(--green);
+  color:var(--green);
+  font-weight:700;
+}
+
+body.dark .receive-btn.received{
+  background:var(--green-soft);
+  border-color:#4a7c59;
+  color:#7ec89a;
+}
+
+.receive-btn:active{
+  transform:scale(0.97);
+}
+
+
 </style>
 </head>
 
 <body>
 
-<div class="nav">
-  <a href="./index.html" class="nav-back">← はとぴ図鑑へ</a>
-  <button id="darkToggle">🌙</button>
+<div class="title-bar">
+  <h1>はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="darkToggle">🌙</button>
+  </div>
 </div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item">図鑑</a>
+  <a href="./codes.html" class="site-nav-item active">コード</a>
+</nav>
+
 
 <div class="page-header">
   <h1>🎁 ギフトコード</h1>
@@ -390,41 +488,76 @@ function setTab(tab){
 // 期限チェック
 function isExpired(expiry){
   if(!expiry) return false;
+  // "YYYY-MM-DD HH:MM" → そのままDateに渡せるよう":"はそのままでOK
   return new Date(expiry) < new Date();
 }
 
+
 // コード描画
+// チェック状態の読み込み
+let receivedCodes =
+  JSON.parse(localStorage.getItem("receivedCodes") || "{}");
+
 function renderCodes(){
   const el = document.getElementById("codeList");
   el.innerHTML = "";
 
   const list = codesData.filter(c =>
-    currentTab === "active" ? !isExpired(c.expiry) && c.active : isExpired(c.expiry) || !c.active
+    currentTab === "active"
+      ? !isExpired(c.expiry) && c.active
+      : isExpired(c.expiry) || !c.active
   );
 
   if(list.length === 0){
-    el.innerHTML = `<div class="empty">${currentTab === "active" ? "現在有効なコードはありません" : "期限切れのコードはありません"}</div>`;
+    el.innerHTML = `<div class="empty">${
+      currentTab === "active"
+        ? "現在有効なコードはありません"
+        : "期限切れのコードはありません"
+    }</div>`;
     return;
   }
 
   list.forEach(c=>{
     const expired = isExpired(c.expiry) || !c.active;
+    const received = !!receivedCodes[c.code];
     const div = document.createElement("div");
-    div.className = "code-card" + (expired ? " expired" : "");
+    div.className = "code-card" + (expired ? " expired" : "") + (received ? " received" : "");
     div.innerHTML = `
       <div class="code-card-top">
         <span class="code-value">${c.code}</span>
-        <span class="code-badge ${expired ? "badge-expired" : "badge-active"}">${expired ? "期限切れ" : "有効"}</span>
+        <span class="code-badge ${expired ? "badge-expired" : "badge-active"}">
+          ${expired ? "期限切れ" : "有効"}
+        </span>
       </div>
       <div class="code-reward">🎁 ${c.reward}</div>
       <div class="code-meta">
-        <span class="code-expiry">${c.expiry ? "期限："+c.expiry : "期限：なし"}</span>
-        <button class="copy-btn" onclick="copyCode('${c.code}', this)">${expired ? "期限切れ" : "コピー"}</button>
+        <span class="code-expiry">
+           ${c.expiry ? "期限：" + formatExpiry(c.expiry) : "期限：なし"}
+        </span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button
+            class="receive-btn ${received ? "received" : ""}"
+            onclick="toggleReceived('${c.code}')"
+            title="受け取り済みにする"
+          >${received ? "✅ 受取済" : "○ 未受取"}</button>
+          <button
+            class="copy-btn ${expired ? "" : ""}"
+            onclick="copyCode('${c.code}', this)"
+            ${expired ? "disabled" : ""}
+          >${expired ? "期限切れ" : "コピー"}</button>
+        </div>
       </div>
     `;
     el.appendChild(div);
   });
 }
+
+function toggleReceived(code){
+  receivedCodes[code] = !receivedCodes[code];
+  localStorage.setItem("receivedCodes", JSON.stringify(receivedCodes));
+  renderCodes();
+}
+
 
 // コピー
 function copyCode(code, btn){
@@ -447,6 +580,18 @@ function copyCode(code, btn){
     showToast("コピーしました！");
   });
 }
+
+function formatExpiry(expiry){
+  if(!expiry) return "なし";
+  const d = new Date(expiry);
+  const yyyy = d.getFullYear();
+  const mm = d.getMonth() + 1;
+  const dd = d.getDate();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${yyyy}/${mm}/${dd} ${hh}:${min}まで`;
+}
+
 
 // トースト
 function showToast(msg){
