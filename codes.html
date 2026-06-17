@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./list.PNG?v=20">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>ギフトコード一覧｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の有効なギフトコード一覧。報酬内容・期限を確認できます。">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+:root{
+  --bg-top:#f7f2e7;
+  --bg-bottom:#ece2cf;
+  --text:#34302b;
+  --text-sub:#7a7164;
+  --indigo:#3c5a6e;
+  --indigo-soft:#5a7d92;
+  --vermillion:#b1503b;
+  --gold:#c8a86b;
+  --card:#fffdf7;
+  --card-sub:#f3ecdc;
+  --border:#e4d9c2;
+  --green:#4a7c59;
+  --green-soft:#dff0e5;
+}
+
+body.dark{
+  --bg-top:#25221d;
+  --bg-bottom:#1a1814;
+  --text:#ece4d4;
+  --text-sub:#b3a89a;
+  --card:#2c2823;
+  --card-sub:#383329;
+  --border:#46423b;
+  --green-soft:#1e3328;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  min-height:100vh;
+  padding:12px;
+}
+
+/* ナビ */
+.nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+}
+
+.nav-back{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  color:var(--indigo);
+  text-decoration:none;
+  padding:6px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card);
+}
+
+body.dark .nav-back{
+  background:var(--card);
+  color:#e8d2a8;
+}
+
+#darkToggle{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:13px;
+  background:var(--card);
+  color:var(--indigo);
+  cursor:pointer;
+}
+
+body.dark #darkToggle{
+  background:var(--card);
+  color:#e8d2a8;
+  border-color:var(--border);
+}
+
+/* ヘッダー */
+.page-header{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.page-header h1{
+  font-family:'Shippori Mincho', serif;
+  font-size:22px;
+  color:var(--indigo);
+  letter-spacing:0.14em;
+  margin-bottom:4px;
+}
+
+body.dark .page-header h1{
+  color:#e8d2a8;
+}
+
+.page-header p{
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+/* タブ */
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:14px;
+}
+
+.tab{
+  flex:1;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.tab.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .tab{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* コードカード */
+.code-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.code-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px 16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.code-card.expired{
+  opacity:0.5;
+}
+
+.code-card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.code-value{
+  font-family:'Shippori Mincho', serif;
+  font-size:17px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+}
+
+body.dark .code-value{
+  color:#e8d2a8;
+}
+
+.code-badge{
+  font-size:10px;
+  padding:3px 10px;
+  border-radius:999px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.badge-active{
+  background:var(--green-soft);
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+body.dark .badge-active{
+  background:var(--green-soft);
+  color:#7ec89a;
+  border-color:#4a7c59;
+}
+
+.badge-expired{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+.code-reward{
+  font-size:12px;
+  color:var(--text);
+  margin-bottom:6px;
+  line-height:1.6;
+}
+
+body.dark .code-reward{
+  color:var(--text);
+}
+
+.code-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.code-expiry{
+  font-size:10px;
+  color:var(--text-sub);
+}
+
+/* コピーボタン */
+.copy-btn{
+  padding:6px 14px;
+  border:1px solid var(--indigo);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  cursor:pointer;
+  transition:0.15s;
+  white-space:nowrap;
+}
+
+.copy-btn:active{
+  opacity:0.75;
+  transform:scale(0.97);
+}
+
+.copy-btn.copied{
+  background:var(--green);
+  border-color:var(--green);
+}
+
+.code-card.expired .copy-btn{
+  background:var(--card-sub);
+  border-color:var(--border);
+  color:var(--text-sub);
+  pointer-events:none;
+}
+
+/* 空表示 */
+.empty{
+  text-align:center;
+  padding:40px 0;
+  color:var(--text-sub);
+  font-size:13px;
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+/* トースト */
+#toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 22px;
+  border-radius:999px;
+  font-size:13px;
+  opacity:0;
+  transition:opacity 0.25s, transform 0.25s;
+  pointer-events:none;
+  z-index:1000;
+  white-space:nowrap;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+</style>
+</head>
+
+<body>
+
+<div class="nav">
+  <a href="./index.html" class="nav-back">← はとぴ図鑑へ</a>
+  <button id="darkToggle">🌙</button>
+</div>
+
+<div class="page-header">
+  <h1>🎁 ギフトコード</h1>
+  <p>コードをタップしてコピーできます</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tab-active" onclick="setTab('active')">有効なコード</button>
+  <button class="tab" id="tab-expired" onclick="setTab('expired')">期限切れ</button>
+</div>
+
+<div class="code-list" id="codeList"></div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです<br>
+  コードに関する不具合はゲーム公式へお問い合わせください
+</div>
+
+<div id="toast">コピーしました！</div>
+
+<script src="js/data-codes.js"></script>
+<script>
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+function updateDarkBtn(){
+  darkToggle.textContent =
+    document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+};
+
+// タブ
+let currentTab = "active";
+function setTab(tab){
+  currentTab = tab;
+  ["active","expired"].forEach(t=>{
+    document.getElementById("tab-"+t).classList.toggle("active", t === tab);
+  });
+  renderCodes();
+}
+
+// 期限チェック
+function isExpired(expiry){
+  if(!expiry) return false;
+  return new Date(expiry) < new Date();
+}
+
+// コード描画
+function renderCodes(){
+  const el = document.getElementById("codeList");
+  el.innerHTML = "";
+
+  const list = codesData.filter(c =>
+    currentTab === "active" ? !isExpired(c.expiry) && c.active : isExpired(c.expiry) || !c.active
+  );
+
+  if(list.length === 0){
+    el.innerHTML = `<div class="empty">${currentTab === "active" ? "現在有効なコードはありません" : "期限切れのコードはありません"}</div>`;
+    return;
+  }
+
+  list.forEach(c=>{
+    const expired = isExpired(c.expiry) || !c.active;
+    const div = document.createElement("div");
+    div.className = "code-card" + (expired ? " expired" : "");
+    div.innerHTML = `
+      <div class="code-card-top">
+        <span class="code-value">${c.code}</span>
+        <span class="code-badge ${expired ? "badge-expired" : "badge-active"}">${expired ? "期限切れ" : "有効"}</span>
+      </div>
+      <div class="code-reward">🎁 ${c.reward}</div>
+      <div class="code-meta">
+        <span class="code-expiry">${c.expiry ? "期限："+c.expiry : "期限：なし"}</span>
+        <button class="copy-btn" onclick="copyCode('${c.code}', this)">${expired ? "期限切れ" : "コピー"}</button>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+// コピー
+function copyCode(code, btn){
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent = "コピー済み";
+    btn.classList.add("copied");
+    setTimeout(()=>{
+      btn.textContent = "コピー";
+      btn.classList.remove("copied");
+    }, 2000);
+    showToast("コピーしました！");
+  }).catch(()=>{
+    // フォールバック
+    const ta = document.createElement("textarea");
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showToast("コピーしました！");
+  });
+}
+
+// トースト
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=> t.classList.remove("show"), 2000);
+}
+
+renderCodes();
+</script>
+</body>
+</html>
