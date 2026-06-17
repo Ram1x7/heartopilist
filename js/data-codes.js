@@ -12,7 +12,7 @@ const codesData = [
   {
     code: "dcthx4u",
     reward: "願い×10",
-    expiry: 2026-06-30 12:00,
+    expiry: "2026-06-30 12:00",
     active: true,
   },
   {
@@ -48,31 +48,31 @@ const codesData = [
   {
     code: "Junegift",
     reward: "月の水晶×50,可愛いパンダのシャボン玉液×5,黒顔パンダのシャボン玉液×5",
-    expiry: 2026-07-01 00:59,
+    expiry: "2026-07-01 00:59",
     active: true,
   },
   {
     code: "shakeurbody",
     reward: "限定エモート",
-    expiry: 2026-07-01 00:59,
+    expiry: "2026-07-01 00:59",
     active: true,
   },
   {
     code: "n3k7q5a8m2",
     reward: "願い星×3,ツルツルオーク×1,コーヒー豆×3",
-    expiry: 2026-08-01 00:59,
+    expiry: "2026-08-01 00:59",
     active: true,
   },
   {
     code: "p9m4r1a6k7",
     reward: "願い星×3,ツルツルオーク×1,コーヒー豆×3",
-    expiry: 2026-08-01 00:59,
+    expiry: "2026-08-01 00:59",
     active: true,
   },
   {
     code: "a5r8k2m7q4",
     reward: "願い星×3,ツルツルオーク×1,コーヒー豆×3",
-    expiry: 2026-08-01 00:59,
+    expiry: "2026-08-01 00:59",
     active: true,
   }
   // 以下、コードを追加していく
