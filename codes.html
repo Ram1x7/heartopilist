@@ -62,26 +62,34 @@ body{
   padding:12px;
 }
 
-/* ナビ */
-.nav{
+/* タイトルバー */
+.title-bar{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:16px;
+  margin-bottom:10px;
+  min-height:40px;
 }
 
-.nav-back{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:13px;
+.title-bar h1{
+  font-family:'Shippori Mincho', serif;
+  font-size:23px;
+  font-weight:700;
   color:var(--indigo);
-  text-decoration:none;
-  padding:6px 12px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:var(--card);
+  letter-spacing:0.18em;
+  margin:0;
+  padding-left:4px;
 }
+
+body.dark .title-bar h1{
+  color:#e8d2a8;
+}
+
+.title-buttons{
+  display:flex;
+  gap:8px;
+}
+
 
 body.dark .nav-back{
   background:var(--card);
