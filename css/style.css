@@ -33,6 +33,12 @@ body{
   overflow-x:hidden;
   position:relative;
   background-attachment:fixed;
+  animation:fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
 }
 
 /* 背景のぼかし（控えめに） */
