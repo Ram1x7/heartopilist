@@ -1,4 +1,4 @@
-const APP_VERSION = "2.0.0";
+const APP_VERSION = "2.0.1";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -868,7 +868,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.0.0";
+const popupVersion = "2.0.1";
 
 if(
  localStorage.getItem("popupVersion")
