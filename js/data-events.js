@@ -54,7 +54,7 @@ const eventData = [
   {
     id: 5,
     category: "event",
-    name: "ハートピアxバターベアコラボ",
+    name: "『ハートピアスローライフ』 × バターベア",
     img: null,
     start: "2026-06-06 06:00",
     end: "2026-06-29 05:59",
@@ -171,6 +171,17 @@ const eventData = [
     exchangeEnd: "2026-06-22 05:59",
     detail: "イベント期間中、開拓者レベルが5に到達すると、期間限定イベント【童心パーティー】に参加でき、\n限定報酬を獲得できます～【フェスへ】をタップすると、直接パーティーフェスに参加できます！",
     link: "https://x.com/heartopia_jp/status/2059220501789061290?s=46&t=LyAkfSIfBfCYf-zqXNRQxQ",
+  },
+  {
+    id: 16,
+    category: "event",
+    name: "『ハートピアスローライフ』 × Animal Haven",
+    img: null,
+    start: "2026-06-15 06:00",
+    end: "2026-06-29 05:59",
+    exchangeEnd: null,
+    detail: "6月15日、特別ドキュメンタリーを公開。あわせて限定イベントも開催。",
+    link: "https://x.com/heartopia_jp/status/2063807776720347192?s=61",
   },
   // 以下、イベントを追加していく
   // {
