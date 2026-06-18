@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./list.PNG?v=20">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>イベント情報｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の開催中・近日開催のイベント・ガチャ情報一覧。">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+:root{
+  --bg-top:#f7f2e7;
+  --bg-bottom:#ece2cf;
+  --text:#34302b;
+  --text-sub:#7a7164;
+  --indigo:#3c5a6e;
+  --indigo-soft:#5a7d92;
+  --vermillion:#b1503b;
+  --vermillion-soft:#c97058;
+  --gold:#c8a86b;
+  --card:#fffdf7;
+  --card-sub:#f3ecdc;
+  --border:#e4d9c2;
+  --green:#4a7c59;
+  --green-soft:#dff0e5;
+  --urgent:#b1503b;
+  --urgent-soft:#fdf0ec;
+}
+
+body.dark{
+  --bg-top:#25221d;
+  --bg-bottom:#1a1814;
+  --text:#ece4d4;
+  --text-sub:#b3a89a;
+  --card:#2c2823;
+  --card-sub:#383329;
+  --border:#46423b;
+  --green-soft:#1e3328;
+  --urgent-soft:#3a1f1a;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  min-height:100vh;
+  padding:12px;
+  animation:fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+
+/* タイトルバー */
+.title-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+  min-height:40px;
+}
+
+.title-bar h1{
+  font-family:'Shippori Mincho', serif;
+  font-size:23px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.18em;
+  margin:0;
+  padding-left:4px;
+}
+
+body.dark .title-bar h1{
+  color:#e8d2a8;
+}
+
+.title-buttons{
+  display:flex;
+  gap:8px;
+}
+
+#darkToggle{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  background:var(--card);
+  color:var(--indigo);
+  cursor:pointer;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark #darkToggle{
+  background:var(--card);
+  color:#e8d2a8;
+  border-color:var(--border);
+}
+
+/* ナビゲーションバー */
+.site-nav{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.site-nav::-webkit-scrollbar{ display:none; }
+
+.site-nav-item{
+  flex-shrink:0;
+  padding:7px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  text-decoration:none;
+  transition:0.15s;
+}
+
+.site-nav-item.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .site-nav-item{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .site-nav-item.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* ページヘッダー */
+.page-header{
+  text-align:center;
+  margin-bottom:16px;
+}
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{
+  color:#e8d2a8;
+}
+
+/* タブ共通 */
+.tab{
+  flex:1;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  text-align:center;
+}
+
+.tab.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .tab{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* カテゴリタブ（ガチャ/イベント） */
+.cat-tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+/* ステータスタブ（開催中/近日/終了） */
+.status-tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:16px;
+}
+
+.status-tabs .tab{
+  font-size:11px;
+  padding:8px 6px;
+}
+
+/* イベントリスト */
+.event-list{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* イベントカード */
+.event-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 4px 14px rgba(52,48,43,0.07);
+}
+
+body.dark .event-card{
+  background:var(--card);
+  border-color:var(--border);
+}
+
+/* バナー画像 */
+.event-banner{
+  width:100%;
+  aspect-ratio:16/7;
+  object-fit:cover;
+  display:block;
+  background:var(--card-sub);
+}
+
+.event-banner-placeholder{
+  width:100%;
+  aspect-ratio:16/7;
+  background:var(--card-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  color:var(--border);
+}
+
+/* カード本文 */
+.event-body{
+  padding:14px 16px;
+}
+
+/* バッジ群 */
+.badge-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:8px;
+}
+
+/* 残り日数バッジ */
+.days-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:999px;
+}
+
+.days-badge.urgent{
+  background:var(--urgent-soft);
+  color:var(--urgent);
+  border:1px solid var(--urgent);
+}
+
+.days-badge.normal{
+  background:var(--green-soft);
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+.days-badge.upcoming{
+  background:var(--card-sub);
+  color:var(--indigo);
+  border:1px solid var(--indigo-soft);
+}
+
+.days-badge.ended{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+body.dark .days-badge.urgent{
+  background:var(--urgent-soft);
+  color:#e8907a;
+  border-color:var(--vermillion-soft);
+}
+
+body.dark .days-badge.normal{
+  background:var(--green-soft);
+  color:#7ec89a;
+  border-color:#4a7c59;
+}
+
+body.dark .days-badge.upcoming{
+  background:var(--card-sub);
+  color:#8fb4c9;
+  border-color:var(--indigo-soft);
+}
+
+/* 交換期限バッジ */
+.exchange-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:999px;
+}
+
+.exchange-badge.active{
+  background:rgba(200,168,107,0.15);
+  color:var(--gold);
+  border:1px solid var(--gold);
+}
+
+.exchange-badge.urgent{
+  background:var(--urgent-soft);
+  color:var(--urgent);
+  border:1px solid var(--urgent);
+}
+
+.exchange-badge.ended{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+body.dark .exchange-badge.active{
+  background:rgba(200,168,107,0.08);
+  color:#d8bd8c;
+  border-color:#d8bd8c;
+}
+
+body.dark .exchange-badge.urgent{
+  background:var(--urgent-soft);
+  color:#e8907a;
+  border-color:var(--vermillion-soft);
+}
+
+/* イベント名 */
+.event-name{
+  font-family:'Shippori Mincho', serif;
+  font-size:16px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.06em;
+  margin-bottom:6px;
+  line-height:1.4;
+}
+
+body.dark .event-name{
+  color:#e8d2a8;
+}
+
+/* 期間 */
+.event-period{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-bottom:8px;
+}
+
+/* 詳細テキスト */
+.event-detail{
+  font-size:12px;
+  color:var(--text);
+  line-height:1.7;
+  white-space:pre-wrap;
+  margin-top:8px;
+}
+
+body.dark .event-detail{
+  color:var(--text);
+}
+
+/* 公式リンク */
+.event-link{
+  display:inline-block;
+  margin-top:10px;
+  font-size:11px;
+  color:var(--vermillion);
+  text-decoration:none;
+}
+
+/* 空表示 */
+.empty{
+  text-align:center;
+  padding:48px 0;
+  color:var(--text-sub);
+  font-size:13px;
+  line-height:2;
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:28px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1>はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="darkToggle">🌙</button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item">図鑑</a>
+  <a href="./codes.html" class="site-nav-item">コード</a>
+  <a href="./events.html" class="site-nav-item active">イベント</a>
+</nav>
+
+<div class="page-header">
+  <h2>📅 イベント情報</h2>
+</div>
+
+<!-- カテゴリタブ -->
+<div class="cat-tabs">
+  <button class="tab active" id="cat-all" onclick="setCat('all')">すべて</button>
+  <button class="tab" id="cat-gacha" onclick="setCat('gacha')">ガチャ</button>
+  <button class="tab" id="cat-event" onclick="setCat('event')">イベント</button>
+</div>
+
+<!-- ステータスタブ -->
+<div class="status-tabs">
+  <button class="tab active" id="status-active" onclick="setStatus('active')">開催中</button>
+  <button class="tab" id="status-upcoming" onclick="setStatus('upcoming')">近日開催</button>
+  <button class="tab" id="status-ended" onclick="setStatus('ended')">終了</button>
+</div>
+
+<div class="event-list" id="eventList"></div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです<br>
+  情報は変更される場合があります
+</div>
+
+<script src="js/data-events.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+function updateDarkBtn(){
+  darkToggle.textContent =
+    document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+};
+
+// 日付パース（Safari対策）
+function parseDate(str){
+  if(!str) return null;
+  return new Date(str.replace(" ", "T"));
+}
+
+// ステータス判定（イベント自体の期間で判定）
+function getStatus(ev){
+  const now = new Date();
+  const start = parseDate(ev.start);
+  const end = parseDate(ev.end);
+  if(end && end < now) return "ended";
+  if(start && start > now) return "upcoming";
+  return "active";
+}
+
+// 残り日数（イベント終了まで）
+function getDaysLeft(ev){
+  const now = new Date();
+  const end = parseDate(ev.end);
+  if(!end) return null;
+  const diff = end - now;
+  if(diff <= 0) return 0;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+// 開始までの日数
+function getDaysUntil(ev){
+  const now = new Date();
+  const start = parseDate(ev.start);
+  if(!start) return null;
+  const diff = start - now;
+  if(diff <= 0) return 0;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+// 交換期限の残り日数
+function getExchangeDaysLeft(ev){
+  if(!ev.exchangeEnd) return null;
+  const now = new Date();
+  const end = parseDate(ev.exchangeEnd);
+  const diff = end - now;
+  if(diff <= 0) return 0;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+// 日付フォーマット
+function formatDate(str){
+  if(!str) return "未定";
+  const d = parseDate(str);
+  const mm = d.getMonth() + 1;
+  const dd = d.getDate();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${mm}/${dd} ${hh}:${min}`;
+}
+
+// タブ状態
+let currentCat = "all";
+let currentStatus = "active";
+
+function setCat(cat){
+  currentCat = cat;
+  ["all","gacha","event"].forEach(c=>{
+    document.getElementById("cat-"+c).classList.toggle("active", c === cat);
+  });
+  renderEvents();
+}
+
+function setStatus(status){
+  currentStatus = status;
+  ["active","upcoming","ended"].forEach(s=>{
+    document.getElementById("status-"+s).classList.toggle("active", s === status);
+  });
+  renderEvents();
+}
+
+// 描画
+function renderEvents(){
+  const el = document.getElementById("eventList");
+  el.innerHTML = "";
+  const now = new Date();
+
+  let list = eventData.filter(ev => {
+    const catMatch = currentCat === "all" || ev.category === currentCat;
+    const statusMatch = getStatus(ev) === currentStatus;
+    return catMatch && statusMatch;
+  });
+
+  // 並び順
+  if(currentStatus === "ended"){
+    // 終了タブ：交換期限が残っているものを上に、次に交換期限が近い順
+    list.sort((a, b) => {
+      const aEx = a.exchangeEnd ? parseDate(a.exchangeEnd) : null;
+      const bEx = b.exchangeEnd ? parseDate(b.exchangeEnd) : null;
+      const aExActive = aEx && aEx > now ? 1 : 0;
+      const bExActive = bEx && bEx > now ? 1 : 0;
+      if(aExActive !== bExActive) return bExActive - aExActive;
+      if(aEx && bEx) return aEx - bEx;
+      return parseDate(b.start) - parseDate(a.start);
+    });
+  } else {
+    // 開催中・近日：新着順（開始日降順）
+    list.sort((a, b) => parseDate(b.start) - parseDate(a.start));
+  }
+
+  if(list.length === 0){
+    const labels = { active:"開催中", upcoming:"近日開催", ended:"終了した" };
+    el.innerHTML = `<div class="empty">現在${labels[currentStatus]}の<br>イベント・ガチャはありません</div>`;
+    return;
+  }
+
+  list.forEach(ev => {
+    const status = getStatus(ev);
+    const daysLeft = getDaysLeft(ev);
+    const daysUntil = getDaysUntil(ev);
+    const exDaysLeft = getExchangeDaysLeft(ev);
+
+    // イベント残り日数バッジ
+    let daysBadgeHTML = "";
+    if(status === "active"){
+      if(daysLeft === null){
+        daysBadgeHTML = `<span class="days-badge normal">🟢 開催中（期限なし）</span>`;
+      } else if(daysLeft <= 3){
+        daysBadgeHTML = `<span class="days-badge urgent">🔴 あと${daysLeft}日で終了</span>`;
+      } else {
+        daysBadgeHTML = `<span class="days-badge normal">🟢 あと${daysLeft}日</span>`;
+      }
+    } else if(status === "upcoming"){
+      daysBadgeHTML = daysUntil !== null
+        ? `<span class="days-badge upcoming">🔵 あと${daysUntil}日で開始</span>`
+        : `<span class="days-badge upcoming">🔵 近日開催</span>`;
+    } else {
+      daysBadgeHTML = `<span class="days-badge ended">⚫ 終了</span>`;
+    }
+
+    // 交換期限バッジ
+    let exchangeBadgeHTML = "";
+    if(ev.exchangeEnd){
+      if(exDaysLeft === null || exDaysLeft <= 0){
+        exchangeBadgeHTML = `<span class="exchange-badge ended">🔄 交換期限終了</span>`;
+      } else if(exDaysLeft <= 3){
+        exchangeBadgeHTML = `<span class="exchange-badge urgent">🔄 交換期限 あと${exDaysLeft}日</span>`;
+      } else {
+        exchangeBadgeHTML = `<span class="exchange-badge active">🔄 交換期限 あと${exDaysLeft}日</span>`;
+      }
+    }
+
+    // バナー
+    const bannerHTML = ev.img
+      ? `<img class="event-banner" src="${ev.img}" alt="${ev.name}" loading="lazy">`
+      : `<div class="event-banner-placeholder">${ev.category === "gacha" ? "🎰" : "🎪"}</div>`;
+
+    // 期間
+    const periodHTML = ev.start
+      ? `${formatDate(ev.start)} 〜 ${ev.end ? formatDate(ev.end) : "未定"}`
+      : "期間未定";
+
+    // 公式リンク
+    const linkHTML = ev.link
+      ? `<a class="event-link" href="${ev.link}" target="_blank">🔗 公式サイトで確認</a>`
+      : "";
+
+    const div = document.createElement("div");
+    div.className = "event-card";
+    div.innerHTML = `
+      ${bannerHTML}
+      <div class="event-body">
+        <div class="badge-row">
+          ${daysBadgeHTML}
+          ${exchangeBadgeHTML}
+        </div>
+        <div class="event-name">${ev.name}</div>
+        <div class="event-period">📅 ${periodHTML}</div>
+        ${ev.detail ? `<div class="event-detail">${ev.detail}</div>` : ""}
+        ${linkHTML}
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+renderEvents();
+</script>
+</body>
+</html>
