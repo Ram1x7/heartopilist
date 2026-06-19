@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./list.PNG?v=20">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>Q&A・不具合対応状況｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+:root{
+  --bg-top:#f7f2e7;
+  --bg-bottom:#ece2cf;
+  --text:#34302b;
+  --text-sub:#7a7164;
+  --indigo:#3c5a6e;
+  --indigo-soft:#5a7d92;
+  --vermillion:#b1503b;
+  --vermillion-soft:#c97058;
+  --gold:#c8a86b;
+  --card:#fffdf7;
+  --card-sub:#f3ecdc;
+  --border:#e4d9c2;
+  --green:#4a7c59;
+  --green-soft:#dff0e5;
+}
+
+body.dark{
+  --bg-top:#25221d;
+  --bg-bottom:#1a1814;
+  --text:#ece4d4;
+  --text-sub:#b3a89a;
+  --card:#2c2823;
+  --card-sub:#383329;
+  --border:#46423b;
+  --green-soft:#1e3328;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  min-height:100vh;
+  padding:12px;
+  animation:fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+
+/* タイトルバー */
+.title-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+  min-height:40px;
+}
+
+.title-bar h1{
+  font-family:'Shippori Mincho', serif;
+  font-size:23px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.18em;
+  margin:0;
+  padding-left:4px;
+}
+
+body.dark .title-bar h1{
+  color:#e8d2a8;
+}
+
+#darkToggle{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  background:var(--card);
+  color:var(--indigo);
+  cursor:pointer;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark #darkToggle{
+  background:var(--card);
+  color:#e8d2a8;
+  border-color:var(--border);
+}
+
+/* ナビゲーションバー */
+.site-nav{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.site-nav::-webkit-scrollbar{ display:none; }
+
+.site-nav-item{
+  flex-shrink:0;
+  padding:7px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  text-decoration:none;
+  transition:0.15s;
+}
+
+.site-nav-item.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .site-nav-item{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .site-nav-item.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* ページヘッダー */
+.page-header{
+  text-align:center;
+  margin-bottom:6px;
+}
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{
+  color:#e8d2a8;
+}
+
+.page-header p{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
+
+/* 検索 */
+.faq-search{
+  width:100%;
+  padding:11px 16px;
+  border:1px solid var(--border);
+  outline:none;
+  border-radius:999px;
+  background:var(--card);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+  color:var(--text);
+  margin:14px 0;
+  box-sizing:border-box;
+}
+
+.faq-search:focus{
+  border-color:var(--indigo-soft);
+}
+
+/* カテゴリタブ */
+.cat-tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:16px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.cat-tabs::-webkit-scrollbar{ display:none; }
+
+.tab{
+  flex-shrink:0;
+  padding:8px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.tab.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .tab{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* リスト */
+.faq-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* カード */
+.faq-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.faq-question{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:14px 16px;
+  cursor:pointer;
+}
+
+.faq-icon{
+  flex-shrink:0;
+  font-size:16px;
+  margin-top:1px;
+}
+
+.faq-title{
+  flex:1;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  line-height:1.6;
+}
+
+body.dark .faq-title{
+  color:var(--text);
+}
+
+.faq-arrow{
+  flex-shrink:0;
+  font-size:11px;
+  color:var(--text-sub);
+  transition:transform 0.2s;
+  margin-top:2px;
+}
+
+.faq-card.open .faq-arrow{
+  transform:rotate(180deg);
+}
+
+.faq-answer{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.25s ease;
+}
+
+.faq-card.open .faq-answer{
+  max-height:600px;
+}
+
+.faq-answer-inner{
+  padding:0 16px 16px 42px;
+  font-size:12.5px;
+  color:var(--text-sub);
+  line-height:1.8;
+  white-space:pre-wrap;
+}
+
+/* ステータスバッジ */
+.status-row{
+  padding:0 16px 12px 42px;
+}
+
+.status-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-size:10.5px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:999px;
+}
+
+.status-fixed{
+  background:var(--green-soft);
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+.status-progress{
+  background:rgba(200,168,107,0.15);
+  color:var(--gold);
+  border:1px solid var(--gold);
+}
+
+.status-considering{
+  background:var(--card-sub);
+  color:var(--indigo);
+  border:1px solid var(--indigo-soft);
+}
+
+.status-wontfix{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+body.dark .status-fixed{
+  background:var(--green-soft);
+  color:#7ec89a;
+  border-color:#4a7c59;
+}
+
+body.dark .status-progress{
+  background:rgba(200,168,107,0.08);
+  color:#d8bd8c;
+  border-color:#d8bd8c;
+}
+
+body.dark .status-considering{
+  background:var(--card-sub);
+  color:#8fb4c9;
+  border-color:var(--indigo-soft);
+}
+
+/* カテゴリラベル(カード内) */
+.cat-label{
+  display:inline-block;
+  font-size:10px;
+  color:var(--text-sub);
+  background:var(--card-sub);
+  border-radius:999px;
+  padding:2px 9px;
+  margin-bottom:6px;
+}
+
+/* 空表示 */
+.empty{
+  text-align:center;
+  padding:48px 0;
+  color:var(--text-sub);
+  font-size:13px;
+  line-height:2;
+}
+
+/* お問い合わせ誘導 */
+.contact-box{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  text-align:center;
+  margin-top:20px;
+}
+
+.contact-box p{
+  font-size:12px;
+  color:var(--text-sub);
+  margin-bottom:10px;
+  line-height:1.7;
+}
+
+.contact-btn{
+  display:inline-block;
+  padding:10px 24px;
+  border:1px solid var(--indigo);
+  border-radius:999px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1>はとぴ図鑑</h1>
+  <button id="darkToggle">🌙</button>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item">図鑑</a>
+  <a href="./codes.html" class="site-nav-item">コード</a>
+  <a href="./events.html" class="site-nav-item">イベント</a>
+  <a href="./faq.html" class="site-nav-item active">Q&A</a>
+</nav>
+
+<div class="page-header">
+  <h2>💬 Q&A・対応状況</h2>
+  <p>よくある質問・要望・不具合の対応状況一覧</p>
+</div>
+
+<input
+  type="text"
+  id="faqSearch"
+  class="faq-search"
+  placeholder="🔍 キーワードで検索"
+>
+
+<div class="cat-tabs">
+  <button class="tab active" id="cat-all" onclick="setCat('all')">すべて</button>
+  <button class="tab" id="cat-question" onclick="setCat('question')">質問</button>
+  <button class="tab" id="cat-request" onclick="setCat('request')">要望</button>
+  <button class="tab" id="cat-bug" onclick="setCat('bug')">不具合</button>
+</div>
+
+<div class="faq-list" id="faqList"></div>
+
+<div class="contact-box">
+  <p>
+    ここに無い質問・新しい要望・不具合報告は<br>
+    匿名フォームからお気軽にどうぞ
+  </p>
+  <a class="contact-btn" href="https://forms.gle/Ns7ZrJyv4b45v5QNA" target="_blank">
+    💌 匿名で送る
+  </a>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<script src="js/data-faq.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+function updateDarkBtn(){
+  darkToggle.textContent =
+    document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+};
+
+// 状態
+let currentCat = "all";
+let openId = null;
+
+function setCat(cat){
+  currentCat = cat;
+  ["all","question","request","bug"].forEach(c=>{
+    document.getElementById("cat-"+c).classList.toggle("active", c === cat);
+  });
+  renderFaq();
+}
+
+// アイコン
+const catIcon = { question:"❓", request:"💡", bug:"🛠" };
+
+// ステータス表示
+function statusBadgeHTML(status){
+  const map = {
+    fixed:       { label:"✅ 修正済み", cls:"status-fixed" },
+    progress:    { label:"🔧 対応中",   cls:"status-progress" },
+    considering: { label:"🔄 検討中",   cls:"status-considering" },
+    wontfix:     { label:"— 対応見送り", cls:"status-wontfix" },
+  };
+  if(!status || !map[status]) return "";
+  const s = map[status];
+  return `<div class="status-row"><span class="status-badge ${s.cls}">${s.label}</span></div>`;
+}
+
+// 描画
+function renderFaq(){
+  const el = document.getElementById("faqList");
+  const keyword = document.getElementById("faqSearch").value.trim();
+  el.innerHTML = "";
+
+  let list = faqData.filter(f => {
+    const catMatch = currentCat === "all" || f.category === currentCat;
+    const kwMatch = !keyword ||
+      f.question.includes(keyword) ||
+      f.answer.includes(keyword);
+    return catMatch && kwMatch;
+  });
+
+  // 新しい順
+  list = list.slice().reverse();
+
+  if(list.length === 0){
+    el.innerHTML = `<div class="empty">該当するQ&Aが見つかりませんでした</div>`;
+    return;
+  }
+
+  list.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "faq-card" + (openId === f.id ? " open" : "");
+    div.innerHTML = `
+      <div class="faq-question" onclick="toggleFaq(${f.id})">
+        <span class="faq-icon">${catIcon[f.category] || "❓"}</span>
+        <span class="faq-title">${f.question}</span>
+        <span class="faq-arrow">▼</span>
+      </div>
+      ${statusBadgeHTML(f.status)}
+      <div class="faq-answer">
+        <div class="faq-answer-inner">${f.answer}</div>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function toggleFaq(id){
+  openId = openId === id ? null : id;
+  renderFaq();
+}
+
+document.getElementById("faqSearch").addEventListener("input", renderFaq);
+
+renderFaq();
+</script>
+</body>
+</html>
