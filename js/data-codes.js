@@ -74,7 +74,13 @@ const codesData = [
     reward: "願い星×3，ツルツルオーク×1，コーヒー豆×3",
     expiry: "2026-08-01 00:59",
     active: true,
-  }
+  },
+  {
+    code: "happyjune2026",
+    reward: "願い星×15，稲の種×3，肉×10，あずき×10",
+    expiry: "2026-07-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
