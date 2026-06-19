@@ -1,4 +1,4 @@
-const APP_VERSION = "2.0.1";
+const APP_VERSION = "2.0.2";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -22,7 +22,7 @@ let authData =
 
 // 天気(毎日入力する) 
 const weatherData = {
- "2026-06-18": {
+ "2026-06-21": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -38,7 +38,7 @@ const weatherData = {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
-   "0-6":"晴れ"
+   "0-6":"雨"
  }
 };
 
@@ -868,7 +868,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.0.1";
+const popupVersion = "2.0.2";
 
 if(
  localStorage.getItem("popupVersion")
