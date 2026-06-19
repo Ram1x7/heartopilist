@@ -10,7 +10,7 @@ const faqData = [
     category: "request",
     question: "ひらがなでも名前検索できるようにして欲しいです！",
     answer: "ご要望ありがとうございます！ですが、現時点では『ひらがな検索』を追加する予定はないです🙇‍♂️",
-    status: "considering",
+    status: "wontfix",
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ const faqData = [
     category: "request",
     question: "天気ごとに検索できたらとても助かります！",
     answer: "ご要望ありがとうございます！出現するものか出現しないものかが天気で分かれており、実質天気ごとに検索しているのと大差がないと考えているので現時点では『天気ごとに検索』は追加する予定はないです🥲",
-    status: "considering",
+    status: "wontfix",
   },
   {
     id: 4,
