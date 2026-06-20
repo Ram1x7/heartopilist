@@ -183,6 +183,17 @@ const eventData = [
     detail: "6月15日、特別ドキュメンタリーを公開。あわせて限定イベントも開催。",
     link: "https://x.com/heartopia_jp/status/2063807776720347192?s=61",
   },
+  {
+    id: 17,
+    category: "event",
+    name: "サッカークラブイベント",
+    img: "./images/events/e017.jpg",
+    start: "2026-06-27 06:00",
+    end: "2026-07-13 05:59",
+    exchangeEnd: null,
+    detail: "6月27日からサッカークラブイベント開催！サッカー大会グッズが期間限定で登場！",
+    link: null,
+  },
   // 以下、イベントを追加していく
   // {
   //   id: 3,
