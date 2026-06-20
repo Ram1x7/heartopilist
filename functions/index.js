@@ -1,4 +1,4 @@
-// functions/index.js
+// functions/index.js 
 // Firebase Cloud Functionsにデプロイするファイルです
 
 const { onRequest } = require("firebase-functions/v2/https");
