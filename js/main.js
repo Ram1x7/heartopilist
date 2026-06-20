@@ -1,4 +1,4 @@
-const APP_VERSION = "2.0.3";
+const APP_VERSION = "2.0.4";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -34,7 +34,7 @@ const weatherData = {
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
-   "2026-06-20": {
+   "2026-06-23": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"雨",
@@ -868,7 +868,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.0.3";
+const popupVersion = "2.0.4";
 
 if(
  localStorage.getItem("popupVersion")
@@ -965,4 +965,4 @@ document.getElementById("disclaimer").textContent =
   "※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。";
 
 document.getElementById("lastUpdate").textContent =
-  "最終更新 2026/06/17";
+  "最終更新 2026/06/21";
