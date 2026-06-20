@@ -81,6 +81,12 @@ const codesData = [
     expiry: "2026-07-01 00:59",
     active: true,
   },
+  {
+    code: "dadstrong4ever",
+    reward: "願い星×5，肥料×10，りんご×10",
+    expiry: "2026-07-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
