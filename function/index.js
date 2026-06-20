@@ -148,3 +148,4 @@ exports.checkAndSendNotifications = onSchedule(
     await batch.commit();
   }
 );
+ 
