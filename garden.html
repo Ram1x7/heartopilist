@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./list.PNG?v=20">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>園芸図鑑｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の園芸作物・花の図鑑。成長時間・種の値段・交配一覧・通知機能対応。">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+:root{
+  --bg-top:#f7f2e7;
+  --bg-bottom:#ece2cf;
+  --text:#34302b;
+  --text-sub:#7a7164;
+  --indigo:#3c5a6e;
+  --indigo-soft:#5a7d92;
+  --vermillion:#b1503b;
+  --vermillion-soft:#c97058;
+  --gold:#c8a86b;
+  --card:#fffdf7;
+  --card-sub:#f3ecdc;
+  --border:#e4d9c2;
+  --green:#4a7c59;
+  --green-soft:#dff0e5;
+}
+
+body.dark{
+  --bg-top:#25221d;
+  --bg-bottom:#1a1814;
+  --text:#ece4d4;
+  --text-sub:#b3a89a;
+  --card:#2c2823;
+  --card-sub:#383329;
+  --border:#46423b;
+  --green-soft:#1e3328;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  min-height:100vh;
+  padding:12px;
+  animation:fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+
+/* タイトルバー */
+.title-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+  min-height:40px;
+}
+
+.title-bar h1{
+  font-family:'Shippori Mincho', serif;
+  font-size:23px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.18em;
+  margin:0;
+  padding-left:4px;
+}
+
+body.dark .title-bar h1{ color:#e8d2a8; }
+
+#darkToggle{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:13px;
+  background:var(--card);
+  color:var(--indigo);
+  cursor:pointer;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark #darkToggle{
+  background:var(--card);
+  color:#e8d2a8;
+  border-color:var(--border);
+}
+
+/* ナビ */
+.site-nav{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.site-nav::-webkit-scrollbar{ display:none; }
+
+.site-nav-item{
+  flex-shrink:0;
+  padding:7px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  text-decoration:none;
+  transition:0.15s;
+}
+
+.site-nav-item.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .site-nav-item{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .site-nav-item.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* ページヘッダー */
+.page-header{
+  text-align:center;
+  margin-bottom:14px;
+}
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{ color:#e8d2a8; }
+
+/* タブ */
+.tab-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.tab{
+  flex:1;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  text-align:center;
+}
+
+.tab.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .tab{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* イベント終了バナー */
+.event-ended-banner{
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  margin-bottom:10px;
+}
+
+/* セクションラベル */
+.section-label{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+  margin:16px 0 8px;
+  padding-left:4px;
+  border-left:3px solid var(--gold);
+  padding-left:10px;
+}
+
+body.dark .section-label{ color:#e8d2a8; }
+
+/* グリッド */
+.garden-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:8px;
+}
+
+/* アイテムカード */
+.garden-item{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:8px;
+  text-align:center;
+  font-size:11px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+  cursor:pointer;
+  transition:0.15s;
+  position:relative;
+}
+
+.garden-item:hover{ transform:translateY(-2px); }
+.garden-item:active{ transform:scale(0.96); }
+
+.garden-item img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:12px;
+  margin-bottom:4px;
+  display:block;
+}
+
+.garden-item-name{
+  font-size:10px;
+  line-height:1.3;
+  color:var(--text);
+  margin-bottom:2px;
+}
+
+.garden-item-sub{
+  font-size:9px;
+  color:var(--text-sub);
+}
+
+/* レベルバッジ */
+.lv-badge{
+  position:absolute;
+  top:5px;
+  left:5px;
+  font-size:7px;
+  padding:1px 4px;
+  border-radius:999px;
+  background:rgba(52,48,43,0.7);
+  color:#fdf9ef;
+}
+
+/* 通知セット済みバッジ */
+.notif-badge{
+  position:absolute;
+  top:5px;
+  right:5px;
+  font-size:10px;
+}
+
+/* ── モーダル ── */
+#detailModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(40,36,30,0.5);
+  backdrop-filter:blur(5px);
+  z-index:999;
+  overflow-y:auto;
+}
+
+.modal-box{
+  background:var(--card);
+  margin:40px auto 40px;
+  padding:20px;
+  width:92%;
+  max-width:360px;
+  border-radius:22px;
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
+}
+
+body.dark .modal-box{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.modal-name{
+  font-family:'Shippori Mincho', serif;
+  font-size:18px;
+  font-weight:700;
+  color:var(--indigo);
+  text-align:center;
+  letter-spacing:0.08em;
+  margin-bottom:12px;
+}
+
+body.dark .modal-name{ color:#e8d2a8; }
+
+/* 画像2枚並び */
+.modal-imgs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:14px;
+}
+
+.modal-img-wrap{
+  text-align:center;
+  flex:1;
+}
+
+.modal-img-wrap img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:14px;
+  padding:4px;
+  display:block;
+}
+
+.modal-img-label{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
+
+/* 基本情報 */
+.modal-info{
+  background:var(--card-sub);
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:12px;
+  font-size:12px;
+  line-height:2;
+}
+
+body.dark .modal-info{
+  background:#383329;
+}
+
+.modal-info-row{
+  display:flex;
+  justify-content:space-between;
+}
+
+.modal-info-label{
+  color:var(--text-sub);
+}
+
+.modal-info-value{
+  font-weight:700;
+  color:var(--text);
+}
+
+/* 売価テーブル */
+.price-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+  margin-bottom:12px;
+}
+
+.price-table th{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  padding:5px 6px;
+  text-align:center;
+  font-weight:500;
+}
+
+body.dark .price-table th{
+  background:#383329;
+}
+
+.price-table td{
+  text-align:center;
+  padding:5px 6px;
+  border-top:1px solid var(--border);
+  color:var(--text);
+}
+
+.price-null{
+  color:var(--border);
+  font-size:10px;
+}
+
+/* 交配セクション */
+.breeding-section{
+  margin-bottom:12px;
+}
+
+.breeding-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  margin-bottom:8px;
+  padding-left:8px;
+  border-left:3px solid var(--gold);
+}
+
+body.dark .breeding-title{ color:#e8d2a8; }
+
+.breeding-note{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-bottom:8px;
+}
+
+.breeding-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+.breeding-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  border:1px solid var(--border);
+}
+
+.rarity-1{ background:#fff8ec; color:#8c6d2f; border-color:#e0c87a; }
+.rarity-2{ background:#fce8f0; color:#b14070; border-color:#e090b0; }
+.rarity-3{ background:#ede8f8; color:#5040a0; border-color:#b0a0e0; }
+.rarity-4{ background:#e8f0e8; color:#2a5a30; border-color:#80b888; }
+.rarity-5{ background:#f0ece0; color:#8c6d00; border-color:var(--gold); }
+
+body.dark .rarity-1{ background:#3a3020; color:#d4b870; border-color:#7a6030; }
+body.dark .rarity-2{ background:#3a2030; color:#e090b0; border-color:#8a4060; }
+body.dark .rarity-3{ background:#28203a; color:#b0a0e0; border-color:#504080; }
+body.dark .rarity-4{ background:#1e3020; color:#80b888; border-color:#3a6040; }
+body.dark .rarity-5{ background:#3a3010; color:#d4b000; border-color:#6a5800; }
+
+/* 交配の組み合わせ例 */
+.breeding-combo{
+  background:var(--card-sub);
+  border-radius:10px;
+  padding:10px 12px;
+  margin-bottom:6px;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+body.dark .breeding-combo{ background:#383329; }
+
+.breeding-combo-arrow{
+  color:var(--text-sub);
+  font-size:13px;
+}
+
+/* 通知セクション */
+.notif-section{
+  margin-bottom:12px;
+}
+
+.notif-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  margin-bottom:8px;
+  padding-left:8px;
+  border-left:3px solid var(--gold);
+}
+
+body.dark .notif-title{ color:#e8d2a8; }
+
+.notif-btns{
+  display:flex;
+  gap:8px;
+}
+
+.notif-btn{
+  flex:1;
+  padding:10px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  text-align:center;
+}
+
+.notif-btn.set{
+  background:var(--green);
+  border-color:var(--green);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .notif-btn{
+  background:#383329;
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+body.dark .notif-btn.set{
+  background:var(--green);
+  border-color:var(--green);
+  color:#fdf9ef;
+}
+
+.notif-desc{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-top:6px;
+  line-height:1.6;
+}
+
+/* 通知中バナー */
+.notif-active-banner{
+  background:var(--green-soft);
+  border:1px solid var(--green);
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:11px;
+  color:var(--green);
+  margin-top:8px;
+  line-height:1.6;
+}
+
+body.dark .notif-active-banner{
+  background:#1e3328;
+  color:#7ec89a;
+  border-color:#4a7c59;
+}
+
+/* モーダル閉じるボタン */
+.modal-close-btn{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  margin-top:4px;
+}
+
+/* 通知許可バナー */
+#notifBanner{
+  display:none;
+  background:rgba(200,168,107,0.15);
+  border:1px solid var(--gold);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  margin-bottom:12px;
+  line-height:1.7;
+}
+
+/* トースト */
+#toast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 22px;
+  border-radius:999px;
+  font-size:13px;
+  opacity:0;
+  transition:opacity 0.25s, transform 0.25s;
+  pointer-events:none;
+  z-index:2000;
+  white-space:nowrap;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1>はとぴ図鑑</h1>
+  <button id="darkToggle">🌙</button>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item">図鑑</a>
+  <a href="./garden.html" class="site-nav-item active">園芸</a>
+  <a href="./codes.html" class="site-nav-item">コード</a>
+  <a href="./events.html" class="site-nav-item">イベント</a>
+  <a href="./faq.html" class="site-nav-item">Q&A</a>
+</nav>
+
+<div class="page-header">
+  <h2>🌱 園芸図鑑</h2>
+</div>
+
+<div id="notifBanner">
+  🔔 通知機能を使うには通知の許可が必要です<br>
+  <button onclick="requestNotif()" style="margin-top:6px; padding:5px 16px; border:1px solid var(--gold); border-radius:999px; background:transparent; color:var(--gold); font-size:11px; cursor:pointer;">通知を許可する</button>
+</div>
+
+<!-- タブ -->
+<div class="tab-row">
+  <button class="tab active" id="tab-crop" onclick="setTab('crop')">🌾 作物</button>
+  <button class="tab" id="tab-flower" onclick="setTab('flower')">🌸 花</button>
+</div>
+
+<div id="gardenContent"></div>
+
+<div class="footer">※本サイトは非公式のファンツールです</div>
+
+<!-- 詳細モーダル -->
+<div id="detailModal" onclick="if(event.target.id==='detailModal')closeModal()">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="js/data-crops.js"></script>
+<script src="js/data-flowers.js"></script>
+<script>
+
+// ── ダークモード ──
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true") document.body.classList.add("dark");
+else if(savedDark === null && window.matchMedia("(prefers-color-scheme: dark)").matches)
+  document.body.classList.add("dark");
+
+function updateDarkBtn(){
+  darkToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+};
+
+// ── 通知 ──
+let notifTimers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
+
+function checkNotifPermission(){
+  if(!("Notification" in window)) return;
+  if(Notification.permission === "default"){
+    document.getElementById("notifBanner").style.display = "block";
+  }
+}
+
+function requestNotif(){
+  Notification.requestPermission().then(p=>{
+    if(p === "granted"){
+      document.getElementById("notifBanner").style.display = "none";
+      showToast("通知が有効になりました！");
+    }
+  });
+}
+
+function sendNotif(title, body){
+  if(Notification.permission === "granted"){
+    new Notification(title, { body, icon:"./apple-touch-icon.png" });
+  }
+}
+
+// 通知をセット
+function setNotification(item, mode){
+  const key = item.name + "_" + mode;
+  const now = Date.now();
+
+  // 既存タイマーをクリア
+  if(notifTimers[key]){
+    clearTimeout(notifTimers[key + "_timer"]);
+  }
+
+  const growMs = item.growTime * 60 * 1000;
+
+  if(mode === "normal"){
+    // 収穫通知
+    const t = setTimeout(()=>{
+      sendNotif("🌾 収穫タイム！", `${item.name}が育ちました！`);
+      delete notifTimers[key];
+      localStorage.setItem("gardenNotifTimers", JSON.stringify(notifTimers));
+      renderModal(currentItem);
+    }, growMs);
+    notifTimers[key] = { end: now + growMs, mode };
+    localStorage.setItem("gardenNotifTimers", JSON.stringify(notifTimers));
+    showToast(`収穫通知をセットしました（${formatTime(item.growTime)}後）`);
+
+  } else if(mode === "weed"){
+    // 草抜き通知（成長時間を4等分した間隔で3回）
+    const interval = Math.floor(growMs / 4);
+    [1,2,3].forEach(i=>{
+      setTimeout(()=>{
+        sendNotif("🌿 草抜きタイム！", `${item.name}の草抜きタイミングです！（${i}/3回目）`);
+      }, interval * i);
+    });
+    // 収穫通知
+    setTimeout(()=>{
+      sendNotif("🌾 収穫タイム！", `${item.name}が育ちました！`);
+      delete notifTimers[key];
+      localStorage.setItem("gardenNotifTimers", JSON.stringify(notifTimers));
+      renderModal(currentItem);
+    }, growMs);
+    notifTimers[key] = { end: now + growMs, mode };
+    localStorage.setItem("gardenNotifTimers", JSON.stringify(notifTimers));
+    showToast(`草抜き通知をセットしました（${formatTime(item.growTime)}後まで）`);
+  }
+}
+
+// 通知キャンセル
+function cancelNotification(item, mode){
+  const key = item.name + "_" + mode;
+  delete notifTimers[key];
+  localStorage.setItem("gardenNotifTimers", JSON.stringify(notifTimers));
+  showToast("通知をキャンセルしました");
+  renderModal(currentItem);
+}
+
+// 通知が有効かチェック
+function isNotifSet(item, mode){
+  const key = item.name + "_" + mode;
+  const t = notifTimers[key];
+  if(!t) return false;
+  return t.end > Date.now();
+}
+
+// 残り時間
+function getRemaining(item, mode){
+  const key = item.name + "_" + mode;
+  const t = notifTimers[key];
+  if(!t) return null;
+  const ms = t.end - Date.now();
+  if(ms <= 0) return null;
+  return formatTime(Math.ceil(ms / 60000));
+}
+
+// 時間フォーマット（分→表示）
+function formatTime(min){
+  if(min < 60) return `${min}分`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if(m === 0) return `${h}時間`;
+  return `${h}時間${m}分`;
+}
+
+// ── タブ ──
+let currentTab = "crop";
+let currentItem = null;
+
+function setTab(tab){
+  currentTab = tab;
+  ["crop","flower"].forEach(t=>{
+    document.getElementById("tab-"+t).classList.toggle("active", t === tab);
+  });
+  renderContent();
+}
+
+// ── 描画 ──
+function renderContent(){
+  const el = document.getElementById("gardenContent");
+  el.innerHTML = "";
+
+  if(currentTab === "crop"){
+    const normal = cropData.filter(c => !c.isEvent);
+    const event  = cropData.filter(c => c.isEvent);
+    el.appendChild(renderSection("通常作物", normal));
+    if(event.length > 0){
+      const eventSection = renderSection("イベント作物", event, true);
+      el.appendChild(eventSection);
+    }
+  } else {
+    const normal = flowerData.filter(f => !f.isEvent);
+    const event  = flowerData.filter(f => f.isEvent);
+    el.appendChild(renderSection("通常の花", normal));
+    if(event.length > 0){
+      const eventSection = renderSection("イベントの花", event, true);
+      el.appendChild(eventSection);
+    }
+  }
+}
+
+function renderSection(label, items, isEvent=false){
+  const wrap = document.createElement("div");
+
+  const lbl = document.createElement("div");
+  lbl.className = "section-label";
+  lbl.textContent = label;
+  wrap.appendChild(lbl);
+
+  if(isEvent){
+    const banner = document.createElement("div");
+    banner.className = "event-ended-banner";
+    banner.textContent = "⚠️ 現在このイベントは終了しています";
+    wrap.appendChild(banner);
+  }
+
+  const grid = document.createElement("div");
+  grid.className = "garden-grid";
+
+  items.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "garden-item";
+
+    const hasNotif = isNotifSet(item,"normal") || isNotifSet(item,"weed");
+
+    div.innerHTML = `
+      <div class="lv-badge">Lv.${item.level}</div>
+      ${hasNotif ? '<div class="notif-badge">🔔</div>' : ''}
+      <img src="${item.img}" alt="${item.name}" loading="lazy">
+      <div class="garden-item-name">${item.name}</div>
+      <div class="garden-item-sub">${formatTime(item.growTime)}</div>
+    `;
+
+    div.onclick = () => openModal(item);
+    grid.appendChild(div);
+  });
+
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// ── モーダル ──
+function openModal(item){
+  currentItem = item;
+  renderModal(item);
+  document.getElementById("detailModal").style.display = "block";
+}
+
+function closeModal(){
+  document.getElementById("detailModal").style.display = "none";
+  currentItem = null;
+  renderContent();
+}
+
+function renderModal(item){
+  const isFlower = currentTab === "flower";
+  const box = document.getElementById("modalBox");
+
+  // 売価テーブル
+  const stars = ["☆1","☆2","☆3","☆4","☆5"];
+  const priceRows = stars.map((s,i) => {
+    const p = item.prices[i];
+    return `<tr>
+      <td>${s}</td>
+      <td>${p !== null ? p.toLocaleString() : '<span class="price-null">未確認</span>'}</td>
+    </tr>`;
+  }).join("");
+
+  // 交配セクション（花のみ）
+  let breedingHTML = "";
+  if(isFlower && item.colors && item.colors.length > 0){
+    const chips = item.colors.map(c => {
+      const r = colorRarity[c] || 1;
+      return `<span class="breeding-chip rarity-${r}">${c}</span>`;
+    }).join("");
+
+    // 組み合わせ例（同レア度→次のレア度）
+    const examples = [
+      { from:["赤","黄","白"], to:"オレンジまたはピンク", rFrom:1, rTo:2 },
+      { from:["オレンジ","ピンク"], to:"黒または桃", rFrom:2, rTo:3 },
+      { from:["黒","桃"], to:"紫・青・緑", rFrom:3, rTo:4 },
+      { from:["紫","青","緑"], to:"輝くまたは夜光", rFrom:4, rTo:5 },
+    ].filter(ex =>
+      ex.from.some(f => item.colors.includes(f)) &&
+      item.colors.some(c => colorRarity[c] === ex.rTo)
+    ).map(ex => `
+      <div class="breeding-combo">
+        <span class="breeding-chip rarity-${ex.rFrom}">${ex.from.filter(f => item.colors.includes(f)).join(" / ")}</span>
+        <span class="breeding-combo-arrow">×2 →</span>
+        <span class="breeding-chip rarity-${ex.rTo}">${ex.to}</span>
+      </div>
+    `).join("");
+
+    breedingHTML = `
+      <div class="breeding-section">
+        <div class="breeding-title">🌸 交配で作れる色</div>
+        <div class="breeding-note">毎朝6時に交配が行われます。同じ色を2株並べると上のレア度の種ができます。</div>
+        <div class="breeding-grid">${chips}</div>
+        ${examples ? `<div style="margin-top:10px; font-size:11px; color:var(--text-sub); margin-bottom:6px;">組み合わせ例</div>${examples}` : ""}
+      </div>
+    `;
+  }
+
+  // 通知セクション（作物のみ）
+  let notifHTML = "";
+  if(!isFlower){
+    const normalSet = isNotifSet(item,"normal");
+    const weedSet   = isNotifSet(item,"weed");
+    const normalRem = getRemaining(item,"normal");
+    const weedRem   = getRemaining(item,"weed");
+
+    notifHTML = `
+      <div class="notif-section">
+        <div class="notif-title">🔔 収穫通知</div>
+        <div class="notif-btns">
+          <button class="notif-btn ${normalSet ? "set" : ""}"
+            onclick="${normalSet
+              ? `cancelNotification(currentItem,'normal')`
+              : `setNotification(currentItem,'normal')`}">
+            ${normalSet ? "✅ 通常：通知中" : "🔔 通常モード"}
+          </button>
+          <button class="notif-btn ${weedSet ? "set" : ""}"
+            onclick="${weedSet
+              ? `cancelNotification(currentItem,'weed')`
+              : `setNotification(currentItem,'weed')`}">
+            ${weedSet ? "✅ 草抜き：通知中" : "🌿 草抜きモード"}
+          </button>
+        </div>
+        <div class="notif-desc">
+          通常：収穫タイムに通知<br>
+          草抜き：成長中に3回草抜きタイムを通知＋収穫時に通知
+        </div>
+        ${normalSet ? `<div class="notif-active-banner">🔔 通常通知中 あと${normalRem}で収穫</div>` : ""}
+        ${weedSet   ? `<div class="notif-active-banner">🌿 草抜き通知中 あと${weedRem}で収穫</div>` : ""}
+      </div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="modal-name">${item.name}</div>
+    <div class="modal-imgs">
+      <div class="modal-img-wrap">
+        <img src="${item.seedImg}" alt="${item.name}の種">
+        <div class="modal-img-label">種</div>
+      </div>
+      <div class="modal-img-wrap">
+        <img src="${item.img}" alt="${item.name}">
+        <div class="modal-img-label">${isFlower ? "花" : "作物"}</div>
+      </div>
+    </div>
+    <div class="modal-info">
+      <div class="modal-info-row">
+        <span class="modal-info-label">レベル</span>
+        <span class="modal-info-value">Lv.${item.level}</span>
+      </div>
+      <div class="modal-info-row">
+        <span class="modal-info-label">成長時間</span>
+        <span class="modal-info-value">${formatTime(item.growTime)}</span>
+      </div>
+      <div class="modal-info-row">
+        <span class="modal-info-label">種の値段</span>
+        <span class="modal-info-value">${item.seedPrice.toLocaleString()} コイン</span>
+      </div>
+      ${!isFlower ? `
+      <div class="modal-info-row">
+        <span class="modal-info-label">草抜き</span>
+        <span class="modal-info-value">最大${item.weedCount}回</span>
+      </div>` : ""}
+      ${item.isEvent ? `
+      <div class="modal-info-row">
+        <span class="modal-info-label">イベント</span>
+        <span class="modal-info-value">${item.eventName}（終了）</span>
+      </div>` : ""}
+    </div>
+    <table class="price-table">
+      <tr>
+        <th>レア度</th>
+        <th>売価</th>
+      </tr>
+      ${priceRows}
+    </table>
+    ${breedingHTML}
+    ${notifHTML}
+    <button class="modal-close-btn" onclick="closeModal()">閉じる</button>
+  `;
+}
+
+// ── トースト ──
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=> t.classList.remove("show"), 2500);
+}
+
+// ── 起動時に期限切れ通知タイマーを掃除 ──
+function cleanExpiredTimers(){
+  const now = Date.now();
+  Object.keys(notifTimers).forEach(k=>{
+    if(notifTimers[k].end <= now){
+      delete notifTimers[k];
+    }
+  });
+  localStorage.setItem("gardenNotifTimers", JSON.stringify(notifTimers));
+}
+
+// 初期化
+checkNotifPermission();
+cleanExpiredTimers();
+renderContent();
+</script>
+</body>
+</html>
