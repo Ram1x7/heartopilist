@@ -12,7 +12,7 @@ const cropData = [
   {
     name: "トマト",
     img: "./images/crops/tomato.PNG",
-    seedImg: "./images/crops/seed_tomato.PNG",
+    seedImg: "./images/crops/seed_tomato.jpg",
     level: 1,
     growTime: 15,
     seedPrice: 10,
@@ -26,7 +26,7 @@ const cropData = [
   {
     name: "ジャガイモ",
     img: "./images/crops/potato.PNG",
-    seedImg: "./images/crops/seed_potato.PNG",
+    seedImg: "./images/crops/seed_potato.jpg",
     level: 1,
     growTime: 60,
     seedPrice: 30,
@@ -40,7 +40,7 @@ const cropData = [
   {
     name: "稲",
     img: "./images/crops/ine.PNG",
-    seedImg: "./images/crops/seed_ine.PNG",
+    seedImg: "./images/crops/seed_ine.jpg",
     level: 1,
     growTime: 20,
     seedPrice: 12,
@@ -54,7 +54,7 @@ const cropData = [
   {
     name: "小麦",
     img: "./images/crops/wheat.PNG",
-    seedImg: "./images/crops/seed_wheat.PNG",
+    seedImg: "./images/crops/seed_wheat.jpg",
     level: 2,
     growTime: 240,
     seedPrice: 95,
@@ -68,7 +68,7 @@ const cropData = [
   {
     name: "レタス",
     img: "./images/crops/lettuce.PNG",
-    seedImg: "./images/crops/seed_lettuce.PNG",
+    seedImg: "./images/crops/seed_lettuce.jpg",
     level: 3,
     growTime: 480,
     seedPrice: 145,
@@ -82,7 +82,7 @@ const cropData = [
   {
     name: "パイナップル",
     img: "./images/crops/pineapple.PNG",
-    seedImg: "./images/crops/seed_pineapple.PNG",
+    seedImg: "./images/crops/seed_pineapple.jpg",
     level: 4,
     growTime: 30,
     seedPrice: 15,
@@ -96,7 +96,7 @@ const cropData = [
   {
     name: "ニンジン",
     img: "./images/crops/carrot.PNG",
-    seedImg: "./images/crops/seed_carrot.PNG",
+    seedImg: "./images/crops/seed_carrot.jpg",
     level: 5,
     growTime: 120,
     seedPrice: 50,
@@ -110,7 +110,7 @@ const cropData = [
   {
     name: "いちご",
     img: "./images/crops/strawberry.PNG",
-    seedImg: "./images/crops/seed_strawberry.PNG",
+    seedImg: "./images/crops/seed_strawberry.jpg",
     level: 6,
     growTime: 360,
     seedPrice: 125,
@@ -124,7 +124,7 @@ const cropData = [
   {
     name: "トウモロコシ",
     img: "./images/crops/corn.PNG",
-    seedImg: "./images/crops/seed_corn.PNG",
+    seedImg: "./images/crops/seed_corn.jpg",
     level: 6,
     growTime: 720,
     seedPrice: 170,
@@ -138,7 +138,7 @@ const cropData = [
   {
     name: "ブドウ",
     img: "./images/crops/grape.PNG",
-    seedImg: "./images/crops/seed_grape.PNG",
+    seedImg: "./images/crops/seed_grape.jpg",
     level: 7,
     growTime: 600,
     seedPrice: 160,
@@ -152,7 +152,7 @@ const cropData = [
   {
     name: "ナス",
     img: "./images/crops/eggplant.PNG",
-    seedImg: "./images/crops/seed_eggplant.PNG",
+    seedImg: "./images/crops/seed_eggplant.jpg",
     level: 8,
     growTime: 420,
     seedPrice: 135,
@@ -166,7 +166,7 @@ const cropData = [
   {
     name: "茶葉",
     img: "./images/crops/tea.PNG",
-    seedImg: "./images/crops/seed_tea.PNG",
+    seedImg: "./images/crops/seed_tea.jpg",
     level: 11,
     growTime: 45,
     seedPrice: 25,
@@ -180,7 +180,7 @@ const cropData = [
   {
     name: "カカオ豆",
     img: "./images/crops/cacao.PNG",
-    seedImg: "./images/crops/seed_cacao.PNG",
+    seedImg: "./images/crops/seed_cacao.jpg",
     level: 12,
     growTime: 300,
     seedPrice: 110,
@@ -194,7 +194,7 @@ const cropData = [
   {
     name: "アボカド",
     img: "./images/crops/avocado.PNG",
-    seedImg: "./images/crops/seed_avocado.PNG",
+    seedImg: "./images/crops/seed_avocado.jpg",
     level: 13,
     growTime: 840,
     seedPrice: 180,
@@ -210,7 +210,7 @@ const cropData = [
   {
     name: "ダイコン",
     img: "./images/crops/daikon.PNG",
-    seedImg: "./images/crops/seed_daikon.PNG",
+    seedImg: "./images/crops/seed_daikon.jpg",
     level: 1,
     growTime: 15,
     seedPrice: 10,
@@ -224,7 +224,7 @@ const cropData = [
   {
     name: "ロメインレタス",
     img: "./images/crops/romaine.PNG",
-    seedImg: "./images/crops/seed_romaine.PNG",
+    seedImg: "./images/crops/seed_romaine.jpg",
     level: 1,
     growTime: 15,
     seedPrice: 10,
@@ -238,7 +238,7 @@ const cropData = [
   {
     name: "レモンバーベナ",
     img: "./images/crops/lemon_verbena.PNG",
-    seedImg: "./images/crops/seed_lemon_verbena.PNG",
+    seedImg: "./images/crops/seed_lemon_verbena.jpg",
     level: 1,
     growTime: 15,
     seedPrice: 10,
