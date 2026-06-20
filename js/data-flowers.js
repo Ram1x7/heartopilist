@@ -1,0 +1,253 @@
+// 花データ
+// growTime: 分単位（例：18時間=1080分）
+// prices: [☆1, ☆2, ☆3, ☆4, ☆5] null = 未確認
+// colors: 交配で作れる色の一覧
+//   ☆1：赤・黄・白
+//   ☆2：オレンジ・ピンク
+//   ☆3：黒・桃
+//   ☆4：紫・青・緑
+//   ☆5：輝く・夜光
+// breedingNote: 交配の補足（毎朝6時に交配が行われる）
+// auth: 認証マスター対象か
+// isEvent: イベント限定か
+// eventName: イベント名
+
+const flowerData = [
+
+  // ── 通常の花 ────────────────────────
+  {
+    name: "ヒナギク",
+    img: "./images/flowers/hinagiku.PNG",
+    seedImg: "./images/flowers/seed_hinagiku.PNG",
+    level: 3,
+    growTime: 1080,   // 18時間
+    seedPrice: 30,
+    prices: [100, 150, 200, 250, 400],
+    colors: ["赤","白","ピンク","桃","緑","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 1,
+  },
+  {
+    name: "パンジー",
+    img: "./images/flowers/pansy.PNG",
+    seedImg: "./images/flowers/seed_pansy.PNG",
+    level: 4,
+    growTime: 1080,   // 18時間
+    seedPrice: 30,
+    prices: [100, null, null, null, null],
+    colors: ["赤","黄","オレンジ","黒","紫","輝く"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 2,
+  },
+  {
+    name: "アンスリウム",
+    img: "./images/flowers/anthurium.PNG",
+    seedImg: "./images/flowers/seed_anthurium.PNG",
+    level: 5,
+    growTime: 1440,   // 24時間
+    seedPrice: 60,
+    prices: [185, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","桃","緑","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 3,
+  },
+  {
+    name: "ヒナゲシ",
+    img: "./images/flowers/hinageshi.PNG",
+    seedImg: "./images/flowers/seed_hinageshi.PNG",
+    level: 5,
+    growTime: 1440,   // 24時間
+    seedPrice: 60,
+    prices: [185, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","紫","輝く"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 4,
+  },
+  {
+    name: "オランダカイウ",
+    img: "./images/flowers/oranda_kaiu.PNG",
+    seedImg: "./images/flowers/seed_oranda_kaiu.PNG",
+    level: 6,
+    growTime: 1800,   // 30時間
+    seedPrice: 90,
+    prices: [250, null, null, null, null],
+    colors: ["赤","黄","オレンジ","ピンク","黒","桃","紫","輝く"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 5,
+  },
+  {
+    name: "アサガオ",
+    img: "./images/flowers/asagao.PNG",
+    seedImg: "./images/flowers/seed_asagao.PNG",
+    level: 6,
+    growTime: 1800,   // 30時間
+    seedPrice: 90,
+    prices: [250, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 6,
+  },
+  {
+    name: "カーネーション",
+    img: "./images/flowers/carnation.PNG",
+    seedImg: "./images/flowers/seed_carnation.PNG",
+    level: 7,
+    growTime: 1800,   // 30時間
+    seedPrice: 120,
+    prices: [305, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 7,
+  },
+  {
+    name: "チューリップ",
+    img: "./images/flowers/tulip.PNG",
+    seedImg: "./images/flowers/seed_tulip.PNG",
+    level: 8,
+    growTime: 2880,   // 48時間
+    seedPrice: 150,
+    prices: [415, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 8,
+  },
+  {
+    name: "ユリ",
+    img: "./images/flowers/yuri.PNG",
+    seedImg: "./images/flowers/seed_yuri.PNG",
+    level: 9,
+    growTime: 2880,   // 48時間
+    seedPrice: 200,
+    prices: [485, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","緑","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 9,
+  },
+  {
+    name: "バラ",
+    img: "./images/flowers/bara.PNG",
+    seedImg: "./images/flowers/seed_bara.PNG",
+    level: 10,
+    growTime: 4320,   // 72時間
+    seedPrice: 300,
+    prices: [765, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 10,
+  },
+  {
+    name: "ヒヤシンス",
+    img: "./images/flowers/hyacinth.PNG",
+    seedImg: "./images/flowers/seed_hyacinth.PNG",
+    level: 11,
+    growTime: 4320,   // 72時間
+    seedPrice: 300,
+    prices: [785, 1180, 1570, 1965, 3140],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 11,
+  },
+  {
+    name: "コチョウラン",
+    img: "./images/flowers/kochoran.PNG",
+    seedImg: "./images/flowers/seed_kochoran.PNG",
+    level: 12,
+    growTime: 4320,   // 72時間
+    seedPrice: 300,
+    prices: [805, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 12,
+  },
+  {
+    name: "ゼラニウム",
+    img: "./images/flowers/geranium.PNG",
+    seedImg: "./images/flowers/seed_geranium.PNG",
+    level: 13,
+    growTime: 4320,   // 72時間
+    seedPrice: 300,
+    prices: [825, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","緑","輝く","夜光"],
+    auth: true,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 13,
+  },
+
+  // ── イベントの花 ────────────────────────
+  {
+    name: "メコノプシス",
+    img: "./images/flowers/mekonopsis.PNG",
+    seedImg: "./images/flowers/seed_mekonopsis.PNG",
+    level: 3,
+    growTime: 1440,   // 24時間
+    seedPrice: 30,
+    prices: [125, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","青","緑","夜光"],
+    auth: false,
+    isEvent: true,
+    eventName: "スノーシーズン",
+    bookIndex: 14,
+  },
+  {
+    name: "タンポポ",
+    img: "./images/flowers/tanpopo.PNG",
+    seedImg: "./images/flowers/seed_tanpopo.PNG",
+    level: 3,
+    growTime: 1440,   // 24時間
+    seedPrice: 30,
+    prices: [125, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","夜光"],
+    auth: false,
+    isEvent: true,
+    eventName: "ドリームライト",
+    bookIndex: 15,
+  },
+  {
+    name: "積み木フラワー",
+    img: "./images/flowers/tsumiki_flower.PNG",
+    seedImg: "./images/flowers/seed_tsumiki_flower.PNG",
+    level: 3,
+    growTime: 1440,   // 24時間
+    seedPrice: 30,
+    prices: [125, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","夜光"],
+    auth: false,
+    isEvent: true,
+    eventName: "ブロック市街地",
+    bookIndex: 16,
+  },
+];
+
+// 交配レア度マップ
+const colorRarity = {
+  "赤": 1, "黄": 1, "白": 1,
+  "オレンジ": 2, "ピンク": 2,
+  "黒": 3, "桃": 3,
+  "紫": 4, "青": 4, "緑": 4,
+  "輝く": 5, "夜光": 5,
+};
