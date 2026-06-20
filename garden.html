@@ -547,7 +547,7 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 
 <div id="notifBanner">
   🔔 バックグラウンド通知を受け取るには通知の許可が必要です<br>
-  <button class="notif-allow-btn" onclick="requestNotifPermission()">通知を許可する</button>
+  <button class="notif-allow-btn" id="notifAllowBtn">通知を許可する</button>
 </div>
 
 <div class="tab-row">
@@ -568,10 +568,12 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+<!-- ★ Firebase SDKをcompat版（通常scriptで読める版）に統一 -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
+<script>
+// ── Firebase初期化（compat版・通常scriptで動作） ──
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB6aGH4BCn2NFNUMeon9LTM_ck2vKoWYFI",
   authDomain: "heartopilist-c8b69.firebaseapp.com",
@@ -585,15 +587,18 @@ const VAPID_KEY = "BHsuetgZxjPnNS1eiqkIRwmFhddZkN0FweRiAbwCv3ixBEnTODksIpyOoHi72
 const REGISTER_URL = "https://registertimer-e67djhnlrq-uc.a.run.app";
 const CANCEL_URL   = "https://canceltimer-e67djhnlrq-uc.a.run.app";
 
-const app = initializeApp(FIREBASE_CONFIG);
-const messaging = getMessaging(app);
+firebase.initializeApp(FIREBASE_CONFIG);
+const messaging = firebase.messaging();
 
 // FCMトークン取得
 async function getFCMToken() {
   try {
+    // ★ Service Workerを明示的に登録してからgetTokenに渡す
     const sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
-    const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
-    if(token){
+    // Service Workerがactiveになるまで待つ
+    await navigator.serviceWorker.ready;
+    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
+    if (token) {
       localStorage.setItem("fcmToken", token);
       return token;
     }
@@ -604,28 +609,32 @@ async function getFCMToken() {
 }
 
 // 通知許可を要求
-window.requestNotifPermission = async function() {
+async function requestNotifPermission() {
   const permission = await Notification.requestPermission();
-  if(permission === "granted"){
+  if (permission === "granted") {
     const token = await getFCMToken();
-    if(token){
+    if (token) {
       document.getElementById("notifBanner").style.display = "none";
       showToast("通知が有効になりました！");
+    } else {
+      showToast("トークン取得に失敗しました");
     }
   } else {
     showToast("通知が拒否されました");
   }
-};
+}
+
+document.getElementById("notifAllowBtn").addEventListener("click", requestNotifPermission);
 
 // フォアグラウンド通知
-onMessage(messaging, (payload) => {
+messaging.onMessage((payload) => {
   showToast(payload.notification?.title || "通知が届きました");
 });
 
 // 通知をCloud Functionsに登録
-window.registerNotification = async function(item, mode) {
+async function registerNotification(item, mode) {
   const token = localStorage.getItem("fcmToken") || await getFCMToken();
-  if(!token){
+  if (!token) {
     showToast("先に通知を許可してください");
     return;
   }
@@ -634,9 +643,9 @@ window.registerNotification = async function(item, mode) {
   const growMs = item.growTime * 60 * 1000;
   let notifyTimes = [];
 
-  if(mode === "normal"){
+  if (mode === "normal") {
     notifyTimes = [{ label:"harvest", time: now + growMs }];
-  } else if(mode === "weed"){
+  } else if (mode === "weed") {
     const interval = Math.floor(growMs / 4);
     notifyTimes = [
       { label:"草抜き1回目", time: now + interval },
@@ -653,8 +662,7 @@ window.registerNotification = async function(item, mode) {
       body: JSON.stringify({ fcmToken: token, cropName: item.name, mode, notifyTimes }),
     });
 
-    if(res.ok){
-      // localStorageにもセット時刻を保存（バッジ表示用）
+    if (res.ok) {
       const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
       timers[item.name + "_" + mode] = { end: now + growMs, mode };
       localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
@@ -668,12 +676,12 @@ window.registerNotification = async function(item, mode) {
     console.error(e);
     showToast("通知のセットに失敗しました");
   }
-};
+}
 
 // 通知をキャンセル
-window.cancelNotification = async function(item, mode) {
+async function cancelNotification(item, mode) {
   const token = localStorage.getItem("fcmToken");
-  if(token){
+  if (token) {
     try {
       await fetch(CANCEL_URL, {
         method: "POST",
@@ -689,14 +697,14 @@ window.cancelNotification = async function(item, mode) {
   showToast("通知をキャンセルしました");
   renderModal(window.currentItem);
   renderContent();
-};
+}
 
 // 起動時にトークンを確認
 (async () => {
-  if(Notification.permission === "granted"){
+  if (Notification.permission === "granted") {
     await getFCMToken();
     document.getElementById("notifBanner").style.display = "none";
-  } else if(Notification.permission === "default"){
+  } else if (Notification.permission === "default") {
     document.getElementById("notifBanner").style.display = "block";
   }
 })();
@@ -893,20 +901,19 @@ function renderModal(item){
     const normalRem = getRemaining(item,"normal");
     const weedRem   = getRemaining(item,"weed");
 
+    // ★ onclickの文字列ではなくdata属性＋イベント委譲に変更（moduleスコープ問題を回避）
     notifHTML = `
       <div style="margin-bottom:12px;">
         <div class="section-title">🔔 収穫通知</div>
         <div class="notif-btns">
           <button class="notif-btn ${normalSet?"set":""}"
-            onclick="${normalSet
-              ? `cancelNotification(window.currentItem,'normal')`
-              : `registerNotification(window.currentItem,'normal')`}">
+            data-action="${normalSet ? "cancel" : "register"}"
+            data-mode="normal">
             ${normalSet ? "✅ 通常：通知中" : "🔔 通常モード"}
           </button>
           <button class="notif-btn ${weedSet?"set":""}"
-            onclick="${weedSet
-              ? `cancelNotification(window.currentItem,'weed')`
-              : `registerNotification(window.currentItem,'weed')`}">
+            data-action="${weedSet ? "cancel" : "register"}"
+            data-mode="weed">
             ${weedSet ? "✅ 草抜き：通知中" : "🌿 草抜きモード"}
           </button>
         </div>
@@ -923,7 +930,7 @@ function renderModal(item){
   // 認証
   const isAuthed = item.auth !== false && !!authData[item.name];
   const authHTML = item.auth !== false ? `
-    <button class="auth-btn ${isAuthed?"authed":""}" onclick="toggleAuth('${item.name}')">
+    <button class="auth-btn ${isAuthed?"authed":""}" data-action="toggleAuth">
       ${isAuthed ? "🎖 認証マスター達成済み" : "○ 認証マスター未達成"}
     </button>
   ` : "";
@@ -973,6 +980,17 @@ function renderModal(item){
     ${authHTML}
     <button class="modal-close-btn" onclick="closeModal()">閉じる</button>
   `;
+
+  // ★ data属性でボタンのクリックを処理（関数スコープの問題なし）
+  box.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action;
+      const mode   = btn.dataset.mode;
+      if(action === "register") registerNotification(window.currentItem, mode);
+      if(action === "cancel")   cancelNotification(window.currentItem, mode);
+      if(action === "toggleAuth") toggleAuth(window.currentItem.name);
+    });
+  });
 }
 
 // ── トースト ──
