@@ -18,7 +18,7 @@ const flowerData = [
   {
     name: "ヒナギク",
     img: "./images/flowers/hinagiku.PNG",
-    seedImg: "./images/flowers/seed_hinagiku.PNG",
+    seedImg: "./images/flowers/seed_hinagiku.jpg",
     level: 3,
     growTime: 1080,   // 18時間
     seedPrice: 30,
@@ -32,7 +32,7 @@ const flowerData = [
   {
     name: "パンジー",
     img: "./images/flowers/pansy.PNG",
-    seedImg: "./images/flowers/seed_pansy.PNG",
+    seedImg: "./images/flowers/seed_pansy.jpg",
     level: 4,
     growTime: 1080,   // 18時間
     seedPrice: 30,
@@ -46,7 +46,7 @@ const flowerData = [
   {
     name: "アンスリウム",
     img: "./images/flowers/anthurium.PNG",
-    seedImg: "./images/flowers/seed_anthurium.PNG",
+    seedImg: "./images/flowers/seed_anthurium.jpg",
     level: 5,
     growTime: 1440,   // 24時間
     seedPrice: 60,
@@ -60,7 +60,7 @@ const flowerData = [
   {
     name: "ヒナゲシ",
     img: "./images/flowers/hinageshi.PNG",
-    seedImg: "./images/flowers/seed_hinageshi.PNG",
+    seedImg: "./images/flowers/seed_hinageshi.jpg",
     level: 5,
     growTime: 1440,   // 24時間
     seedPrice: 60,
@@ -74,7 +74,7 @@ const flowerData = [
   {
     name: "オランダカイウ",
     img: "./images/flowers/oranda_kaiu.PNG",
-    seedImg: "./images/flowers/seed_oranda_kaiu.PNG",
+    seedImg: "./images/flowers/seed_oranda_kaiu.jpg",
     level: 6,
     growTime: 1800,   // 30時間
     seedPrice: 90,
@@ -88,7 +88,7 @@ const flowerData = [
   {
     name: "アサガオ",
     img: "./images/flowers/asagao.PNG",
-    seedImg: "./images/flowers/seed_asagao.PNG",
+    seedImg: "./images/flowers/seed_asagao.jpg",
     level: 6,
     growTime: 1800,   // 30時間
     seedPrice: 90,
@@ -102,7 +102,7 @@ const flowerData = [
   {
     name: "カーネーション",
     img: "./images/flowers/carnation.PNG",
-    seedImg: "./images/flowers/seed_carnation.PNG",
+    seedImg: "./images/flowers/seed_carnation.jpg",
     level: 7,
     growTime: 1800,   // 30時間
     seedPrice: 120,
@@ -116,7 +116,7 @@ const flowerData = [
   {
     name: "チューリップ",
     img: "./images/flowers/tulip.PNG",
-    seedImg: "./images/flowers/seed_tulip.PNG",
+    seedImg: "./images/flowers/seed_tulip.jpg",
     level: 8,
     growTime: 2880,   // 48時間
     seedPrice: 150,
@@ -130,7 +130,7 @@ const flowerData = [
   {
     name: "ユリ",
     img: "./images/flowers/yuri.PNG",
-    seedImg: "./images/flowers/seed_yuri.PNG",
+    seedImg: "./images/flowers/seed_yuri.jpg",
     level: 9,
     growTime: 2880,   // 48時間
     seedPrice: 200,
@@ -144,7 +144,7 @@ const flowerData = [
   {
     name: "バラ",
     img: "./images/flowers/bara.PNG",
-    seedImg: "./images/flowers/seed_bara.PNG",
+    seedImg: "./images/flowers/seed_bara.jpg",
     level: 10,
     growTime: 4320,   // 72時間
     seedPrice: 300,
@@ -158,7 +158,7 @@ const flowerData = [
   {
     name: "ヒヤシンス",
     img: "./images/flowers/hyacinth.PNG",
-    seedImg: "./images/flowers/seed_hyacinth.PNG",
+    seedImg: "./images/flowers/seed_hyacinth.jpg",
     level: 11,
     growTime: 4320,   // 72時間
     seedPrice: 300,
@@ -171,8 +171,8 @@ const flowerData = [
   },
   {
     name: "コチョウラン",
-    img: "./images/flowers/kochoran.PNG",
-    seedImg: "./images/flowers/seed_kochoran.PNG",
+    img: "./images/flowers/kochoран.PNG",
+    seedImg: "./images/flowers/seed_kochoран.jpg",
     level: 12,
     growTime: 4320,   // 72時間
     seedPrice: 300,
@@ -186,7 +186,7 @@ const flowerData = [
   {
     name: "ゼラニウム",
     img: "./images/flowers/geranium.PNG",
-    seedImg: "./images/flowers/seed_geranium.PNG",
+    seedImg: "./images/flowers/seed_geranium.jpg",
     level: 13,
     growTime: 4320,   // 72時間
     seedPrice: 300,
@@ -202,7 +202,7 @@ const flowerData = [
   {
     name: "メコノプシス",
     img: "./images/flowers/mekonopsis.PNG",
-    seedImg: "./images/flowers/seed_mekonopsis.PNG",
+    seedImg: "./images/flowers/seed_mekonopsis.jpg",
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
@@ -216,7 +216,7 @@ const flowerData = [
   {
     name: "タンポポ",
     img: "./images/flowers/tanpopo.PNG",
-    seedImg: "./images/flowers/seed_tanpopo.PNG",
+    seedImg: "./images/flowers/seed_tanpopo.jpg",
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
@@ -230,7 +230,7 @@ const flowerData = [
   {
     name: "積み木フラワー",
     img: "./images/flowers/tsumiki_flower.PNG",
-    seedImg: "./images/flowers/seed_tsumiki_flower.PNG",
+    seedImg: "./images/flowers/seed_tsumiki_flower.jpg",
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
