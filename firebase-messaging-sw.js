@@ -15,15 +15,35 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// バックグラウンド通知の受信
-messaging.onBackgroundMessage((payload) => {
-  const { title, body, icon } = payload.notification;
-  self.registration.showNotification(title, {
-    body: body || "",
-    icon: icon || "./apple-touch-icon.png",
-    badge: "./apple-touch-icon.png",
-    tag: "hatopi-notif",
-    renotify: false,
-    requireInteraction: false,
-  });
+// ★ pushイベントを直接ハンドルしてFCMのデフォルト表示を上書き
+// これによりonBackgroundMessageとの二重表示を防ぐ
+self.addEventListener("push", (event) => {
+  // FCMのデフォルト処理をここで止める
+  event.stopImmediatePropagation();
+
+  let title = "はとぴ図鑑";
+  let body = "";
+  let icon = "./apple-touch-icon.png";
+
+  try {
+    const data = event.data?.json();
+    // FCMのペイロード構造に対応
+    const notification = data?.notification || data?.data || {};
+    title = notification.title || data?.data?.title || title;
+    body  = notification.body  || data?.data?.body  || body;
+    icon  = notification.icon  || data?.data?.icon  || icon;
+  } catch(e) {
+    console.error("push parse error:", e);
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon,
+      badge: "./apple-touch-icon.png",
+      tag: "hatopi-notif",
+      renotify: false,
+      requireInteraction: false,
+    })
+  );
 });
