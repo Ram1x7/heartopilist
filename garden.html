@@ -576,6 +576,16 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 
 <script type="module">
   alert("module開始");
+
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
+alert("firebase-app OK");
+
+import { getMessaging, getToken, onMessage }
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+alert("firebase-messaging OK");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
