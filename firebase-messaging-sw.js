@@ -22,7 +22,8 @@ messaging.onBackgroundMessage((payload) => {
     body: body || "",
     icon: icon || "./apple-touch-icon.png",
     badge: "./apple-touch-icon.png",
-    tag: payload.data?.tag || "hatopi-notif",
+    tag: "hatopi-notif",
+    renotify: false,
     requireInteraction: false,
   });
 });
