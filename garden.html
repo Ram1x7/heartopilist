@@ -144,7 +144,6 @@ body.dark .site-nav-item.active{ background:var(--indigo-soft); border-color:var
 
 body.dark .page-header h2{ color:#e8d2a8; }
 
-/* 通知バナー */
 #notifBanner{
   display:none;
   background:rgba(200,168,107,0.15);
@@ -168,6 +167,26 @@ body.dark .page-header h2{ color:#e8d2a8; }
   font-size:12px;
   font-family:'Zen Maru Gothic', sans-serif;
   cursor:pointer;
+}
+
+/* デバッグボックス */
+#debugBox{
+  background:#f3ecdc;
+  border:1px solid #e4d9c2;
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:10px;
+  color:#7a7164;
+  margin-bottom:12px;
+  line-height:1.8;
+  word-break:break-all;
+  font-family:monospace;
+}
+
+body.dark #debugBox{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
 }
 
 .tab-row{ display:flex; gap:8px; margin-bottom:12px; }
@@ -280,7 +299,6 @@ body.dark .section-label{ color:#e8d2a8; }
   font-size:10px;
 }
 
-/* モーダル */
 #detailModal{
   display:none;
   position:fixed;
@@ -317,7 +335,6 @@ body.dark .modal-box{ background:#2c2823; border-color:#46423b; }
 body.dark .modal-name{ color:#e8d2a8; }
 
 .modal-imgs{ display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
-
 .modal-img-wrap{ text-align:center; flex:1; }
 
 .modal-img-wrap img{
@@ -342,7 +359,6 @@ body.dark .modal-name{ color:#e8d2a8; }
 }
 
 body.dark .modal-info{ background:#383329; }
-
 .modal-info-row{ display:flex; justify-content:space-between; }
 .modal-info-label{ color:var(--text-sub); }
 .modal-info-value{ font-weight:700; color:var(--text); }
@@ -385,7 +401,6 @@ body.dark .price-table th{ background:#383329; }
 body.dark .section-title{ color:#e8d2a8; }
 
 .breeding-note{ font-size:10px; color:var(--text-sub); margin-bottom:8px; }
-
 .breeding-grid{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
 
 .breeding-chip{
@@ -426,7 +441,6 @@ body.dark .rarity-5{ background:#3a3010; color:#d4b000; border-color:#6a5800; }
 body.dark .breeding-combo{ background:#383329; }
 .breeding-combo-arrow{ color:var(--text-sub); font-size:13px; }
 
-/* 通知ボタン */
 .notif-btns{ display:flex; gap:8px; margin-bottom:8px; }
 
 .notif-btn{
@@ -468,7 +482,6 @@ body.dark .notif-btn.set{ background:var(--green); border-color:var(--green); co
 
 body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:#4a7c59; }
 
-/* 認証ボタン */
 .auth-btn{
   width:100%;
   padding:10px;
@@ -502,7 +515,6 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
   cursor:pointer;
 }
 
-/* トースト */
 #toast{
   position:fixed;
   bottom:24px;
@@ -547,8 +559,11 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 
 <div id="notifBanner">
   🔔 バックグラウンド通知を受け取るには通知の許可が必要です<br>
-  <button class="notif-allow-btn" id="notifAllowBtn">通知を許可する</button>
+  <button class="notif-allow-btn" onclick="requestNotifPermission()">通知を許可する</button>
 </div>
+
+<!-- デバッグボックス（確認後に削除してください） -->
+<div id="debugBox">🔍 デバッグ情報：<br></div>
 
 <div class="tab-row">
   <button class="tab active" id="tab-crop" onclick="setTab('crop')">🌾 作物</button>
@@ -568,12 +583,10 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
 
-<!-- ★ Firebase SDKをcompat版（通常scriptで読める版）に統一 -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
-<script>
-// ── Firebase初期化（compat版・通常scriptで動作） ──
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB6aGH4BCn2NFNUMeon9LTM_ck2vKoWYFI",
   authDomain: "heartopilist-c8b69.firebaseapp.com",
@@ -587,54 +600,65 @@ const VAPID_KEY = "BHsuetgZxjPnNS1eiqkIRwmFhddZkN0FweRiAbwCv3ixBEnTODksIpyOoHi72
 const REGISTER_URL = "https://registertimer-e67djhnlrq-uc.a.run.app";
 const CANCEL_URL   = "https://canceltimer-e67djhnlrq-uc.a.run.app";
 
-firebase.initializeApp(FIREBASE_CONFIG);
-const messaging = firebase.messaging();
+const app = initializeApp(FIREBASE_CONFIG);
+const messaging = getMessaging(app);
+
+const debug = document.getElementById("debugBox");
+function dbg(msg){ debug.innerHTML += msg + "<br>"; }
 
 // FCMトークン取得
 async function getFCMToken() {
   try {
-    // ★ Service Workerを明示的に登録してからgetTokenに渡す
+    dbg("🔄 ServiceWorker登録中...");
     const sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
-    // Service Workerがactiveになるまで待つ
-    await navigator.serviceWorker.ready;
-    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
-    if (token) {
+    dbg("✅ SW登録成功");
+
+    dbg("🔄 FCMトークン取得中...");
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: sw,
+    });
+
+    if(token){
       localStorage.setItem("fcmToken", token);
+      dbg(`✅ トークン取得成功：${token.slice(0,30)}...`);
       return token;
+    } else {
+      dbg("❌ トークンが空でした");
     }
   } catch(e) {
+    dbg(`❌ FCMエラー：${e.message}`);
     console.error("FCMトークン取得失敗:", e);
   }
   return null;
 }
 
 // 通知許可を要求
-async function requestNotifPermission() {
+window.requestNotifPermission = async function() {
+  dbg("🔄 通知許可をリクエスト中...");
   const permission = await Notification.requestPermission();
-  if (permission === "granted") {
+  dbg(`通知許可の結果：${permission}`);
+  if(permission === "granted"){
     const token = await getFCMToken();
-    if (token) {
+    if(token){
       document.getElementById("notifBanner").style.display = "none";
       showToast("通知が有効になりました！");
-    } else {
-      showToast("トークン取得に失敗しました");
     }
   } else {
     showToast("通知が拒否されました");
   }
-}
-
-document.getElementById("notifAllowBtn").addEventListener("click", requestNotifPermission);
+};
 
 // フォアグラウンド通知
-messaging.onMessage((payload) => {
+onMessage(messaging, (payload) => {
+  dbg(`📩 フォアグラウンド通知受信：${payload.notification?.title}`);
   showToast(payload.notification?.title || "通知が届きました");
 });
 
 // 通知をCloud Functionsに登録
-async function registerNotification(item, mode) {
+window.registerNotification = async function(item, mode) {
   const token = localStorage.getItem("fcmToken") || await getFCMToken();
-  if (!token) {
+  if(!token){
     showToast("先に通知を許可してください");
     return;
   }
@@ -643,9 +667,9 @@ async function registerNotification(item, mode) {
   const growMs = item.growTime * 60 * 1000;
   let notifyTimes = [];
 
-  if (mode === "normal") {
+  if(mode === "normal"){
     notifyTimes = [{ label:"harvest", time: now + growMs }];
-  } else if (mode === "weed") {
+  } else if(mode === "weed"){
     const interval = Math.floor(growMs / 4);
     notifyTimes = [
       { label:"草抜き1回目", time: now + interval },
@@ -656,13 +680,15 @@ async function registerNotification(item, mode) {
   }
 
   try {
+    dbg(`🔄 Cloud Functionsにリクエスト中... (${item.name}/${mode})`);
     const res = await fetch(REGISTER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ fcmToken: token, cropName: item.name, mode, notifyTimes }),
     });
+    dbg(`${res.ok ? "✅" : "❌"} レスポンス：${res.status}`);
 
-    if (res.ok) {
+    if(res.ok){
       const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
       timers[item.name + "_" + mode] = { end: now + growMs, mode };
       localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
@@ -670,25 +696,27 @@ async function registerNotification(item, mode) {
       renderModal(window.currentItem);
       renderContent();
     } else {
+      const txt = await res.text();
+      dbg(`❌ エラー内容：${txt}`);
       showToast("通知のセットに失敗しました");
     }
   } catch(e) {
-    console.error(e);
+    dbg(`❌ fetchエラー：${e.message}`);
     showToast("通知のセットに失敗しました");
   }
-}
+};
 
 // 通知をキャンセル
-async function cancelNotification(item, mode) {
+window.cancelNotification = async function(item, mode) {
   const token = localStorage.getItem("fcmToken");
-  if (token) {
+  if(token){
     try {
       await fetch(CANCEL_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fcmToken: token, cropName: item.name }),
       });
-    } catch(e) { console.error(e); }
+    } catch(e) { dbg(`❌ キャンセルエラー：${e.message}`); }
   }
 
   const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
@@ -697,21 +725,24 @@ async function cancelNotification(item, mode) {
   showToast("通知をキャンセルしました");
   renderModal(window.currentItem);
   renderContent();
-}
+};
 
 // 起動時にトークンを確認
 (async () => {
-  if (Notification.permission === "granted") {
+  dbg(`通知許可状態：${Notification.permission}`);
+  if(Notification.permission === "granted"){
     await getFCMToken();
     document.getElementById("notifBanner").style.display = "none";
-  } else if (Notification.permission === "default") {
+  } else if(Notification.permission === "default"){
     document.getElementById("notifBanner").style.display = "block";
+    dbg("→ 通知バナーを表示しました");
+  } else {
+    dbg("→ 通知が拒否されています");
   }
 })();
 </script>
 
 <script>
-// ── ダークモード ──
 const darkToggle = document.getElementById("darkToggle");
 const savedDark = localStorage.getItem("darkMode");
 if(savedDark === "true") document.body.classList.add("dark");
@@ -728,7 +759,6 @@ darkToggle.onclick = ()=>{
   updateDarkBtn();
 };
 
-// ── 認証データ ──
 let authData = JSON.parse(localStorage.getItem("authData") || "{}");
 
 function toggleAuth(name){
@@ -738,7 +768,6 @@ function toggleAuth(name){
   renderContent();
 }
 
-// ── 通知タイマー ──
 function isNotifSet(item, mode){
   const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
   const t = timers[item.name + "_" + mode];
@@ -762,7 +791,6 @@ function cleanExpiredTimers(){
   localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
 }
 
-// ── 時間フォーマット ──
 function formatTime(min){
   if(min < 60) return `${min}分`;
   const h = Math.floor(min / 60);
@@ -771,7 +799,6 @@ function formatTime(min){
   return `${h}時間${m}分`;
 }
 
-// ── タブ ──
 let currentTab = "crop";
 window.currentItem = null;
 
@@ -783,7 +810,6 @@ function setTab(tab){
   renderContent();
 }
 
-// ── 描画 ──
 function renderContent(){
   const el = document.getElementById("gardenContent");
   el.innerHTML = "";
@@ -822,42 +848,13 @@ function renderSection(label, items, isEvent=false){
     const isAuthed = item.auth !== false && !!authData[item.name];
 
     div.innerHTML = `
-<div class="img-wrap">
-
-  <div class="level-badge">
-    Lv.${item.level}
-  </div>
-
-  ${hasNotif ? `
-    <div class="notif-badge"
-      style="
-        position:absolute;
-        top:6px;
-        right:6px;
-        z-index:5;
-        font-size:10px;
-      ">
-      🔔
-    </div>
-  ` : ""}
-
-  <button
-    class="auth-btn ${isAuthed ? "checked" : ""}"
-    onclick="event.stopPropagation();toggleAuth('${item.name}')">
-    ${isAuthed ? "🎖" : ""}
-  </button>
-
-  <img src="${item.img}" alt="${item.name}" loading="lazy">
-</div>
-
-<div class="item-name">
-  ${item.name}
-</div>
-
-<div style="font-size:9px;color:var(--text-sub);">
-  ${formatTime(item.growTime)}
-</div>
-`;
+      <div class="lv-badge">Lv.${item.level}</div>
+      ${hasNotif ? '<div class="notif-badge">🔔</div>' : ''}
+      ${isAuthed ? '<div class="auth-badge">🎖</div>' : ''}
+      <img src="${item.img}" alt="${item.name}" loading="lazy">
+      <div class="garden-item-name">${item.name}</div>
+      <div class="garden-item-sub">${formatTime(item.growTime)}</div>
+    `;
     div.onclick = () => openModal(item);
     grid.appendChild(div);
   });
@@ -866,7 +863,6 @@ function renderSection(label, items, isEvent=false){
   return wrap;
 }
 
-// ── モーダル ──
 function openModal(item){
   window.currentItem = item;
   renderModal(item);
@@ -888,7 +884,6 @@ function renderModal(item){
     return `<tr><td>${s}</td><td>${p !== null ? p.toLocaleString() : '<span class="price-null">未確認</span>'}</td></tr>`;
   }).join("");
 
-  // 交配（花のみ）
   let breedingHTML = "";
   if(isFlower && item.colors && item.colors.length > 0){
     const chips = item.colors.map(c => {
@@ -922,7 +917,6 @@ function renderModal(item){
     `;
   }
 
-  // 通知（作物のみ）
   let notifHTML = "";
   if(!isFlower){
     const normalSet = isNotifSet(item,"normal");
@@ -930,19 +924,20 @@ function renderModal(item){
     const normalRem = getRemaining(item,"normal");
     const weedRem   = getRemaining(item,"weed");
 
-    // ★ onclickの文字列ではなくdata属性＋イベント委譲に変更（moduleスコープ問題を回避）
     notifHTML = `
       <div style="margin-bottom:12px;">
         <div class="section-title">🔔 収穫通知</div>
         <div class="notif-btns">
           <button class="notif-btn ${normalSet?"set":""}"
-            data-action="${normalSet ? "cancel" : "register"}"
-            data-mode="normal">
+            onclick="${normalSet
+              ? `cancelNotification(window.currentItem,'normal')`
+              : `registerNotification(window.currentItem,'normal')`}">
             ${normalSet ? "✅ 通常：通知中" : "🔔 通常モード"}
           </button>
           <button class="notif-btn ${weedSet?"set":""}"
-            data-action="${weedSet ? "cancel" : "register"}"
-            data-mode="weed">
+            onclick="${weedSet
+              ? `cancelNotification(window.currentItem,'weed')`
+              : `registerNotification(window.currentItem,'weed')`}">
             ${weedSet ? "✅ 草抜き：通知中" : "🌿 草抜きモード"}
           </button>
         </div>
@@ -955,6 +950,13 @@ function renderModal(item){
       </div>
     `;
   }
+
+  const isAuthed = item.auth !== false && !!authData[item.name];
+  const authHTML = item.auth !== false ? `
+    <button class="auth-btn ${isAuthed?"authed":""}" onclick="toggleAuth('${item.name}')">
+      ${isAuthed ? "🎖 認証マスター達成済み" : "○ 認証マスター未達成"}
+    </button>
+  ` : "";
 
   box.innerHTML = `
     <div class="modal-name">${item.name}</div>
@@ -998,22 +1000,11 @@ function renderModal(item){
     </table>
     ${breedingHTML}
     ${notifHTML}
+    ${authHTML}
     <button class="modal-close-btn" onclick="closeModal()">閉じる</button>
   `;
-
-  // ★ data属性でボタンのクリックを処理（関数スコープの問題なし）
-  box.querySelectorAll("[data-action]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const action = btn.dataset.action;
-      const mode   = btn.dataset.mode;
-      if(action === "register") registerNotification(window.currentItem, mode);
-      if(action === "cancel")   cancelNotification(window.currentItem, mode);
-      if(action === "toggleAuth") toggleAuth(window.currentItem.name);
-    });
-  });
 }
 
-// ── トースト ──
 function showToast(msg){
   const t = document.getElementById("toast");
   t.textContent = msg;
@@ -1021,7 +1012,6 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove("show"), 2500);
 }
 
-// 初期化
 cleanExpiredTimers();
 renderContent();
 </script>
