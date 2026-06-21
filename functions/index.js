@@ -23,7 +23,7 @@ exports.registerTimer = onRequest(
     }
 
     try {
-      // ★ 既存の未送信タイマーを先に削除（二重登録防止）
+      // 既存の未送信タイマーを先に削除（二重登録防止）
       const existing = await db
         .collection("timers")
         .where("fcmToken", "==", fcmToken)
@@ -94,9 +94,7 @@ exports.cancelTimer = onRequest(
 
       await batch.commit();
 
-      console.log(
-        `Timer cancelled: ${cropName} (${snap.size}件削除)`
-      );
+      console.log(`Timer cancelled: ${cropName} (${snap.size}件削除)`);
 
       res.status(200).json({ success: true });
     } catch (err) {
@@ -110,10 +108,7 @@ exports.cancelTimer = onRequest(
 exports.checkAndSendNotifications = onSchedule(
   "every 1 minutes",
   async () => {
-    console.log(
-      "Scheduler executed:",
-      new Date().toISOString()
-    );
+    console.log("Scheduler executed:", new Date().toISOString());
 
     const now = admin.firestore.Timestamp.now();
 
@@ -136,8 +131,22 @@ exports.checkAndSendNotifications = onSchedule(
         snap.docs.map(async (doc) => {
           const data = doc.data();
 
-          // ★ 先にsentをtrueにして二重送信を防ぐ
-          await doc.ref.update({ sent: true });
+          // ★ トランザクションで「sent確認→true更新」を原子的に行う
+          // これにより複数のスケジューラーが同時に同じドキュメントを処理するのを防ぐ
+          const processed = await db.runTransaction(async (tx) => {
+            const freshDoc = await tx.get(doc.ref);
+            if (!freshDoc.exists || freshDoc.data().sent === true) {
+              // すでに処理済みならスキップ
+              return false;
+            }
+            tx.update(doc.ref, { sent: true });
+            return true;
+          });
+
+          if (!processed) {
+            console.log(`Skipped (already processed): ${data.cropName}`);
+            return;
+          }
 
           let title;
           let body;
@@ -150,17 +159,12 @@ exports.checkAndSendNotifications = onSchedule(
             body = `${data.cropName}の${data.label}です！草を抜きましょう！`;
           }
 
-          console.log(
-            `Sending notification: ${data.cropName} (${data.label})`
-          );
+          console.log(`Sending notification: ${data.cropName} (${data.label})`);
 
           try {
             await admin.messaging().send({
               token: data.fcmToken,
-              notification: {
-                title,
-                body,
-              },
+              notification: { title, body },
               webpush: {
                 notification: {
                   title,
@@ -174,12 +178,8 @@ exports.checkAndSendNotifications = onSchedule(
 
             console.log(`Notification sent: ${data.cropName}`);
           } catch (err) {
-            console.error(
-              `Notification failed: ${data.cropName}`,
-              err
-            );
+            console.error(`Notification failed: ${data.cropName}`, err);
 
-            // トークンが無効な場合はドキュメントを削除
             if (
               err.code === "messaging/invalid-registration-token" ||
               err.code === "messaging/registration-token-not-registered"
