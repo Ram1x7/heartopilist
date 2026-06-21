@@ -586,8 +586,6 @@ import { getMessaging, getToken, onMessage }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 alert("firebase-messaging OK");
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB6aGH4BCn2NFNUMeon9LTM_ck2vKoWYFI",
@@ -680,7 +678,6 @@ window.registerNotification = async function(item, mode) {
     { label:"草抜き3回目", time: now + growMs - 60000 },
     { label:"harvest", time: now + growMs },
   ];
-}
   }
 
   try {
