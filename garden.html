@@ -914,8 +914,7 @@ function renderModal(item){
     `;
   }
 
-  const isAuthed = item.auth !== false && !!authData[item.name];
-
+  const isAuthed = !!authData[item.name];
 
   box.innerHTML = `
     <div class="modal-name">${item.name}</div>
