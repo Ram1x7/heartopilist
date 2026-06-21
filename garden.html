@@ -822,18 +822,42 @@ function renderSection(label, items, isEvent=false){
     const isAuthed = item.auth !== false && !!authData[item.name];
 
     div.innerHTML = `
-  <div class="img-wrap">
-    <div class="level-badge">Lv.${item.level}</div>
-    ${hasNotif ? '<div class="notif-badge" style="position:absolute;top:6px;right:6px;z-index:5;font-size:10px;">🔔</div>' : ''}
-    <button class="auth-btn ${isAuthed ? "checked" : ""}"
-      onclick="event.stopPropagation(); toggleAuth('${item.name}')">
-      ${isAuthed ? "🎖" : ""}
-    </button>
-    <img src="${item.img}" alt="${item.name}" loading="lazy">
+<div class="img-wrap">
+
+  <div class="level-badge">
+    Lv.${item.level}
   </div>
-  <div class="item-name">${item.name}</div>
-  <div style="font-size:9px; color:var(--text-sub);">${formatTime(item.growTime)}</div>
-  `;
+
+  ${hasNotif ? `
+    <div class="notif-badge"
+      style="
+        position:absolute;
+        top:6px;
+        right:6px;
+        z-index:5;
+        font-size:10px;
+      ">
+      🔔
+    </div>
+  ` : ""}
+
+  <button
+    class="auth-btn ${isAuthed ? "checked" : ""}"
+    onclick="event.stopPropagation();toggleAuth('${item.name}')">
+    ${isAuthed ? "🎖" : ""}
+  </button>
+
+  <img src="${item.img}" alt="${item.name}" loading="lazy">
+</div>
+
+<div class="item-name">
+  ${item.name}
+</div>
+
+<div style="font-size:9px;color:var(--text-sub);">
+  ${formatTime(item.growTime)}
+</div>
+`;
     div.onclick = () => openModal(item);
     grid.appendChild(div);
   });
@@ -974,7 +998,6 @@ function renderModal(item){
     </table>
     ${breedingHTML}
     ${notifHTML}
-    ${authHTML}
     <button class="modal-close-btn" onclick="closeModal()">閉じる</button>
   `;
 
