@@ -889,6 +889,7 @@ function renderModal(item){
   const box = document.getElementById("modalBox");
 
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
+  const prices = item.prices || [];
   const priceRows = stars.map((s,i) => {
     const p = item.prices[i];
     return `<tr><td>${s}</td><td>${p !== null ? p.toLocaleString() : '<span class="price-null">未確認</span>'}</td></tr>`;
