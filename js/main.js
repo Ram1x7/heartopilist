@@ -1,4 +1,4 @@
-const APP_VERSION = "2.0.5";
+const APP_VERSION = "2.1.0";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -868,7 +868,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.0.5";
+const popupVersion = "2.1.0";
 
 if(
  localStorage.getItem("popupVersion")
@@ -965,4 +965,4 @@ document.getElementById("disclaimer").textContent =
   "※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。";
 
 document.getElementById("lastUpdate").textContent =
-  "最終更新 2026/06/21";
+  "最終更新 2026/06/22";
