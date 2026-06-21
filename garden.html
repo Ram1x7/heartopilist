@@ -575,6 +575,7 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <script src="js/data-flowers.js"></script>
 
 <script type="module">
+  alert("module開始");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
@@ -733,24 +734,6 @@ window.cancelNotification = async function(item, mode) {
     dbg("→ 通知が拒否されています");
   }
 })();
-  const box = document.createElement("div");
-box.style.position = "fixed";
-box.style.bottom = "10px";
-box.style.left = "10px";
-box.style.right = "10px";
-box.style.background = "#000";
-box.style.color = "#0f0";
-box.style.fontSize = "12px";
-box.style.padding = "10px";
-box.style.zIndex = "99999";
-
-box.innerHTML = `
-permission=${Notification.permission}<br>
-registerNotification=${typeof window.registerNotification}<br>
-requestNotifPermission=${typeof window.requestNotifPermission}
-`;
-
-document.body.appendChild(box);
 </script>
 
 <script>
