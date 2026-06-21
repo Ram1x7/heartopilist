@@ -661,14 +661,15 @@ window.registerNotification = async function(item, mode) {
 
   if(mode === "normal"){
     notifyTimes = [{ label:"harvest", time: now + growMs }];
-  } else if(mode === "weed"){
-    const interval = Math.floor(growMs / 4);
+  } else if(mode === "weed") {
+     const third = Math.floor(growMs / 3);
     notifyTimes = [
-      { label:"草抜き1回目", time: now + interval },
-      { label:"草抜き2回目", time: now + interval * 2 },
-      { label:"草抜き3回目", time: now + interval * 3 },
-      { label:"harvest",    time: now + growMs },
-    ];
+    { label:"草抜き1回目", time: now + third },
+    { label:"草抜き2回目", time: now + third * 2 },
+    { label:"草抜き3回目", time: now + growMs - 60000 },
+    { label:"harvest", time: now + growMs },
+  ];
+}
   }
 
   try {
