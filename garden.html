@@ -339,6 +339,45 @@ body.dark .modal-info{ background:#383329; }
 .modal-info-label{ color:var(--text-sub); }
 .modal-info-value{ font-weight:700; color:var(--text); }
 
+.img-wrap{
+  position:relative;
+}
+
+.level-badge{
+  position:absolute;
+  top:6px;
+  left:6px;
+  z-index:5;
+  padding:1px 5px;
+  border-radius:999px;
+  font-size:6px;
+  color:#fdf9ef;
+  background:rgba(52,48,43,0.75);
+  backdrop-filter:blur(4px);
+}
+
+.auth-btn{
+  position:absolute;
+  bottom:6px;
+  right:6px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+  cursor:pointer;
+}
+
+.auth-btn.checked{
+  background:var(--gold);
+  border-color:var(--gold);
+}
+  
 .price-table{
   width:100%;
   border-collapse:collapse;
@@ -798,19 +837,26 @@ function renderSection(label, items, isEvent=false){
 
     div.innerHTML = `
   <div class="img-wrap">
-    <div class="level-badge">Lv.${item.level}</div>
-    ${hasNotif ? `<div style="
+  <div class="level-badge">
+    Lv.${item.level}
+  </div>
+  ${hasNotif ? `
+    <div style="
       position:absolute;
       top:6px;
-      right:30px;
+      right:32px;
       z-index:10;
       font-size:10px;
-    ">🔔</div>` : ''}
-    <button class="auth-btn ${isAuthed ? "checked" : ""}"
-      onclick="event.stopPropagation(); toggleAuth('${item.name}')">
-      ${isAuthed ? "🎖" : ""}
-    </button>
-    <img src="${item.img}" alt="${item.name}" loading="lazy">
+    ">🔔</div>
+  ` : ''}
+  <button
+    class="auth-btn ${isAuthed ? "checked" : ""}"
+    onclick="event.stopPropagation(); toggleAuth('${item.name}')"
+  >
+    ${isAuthed ? "🎖" : ""}
+  </button>
+  <img src="${item.img}" alt="${item.name}" loading="lazy">
+</div>
   </div>
   <div class="item-name">${item.name}</div>
   <div style="font-size:9px; color:var(--text-sub); text-align:center; margin-top:2px;">
