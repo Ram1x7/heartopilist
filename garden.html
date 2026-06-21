@@ -593,7 +593,11 @@ const CANCEL_URL   = "https://canceltimer-e67djhnlrq-uc.a.run.app";
 
 const app = initializeApp(FIREBASE_CONFIG);
 const messaging = getMessaging(app);
-
+  
+function dbg(msg){
+  console.log(msg);
+}
+  
 // FCMトークン取得
 async function getFCMToken() {
   try {
@@ -752,8 +756,14 @@ let authData = JSON.parse(localStorage.getItem("authData") || "{}");
 function toggleAuth(name){
   authData[name] = !authData[name];
   localStorage.setItem("authData", JSON.stringify(authData));
-  renderModal(window.currentItem);
   renderContent();
+  if(window.currentItem){
+    try{
+      renderModal(window.currentItem);
+    }catch(e){
+      console.error(e);
+    }
+  }
 }
 
 function isNotifSet(item, mode){
@@ -884,10 +894,10 @@ function closeModal(){
 }
 
 function renderModal(item){
-  console.log(item);
+  console.log("modal item", item);
   const isFlower = currentTab === "flower";
   const box = document.getElementById("modalBox");
-
+  console.log("prices", item.prices);
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
   const prices = item.prices || [];
   const priceRows = stars.map((s,i) => {
