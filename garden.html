@@ -273,32 +273,7 @@ body.dark .section-label{ color:#e8d2a8; }
 
 .garden-item-name{ font-size:10px; line-height:1.3; color:var(--text); margin-bottom:2px; }
 .garden-item-sub{ font-size:9px; color:var(--text-sub); }
-
-.lv-badge{
-  position:absolute;
-  top:5px;
-  left:5px;
-  font-size:7px;
-  padding:1px 4px;
-  border-radius:999px;
-  background:rgba(52,48,43,0.7);
-  color:#fdf9ef;
-}
-
-.notif-badge{
-  position:absolute;
-  top:5px;
-  right:5px;
-  font-size:10px;
-}
-
-.auth-badge{
-  position:absolute;
-  bottom:5px;
-  right:5px;
-  font-size:10px;
-}
-
+  
 #detailModal{
   display:none;
   position:fixed;
@@ -842,13 +817,27 @@ function renderSection(label, items, isEvent=false){
     const isAuthed = item.auth !== false && !!authData[item.name];
 
     div.innerHTML = `
-      <div class="lv-badge">Lv.${item.level}</div>
-      ${hasNotif ? '<div class="notif-badge">🔔</div>' : ''}
-      ${isAuthed ? '<div class="auth-badge">🎖</div>' : ''}
-      <img src="${item.img}" alt="${item.name}" loading="lazy">
-      <div class="garden-item-name">${item.name}</div>
-      <div class="garden-item-sub">${formatTime(item.growTime)}</div>
-    `;
+  <div class="img-wrap">
+    <div class="level-badge">Lv.${item.level}</div>
+    ${hasNotif ? `<div style="
+      position:absolute;
+      top:6px;
+      right:30px;
+      z-index:10;
+      font-size:10px;
+    ">🔔</div>` : ''}
+    <button class="auth-btn ${isAuthed ? "checked" : ""}"
+      onclick="event.stopPropagation(); toggleAuth('${item.name}')">
+      ${isAuthed ? "🎖" : ""}
+    </button>
+    <img src="${item.img}" alt="${item.name}" loading="lazy">
+  </div>
+  <div class="item-name">${item.name}</div>
+  <div style="font-size:9px; color:var(--text-sub); text-align:center; margin-top:2px;">
+    ${formatTime(item.growTime)}
+  </div>
+`;
+
     div.onclick = () => openModal(item);
     grid.appendChild(div);
   });
