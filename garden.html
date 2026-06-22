@@ -865,21 +865,6 @@ function renderModal(item){
     `;
   }
 
-  // 認証
-  const isAuthed = item.auth !== false && !!authData[item.name];
-  const authHTML = item.auth !== false ? `
-    <button class="auth-btn" data-action="toggleAuth" style="
-      position:static; width:100%; height:auto; border-radius:999px;
-      padding:10px; font-size:12px; margin-bottom:10px;
-      background:${isAuthed ? "var(--gold)" : "var(--card-sub)"};
-      border-color:${isAuthed ? "var(--gold)" : "var(--border)"};
-      color:${isAuthed ? "#fdf9ef" : "var(--text-sub)"};
-      font-weight:${isAuthed ? "700" : "400"};
-    ">
-      ${isAuthed ? "🎖 認証マスター達成済み" : "○ 認証マスター未達成"}
-    </button>
-  ` : "";
-
   box.innerHTML = `
     <div class="g-modal-name">${item.name}</div>
     <div class="g-modal-imgs">
@@ -922,7 +907,6 @@ function renderModal(item){
     </table>
     ${breedingHTML}
     ${notifHTML}
-    ${authHTML}
     <button class="g-close-btn" onclick="closeModal()">閉じる</button>
   `;
 
