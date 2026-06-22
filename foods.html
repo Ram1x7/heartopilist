@@ -66,8 +66,173 @@ body.dark{
 <script>
 const foods = foodsData;
 
+let checkedData =
+
+  JSON.parse(localStorage.getItem("food_checked") || "{}");
+
+let authData =
+
+  JSON.parse(localStorage.getItem("food_auth") || "{}");
+
+/* ===================== SEARCH ===================== */
+
+const searchInput = document.getElementById("search");
+
+searchInput.addEventListener("input", render);
+
+/* ===================== RENDER ===================== */
+
+function render(){
+
+  const keyword = searchInput.value || "";
+
+  let list = foods.filter(f =>
+
+    f.name.includes(keyword)
+
+  );
+
+  const el = document.getElementById("list");
+
+  el.innerHTML = "";
+
+  list.forEach(f => {
+
+    const div = document.createElement("div");
+
+    div.className = "item";
+
+    const checked = checkedData[f.name];
+
+    const auth = authData[f.name];
+
+    div.innerHTML = `
+
+      <div class="img-wrap">
+
+        <div class="level-badge">
+
+          Lv.${f.level}
+
+        </div>
+
+        <button class="check-btn ${checked ? "checked" : ""}">
+
+          ${checked ? "⭐️" : ""}
+
+        </button>
+
+        <button class="auth-btn ${auth ? "checked" : ""}">
+
+          ${auth ? "🎖" : ""}
+
+        </button>
+
+        <img src="${f.image}">
+
+      </div>
+
+      <div class="item-name">${f.name}</div>
+
+    `;
+
+    /* =====================
+
+       モーダル
+
+    ===================== */
+
+    div.onclick = () => openModal(f);
+
+    /* ⭐ */
+
+    div.querySelector(".check-btn").onclick = (e)=>{
+
+      e.stopPropagation();
+
+      checkedData[f.name] = !checkedData[f.name];
+
+      localStorage.setItem("food_checked", JSON.stringify(checkedData));
+
+      render();
+
+    };
+
+    /* 🎖 */
+
+    div.querySelector(".auth-btn").onclick = (e)=>{
+
+      e.stopPropagation();
+
+      authData[f.name] = !authData[f.name];
+
+      localStorage.setItem("food_auth", JSON.stringify(authData));
+
+      render();
+
+    };
+
+    el.appendChild(div);
+
+  });
+
+}
+
+/* ===================== MODAL ===================== */
+
+function openModal(f){
+
+  modal.style.display = "block";
+
+  m_name.textContent = f.name;
+
+  m_img.src = f.image;
+
+  m_level.textContent = "Lv." + f.level;
+
+  const prices = f.prices.filter(p => p !== null);
+
+  const min = Math.min(...prices);
+
+  const max = Math.max(...prices);
+
+  const profit = max - min;
+
+  m_profit.textContent = `利益：${profit}`;
+
+}
+
+function closeModal(){
+
+  modal.style.display = "none";
+
+}
+
+/* ===================== DARK MODE ===================== */
+
+darkToggle.onclick = ()=>{
+
+  document.body.classList.toggle("dark");
+
+  localStorage.setItem(
+
+    "darkMode",
+
+    document.body.classList.contains("dark")
+
+  );
+
+};
+
+if(localStorage.getItem("darkMode")==="true"){
+
+  document.body.classList.add("dark");
+
+}
+
+/* ===================== INIT ===================== */  
 // 初期化
-renderContent();
+render()
 </script>
 </body>
 </html>
