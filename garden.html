@@ -25,20 +25,7 @@
 </script>
 
 <style>
-/* ========================================
-   garden.html 専用CSS
-   style.cssで定義済みのものは書かない：
-   - :root変数（--indigo, --card, --border等）
-   - body（margin, padding, font, background, color）
-   - @keyframes fadeIn
-   - .title-bar, .title-buttons, h1
-   - .site-nav, .site-nav-item
-   - .level-badge, .auth-btn, .check-btn, .img-wrap
-   - .item-name
-   - a, h3
-   ======================================== */
-
-/* green変数はstyle.cssにないので定義 */
+/* garden.html 専用CSS */
 :root{
   --green:#4a7c59;
   --green-soft:#dff0e5;
@@ -84,14 +71,11 @@ body.dark{
   font-size:20px;
   color:var(--indigo);
   letter-spacing:0.12em;
-  /* h3と被らないようh2を使用 */
 }
 
-body.dark .page-header h2{
-  color:#e8d2a8;
-}
+body.dark .page-header h2{ color:#e8d2a8; }
 
-/* ── 作物/花タブ ── */
+/* ── タブ ── */
 .tab-row{
   display:flex;
   gap:8px;
@@ -119,17 +103,8 @@ body.dark .page-header h2{
   font-weight:700;
 }
 
-body.dark .g-tab{
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border-color:var(--border);
-}
-
-body.dark .g-tab.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
-}
+body.dark .g-tab{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
+body.dark .g-tab.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
 
 /* ── イベント終了バナー ── */
 .event-ended-banner{
@@ -154,11 +129,9 @@ body.dark .g-tab.active{
   border-left:3px solid var(--gold);
 }
 
-body.dark .section-label{
-  color:#e8d2a8;
-}
+body.dark .section-label{ color:#e8d2a8; }
 
-/* ── 園芸グリッド ── */
+/* ── 園芸グリッド（.gridと同じ4列） ── */
 .garden-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -166,49 +139,62 @@ body.dark .section-label{
   margin-bottom:8px;
 }
 
-/* ── 園芸アイテムカード ── */
-/* .itemと被らないようgarden-itemを使用 */
+/* ── 園芸アイテム（.itemと同じスタイル） ── */
 .garden-item{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:16px;
-  padding:8px;
+  border-radius:18px;
+  padding:10px;
   text-align:center;
   font-size:11px;
-  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+  box-shadow:0 6px 16px rgba(52,48,43,0.06);
   cursor:pointer;
   transition:0.15s;
   position:relative;
   overflow:hidden;
 }
 
-.garden-item:hover{ transform:translateY(-2px); }
+.garden-item:hover{ transform:translateY(-2px); box-shadow:0 10px 20px rgba(52,48,43,0.1); }
 .garden-item:active{ transform:scale(0.96); }
+
+body.dark .garden-item{ background:#2c2823; border-color:#46423b; }
+
+/* 画像（.item imgと同じ） */
+.garden-item .img-wrap img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:14px;
+  padding:2px;
+  box-sizing:border-box;
+  margin-bottom:6px;
+  display:block;
+}
+
+body.dark .garden-item .img-wrap img{ background:#383329; }
+
+/* 通知バッジ（level-badgeの隣） */
+.notif-badge{
+  position:absolute;
+  top:6px;
+  left:28px;
+  z-index:5;
+  padding:1px 4px;
+  border-radius:999px;
+  font-size:7px;
+  color:#fdf9ef;
+  background:var(--green);
+  line-height:1.4;
+}
 
 .garden-item-sub{
   font-size:9px;
   color:var(--text-sub);
-  text-align:center;
   margin-top:2px;
 }
 
-/* 通知アイコン（level-badgeの右隣） */
-.notif-icon{
-  position:absolute;
-  top:6px;
-  left:32px;
-  z-index:10;
-  font-size:9px;
-  background:var(--green);
-  color:#fdf9ef;
-  border-radius:999px;
-  padding:1px 4px;
-  line-height:1.4;
-}
-
 /* ── 園芸モーダル ── */
-/* style.cssの#modalと被らないよう#detailModalを使用 */
-/* style.cssの.modal-boxと被らないようg-modal-boxを使用 */
 #detailModal{
   display:none;
   position:fixed;
@@ -230,10 +216,7 @@ body.dark .section-label{
   box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
-body.dark .g-modal-box{
-  background:#2c2823;
-  border-color:#46423b;
-}
+body.dark .g-modal-box{ background:#2c2823; border-color:#46423b; }
 
 .g-modal-name{
   font-family:'Shippori Mincho', serif;
@@ -266,13 +249,11 @@ body.dark .g-modal-name{ color:#e8d2a8; }
   display:block;
 }
 
-.g-modal-img-label{
-  font-size:10px;
-  color:var(--text-sub);
-  margin-top:4px;
-}
+body.dark .g-modal-img-wrap img{ background:#383329; }
 
-/* ── 基本情報ブロック ── */
+.g-modal-img-label{ font-size:10px; color:var(--text-sub); margin-top:4px; }
+
+/* ── 基本情報 ── */
 .g-info{
   background:var(--card-sub);
   border-radius:12px;
@@ -287,6 +268,8 @@ body.dark .g-info{ background:#383329; }
 .g-info-row{ display:flex; justify-content:space-between; }
 .g-info-label{ color:var(--text-sub); }
 .g-info-value{ font-weight:700; color:var(--text); }
+
+body.dark .g-info-value{ color:#ece4d4; }
 
 /* ── 売価テーブル ── */
 .g-price-table{
@@ -312,6 +295,8 @@ body.dark .g-price-table th{ background:#383329; }
   border-top:1px solid var(--border);
   color:var(--text);
 }
+
+body.dark .g-price-table td{ color:#ece4d4; border-color:#46423b; }
 
 .g-price-null{ color:var(--border); font-size:10px; }
 
@@ -481,7 +466,7 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 
 <div id="notifBanner">
   🔔 バックグラウンド通知を受け取るには通知の許可が必要です<br>
-  <button class="notif-allow-btn" onclick="requestNotifPermission()">通知を許可する</button>
+  <button class="notif-allow-btn" id="notifAllowBtn">通知を許可する</button>
 </div>
 
 <div class="tab-row">
@@ -502,12 +487,12 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
 
-<script type="module">
-import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getMessaging, getToken, onMessage }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+<!-- Firebase compat版（通常scriptで動作・module不要） -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
+<script>
+// ── Firebase初期化 ──
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB6aGH4BCn2NFNUMeon9LTM_ck2vKoWYFI",
   authDomain: "heartopilist-c8b69.firebaseapp.com",
@@ -521,16 +506,15 @@ const VAPID_KEY = "BHsuetgZxjPnNS1eiqkIRwmFhddZkN0FweRiAbwCv3ixBEnTODksIpyOoHi72
 const REGISTER_URL = "https://registertimer-e67djhnlrq-uc.a.run.app";
 const CANCEL_URL   = "https://canceltimer-e67djhnlrq-uc.a.run.app";
 
-const app = initializeApp(FIREBASE_CONFIG);
-const messaging = getMessaging(app);
+firebase.initializeApp(FIREBASE_CONFIG);
+const messaging = firebase.messaging();
 
+// FCMトークン取得
 async function getFCMToken() {
   try {
     const sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
-    const token = await getToken(messaging, {
-      vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: sw,
-    });
+    await navigator.serviceWorker.ready;
+    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
     if(token){
       localStorage.setItem("fcmToken", token);
       return token;
@@ -541,24 +525,31 @@ async function getFCMToken() {
   return null;
 }
 
-window.requestNotifPermission = async function() {
+// 通知許可を要求
+async function requestNotifPermission() {
   const permission = await Notification.requestPermission();
   if(permission === "granted"){
     const token = await getFCMToken();
     if(token){
       document.getElementById("notifBanner").style.display = "none";
       showToast("通知が有効になりました！");
+    } else {
+      showToast("トークン取得に失敗しました");
     }
   } else {
     showToast("通知が拒否されました");
   }
-};
+}
 
-onMessage(messaging, (payload) => {
+document.getElementById("notifAllowBtn").addEventListener("click", requestNotifPermission);
+
+// フォアグラウンド通知
+messaging.onMessage((payload) => {
   showToast(payload.notification?.title || "通知が届きました");
 });
 
-window.registerNotification = async function(item, mode) {
+// 通知をCloud Functionsに登録
+async function registerNotification(item, mode) {
   const token = localStorage.getItem("fcmToken") || await getFCMToken();
   if(!token){
     showToast("先に通知を許可してください");
@@ -602,9 +593,10 @@ window.registerNotification = async function(item, mode) {
     console.error(e);
     showToast("通知のセットに失敗しました");
   }
-};
+}
 
-window.cancelNotification = async function(item, mode) {
+// 通知をキャンセル
+async function cancelNotification(item, mode) {
   const token = localStorage.getItem("fcmToken");
   if(token){
     try {
@@ -622,8 +614,9 @@ window.cancelNotification = async function(item, mode) {
   showToast("通知をキャンセルしました");
   renderModal(window.currentItem);
   renderContent();
-};
+}
 
+// 起動時にトークンを確認
 (async () => {
   if(Notification.permission === "granted"){
     await getFCMToken();
@@ -658,11 +651,8 @@ let authData = JSON.parse(localStorage.getItem("authData") || "{}");
 function toggleAuth(name){
   authData[name] = !authData[name];
   localStorage.setItem("authData", JSON.stringify(authData));
+  renderModal(window.currentItem);
   renderContent();
-  if(window.currentItem){
-    try{ renderModal(window.currentItem); }
-    catch(e){ console.error(e); }
-  }
 }
 
 // ── 通知タイマー ──
@@ -685,9 +675,7 @@ function getRemaining(item, mode){
 function cleanExpiredTimers(){
   const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
   const now = Date.now();
-  Object.keys(timers).forEach(k => {
-    if(timers[k].end <= now) delete timers[k];
-  });
+  Object.keys(timers).forEach(k => { if(timers[k].end <= now) delete timers[k]; });
   localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
 }
 
@@ -753,14 +741,12 @@ function renderSection(label, items, isEvent=false){
     const hasNotif = isNotifSet(item,"normal") || isNotifSet(item,"weed");
     const isAuthed = item.auth !== false && !!authData[item.name];
 
-    // img-wrap, level-badge, auth-btn はstyle.cssで定義済み
     div.innerHTML = `
       <div class="img-wrap">
         <div class="level-badge">Lv.${item.level}</div>
-        ${hasNotif ? '<div class="notif-icon">🔔</div>' : ''}
+        ${hasNotif ? '<div class="notif-badge">🔔</div>' : ''}
         ${item.auth !== false ? `
-          <button class="auth-btn ${isAuthed ? "checked" : ""}"
-            onclick="event.stopPropagation(); toggleAuth('${item.name}')">
+          <button class="auth-btn ${isAuthed ? "checked" : ""}">
             ${isAuthed ? "🎖" : ""}
           </button>
         ` : ''}
@@ -769,6 +755,15 @@ function renderSection(label, items, isEvent=false){
       <div class="item-name">${item.name}</div>
       <div class="garden-item-sub">${formatTime(item.growTime)}</div>
     `;
+
+    // 認証ボタンのクリック
+    const authBtn = div.querySelector(".auth-btn");
+    if(authBtn){
+      authBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleAuth(item.name);
+      });
+    }
 
     div.onclick = () => openModal(item);
     grid.appendChild(div);
@@ -803,6 +798,7 @@ function renderModal(item){
     </tr>`;
   }).join("");
 
+  // 交配（花のみ）
   let breedingHTML = "";
   if(isFlower && item.colors && item.colors.length > 0){
     const chips = item.colors.map(c => {
@@ -838,6 +834,7 @@ function renderModal(item){
     `;
   }
 
+  // 通知（作物のみ）
   let notifHTML = "";
   if(!isFlower){
     const normalSet = isNotifSet(item,"normal");
@@ -850,15 +847,11 @@ function renderModal(item){
         <div class="g-section-title">🔔 収穫通知</div>
         <div class="notif-btns">
           <button class="notif-btn ${normalSet ? "set" : ""}"
-            onclick="${normalSet
-              ? `cancelNotification(window.currentItem,'normal')`
-              : `registerNotification(window.currentItem,'normal')`}">
+            data-action="${normalSet ? "cancel" : "register"}" data-mode="normal">
             ${normalSet ? "✅ 通常：通知中" : "🔔 通常モード"}
           </button>
           <button class="notif-btn ${weedSet ? "set" : ""}"
-            onclick="${weedSet
-              ? `cancelNotification(window.currentItem,'weed')`
-              : `registerNotification(window.currentItem,'weed')`}">
+            data-action="${weedSet ? "cancel" : "register"}" data-mode="weed">
             ${weedSet ? "✅ 草抜き：通知中" : "🌿 草抜きモード"}
           </button>
         </div>
@@ -871,6 +864,21 @@ function renderModal(item){
       </div>
     `;
   }
+
+  // 認証
+  const isAuthed = item.auth !== false && !!authData[item.name];
+  const authHTML = item.auth !== false ? `
+    <button class="auth-btn" data-action="toggleAuth" style="
+      position:static; width:100%; height:auto; border-radius:999px;
+      padding:10px; font-size:12px; margin-bottom:10px;
+      background:${isAuthed ? "var(--gold)" : "var(--card-sub)"};
+      border-color:${isAuthed ? "var(--gold)" : "var(--border)"};
+      color:${isAuthed ? "#fdf9ef" : "var(--text-sub)"};
+      font-weight:${isAuthed ? "700" : "400"};
+    ">
+      ${isAuthed ? "🎖 認証マスター達成済み" : "○ 認証マスター未達成"}
+    </button>
+  ` : "";
 
   box.innerHTML = `
     <div class="g-modal-name">${item.name}</div>
@@ -914,8 +922,20 @@ function renderModal(item){
     </table>
     ${breedingHTML}
     ${notifHTML}
+    ${authHTML}
     <button class="g-close-btn" onclick="closeModal()">閉じる</button>
   `;
+
+  // data属性でイベント登録
+  box.querySelectorAll("[data-action]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = btn.dataset.action;
+      const mode   = btn.dataset.mode;
+      if(action === "register")    registerNotification(window.currentItem, mode);
+      if(action === "cancel")      cancelNotification(window.currentItem, mode);
+      if(action === "toggleAuth")  toggleAuth(window.currentItem.name);
+    });
+  });
 }
 
 // ── トースト ──
