@@ -449,7 +449,7 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 </nav>
 
 <div class="page-header">
-  <h2>🌱 園芸図鑑</h2>
+  <h2>園芸図鑑</h2>
 </div>
 
 <div id="notifBanner">
@@ -549,7 +549,7 @@ async function registerNotification(item, mode) {
     notifyTimes = [
       { label:"草抜き1回目", time: now + third },
       { label:"草抜き2回目", time: now + third * 2 },
-      { label:"草抜き3回目", time: now + growMs - 60000 },
+      { label:"草抜き3回目", time: now + growMs - 90000 },
       { label:"harvest",    time: now + growMs },
     ];
   }
@@ -587,6 +587,15 @@ async function registerNotification(item, mode) {
 }
 
 async function cancelNotification(item, mode) {
+  // ★ 先にlocalStorageを更新してUIを即座に反映
+  const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
+  delete timers[item.name + "_" + mode];
+  localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
+  showToast("通知をキャンセルしました");
+  renderModal(window.currentItem);
+  renderContent();
+
+  // APIはバックグラウンドで送信
   const token = localStorage.getItem("fcmToken");
   if(token){
     try {
@@ -597,13 +606,6 @@ async function cancelNotification(item, mode) {
       });
     } catch(e) { console.error(e); }
   }
-
-  const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
-  delete timers[item.name + "_" + mode];
-  localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
-  showToast("通知をキャンセルしました");
-  renderModal(window.currentItem);
-  renderContent();
 }
 
 (async () => {
