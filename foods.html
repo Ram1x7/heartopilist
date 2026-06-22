@@ -6,72 +6,79 @@
 
 <title>はとぴ図鑑｜料理</title>
 
-<!-- ★ index完全依存 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 <link rel="stylesheet" href="css/style.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
 <!-- =========================
-     title bar（index完全踏襲）
+ title-bar（完全一致）
 ========================= -->
 <div class="title-bar">
-  <h1>料理図鑑</h1>
+
+  <h1>はとぴ図鑑</h1>
 
   <div class="title-buttons">
     <button id="helpBtn">ℹ️</button>
     <button id="shareBtn">📤</button>
     <button id="darkToggle">🌙</button>
   </div>
+
 </div>
 
 <!-- =========================
-     ナビ（indexと統一）
+ site-nav（完全一致）
 ========================= -->
 <nav class="site-nav">
-  <a class="site-nav-item active">料理</a>
-  <a href="index.html" class="site-nav-item">図鑑へ</a>
+  <a href="./index.html" class="site-nav-item">図鑑</a>
+  <a href="./foods.html" class="site-nav-item active">料理</a>
+  <a href="./codes.html" class="site-nav-item">コード</a>
+  <a href="./events.html" class="site-nav-item">イベント</a>
+  <a href="./faq.html" class="site-nav-item">Q&A</a>
 </nav>
 
 <!-- =========================
-     検索・操作パネル
+ topPanel（index完全コピー）
 ========================= -->
 <div class="card sticky" id="topPanel">
 
-  <div style="position:relative;">
-    <input type="text" id="search" class="search" placeholder="🔍 料理名で検索">
-    <button id="clearBtn">×</button>
-  </div>
+  <button id="minimizeBtn">－</button>
 
-  <div class="filter" style="margin-top:8px;">
-    <button id="multiBtn" onclick="toggleMultiSelect()">☑️複数選択</button>
+  <div class="mini-info">
 
-    <button id="bulkStarBtn" onclick="bulkStar()" style="display:none;">⭐一括</button>
-    <button id="bulkUnstarBtn" onclick="bulkUnstar()" style="display:none;">⭐解除</button>
+    <input type="text" id="search" class="search mini-search" placeholder="🔍 料理名で検索">
 
-    <button id="bulkAuthBtn" onclick="bulkAuth()" style="display:none;">🎖一括</button>
-    <button id="bulkAuthUnBtn" onclick="bulkAuthUncheck()" style="display:none;">🎖解除</button>
+    <div class="mini-status">
+      <div id="miniTime"></div>
+      <div id="miniWeather"></div>
+    </div>
+
   </div>
 
 </div>
 
 <!-- =========================
-     グリッド
+ grid
 ========================= -->
 <div id="list" class="grid"></div>
 
 <!-- =========================
-     モーダル（index完全流用構造）
+ modal（index完全一致構造）
 ========================= -->
-<div id="modal" onclick="if(event.target.id==='modal')closeModal()">
+<div id="modal" onclick="if(event.target.id==='modal') closeModal()">
+
   <div class="modal-box">
 
     <h3 id="m_name"></h3>
+
     <img id="m_img">
 
     <div class="modal-info-row">
+
       <div class="modal-left">
         <p id="m_level"></p>
         <p id="m_materials"></p>
@@ -81,19 +88,22 @@
         <p id="m_prices"></p>
         <p id="m_profit"></p>
       </div>
+
     </div>
 
     <button onclick="closeModal()">閉じる</button>
+
   </div>
+
 </div>
 
 <!-- =========================
-     DATA（別ファイル）
+ DATA
 ========================= -->
 <script src="js/data-foods.js"></script>
 
 <!-- =========================
-     JS本体
+ JS
 ========================= -->
 <script>
 const foods = foodsData;
@@ -101,132 +111,120 @@ const foods = foodsData;
 let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
 let authData = JSON.parse(localStorage.getItem("food_auth") || "{}");
 
-let multiSelectMode = false;
-let selectedItems = {};
-
-const searchInput = document.getElementById("search");
 const list = document.getElementById("list");
-const clearBtn = document.getElementById("clearBtn");
+const search = document.getElementById("search");
 
-searchInput.addEventListener("input", ()=>{
-  clearBtn.style.display = searchInput.value ? "block" : "none";
-  render();
-});
-
-clearBtn.onclick = ()=>{
-  searchInput.value = "";
-  clearBtn.style.display = "none";
-  render();
-};
+search.addEventListener("input", render);
 
 // =========================
-// 描画
+// INDEX完全一致カード描画
 // =========================
 function render(){
 
-  let data = [...foods];
+  let data = foods;
 
-  const k = searchInput.value;
+  const k = search.value;
   if(k){
     data = data.filter(f => f.name.includes(k));
   }
 
   list.innerHTML = "";
 
-  data.forEach(f => {
+  data.forEach(c => {
 
-    const el = document.createElement("div");
-    el.className = "item" + (selectedItems[f.name] ? " selected" : "");
+    const div = document.createElement("div");
+    div.className = "item";
 
-    el.innerHTML = `
+    div.innerHTML = `
       <div class="img-wrap">
 
-        <div class="level-badge">Lv.${f.level}</div>
+        <div class="level-badge">
+          Lv.${c.level}
+        </div>
 
-        <button class="check-btn ${checkedData[f.name] ? "checked" : ""}">
+        <!-- ⭐（index完全一致） -->
+        <button class="check-btn ${checkedData[c.name] ? "checked" : ""}">
           ⭐️
         </button>
 
-        <button class="auth-btn ${authData[f.name] ? "checked" : ""}">
+        <!-- 🎖（index完全一致） -->
+        ${c.hasMaster !== false ? `
+        <button class="auth-btn ${authData[c.name] ? "checked" : ""}">
           🎖
-        </button>
+        </button>` : ""}
 
-        <img src="${f.image}">
+        <img src="${c.image}">
       </div>
 
-      <div class="item-name">${f.name}</div>
+      <div class="item-name">
+        ${c.name}
+      </div>
     `;
 
-    el.onclick = ()=>{
-      if(multiSelectMode){
-        selectedItems[f.name] = !selectedItems[f.name];
-        el.classList.toggle("selected");
-        return;
-      }
-      openModal(f);
-    };
+    // モーダル
+    div.onclick = ()=> openModal(c);
 
-    el.querySelector(".check-btn").onclick = (e)=>{
+    // ⭐
+    div.querySelector(".check-btn").onclick = (e)=>{
       e.stopPropagation();
-      checkedData[f.name] = !checkedData[f.name];
+      checkedData[c.name] = !checkedData[c.name];
       save();
       render();
     };
 
-    el.querySelector(".auth-btn").onclick = (e)=>{
-      e.stopPropagation();
-      authData[f.name] = !authData[f.name];
-      save();
-      render();
-    };
+    // 🎖
+    const authBtn = div.querySelector(".auth-btn");
+    if(authBtn){
+      authBtn.onclick = (e)=>{
+        e.stopPropagation();
+        authData[c.name] = !authData[c.name];
+        save();
+        render();
+      };
+    }
 
-    list.appendChild(el);
+    list.appendChild(div);
   });
 }
 
 // =========================
-// モーダル（利益計算込み）
-// =========================
-function openModal(f){
+// モーダル（index完全仕様）
+# =========================
+function openModal(c){
 
   modal.style.display = "block";
 
-  m_name.innerText = f.name;
-  m_img.src = f.image;
+  m_name.innerText = c.name;
+  m_img.src = c.image;
 
-  m_level.innerText = "Lv." + f.level;
+  m_level.innerText = "Lv." + c.level;
 
-  // 材料
-  m_materials.innerHTML = f.materials
-    .map(m => `<img src="${m.image}" style="width:32px;margin:2px;">`)
-    .join("");
+  m_materials.innerHTML =
+    (c.materials || [])
+      .map(m=>`<img src="${m.image}" style="width:32px;margin:2px;">`)
+      .join("");
 
-  // 売値
-  m_prices.innerHTML = f.prices
-    .map((p,i)=>`★${i+1}: ${p ?? "-"}`)
-    .join("<br>");
+  const base = c.prices?.[0] || 0;
 
-  // 利益（heartopia方式）
-  const valid = f.prices.filter(p => p);
-  const max = Math.max(...valid);
-  const min = Math.min(...valid);
+  const rates = [1,1.5,2,4,8];
+
+  let html = "";
+
+  rates.forEach((r,i)=>{
+    html += `<p>★${i+1}：${Math.floor(base*r)}</p>`;
+  });
+
+  m_prices.innerHTML = html;
+
+  const max = Math.floor(base*8);
+  const min = base;
 
   m_profit.innerText =
-    isFinite(max - min)
-      ? `最大利益：${max - min}`
-      : "-";
+    base ? `最大利益：${max - min}` : "-";
 }
 
 function closeModal(){
   modal.style.display = "none";
-}
-
-// =========================
-// 複数選択
-// =========================
-function toggleMultiSelect(){
-  multiSelectMode = !multiSelectMode;
-  multiBtn.classList.toggle("active", multiSelectMode);
 }
 
 // =========================
@@ -237,6 +235,7 @@ function save(){
   localStorage.setItem("food_auth", JSON.stringify(authData));
 }
 
+// 初期
 render();
 </script>
 
