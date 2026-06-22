@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+  <meta name="description" content="Heartopia（ハートピアスローライフ）の料理レシピ図鑑。材料費・利益・時給・レア度ごとに検索・比較できます。">
+  <meta name="theme-color" content="#3c5a6e">
+  <meta property="og:title" content="料理レシピ図鑑｜はとぴ図鑑">
+  <meta property="og:description" content="Heartopiaの料理レシピ図鑑。材料費・利益・時給・レア度ごとに検索・比較できます。">
+  <meta property="og:site_name" content="はとぴ図鑑">
+  <meta property="og:type" content="website">
+  <title>料理レシピ図鑑｜はとぴ図鑑</title>
+  <style>
+    /* =============================================
+       ベース（既存サイトのテーマカラー・フォントに合わせる）
+       ============================================= */
+    :root {
+      --bg:        #f0f4f8;
+      --card-bg:   #ffffff;
+      --header-bg: #3c5a6e;
+      --nav-bg:    #2e4657;
+      --accent:    #4e9dcc;
+      --accent2:   #f7c948;
+      --text:      #1e2c38;
+      --sub:       #6b8497;
+      --border:    #d4e0ea;
+      --green:     #28a745;
+      --red:       #dc3545;
+      --lv1:       #7aa8ff;
+      --lv2:       #41b66f;
+      --lv3:       #ff9800;
+      --lv4:       #e040fb;
+      --lv5:       #f44336;
+    }
+    [data-theme="dark"] {
+      --bg:        #141c24;
+      --card-bg:   #1e2c38;
+      --header-bg: #1a2a36;
+      --nav-bg:    #111d27;
+      --accent:    #4e9dcc;
+      --accent2:   #f7c948;
+      --text:      #dce8f0;
+      --sub:       #7a9db5;
+      --border:    #2a3f52;
+      --green:     #3dbb5e;
+      --red:       #ff6070;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans",
+                   "Yu Gothic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ---- ヘッダー ---- */
+    header {
+      background: var(--header-bg);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+
+    .site-title {
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: .02em;
+    }
+
+    .header-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+      transition: background .15s;
+    }
+    .header-btn:hover { background: rgba(255,255,255,.15); }
+
+    /* ---- ナビ ---- */
+    nav {
+      background: var(--nav-bg);
+      display: flex;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar { display: none; }
+
+    nav a {
+      color: rgba(255,255,255,.7);
+      text-decoration: none;
+      padding: 10px 18px;
+      font-size: .88rem;
+      font-weight: 600;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    nav a:hover { color: #fff; }
+    nav a.active {
+      color: #fff;
+      border-bottom-color: var(--accent2);
+    }
+
+    /* ---- メイン ---- */
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .page-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ---- コントロールバー ---- */
+    .food-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .food-search-wrap {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 12px;
+      gap: 8px;
+    }
+    .food-search-wrap input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: .95rem;
+      color: var(--text);
+      width: 100%;
+    }
+    .food-search-wrap input::placeholder { color: var(--sub); }
+    .food-search-wrap button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--sub);
+      font-size: 1rem;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .ctrl-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .ctrl-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ctrl-group label {
+      font-size: .7rem;
+      color: var(--sub);
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .ctrl-btns {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .chip-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      font-size: .8rem;
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .chip-btn.star-active  { background: var(--accent2); border-color: var(--accent2); color: #5a3e00; }
+    .chip-btn.sort-active  { background: var(--accent);  border-color: var(--accent);  color: #fff; }
+    .chip-btn.level-active { background: var(--header-bg); border-color: var(--header-bg); color: #fff; }
+
+    /* ---- 比較ツール ---- */
+    .compare-wrap {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .compare-title {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 10px;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .compare-selects {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .compare-selects select {
+      flex: 1;
+      min-width: 130px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: .85rem;
+    }
+    .compare-selects span { color: var(--sub); font-weight: 700; }
+    .compare-btn {
+      padding: 7px 18px;
+      border-radius: 20px;
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .compare-btn:hover { opacity: .85; }
+
+    .compare-result { display: flex; gap: 8px; align-items: stretch; margin-top: 8px; }
+    .compare-col {
+      flex: 1;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: .83rem;
+      line-height: 1.8;
+    }
+    .compare-col strong { font-size: .9rem; }
+    .compare-vs { font-size: .95rem; font-weight: 900; color: var(--sub); align-self: center; }
+    .compare-winner {
+      margin-top: 8px;
+      font-size: .87rem;
+      color: var(--text);
+      text-align: center;
+    }
+
+    /* ---- カードリスト ---- */
+    #foodList { display: flex; flex-direction: column; gap: 8px; }
+
+    /* ---- カード ---- */
+    .food-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: box-shadow .15s;
+    }
+    .food-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.10); }
+
+    .food-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+    }
+
+    .food-thumb {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      border-radius: 10px;
+      background: var(--bg);
+      flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+
+    .food-card-body { flex: 1; min-width: 0; }
+    .food-card-name {
+      font-size: .97rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .food-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+    .tag {
+      font-size: .72rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--sub);
+      white-space: nowrap;
+      font-weight: 500;
+    }
+    .tag-profit-pos { background: rgba(40,167,69,.12); color: var(--green); font-weight: 700; }
+    .tag-profit-neg { background: rgba(220,53,69,.12); color: var(--red);   font-weight: 700; }
+    .tag-price      { background: rgba(247,201,72,.15); color: #8a6400; }
+
+    .lv-badge {
+      font-size: .7rem;
+      font-weight: 700;
+      color: #fff;
+      padding: 3px 8px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .arrow {
+      font-size: .7rem;
+      color: var(--sub);
+      transition: transform .2s;
+      flex-shrink: 0;
+    }
+    .arrow.open { transform: rotate(180deg); }
+
+    /* ---- 詳細エリア ---- */
+    .food-detail {
+      border-top: 1.5px solid var(--border);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .food-detail.hidden { display: none; }
+
+    .detail-section-title {
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--sub);
+      margin-bottom: 7px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    /* ★別価格テーブル */
+    .star-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .star-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: .83rem;
+      padding: 4px 8px;
+      border-radius: 8px;
+      color: var(--text);
+    }
+    .star-row .sr-star { width: 28px; color: var(--sub); font-size: .78rem; }
+    .star-row .sr-price { flex: 1; font-weight: 600; }
+    .star-row.active-star {
+      background: rgba(247,201,72,.15);
+      border: 1px solid rgba(247,201,72,.4);
+    }
+    .star-row.active-star .sr-star { color: #b08000; font-weight: 700; }
+
+    /* 材料グリッド */
+    .materials-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .mat-chip {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: .81rem;
+      color: var(--text);
+    }
+    .mat-img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 7px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+    .mat-no-img {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      border-radius: 7px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .mat-label { line-height: 1.4; }
+    .mat-label small { color: var(--sub); font-size: .7rem; display: block; }
+
+    .cost-note {
+      margin-top: 6px;
+      font-size: .78rem;
+      color: var(--sub);
+    }
+
+    /* ---- 空状態 ---- */
+    .empty-state {
+      text-align: center;
+      color: var(--sub);
+      padding: 40px 16px;
+      font-size: .9rem;
+    }
+
+    /* ---- フッター ---- */
+    footer {
+      text-align: center;
+      font-size: .75rem;
+      color: var(--sub);
+      padding: 32px 16px 24px;
+    }
+
+    /* ---- プロフィール色クラス ---- */
+    .pos { color: var(--green); font-weight: 700; }
+    .neg { color: var(--red);   font-weight: 700; }
+
+    /* ---- レスポンシブ ---- */
+    @media (max-width: 480px) {
+      .food-card-header { gap: 8px; padding: 10px 12px; }
+      .food-thumb { width: 50px; height: 50px; }
+      .compare-result { flex-direction: column; }
+      .compare-vs { align-self: unset; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== ヘッダー ===================== -->
+<header>
+  <a class="site-title" href="index.html">はとぴ図鑑</a>
+  <button class="header-btn" id="themeToggle" title="ダーク/ライト切替">🌙</button>
+</header>
+
+<!-- ===================== ナビ ===================== -->
+<nav>
+  <a href="index.html">図鑑</a>
+  <a href="codes.html">コード</a>
+  <a href="events.html">イベント</a>
+  <a href="foods.html" class="active">料理</a>
+  <a href="faq.html">Q&amp;A</a>
+</nav>
+
+<!-- ===================== メイン ===================== -->
+<main>
+  <div class="page-title">🍳 料理レシピ図鑑</div>
+
+  <!-- ---- コントロールバー ---- -->
+  <div class="food-controls">
+
+    <!-- 検索 -->
+    <div class="food-search-wrap">
+      <span style="color:var(--sub)">🔍</span>
+      <input type="text" id="foodSearchInput" placeholder="料理名・材料で検索…">
+      <button id="foodSearchClear" title="クリア">✕</button>
+    </div>
+
+    <div class="ctrl-row">
+      <!-- ★フィルタ -->
+      <div class="ctrl-group">
+        <label>売価の★</label>
+        <div class="ctrl-btns" id="starBtns">
+          <button class="chip-btn star-active" data-star="1" onclick="setFoodStar(1)">★1</button>
+          <button class="chip-btn" data-star="2" onclick="setFoodStar(2)">★2</button>
+          <button class="chip-btn" data-star="3" onclick="setFoodStar(3)">★3</button>
+          <button class="chip-btn" data-star="4" onclick="setFoodStar(4)">★4</button>
+          <button class="chip-btn" data-star="5" onclick="setFoodStar(5)">★5</button>
+        </div>
+      </div>
+
+      <!-- ソート -->
+      <div class="ctrl-group">
+        <label>並び替え</label>
+        <div class="ctrl-btns" id="sortBtns">
+          <button class="chip-btn sort-active" data-sort="default" onclick="setFoodSort('default')">デフォルト</button>
+          <button class="chip-btn" data-sort="profit" onclick="setFoodSort('profit')">利益順</button>
+          <button class="chip-btn" data-sort="hourly" onclick="setFoodSort('hourly')">時給順</button>
+        </div>
+      </div>
+
+      <!-- レベルフィルタ -->
+      <div class="ctrl-group">
+        <label>レシピ Lv</label>
+        <div class="ctrl-btns" id="levelBtns">
+          <button class="chip-btn level-active" data-level="0" onclick="setFoodLevel(0)">すべて</button>
+          <button class="chip-btn" data-level="1" onclick="setFoodLevel(1)">Lv.1</button>
+          <button class="chip-btn" data-level="2" onclick="setFoodLevel(2)">Lv.2</button>
+          <button class="chip-btn" data-level="3" onclick="setFoodLevel(3)">Lv.3</button>
+          <button class="chip-btn" data-level="4" onclick="setFoodLevel(4)">Lv.4</button>
+        </div>
+      </div>
+    </div>
+  </div><!-- /.food-controls -->
+
+  <!-- ---- 比較ツール ---- -->
+  <div class="compare-wrap">
+    <div class="compare-title">⚖️ 料理を比較する</div>
+    <div class="compare-selects">
+      <select id="foodSelectA"></select>
+      <span>VS</span>
+      <select id="foodSelectB"></select>
+      <button class="compare-btn" onclick="compareFoods()">比較</button>
+    </div>
+    <div id="foodCompareResult"></div>
+  </div>
+
+  <!-- ---- カードリスト ---- -->
+  <div id="foodList"></div>
+
+</main>
+
+<footer>
+  ※ 非公式ファンツールです。ゲーム内情報と異なる場合があります。<br>
+  <a href="index.html" style="color:var(--accent)">はとぴ図鑑 トップへ</a>
+</footer>
+
+<!-- ===================== データ ===================== -->
+<script>
+// -------------------------------------------------------
+// FOODS データ
+// -------------------------------------------------------
+const FOODS = [
+  { id:  1, name: "田園サラダ",       image: "foods/001.PNG", cost: 20,  time: 15,  prices: [90,135,180,360,720],           level: 1, materials: [{name:"トマト",qty:2,note:"種@10×2",image:""}] },
+  { id:  2, name: "ミックスジャム",   image: "foods/002.PNG", cost: 0,   time: 1,   prices: [160,240,320,640,1280],         level: 1, materials: [{name:"ブルーベリー",qty:4,note:"他果物でもok",image:""}] },
+  { id:  3, name: "ラズベリージャム", image: "foods/003.PNG", cost: 0,   time: 1,   prices: [160,240,320,640,1280],         level: 1, materials: [{name:"ラズベリー",qty:4,note:"",image:""}] },
+  { id:  4, name: "トマトソース",     image: "foods/004.PNG", cost: 40,  time: 15,  prices: [180,270,360,720,1440],         level: 1, materials: [{name:"トマト",qty:4,note:"種@10×4",image:""}] },
+  { id:  5, name: "ブルーベリージャム", image: "foods/005.PNG", cost: 0, time: 1,   prices: [170,255,340,680,1360],         level: 1, materials: [{name:"ブルーベリー",qty:4,note:"",image:""}] },
+  { id:  6, name: "リンゴジャム",     image: "foods/006.PNG", cost: 0,   time: 1,   prices: [270,405,540,1080,2160],        level: 1, materials: [{name:"リンゴ",qty:4,note:"",image:""}] },
+  { id:  7, name: "オレンジジャム",   image: "foods/007.PNG", cost: 0,   time: 1,   prices: [270,405,540,1080,2160],        level: 1, materials: [{name:"オレンジ",qty:4,note:"",image:""}] },
+  { id:  8, name: "パイナップルジャム", image: "foods/012.PNG", cost: 60, time: 30, prices: [280,420,560,1120,2240],        level: 1, materials: [{name:"パイナップル",qty:4,note:"種@15×4",image:""}] },
+  { id:  9, name: "ブドウジャム",     image: "foods/013.PNG", cost: 640, time: 600, prices: [2020,3030,4040,8080,16160],    level: 2, materials: [{name:"ブドウ",qty:4,note:"種@160×4",image:""}] },
+  { id: 10, name: "チョコソース",     image: "foods/001.PNG", cost: 440, time: 300, prices: [1400,2100,2800,5600,11200],    level: 1, materials: [{name:"カカオ豆",qty:4,note:"種@110×4",image:""}] },
+  { id: 11, name: "フィッシュアンドチップス", image: "foods/008.PNG", cost: 60, time: 60, prices: [310,465,620,1240,2480], level: 1, materials: [{name:"魚素材",qty:2,note:"★1推奨",image:""},{name:"じゃがいも",qty:2,note:"種@30×2",image:""}] },
+  { id: 12, name: "不気味な食べ物",   image: "foods/009.PNG", cost: 0,   time: 1,   prices: [30],                           level: 1, materials: [{name:"食料系の失敗作",qty:1,note:"必ず損",image:""}] },
+  { id: 13, name: "不気味な飲み物",   image: "foods/010.PNG", cost: 0,   time: 0,   prices: [30],                           level: 1, materials: [{name:"飲料系の失敗作",qty:1,note:"必ず損",image:""}] },
+  { id: 14, name: "イチゴジャム",     image: "foods/011.PNG", cost: 500, time: 360, prices: [1580,2370,3160,6320,12640],    level: 2, materials: [{name:"イチゴ",qty:4,note:"種@125×4",image:""}] },
+  { id: 15, name: "チーズケーキ",     image: "foods/014.PNG", cost: 245, time: 240, prices: [480,720,960,1920,3840],        level: 1, materials: [{name:"チーズ",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"小麦",qty:2,note:"種@95×2",image:""}] },
+  { id: 16, name: "オリジナルロールケーキ", image: "foods/015.PNG", cost: 450, time: 1, prices: [550,825,1100,2200,4400],  level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"紫のキャンディ",qty:2,note:"@150×2",image:""}] },
+  { id: 17, name: "赤いロールケーキ", image: "foods/016.PNG", cost: 550, time: 1,   prices: [670,1005,1340,2680,5360],     level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"赤いキャンディ",qty:2,note:"@200×2",image:""}] },
+  { id: 18, name: "オレンジのロールケーキ", image: "foods/017.PNG", cost: 550, time: 1, prices: [670,1005,1340,2680,5360], level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"オレンジのキャンディ",qty:2,note:"@200×2",image:""}] },
+  { id: 19, name: "黄色いロールケーキ", image: "foods/018.PNG", cost: 550, time: 1, prices: [670,1005,1340,2680,5360],    level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"黄色いキャンディ",qty:2,note:"@200×2",image:""}] },
+  { id: 20, name: "紫のロールケーキ", image: "foods/019.PNG", cost: 450, time: 1,   prices: [570,855,1140,2280,4560],     level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"紫のキャンディ",qty:2,note:"@150×2",image:""}] },
+  { id: 21, name: "緑のロールケーキ", image: "foods/020.PNG", cost: 550, time: 1,   prices: [670,1005,1340,2680,5360],    level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"緑のキャンディ",qty:2,note:"@200×2",image:""}] },
+  { id: 22, name: "青いロールケーキ", image: "foods/021.PNG", cost: 450, time: 1,   prices: [570,855,1140,2280,4560],     level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"青いキャンディ",qty:2,note:"@150×2",image:""}] },
+  { id: 23, name: "ブルーロールケーキ", image: "foods/022.PNG", cost: 450, time: 1, prices: [570,855,1140,2280,4560],     level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"藍色のキャンディ",qty:2,note:"@150×2",image:""}] },
+  { id: 24, name: "キノコパイ",       image: "foods/023.PNG", cost: 195, time: 240, prices: [500,750,1000,2000,4000],      level: 1, materials: [{name:"キノコ",qty:2,note:"トリュフ以外推奨",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"卵",qty:1,note:"@100",image:""}] },
+  { id: 25, name: "トリュフパイ",     image: "foods/028.PNG", cost: 195, time: 240, prices: [830,1245,1660,3320,6640],     level: 2, materials: [{name:"トリュフ",qty:2,note:"",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"卵",qty:1,note:"@100",image:""}] },
+  { id: 26, name: "焼きキノコ",       image: "foods/029.PNG", cost: 0,   time: 1,   prices: [180,270,360,720,1440],        level: 1, materials: [{name:"キノコ",qty:4,note:"トリュフ以外推奨",image:""}] },
+  { id: 27, name: "コーヒー",         image: "foods/034.PNG", cost: 200, time: 1,   prices: [290,435,580,1160,2320],       level: 1, materials: [{name:"コーヒー豆",qty:4,note:"@50×4",image:""}] },
+  { id: 28, name: "カフェラテ",       image: "foods/035.PNG", cost: 200, time: 1,   prices: [300,450,600,1200,2400],       level: 1, materials: [{name:"コーヒー豆",qty:2,note:"@50×2",image:""},{name:"牛乳",qty:2,note:"@50×2",image:""}] },
+  { id: 29, name: "スモークサーモンベーグル", image: "foods/036.PNG", cost: 205, time: 240, prices: [520,780,1040,2080,4160], level: 2, materials: [{name:"魚",qty:1,note:"★1推奨",image:""},{name:"チーズ",qty:1,note:"@100",image:""},{name:"野菜",qty:1,note:"種@10",image:""},{name:"小麦",qty:1,note:"種@95",image:""}] },
+  { id: 30, name: "シーフードリゾット", image: "foods/037.PNG", cost: 105, time: 240, prices: [490,735,980,1960,3920],     level: 1, materials: [{name:"魚orエビ",qty:2,note:"★1推奨",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"トマト",qty:1,note:"種@10",image:""}] },
+  { id: 31, name: "カントリー風煮込み", image: "foods/038.PNG", cost: 185, time: 640, prices: [640,960,1280,2560,5120],   level: 2, materials: [{name:"トマト",qty:1,note:"種@10",image:""},{name:"じゃがいも",qty:1,note:"種@30",image:""},{name:"レタス",qty:1,note:"種@145",image:""}] },
+  { id: 32, name: "トリュフのクリームパスタ", image: "foods/039.PNG", cost: 240, time: 240, prices: [900,1350,1800,3600,7200], level: 3, materials: [{name:"トリュフ",qty:1,note:"",image:""},{name:"小麦",qty:2,note:"種@95×2",image:""},{name:"牛乳",qty:1,note:"@50",image:""}] },
+  { id: 33, name: "シーフードピザ",   image: "foods/040.PNG", cost: 235, time: 240, prices: [780,1170,1560,3120,6240],     level: 2, materials: [{name:"チーズ",qty:1,note:"@100",image:""},{name:"トマトソース",qty:1,note:"@40",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"魚",qty:1,note:"★1推奨",image:""}] },
+  { id: 34, name: "ミートソースパスタ", image: "foods/041.PNG", cost: 405, time: 240, prices: [670,1005,1340,2680,5360],  level: 2, materials: [{name:"肉",qty:1,note:"@200",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"トマト",qty:1,note:"種@10",image:""},{name:"チーズ",qty:1,note:"@100",image:""}] },
+  { id: 35, name: "アップルパイ",     image: "foods/042.PNG", cost: 345, time: 240, prices: [730,1095,1460,2920,5840],    level: 2, materials: [{name:"リンゴ",qty:1,note:"",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"卵",qty:1,note:"@100",image:""},{name:"バター",qty:1,note:"@150",image:""}] },
+  { id: 36, name: "ニンジンケーキ",   image: "foods/043.PNG", cost: 245, time: 240, prices: [840,1260,1680,3360,6720],    level: 2, materials: [{name:"ニンジン",qty:2,note:"種@25×2",image:""},{name:"卵",qty:1,note:"@100",image:""},{name:"小麦",qty:1,note:"種@95",image:""}] },
+  { id: 37, name: "コーンポタージュ", image: "foods/044.PNG", cost: 540, time: 720, prices: [1340,2010,2680,5360,10720],  level: 3, materials: [{name:"トウモロコシ",qty:2,note:"種@170×2",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"バター",qty:1,note:"@150",image:""}] },
+  { id: 38, name: "豪華海鮮盛り合わせ", image: "foods/045.PNG", cost: 0, time: 1,  prices: [410,615,820,1640,3280],       level: 1, materials: [{name:"魚",qty:2,note:"★1推奨",image:""},{name:"エビ",qty:2,note:"★1推奨",image:""}] },
+  { id: 39, name: "ティラミス",       image: "foods/046.PNG", cost: 300, time: 1,   prices: [530,795,1060,2120,4240],     level: 2, materials: [{name:"コーヒー豆",qty:1,note:"@50",image:""},{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"チーズ",qty:1,note:"@100",image:""}] },
+  { id: 40, name: "キャンプセット",   image: "foods/047.PNG", cost: 840, time: 240, prices: [2260,3390,4520,9040,18080],  level: 3, materials: [{name:"コーヒー",qty:1,note:"@200",image:""},{name:"シーフードピザ",qty:1,note:"@235",image:""},{name:"アップルパイ",qty:1,note:"@345",image:""},{name:"フィッシュアンドチップス",qty:1,note:"@60",image:""}] },
+  { id: 41, name: "英式アフタヌーンティー", image: "foods/048.PNG", cost: 300, time: 1, prices: [710,1065,1420,2840,5680], level: 2, materials: [{name:"ティラミス",qty:1,note:"@300",image:""},{name:"ブルーベリー",qty:1,note:"",image:""}] },
+  { id: 42, name: "ミートバーガー",   image: "foods/049.PNG", cost: 480, time: 480, prices: [1350,2025,2700,5400,10800],  level: 3, materials: [{name:"小麦",qty:1,note:"種@95",image:""},{name:"肉",qty:1,note:"@200",image:""},{name:"レタス",qty:1,note:"種@145",image:""},{name:"トマトソース",qty:1,note:"@40",image:""}] },
+  { id: 43, name: "アカザエビの前菜", image: "foods/050.PNG", cost: 145, time: 480, prices: [850,1275,1700,3400,6800],    level: 2, materials: [{name:"アカザエビ",qty:3,note:"",image:""},{name:"レタス",qty:1,note:"種@145",image:""}] },
+  { id: 44, name: "北欧ブルーアカザエビの前菜", image: "foods/051.PNG", cost: 145, time: 480, prices: [1310,1965,2620,5240,10480], level: 3, materials: [{name:"北欧ブルーアカザエビ",qty:3,note:"",image:""},{name:"レタス",qty:1,note:"種@145",image:""}] },
+  { id: 45, name: "ナスとひき肉の炒め物", image: "foods/052.PNG", cost: 475, time: 420, prices: [1230,1845,2460,4920,9840], level: 3, materials: [{name:"ナス",qty:1,note:"種@135",image:""},{name:"肉",qty:1,note:"@200",image:""},{name:"料理油",qty:1,note:"@100",image:""},{name:"トマトソース",qty:1,note:"@40",image:""}] },
+  { id: 46, name: "キャンドルディナー", image: "foods/053.PNG", cost: 630, time: 240, prices: [1760,2640,3520,7040,14080], level: 3, materials: [{name:"田園サラダ",qty:1,note:"@20",image:""},{name:"スモークサーモンベーグル",qty:1,note:"@205",image:""},{name:"シーフードリゾット",qty:1,note:"@105",image:""},{name:"ティラミス",qty:1,note:"@300",image:""}] },
+  { id: 47, name: "蒸しタラバガニ",   image: "foods/054.PNG", cost: 150, time: 1,   prices: [1990,2985,3980,7960,15920],  level: 3, materials: [{name:"タラバガニ",qty:3,note:"★1推奨",image:""},{name:"バター",qty:1,note:"@150",image:""}] },
+  { id: 48, name: "蒸し黄金タラバガニ", image: "foods/055.PNG", cost: 150, time: 1, prices: [2980,4470,5960,11920,23840], level: 4, materials: [{name:"黄金タラバガニ",qty:3,note:"★1推奨",image:""},{name:"バター",qty:1,note:"@150",image:""}] },
+  { id: 49, name: "温泉卵",           image: "foods/056.PNG", cost: 100, time: 1,   prices: [130,195,260,520,1140],        level: 1, materials: [{name:"無菌卵",qty:1,note:"@100",image:""}] },
+  { id: 50, name: "若草のケーキ",     image: "foods/057.PNG", cost: 395, time: 240, prices: [690,1035,1380,2760,5520],    level: 2, materials: [{name:"小麦",qty:1,note:"種@95",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"抹茶パウダー",qty:1,note:"@250",image:""},{name:"雑草",qty:1,note:"",image:""}] },
+  { id: 51, name: "復活のエッグ",     image: "foods/058.PNG", cost: 100, time: 1,   prices: [190,285,380,760,1520],        level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"リンゴ",qty:1,note:"",image:""}] },
+  { id: 52, name: "復活祭の模様入り卵(紫)", image: "foods/059.PNG", cost: 260, time: 600, prices: [620,930,1240,2480,4960], level: 2, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"ブドウ",qty:1,note:"種@160",image:""}] },
+  { id: 53, name: "復活祭の模様入り卵(緑)", image: "foods/060.PNG", cost: 245, time: 480, prices: [570,855,1140,2280,4560], level: 2, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"レタス",qty:1,note:"種@145",image:""}] },
+  { id: 54, name: "復活祭の模様入り卵(オレンジ)", image: "foods/061.PNG", cost: 100, time: 1, prices: [190,285,380,760,1520], level: 1, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"リンゴ",qty:1,note:"",image:""}] },
+  { id: 55, name: "復活祭のイースターエッグの宴", image: "foods/062.PNG", cost: 755, time: 600, prices: [1650,2475,3300,6600,13200], level: 3, materials: [{name:"復活のエッグ",qty:1,note:"",image:""},{name:"復活祭の模様入り卵(紫)",qty:1,note:"",image:""},{name:"復活祭の模様入り卵(緑)",qty:1,note:"",image:""},{name:"復活祭の模様入り卵(オレンジ)",qty:1,note:"",image:""}] },
+  { id: 56, name: "モルチーズカヌレ", image: "foods/063.PNG", cost: 370, time: 240, prices: [910,1365,1820,3640,7280],    level: 3, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"イチゴ",qty:1,note:"種@125",image:""}] },
+  { id: 57, name: "レトリバーカヌレ", image: "foods/064.PNG", cost: 295, time: 240, prices: [590,885,1180,2360,4720],     level: 2, materials: [{name:"卵",qty:1,note:"@100",image:""},{name:"牛乳",qty:1,note:"@50",image:""},{name:"小麦",qty:1,note:"種@95",image:""},{name:"コーヒー豆",qty:1,note:"@50",image:""}] },
+  { id: 58, name: "モルチーズコンパンナ", image: "foods/065.PNG", cost: 350, time: 1, prices: [520,780,1040,2080,4160],  level: 2, materials: [{name:"牛乳",qty:3,note:"@50×3",image:""},{name:"コーヒー",qty:1,note:"@200",image:""}] },
+];
+</script>
+
+<!-- ===================== ロジック ===================== -->
+<script>
+(function () {
+  // ---- 状態 ----
+  let starFilter  = 1;
+  let sortType    = 'default';
+  let searchQuery = '';
+  let levelFilter = 0;
+  let openId      = null;
+
+  // ---- ヘルパー ----
+  function getPrice(food) {
+    return food.prices[Math.min(starFilter - 1, food.prices.length - 1)];
+  }
+  function getProfit(food) { return getPrice(food) - food.cost; }
+  function getHourly(food) {
+    if (!food.time) return Infinity;
+    return Math.round((getProfit(food) / food.time) * 3600);
+  }
+  function formatTime(sec) {
+    if (!sec || sec === 0) return '即時';
+    if (sec < 60)   return `${sec}秒`;
+    if (sec < 3600) return `${Math.floor(sec / 60)}分`;
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+    return m ? `${h}時間${m}分` : `${h}時間`;
+  }
+  function lvColor(lv) {
+    return ['','var(--lv1)','var(--lv2)','var(--lv3)','var(--lv4)','var(--lv5)'][lv] || 'var(--lv1)';
+  }
+
+  // ---- フィルタ＆ソート ----
+  function filtered() {
+    let list = FOODS.slice();
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim();
+      list = list.filter(f => f.name.includes(q) || f.materials.some(m => m.name.includes(q)));
+    }
+    if (levelFilter > 0) list = list.filter(f => f.level === levelFilter);
+    if (sortType === 'profit') list.sort((a, b) => getProfit(b) - getProfit(a));
+    if (sortType === 'hourly') list.sort((a, b) => getHourly(b) - getHourly(a));
+    return list;
+  }
+
+  // ---- レンダリング ----
+  function render() {
+    const container = document.getElementById('foodList');
+    const list = filtered();
+
+    if (!list.length) {
+      container.innerHTML = '<div class="empty-state">😢 該当する料理がありません</div>';
+      return;
+    }
+
+    container.innerHTML = list.map(food => {
+      const price  = getPrice(food);
+      const profit = getProfit(food);
+      const hourly = getHourly(food);
+      const isOpen = openId === food.id;
+
+      const materialsHtml = food.materials.map(m => {
+        const img = m.image
+          ? `<img src="${m.image}" alt="${m.name}" class="mat-img" onerror="this.style.display='none'">`
+          : `<div class="mat-no-img">🧂</div>`;
+        return `<div class="mat-chip">
+          ${img}
+          <div class="mat-label">
+            ${m.name}×${m.qty}
+            ${m.note ? `<small>${m.note}</small>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+
+      const allPricesHtml = food.prices.map((p, i) => {
+        const pft = p - food.cost;
+        const cls = i + 1 === starFilter ? 'star-row active-star' : 'star-row';
+        const pftCls = pft >= 0 ? 'pos' : 'neg';
+        return `<div class="${cls}">
+          <span class="sr-star">★${i+1}</span>
+          <span class="sr-price">${p.toLocaleString()}G</span>
+          <span class="${pftCls}">${pft >= 0 ? '+' : ''}${pft.toLocaleString()}G</span>
+        </div>`;
+      }).join('');
+
+      return `
+      <div class="food-card" id="fc-${food.id}">
+        <div class="food-card-header" onclick="toggleDetail(${food.id})">
+          <img src="${food.image}" alt="${food.name}" class="food-thumb"
+            onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'58\' height=\'58\'><rect fill=\'%23c8d8e8\' width=\'58\' height=\'58\' rx=\'10\'/><text x=\'50%\' y=\'55%\' text-anchor=\'middle\' dominant-baseline=\'middle\' font-size=\'28\'>🍳</text></svg>'">
+          <div class="food-card-body">
+            <div class="food-card-name">${food.name}</div>
+            <div class="food-tags">
+              <span class="tag tag-price">💰 ${price.toLocaleString()}G</span>
+              <span class="tag ${profit >= 0 ? 'tag-profit-pos' : 'tag-profit-neg'}">
+                利益 ${profit >= 0 ? '+' : ''}${profit.toLocaleString()}G
+              </span>
+              ${food.time > 0 && isFinite(hourly)
+                ? `<span class="tag">⏱ 時給${hourly.toLocaleString()}G</span>` : ''}
+              <span class="tag">🕐 ${formatTime(food.time)}</span>
+            </div>
+          </div>
+          <div class="lv-badge" style="background:${lvColor(food.level)}">Lv.${food.level}</div>
+          <div class="arrow ${isOpen ? 'open' : ''}">▼</div>
+        </div>
+
+        <div class="food-detail ${isOpen ? '' : 'hidden'}">
+          <div>
+            <div class="detail-section-title">📊 各★での売価・利益</div>
+            <div class="star-grid">${allPricesHtml}</div>
+          </div>
+          <div>
+            <div class="detail-section-title">🧂 材料</div>
+            <div class="materials-grid">${materialsHtml}</div>
+            ${food.cost > 0
+              ? `<div class="cost-note">材料費合計：${food.cost.toLocaleString()}G</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ---- 詳細トグル ----
+  window.toggleDetail = function(id) {
+    openId = openId === id ? null : id;
+    render();
+    if (openId) {
+      setTimeout(() => {
+        const el = document.getElementById(`fc-${id}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 40);
+    }
+  };
+
+  // ---- ★ ----
+  window.setFoodStar = function(star) {
+    starFilter = star;
+    document.querySelectorAll('[data-star]').forEach(b =>
+      b.classList.toggle('star-active', +b.dataset.star === star));
+    render();
+  };
+
+  // ---- ソート ----
+  window.setFoodSort = function(type) {
+    sortType = type;
+    document.querySelectorAll('[data-sort]').forEach(b =>
+      b.classList.toggle('sort-active', b.dataset.sort === type));
+    render();
+  };
+
+  // ---- レベル ----
+  window.setFoodLevel = function(lv) {
+    levelFilter = lv;
+    document.querySelectorAll('[data-level]').forEach(b =>
+      b.classList.toggle('level-active', +b.dataset.level === lv));
+    render();
+  };
+
+  // ---- 検索 ----
+  document.getElementById('foodSearchInput').addEventListener('input', e => {
+    searchQuery = e.target.value;
+    render();
+  });
+  document.getElementById('foodSearchClear').addEventListener('click', () => {
+    searchQuery = '';
+    document.getElementById('foodSearchInput').value = '';
+    render();
+  });
+
+  // ---- 比較セレクト初期化 ----
+  function buildSelects() {
+    const opts = FOODS.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
+    document.getElementById('foodSelectA').innerHTML = opts;
+    document.getElementById('foodSelectB').innerHTML = opts;
+    if (FOODS.length > 1) document.getElementById('foodSelectB').selectedIndex = 1;
+  }
+
+  // ---- 比較 ----
+  window.compareFoods = function() {
+    const idA = +document.getElementById('foodSelectA').value;
+    const idB = +document.getElementById('foodSelectB').value;
+    const fA = FOODS.find(f => f.id === idA);
+    const fB = FOODS.find(f => f.id === idB);
+    if (!fA || !fB) return;
+
+    const prA = getPrice(fA), prB = getPrice(fB);
+    const pfA = prA - fA.cost, pfB = prB - fB.cost;
+    const hrA = getHourly(fA), hrB = getHourly(fB);
+    const pfWin = pfA >= pfB ? fA.name : fB.name;
+    const hrWin = hrA >= hrB ? fA.name : fB.name;
+
+    document.getElementById('foodCompareResult').innerHTML = `
+      <div class="compare-result">
+        <div class="compare-col">
+          <strong>${fA.name}</strong><br>
+          売価: ${prA.toLocaleString()}G<br>
+          利益: <span class="${pfA>=0?'pos':'neg'}">${pfA>=0?'+':''}${pfA.toLocaleString()}G</span><br>
+          時給: ${isFinite(hrA) ? hrA.toLocaleString()+'G' : '―'}
+        </div>
+        <div class="compare-vs">VS</div>
+        <div class="compare-col">
+          <strong>${fB.name}</strong><br>
+          売価: ${prB.toLocaleString()}G<br>
+          利益: <span class="${pfB>=0?'pos':'neg'}">${pfB>=0?'+':''}${pfB.toLocaleString()}G</span><br>
+          時給: ${isFinite(hrB) ? hrB.toLocaleString()+'G' : '―'}
+        </div>
+      </div>
+      <div class="compare-winner">
+        🏆 利益：<strong>${pfWin}</strong>　⏱ 時給：<strong>${hrWin}</strong>
+      </div>`;
+  };
+
+  // ---- ダークモード ----
+  (function() {
+    const saved = localStorage.getItem('theme') || 'light';
+    if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('themeToggle').textContent = saved === 'dark' ? '☀️' : '🌙';
+  })();
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('themeToggle').textContent = isDark ? '🌙' : '☀️';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  });
+
+  // ---- 初期化 ----
+  buildSelects();
+  render();
+})();
+</script>
+
+</body>
+</html>
