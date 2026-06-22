@@ -3,241 +3,71 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>はとぴ図鑑｜料理</title>
-
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./list.PNG?v=20">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>園芸図鑑｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の園芸作物・花の図鑑。成長時間・種の値段・交配一覧・通知機能対応。">
 
-<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css">
 
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* garden.html 専用CSS */
+:root{
+  --green:#4a7c59;
+  --green-soft:#dff0e5;
+}
+ 
+body.dark{
+  --green-soft:#1e3328;
+}
+
+</style>
 </head>
 
 <body>
 
-<!-- =========================
- title-bar（完全一致）
-========================= -->
 <div class="title-bar">
-
   <h1>はとぴ図鑑</h1>
-
   <div class="title-buttons">
-    <button id="helpBtn">ℹ️</button>
-    <button id="shareBtn">📤</button>
     <button id="darkToggle">🌙</button>
   </div>
-
 </div>
 
-<!-- =========================
- site-nav（完全一致）
-========================= -->
 <nav class="site-nav">
   <a href="./index.html" class="site-nav-item">図鑑</a>
-  <a href="./foods.html" class="site-nav-item active">料理</a>
+  <a href="./garden.html" class="site-nav-item active">園芸</a>
   <a href="./codes.html" class="site-nav-item">コード</a>
   <a href="./events.html" class="site-nav-item">イベント</a>
   <a href="./faq.html" class="site-nav-item">Q&A</a>
 </nav>
 
-<!-- =========================
- topPanel（index完全コピー）
-========================= -->
-<div class="card sticky" id="topPanel">
-
-  <button id="minimizeBtn">－</button>
-
-  <div class="mini-info">
-
-    <input type="text" id="search" class="search mini-search" placeholder="🔍 料理名で検索">
-
-    <div class="mini-status">
-      <div id="miniTime"></div>
-      <div id="miniWeather"></div>
-    </div>
-
-  </div>
-
+<div class="page-header">
+  <h2>料理レシピ図鑑</h2>
 </div>
 
-<!-- =========================
- grid
-========================= -->
-<div id="list" class="grid"></div>
+<div class="foods-footer">※本サイトは非公式のファンツールです</div>
 
-<!-- =========================
- modal（index完全一致構造）
-========================= -->
-<div id="modal" onclick="if(event.target.id==='modal') closeModal()">
-
-  <div class="modal-box">
-
-    <h3 id="m_name"></h3>
-
-    <img id="m_img">
-
-    <div class="modal-info-row">
-
-      <div class="modal-left">
-        <p id="m_level"></p>
-        <p id="m_materials"></p>
-      </div>
-
-      <div class="modal-right">
-        <p id="m_prices"></p>
-        <p id="m_profit"></p>
-      </div>
-
-    </div>
-
-    <button onclick="closeModal()">閉じる</button>
-
-  </div>
-
-</div>
-
-<!-- =========================
- DATA
-========================= -->
 <script src="js/data-foods.js"></script>
 
-<!-- =========================
- JS
-========================= -->
 <script>
 const foods = foodsData;
 
-let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
-let authData = JSON.parse(localStorage.getItem("food_auth") || "{}");
-
-const list = document.getElementById("list");
-const search = document.getElementById("search");
-
-search.addEventListener("input", render);
-
-// =========================
-// INDEX完全一致カード描画
-// =========================
-function render(){
-
-  let data = foods;
-
-  const k = search.value;
-  if(k){
-    data = data.filter(f => f.name.includes(k));
-  }
-
-  list.innerHTML = "";
-
-  data.forEach(c => {
-
-    const div = document.createElement("div");
-    div.className = "item";
-
-    div.innerHTML = `
-      <div class="img-wrap">
-
-        <div class="level-badge">
-          Lv.${c.level}
-        </div>
-
-        <!-- ⭐（index完全一致） -->
-        <button class="check-btn ${checkedData[c.name] ? "checked" : ""}">
-          ⭐️
-        </button>
-
-        <!-- 🎖（index完全一致） -->
-        ${c.hasMaster !== false ? `
-        <button class="auth-btn ${authData[c.name] ? "checked" : ""}">
-          🎖
-        </button>` : ""}
-
-        <img src="${c.image}">
-      </div>
-
-      <div class="item-name">
-        ${c.name}
-      </div>
-    `;
-
-    // モーダル
-    div.onclick = ()=> openModal(c);
-
-    // ⭐
-    div.querySelector(".check-btn").onclick = (e)=>{
-      e.stopPropagation();
-      checkedData[c.name] = !checkedData[c.name];
-      save();
-      render();
-    };
-
-    // 🎖
-    const authBtn = div.querySelector(".auth-btn");
-    if(authBtn){
-      authBtn.onclick = (e)=>{
-        e.stopPropagation();
-        authData[c.name] = !authData[c.name];
-        save();
-        render();
-      };
-    }
-
-    list.appendChild(div);
-  });
-}
-
-// =========================
-// モーダル（index完全仕様）
-# =========================
-function openModal(c){
-
-  modal.style.display = "block";
-
-  m_name.innerText = c.name;
-  m_img.src = c.image;
-
-  m_level.innerText = "Lv." + c.level;
-
-  m_materials.innerHTML =
-    (c.materials || [])
-      .map(m=>`<img src="${m.image}" style="width:32px;margin:2px;">`)
-      .join("");
-
-  const base = c.prices?.[0] || 0;
-
-  const rates = [1,1.5,2,4,8];
-
-  let html = "";
-
-  rates.forEach((r,i)=>{
-    html += `<p>★${i+1}：${Math.floor(base*r)}</p>`;
-  });
-
-  m_prices.innerHTML = html;
-
-  const max = Math.floor(base*8);
-  const min = base;
-
-  m_profit.innerText =
-    base ? `最大利益：${max - min}` : "-";
-}
-
-function closeModal(){
-  modal.style.display = "none";
-}
-
-// =========================
-// 保存
-// =========================
-function save(){
-  localStorage.setItem("food_checked", JSON.stringify(checkedData));
-  localStorage.setItem("food_auth", JSON.stringify(authData));
-}
-
-// 初期
-render();
+// 初期化
+renderContent();
 </script>
-
 </body>
 </html>
