@@ -651,7 +651,6 @@ let authData = JSON.parse(localStorage.getItem("authData") || "{}");
 function toggleAuth(name){
   authData[name] = !authData[name];
   localStorage.setItem("authData", JSON.stringify(authData));
-  renderModal(window.currentItem);
   renderContent();
 }
 
