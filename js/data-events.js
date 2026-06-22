@@ -192,7 +192,7 @@ const eventData = [
     end: "2026-07-13 05:59",
     exchangeEnd: null,
     detail: "6月27日からサッカークラブイベント開催！サッカー大会グッズが期間限定で登場！",
-    link: null,
+    link: "https://x.com/heartopia_jp/status/2068982327661810150?s=61",
   },
   // 以下、イベントを追加していく
   // {
