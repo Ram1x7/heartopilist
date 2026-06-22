@@ -36,15 +36,6 @@ body.dark{
   --green-soft:#1e3328;
 }
 
-/* ── garden.html固有スタイル ── */
-body{
-  min-height:100vh;
-  padding:12px;
-  animation:fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn{ from{ opacity:0; } to{ opacity:1; } }
-
 /* 通知バナー */
 #notifBanner{
   display:none;
@@ -168,19 +159,14 @@ body.dark .section-label{ color:#e8d2a8; }
   overflow-y:auto;
 }
 
-.modal-box{
-  background:var(--card);
+/* garden専用モーダル */
+#detailModal .modal-box{
   margin:40px auto;
-  padding:20px;
   width:92%;
   max-width:360px;
-  border-radius:22px;
-  border:1px solid var(--gold);
-  box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
-body.dark .modal-box{ background:#2c2823; border-color:#46423b; }
-
+  
 .modal-name{
   font-family:'Shippori Mincho', serif;
   font-size:18px;
@@ -218,10 +204,10 @@ body.dark .modal-name{ color:#e8d2a8; }
 }
 
 body.dark .modal-info{ background:#383329; }
-.modal-info-row{ display:flex; justify-content:space-between; }
-.modal-info-label{ color:var(--text-sub); }
-.modal-info-value{ font-weight:700; color:var(--text); }
-
+.garden-info-row{ display:flex; justify-content:space-between; }
+.garden-info-label{ color:var(--text-sub); }
+.garden-info-value{ font-weight:700; color:var(--text); }
+  
 /* 売価テーブル */
 .price-table{
   width:100%;
@@ -814,27 +800,27 @@ function renderModal(item){
       </div>
     </div>
     <div class="modal-info">
-      <div class="modal-info-row">
-        <span class="modal-info-label">レベル</span>
-        <span class="modal-info-value">Lv.${item.level}</span>
+      <div class="garden-info-row">
+        <span class="garden-info-label">レベル</span>
+        <span class="garden-info-value">Lv.${item.level}</span>
       </div>
-      <div class="modal-info-row">
-        <span class="modal-info-label">成長時間</span>
-        <span class="modal-info-value">${formatTime(item.growTime)}</span>
+      <div class="garden-info-row">
+        <span class="garden-info-label">成長時間</span>
+        <span class="garden-info-value">${formatTime(item.growTime)}</span>
       </div>
-      <div class="modal-info-row">
-        <span class="modal-info-label">種の値段</span>
-        <span class="modal-info-value">${item.seedPrice.toLocaleString()} コイン</span>
+      <div class="garden-info-row">
+        <span class="garden-info-label">種の値段</span>
+        <span class="garden-info-value">${item.seedPrice.toLocaleString()} コイン</span>
       </div>
       ${!isFlower ? `
-      <div class="modal-info-row">
-        <span class="modal-info-label">草抜き</span>
-        <span class="modal-info-value">最大${item.weedCount}回</span>
+      <div class="gardenl-info-row">
+        <span class="garden-info-label">草抜き</span>
+        <span class="garden-info-value">最大${item.weedCount}回</span>
       </div>` : ""}
       ${item.isEvent ? `
-      <div class="modal-info-row">
-        <span class="modal-info-label">イベント</span>
-        <span class="modal-info-value">${item.eventName}（終了）</span>
+      <div class="garden-info-row">
+        <span class="garden-info-label">イベント</span>
+        <span class="garden-info-value">${item.eventName}（終了）</span>
       </div>` : ""}
     </div>
     <table class="price-table">
