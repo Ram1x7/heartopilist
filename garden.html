@@ -13,7 +13,6 @@
 <meta name="description" content="Heartopia（ハートピアスローライフ）の園芸作物・花の図鑑。成長時間・種の値段・交配一覧・通知機能対応。">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-
 <link rel="stylesheet" href="./css/style.css">
 
 <!-- Google Analytics -->
@@ -26,17 +25,29 @@
 </script>
 
 <style>
-/* ── style.cssにない変数のみ定義 ── */
+/* ========================================
+   garden.html 専用CSS
+   style.cssで定義済みのものは書かない：
+   - :root変数（--indigo, --card, --border等）
+   - body（margin, padding, font, background, color）
+   - @keyframes fadeIn
+   - .title-bar, .title-buttons, h1
+   - .site-nav, .site-nav-item
+   - .level-badge, .auth-btn, .check-btn, .img-wrap
+   - .item-name
+   - a, h3
+   ======================================== */
+
+/* green変数はstyle.cssにないので定義 */
 :root{
   --green:#4a7c59;
   --green-soft:#dff0e5;
 }
-
 body.dark{
   --green-soft:#1e3328;
 }
 
-/* 通知バナー */
+/* ── 通知バナー ── */
 #notifBanner{
   display:none;
   background:rgba(200,168,107,0.15);
@@ -62,10 +73,32 @@ body.dark{
   cursor:pointer;
 }
 
-/* タブ行 */
-.tab-row{ display:flex; gap:8px; margin-bottom:12px; }
+/* ── ページヘッダー ── */
+.page-header{
+  text-align:center;
+  margin-bottom:14px;
+}
 
-.tab{
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+  /* h3と被らないようh2を使用 */
+}
+
+body.dark .page-header h2{
+  color:#e8d2a8;
+}
+
+/* ── 作物/花タブ ── */
+.tab-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.g-tab{
   flex:1;
   padding:10px;
   border:1px solid var(--border);
@@ -79,17 +112,26 @@ body.dark{
   text-align:center;
 }
 
-.tab.active{
+.g-tab.active{
   background:var(--indigo);
   border-color:var(--indigo);
   color:#fdf9ef;
   font-weight:700;
 }
 
-body.dark .tab{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
-body.dark .tab.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
+body.dark .g-tab{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
 
-/* イベント終了バナー */
+body.dark .g-tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* ── イベント終了バナー ── */
 .event-ended-banner{
   background:var(--card-sub);
   border:1px solid var(--border);
@@ -101,7 +143,7 @@ body.dark .tab.active{ background:var(--indigo-soft); border-color:var(--indigo-
   margin-bottom:10px;
 }
 
-/* セクションラベル */
+/* ── セクションラベル ── */
 .section-label{
   font-family:'Shippori Mincho', serif;
   font-size:13px;
@@ -112,9 +154,11 @@ body.dark .tab.active{ background:var(--indigo-soft); border-color:var(--indigo-
   border-left:3px solid var(--gold);
 }
 
-body.dark .section-label{ color:#e8d2a8; }
+body.dark .section-label{
+  color:#e8d2a8;
+}
 
-/* グリッド */
+/* ── 園芸グリッド ── */
 .garden-grid{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -122,7 +166,8 @@ body.dark .section-label{ color:#e8d2a8; }
   margin-bottom:8px;
 }
 
-/* アイテムカード */
+/* ── 園芸アイテムカード ── */
+/* .itemと被らないようgarden-itemを使用 */
 .garden-item{
   background:var(--card);
   border:1px solid var(--border);
@@ -134,40 +179,63 @@ body.dark .section-label{ color:#e8d2a8; }
   cursor:pointer;
   transition:0.15s;
   position:relative;
+  overflow:hidden;
 }
 
 .garden-item:hover{ transform:translateY(-2px); }
 .garden-item:active{ transform:scale(0.96); }
 
-/* 通知中アイコン（レベルバッジの右隣） */
+.garden-item-sub{
+  font-size:9px;
+  color:var(--text-sub);
+  text-align:center;
+  margin-top:2px;
+}
+
+/* 通知アイコン（level-badgeの右隣） */
 .notif-icon{
   position:absolute;
   top:6px;
-  right:32px;
+  left:32px;
   z-index:10;
-  font-size:10px;
+  font-size:9px;
+  background:var(--green);
+  color:#fdf9ef;
+  border-radius:999px;
+  padding:1px 4px;
+  line-height:1.4;
 }
 
-/* モーダル */
+/* ── 園芸モーダル ── */
+/* style.cssの#modalと被らないよう#detailModalを使用 */
+/* style.cssの.modal-boxと被らないようg-modal-boxを使用 */
 #detailModal{
   display:none;
   position:fixed;
   inset:0;
   background:rgba(40,36,30,0.5);
   backdrop-filter:blur(5px);
-  z-index:999;
+  z-index:998;
   overflow-y:auto;
 }
 
-/* garden専用モーダル */
-#detailModal .modal-box{
+.g-modal-box{
+  background:var(--card);
   margin:40px auto;
+  padding:20px;
   width:92%;
   max-width:360px;
+  border-radius:22px;
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
-  
-.modal-name{
+body.dark .g-modal-box{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.g-modal-name{
   font-family:'Shippori Mincho', serif;
   font-size:18px;
   font-weight:700;
@@ -177,12 +245,18 @@ body.dark .section-label{ color:#e8d2a8; }
   margin-bottom:12px;
 }
 
-body.dark .modal-name{ color:#e8d2a8; }
+body.dark .g-modal-name{ color:#e8d2a8; }
 
-.modal-imgs{ display:flex; gap:10px; justify-content:center; margin-bottom:14px; }
-.modal-img-wrap{ text-align:center; flex:1; }
+.g-modal-imgs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:14px;
+}
 
-.modal-img-wrap img{
+.g-modal-img-wrap{ text-align:center; flex:1; }
+
+.g-modal-img-wrap img{
   width:100%;
   aspect-ratio:1/1;
   object-fit:contain;
@@ -192,9 +266,14 @@ body.dark .modal-name{ color:#e8d2a8; }
   display:block;
 }
 
-.modal-img-label{ font-size:10px; color:var(--text-sub); margin-top:4px; }
+.g-modal-img-label{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
 
-.modal-info{
+/* ── 基本情報ブロック ── */
+.g-info{
   background:var(--card-sub);
   border-radius:12px;
   padding:12px 14px;
@@ -203,20 +282,21 @@ body.dark .modal-name{ color:#e8d2a8; }
   line-height:2;
 }
 
-body.dark .modal-info{ background:#383329; }
-.garden-info-row{ display:flex; justify-content:space-between; }
-.garden-info-label{ color:var(--text-sub); }
-.garden-info-value{ font-weight:700; color:var(--text); }
-  
-/* 売価テーブル */
-.price-table{
+body.dark .g-info{ background:#383329; }
+
+.g-info-row{ display:flex; justify-content:space-between; }
+.g-info-label{ color:var(--text-sub); }
+.g-info-value{ font-weight:700; color:var(--text); }
+
+/* ── 売価テーブル ── */
+.g-price-table{
   width:100%;
   border-collapse:collapse;
   font-size:11px;
   margin-bottom:12px;
 }
 
-.price-table th{
+.g-price-table th{
   background:var(--card-sub);
   color:var(--text-sub);
   padding:5px 6px;
@@ -224,19 +304,19 @@ body.dark .modal-info{ background:#383329; }
   font-weight:500;
 }
 
-body.dark .price-table th{ background:#383329; }
+body.dark .g-price-table th{ background:#383329; }
 
-.price-table td{
+.g-price-table td{
   text-align:center;
   padding:5px 6px;
   border-top:1px solid var(--border);
   color:var(--text);
 }
 
-.price-null{ color:var(--border); font-size:10px; }
+.g-price-null{ color:var(--border); font-size:10px; }
 
-/* セクションタイトル（モーダル内） */
-.section-title{
+/* ── モーダル内セクションタイトル ── */
+.g-section-title{
   font-family:'Shippori Mincho', serif;
   font-size:13px;
   color:var(--indigo);
@@ -245,9 +325,9 @@ body.dark .price-table th{ background:#383329; }
   border-left:3px solid var(--gold);
 }
 
-body.dark .section-title{ color:#e8d2a8; }
+body.dark .g-section-title{ color:#e8d2a8; }
 
-/* 交配 */
+/* ── 交配 ── */
 .breeding-note{ font-size:10px; color:var(--text-sub); margin-bottom:8px; }
 .breeding-grid{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
 
@@ -288,7 +368,7 @@ body.dark .rarity-5{ background:#3a3010; color:#d4b000; border-color:#6a5800; }
 body.dark .breeding-combo{ background:#383329; }
 .breeding-combo-arrow{ color:var(--text-sub); font-size:13px; }
 
-/* 通知ボタン */
+/* ── 通知ボタン ── */
 .notif-btns{ display:flex; gap:8px; margin-bottom:8px; }
 
 .notif-btn{
@@ -330,8 +410,8 @@ body.dark .notif-btn.set{ background:var(--green); border-color:var(--green); co
 
 body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:#4a7c59; }
 
-/* モーダル閉じるボタン */
-.modal-close-btn{
+/* ── 閉じるボタン ── */
+.g-close-btn{
   width:100%;
   padding:12px;
   border:1px solid var(--border);
@@ -344,15 +424,37 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
   margin-top:4px;
 }
 
-/* ページヘッダー */
-.page-header{ text-align:center; margin-bottom:14px; }
-.page-header h2{
-  font-family:'Shippori Mincho', serif;
-  font-size:20px;
-  color:var(--indigo);
-  letter-spacing:0.12em;
+/* ── フッター ── */
+.garden-footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
 }
-body.dark .page-header h2{ color:#e8d2a8; }
+
+/* ── トースト ── */
+#gardenToast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 22px;
+  border-radius:999px;
+  font-size:13px;
+  opacity:0;
+  transition:opacity 0.25s, transform 0.25s;
+  pointer-events:none;
+  z-index:2000;
+  white-space:nowrap;
+}
+
+#gardenToast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
 </style>
 </head>
 
@@ -383,24 +485,23 @@ body.dark .page-header h2{ color:#e8d2a8; }
 </div>
 
 <div class="tab-row">
-  <button class="tab active" id="tab-crop" onclick="setTab('crop')">🌾 作物</button>
-  <button class="tab" id="tab-flower" onclick="setTab('flower')">🌸 花</button>
+  <button class="g-tab active" id="tab-crop" onclick="setTab('crop')">🌾 作物</button>
+  <button class="g-tab" id="tab-flower" onclick="setTab('flower')">🌸 花</button>
 </div>
 
 <div id="gardenContent"></div>
 
-<div class="footer">※本サイトは非公式のファンツールです</div>
+<div class="garden-footer">※本サイトは非公式のファンツールです</div>
 
 <div id="detailModal" onclick="if(event.target.id==='detailModal')closeModal()">
-  <div class="modal-box" id="modalBox"></div>
+  <div class="g-modal-box" id="modalBox"></div>
 </div>
 
-<div id="toast"></div>
+<div id="gardenToast"></div>
 
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
 
-<!-- Firebase FCM（module） -->
 <script type="module">
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -423,7 +524,6 @@ const CANCEL_URL   = "https://canceltimer-e67djhnlrq-uc.a.run.app";
 const app = initializeApp(FIREBASE_CONFIG);
 const messaging = getMessaging(app);
 
-// FCMトークン取得
 async function getFCMToken() {
   try {
     const sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
@@ -441,7 +541,6 @@ async function getFCMToken() {
   return null;
 }
 
-// 通知許可を要求
 window.requestNotifPermission = async function() {
   const permission = await Notification.requestPermission();
   if(permission === "granted"){
@@ -455,12 +554,10 @@ window.requestNotifPermission = async function() {
   }
 };
 
-// フォアグラウンド通知
 onMessage(messaging, (payload) => {
   showToast(payload.notification?.title || "通知が届きました");
 });
 
-// 通知をCloud Functionsに登録
 window.registerNotification = async function(item, mode) {
   const token = localStorage.getItem("fcmToken") || await getFCMToken();
   if(!token){
@@ -507,7 +604,6 @@ window.registerNotification = async function(item, mode) {
   }
 };
 
-// 通知をキャンセル
 window.cancelNotification = async function(item, mode) {
   const token = localStorage.getItem("fcmToken");
   if(token){
@@ -528,7 +624,6 @@ window.cancelNotification = async function(item, mode) {
   renderContent();
 };
 
-// 起動時にトークンを確認
 (async () => {
   if(Notification.permission === "granted"){
     await getFCMToken();
@@ -539,7 +634,6 @@ window.cancelNotification = async function(item, mode) {
 })();
 </script>
 
-<!-- メインロジック -->
 <script>
 // ── ダークモード ──
 const darkToggle = document.getElementById("darkToggle");
@@ -558,7 +652,7 @@ darkToggle.onclick = ()=>{
   updateDarkBtn();
 };
 
-// ── 認証データ（index.htmlと共有） ──
+// ── 認証データ ──
 let authData = JSON.parse(localStorage.getItem("authData") || "{}");
 
 function toggleAuth(name){
@@ -659,6 +753,7 @@ function renderSection(label, items, isEvent=false){
     const hasNotif = isNotifSet(item,"normal") || isNotifSet(item,"weed");
     const isAuthed = item.auth !== false && !!authData[item.name];
 
+    // img-wrap, level-badge, auth-btn はstyle.cssで定義済み
     div.innerHTML = `
       <div class="img-wrap">
         <div class="level-badge">Lv.${item.level}</div>
@@ -672,9 +767,7 @@ function renderSection(label, items, isEvent=false){
         <img src="${item.img}" alt="${item.name}" loading="lazy">
       </div>
       <div class="item-name">${item.name}</div>
-      <div style="font-size:9px; color:var(--text-sub); text-align:center; margin-top:2px;">
-        ${formatTime(item.growTime)}
-      </div>
+      <div class="garden-item-sub">${formatTime(item.growTime)}</div>
     `;
 
     div.onclick = () => openModal(item);
@@ -701,17 +794,15 @@ function renderModal(item){
   const isFlower = currentTab === "flower";
   const box = document.getElementById("modalBox");
 
-  // 売価テーブル
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
   const priceRows = stars.map((s,i) => {
     const p = item.prices[i];
     return `<tr>
       <td>${s}</td>
-      <td>${p !== null ? p.toLocaleString() : '<span class="price-null">未確認</span>'}</td>
+      <td>${p !== null ? p.toLocaleString() : '<span class="g-price-null">未確認</span>'}</td>
     </tr>`;
   }).join("");
 
-  // 交配（花のみ）
   let breedingHTML = "";
   if(isFlower && item.colors && item.colors.length > 0){
     const chips = item.colors.map(c => {
@@ -739,20 +830,14 @@ function renderModal(item){
 
     breedingHTML = `
       <div style="margin-bottom:12px;">
-        <div class="section-title">🌸 交配で作れる色</div>
-        <div class="breeding-note">
-          毎朝6時に交配が行われます。同じ色を2株並べると上のレア度の種ができます。
-        </div>
+        <div class="g-section-title">🌸 交配で作れる色</div>
+        <div class="breeding-note">毎朝6時に交配が行われます。同じ色を2株並べると上のレア度の種ができます。</div>
         <div class="breeding-grid">${chips}</div>
-        ${examples ? `
-          <div style="font-size:11px; color:var(--text-sub); margin-bottom:6px;">組み合わせ例</div>
-          ${examples}
-        ` : ""}
+        ${examples ? `<div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;">組み合わせ例</div>${examples}` : ""}
       </div>
     `;
   }
 
-  // 通知（作物のみ）
   let notifHTML = "";
   if(!isFlower){
     const normalSet = isNotifSet(item,"normal");
@@ -762,7 +847,7 @@ function renderModal(item){
 
     notifHTML = `
       <div style="margin-bottom:12px;">
-        <div class="section-title">🔔 収穫通知</div>
+        <div class="g-section-title">🔔 収穫通知</div>
         <div class="notif-btns">
           <button class="notif-btn ${normalSet ? "set" : ""}"
             onclick="${normalSet
@@ -788,54 +873,54 @@ function renderModal(item){
   }
 
   box.innerHTML = `
-    <div class="modal-name">${item.name}</div>
-    <div class="modal-imgs">
-      <div class="modal-img-wrap">
+    <div class="g-modal-name">${item.name}</div>
+    <div class="g-modal-imgs">
+      <div class="g-modal-img-wrap">
         <img src="${item.seedImg}" alt="${item.name}の種">
-        <div class="modal-img-label">種</div>
+        <div class="g-modal-img-label">種</div>
       </div>
-      <div class="modal-img-wrap">
+      <div class="g-modal-img-wrap">
         <img src="${item.img}" alt="${item.name}">
-        <div class="modal-img-label">${isFlower ? "花" : "作物"}</div>
+        <div class="g-modal-img-label">${isFlower ? "花" : "作物"}</div>
       </div>
     </div>
-    <div class="modal-info">
-      <div class="garden-info-row">
-        <span class="garden-info-label">レベル</span>
-        <span class="garden-info-value">Lv.${item.level}</span>
+    <div class="g-info">
+      <div class="g-info-row">
+        <span class="g-info-label">レベル</span>
+        <span class="g-info-value">Lv.${item.level}</span>
       </div>
-      <div class="garden-info-row">
-        <span class="garden-info-label">成長時間</span>
-        <span class="garden-info-value">${formatTime(item.growTime)}</span>
+      <div class="g-info-row">
+        <span class="g-info-label">成長時間</span>
+        <span class="g-info-value">${formatTime(item.growTime)}</span>
       </div>
-      <div class="garden-info-row">
-        <span class="garden-info-label">種の値段</span>
-        <span class="garden-info-value">${item.seedPrice.toLocaleString()} コイン</span>
+      <div class="g-info-row">
+        <span class="g-info-label">種の値段</span>
+        <span class="g-info-value">${item.seedPrice.toLocaleString()} コイン</span>
       </div>
       ${!isFlower ? `
-      <div class="gardenl-info-row">
-        <span class="garden-info-label">草抜き</span>
-        <span class="garden-info-value">最大${item.weedCount}回</span>
+      <div class="g-info-row">
+        <span class="g-info-label">草抜き</span>
+        <span class="g-info-value">最大${item.weedCount}回</span>
       </div>` : ""}
       ${item.isEvent ? `
-      <div class="garden-info-row">
-        <span class="garden-info-label">イベント</span>
-        <span class="garden-info-value">${item.eventName}（終了）</span>
+      <div class="g-info-row">
+        <span class="g-info-label">イベント</span>
+        <span class="g-info-value">${item.eventName}（終了）</span>
       </div>` : ""}
     </div>
-    <table class="price-table">
+    <table class="g-price-table">
       <tr><th>レア度</th><th>売価</th></tr>
       ${priceRows}
     </table>
     ${breedingHTML}
     ${notifHTML}
-    <button class="modal-close-btn" onclick="closeModal()">閉じる</button>
+    <button class="g-close-btn" onclick="closeModal()">閉じる</button>
   `;
 }
 
 // ── トースト ──
 function showToast(msg){
-  const t = document.getElementById("toast");
+  const t = document.getElementById("gardenToast");
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(()=> t.classList.remove("show"), 2500);
