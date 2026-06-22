@@ -737,7 +737,7 @@ function renderSection(label, items, isEvent=false){
     const div = document.createElement("div");
     div.className = "garden-item";
 
-    const hasNotif = isNotifSet(item,"normal") || isNotifSet(item,"weed");
+    const hasNotif = !item.isEvent && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
     const isAuthed = item.auth !== false && !!authData[item.name];
 
     div.innerHTML = `
@@ -833,8 +833,9 @@ function renderModal(item){
     `;
   }
 
+// 通知（作物のみ・イベント終了済みは除外）
   let notifHTML = "";
-  if(!isFlower){
+  if(!isFlower && !item.isEvent){
     const normalSet = isNotifSet(item,"normal");
     const weedSet   = isNotifSet(item,"weed");
 
