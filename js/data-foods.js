@@ -143,7 +143,7 @@ const foodsData = [
   rarity: [true,false,false,false,false],
   prices:[30,null,null,null,null],
   materials:["食料系の失敗作(必ず損)"],
-  level:,
+  level:null,
   materials_image:[
     { image:null },
     { image:null },
@@ -160,7 +160,7 @@ const foodsData = [
   rarity: [true,false,false,false,false],
   prices:[30,null,null,null,null],
   materials:["飲み物の失敗作"],
-  level:1,
+  level:null,
   materials_image:[
     { image:null },
     { image:null },
@@ -495,7 +495,7 @@ const foodsData = [
 },
 {
   name:"焼きキノコ",
-  image:"./images/foods/030PNG",
+  image:"./images/foods/030.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
