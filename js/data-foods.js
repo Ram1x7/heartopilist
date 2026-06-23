@@ -682,7 +682,7 @@ const foodsData = [
 {
   name:"三角の白米ちまき",
   image:"./images/000.PNG",
-  cost:262,
+  cost:162,
   time:20,
   rarity: [true,true,true,true,true],
   prices:[240,360,480,960,1920],
@@ -733,7 +733,7 @@ const foodsData = [
 {
   name:"枕型の白米ちまき",
   image:"./images/000.PNG",
-  cost:262,
+  cost:162,
   time:20,
   rarity: [true,true,true,true,true],
   prices:[240,360,480,960,1920],
