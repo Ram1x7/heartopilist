@@ -9,8 +9,8 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#3c5a6e">
-<title>園芸図鑑｜はとぴ図鑑</title>
-<meta name="description" content="Heartopia（ハートピアスローライフ）の園芸作物・花の図鑑。成長時間・種の値段・交配一覧・通知機能対応。">
+<title>料理レシピ図鑑｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の料理レシピ一覧。材料・材料費・売価・利益を確認できます。">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css">
@@ -25,16 +25,9 @@
 </script>
 
 <style>
-/* garden.html 専用CSS */
-:root{
-  --green:#4a7c59;
-  --green-soft:#dff0e5;
-}
- 
-body.dark{
-  --green-soft:#1e3328;
-}
+/* ── foods.html 専用CSS（style.cssと競合しないようf-プレフィックス使用）── */
 
+/* ページヘッダー */
 .page-header{
   text-align:center;
   margin-bottom:14px;
@@ -48,7 +41,298 @@ body.dark{
 }
 
 body.dark .page-header h2{ color:#e8d2a8; }
-  
+
+/* フィルター行（style.cssの.filterと別クラス） */
+.f-filter{
+  display:flex;
+  gap:6px;
+  margin-bottom:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.f-filter::-webkit-scrollbar{ display:none; }
+
+.f-btn{
+  flex-shrink:0;
+  padding:8px 14px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  white-space:nowrap;
+}
+
+.f-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .f-btn{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
+body.dark .f-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
+
+/* 並び替え行（4ボタン） */
+.f-sort{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.f-sort-btn{
+  flex:1;
+  padding:8px 4px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:10px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  text-align:center;
+}
+
+.f-sort-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .f-sort-btn{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
+body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
+
+/* 検索欄ラッパー */
+.f-search-wrap{
+  position:relative;
+  margin-bottom:10px;
+}
+
+/* 料理モーダル */
+#foodModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(40,36,30,0.5);
+  backdrop-filter:blur(5px);
+  z-index:999;
+  overflow-y:auto;
+}
+
+.f-modal-box{
+  background:var(--card);
+  margin:40px auto;
+  padding:20px;
+  width:92%;
+  max-width:380px;
+  border-radius:22px;
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
+}
+
+body.dark .f-modal-box{ background:#2c2823; border-color:#46423b; }
+
+.f-modal-name{
+  font-family:'Shippori Mincho', serif;
+  font-size:18px;
+  font-weight:700;
+  color:var(--indigo);
+  text-align:center;
+  letter-spacing:0.06em;
+  margin-bottom:12px;
+}
+
+body.dark .f-modal-name{ color:#e8d2a8; }
+
+/* 料理画像 */
+.f-modal-img{
+  width:120px;
+  height:120px;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:16px;
+  padding:6px;
+  display:block;
+  margin:0 auto 14px;
+}
+
+/* 基本情報 */
+.f-info{
+  background:var(--card-sub);
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:12px;
+  font-size:12px;
+  line-height:2;
+}
+
+body.dark .f-info{ background:#383329; }
+
+.f-info-row{
+  display:flex;
+  justify-content:space-between;
+}
+
+.f-info-label{ color:var(--text-sub); }
+.f-info-value{ font-weight:700; color:var(--text); }
+.f-info-value.profit-plus{ color:#4a7c59; }
+.f-info-value.profit-minus{ color:var(--vermillion); }
+
+/* レア度タブ（モーダル内） */
+.f-rarity-tabs{
+  display:flex;
+  gap:5px;
+  margin-bottom:10px;
+}
+
+.f-rarity-tab{
+  flex:1;
+  padding:6px 4px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:10px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  text-align:center;
+  transition:0.15s;
+}
+
+.f-rarity-tab.active{
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+.f-rarity-tab.disabled{
+  opacity:0.3;
+  pointer-events:none;
+}
+
+body.dark .f-rarity-tab{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
+body.dark .f-rarity-tab.active{ background:var(--gold); border-color:var(--gold); color:#2c2823; }
+
+/* 売価・利益カード */
+.f-price-card{
+  background:var(--card-sub);
+  border-radius:12px;
+  padding:10px 14px;
+  margin-bottom:12px;
+  font-size:12px;
+}
+
+body.dark .f-price-card{ background:#383329; }
+
+/* モーダル内セクションタイトル */
+.f-section-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  margin-bottom:8px;
+  padding-left:8px;
+  border-left:3px solid var(--gold);
+}
+
+body.dark .f-section-title{ color:#e8d2a8; }
+
+/* 素材横並び */
+.f-materials{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.f-material-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  flex:1;
+  min-width:60px;
+  max-width:80px;
+}
+
+.f-material-img{
+  width:52px;
+  height:52px;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:10px;
+  padding:3px;
+  border:1px solid var(--border);
+}
+
+body.dark .f-material-img{ background:#383329; border-color:var(--border); }
+
+.f-material-name{
+  font-size:9px;
+  color:var(--text-sub);
+  text-align:center;
+  line-height:1.3;
+}
+
+/* 素材テキスト（画像なし） */
+.f-material-text{
+  font-size:11px;
+  color:var(--text-sub);
+  line-height:1.8;
+  margin-bottom:12px;
+}
+
+/* 閉じるボタン */
+.f-close-btn{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  margin-top:4px;
+}
+
+/* フッター */
+.foods-footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+}
+
+/* トースト（style.cssの#toastと別IDにする） */
+#foodToast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 22px;
+  border-radius:999px;
+  font-size:13px;
+  opacity:0;
+  transition:opacity 0.25s, transform 0.25s;
+  pointer-events:none;
+  z-index:2000;
+  white-space:nowrap;
+}
+
+#foodToast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
 </style>
 </head>
 
@@ -70,183 +354,348 @@ body.dark .page-header h2{ color:#e8d2a8; }
 </nav>
 
 <div class="page-header">
-  <h2>料理レシピ図鑑</h2>
+  <h2>🍳 料理レシピ図鑑</h2>
 </div>
+
+<!-- 検索 -->
+<div class="f-search-wrap">
+  <input type="text" id="search" class="search" placeholder="🔍 料理名・素材名で検索">
+  <button id="clearBtn">×</button>
+</div>
+
+<!-- レア度フィルター -->
+<div class="f-filter">
+  <button class="f-btn active" id="r_all" onclick="setRarity('all')">全て</button>
+  <button class="f-btn" id="r_1" onclick="setRarity(1)">☆1</button>
+  <button class="f-btn" id="r_2" onclick="setRarity(2)">☆2</button>
+  <button class="f-btn" id="r_3" onclick="setRarity(3)">☆3</button>
+  <button class="f-btn" id="r_4" onclick="setRarity(4)">☆4</button>
+  <button class="f-btn" id="r_5" onclick="setRarity(5)">☆5</button>
+</div>
+
+<!-- 並び替え -->
+<div class="f-sort">
+  <button class="f-sort-btn active" id="s_book" onclick="setSort('book')">図鑑順</button>
+  <button class="f-sort-btn" id="s_level" onclick="setSort('level')">レベル順</button>
+  <button class="f-sort-btn" id="s_unchecked" onclick="setSort('unchecked')">未コンプ順</button>
+  <button class="f-sort-btn" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
+</div>
+
+<!-- グリッド -->
+<div id="list" class="grid"></div>
 
 <div class="foods-footer">※本サイトは非公式のファンツールです</div>
 
+<!-- モーダル -->
+<div id="foodModal" onclick="if(event.target.id==='foodModal')closeModal()">
+  <div class="f-modal-box" id="modalBox"></div>
+</div>
+
+<div id="foodToast"></div>
+
 <script src="js/data-foods.js"></script>
-
 <script>
-const foods = foodsData;
 
-let checkedData =
+// ── ダークモード ──
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true") document.body.classList.add("dark");
+else if(savedDark === null && window.matchMedia("(prefers-color-scheme: dark)").matches)
+  document.body.classList.add("dark");
 
-  JSON.parse(localStorage.getItem("food_checked") || "{}");
+function updateDarkBtn(){
+  darkToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+};
 
-let authData =
+// ── データ ──
+let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
+let authData    = JSON.parse(localStorage.getItem("food_auth") || "{}");
 
-  JSON.parse(localStorage.getItem("food_auth") || "{}");
+// ── 状態 ──
+let currentRarity = "all";
+let currentSort   = "book";
+let currentModalRarity = 1; // モーダル内の選択レア度
+let currentModalFood = null;
 
-/* ===================== SEARCH ===================== */
-
+// ── 検索 ──
 const searchInput = document.getElementById("search");
+const clearBtn    = document.getElementById("clearBtn");
 
-searchInput.addEventListener("input", render);
+searchInput.addEventListener("input", ()=>{
+  clearBtn.style.display = searchInput.value ? "block" : "none";
+  render();
+});
 
-/* ===================== RENDER ===================== */
+clearBtn.onclick = ()=>{
+  searchInput.value = "";
+  clearBtn.style.display = "none";
+  render();
+};
 
-function render(){
-
-  const keyword = searchInput.value || "";
-
-  let list = foods.filter(f =>
-
-    f.name.includes(keyword)
-
-  );
-
-  const el = document.getElementById("list");
-
-  el.innerHTML = "";
-
-  list.forEach(f => {
-
-    const div = document.createElement("div");
-
-    div.className = "item";
-
-    const checked = checkedData[f.name];
-
-    const auth = authData[f.name];
-
-    div.innerHTML = `
-
-      <div class="img-wrap">
-
-        <div class="level-badge">
-
-          Lv.${f.level}
-
-        </div>
-
-        <button class="check-btn ${checked ? "checked" : ""}">
-
-          ${checked ? "⭐️" : ""}
-
-        </button>
-
-        <button class="auth-btn ${auth ? "checked" : ""}">
-
-          ${auth ? "🎖" : ""}
-
-        </button>
-
-        <img src="${f.image}">
-
-      </div>
-
-      <div class="item-name">${f.name}</div>
-
-    `;
-
-    /* =====================
-
-       モーダル
-
-    ===================== */
-
-    div.onclick = () => openModal(f);
-
-    /* ⭐ */
-
-    div.querySelector(".check-btn").onclick = (e)=>{
-
-      e.stopPropagation();
-
-      checkedData[f.name] = !checkedData[f.name];
-
-      localStorage.setItem("food_checked", JSON.stringify(checkedData));
-
-      render();
-
-    };
-
-    /* 🎖 */
-
-    div.querySelector(".auth-btn").onclick = (e)=>{
-
-      e.stopPropagation();
-
-      authData[f.name] = !authData[f.name];
-
-      localStorage.setItem("food_auth", JSON.stringify(authData));
-
-      render();
-
-    };
-
-    el.appendChild(div);
-
+// ── レア度フィルター ──
+function setRarity(r){
+  currentRarity = r;
+  ["all",1,2,3,4,5].forEach(x=>{
+    document.getElementById("r_"+x).classList.toggle("active", x === r);
   });
-
+  render();
 }
 
-/* ===================== MODAL ===================== */
+// ── 並び替え ──
+function setSort(type){
+  currentSort = type;
+  ["book","level","unchecked","unauth"].forEach(x=>{
+    document.getElementById("s_"+x).classList.toggle("active", x === type);
+  });
+  render();
+}
 
+// ── 利益計算 ──
+function getProfit(food, rarityIndex){
+  if(!food.prices || food.prices[rarityIndex] == null) return null;
+  return food.prices[rarityIndex] - (food.cost || 0);
+}
+
+// ── レア度インデックス（0始まり）──
+function rarityIdx(r){ return r - 1; }
+
+// ── 描画 ──
+function render(){
+  const keyword = searchInput.value.trim();
+  const el = document.getElementById("list");
+  el.innerHTML = "";
+
+  let list = foodsData.filter(f => {
+    // レア度フィルター
+    if(currentRarity !== "all"){
+      const idx = rarityIdx(currentRarity);
+      if(!f.rarity || !f.rarity[idx]) return false;
+    }
+    // キーワード検索
+    if(keyword){
+      const hit =
+        f.name.includes(keyword) ||
+        (f.materials && f.materials.some(m => m.includes(keyword)));
+      if(!hit) return false;
+    }
+    return true;
+  });
+
+  // 並び替え
+  if(currentSort === "level"){
+    list = list.slice().sort((a,b) => (a.level||99) - (b.level||99));
+  } else if(currentSort === "unchecked"){
+    list = list.slice().sort((a,b) => {
+      const ac = checkedData[a.name] ? 1 : 0;
+      const bc = checkedData[b.name] ? 1 : 0;
+      if(ac !== bc) return ac - bc;
+      return (foodsData.indexOf(a)) - (foodsData.indexOf(b));
+    });
+  } else if(currentSort === "unauth"){
+    list = list.slice().sort((a,b) => {
+      // auth:falseのものは後ろへ
+      const ae = a.auth !== false ? 0 : 1;
+      const be = b.auth !== false ? 0 : 1;
+      if(ae !== be) return ae - be;
+      const aa = authData[a.name] ? 1 : 0;
+      const ba = authData[b.name] ? 1 : 0;
+      if(aa !== ba) return aa - ba;
+      return (foodsData.indexOf(a)) - (foodsData.indexOf(b));
+    });
+  }
+  // book順はそのまま
+
+  if(list.length === 0){
+    el.innerHTML = `<p style="text-align:center; color:var(--text-sub); padding:40px 0; grid-column:1/-1;">該当なし</p>`;
+    return;
+  }
+
+  list.forEach(f => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const checked = !!checkedData[f.name];
+    const authed  = !!authData[f.name];
+
+    div.innerHTML = `
+      <div class="img-wrap">
+        ${f.level != null ? `<div class="level-badge">Lv.${f.level}</div>` : ''}
+        <button class="check-btn ${checked ? "checked" : ""}">
+          ${checked ? "⭐️" : ""}
+        </button>
+        ${f.auth !== false ? `
+          <button class="auth-btn ${authed ? "checked" : ""}">
+            ${authed ? "🎖" : ""}
+          </button>
+        ` : ''}
+        <img src="${f.image}" alt="${f.name}" loading="lazy">
+      </div>
+      <div class="item-name">${f.name}</div>
+    `;
+
+    // モーダルを開く
+    div.onclick = () => openModal(f);
+
+    // ⭐チェック
+    div.querySelector(".check-btn").onclick = (e) => {
+      e.stopPropagation();
+      checkedData[f.name] = !checkedData[f.name];
+      localStorage.setItem("food_checked", JSON.stringify(checkedData));
+      render();
+    };
+
+    // 🎖認証
+    const authBtn = div.querySelector(".auth-btn");
+    if(authBtn){
+      authBtn.onclick = (e) => {
+        e.stopPropagation();
+        authData[f.name] = !authData[f.name];
+        localStorage.setItem("food_auth", JSON.stringify(authData));
+        render();
+      };
+    }
+
+    el.appendChild(div);
+  });
+}
+
+// ── モーダル ──
 function openModal(f){
-
-  modal.style.display = "block";
-
-  m_name.textContent = f.name;
-
-  m_img.src = f.image;
-
-  m_level.textContent = "Lv." + f.level;
-
-  const prices = f.prices.filter(p => p !== null);
-
-  const min = Math.min(...prices);
-
-  const max = Math.max(...prices);
-
-  const profit = max - min;
-
-  m_profit.textContent = `利益：${profit}`;
-
+  currentModalFood = f;
+  // 最初に表示するレア度（☆1から使えるものを探す）
+  currentModalRarity = 1;
+  if(f.rarity){
+    for(let i=0;i<5;i++){
+      if(f.rarity[i]){ currentModalRarity = i+1; break; }
+    }
+  }
+  renderModal();
+  document.getElementById("foodModal").style.display = "block";
 }
 
 function closeModal(){
-
-  modal.style.display = "none";
-
+  document.getElementById("foodModal").style.display = "none";
+  currentModalFood = null;
 }
 
-/* ===================== DARK MODE ===================== */
-
-darkToggle.onclick = ()=>{
-
-  document.body.classList.toggle("dark");
-
-  localStorage.setItem(
-
-    "darkMode",
-
-    document.body.classList.contains("dark")
-
-  );
-
-};
-
-if(localStorage.getItem("darkMode")==="true"){
-
-  document.body.classList.add("dark");
-
+function setModalRarity(r){
+  currentModalRarity = r;
+  renderModal();
 }
 
-/* ===================== INIT ===================== */  
+function renderModal(){
+  const f = currentModalFood;
+  if(!f) return;
+  const box = document.getElementById("modalBox");
+  const r = currentModalRarity;
+  const idx = rarityIdx(r);
+
+  // 売価
+  const price = f.prices && f.prices[idx] != null ? f.prices[idx] : null;
+  // 利益
+  const profit = price != null ? price - (f.cost || 0) : null;
+  const profitClass = profit == null ? "" : profit >= 0 ? "profit-plus" : "profit-minus";
+  const profitText = profit == null ? "不明" : (profit >= 0 ? `+${profit.toLocaleString()}` : `${profit.toLocaleString()}`);
+
+  // レア度タブ
+  const rarityTabs = [1,2,3,4,5].map(rv => {
+    const available = f.rarity && f.rarity[rv-1];
+    return `<button
+      class="f-rarity-tab ${rv === r ? "active" : ""} ${!available ? "disabled" : ""}"
+      onclick="setModalRarity(${rv})">☆${rv}</button>`;
+  }).join("");
+
+  // 素材表示
+  let materialsHTML = "";
+  if(f.materials_image && f.materials_image.length > 0){
+    const items = f.materials_image.map((m, i) => {
+      const label = f.materials && f.materials[i] ? f.materials[i] : "";
+      return `
+        <div class="f-material-item">
+          <img class="f-material-img" src="${m.image}" alt="${label}" loading="lazy"
+            onerror="this.style.display='none'">
+          <div class="f-material-name">${label}</div>
+        </div>
+      `;
+    }).join("");
+    materialsHTML = `
+      <div class="f-section-title">🥕 素材</div>
+      <div class="f-materials">${items}</div>
+    `;
+  } else if(f.materials && f.materials.length > 0){
+    // 画像がない場合はテキスト表示
+    const lines = f.materials.map(m => `<div>・${m}</div>`).join("");
+    materialsHTML = `
+      <div class="f-section-title">🥕 素材</div>
+      <div class="f-material-text">${lines}</div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="f-modal-name">${f.name}</div>
+    <img class="f-modal-img" src="${f.image}" alt="${f.name}">
+
+    <div class="f-rarity-tabs">${rarityTabs}</div>
+
+    <div class="f-price-card">
+      <div class="f-info-row">
+        <span class="f-info-label">売価</span>
+        <span class="f-info-value">${price != null ? price.toLocaleString() + " コイン" : "不明"}</span>
+      </div>
+      <div class="f-info-row">
+        <span class="f-info-label">材料費</span>
+        <span class="f-info-value">${(f.cost || 0).toLocaleString()} コイン</span>
+      </div>
+      <div class="f-info-row">
+        <span class="f-info-label">利益</span>
+        <span class="f-info-value ${profitClass}">${profitText} コイン</span>
+      </div>
+    </div>
+
+    <div class="f-info" style="margin-bottom:12px;">
+      <div class="f-info-row">
+        <span class="f-info-label">調理時間</span>
+        <span class="f-info-value">${formatTime(f.time)}</span>
+      </div>
+      ${f.level != null ? `
+      <div class="f-info-row">
+        <span class="f-info-label">レベル</span>
+        <span class="f-info-value">Lv.${f.level}</span>
+      </div>` : ""}
+    </div>
+
+    ${materialsHTML}
+
+    <button class="f-close-btn" onclick="closeModal()">閉じる</button>
+  `;
+}
+
+// ── 時間フォーマット ──
+function formatTime(min){
+  if(!min || min === 0) return "即時";
+  if(min < 60) return `${min}分`;
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if(m === 0) return `${h}時間`;
+  return `${h}時間${m}分`;
+}
+
+// ── トースト ──
+function showToast(msg){
+  const t = document.getElementById("foodToast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=> t.classList.remove("show"), 2500);
+}
+
 // 初期化
-render()
+render();
 </script>
 </body>
 </html>
