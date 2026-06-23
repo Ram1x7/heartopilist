@@ -6,7 +6,7 @@ const foodsData = [
   time:15,
   rarity: [true,true,true,true,true],
   prices:[90,135,180,360,720],
-  materials:["野菜なら\nなんでもOK","野菜なら\nなんでもOK","",""],
+  materials:["野菜ならなんでもOK","野菜ならなんでもOK","",""],
   level:1,
   materials_image:[
     { image:"./images/materials/all_vege.jpg" },
@@ -20,7 +20,7 @@ const foodsData = [
   name:"ミックスジャム",
   image:"./images/foods/002.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[160,240,320,640,1280],
   materials:["ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK"],
@@ -37,7 +37,7 @@ const foodsData = [
   name:"ラズベリージャム",
   image:"./images/foods/003.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[160,240,320,640,1280],
   materials:["ラズベリー","ラズベリー","ラズベリー","ラズベリー"],
@@ -71,7 +71,7 @@ const foodsData = [
   name:"ブルーベリージャム",
   image:"./images/foods/005.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[170,255,340,680,1360],
   materials:["ブルーベリー","ブルーベリー","ブルーベリー","ブルーベリー"],
@@ -88,7 +88,7 @@ const foodsData = [
   name:"リンゴジャム",
   image:"./images/foods/006.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[270,405,540,1080,2160],
   materials:["リンゴ","リンゴ","リンゴ","リンゴ"],
@@ -105,7 +105,7 @@ const foodsData = [
   name:"オレンジジャム",
   image:"./images/foods/007.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[270,405,540,1080,2160],
   materials:["オレンジ","オレンジ","オレンジ","オレンジ"],
@@ -125,13 +125,13 @@ const foodsData = [
   time:60,
   rarity: [true,true,true,true,true],
   prices:[310,465,620,1240,2480],
-  materials:["魚素材×2","じゃがいも×2(種@30×2)"],
+  materials:["魚ならなんでもOK","魚ならなんでもOK","じゃがいも(種@30)","じゃがいも(種@30)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/potato.jpg" }
   ],
   auth:true
 },
@@ -139,7 +139,7 @@ const foodsData = [
   name:"不気味な食べ物",
   image:"./images/foods/009.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,false,false,false,false],
   prices:[30,null,null,null,null],
   materials:["食料系の失敗作(必ず損)"],
@@ -176,13 +176,13 @@ const foodsData = [
   time:30,
   rarity: [true,true,true,true,true],
   prices:[280,420,560,1120,2240],
-  materials:["パイナップル×4(種@15×4)"],
+  materials:["パイナップル(種@15)","パイナップル(種@15)","パイナップル(種@15)","パイナップル(種@15)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/pineapple.jpg" }
   ],
   auth:true
 },
@@ -193,13 +193,13 @@ const foodsData = [
   time:600,
   rarity: [true,true,true,true,true],
   prices:[2020,3030,4040,8080,16160],
-  materials:["ブドウ×4(種@160×4)"],
+  materials:["ブドウ(種@160)","ブドウ(種@160)","ブドウ(種@160)","ブドウ(種@160)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/grape.jpg" }
   ],
   auth:true
 },
@@ -210,13 +210,13 @@ const foodsData = [
   time:300,
   rarity: [true,true,true,true,true],
   prices:[1400,2100,2800,5600,11200],
-  materials:["カカオ豆×4(種@110×4)"],
+  materials:["カカオ豆(種@110)","カカオ豆(種@110)","カカオ豆(種@110)","カカオ豆(種@110)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/cacao.jpg" },
+    { image:"./images/materials/cacao.jpg" },
+    { image:"./images/materials/cacao.jpg" },
+    { image:"./images/materials/cacao.jpg" }
   ],
   auth:true
 },
@@ -227,13 +227,13 @@ const foodsData = [
   time:360,
   rarity: [true,true,true,true,true],
   prices:[1580,2370,3160,6320,12640],
-  materials:["いちご×4(種@125×4)"],
+  materials:["いちご(種@125)","いちご(種@125)","いちご(種@125)","いちご(種@125)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
   ],
   auth:true
 },
@@ -244,13 +244,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[480,720,960,1920,3840],
-  materials:["チーズ×1(@100)","牛乳×1(@50)","小麦×2(種@95×2)"],
+  materials:["チーズ(@100)","牛乳(@50)","小麦(種@95)","小麦(種@95)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/cheese.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/wheat.jpg" }
   ],
   auth:true
 },
@@ -258,16 +258,16 @@ const foodsData = [
   name:"オリジナルロールケーキ",
   image:"./images/foods/015.PNG",
   cost:450,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[550,825,1100,2200,4400],
-  materials:["卵×1(@100)","牛乳×1(@50)","紫のキャンディ×2(@150×2)"],
+  materials:["卵(@100)","牛乳(@50)","虹色キャンディならなんでもOK","虹キャンディならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/all_candy.jpg" },
+    { image:"./images/materials/all_candy.jpg" }
   ],
   auth:true
 },
@@ -275,16 +275,16 @@ const foodsData = [
   name:"赤いロールケーキ",
   image:"./images/foods/016.PNG",
   cost:550,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[670,1005,1340,2680,5360],
-  materials:["卵×1(@100)","牛乳×1(@50)","赤いキャンディ×2(@200×2)"],
+  materials:["卵(@100)","牛乳(@50)","赤いキャンディ(@200)","赤いキャンディ(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/red_candy.jpg" },
+    { image:"./images/materials/red_candy.jpg" }
   ],
   auth:true
 },
@@ -292,16 +292,16 @@ const foodsData = [
   name:"オレンジのロールケーキ",
   image:"./images/foods/017.PNG",
   cost:550,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[670,1005,1340,2680,5360],
-  materials:["卵×1(@100)","牛乳×1(@50)","オレンジのキャンディ×2(@200×2)"],
+  materials:["卵(@100)","牛乳(@50)","オレンジのキャンディ(@200)","オレンジのキャンディ(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/orange_candy.jpg" },
+    { image:"./images/materials/orange_candy.jpg" }
   ],
   auth:true
 },
@@ -309,16 +309,16 @@ const foodsData = [
   name:"黄色いロールケーキ",
   image:"./images/foods/018.PNG",
   cost:550,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[670,1005,1340,2680,5360],
-  materials:["卵×1(@100)","牛乳×1(@50)","黄色いキャンディ×2(@200×2)"],
+  materials:["卵(@100)","牛乳(@50)","黄色いキャンディ(@200)","黄色いキャンディ(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/yellow_candy.jpg" },
+    { image:"./images/materials/yellow_candy.jpg" }
   ],
   auth:true
 },
@@ -329,13 +329,13 @@ const foodsData = [
   time:1,
   rarity: [true,true,true,true,true],
   prices:[570,855,1140,2280,4560],
-  materials:["卵×1(@100)","牛乳×1(@50)","紫のキャンディ×2(@150×2)"],
+  materials:["卵(@100)","牛乳(@50)","紫のキャンディ(@150)","紫のキャンディ(@150)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/purple_candy.jpg" },
+    { image:"./images/materials/purple_candy.jpg" }
   ],
   auth:true
 },
@@ -343,16 +343,16 @@ const foodsData = [
   name:"緑のロールケーキ",
   image:"./images/foods/020.PNG",
   cost:550,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[670,1005,1340,2680,5360],
-  materials:["卵×1(@100)","牛乳×1(@50)","緑のキャンディ×2(@200×2)"],
+  materials:["卵(@100)","牛乳(@50)","緑のキャンディ(@200)","緑のキャンディ(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/green_candy.jpg" },
+    { image:"./images/materials/green_candy.jpg" }
   ],
   auth:true
 },
@@ -360,16 +360,16 @@ const foodsData = [
   name:"水色ロールケーキ",
   image:"./images/foods/021.PNG",
   cost:450,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[570,855,1140,2280,4560],
-  materials:["卵×1(@100)","牛乳×1(@50)","青のキャンディ×2(@150×2)"],
+  materials:["卵(@100)","牛乳(@50)","青のキャンディ(@150)","青のキャンディ(@150)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/water_candy.jpg" },
+    { image:"./images/materials/water_candy.jpg" }
   ],
   auth:true
 },
@@ -377,16 +377,16 @@ const foodsData = [
   name:"青いロールケーキ",
   image:"./images/foods/022.PNG",
   cost:450,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[570,855,1140,2280,4560],
-  materials:["卵×1(@100)","牛乳×1(@50)","ブルーキャンディ×2(@150×2)"],
+  materials:["卵(@100)","牛乳(@50)","ブルーキャンディ(@150)","ブルーキャンディ(@150)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/blue_candy.jpg" },
+    { image:"./images/materials/blue_candy.jpg" }
   ],
   auth:true
 },
@@ -397,13 +397,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[500,750,1000,2000,4000],
-  materials:["キノコ×2(トリュフ以外推奨)","小麦×1(種@95)","卵×1(@100)"],
+  materials:["キノコならなんでもOK","キノコならなんでもOK","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" }
   ],
   auth:true
 },
@@ -414,13 +414,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[500,750,1000,2000,4000],
-  materials:["ヒラタケ×2","小麦×1(種@95)","卵×1(@100)"],
+  materials:["ヒラタケ","ヒラタケ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/hiratake.jpg" },
+    { image:"./images/materials/hiratake.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" }
   ],
   auth:true
 },
@@ -431,13 +431,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[500,750,1000,2000,4000],
-  materials:["シイタケ×2","小麦×1(種@95)","卵×1(@100)"],
+  materials:["シイタケ","シイタケ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" }
   ],
   auth:true
 },
@@ -448,13 +448,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[500,750,1000,2000,4000],
-  materials:["マッシュルーム×2","小麦×1(種@95)","卵×1(@100)"],
+  materials:["マッシュルーム","マッシュルーム","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/mushroom.jpg" },
+    { image:"./images/materials/mushroom.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" }
   ],
   auth:true
 },
@@ -465,13 +465,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[500,750,1000,2000,4000],
-  materials:["ヤマドリタケ×2","小麦×1(種@95)","卵×1(@100)"],
+  materials:["ヤマドリタケ","ヤマドリタケ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/yamadoritake.jpg" },
+    { image:"./images/materials/yamadoritake.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" }
   ],
   auth:true
 },
@@ -482,13 +482,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[830,1245,1660,3320,6640],
-  materials:["トリュフ×2","小麦×1(種@95)","卵×1(@100)"],
+  materials:["トリュフ","トリュフ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/truffle.jpg" },
+    { image:"./images/materials/truffle.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" }
   ],
   auth:true
 },
@@ -496,16 +496,16 @@ const foodsData = [
   name:"焼きキノコ",
   image:"./images/foods/029.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[180,270,360,720,1440],
-  materials:["キノコ×4(トリュフ以外推奨)"],
-  level:1,
+  materials:["キノコならなんでもOK","キノコならなんでもOK","キノコならなんでもOK","キノコならなんでもOK"],
+  level:0,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" }
   ],
   auth:true
 },
@@ -513,16 +513,16 @@ const foodsData = [
   name:"焼きヒラタケ",
   image:"./images/foods/030.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[180,270,360,720,1440],
-  materials:["ヒラタケ×4"],
+  materials:["ヒラタケ","ヒラタケ","ヒラタケ","ヒラタケ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/hiratake.jpg" },
+    { image:"./images/materials/hiratake.jpg" },
+    { image:"./images/materials/hiratake.jpg" },
+    { image:"./images/materials/hiratake.jpg" }
   ],
   auth:true
 },
@@ -530,16 +530,16 @@ const foodsData = [
   name:"焼きシイタケ",
   image:"./images/foods/031.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[180,270,360,720,1440],
-  materials:["シイタケ×4"],
+  materials:["シイタケ","シイタケ","シイタケ","シイタケ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/shitake.jpg" }
   ],
   auth:true
 },
@@ -547,16 +547,16 @@ const foodsData = [
   name:"焼きマッシュルーム",
   image:"./images/foods/032.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[180,270,360,720,1440],
-  materials:["マッシュルーム×4"],
+  materials:["マッシュルーム","マッシュルーム","マッシュルーム","マッシュルーム"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/mushroom.jpg" },
+    { image:"./images/materials/mushroom.jpg" },
+    { image:"./images/materials/mushroom.jpg" },
+    { image:"./images/materials/mushroom.jpg" }
   ],
   auth:true
 },
@@ -564,16 +564,16 @@ const foodsData = [
   name:"焼きヤマドリタケ",
   image:"./images/foods/033.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[180,270,360,720,1440],
-  materials:["ヤマドリタケ×4"],
+  materials:["ヤマドリタケ","ヤマドリタケ","ヤマドリタケ","ヤマドリタケ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/yamadoritake.jpg" },
+    { image:"./images/materials/yamadoritake.jpg" },
+    { image:"./images/materials/yamadoritake.jpg" },
+    { image:"./images/materials/yamadoritake.jpg" }
   ],
   auth:true
 },
@@ -581,16 +581,16 @@ const foodsData = [
   name:"温泉卵",
   image:"./images/foods/056.PNG",
   cost:100,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[130,195,260,520,1140],
-  materials:["無菌卵×1(@100)"],
+  materials:["無菌卵(@100)","","",""],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/m_egg.jpg" },
+    { image:null },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
@@ -601,13 +601,13 @@ const foodsData = [
   time:1,
   rarity: [true,true,true,true,true],
   prices:[190,285,380,760,1520],
-  materials:["卵×1(@100)","リンゴ×1"],
+  materials:["卵(@100)","復活のエッグの素材ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
@@ -618,13 +618,13 @@ const foodsData = [
   time:600,
   rarity: [true,true,true,true,true],
   prices:[620,930,1240,2480,4960],
-  materials:["卵×1(@100)","ブドウ×1(種@160)"],
+  materials:["卵(@100)","ブドウ(種@160)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
@@ -635,13 +635,13 @@ const foodsData = [
   time:480,
   rarity: [true,true,true,true,true],
   prices:[570,855,1140,2280,4560],
-  materials:["卵×1(@100)","レタス×1(種@145)"],
+  materials:["卵(@100)","レタス(種@145)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lettuce.jpg" },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
@@ -649,16 +649,16 @@ const foodsData = [
   name:"復活祭の模様入り卵(オレンジ)",
   image:"./images/foods/061.PNG",
   cost:100,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[190,285,380,760,1520],
-  materials:["卵×1(@100)","リンゴ×1"],
+  materials:["卵(@100)","リンゴ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/apple.jpg" },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
@@ -672,10 +672,10 @@ const foodsData = [
   materials:["復活のエッグ","復活祭の模様入り卵(紫)","復活祭の模様入り卵(緑)","復活祭の模様入り卵(オレンジ)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/f_egg.jpg" },
+    { image:"./images/materials/p_egg.jpg" },
+    { image:"./images/materials/g_egg.jpg" },
+    { image:"./images/materials/o_egg.jpg" }
   ],
   auth:true
 },
@@ -685,14 +685,14 @@ const foodsData = [
   cost:262,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[240,360,480,960,1920],
   materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/timaki.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
   ],
   auth:true
 },
@@ -702,14 +702,14 @@ const foodsData = [
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[260,390,520,1040,2080],
   materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/timaki.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/azuki.jpg" },
+    { image:"./images/materials/azuki.jpg" }
   ],
   auth:true
 },
@@ -719,14 +719,14 @@ const foodsData = [
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[460,690,920,1840,3680],
   materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/timaki.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/meat.jpg" }
   ],
   auth:true
 },
@@ -736,14 +736,14 @@ const foodsData = [
   cost:262,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[240,360,480,960,1920],
   materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/timaki.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
   ],
   auth:true
 },
@@ -753,14 +753,14 @@ const foodsData = [
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[260,390,520,1040,2080],
   materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/timaki.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/azuki.jpg" },
+    { image:"./images/materials/azuki.jpg" }
   ],
   auth:true
 },
@@ -770,14 +770,14 @@ const foodsData = [
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[460,690,920,1840,3680],
   materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/timaki.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/meat.jpg" }
   ],
   auth:true
 },
@@ -788,13 +788,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[910,1365,1820,3640,7280],
-  materials:["卵×1(@100)","牛乳×1(@50)","小麦×1(種@95)","イチゴ×1(種@125)"],
+  materials:["卵(@100)","牛乳(@50)","小麦(種@95)","イチゴ(種@125)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
   ],
   auth:true
 },
@@ -805,13 +805,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[590,885,1180,2360,4720],
-  materials:["卵×1(@100)","牛乳×1(@50)","小麦(種@95)","コーヒー豆(@50)"],
+  materials:["卵(@100)","牛乳(@50)","小麦(種@95)","コーヒー豆(@50)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/coffee.jpg" }
   ],
   auth:true
 },
@@ -819,16 +819,16 @@ const foodsData = [
   name:"モルチーズコンパンナ",
   image:"./images/foods/065.PNG",
   cost:350,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[520,780,1040,2080,4160],
-  materials:["牛乳×3(@50×3)","コーヒー×1(@200)"],
+  materials:["牛乳(@50)","牛乳(@50)","牛乳(@50)","コーヒー(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/r_coffee.jpg" }
   ],
   auth:true
 },
@@ -836,16 +836,16 @@ const foodsData = [
   name:"レトリバーコンパンナ",
   image:"./images/foods/066.PNG",
   cost:350,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[520,780,1040,2080,4160],
-  materials:["牛乳×2(@50×2)","コーヒー豆×1(@50)","コーヒー×1(@200)"],
+  materials:["牛乳(@50)","牛乳(@50)","コーヒー豆(@50)","コーヒー(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/r_coffee.jpg" }
   ],
   auth:true
 },
@@ -853,16 +853,16 @@ const foodsData = [
   name:"ラブリーMALTESEコンパンナ",
   image:"./images/foods/067.PNG",
   cost:500,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[1220,1830,2440,4880,9760],
-  materials:["牛乳×2(@50×2)","コーヒー×2(@200×2)"],
+  materials:["牛乳(@50)","牛乳(@50)","コーヒー(@200)","コーヒー(@200)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/r_coffee.jpg" },
+    { image:"./images/materials/r_coffee.jpg" }
   ],
   auth:true
 },
@@ -873,13 +873,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[690,1035,1380,2760,5520],
-  materials:["小麦×1(種@95)","牛乳×1(@50)","抹茶パウダー×1(@250)","雑草×1"],
+  materials:["小麦(種@95)","牛乳(@50)","抹茶パウダー(@250)","雑草"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/mattya.jpg" },
+    { image:"./images/materials/grass.jpg" }
   ],
   auth:true
 },
@@ -889,14 +889,14 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[690,1035,1380,2760,5520],
+  prices:[170,255,340,680,1360],
   materials:["果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
   ],
   auth:true
 },
@@ -906,14 +906,14 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[690,1035,1380,2760,5520],
+  prices:[170,255,340,680,1360],
   materials:["果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
   ],
   auth:true
 },
@@ -921,16 +921,16 @@ const foodsData = [
   name:"コーヒー",
   image:"./images/foods/034.PNG",
   cost:200,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[290,435,580,1160,2320],
-  materials:["コーヒー豆×4(@50×4)"],
-  level:1,
+  materials:["コーヒー豆(@50)","コーヒー豆(@50)","コーヒーの材料ならなんでもOK","コーヒーの材料ならなんでもOK"],
+  level:2,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
   ],
   auth:true
 },
@@ -938,16 +938,16 @@ const foodsData = [
   name:"カフェラテ",
   image:"./images/foods/035.PNG",
   cost:200,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[300,450,600,1200,2400],
   materials:["コーヒー豆×2(@50×2)","牛乳×2(@50×2)"],
-  level:1,
+  level:2,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" }
   ],
   auth:true
 },
@@ -958,13 +958,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[520,780,1040,2080,4160],
-  materials:["魚×1(★1推奨)","チーズ×1(@100)","野菜×1(★1トマト推奨)(種@10)","小麦×1(種@95)"],
-  level:1,
+  materials:["魚ならなんでもOK","チーズ(@100)","野菜ならなんでもOK","小麦(種@95)"],
+  level:2,
   materials_image:[
+    { image:"./images/materials/all_fish.jpg" },
+    { image:"./images/materials/cheese.jpg" },
     { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/wheat.jpg" }
   ],
   auth:true
 },
@@ -975,13 +975,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[490,735,980,1960,3920],
-  materials:["魚orエビ×2(★1推奨)","小麦×1(種@95)","トマト×1(種@10)"],
-  level:1,
+  materials:["海鮮ならなんでもOK","海鮮ならなんでもOK","小麦(種@95)","トマト(種@10)"],
+  level:3,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tomato.jpg" }
   ],
   auth:true
 },
@@ -992,13 +992,13 @@ const foodsData = [
   time:640,
   rarity: [true,true,true,true,true],
   prices:[640,960,1280,2560,5120],
-  materials:["トマト×1(種@10)","じゃがいも×1(種@30)","レタス×1(種@145)"],
-  level:1,
+  materials:["トマト(種@10)","じゃがいも(種@30)","レタス(種@145)",""],
+  level:3,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/tomato.jpg" },
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/lettuce.jpg" },
+    { image:null }
   ],
   auth:true
 },
@@ -1009,13 +1009,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[900,1350,1800,3600,7200],
-  materials:["トリュフ×1","小麦×2(種@95×2)","牛乳×1(@50)"],
-  level:1,
+  materials:["トリュフ","小麦(種@95)","小麦(種@95)","牛乳(@50)"],
+  level:3,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/truffle.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" }
   ],
   auth:true
 },
@@ -1026,13 +1026,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[780,1170,1560,3120,6240],
-  materials:["チーズ×1(@100)","トマトソース×1(@40)","小麦×1(種@95)","魚×1(★1推奨)"],
-  level:1,
+  materials:["チーズ(@100)","トマトソース(@40)","小麦(種@95)","魚ならなんでもOK"],
+  level:4,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/cheese.jpg" },
+    { image:"./images/materials/tomato_source.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/all_fish.jpg" }
   ],
   auth:true
 },
@@ -1043,13 +1043,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[670,1005,1340,2680,5360],
-  materials:["肉×1(@200)","小麦×1(種@95)","トマト×1(種@10)","チーズ×1(@100)"],
-  level:1,
+  materials:["肉(@200)","小麦(種@95)","トマト(種@10)","チーズ(@100)"],
+  level:4,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tomato.jpg" },
+    { image:"./images/materials/cheese.jpg" }
   ],
   auth:true
 },
@@ -1060,13 +1060,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[730,1095,1460,2920,5840],
-  materials:["リンゴ×1","小麦×1(種@95)","卵×1(@100)","バター×1(@150)"],
-  level:1,
+  materials:["リンゴ","小麦(種@95)","卵(@100)","バター(@150)"],
+  level:5,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/apple.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/butter.jpg" }
   ],
   auth:true
 },
@@ -1077,13 +1077,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[840,1260,1680,3360,6720],
-  materials:["ニンジン×2(種@25×2)","卵×1(@100)","小麦×1(種@95)"],
-  level:1,
+  materials:["ニンジン(種@25)","ニンジン(種@25)","卵(@100)","小麦(種@95)"],
+  level:5,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/carrot.jpg" },
+    { image:"./images/materials/carrot.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/wheat.jpg" }
   ],
   auth:true
 },
@@ -1094,13 +1094,13 @@ const foodsData = [
   time:720,
   rarity: [true,true,true,true,true],
   prices:[1340,2010,2680,5360,10720],
-  materials:["トウモロコシ×2(種@170×2)","牛乳×1(@50)","バター×1(@150)"],
-  level:1,
+  materials:["トウモロコシ(種@170)","トウモロコシ(種@170)","牛乳(@50)","バター(@150)"],
+  level:5,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/corn.jpg" },
+    { image:"./images/materials/corn.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/butter.jpg" }
   ],
   auth:true
 },
@@ -1108,16 +1108,16 @@ const foodsData = [
   name:"豪華海鮮盛り合わせ",
   image:"./images/foods/045.PNG",
   cost:0,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[410,615,820,1640,3280],
-  materials:["魚×2(★1推奨)","エビ×2(★1推奨)"],
-  level:1,
+  materials:["北欧アカザエビ","北欧アカザエビ","魚ならなんでもOK","魚ならなんでもOK"],
+  level:6,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/akaza.jpg" },
+    { image:"./images/materials/akaza.jpg" },
+    { image:"./images/materials/all_fish.jpg" },
+    { image:"./images/materials/all_fish.jpg" }
   ],
   auth:true
 },
@@ -1125,16 +1125,16 @@ const foodsData = [
   name:"ティラミス",
   image:"./images/foods/046.PNG",
   cost:300,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[530,795,1060,2120,4240],
-  materials:["コーヒー豆×1(@50)","卵×1(@100)","牛乳×1(@50)","チーズ×1(@100)"],
-  level:1,
+  materials:["コーヒー豆(@50)","卵(@100)","牛乳(@50)","チーズ(@100)"],
+  level:6,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/cheese.jpg" }
   ],
   auth:true
 },
@@ -1145,13 +1145,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[2260,3390,4520,9040,18080],
-  materials:["コーヒー×1(@200)","シーフードピザ×1(@235)","アップルパイ×1(@345)","フィッシュアンドチップス×1(@60)"],
-  level:1,
+  materials:["コーヒー(@200)","シーフードピザ(@235)","アップルパイ(@345)","フィッシュアンドチップス(@60)"],
+  level:7,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/r_coffee.jpg" },
+    { image:"./images/materials/seafood_pizza.jpg" },
+    { image:"./images/materials/apple_pie.jpg" },
+    { image:"./images/materials/fish_Chips.jpg" }
   ],
   auth:true
 },
@@ -1159,16 +1159,16 @@ const foodsData = [
   name:"英式アフタヌーンティー",
   image:"./images/foods/048.PNG",
   cost:300,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[710,1065,1420,2840,5680],
-  materials:["ティラミス×1(@300)","ブルーベリー×1"],
-  level:1,
+  materials:["ティラミス(@300)","ジャムの材料ならなんでもOK","",""],
+  level:7,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_teiramisu.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
@@ -1179,13 +1179,13 @@ const foodsData = [
   time:480,
   rarity: [true,true,true,true,true],
   prices:[1350,2025,2700,5400,10800],
-  materials:["小麦×1(種@95)","肉×1(@200)","レタス×1(種@145)","トマトソース×1(@40)"],
-  level:1,
+  materials:["小麦(種@95)","肉(@200)","レタス(種@145)","トマトソース(@40)"],
+  level:8,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/lettuce.jpg" },
+    { image:"./images/materials/tomato_source.jpg" }
   ],
   auth:true
 },
@@ -1196,13 +1196,13 @@ const foodsData = [
   time:480,
   rarity: [true,true,true,true,true],
   prices:[850,1275,1700,3400,6800],
-  materials:["アカザエビ×3","レタス×1(種@145)"],
-  level:1,
+  materials:["アカザエビ","アカザエビ","アカザエビ","レタス(種@145)"],
+  level:8,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/akaza.jpg" },
+    { image:"./images/materials/akaza.jpg" },
+    { image:"./images/materials/akaza.jpg" },
+    { image:"./images/materials/lettuce.jpg" }
   ],
   auth:true
 },
@@ -1213,13 +1213,13 @@ const foodsData = [
   time:480,
   rarity: [true,true,true,true,true],
   prices:[1310,1965,2620,5240,10480],
-  materials:["北欧ブルーアカザエビ×3","レタス×1(種@145)"],
-  level:1,
+  materials:["北欧ブルーアカザエビ","北欧ブルーアカザエビ","北欧ブルーアカザエビ","レタス(種@145)"],
+  level:8,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/blue_akaza.jpg" },
+    { image:"./images/materials/blue_akaza.jpg" },
+    { image:"./images/materials/blue_akaza.jpg" },
+    { image:"./images/materials/lettuce.jpg" }
   ],
   auth:true
 },
@@ -1230,13 +1230,13 @@ const foodsData = [
   time:420,
   rarity: [true,true,true,true,true],
   prices:[1230,1845,2460,4920,9840],
-  materials:["ナス×1(種@135)","肉×1(@200)","料理油×1(@100)","トマトソース×1(@40)"],
-  level:1,
+  materials:["ナス(種@135)","肉(@200)","料理油(@100)","トマトソース(@40)"],
+  level:10,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/eggplant.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/oil.jpg" },
+    { image:"./images/materials/tomato_source.jpg" }
   ],
   auth:true
 },
@@ -1247,13 +1247,13 @@ const foodsData = [
   time:240,
   rarity: [true,true,true,true,true],
   prices:[1760,2640,3520,7040,14080],
-  materials:["田園サラダ×1(@20)","スモークサーモンベーグル×1(@205)","シーフードリゾット×1(@105)","ティラミス×1(@300)"],
-  level:1,
+  materials:["田園サラダ(@20)","スモークサーモンベーグル(@205)","シーフードリゾット(@105)","ティラミス(@300)"],
+  level:9,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/denen_salad.jpg" },
+    { image:"./images/materials/salmon_bagel.jpg" },
+    { image:"./images/materials/seafood_rizotto.jpg" },
+    { image:"./images/materials/teiramisu.jpg" }
   ],
   auth:true
 },
@@ -1261,16 +1261,16 @@ const foodsData = [
   name:"蒸しタラバガニ",
   image:"./images/foods/054.PNG",
   cost:150,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[1990,2985,3980,7960,15920],
-  materials:["タラバガニ×3(★1推奨)","バター×1(@150)"],
-  level:1,
+  materials:["タラバガニならなんでもOK","タラバガニならなんでもOK","タラバガニならなんでもOK","バター(@150)"],
+  level:10,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/butter.jpg" }
   ],
   auth:true
 },
@@ -1278,16 +1278,16 @@ const foodsData = [
   name:"蒸し黄金タラバガニ",
   image:"./images/foods/055.PNG",
   cost:150,
-  time:1,
+  time:0,
   rarity: [true,true,true,true,true],
   prices:[2980,4470,5960,11920,23840],
-  materials:["黄金タラバガニ×3(★1推奨)","バター×1(@150)"],
-  level:1,
+  materials:["黄金タラバガニ","黄金タラバガニ","黄金タラバガニ","バター(@150)"],
+  level:10,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
   ],
   auth:true
 },
