@@ -8,12 +8,12 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[90,135,180,360,720],
   level:1,
-  materials:["トマト","トマト","(他野菜でもok)"],
+  materials:["野菜ならなんでもOK","野菜ならなんでもOK","",""],
   materials_image:[
-    { image:"./images/materials/tomato.png" },
-    { image:"./images/materials/tomato.png" },
-    { image:"./images/materials/egg.png" },
-    { image:"./images/materials/fish_any.png" }
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:null },
+    { image:null }
   ],
   auth:true
 },
