@@ -85,13 +85,13 @@ const foodsData = [
   auth:true
 },
 {
-  name:"りんごジャム",
+  name:"リンゴジャム",
   image:"./images/foods/006.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
   prices:[270,405,540,1080,2160],
-  materials:["りんご","りんご","りんご","りんご"],
+  materials:["リンゴ","リンゴ","リンゴ","リンゴ"],
   level:1,
   materials_image:[
     { image:"./images/materials/ringo.jpg" },
@@ -171,7 +171,7 @@ const foodsData = [
 },
 {
   name:"パイナップルジャム",
-  image:"./images/foods/011.PNG",
+  image:"./images/foods/012.PNG",
   cost:60,
   time:30,
   rarity: [true,true,true,true,true],
@@ -188,7 +188,7 @@ const foodsData = [
 },
 {
   name:"ブドウジャム",
-  image:"./images/foods/012.PNG",
+  image:"./images/foods/013.PNG",
   cost:640,
   time:600,
   rarity: [true,true,true,true,true],
@@ -205,7 +205,7 @@ const foodsData = [
 },
 {
   name:"チョコソース",
-  image:"./images/foods/013.PNG",
+  image:"./images/000.PNG",
   cost:440,
   time:300,
   rarity: [true,true,true,true,true],
@@ -221,13 +221,13 @@ const foodsData = [
   auth:true
 },
 {
-  name:"イチゴジャム",
-  image:"./images/foods/014.PNG",
+  name:"いちごジャム",
+  image:"./images/foods/011.PNG",
   cost:500,
   time:360,
   rarity: [true,true,true,true,true],
   prices:[1580,2370,3160,6320,12640],
-  materials:["イチゴ×4(種@125×4)"],
+  materials:["いちご×4(種@125×4)"],
   level:1,
   materials_image:[
     { image:"./images/materials/all_vege.jpg" },
@@ -239,7 +239,7 @@ const foodsData = [
 },
 {
   name:"チーズケーキ",
-  image:"./images/foods/015.PNG",
+  image:"./images/foods/014.PNG",
   cost:245,
   time:240,
   rarity: [true,true,true,true,true],
@@ -256,7 +256,7 @@ const foodsData = [
 },
 {
   name:"オリジナルロールケーキ",
-  image:"./images/foods/016.PNG",
+  image:"./images/foods/015.PNG",
   cost:450,
   time:1,
   rarity: [true,true,true,true,true],
@@ -273,7 +273,7 @@ const foodsData = [
 },
 {
   name:"赤いロールケーキ",
-  image:"./images/foods/017.PNG",
+  image:"./images/foods/016.PNG",
   cost:550,
   time:1,
   rarity: [true,true,true,true,true],
@@ -290,7 +290,7 @@ const foodsData = [
 },
 {
   name:"オレンジのロールケーキ",
-  image:"./images/foods/018.PNG",
+  image:"./images/foods/017.PNG",
   cost:550,
   time:1,
   rarity: [true,true,true,true,true],
@@ -307,7 +307,7 @@ const foodsData = [
 },
 {
   name:"黄色いロールケーキ",
-  image:"./images/foods/019.PNG",
+  image:"./images/foods/018.PNG",
   cost:550,
   time:1,
   rarity: [true,true,true,true,true],
@@ -324,7 +324,7 @@ const foodsData = [
 },
 {
   name:"紫のロールケーキ",
-  image:"./images/foods/020.PNG",
+  image:"./images/foods/019.PNG",
   cost:450,
   time:1,
   rarity: [true,true,true,true,true],
@@ -341,7 +341,7 @@ const foodsData = [
 },
 {
   name:"緑のロールケーキ",
-  image:"./images/foods/021.PNG",
+  image:"./images/foods/020.PNG",
   cost:550,
   time:1,
   rarity: [true,true,true,true,true],
@@ -358,7 +358,7 @@ const foodsData = [
 },
 {
   name:"水色ロールケーキ",
-  image:"./images/foods/022.PNG",
+  image:"./images/foods/021.PNG",
   cost:450,
   time:1,
   rarity: [true,true,true,true,true],
@@ -375,7 +375,7 @@ const foodsData = [
 },
 {
   name:"青いロールケーキ",
-  image:"./images/foods/023.PNG",
+  image:"./images/foods/022.PNG",
   cost:450,
   time:1,
   rarity: [true,true,true,true,true],
@@ -392,7 +392,7 @@ const foodsData = [
 },
 {
   name:"キノコパイ",
-  image:"./images/foods/024.PNG",
+  image:"./images/foods/023.PNG",
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -409,7 +409,7 @@ const foodsData = [
 },
 {
   name:"ヒラタケパイ",
-  image:"./images/foods/025.PNG",
+  image:"./images/foods/024.PNG",
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -426,7 +426,7 @@ const foodsData = [
 },
 {
   name:"シイタケパイ",
-  image:"./images/foods/026.PNG",
+  image:"./images/foods/025.PNG",
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -443,7 +443,7 @@ const foodsData = [
 },
 {
   name:"マッシュルームパイ",
-  image:"./images/foods/027.PNG",
+  image:"./images/foods/026.PNG",
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -460,7 +460,7 @@ const foodsData = [
 },
 {
   name:"ヤマドリタケパイ",
-  image:"./images/foods/028.PNG",
+  image:"./images/foods/027.PNG",
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -477,7 +477,7 @@ const foodsData = [
 },
 {
   name:"トリュフパイ",
-  image:"./images/foods/029.PNG",
+  image:"./images/foods/028.PNG",
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -494,7 +494,7 @@ const foodsData = [
 },
 {
   name:"焼きキノコ",
-  image:"./images/foods/030.PNG",
+  image:"./images/foods/029.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
@@ -511,7 +511,7 @@ const foodsData = [
 },
 {
   name:"焼きヒラタケ",
-  image:"./images/foods/031.PNG",
+  image:"./images/foods/030.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
@@ -528,7 +528,7 @@ const foodsData = [
 },
 {
   name:"焼きシイタケ",
-  image:"./images/foods/032.PNG",
+  image:"./images/foods/031.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
@@ -545,7 +545,7 @@ const foodsData = [
 },
 {
   name:"焼きマッシュルーム",
-  image:"./images/foods/033.PNG",
+  image:"./images/foods/032.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
@@ -562,7 +562,7 @@ const foodsData = [
 },
 {
   name:"焼きヤマドリタケ",
-  image:"./images/foods/034.PNG",
+  image:"./images/foods/033.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
@@ -579,7 +579,7 @@ const foodsData = [
 },
 {
   name:"コーヒー",
-  image:"./images/foods/035.PNG",
+  image:"./images/foods/034.PNG",
   cost:200,
   time:1,
   rarity: [true,true,true,true,true],
@@ -596,7 +596,7 @@ const foodsData = [
 },
 {
   name:"カフェラテ",
-  image:"./images/foods/036.PNG",
+  image:"./images/foods/035.PNG",
   cost:200,
   time:1,
   rarity: [true,true,true,true,true],
@@ -613,7 +613,7 @@ const foodsData = [
 },
 {
   name:"スモークサーモンベーグル",
-  image:"./images/foods/037.PNG",
+  image:"./images/foods/036.PNG",
   cost:205,
   time:240,
   rarity: [true,true,true,true,true],
@@ -630,7 +630,7 @@ const foodsData = [
 },
 {
   name:"シーフードリゾット",
-  image:"./images/foods/038.PNG",
+  image:"./images/foods/037.PNG",
   cost:105,
   time:240,
   rarity: [true,true,true,true,true],
@@ -647,7 +647,7 @@ const foodsData = [
 },
 {
   name:"カントリー風煮込み",
-  image:"./images/foods/039.PNG",
+  image:"./images/foods/038.PNG",
   cost:185,
   time:640,
   rarity: [true,true,true,true,true],
@@ -664,7 +664,7 @@ const foodsData = [
 },
 {
   name:"トリュフのクリームパスタ",
-  image:"./images/foods/040.PNG",
+  image:"./images/foods/039.PNG",
   cost:240,
   time:240,
   rarity: [true,true,true,true,true],
@@ -681,7 +681,7 @@ const foodsData = [
 },
 {
   name:"シーフードピザ",
-  image:"./images/foods/041.PNG",
+  image:"./images/foods/040.PNG",
   cost:235,
   time:240,
   rarity: [true,true,true,true,true],
@@ -698,7 +698,7 @@ const foodsData = [
 },
 {
   name:"ミートソースパスタ",
-  image:"./images/foods/042.PNG",
+  image:"./images/foods/041.PNG",
   cost:405,
   time:240,
   rarity: [true,true,true,true,true],
@@ -715,7 +715,7 @@ const foodsData = [
 },
 {
   name:"アップルパイ",
-  image:"./images/foods/043.PNG",
+  image:"./images/foods/042.PNG",
   cost:345,
   time:240,
   rarity: [true,true,true,true,true],
@@ -732,7 +732,7 @@ const foodsData = [
 },
 {
   name:"ニンジンケーキ",
-  image:"./images/foods/044.PNG",
+  image:"./images/foods/043.PNG",
   cost:245,
   time:240,
   rarity: [true,true,true,true,true],
@@ -749,7 +749,7 @@ const foodsData = [
 },
 {
   name:"コーンポタージュ",
-  image:"./images/foods/045.PNG",
+  image:"./images/foods/044.PNG",
   cost:540,
   time:720,
   rarity: [true,true,true,true,true],
@@ -766,7 +766,7 @@ const foodsData = [
 },
 {
   name:"豪華海鮮盛り合わせ",
-  image:"./images/foods/046.PNG",
+  image:"./images/foods/045.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
@@ -783,7 +783,7 @@ const foodsData = [
 },
 {
   name:"ティラミス",
-  image:"./images/foods/047.PNG",
+  image:"./images/foods/046.PNG",
   cost:300,
   time:1,
   rarity: [true,true,true,true,true],
@@ -800,7 +800,7 @@ const foodsData = [
 },
 {
   name:"キャンプセット",
-  image:"./images/foods/048.PNG",
+  image:"./images/foods/047.PNG",
   cost:840,
   time:240,
   rarity: [true,true,true,true,true],
@@ -817,7 +817,7 @@ const foodsData = [
 },
 {
   name:"英式アフタヌーンティー",
-  image:"./images/foods/049.PNG",
+  image:"./images/foods/048.PNG",
   cost:300,
   time:1,
   rarity: [true,true,true,true,true],
@@ -834,7 +834,7 @@ const foodsData = [
 },
 {
   name:"ミートバーガー",
-  image:"./images/foods/050.PNG",
+  image:"./images/foods/049.PNG",
   cost:480,
   time:480,
   rarity: [true,true,true,true,true],
@@ -851,7 +851,7 @@ const foodsData = [
 },
 {
   name:"アカザエビの前菜",
-  image:"./images/foods/051.PNG",
+  image:"./images/foods/050.PNG",
   cost:145,
   time:480,
   rarity: [true,true,true,true,true],
@@ -868,7 +868,7 @@ const foodsData = [
 },
 {
   name:"北欧ブルーアカザエビの前菜",
-  image:"./images/foods/052.PNG",
+  image:"./images/foods/051.PNG",
   cost:145,
   time:480,
   rarity: [true,true,true,true,true],
@@ -885,7 +885,7 @@ const foodsData = [
 },
 {
   name:"ナスとひき肉の炒め物",
-  image:"./images/foods/053.PNG",
+  image:"./images/foods/052.PNG",
   cost:475,
   time:420,
   rarity: [true,true,true,true,true],
@@ -902,7 +902,7 @@ const foodsData = [
 },
 {
   name:"キャンドルディナー",
-  image:"./images/foods/054.PNG",
+  image:"./images/foods/053.PNG",
   cost:630,
   time:240,
   rarity: [true,true,true,true,true],
@@ -919,7 +919,7 @@ const foodsData = [
 },
 {
   name:"蒸しタラバガニ",
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/054.PNG",
   cost:150,
   time:1,
   rarity: [true,true,true,true,true],
@@ -936,7 +936,7 @@ const foodsData = [
 },
 {
   name:"蒸し黄金タラバガニ",
-  image:"./images/foods/056.PNG",
+  image:"./images/foods/055.PNG",
   cost:150,
   time:1,
   rarity: [true,true,true,true,true],
@@ -953,7 +953,7 @@ const foodsData = [
 },
 {
   name:"温泉卵",
-  image:"./images/foods/057.PNG",
+  image:"./images/foods/056.PNG",
   cost:100,
   time:1,
   rarity: [true,true,true,true,true],
@@ -970,7 +970,7 @@ const foodsData = [
 },
 {
   name:"若草のケーキ",
-  image:"./images/foods/058.PNG",
+  image:"./images/foods/057.PNG",
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
@@ -987,7 +987,7 @@ const foodsData = [
 },
 {
   name:"復活のエッグ",
-  image:"./images/foods/059.PNG",
+  image:"./images/foods/058.PNG",
   cost:100,
   time:1,
   rarity: [true,true,true,true,true],
@@ -1004,7 +1004,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(紫)",
-  image:"./images/foods/060.PNG",
+  image:"./images/foods/059.PNG",
   cost:260,
   time:600,
   rarity: [true,true,true,true,true],
@@ -1021,7 +1021,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(緑)",
-  image:"./images/foods/061.PNG",
+  image:"./images/foods/060.PNG",
   cost:245,
   time:480,
   rarity: [true,true,true,true,true],
@@ -1038,7 +1038,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(オレンジ)",
-  image:"./images/foods/062.PNG",
+  image:"./images/foods/061.PNG",
   cost:100,
   time:1,
   rarity: [true,true,true,true,true],
@@ -1055,7 +1055,7 @@ const foodsData = [
 },
 {
   name:"復活祭のイースターエッグの宴",
-  image:"./images/foods/063.PNG",
+  image:"./images/foods/062.PNG",
   cost:755,
   time:600,
   rarity: [true,true,true,true,true],
@@ -1072,7 +1072,7 @@ const foodsData = [
 },
 {
   name:"モルチーズカヌレ",
-  image:"./images/foods/064.PNG",
+  image:"./images/foods/063.PNG",
   cost:370,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1089,7 +1089,7 @@ const foodsData = [
 },
 {
   name:"レトリバーカヌレ",
-  image:"./images/foods/065.PNG",
+  image:"./images/foods/064.PNG",
   cost:295,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1106,7 +1106,7 @@ const foodsData = [
 },
 {
   name:"モルチーズコンパンナ",
-  image:"./images/foods/066.PNG",
+  image:"./images/foods/065.PNG",
   cost:350,
   time:1,
   rarity: [true,true,true,true,true],
@@ -1123,7 +1123,7 @@ const foodsData = [
 },
 {
   name:"レトリバーコンパンナ",
-  image:"./images/foods/067.PNG",
+  image:"./images/foods/066.PNG",
   cost:350,
   time:1,
   rarity: [true,true,true,true,true],
@@ -1140,7 +1140,7 @@ const foodsData = [
 },
 {
   name:"ラブリーMALTESEコンパンナ",
-  image:"./images/foods/068.PNG",
+  image:"./images/foods/067.PNG",
   cost:500,
   time:1,
   rarity: [true,true,true,true,true],
