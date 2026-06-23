@@ -6,7 +6,7 @@ const foodsData = [
   time:15,
   rarity: [true,true,true,true,true],
   prices:[90,135,180,360,720],
-  materials:["野菜ならなんでもOK","野菜ならなんでもOK","",""],
+  materials:["野菜なら\nなんでもOK","野菜なら\nなんでもOK","",""],
   level:1,
   materials_image:[
     { image:"./images/materials/all_vege.jpg" },
