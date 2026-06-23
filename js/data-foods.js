@@ -19,19 +19,18 @@ const foodsData = [
 },
 {
   name:"ミックスジャム",
-  image:"./images/foods/001.PNG",
+  image:"./images/foods/002.PNG",
   cost:0,
   time:1,
   rarity: [true,true,true,true,true],
   prices:[160,240,320,640,1280],
-  materials:["ブルーベリー×4(他果物でもok)"],
   level:1,
-  materials:["野菜ならなんでも可","野菜ならなんでも可","",""],
+  materials:["ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK"],
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
   ],
   auth:true
 },
