@@ -143,7 +143,7 @@ const foodsData = [
   rarity: [true,false,false,false,false],
   prices:[30,null,null,null,null],
   materials:["食料系の失敗作(必ず損)"],
-  level:null,
+  level:1,
   materials_image:[
     { image:null },
     { image:null },
@@ -160,7 +160,7 @@ const foodsData = [
   rarity: [true,false,false,false,false],
   prices:[30,null,null,null,null],
   materials:["飲み物の失敗作"],
-  level:null,
+  level:1,
   materials_image:[
     { image:null },
     { image:null },
@@ -210,7 +210,6 @@ const foodsData = [
   time:300,
   rarity: [true,true,true,true,true],
   prices:[1400,2100,2800,5600,11200],
-  level:1,
   materials:["カカオ豆×4(種@110×4)"],
   level:1,
   materials_image:[
