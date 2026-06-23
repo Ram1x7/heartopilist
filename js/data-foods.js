@@ -111,10 +111,10 @@ const foodsData = [
   materials:["オレンジ","オレンジ","オレンジ","オレンジ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/orange.jpg" }
   ],
   auth:true
 },
@@ -128,8 +128,8 @@ const foodsData = [
   materials:["魚ならなんでもOK","魚ならなんでもOK","じゃがいも(種@30)","じゃがいも(種@30)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/potato.jpg" },
-    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/all_fish.jpg" },
+    { image:"./images/materials/all_fish.jpg" },
     { image:"./images/materials/potato.jpg" },
     { image:"./images/materials/potato.jpg" }
   ],
@@ -142,7 +142,7 @@ const foodsData = [
   time:0,
   rarity: [true,false,false,false,false],
   prices:[30,null,null,null,null],
-  materials:["食料系の失敗作(必ず損)"],
+  materials:["食べ物の失敗作"],
   level:1,
   materials_image:[
     { image:null },
