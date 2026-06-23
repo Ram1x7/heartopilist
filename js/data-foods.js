@@ -578,6 +578,346 @@ const foodsData = [
   auth:true
 },
 {
+  name:"温泉卵",
+  image:"./images/foods/056.PNG",
+  cost:100,
+  time:1,
+  rarity: [true,true,true,true,true],
+  prices:[130,195,260,520,1140],
+  materials:["無菌卵×1(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"復活のエッグ",
+  image:"./images/foods/058.PNG",
+  cost:100,
+  time:1,
+  rarity: [true,true,true,true,true],
+  prices:[190,285,380,760,1520],
+  materials:["卵×1(@100)","リンゴ×1"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"復活祭の模様入り卵(紫)",
+  image:"./images/foods/059.PNG",
+  cost:260,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[620,930,1240,2480,4960],
+  materials:["卵×1(@100)","ブドウ×1(種@160)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"復活祭の模様入り卵(緑)",
+  image:"./images/foods/060.PNG",
+  cost:245,
+  time:480,
+  rarity: [true,true,true,true,true],
+  prices:[570,855,1140,2280,4560],
+  materials:["卵×1(@100)","レタス×1(種@145)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"復活祭の模様入り卵(オレンジ)",
+  image:"./images/foods/061.PNG",
+  cost:100,
+  time:1,
+  rarity: [true,true,true,true,true],
+  prices:[190,285,380,760,1520],
+  materials:["卵×1(@100)","リンゴ×1"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"復活祭のイースターエッグの宴",
+  image:"./images/foods/062.PNG",
+  cost:755,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[1650,2475,3300,6600,13200],
+  materials:["復活のエッグ","復活祭の模様入り卵(紫)","復活祭の模様入り卵(緑)","復活祭の模様入り卵(オレンジ)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"三角の白米ちまき",
+  image:"./images/000.PNG",
+  cost:262,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"三角のあずきちまき",
+  image:"./images/000.PNG",
+  cost:162,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"三角の卵黄入り肉ちまき",
+  image:"./images/000.PNG",
+  cost:362,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"枕型の白米ちまき",
+  image:"./images/000.PNG",
+  cost:262,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"枕型のこしあんちまき",
+  image:"./images/000.PNG",
+  cost:162,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"枕型の卵黄入りちまき",
+  image:"./images/000.PNG",
+  cost:362,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"モルチーズカヌレ",
+  image:"./images/foods/063.PNG",
+  cost:370,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["卵×1(@100)","牛乳×1(@50)","小麦×1(種@95)","イチゴ×1(種@125)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"レトリバーカヌレ",
+  image:"./images/foods/064.PNG",
+  cost:295,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[590,885,1180,2360,4720],
+  materials:["卵×1(@100)","牛乳×1(@50)","小麦(種@95)","コーヒー豆(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"モルチーズコンパンナ",
+  image:"./images/foods/065.PNG",
+  cost:350,
+  time:1,
+  rarity: [true,true,true,true,true],
+  prices:[520,780,1040,2080,4160],
+  materials:["牛乳×3(@50×3)","コーヒー×1(@200)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"レトリバーコンパンナ",
+  image:"./images/foods/066.PNG",
+  cost:350,
+  time:1,
+  rarity: [true,true,true,true,true],
+  prices:[520,780,1040,2080,4160],
+  materials:["牛乳×2(@50×2)","コーヒー豆×1(@50)","コーヒー×1(@200)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ラブリーMALTESEコンパンナ",
+  image:"./images/foods/067.PNG",
+  cost:500,
+  time:1,
+  rarity: [true,true,true,true,true],
+  prices:[1220,1830,2440,4880,9760],
+  materials:["牛乳×2(@50×2)","コーヒー×2(@200×2)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"若草のケーキ",
+  image:"./images/foods/057.PNG",
+  cost:395,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[690,1035,1380,2760,5520],
+  materials:["小麦×1(種@95)","牛乳×1(@50)","抹茶パウダー×1(@250)","雑草×1"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"虹のときめきグミ",
+  image:"./images/000.PNG",
+  cost:0,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[690,1035,1380,2760,5520],
+  materials:["果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"虹のドキドキグミ",
+  image:"./images/000.PNG",
+  cost:0,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[690,1035,1380,2760,5520],
+  materials:["果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  auth:true
+},
+{
   name:"コーヒー",
   image:"./images/foods/034.PNG",
   cost:200,
@@ -951,208 +1291,4 @@ const foodsData = [
   ],
   auth:true
 },
-{
-  name:"温泉卵",
-  image:"./images/foods/056.PNG",
-  cost:100,
-  time:1,
-  rarity: [true,true,true,true,true],
-  prices:[130,195,260,520,1140],
-  materials:["無菌卵×1(@100)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"若草のケーキ",
-  image:"./images/foods/057.PNG",
-  cost:395,
-  time:240,
-  rarity: [true,true,true,true,true],
-  prices:[690,1035,1380,2760,5520],
-  materials:["小麦×1(種@95)","牛乳×1(@50)","抹茶パウダー×1(@250)","雑草×1"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"復活のエッグ",
-  image:"./images/foods/058.PNG",
-  cost:100,
-  time:1,
-  rarity: [true,true,true,true,true],
-  prices:[190,285,380,760,1520],
-  materials:["卵×1(@100)","リンゴ×1"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"復活祭の模様入り卵(紫)",
-  image:"./images/foods/059.PNG",
-  cost:260,
-  time:600,
-  rarity: [true,true,true,true,true],
-  prices:[620,930,1240,2480,4960],
-  materials:["卵×1(@100)","ブドウ×1(種@160)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"復活祭の模様入り卵(緑)",
-  image:"./images/foods/060.PNG",
-  cost:245,
-  time:480,
-  rarity: [true,true,true,true,true],
-  prices:[570,855,1140,2280,4560],
-  materials:["卵×1(@100)","レタス×1(種@145)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"復活祭の模様入り卵(オレンジ)",
-  image:"./images/foods/061.PNG",
-  cost:100,
-  time:1,
-  rarity: [true,true,true,true,true],
-  prices:[190,285,380,760,1520],
-  materials:["卵×1(@100)","リンゴ×1"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"復活祭のイースターエッグの宴",
-  image:"./images/foods/062.PNG",
-  cost:755,
-  time:600,
-  rarity: [true,true,true,true,true],
-  prices:[1650,2475,3300,6600,13200],
-  materials:["復活のエッグ×1","復活祭の模様入り卵(紫)×1","復活祭の模様入り卵(緑)×1","復活祭の模様入り卵(オレンジ)×1"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"モルチーズカヌレ",
-  image:"./images/foods/063.PNG",
-  cost:370,
-  time:240,
-  rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
-  materials:["卵×1(@100)","牛乳×1(@50)","小麦×1(種@95)","イチゴ×1(種@125)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"レトリバーカヌレ",
-  image:"./images/foods/064.PNG",
-  cost:295,
-  time:240,
-  rarity: [true,true,true,true,true],
-  prices:[590,885,1180,2360,4720],
-  materials:["卵×1(@100)","牛乳×1(@50)","小麦(種@95)","コーヒー豆(@50)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"モルチーズコンパンナ",
-  image:"./images/foods/065.PNG",
-  cost:350,
-  time:1,
-  rarity: [true,true,true,true,true],
-  prices:[520,780,1040,2080,4160],
-  materials:["牛乳×3(@50×3)","コーヒー×1(@200)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"レトリバーコンパンナ",
-  image:"./images/foods/066.PNG",
-  cost:350,
-  time:1,
-  rarity: [true,true,true,true,true],
-  prices:[520,780,1040,2080,4160],
-  materials:["牛乳×2(@50×2)","コーヒー豆×1(@50)","コーヒー×1(@200)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-},
-{
-  name:"ラブリーMALTESEコンパンナ",
-  image:"./images/foods/067.PNG",
-  cost:500,
-  time:1,
-  rarity: [true,true,true,true,true],
-  prices:[1220,1830,2440,4880,9760],
-  materials:["牛乳×2(@50×2)","コーヒー×2(@200×2)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" },
-    { image:"./images/materials/all_vege.jpg" }
-  ],
-  auth:true
-}
 ];
