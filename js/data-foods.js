@@ -19,7 +19,7 @@ const foodsData = [
 },
 {
   name:"ミックスジャム",
-  image:"foods/002.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[160,240,320,640,1280],
@@ -27,7 +27,7 @@ const foodsData = [
 },
 {
   name:"ラズベリージャム",
-  image:"foods/003.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[160,240,320,640,1280],
@@ -35,7 +35,7 @@ const foodsData = [
 },
 {
   name:"トマトソース",
-  image:"foods/004.PNG",
+  image:"./images/foods/001.PNG",
   cost:40,
   time:15,
   prices:[180,270,360,720,1440],
@@ -43,7 +43,7 @@ const foodsData = [
 },
 {
   name:"ブルーベリージャム",
-  image:"foods/005.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[170,255,340,680,1360],
@@ -51,7 +51,7 @@ const foodsData = [
 },
 {
   name:"リンゴジャム",
-  image:"foods/006.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[270,405,540,1080,2160],
@@ -59,7 +59,7 @@ const foodsData = [
 },
 {
   name:"オレンジジャム",
-  image:"foods/007.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[270,405,540,1080,2160],
@@ -67,7 +67,7 @@ const foodsData = [
 },
 {
   name:"パイナップルジャム",
-  image:"foods/012.PNG",
+  image:"./images/foods/001.PNG",
   cost:60,
   time:30,
   prices:[280,420,560,1120,2240],
@@ -75,7 +75,7 @@ const foodsData = [
 },
 {
   name:"ブドウジャム",
-  image:"foods/013.PNG",
+  image:"./images/foods/001.PNG",
   cost:640,
   time:600,
   prices:[2020,3030,4040,8080,16160],
@@ -83,7 +83,7 @@ const foodsData = [
 },
 {
   name:"チョコソース",
-  image:"foods/001.PNG",
+  image:"./images/foods/001.PNG",
   cost:440,
   time:300,
   prices:[1400,2100,2800,5600,11200],
@@ -92,7 +92,7 @@ const foodsData = [
 },
 {
   name:"フィッシュアンドチップス",
-  image:"foods/008.PNG",
+  image:"./images/foods/001.PNG",
   cost:60,
   time:60,
   prices:[310,465,620,1240,2480],
@@ -100,7 +100,7 @@ const foodsData = [
 },
 {
   name:"不気味な食べ物",
-  image:"foods/009.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[30],
@@ -108,7 +108,7 @@ const foodsData = [
 },
 {
   name:"不気味な飲み物",
-  image:"foods/010.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:0,
   prices:[30],
@@ -116,7 +116,7 @@ const foodsData = [
 },
 {
   name:"イチゴジャム",
-  image:"foods/011.PNG",
+  image:"./images/foods/001.PNG",
   cost:500,
   time:360,
   prices:[1580,2370,3160,6320,12640],
@@ -124,7 +124,7 @@ const foodsData = [
 },
 {
   name:"チーズケーキ",
-  image:"foods/014.PNG",
+  image:"./images/foods/001.PNG",
   cost:245,
   time:240,
   prices:[480,720,960,1920,3840],
@@ -132,7 +132,7 @@ const foodsData = [
 },
 {
   name:"オリジナルロールケーキ",
-  image:"foods/015.PNG",
+  image:"./images/foods/001.PNG",
   cost:450,
   time:1,
   prices:[550,825,1100,2200,4400],
@@ -140,7 +140,7 @@ const foodsData = [
 },
 {
   name:"赤いロールケーキ",
-  image:"foods/016.PNG",
+  image:"./images/foods/001.PNG",
   cost:550,
   time:1,
   prices:[670,1005,1340,2680,5360],
@@ -148,7 +148,7 @@ const foodsData = [
 },
 {
   name:"オレンジのロールケーキ",
-  image:"foods/017.PNG",
+  image:"./images/foods/001.PNG",
   cost:550,
   time:1,
   prices:[670,1005,1340,2680,5360],
@@ -156,7 +156,7 @@ const foodsData = [
 },
 {
   name:"黄色いロールケーキ",
-  image:"foods/018.PNG",
+  image:"./images/foods/001.PNG",
   cost:550,
   time:1,
   prices:[670,1005,1340,2680,5360],
@@ -164,7 +164,7 @@ const foodsData = [
 },
 {
   name:"紫のロールケーキ",
-  image:"foods/019.PNG",
+  image:"./images/foods/001.PNG",
   cost:450,
   time:1,
   prices:[570,855,1140,2280,4560],
@@ -172,7 +172,7 @@ const foodsData = [
 },
 {
   name:"緑のロールケーキ",
-  image:"foods/020.PNG",
+  image:"./images/foods/001.PNG",
   cost:550,
   time:1,
   prices:[670,1005,1340,2680,5360],
@@ -180,7 +180,7 @@ const foodsData = [
 },
 {
   name:"青いロールケーキ",
-  image:"foods/021.PNG",
+  image:"./images/foods/001.PNG",
   cost:450,
   time:1,
   prices:[570,855,1140,2280,4560],
@@ -188,7 +188,7 @@ const foodsData = [
 },
 {
   name:"ブルーロールケーキ",
-  image:"foods/022.PNG",
+  image:"./images/foods/001.PNG",
   cost:450,
   time:1,
   prices:[570,855,1140,2280,4560],
@@ -196,7 +196,7 @@ const foodsData = [
 },
 {
   name:"キノコパイ",
-  image:"foods/023.PNG",
+  image:"./images/foods/001.PNG",
   cost:195,
   time:240,
   prices:[500,750,1000,2000,4000],
@@ -204,7 +204,7 @@ const foodsData = [
 },
 {
   name:"ヒラタケパイ",
-  image:"foods/024.PNG",
+  image:"./images/foods/001.PNG",
   cost:195,
   time:240,
   prices:[500,750,1000,2000,4000],
@@ -212,7 +212,7 @@ const foodsData = [
 },
 {
   name:"シイタケパイ",
-  image:"foods/025.PNG",
+  image:"./images/foods/001.PNG",
   cost:195,
   time:240,
   prices:[500,750,1000,2000,4000],
@@ -220,7 +220,7 @@ const foodsData = [
 },
 {
   name:"マッシュルームパイ",
-  image:"foods/026.PNG",
+  image:"./images/foods/001.PNG",
   cost:195,
   time:240,
   prices:[500,750,1000,2000,4000],
@@ -228,7 +228,7 @@ const foodsData = [
 },
 {
   name:"ヤマドリタケパイ",
-  image:"foods/027.PNG",
+  image:"./images/foods/001.PNG",
   cost:195,
   time:240,
   prices:[500,750,1000,2000,4000],
@@ -236,7 +236,7 @@ const foodsData = [
 },
 {
   name:"トリュフパイ",
-  image:"foods/028.PNG",
+  image:"./images/foods/001.PNG",
   cost:195,
   time:240,
   prices:[830,1245,1660,3320,6640],
@@ -244,7 +244,7 @@ const foodsData = [
 },
 {
   name:"焼きキノコ",
-  image:"foods/029.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[180,270,360,720,1440],
@@ -252,7 +252,7 @@ const foodsData = [
 },
 {
   name:"焼きヒラタケ",
-  image:"foods/030.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[180,270,360,720,1440],
@@ -260,7 +260,7 @@ const foodsData = [
 },
 {
   name:"焼きシイタケ",
-  image:"foods/031.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[180,270,360,720,1440],
@@ -268,7 +268,7 @@ const foodsData = [
 },
 {
   name:"焼きマッシュルーム",
-  image:"foods/032.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[180,270,360,720,1440],
@@ -276,7 +276,7 @@ const foodsData = [
 },
 {
   name:"焼きヤマドリタケ",
-  image:"foods/033.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[180,270,360,720,1440],
@@ -284,7 +284,7 @@ const foodsData = [
 },
 {
   name:"コーヒー",
-  image:"foods/034.PNG",
+  image:"./images/foods/001.PNG",
   cost:200,
   time:1,
   prices:[290,435,580,1160,2320],
@@ -292,7 +292,7 @@ const foodsData = [
 },
 {
   name:"カフェラテ",
-  image:"foods/035.PNG",
+  image:"./images/foods/001.PNG",
   cost:200,
   time:1,
   prices:[300,450,600,1200,2400],
@@ -300,7 +300,7 @@ const foodsData = [
 },
 {
   name:"スモークサーモンベーグル",
-  image:"foods/036.PNG",
+  image:"./images/foods/001.PNG",
   cost:205,
   time:240,
   prices:[520,780,1040,2080,4160],
@@ -308,7 +308,7 @@ const foodsData = [
 },
 {
   name:"シーフードリゾット",
-  image:"foods/037.PNG",
+  image:"./images/foods/001.PNG",
   cost:105,
   time:240,
   prices:[490,735,980,1960,3920],
@@ -316,7 +316,7 @@ const foodsData = [
 },
 {
   name:"カントリー風煮込み",
-  image:"foods/038.PNG",
+  image:"./images/foods/001.PNG",
   cost:185,
   time:640,
   prices:[640,960,1280,2560,5120],
@@ -324,7 +324,7 @@ const foodsData = [
 },
 {
   name:"トリュフのクリームパスタ",
-  image:"foods/039.PNG",
+  image:"./images/foods/001.PNG",
   cost:240,
   time:240,
   prices:[900,1350,1800,3600,7200],
@@ -332,7 +332,7 @@ const foodsData = [
 },
 {
   name:"シーフードピザ",
-  image:"foods/040.PNG",
+  image:"./images/foods/001.PNG",
   cost:235,
   time:240,
   prices:[780,1170,1560,3120,6240],
@@ -340,7 +340,7 @@ const foodsData = [
 },
 {
   name:"ミートソースパスタ",
-  image:"foods/041.PNG",
+  image:"./images/foods/001.PNG",
   cost:405,
   time:240,
   prices:[670,1005,1340,2680,5360],
@@ -348,7 +348,7 @@ const foodsData = [
 },
 {
   name:"アップルパイ",
-  image:"foods/042.PNG",
+  image:"./images/foods/001.PNG",
   cost:345,
   time:240,
   prices:[730,1095,1460,2920,5840],
@@ -356,7 +356,7 @@ const foodsData = [
 },
 {
   name:"ニンジンケーキ",
-  image:"foods/043.PNG",
+  image:"./images/foods/001.PNG",
   cost:245,
   time:240,
   prices:[840,1260,1680,3360,6720],
@@ -364,7 +364,7 @@ const foodsData = [
 },
 {
   name:"コーンポタージュ",
-  image:"foods/044.PNG",
+  image:"./images/foods/001.PNG",
   cost:540,
   time:720,
   prices:[1340,2010,2680,5360,10720],
@@ -372,7 +372,7 @@ const foodsData = [
 },
 {
   name:"豪華海鮮盛り合わせ",
-  image:"foods/045.PNG",
+  image:"./images/foods/001.PNG",
   cost:0,
   time:1,
   prices:[410,615,820,1640,3280],
@@ -380,7 +380,7 @@ const foodsData = [
 },
 {
   name:"ティラミス",
-  image:"foods/046.PNG",
+  image:"./images/foods/001.PNG",
   cost:300,
   time:1,
   prices:[530,795,1060,2120,4240],
@@ -388,7 +388,7 @@ const foodsData = [
 },
 {
   name:"キャンプセット",
-  image:"foods/047.PNG",
+  image:"./images/foods/001.PNG",
   cost:840,
   time:240,
   prices:[2260,3390,4520,9040,18080],
@@ -396,7 +396,7 @@ const foodsData = [
 },
 {
   name:"英式アフタヌーンティー",
-  image:"foods/048.PNG",
+  image:"./images/foods/001.PNG",
   cost:300,
   time:1,
   prices:[710,1065,1420,2840,5680],
@@ -404,7 +404,7 @@ const foodsData = [
 },
 {
   name:"ミートバーガー",
-  image:"foods/049.PNG",
+  image:"./images/foods/001.PNG",
   cost:480,
   time:480,
   prices:[1350,2025,2700,5400,10800],
@@ -412,7 +412,7 @@ const foodsData = [
 },
 {
   name:"アカザエビの前菜",
-  image:"foods/050.PNG",
+  image:"./images/foods/001.PNG",
   cost:145,
   time:480,
   prices:[850,1275,1700,3400,6800],
@@ -420,7 +420,7 @@ const foodsData = [
 },
 {
   name:"北欧ブルーアカザエビの前菜",
-  image:"foods/051.PNG",
+  image:"./images/foods/001.PNG",
   cost:145,
   time:480,
   prices:[1310,1965,2620,5240,10480],
@@ -428,7 +428,7 @@ const foodsData = [
 },
 {
   name:"ナスとひき肉の炒め物",
-  image:"foods/052.PNG",
+  image:"./images/foods/001.PNG",
   cost:475,
   time:420,
   prices:[1230,1845,2460,4920,9840],
@@ -436,7 +436,7 @@ const foodsData = [
 },
 {
   name:"キャンドルディナー",
-  image:"foods/053.PNG",
+  image:"./images/foods/001.PNG",
   cost:630,
   time:240,
   prices:[1760,2640,3520,7040,14080],
@@ -444,7 +444,7 @@ const foodsData = [
 },
 {
   name:"蒸しタラバガニ",
-  image:"foods/054.PNG",
+  image:"./images/foods/001.PNG",
   cost:150,
   time:1,
   prices:[1990,2985,3980,7960,15920],
@@ -452,7 +452,7 @@ const foodsData = [
 },
 {
   name:"蒸し黄金タラバガニ",
-  image:"foods/055.PNG",
+  image:"./images/foods/001.PNG",
   cost:150,
   time:1,
   prices:[2980,4470,5960,11920,23840],
@@ -460,7 +460,7 @@ const foodsData = [
 },
 {
   name:"温泉卵",
-  image:"foods/056.PNG",
+  image:"./images/foods/001.PNG",
   cost:100,
   time:1,
   prices:[130,195,260,520,1140],
@@ -468,7 +468,7 @@ const foodsData = [
 },
 {
   name:"若草のケーキ",
-  image:"foods/057.PNG",
+  image:"./images/foods/001.PNG",
   cost:395,
   time:240,
   prices:[690,1035,1380,2760,5520],
@@ -476,7 +476,7 @@ const foodsData = [
 },
 {
   name:"復活のエッグ",
-  image:"foods/058.PNG",
+  image:"./images/foods/001.PNG",
   cost:100,
   time:1,
   prices:[190,285,380,760,1520],
@@ -484,7 +484,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(紫)",
-  image:"foods/059.PNG",
+  image:"./images/foods/001.PNG",
   cost:260,
   time:600,
   prices:[620,930,1240,2480,4960],
@@ -492,7 +492,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(緑)",
-  image:"foods/060.PNG",
+  image:"./images/foods/001.PNG",
   cost:245,
   time:480,
   prices:[570,855,1140,2280,4560],
@@ -500,7 +500,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(オレンジ)",
-  image:"foods/061.PNG",
+  image:"./images/foods/001.PNG",
   cost:100,
   time:1,
   prices:[190,285,380,760,1520],
@@ -508,7 +508,7 @@ const foodsData = [
 },
 {
   name:"復活祭のイースターエッグの宴",
-  image:"foods/062.PNG",
+  image:"./images/foods/001.PNG",
   cost:755,
   time:600,
   prices:[1650,2475,3300,6600,13200],
@@ -516,7 +516,7 @@ const foodsData = [
 },
 {
   name:"モルチーズカヌレ",
-  image:"foods/063.PNG",
+  image:"./images/foods/001.PNG",
   cost:370,
   time:240,
   prices:[910,1365,1820,3640,7280],
@@ -524,7 +524,7 @@ const foodsData = [
 },
 {
   name:"レトリバーカヌレ",
-  image:"foods/064.PNG",
+  image:"./images/foods/001.PNG",
   cost:295,
   time:240,
   prices:[590,885,1180,2360,4720],
@@ -532,7 +532,7 @@ const foodsData = [
 },
 {
   name:"モルチーズコンパンナ",
-  image:"foods/065.PNG",
+  image:"./images/foods/001.PNG",
   cost:350,
   time:1,
   prices:[520,780,1040,2080,4160],
@@ -540,7 +540,7 @@ const foodsData = [
 },
 {
   name:"レトリバーコンパンナ",
-  image:"foods/066.PNG",
+  image:"./images/foods/001.PNG",
   cost:350,
   time:1,
   prices:[520,780,1040,2080,4160],
@@ -548,7 +548,7 @@ const foodsData = [
 },
 {
   name:"ラブリーMALTESEコンパンナ",
-  image:"foods/067.PNG",
+  image:"./images/foods/001.PNG",
   cost:500,
   time:1,
   prices:[1220,1830,2440,4880,9760],
