@@ -439,11 +439,17 @@ updateDarkBtn();
 
 // ★ ダークモード切り替え時にグリッドを再描画してバグを防ぐ
 darkToggle.onclick = ()=>{
+  // 切替
   document.body.classList.toggle("dark");
-  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
-  updateDarkBtn();
-  // ★ CSSの再描画を先に走らせてからグリッドを再描画
-  requestAnimationFrame(() => render());
+  // 保存
+  localStorage.setItem(
+    "darkMode",
+    document.body.classList.contains("dark")
+  );
+  // ボタン更新
+  updateDarkButton();
+  // Safari再描画対策
+  forceRepaint();
 };
 
 
