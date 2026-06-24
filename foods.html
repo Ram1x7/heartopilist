@@ -41,43 +41,6 @@
 
 body.dark .page-header h2{ color:#e8d2a8; }
 
-/* フィルター行 */
-.f-filter{
-  display:flex;
-  gap:6px;
-  margin-bottom:8px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-
-.f-filter::-webkit-scrollbar{ display:none; }
-
-.f-btn{
-  flex-shrink:0;
-  padding:8px 14px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:11px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
-  white-space:nowrap;
-}
-
-.f-btn.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .f-btn{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
-body.dark .f-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
-
-/* 並び替え行（レア度削除→3ボタンに） */
 .f-sort{
   display:flex;
   gap:6px;
@@ -108,13 +71,11 @@ body.dark .f-btn.active{ background:var(--indigo-soft); border-color:var(--indig
 body.dark .f-sort-btn{ background:var(--card-sub); color:var(--text-sub); border-color:var(--border); }
 body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
 
-/* 検索欄ラッパー */
 .f-search-wrap{
   position:relative;
   margin-bottom:10px;
 }
 
-/* セクションラベル（イベント用） */
 .f-section-label{
   font-family:'Shippori Mincho', serif;
   font-size:13px;
@@ -127,7 +88,6 @@ body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--
 
 body.dark .f-section-label{ color:#e8d2a8; }
 
-/* イベント終了バナー */
 .f-event-banner{
   background:var(--card-sub);
   border:1px solid var(--border);
@@ -139,7 +99,6 @@ body.dark .f-section-label{ color:#e8d2a8; }
   margin-bottom:10px;
 }
 
-/* 料理モーダル */
 #foodModal{
   display:none;
   position:fixed;
@@ -175,7 +134,6 @@ body.dark .f-modal-box{ background:#2c2823; border-color:#46423b; }
 
 body.dark .f-modal-name{ color:#e8d2a8; }
 
-/* 料理画像 */
 .f-modal-img{
   width:120px;
   height:120px;
@@ -189,7 +147,6 @@ body.dark .f-modal-name{ color:#e8d2a8; }
 
 body.dark .f-modal-img{ background:#383329; }
 
-/* 基本情報 */
 .f-info{
   background:var(--card-sub);
   border-radius:12px;
@@ -201,19 +158,10 @@ body.dark .f-modal-img{ background:#383329; }
 
 body.dark .f-info{ background:#383329; }
 
-.f-info-row{
-  display:flex;
-  justify-content:space-between;
-}
-
+.f-info-row{ display:flex; justify-content:space-between; }
 .f-info-label{ color:var(--text-sub); }
 
-/* ★ ダークモード時も見える色に修正 */
-.f-info-value{
-  font-weight:700;
-  color:var(--text);
-}
-
+.f-info-value{ font-weight:700; color:var(--text); }
 body.dark .f-info-value{ color:#ece4d4; }
 
 .f-info-value.profit-plus{ color:#4a7c59; }
@@ -222,7 +170,6 @@ body.dark .f-info-value.profit-plus{ color:#7ec89a; }
 .f-info-value.profit-minus{ color:var(--vermillion); }
 body.dark .f-info-value.profit-minus{ color:#e07060; }
 
-/* レア度タブ（モーダル内） */
 .f-rarity-tabs{
   display:flex;
   gap:5px;
@@ -257,7 +204,6 @@ body.dark .f-info-value.profit-minus{ color:#e07060; }
 body.dark .f-rarity-tab{ background:#383329; color:var(--text-sub); border-color:var(--border); }
 body.dark .f-rarity-tab.active{ background:var(--gold); border-color:var(--gold); color:#2c2823; }
 
-/* 売価・利益カード */
 .f-price-card{
   background:var(--card-sub);
   border-radius:12px;
@@ -268,7 +214,6 @@ body.dark .f-rarity-tab.active{ background:var(--gold); border-color:var(--gold)
 
 body.dark .f-price-card{ background:#383329; }
 
-/* モーダル内セクションタイトル */
 .f-section-title{
   font-family:'Shippori Mincho', serif;
   font-size:13px;
@@ -280,7 +225,6 @@ body.dark .f-price-card{ background:#383329; }
 
 body.dark .f-section-title{ color:#e8d2a8; }
 
-/* 素材横並び */
 .f-materials{
   display:flex;
   flex-wrap:wrap;
@@ -317,7 +261,6 @@ body.dark .f-material-img{ background:#383329; border-color:#46423b; }
   line-height:1.3;
 }
 
-/* 素材テキスト（画像なし） */
 .f-material-text{
   font-size:11px;
   color:var(--text-sub);
@@ -325,7 +268,6 @@ body.dark .f-material-img{ background:#383329; border-color:#46423b; }
   margin-bottom:12px;
 }
 
-/* 閉じるボタン */
 .f-close-btn{
   width:100%;
   padding:12px;
@@ -341,7 +283,6 @@ body.dark .f-material-img{ background:#383329; border-color:#46423b; }
 
 body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b; }
 
-/* フッター */
 .foods-footer{
   text-align:center;
   margin-top:24px;
@@ -350,7 +291,6 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
   opacity:0.6;
 }
 
-/* トースト */
 #foodToast{
   position:fixed;
   bottom:24px;
@@ -396,13 +336,11 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
   <h2>🍳 料理レシピ図鑑</h2>
 </div>
 
-<!-- 検索 -->
 <div class="f-search-wrap">
   <input type="text" id="search" class="search" placeholder="🔍 料理名・素材名で検索">
   <button id="clearBtn">×</button>
 </div>
 
-<!-- ★ 並び替え（レア度フィルター削除・3ボタンに） -->
 <div class="f-sort">
   <button class="f-sort-btn active" id="s_book" onclick="setSort('book')">図鑑順</button>
   <button class="f-sort-btn" id="s_level" onclick="setSort('level')">レベル順</button>
@@ -410,12 +348,10 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
   <button class="f-sort-btn" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
 </div>
 
-<!-- グリッド -->
 <div id="list"></div>
 
 <div class="foods-footer">※本サイトは非公式のファンツールです</div>
 
-<!-- モーダル -->
 <div id="foodModal" onclick="if(event.target.id==='foodModal')closeModal()">
   <div class="f-modal-box" id="modalBox"></div>
 </div>
@@ -469,7 +405,7 @@ let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
 let authData    = JSON.parse(localStorage.getItem("food_auth") || "{}");
 
 // ── 状態 ──
-let currentSort      = "book";
+let currentSort        = "book";
 let currentModalRarity = 1;
 let currentModalFood   = null;
 
@@ -497,22 +433,34 @@ function setSort(type){
   render();
 }
 
-// ── レア度インデックス（0始まり）──
+// ── レア度インデックス ──
 function rarityIdx(r){ return r - 1; }
 
-// ── セクション描画（通常・イベント共通） ──
-function renderSection(items, isEvent=false){
+// ── セクション描画 ──
+// type: "normal" | "season" | "fes"
+function renderSection(items, type="normal"){
   const frag = document.createDocumentFragment();
 
-  if(isEvent){
+  if(type === "season"){
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
-    lbl.textContent = "🎉 イベント料理";
+    lbl.textContent = "🌸 シーズン料理";
     frag.appendChild(lbl);
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    banner.textContent = "⚠️ 現在このイベントは終了しています";
+    banner.textContent = "⚠️ 現在このシーズンは終了しています";
+    frag.appendChild(banner);
+
+  } else if(type === "fes"){
+    const lbl = document.createElement("div");
+    lbl.className = "f-section-label";
+    lbl.textContent = "🎉 フェス料理";
+    frag.appendChild(lbl);
+
+    const banner = document.createElement("div");
+    banner.className = "f-event-banner";
+    banner.textContent = "⚠️ 現在このフェスは終了しています";
     frag.appendChild(banner);
   }
 
@@ -574,9 +522,10 @@ function render(){
   const el = document.getElementById("list");
   el.innerHTML = "";
 
-  // 通常とイベントに分離
-  let normalList = foodsData.filter(f => !f.isEvent);
-  let eventList  = foodsData.filter(f => f.isEvent);
+  // ★ 通常・シーズン・フェスに分離
+  let normalList = foodsData.filter(f => !f.season && !f.fes);
+  let seasonList = foodsData.filter(f => f.season);
+  let fesList    = foodsData.filter(f => f.fes);
 
   // キーワード検索
   const filterByKeyword = (list) => list.filter(f => {
@@ -586,9 +535,10 @@ function render(){
   });
 
   normalList = filterByKeyword(normalList);
-  eventList  = filterByKeyword(eventList);
+  seasonList = filterByKeyword(seasonList);
+  fesList    = filterByKeyword(fesList);
 
-  // 並び替え（通常のみ。イベントは常に図鑑順）
+  // 並び替え（通常のみ。シーズン・フェスは図鑑順固定）
   const sortList = (list) => {
     if(currentSort === "level"){
       return list.slice().sort((a,b) => (a.level||99) - (b.level||99));
@@ -615,20 +565,14 @@ function render(){
 
   normalList = sortList(normalList);
 
-  if(normalList.length === 0 && eventList.length === 0){
+  if(normalList.length === 0 && seasonList.length === 0 && fesList.length === 0){
     el.innerHTML = `<p style="text-align:center;color:var(--text-sub);padding:40px 0;">該当なし</p>`;
     return;
   }
 
-  // 通常料理を描画
-  if(normalList.length > 0){
-    el.appendChild(renderSection(normalList, false));
-  }
-
-  // ★ イベント料理をページ下部に描画
-  if(eventList.length > 0){
-    el.appendChild(renderSection(eventList, true));
-  }
+  if(normalList.length > 0) el.appendChild(renderSection(normalList, "normal"));
+  if(seasonList.length > 0) el.appendChild(renderSection(seasonList, "season"));
+  if(fesList.length > 0)    el.appendChild(renderSection(fesList, "fes"));
 }
 
 // ── モーダル ──
@@ -674,12 +618,11 @@ function renderModal(){
       onclick="setModalRarity(${rv})">☆${rv}</button>`;
   }).join("");
 
-  // ★ 素材：imageがnullや空のものを除外して実際の素材だけ表示
   let materialsHTML = "";
   if(f.materials_image && f.materials_image.length > 0){
     const validItems = f.materials_image
       .map((m, i) => ({ img: m.image, label: f.materials && f.materials[i] ? f.materials[i] : "" }))
-      .filter(item => item.img && item.label); // ★ imageもlabelも空でないものだけ
+      .filter(item => item.img && item.label);
 
     if(validItems.length > 0){
       const itemsHTML = validItems.map(item => `
