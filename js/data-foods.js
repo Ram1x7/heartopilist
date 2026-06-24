@@ -1068,7 +1068,7 @@ const foodsData = [
     { image:"./images/materials/apple.jpg" },
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/egg.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/batter.jpg" }
   ],
   auth:true
 },
@@ -1102,7 +1102,7 @@ const foodsData = [
     { image:"./images/materials/corn.jpg" },
     { image:"./images/materials/corn.jpg" },
     { image:"./images/materials/milk.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/batter.jpg" }
   ],
   auth:true
 },
@@ -1272,7 +1272,7 @@ const foodsData = [
     { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/all_kaisen.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/batter.jpg" }
   ],
   auth:true
 },
@@ -1289,7 +1289,7 @@ const foodsData = [
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/batter.jpg" }
   ],
   auth:true
 },
@@ -1304,10 +1304,10 @@ const foodsData = [
   materials:["シュガー(@50)","コーヒー豆(@50)","コーヒーの材料ならなんでもOK","コーヒーの材料ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
   ],
   auth:false
 },
@@ -1322,10 +1322,10 @@ const foodsData = [
   materials:["シュガー(@50)","コーヒー豆(@50)","牛乳(@50)","牛乳(@50)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/coffee.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" }
   ],
   auth:false
 },
@@ -1340,10 +1340,10 @@ const foodsData = [
   materials:["肉(@200)","肉(@200)","バター(@150)","大根(種@10)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/daikon.jpg" }
   ],
   auth:false
 },
@@ -1358,10 +1358,10 @@ const foodsData = [
   materials:["牛乳(@50)","バター(@150)","大根(種@10)","大根(種@10)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/daikon.jpg" },
+    { image:"./images/materials/daikon.jpg" }
   ],
   auth:false
 },
@@ -1376,10 +1376,10 @@ const foodsData = [
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","果物ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
   ],
   auth:false
 },
@@ -1394,10 +1394,10 @@ const foodsData = [
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","ブルーベリー"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/buruberi.jpg" }
   ],
   auth:false
 },
@@ -1412,10 +1412,10 @@ const foodsData = [
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","ラズベリー"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
   ],
   auth:false
 },
@@ -1430,10 +1430,10 @@ const foodsData = [
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","リンゴ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/apple.jpg" }
   ],
   auth:false
 },
@@ -1448,10 +1448,10 @@ const foodsData = [
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","オレンジ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/sugar.jpg" },
+    { image:"./images/materials/orange.jpg" }
   ],
   auth:false
 },
@@ -1466,10 +1466,10 @@ const foodsData = [
   materials:["大根おろし肉(@560)","大根クリームポタージュ(@220)","アイスカップコーヒーの材料ならなんでもOK","シュガーパンケーキの料理ならなんでもOK"],
   level:10,
   materials_image:[
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/gold_taraba.jpg" },
-    { image:"./images/materials/butter.jpg" }
+    { image:"./images/materials/daikon_meat.jpg" },
+    { image:"./images/materials/daikon_potage.jpg" },
+    { image:"./images/materials/all_ice_coffee.jpg" },
+    { image:"./images/materials/all_pancake.jpg" }
   ],
   auth:false
 },
