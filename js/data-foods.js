@@ -1,3 +1,5 @@
+//isEvent: true
+
 const foodsData = [
 {
   name:"田園サラダ",
@@ -1270,6 +1272,23 @@ const foodsData = [
     { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"蒸し黄金タラバガニ",
+  image:"./images/foods/055.PNG",
+  cost:150,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[2980,4470,5960,11920,23840],
+  materials:["黄金タラバガニ","黄金タラバガニ","黄金タラバガニ","バター(@150)"],
+  level:10,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/butter.jpg" }
   ],
   auth:true
