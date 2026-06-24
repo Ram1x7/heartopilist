@@ -1296,7 +1296,7 @@ const foodsData = [
 {
   name:"アイスカップコーヒー",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1001.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1314,7 +1314,7 @@ const foodsData = [
 {
   name:"アイスカップカフェラテ",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1002.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1332,7 +1332,7 @@ const foodsData = [
 {
   name:"大根おろし肉",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1003.PNG",
   cost:560,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1350,7 +1350,7 @@ const foodsData = [
 {
   name:"大根クリームポタージュ",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1004.PNG",
   cost:220,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1368,7 +1368,7 @@ const foodsData = [
 {
   name:"シュガーパンケーキ(プレーン)",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1005.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1386,7 +1386,7 @@ const foodsData = [
 {
   name:"シュガーパンケーキ(ブルーベリー)",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1006.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1404,7 +1404,7 @@ const foodsData = [
 {
   name:"シュガーパンケーキ(ラズベリー)",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1007.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1422,7 +1422,7 @@ const foodsData = [
 {
   name:"シュガーパンケーキ(アップル)",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1008.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1440,7 +1440,7 @@ const foodsData = [
 {
   name:"シュガーパンケーキ(オレンジ)",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1009.PNG",
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1458,7 +1458,7 @@ const foodsData = [
 {
   name:"オーロラディナー",
   season:true,
-  image:"./images/foods/055.PNG",
+  image:"./images/foods/1010.PNG",
   cost:1180,
   time:0,
   rarity: [true,true,true,true,true],
