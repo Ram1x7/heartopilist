@@ -1167,7 +1167,7 @@ const foodsData = [
   materials:["ティラミス(@300)","ジャムの材料ならなんでもOK","",""],
   level:7,
   materials_image:[
-    { image:"./images/materials/all_teiramisu.jpg" },
+    { image:"./images/materials/teiramisu.jpg" },
     { image:"./images/materials/all_material.jpg" },
     { image:null },
     { image:null }
@@ -1252,7 +1252,7 @@ const foodsData = [
   materials:["田園サラダ(@20)","スモークサーモンベーグル(@205)","シーフードリゾット(@105)","ティラミス(@300)"],
   level:9,
   materials_image:[
-    { image:"./images/materials/denen_salad.jpg" },
+    { image:"./images/materials/salad.jpg" },
     { image:"./images/materials/salmon_bagel.jpg" },
     { image:"./images/materials/seafood_rizotto.jpg" },
     { image:"./images/materials/teiramisu.jpg" }
