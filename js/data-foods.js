@@ -502,7 +502,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[180,270,360,720,1440],
   materials:["キノコならなんでもOK","キノコならなんでもOK","キノコならなんでもOK","キノコならなんでもOK"],
-  level:0,
+  level:1,
   materials_image:[
     { image:"./images/materials/all_kinoko.jpg" },
     { image:"./images/materials/all_kinoko.jpg" },
@@ -1284,7 +1284,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[2980,4470,5960,11920,23840],
   materials:["黄金タラバガニ","黄金タラバガニ","黄金タラバガニ","バター(@150)"],
-  level:1,
+  level:10,
   materials_image:[
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/gold_taraba.jpg" },
