@@ -432,12 +432,7 @@ if(savedDark === "true") document.body.classList.add("dark");
 else if(savedDark === null && window.matchMedia("(prefers-color-scheme: dark)").matches)
   document.body.classList.add("dark");
 
-function updateDarkBtn(){
-  darkToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
-}
-updateDarkBtn();
-
-// ★ ダークモード切り替え時にグリッドを再描画してバグを防ぐ
+// ボタン
 darkToggle.onclick = ()=>{
   // 切替
   document.body.classList.toggle("dark");
@@ -451,6 +446,22 @@ darkToggle.onclick = ()=>{
   // Safari再描画対策
   forceRepaint();
 };
+
+// ボタン表示
+function updateDarkButton(){
+
+  darkToggle.textContent =
+    document.body.classList.contains("dark")
+    ? "☀️"
+    : "🌙";
+}
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  // 強制reflow
+  document.body.offsetHeight;
+  document.body.style.display = "";
 
 
 // ── データ ──
