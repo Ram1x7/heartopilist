@@ -514,11 +514,17 @@ function renderCodes(){
   const el = document.getElementById("codeList");
   el.innerHTML = "";
 
-  const list = codesData.filter(c =>
+  const list = codesData
+  .filter(c =>
     currentTab === "active"
       ? !isExpired(c.expiry) && c.active
       : isExpired(c.expiry) || !c.active
-  );
+  )
+  .sort((a, b) => {
+    const ar = receivedCodes[a.code] ? 1 : 0;
+    const br = receivedCodes[b.code] ? 1 : 0;
+    return ar - br;
+  });
 
   if(list.length === 0){
     el.innerHTML = `<div class="empty">${
