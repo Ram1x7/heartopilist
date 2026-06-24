@@ -241,8 +241,10 @@ body.dark .page-header h1{
   color:#e8d2a8;
 }
 
-.page-header p{
+.page-subtitle{
+  margin:0;
   font-size:11px;
+  text-align:center;
   color:var(--text-sub);
 }
 
