@@ -440,48 +440,47 @@ function rarityIdx(r){ return r - 1; }
 // type: "normal" | "season" | "season_ended" | "fes" | "fes_ended"
 function renderSection(items, type = "normal"){
   const frag = document.createDocumentFragment();
-  
+
+  // 見出し
   if(type === "season" || type === "season_ended"){
+
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
     lbl.textContent = "🌸 シーズン料理";
     frag.appendChild(lbl);
-    
+
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    
-    if(type === "season"){
-      banner.textContent = "📍 現在開催中のシーズン";
-    } else {
-      banner.textContent = "⚠️ 現在このシーズンは終了しています";
-    }
-    
+    banner.textContent =
+      type === "season"
+      ? "📍 現在開催中のシーズン"
+      : "⚠️ 現在このシーズンは終了しています";
+
     frag.appendChild(banner);
-    
-  } else if(type === "fes" || type === "fes_ended"){
+
+  }else if(type === "fes" || type === "fes_ended"){
+
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
     lbl.textContent = "🎉 フェス料理";
     frag.appendChild(lbl);
-    
+
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    if(type === "fes"){
-      banner.textContent = "📍 現在開催中のフェス";
-    } else {
-      banner.textContent = "⚠️ 現在このフェスは終了しています";
-    }
-    
+    banner.textContent =
+      type === "fes"
+      ? "📍 現在開催中のフェス"
+      : "⚠️ 現在このフェスは終了しています";
+
     frag.appendChild(banner);
   }
-  
-  return frag;
-}
 
+  // グリッド
   const grid = document.createElement("div");
   grid.className = "grid";
 
   items.forEach(f => {
+
     const div = document.createElement("div");
     div.className = "item";
 
@@ -506,7 +505,7 @@ function renderSection(items, type = "normal"){
 
     div.onclick = () => openModal(f);
 
-    div.querySelector(".check-btn").onclick = (e) => {
+    div.querySelector(".check-btn").onclick = (e)=>{
       e.stopPropagation();
       checkedData[f.name] = !checkedData[f.name];
       localStorage.setItem("food_checked", JSON.stringify(checkedData));
@@ -515,7 +514,7 @@ function renderSection(items, type = "normal"){
 
     const authBtn = div.querySelector(".auth-btn");
     if(authBtn){
-      authBtn.onclick = (e) => {
+      authBtn.onclick = (e)=>{
         e.stopPropagation();
         authData[f.name] = !authData[f.name];
         localStorage.setItem("food_auth", JSON.stringify(authData));
@@ -527,6 +526,7 @@ function renderSection(items, type = "normal"){
   });
 
   frag.appendChild(grid);
+
   return frag;
 }
 
@@ -551,8 +551,10 @@ function render(){
   });
 
   normalList = filterByKeyword(normalList);
-  seasonList = filterByKeyword(seasonList);
-  fesList    = filterByKeyword(fesList);
+  seasonActiveList = filterByKeyword(seasonActiveList);
+  seasonEndedList  = filterByKeyword(seasonEndedList);
+  fesActiveList    = filterByKeyword(fesActiveList);
+  fesEndedList     = filterByKeyword(fesEndedList);
 
   // 並び替え（通常のみ。シーズン・フェスは図鑑順固定）
   const sortList = (list) => {
@@ -587,8 +589,10 @@ function render(){
   }
 
   if(normalList.length > 0) el.appendChild(renderSection(normalList, "normal"));
-  if(seasonList.length > 0) el.appendChild(renderSection(seasonList, "season"));
-  if(fesList.length > 0)    el.appendChild(renderSection(fesList, "fes"));
+  if(seasonActiveList.length > 0) el.appendChild(renderSection(seasonActiveList, "season"));
+  if(seasonEndedList.length > 0) el.appendChild(renderSection(seasonEndedList, "season_ended"));
+  if(fesActiveList.length > 0) el.appendChild(renderSection(fesActiveList, "fes"));
+  if(fesEndedList.length > 0) el.appendChild(renderSection(fesEndedList, "fes_ended"));
 }
 
 // ── モーダル ──
