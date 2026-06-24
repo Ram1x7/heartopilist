@@ -1284,7 +1284,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[2980,4470,5960,11920,23840],
   materials:["黄金タラバガニ","黄金タラバガニ","黄金タラバガニ","バター(@150)"],
-  level:10,
+  level:1,
   materials_image:[
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/gold_taraba.jpg" },
@@ -1294,13 +1294,176 @@ const foodsData = [
   auth:true
 },
 {
-  name:"蒸し黄金タラバガニ",
+  name:"アイスカップコーヒー",
+  season:true,
   image:"./images/foods/055.PNG",
-  cost:150,
+  cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[2980,4470,5960,11920,23840],
-  materials:["黄金タラバガニ","黄金タラバガニ","黄金タラバガニ","バター(@150)"],
+  prices:[280,420,560,1120,2240],
+  materials:["シュガー(@50)","コーヒー豆(@50)","コーヒーの材料ならなんでもOK","コーヒーの材料ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"アイスカップカフェラテ",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[280,420,560,1120,2240],
+  materials:["シュガー(@50)","コーヒー豆(@50)","牛乳(@50)","牛乳(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"大根おろし肉",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:560,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[630,945,1260,2520,5040],
+  materials:["肉(@200)","肉(@200)","バター(@150)","大根(種@10)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"大根クリームポタージュ",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:220,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[340,510,680,1360,2720],
+  materials:["牛乳(@50)","バター(@150)","大根(種@10)","大根(種@10)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"シュガーパンケーキ(プレーン)",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["卵(@100)","牛乳(@50)","シュガー(@50)","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"シュガーパンケーキ(ブルーベリー)",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["卵(@100)","牛乳(@50)","シュガー(@50)","ブルーベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"シュガーパンケーキ(ラズベリー)",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[350,525,700,1400,2800],
+  materials:["卵(@100)","牛乳(@50)","シュガー(@50)","ラズベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"シュガーパンケーキ(アップル)",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[360,540,720,1440,2880],
+  materials:["卵(@100)","牛乳(@50)","シュガー(@50)","リンゴ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"シュガーパンケーキ(オレンジ)",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[360,540,720,1440,2880],
+  materials:["卵(@100)","牛乳(@50)","シュガー(@50)","オレンジ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/gold_taraba.jpg" },
+    { image:"./images/materials/butter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"オーロラディナー",
+  season:true,
+  image:"./images/foods/055.PNG",
+  cost:1180,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[1630,2445,3260,6520,13040],
+  materials:["大根おろし肉(@560)","大根クリームポタージュ(@220)","アイスカップコーヒーの材料ならなんでもOK","シュガーパンケーキの料理ならなんでもOK"],
   level:10,
   materials_image:[
     { image:"./images/materials/gold_taraba.jpg" },
@@ -1308,6 +1471,6 @@ const foodsData = [
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/butter.jpg" }
   ],
-  auth:true
+  auth:false
 },
 ];
