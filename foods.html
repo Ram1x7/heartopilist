@@ -437,7 +437,7 @@ function setSort(type){
 function rarityIdx(r){ return r - 1; }
 
 // ── セクション描画 ──
-// type: "normal" | "season" | "fes"
+// type: "normal" | "season" | "season_ended" | "fes" | "fes_ended"
 function renderSection(items, type="normal"){
   const frag = document.createDocumentFragment();
 
@@ -449,8 +449,15 @@ function renderSection(items, type="normal"){
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
+    banner.textContent = "📍 現在開催中のシーズン";
+    frag.appendChild(banner);
+
+    if(type === "season_ended"){
+      const banner = document.createElement("div");
+    banner.className = "f-event-banner";
     banner.textContent = "⚠️ 現在このシーズンは終了しています";
     frag.appendChild(banner);
+    };
 
   } else if(type === "fes"){
     const lbl = document.createElement("div");
@@ -460,8 +467,15 @@ function renderSection(items, type="normal"){
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
+    banner.textContent = "📍 現在開催中のフェス";
+    frag.appendChild(banner);
+
+    if(type === "fes_ended"){
+      const banner = document.createElement("div");
+    banner.className = "f-event-banner";
     banner.textContent = "⚠️ 現在このフェスは終了しています";
     frag.appendChild(banner);
+    };
   }
 
   const grid = document.createElement("div");
@@ -524,8 +538,10 @@ function render(){
 
   // ★ 通常・シーズン・フェスに分離
   let normalList = foodsData.filter(f => !f.season && !f.fes);
-  let seasonList = foodsData.filter(f => f.season);
-  let fesList    = foodsData.filter(f => f.fes);
+  let seasonActiveList = foodsData.filter(f => f.season && !f.ended);
+  let seasonEndedList  = foodsData.filter(f => f.season && f.ended);
+  let fesActiveList    = foodsData.filter(f => f.fes && !f.ended);
+  let fesEndedList     = foodsData.filter(f => f.fes && f.ended);
 
   // キーワード検索
   const filterByKeyword = (list) => list.filter(f => {
