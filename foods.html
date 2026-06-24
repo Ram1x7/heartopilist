@@ -438,45 +438,45 @@ function rarityIdx(r){ return r - 1; }
 
 // ── セクション描画 ──
 // type: "normal" | "season" | "season_ended" | "fes" | "fes_ended"
-function renderSection(items, type="normal"){
+function renderSection(items, type = "normal"){
   const frag = document.createDocumentFragment();
-
-  if(type === "season"){
+  
+  if(type === "season" || type === "season_ended"){
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
     lbl.textContent = "🌸 シーズン料理";
     frag.appendChild(lbl);
-
+    
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    banner.textContent = "📍 現在開催中のシーズン";
+    
+    if(type === "season"){
+      banner.textContent = "📍 現在開催中のシーズン";
+    } else {
+      banner.textContent = "⚠️ 現在このシーズンは終了しています";
+    }
+    
     frag.appendChild(banner);
-
-    if(type === "season_ended"){
-      const banner = document.createElement("div");
-    banner.className = "f-event-banner";
-    banner.textContent = "⚠️ 現在このシーズンは終了しています";
-    frag.appendChild(banner);
-    };
-
-  } else if(type === "fes"){
+    
+  } else if(type === "fes" || type === "fes_ended"){
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
     lbl.textContent = "🎉 フェス料理";
     frag.appendChild(lbl);
-
+    
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    banner.textContent = "📍 現在開催中のフェス";
+    if(type === "fes"){
+      banner.textContent = "📍 現在開催中のフェス";
+    } else {
+      banner.textContent = "⚠️ 現在このフェスは終了しています";
+    }
+    
     frag.appendChild(banner);
-
-    if(type === "fes_ended"){
-      const banner = document.createElement("div");
-    banner.className = "f-event-banner";
-    banner.textContent = "⚠️ 現在このフェスは終了しています";
-    frag.appendChild(banner);
-    };
   }
+  
+  return frag;
+}
 
   const grid = document.createElement("div");
   grid.className = "grid";
