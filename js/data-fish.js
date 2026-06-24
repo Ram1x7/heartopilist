@@ -968,6 +968,8 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(青)",
+ fes:true,
+ ended:true,
  level:1,
  shadow:"小",
  price:100,
@@ -979,6 +981,8 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(赤)",
+ fes:true,
+ ended:true,
  level:1,
  shadow:"小",
  price:100,
@@ -990,6 +994,8 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(青緑)",
+ fes:true,
+ ended:true,
  level:1,
  shadow:"小",
  price:100,
@@ -1001,6 +1007,8 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(紫)",
+ fes:true,
+ ended:true,
  level:1,
  shadow:"小",
  price:100,
@@ -1012,6 +1020,8 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(虹)",
+ fes:true,
+ ended:true,
  level:1,
  shadow:"小",
  price:150,
