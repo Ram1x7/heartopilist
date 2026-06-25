@@ -680,7 +680,11 @@ async function cancelNotification(item, mode) {
 
 (async () => {
   if(Notification.permission === "granted"){
-    await getFCMToken();
+    localStorage.removeItem("fcmToken");
+    const token = await getFCMToken();
+    if(token){
+      console.log("FCM取得成功");
+    }
   }
   updateNotifBanner();
 })();
