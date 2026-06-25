@@ -587,10 +587,12 @@ function render(){
 
   normalList = sortList(normalList);
 
-  if(normalList.length === 0 && seasonList.length === 0 && fesList.length === 0){
-    el.innerHTML = `<p style="text-align:center;color:var(--text-sub);padding:40px 0;">該当なし</p>`;
-    return;
-  }
+  if(normalList.length === 0 && seasonActiveList.length === 0 && seasonEndedList.length === 0 &&
+   fesActiveList.length === 0 && fesEndedList.length === 0){
+  el.innerHTML = `<p style="text-align:center;color:var(--text-sub);padding:40px 0;">該当なし</p>`;
+  return;
+}
+
 
   if(normalList.length > 0) el.appendChild(renderSection(normalList, "normal"));
   if(seasonActiveList.length > 0) el.appendChild(renderSection(seasonActiveList, "season"));
