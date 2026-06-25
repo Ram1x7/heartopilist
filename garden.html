@@ -195,6 +195,37 @@ body.dark .garden-item .img-wrap img{ background:#383329; }
 
 body.dark .garden-item-timer{ color:#7ec89a; }
 
+/* ★ 進行バー（v85風） */
+.garden-progress-track{
+  position:relative;
+  width:100%;
+  height:4px;
+  background:var(--card-sub);
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:4px;
+}
+
+.garden-progress-fill{
+  height:100%;
+  background:var(--green);
+  border-radius:999px;
+  transition:width 1s linear;
+}
+
+body.dark .garden-progress-track{ background:#46423b; }
+body.dark .garden-progress-fill{ background:#7ec89a; }
+
+/* ★ 草抜きマーカー */
+.weed-marker{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:var(--gold);
+  z-index:2;
+}
+
 #detailModal{
   display:none;
   position:fixed;
@@ -554,9 +585,9 @@ async function registerNotification(item, mode) {
     ];
   }
 
-  // ★ 先にlocalStorageを更新してUIを即座に反映
+  // ★ 先にlocalStorageを更新してUIを即座に反映（start/totalを保存：進行バー用）
   const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
-  timers[item.name + "_" + mode] = { end: now + growMs, mode };
+  timers[item.name + "_" + mode] = { end: now + growMs, start: now, total: growMs, mode };
   localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
   showToast(`通知をセットしました（${formatTime(item.growTime)}後）`);
   renderModal(window.currentItem);
@@ -720,6 +751,14 @@ function formatTimeSeconds(sec){
   return s > 0 ? `${h}時間${rm}分${s}秒` : `${h}時間${rm}分`;
 }
 
+// ── 時計風フォーマット（v85方式） ──
+function formatClock(sec){
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return `${h > 0 ? h + ":" : ""}${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+}
+
 // ── タブ ──
 let currentTab = "crop";
 window.currentItem = null;
@@ -782,7 +821,7 @@ function renderSection(label, items, eventStatus = null){
     const div = document.createElement("div");
     div.className = "garden-item";
 
-    const isEventItem = !!(item.season || item.fes);   // ★追加
+    const isEventItem = !!(item.season || item.fes);
     const hasNotif = !isEventItem && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
     const isAuthed = item.auth !== false && !!authData[item.name];
     const isChecked = !!checkedData[item.name];
@@ -803,7 +842,12 @@ function renderSection(label, items, eventStatus = null){
       </div>
       <div class="item-name">${item.name}</div>
       <div class="garden-item-sub">${formatTime(item.growTime)}</div>
-      ${hasNotif ? `<div class="garden-item-timer" id="timer-${CSS.escape(item.name)}"></div>` : ''}
+      ${hasNotif ? `
+        <div class="garden-item-timer" id="timer-${CSS.escape(item.name)}"></div>
+        <div class="garden-progress-track" id="track-${CSS.escape(item.name)}">
+          <div class="garden-progress-fill" id="bar-${CSS.escape(item.name)}" style="width:0%"></div>
+        </div>
+      ` : ''}
     `;
 
     const checkBtn = div.querySelector(".check-btn");
@@ -847,7 +891,7 @@ function renderModal(item){
   if(!item) return;
   const isFlower = currentTab === "flower";
   const box = document.getElementById("modalBox");
-  const isEventItem = !!(item.season || item.fes);   // ★追加
+  const isEventItem = !!(item.season || item.fes);
 
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
   const priceRows = stars.map((s,i) => {
@@ -983,24 +1027,55 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove("show"), 2500);
 }
 
-// ── ★ 1秒ごとにカード上のタイマーだけ更新 ──
+// ── ★ 1秒ごとにカード上のタイマー・進行バー・草抜きマーカーを更新 ──
 function updateTimers(){
   const allItems = [
     ...(typeof cropData !== "undefined" ? cropData : []),
     ...(typeof flowerData !== "undefined" ? flowerData : []),
   ];
 
+  const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
+
   allItems.forEach(item => {
-    const el = document.getElementById("timer-" + CSS.escape(item.name));
+    const el  = document.getElementById("timer-" + CSS.escape(item.name));
+    const bar = document.getElementById("bar-" + CSS.escape(item.name));
     if(!el) return;
 
-    const msNormal = getRemainingMs(item, "normal");
-    const msWeed   = getRemainingMs(item, "weed");
-    const ms = msNormal !== null ? msNormal : msWeed;
+    const tNormal = timers[item.name + "_normal"];
+    const tWeed   = timers[item.name + "_weed"];
+    const t = (tNormal && tNormal.end > Date.now()) ? tNormal
+            : (tWeed && tWeed.end > Date.now()) ? tWeed
+            : null;
 
-    if(ms !== null){
+    if(t){
+      const ms = t.end - Date.now();
       const sec = Math.ceil(ms / 1000);
-      el.textContent = "⏱ " + formatTimeSeconds(sec);
+      el.textContent = "⏱ " + formatClock(sec);
+
+      const total = t.total || (item.growTime * 60 * 1000);
+
+      if(bar){
+        const progress = Math.max(0, Math.min(100, ((total - ms) / total) * 100));
+        bar.style.width = progress + "%";
+      }
+
+      // 草抜きモードなら3つのマーカーを表示（一度だけ）
+      const track = document.getElementById("track-" + CSS.escape(item.name));
+      if(track && t.mode === "weed" && !track.dataset.markersAdded){
+        const third = total / 3;
+        const positions = [
+          (third / total) * 100,
+          (third * 2 / total) * 100,
+          ((total - 90000) / total) * 100,
+        ];
+        positions.forEach(pos => {
+          const marker = document.createElement("div");
+          marker.className = "weed-marker";
+          marker.style.left = pos + "%";
+          track.appendChild(marker);
+        });
+        track.dataset.markersAdded = "true";
+      }
     } else {
       el.textContent = "";
       // タイマー切れたらグリッド再描画
