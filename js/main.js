@@ -1,4 +1,4 @@
-const APP_VERSION = "2.2.1";
+const APP_VERSION = "2.3.0";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -22,7 +22,7 @@ let authData =
 
 // 天気(毎日入力する) 
 const weatherData = {
- "2026-06-24": {
+ "2026-06-27": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -868,7 +868,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.2.1";
+const popupVersion = "2.3.0";
 
 if(
  localStorage.getItem("popupVersion")
@@ -965,4 +965,4 @@ document.getElementById("disclaimer").textContent =
   "※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。";
 
 document.getElementById("lastUpdate").textContent =
-  "最終更新 2026/06/24";
+  "最終更新 2026/06/25";
