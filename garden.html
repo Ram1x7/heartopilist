@@ -167,8 +167,8 @@ body.dark .garden-item .img-wrap img{ background:#383329; }
 
 .notif-badge{
   position:absolute;
-  bottom:6px;      /* top:6px から変更 */
-  left:6px;        /* left:28px から変更 */
+  bottom:6px;
+  left:6px;
   z-index:5;
   padding:1px 4px;
   border-radius:999px;
@@ -634,18 +634,17 @@ darkToggle.onclick = ()=>{
   document.body.classList.toggle("dark");
   localStorage.setItem("darkMode", document.body.classList.contains("dark"));
   updateDarkBtn();
-  forceRepaint();   // ★追加
+  forceRepaint();
 };
 
-// ★追加：forceRepaint関数自体も追加
 function forceRepaint(){
+  // Safari/iPad再描画バグ対策
   document.body.style.display = "none";
   document.body.offsetHeight;
   document.body.style.display = "";
 }
 
-
-// ── コンプリート（⭐）データ ──
+// ── コンプリート（⭐️）データ ──
 let checkedData = JSON.parse(localStorage.getItem("garden_checked") || "{}");
 
 function toggleChecked(name){
@@ -663,7 +662,7 @@ function toggleAuth(name){
   renderContent();
 }
 
-  // ── 画像プリロード（IntersectionObserver方式） ──
+// ── 画像プリロード（IntersectionObserver方式） ──
 const gardenImgObserver = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => {
     if(entry.isIntersecting){
@@ -734,22 +733,29 @@ function setTab(tab){
 }
 
 // ── グリッド描画 ──
+// ★ season / fes に対応
 function renderContent(){
   const el = document.getElementById("gardenContent");
   el.innerHTML = "";
 
-  if(currentTab === "crop"){
-    el.appendChild(renderSection("通常作物", cropData.filter(c=>!c.isEvent)));
-    const ev = cropData.filter(c=>c.isEvent);
-    if(ev.length) el.appendChild(renderSection("イベント作物", ev, true));
-  } else {
-    el.appendChild(renderSection("通常の花", flowerData.filter(f=>!f.isEvent)));
-    const ev = flowerData.filter(f=>f.isEvent);
-    if(ev.length) el.appendChild(renderSection("イベントの花", ev, true));
-  }
+  const data  = currentTab === "crop" ? cropData : flowerData;
+  const label = currentTab === "crop" ? "作物" : "花";
+
+  const normalList       = data.filter(d => !d.season && !d.fes);
+  const seasonActiveList = data.filter(d => d.season && !d.ended);
+  const seasonEndedList  = data.filter(d => d.season && d.ended);
+  const fesActiveList    = data.filter(d => d.fes && !d.ended);
+  const fesEndedList     = data.filter(d => d.fes && d.ended);
+
+  el.appendChild(renderSection(`通常の${label}`, normalList));
+  if(seasonActiveList.length) el.appendChild(renderSection(`🌸 シーズン${label}`, seasonActiveList, "season"));
+  if(seasonEndedList.length)  el.appendChild(renderSection(`🌸 シーズン${label}`, seasonEndedList, "season_ended"));
+  if(fesActiveList.length)    el.appendChild(renderSection(`🎉 フェス${label}`, fesActiveList, "fes"));
+  if(fesEndedList.length)     el.appendChild(renderSection(`🎉 フェス${label}`, fesEndedList, "fes_ended"));
 }
 
-function renderSection(label, items, isEvent=false){
+// ★ eventStatus: null | "season" | "season_ended" | "fes" | "fes_ended"
+function renderSection(label, items, eventStatus = null){
   const wrap = document.createElement("div");
 
   const lbl = document.createElement("div");
@@ -757,7 +763,12 @@ function renderSection(label, items, isEvent=false){
   lbl.textContent = label;
   wrap.appendChild(lbl);
 
-  if(isEvent){
+  if(eventStatus === "season" || eventStatus === "fes"){
+    const banner = document.createElement("div");
+    banner.className = "event-ended-banner";
+    banner.textContent = "📍 現在開催中です";
+    wrap.appendChild(banner);
+  } else if(eventStatus === "season_ended" || eventStatus === "fes_ended"){
     const banner = document.createElement("div");
     banner.className = "event-ended-banner";
     banner.textContent = "⚠️ 現在このイベントは終了しています";
@@ -771,9 +782,10 @@ function renderSection(label, items, isEvent=false){
     const div = document.createElement("div");
     div.className = "garden-item";
 
-    const hasNotif = !item.isEvent && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
+    const isEventItem = !!(item.season || item.fes);   // ★追加
+    const hasNotif = !isEventItem && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
     const isAuthed = item.auth !== false && !!authData[item.name];
-    const isChecked = !!checkedData[item.name];   // ★追加
+    const isChecked = !!checkedData[item.name];
 
     div.innerHTML = `
       <div class="img-wrap">
@@ -794,7 +806,6 @@ function renderSection(label, items, isEvent=false){
       ${hasNotif ? `<div class="garden-item-timer" id="timer-${CSS.escape(item.name)}"></div>` : ''}
     `;
 
-    // ★追加：check-btnのクリック処理
     const checkBtn = div.querySelector(".check-btn");
     checkBtn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -808,13 +819,13 @@ function renderSection(label, items, isEvent=false){
         toggleAuth(item.name);
       });
     }
+
     div._item = item;
-    gardenImgObserver.observe(div);   // ★追加
-    
+    gardenImgObserver.observe(div);
+
     div.onclick = () => openModal(item);
     grid.appendChild(div);
   });
-
 
   wrap.appendChild(grid);
   return wrap;
@@ -836,6 +847,7 @@ function renderModal(item){
   if(!item) return;
   const isFlower = currentTab === "flower";
   const box = document.getElementById("modalBox");
+  const isEventItem = !!(item.season || item.fes);   // ★追加
 
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
   const priceRows = stars.map((s,i) => {
@@ -881,9 +893,9 @@ function renderModal(item){
     `;
   }
 
-// 通知（作物のみ・イベント終了済みは除外）
+  // 通知（作物のみ・イベント終了済みは除外）
   let notifHTML = "";
-  if(!isFlower && !item.isEvent){
+  if(!isFlower && !isEventItem){
     const normalSet = isNotifSet(item,"normal");
     const weedSet   = isNotifSet(item,"weed");
 
@@ -938,10 +950,10 @@ function renderModal(item){
         <span class="g-info-label">草抜き</span>
         <span class="g-info-value">最大${item.weedCount}回</span>
       </div>` : ""}
-      ${item.isEvent ? `
+      ${isEventItem ? `
       <div class="g-info-row">
-        <span class="g-info-label">イベント</span>
-        <span class="g-info-value">${item.eventName}（終了）</span>
+        <span class="g-info-label">${item.fes ? "フェス" : "シーズン"}</span>
+        <span class="g-info-value">${item.eventName}${item.ended ? "（終了）" : "（開催中）"}</span>
       </div>` : ""}
     </div>
     <table class="g-price-table">
