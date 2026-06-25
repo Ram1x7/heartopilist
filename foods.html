@@ -413,6 +413,41 @@ let currentSort        = "book";
 let currentModalRarity = 1;
 let currentModalFood   = null;
 
+// ── 画像プリロード（IntersectionObserver方式） ──
+const foodImgObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const f = entry.target._food;
+      if(f.materials_image){
+        f.materials_image.forEach(m => {
+          if(m.image){
+            const img = new Image();
+            img.src = m.image;
+          }
+        });
+      }
+      obs.unobserve(entry.target);
+    }
+  });
+}, { rootMargin: "300px" });
+// ── 画像プリロード（IntersectionObserver方式） ──
+const foodImgObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if(entry.isIntersecting){
+      const f = entry.target._food;
+      if(f.materials_image){
+        f.materials_image.forEach(m => {
+          if(m.image){
+            const img = new Image();
+            img.src = m.image;
+          }
+        });
+      }
+      obs.unobserve(entry.target);
+    }
+  });
+}, { rootMargin: "300px" });
+
 // ── 検索 ──
 const searchInput = document.getElementById("search");
 const clearBtn    = document.getElementById("clearBtn");
@@ -507,6 +542,9 @@ function renderSection(items, type = "normal"){
       <div class="item-name">${f.name}</div>
     `;
 
+    div._food = f;
+    foodImgObserver.observe(div);   // ★追加
+    
     div.onclick = () => openModal(f);
 
     div.querySelector(".check-btn").onclick = (e)=>{
