@@ -1093,6 +1093,29 @@ function updateTimers(){
 
 setInterval(updateTimers, 1000);
 
+document.getElementById("helpBtn").onclick = () => {
+  document.getElementById("modalBox").innerHTML = `
+    <div class="g-modal-name">使い方</div>
+    <div class="g-info" style="text-align:left;">
+      🌱 通常モード：収穫タイミングで1回通知<br>
+      🌿 草抜きモード：草抜き3回＋収穫タイミングで通知<br>
+      🔔：通知ONの作物に表示<br>
+      ⭐️：星5チェック<br>
+      🎖：認証マスターチェック<br><br>
+      ⚠️通知には最大1分の誤差があり、草抜きモードでは、<br>
+      最初の2回は『成長時間÷3の1分前後』のタイミングで通知され、<br>
+      3回目は、『収穫時間の1〜2分前』に通知されます。<br>
+      この通知機能はホーム追加した状態でしか使えず、<br>
+      通知許可をしていないと使えないのでご了承ください。<br>
+      また不具合等あれば急に機能停止させる場合もありますが、<br>
+      そちらも合わせてご了承ください🙇‍♂️
+    </div>
+    <button class="g-close-btn" onclick="closeModal()">閉じる</button>
+  `;
+  document.getElementById("detailModal").style.display = "block";
+};
+
+
 // 初期化
 cleanExpiredTimers();
 renderContent();
