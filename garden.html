@@ -536,15 +536,29 @@ const messaging = firebase.messaging();
 
 async function getFCMToken() {
   try {
-    const sw = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+    alert("SW登録開始");
+    const sw = await navigator.serviceWorker.register(
+      "./firebase-messaging-sw.js"
+    );
+    alert("SW登録成功");
     await navigator.serviceWorker.ready;
-    const token = await messaging.getToken({ vapidKey: VAPID_KEY, serviceWorkerRegistration: sw });
+    alert("FCM取得開始");
+    const token = await messaging.getToken({
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: sw
+    });
+    alert("取得結果", token);
     if(token){
       localStorage.setItem("fcmToken", token);
       return token;
     }
+    alert("tokenがnull");
   } catch(e) {
-    console.error("FCMトークン取得失敗:", e);
+    alert("FCM取得失敗", e);
+    alert(
+      "FCM取得失敗\n\n" +
+      e.message
+    );
   }
   return null;
 }
