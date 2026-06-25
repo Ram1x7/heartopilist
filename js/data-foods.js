@@ -594,7 +594,7 @@ const foodsData = [
     { image:null },
     { image:null }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"復活のエッグ",
@@ -611,7 +611,7 @@ const foodsData = [
     { image:null },
     { image:null }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"復活祭の模様入り卵(紫)",
@@ -628,7 +628,7 @@ const foodsData = [
     { image:null },
     { image:null }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"復活祭の模様入り卵(緑)",
@@ -645,7 +645,7 @@ const foodsData = [
     { image:null },
     { image:null }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"復活祭の模様入り卵(オレンジ)",
@@ -662,7 +662,7 @@ const foodsData = [
     { image:null },
     { image:null }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"復活祭のイースターエッグの宴",
@@ -679,7 +679,7 @@ const foodsData = [
     { image:"./images/materials/g_egg.jpg" },
     { image:"./images/materials/o_egg.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"三角の白米ちまき",
@@ -696,7 +696,7 @@ const foodsData = [
     { image:"./images/materials/all_material.jpg" },
     { image:"./images/materials/all_material.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"三角のあずきちまき",
@@ -713,7 +713,7 @@ const foodsData = [
     { image:"./images/materials/azuki.jpg" },
     { image:"./images/materials/azuki.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"三角の卵黄入り肉ちまき",
@@ -730,7 +730,7 @@ const foodsData = [
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/meat.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"枕型の白米ちまき",
@@ -747,7 +747,7 @@ const foodsData = [
     { image:"./images/materials/all_material.jpg" },
     { image:"./images/materials/all_material.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"枕型のこしあんちまき",
@@ -764,7 +764,7 @@ const foodsData = [
     { image:"./images/materials/azuki.jpg" },
     { image:"./images/materials/azuki.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"枕型の卵黄入りちまき",
@@ -781,7 +781,7 @@ const foodsData = [
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/meat.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"モルチーズカヌレ",
@@ -798,7 +798,7 @@ const foodsData = [
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/strawberry.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"レトリバーカヌレ",
@@ -815,7 +815,7 @@ const foodsData = [
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/coffee.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"モルチーズコンパンナ",
@@ -832,7 +832,7 @@ const foodsData = [
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/r_coffee.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"レトリバーコンパンナ",
@@ -849,7 +849,7 @@ const foodsData = [
     { image:"./images/materials/coffee.jpg" },
     { image:"./images/materials/r_coffee.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"ラブリーMALTESEコンパンナ",
@@ -866,7 +866,7 @@ const foodsData = [
     { image:"./images/materials/r_coffee.jpg" },
     { image:"./images/materials/r_coffee.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"若草のケーキ",
@@ -883,7 +883,7 @@ const foodsData = [
     { image:"./images/materials/mattya.jpg" },
     { image:"./images/materials/grass.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"虹のときめきグミ",
@@ -900,7 +900,7 @@ const foodsData = [
     { image:"./images/materials/all_fruit.jpg" },
     { image:"./images/materials/all_fruit.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"虹のドキドキグミ",
@@ -917,7 +917,7 @@ const foodsData = [
     { image:"./images/materials/all_fruit.jpg" },
     { image:"./images/materials/all_fruit.jpg" }
   ],
-  auth:true
+  auth:false
 },
 {
   name:"コーヒー",
