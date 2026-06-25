@@ -491,9 +491,10 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 </div>
 
 <div id="notifBanner">
-  🔔 バックグラウンド通知を受け取るには通知の許可が必要です<br>
+  <span id="notifBannerText">🔔 バックグラウンド通知を受け取るには通知の許可が必要です</span><br>
   <button class="notif-allow-btn" id="notifAllowBtn">通知を許可する</button>
 </div>
+
 
 <div class="tab-row">
   <button class="g-tab active" id="tab-crop" onclick="setTab('crop')">🌾 作物</button>
@@ -548,12 +549,43 @@ async function getFCMToken() {
   return null;
 }
 
+function updateNotifBanner(){
+  const banner = document.getElementById("notifBanner");
+  const text   = document.getElementById("notifBannerText");
+  const btn    = document.getElementById("notifAllowBtn");
+
+  if(Notification.permission === "granted"){
+    banner.style.display = "none";
+  } else if(Notification.permission === "denied"){
+    banner.style.display = "block";
+    text.innerHTML = "🔕 通知がブロックされています。<br>端末・ブラウザの設定からこのサイトの通知を「許可」に変更後、下のボタンを押してください。";
+    btn.textContent = "再確認する";
+  } else {
+    banner.style.display = "block";
+    text.textContent = "🔔 バックグラウンド通知を受け取るには通知の許可が必要です";
+    btn.textContent = "通知を許可する";
+  }
+}
+
+
 async function requestNotifPermission() {
+  if(Notification.permission === "denied"){
+    // JSからは再度ダイアログを出せないので、設定変更済みかどうかを再チェックするだけ
+    updateNotifBanner();
+    if(Notification.permission === "granted"){
+      const token = await getFCMToken();
+      if(token) showToast("通知が有効になりました！");
+    } else {
+      showToast("まだブロックされています。設定をご確認ください");
+    }
+    return;
+  }
+
   const permission = await Notification.requestPermission();
+  updateNotifBanner();
   if(permission === "granted"){
     const token = await getFCMToken();
     if(token){
-      document.getElementById("notifBanner").style.display = "none";
       showToast("通知が有効になりました！");
     } else {
       showToast("トークン取得に失敗しました");
@@ -649,11 +681,19 @@ async function cancelNotification(item, mode) {
 (async () => {
   if(Notification.permission === "granted"){
     await getFCMToken();
-    document.getElementById("notifBanner").style.display = "none";
-  } else if(Notification.permission === "default"){
-    document.getElementById("notifBanner").style.display = "block";
   }
+  updateNotifBanner();
 })();
+
+document.addEventListener("visibilitychange", () => {
+  if(document.visibilityState === "visible"){
+    updateNotifBanner();
+    if(Notification.permission === "granted" && !localStorage.getItem("fcmToken")){
+      getFCMToken();
+    }
+  }
+});
+
 </script>
 
 <script>
