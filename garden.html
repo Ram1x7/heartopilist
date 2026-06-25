@@ -636,6 +636,15 @@ darkToggle.onclick = ()=>{
   updateDarkBtn();
 };
 
+// ── コンプリート（⭐）データ ──
+let checkedData = JSON.parse(localStorage.getItem("garden_checked") || "{}");
+
+function toggleChecked(name){
+  checkedData[name] = !checkedData[name];
+  localStorage.setItem("garden_checked", JSON.stringify(checkedData));
+  renderContent();
+}
+
 // ── 認証データ ──
 let authData = JSON.parse(localStorage.getItem("authData") || "{}");
 
@@ -741,11 +750,15 @@ function renderSection(label, items, isEvent=false){
 
     const hasNotif = !item.isEvent && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
     const isAuthed = item.auth !== false && !!authData[item.name];
+    const isChecked = !!checkedData[item.name];   // ★追加
 
     div.innerHTML = `
       <div class="img-wrap">
         <div class="level-badge">Lv.${item.level}</div>
         ${hasNotif ? '<div class="notif-badge">🔔</div>' : ''}
+        <button class="check-btn ${isChecked ? "checked" : ""}">
+          ${isChecked ? "⭐️" : ""}
+        </button>
         ${item.auth !== false ? `
           <button class="auth-btn ${isAuthed ? "checked" : ""}">
             ${isAuthed ? "🎖" : ""}
@@ -758,6 +771,13 @@ function renderSection(label, items, isEvent=false){
       ${hasNotif ? `<div class="garden-item-timer" id="timer-${CSS.escape(item.name)}"></div>` : ''}
     `;
 
+    // ★追加：check-btnのクリック処理
+    const checkBtn = div.querySelector(".check-btn");
+    checkBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleChecked(item.name);
+    });
+
     const authBtn = div.querySelector(".auth-btn");
     if(authBtn){
       authBtn.addEventListener("click", (e) => {
@@ -769,6 +789,7 @@ function renderSection(label, items, isEvent=false){
     div.onclick = () => openModal(item);
     grid.appendChild(div);
   });
+
 
   wrap.appendChild(grid);
   return wrap;
