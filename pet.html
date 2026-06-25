@@ -1,1 +1,1053 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<meta name="description" content="Heartopia(ハートピアスローライフ)のペット好物管理ツール。犬・猫のエサの好き嫌いを管理できます。">
+<meta property="og:title" content="はとぴ図鑑 | ペット好物">
+<meta property="og:description" content="犬・猫のエサの好き嫌いを管理できるツール">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#3c5a6e">
+<link rel="icon" type="image/png" sizes="48x48" href="images/favicon.PNG">
+<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.PNG">
+<title>はとぴ図鑑｜ペット好物</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+/* =====================
+   はとぴ図鑑 共通トークン
+===================== */
+:root {
+  --bg:        #eaf4f8;
+  --surface:   #ffffff;
+  --nav-bg:    #3c5a6e;
+  --nav-text:  #ffffff;
+  --accent:    #4a90a4;
+  --accent2:   #e07b4a;
+  --text-main: #2c3e50;
+  --text-sub:  #6b8a9a;
+  --border:    #d0e4ec;
+  --like-bg:   #d9f8e3;
+  --like-bd:   #7bd88f;
+  --dislike-bg:#ffd6d6;
+  --dislike-bd:#ff6b6b;
+  --given-bg:  #e8e8e8;
+  --radius:    14px;
+  --shadow:    0 2px 10px rgba(60,90,110,0.10);
+}
+body.dark {
+  --bg:        #1a2630;
+  --surface:   #243040;
+  --nav-bg:    #1e3040;
+  --accent:    #5aa8be;
+  --text-main: #ddeef5;
+  --text-sub:  #7fa8bb;
+  --border:    #2e4458;
+  --like-bg:   #1e4028;
+  --dislike-bg:#401e1e;
+  --given-bg:  #2a3540;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Mochiy Pop One", "Noto Sans JP", sans-serif;
+  background: var(--bg);
+  color: var(--text-main);
+  min-height: 100vh;
+}
+
+/* =====================
+   ナビゲーション（図鑑共通）
+===================== */
+.site-header {
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  padding: 12px 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.site-title {
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.header-actions button {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.header-actions button:hover { background: rgba(255,255,255,0.28); }
+
+.site-nav {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.site-nav::-webkit-scrollbar { display: none; }
+
+.site-nav a {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 8px 8px 0 0;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.site-nav a:hover { color: white; background: rgba(255,255,255,0.12); }
+.site-nav a.active {
+  color: var(--nav-bg);
+  background: var(--bg);
+  font-weight: bold;
+}
+
+/* =====================
+   コンテンツ
+===================== */
+.page-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px 12px 60px;
+}
+
+/* =====================
+   コントロールバー
+===================== */
+.control-bar {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 10px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.control-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--accent); }
+
+.ctrl-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  transition: all 0.12s;
+  white-space: nowrap;
+}
+.ctrl-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.ctrl-btn:active { transform: scale(0.96); }
+
+/* ペットセレクター */
+.pet-selector {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.pet-selector::-webkit-scrollbar { display: none; }
+
+.pet-tab {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.pet-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.pet-tab:active { transform: scale(0.95); }
+
+.type-select {
+  padding: 7px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 13px;
+}
+
+/* 進捗 */
+.progress-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.progress-label {
+  font-size: 12px;
+  color: var(--text-sub);
+  white-space: nowrap;
+}
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.3s;
+}
+
+/* =====================
+   グリッド & カード
+===================== */
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 360px) {
+  .food-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.food-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 2.5px solid transparent;
+  transition: border-color 0.15s, opacity 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+.food-card.like    { border-color: var(--like-bd); }
+.food-card.dislike { border-color: var(--dislike-bd); }
+.food-card.given   { opacity: 0.45; filter: grayscale(50%); }
+
+.food-card.pop { animation: pop 0.22s ease; }
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
+}
+
+.img-box {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  position: relative;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.img-box:active { transform: scale(0.96); transition: 0.08s; }
+
+.img-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 6px 3px 4px;
+  font-size: 9px;
+  color: white;
+  background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.card-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 3px;
+}
+.card-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 7px 0;
+  font-size: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.1s, transform 0.08s;
+}
+.card-btn:active { transform: scale(0.94); }
+.like-btn    { background: var(--like-bg);    color: #2a7a3a; }
+.dislike-btn { background: var(--dislike-bg); color: #a03030; }
+
+/* =====================
+   モーダル共通
+===================== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.modal.open { display: flex; }
+
+.modal-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 24px 20px;
+  width: min(88vw, 360px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+  position: relative;
+  animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: var(--bg);
+  border: none;
+  border-radius: 50%;
+  width: 28px; height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--border); }
+
+.modal-title {
+  font-size: 16px;
+  margin-bottom: 14px;
+  color: var(--accent);
+}
+
+.modal-card p, .modal-card li {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--text-main);
+}
+
+.modal-card button.full-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.modal-card button.full-btn:hover { background: #3a7a90; }
+.modal-card button.full-btn.danger {
+  background: #e05555;
+}
+.modal-card button.full-btn.secondary {
+  background: var(--bg);
+  color: var(--text-main);
+  border: 1.5px solid var(--border);
+  margin-top: 6px;
+}
+
+.modal-card textarea {
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 12px;
+  font-family: monospace;
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* フッター */
+.footer {
+  text-align: center;
+  padding: 30px 16px 20px;
+  font-size: 11px;
+  color: var(--text-sub);
+  border-top: 1px solid var(--border);
+  margin-top: 30px;
+}
+.footer a { color: var(--accent); text-decoration: none; }
+
+/* =====================
+   言語ボタングリッド
+===================== */
+.lang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+.lang-btn {
+  padding: 9px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text-main);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.lang-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+
+/* 移行ステップ */
+.migrate-step {
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-main);
+  border-left: 3px solid var(--accent);
+}
+.migrate-step strong { color: var(--accent); }
+
+.copy-btn {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 10px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== ヘッダー（図鑑共通） ===================== -->
+<header class="site-header">
+  <div class="header-top">
+    <span class="site-title">はとぴ図鑑</span>
+    <div class="header-actions">
+      <button onclick="openInfo()" title="情報">ℹ️</button>
+      <button id="darkBtn" onclick="toggleDark()" title="ダーク切替">🌙</button>
+    </div>
+  </div>
+  <nav class="site-nav">
+    <a href="index.html">図鑑</a>
+    <a href="foods.html">料理</a>
+    <a href="garden.html">園芸</a>
+    <a href="codes.html">コード</a>
+    <a href="events.html">イベント</a>
+    <a href="faq.html">Q&A</a>
+    <a href="pet.html" class="active">🐾 ペット</a>
+  </nav>
+</header>
+
+<!-- ===================== メイン ===================== -->
+<main class="page-wrap">
+
+  <!-- コントロールバー -->
+  <div class="control-bar">
+
+    <!-- ペットタブ + 追加 -->
+    <div class="control-row">
+      <div class="pet-selector" id="petSelector"></div>
+      <select id="petTypeSelect" class="type-select">
+        <option value="dog">🐶 犬</option>
+        <option value="cat">🐱 猫</option>
+      </select>
+      <button class="ctrl-btn" onclick="addPet()" title="ペット追加">＋</button>
+    </div>
+
+    <!-- 検索 + リセット -->
+    <div class="control-row">
+      <input id="searchInput" class="search-input" placeholder="エサを検索…" oninput="render()">
+      <button class="ctrl-btn" onclick="resetData()">🗑 リセット</button>
+    </div>
+
+    <!-- 進捗 -->
+    <div class="progress-bar-wrap">
+      <span class="progress-label" id="progressLabel">0 / 0</span>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+  </div>
+
+  <!-- エサグリッド -->
+  <div class="food-grid" id="foodGrid"></div>
+
+  <!-- フッター -->
+  <footer class="footer">
+    <p>本サイトではデータはブラウザ内（LocalStorage）のみで管理され、外部に送信されることはありません。</p>
+    <p style="margin-top:6px;">X（旧Twitter）：<a href="https://x.com/_ram1x?s=21" target="_blank">@_Ram1x</a></p>
+    <p style="margin-top:8px; font-size:10px; opacity:0.6;">本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。</p>
+  </footer>
+
+</main>
+
+<!-- ===================== モーダル：情報 / データ移行 ===================== -->
+<div class="modal" id="infoModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('infoModal')">✕</button>
+    <div class="modal-title">🐾 ペット好物について</div>
+
+    <p>犬・猫ごとにエサの好き/嫌いを管理できます。<br>
+    画像タップ → あげた記録<br>
+    🟢 好き / 🔴 嫌い ボタンで記録。</p>
+
+    <hr style="margin:14px 0; border:none; border-top:1px solid var(--border)">
+
+    <div class="modal-title" style="margin-top:0;">📦 旧サイトからデータ移行</div>
+    <p style="font-size:12px; color:var(--text-sub);">heartopia-petfood.com で保存したデータをこちらに取り込めます。</p>
+
+    <div class="migrate-step">
+      <strong>STEP 1</strong>　旧サイトを開きエクスポート<br>
+      <a href="https://heartopia-petfood.com" target="_blank" style="color:var(--accent); font-size:12px;">heartopia-petfood.com を開く →</a>
+    </div>
+
+    <div class="migrate-step">
+      <strong>STEP 2</strong>　旧サイトのブラウザコンソールで下記を実行し、表示されたJSONをコピー<br>
+      <code style="font-size:10px; word-break:break-all; color:var(--text-sub);">copy(JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('pet_')||k==='pets').map(k=>[k,localStorage.getItem(k)]))))</code>
+      <button class="copy-btn" onclick="copyExportScript()">スクリプトをコピー</button>
+    </div>
+
+    <div class="migrate-step">
+      <strong>STEP 3</strong>　下のテキストエリアにJSONを貼り付けてインポート
+    </div>
+
+    <textarea id="importJson" placeholder='{"pets":"[...]","pet_1234_dog_0":"..."} ← ここに貼り付け'></textarea>
+
+    <button class="full-btn" onclick="importData()">📥 インポート実行</button>
+    <button class="full-btn secondary" onclick="exportData()">📤 このサイトのデータをエクスポート</button>
+    <button class="full-btn danger" onclick="closeModal('infoModal')">閉じる</button>
+  </div>
+</div>
+
+<!-- 言語モーダル -->
+<div class="modal" id="langModal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('langModal')">✕</button>
+    <div class="modal-title">🌐 言語 / Language</div>
+    <div class="lang-grid">
+      <button class="lang-btn" onclick="setLang('jp')">🇯🇵 日本語</button>
+      <button class="lang-btn" onclick="setLang('en')">🇺🇸 English</button>
+      <button class="lang-btn" onclick="setLang('zh_cn')">🇨🇳 简体中文</button>
+      <button class="lang-btn" onclick="setLang('zh_tw')">🇹🇼 繁體中文</button>
+      <button class="lang-btn" onclick="setLang('ko')">🇰🇷 한국어</button>
+      <button class="lang-btn" onclick="setLang('th')">🇹🇭 ไทย</button>
+      <button class="lang-btn" onclick="setLang('tl')">🇵🇭 Filipino</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== データ ===================== */
+const dogFoods = [
+{name:{jp:"動物汎用エサ",en:"Generic Feed",zh_cn:"通用饲料",zh_tw:"通用飼料",ko:"범용 사료",th:"อาหารทั่วไป",tl:"Pangkalahatang pagkain"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/001.PNG"},
+{name:{jp:"ドッグフード",en:"Dog Food",zh_cn:"狗粮",zh_tw:"狗糧",ko:"강아지 사료",th:"อาหารสุนัข",tl:"Pagkain ng aso"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/002.PNG"},
+{name:{jp:"ヒラタケ",en:"Oyster Mushroom",zh_cn:"平菇",zh_tw:"平菇",ko:"느타리버섯",th:"เห็ดนางรม",tl:"Oyster mushroom"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/003.PNG"},
+{name:{jp:"シイタケ",en:"Shiitake",zh_cn:"香菇",zh_tw:"香菇",ko:"표고버섯",th:"เห็ดชิตาเกะ",tl:"Shiitake"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/004.PNG"},
+{name:{jp:"マッシュルーム",en:"Mushroom",zh_cn:"蘑菇",zh_tw:"蘑菇",ko:"양송이버섯",th:"เห็ด",tl:"Kabute"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/005.PNG"},
+{name:{jp:"リンゴ",en:"Apple",zh_cn:"苹果",zh_tw:"蘋果",ko:"사과",th:"แอปเปิล",tl:"Mansanas"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/006.PNG"},
+{name:{jp:"田園サラダ",en:"Country Salad",zh_cn:"田园沙拉",zh_tw:"田園沙拉",ko:"컨트리 샐러드",th:"สลัดชนบท",tl:"Country salad"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/007.PNG"},
+{name:{jp:"ミックスジャム",en:"Mixed Jam",zh_cn:"混合果酱",zh_tw:"混合果醬",ko:"믹스 잼",th:"แยมรวม",tl:"Mixed jam"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/008.PNG"},
+{name:{jp:"ラズベリージャム",en:"Raspberry Jam",zh_cn:"覆盆子果酱",zh_tw:"覆盆子果醬",ko:"라즈베리 잼",th:"แยมราสเบอร์รี่",tl:"Raspberry jam"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/009.PNG"},
+{name:{jp:"トマトソース",en:"Tomato Sauce",zh_cn:"番茄酱",zh_tw:"番茄醬",ko:"토마토 소스",th:"ซอสมะเขือเทศ",tl:"Tomato sauce"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/010.PNG"},
+{name:{jp:"ブルーベリージャム",en:"Blueberry Jam",zh_cn:"蓝莓果酱",zh_tw:"藍莓果醬",ko:"블루베리 잼",th:"แยมบลูเบอร์รี่",tl:"Blueberry jam"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/011.PNG"},
+{name:{jp:"リンゴジャム",en:"Apple Jam",zh_cn:"苹果果酱",zh_tw:"蘋果果醬",ko:"사과 잼",th:"แยมแอปเปิล",tl:"Apple jam"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/012.PNG"},
+{name:{jp:"イチゴジャム",en:"Strawberry Jam",zh_cn:"草莓果酱",zh_tw:"草莓果醬",ko:"딸기 잼",th:"แยมสตรอว์เบอร์รี่",tl:"Strawberry jam"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/013.PNG"},
+{name:{jp:"キノコパイ",en:"Mushroom Pie",zh_cn:"蘑菇派",zh_tw:"蘑菇派",ko:"버섯 파이",th:"พายเห็ด",tl:"Mushroom pie"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/014.PNG"},
+{name:{jp:"マッシュルームパイ",en:"Mushroom Pie",zh_cn:"蘑菇派",zh_tw:"蘑菇派",ko:"버섯 파이",th:"พายเห็ด",tl:"Mushroom pie"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/017.PNG"},
+{name:{jp:"シイタケパイ",en:"Shiitake Pie",zh_cn:"香菇派",zh_tw:"香菇派",ko:"표고 파이",th:"พายเห็ดชิตาเกะ",tl:"Shiitake pie"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/016.PNG"},
+{name:{jp:"ヒラタケパイ",en:"Oyster Mushroom Pie",zh_cn:"平菇派",zh_tw:"平菇派",ko:"느타리 파이",th:"พายเห็ดนางรม",tl:"Oyster mushroom pie"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/015.PNG"},
+{name:{jp:"焼きキノコ",en:"Grilled Mushrooms",zh_cn:"烤蘑菇",zh_tw:"烤蘑菇",ko:"구운 버섯",th:"เห็ดย่าง",tl:"Inihaw na kabute"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/018.PNG"},
+{name:{jp:"焼きヒラタケ",en:"Grilled Oyster Mushroom",zh_cn:"烤平菇",zh_tw:"烤平菇",ko:"구운 느타리",th:"เห็ดนางรมย่าง",tl:"Inihaw na oyster mushroom"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/019.PNG"},
+{name:{jp:"焼きシイタケ",en:"Grilled Shiitake",zh_cn:"烤香菇",zh_tw:"烤香菇",ko:"구운 표고",th:"เห็ดชิตาเกะย่าง",tl:"Inihaw na shiitake"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/020.PNG"},
+{name:{jp:"焼きマッシュルーム",en:"Grilled Mushroom",zh_cn:"烤蘑菇",zh_tw:"烤蘑菇",ko:"구운 양송이",th:"เห็ดย่าง",tl:"Inihaw na kabute"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/021.PNG"},
+{name:{jp:"シーフードリゾート",en:"Seafood Risotto",zh_cn:"海鲜烩饭",zh_tw:"海鮮燉飯",ko:"해산물 리조또",th:"รีซอตโตทะเล",tl:"Seafood risotto"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/022.PNG"},
+{name:{jp:"カントリー風煮込み",en:"Country Stew",zh_cn:"乡村炖菜",zh_tw:"鄉村燉菜",ko:"컨트리 스튜",th:"สตูว์ชนบท",tl:"Country stew"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/023.PNG"},
+{name:{jp:"ミートソースパスタ",en:"Meat Sauce Pasta",zh_cn:"肉酱意面",zh_tw:"肉醬義大利麵",ko:"미트소스 파스타",th:"พาสต้าเนื้อ",tl:"Pasta na may meat sauce"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/024.PNG"},
+{name:{jp:"コーンポタージュ",en:"Corn Soup",zh_cn:"玉米浓汤",zh_tw:"玉米濃湯",ko:"옥수수 스프",th:"ซุปข้าวโพด",tl:"Corn soup"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/025.PNG"},
+{name:{jp:"豪華海鮮盛り合わせ",en:"Seafood Platter",zh_cn:"豪华海鲜拼盘",zh_tw:"豪華海鮮拼盤",ko:"해산물 모둠",th:"ซีฟู้ดรวม",tl:"Seafood platter"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/026.PNG"},
+{name:{jp:"ミートバーガー",en:"Meat Burger",zh_cn:"肉汉堡",zh_tw:"肉漢堡",ko:"고기 버거",th:"เบอร์เกอร์เนื้อ",tl:"Meat burger"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/027.PNG"},
+{name:{jp:"ナスとひき肉の炒め物",en:"Eggplant & Minced Meat",zh_cn:"茄子炒肉末",zh_tw:"茄子炒肉末",ko:"가지 다진고기 볶음",th:"ผัดมะเขือกับหมูสับ",tl:"Ginisang talong"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/028.PNG"},
+{name:{jp:"蒸しタラバガニ",en:"Steamed King Crab",zh_cn:"清蒸帝王蟹",zh_tw:"清蒸帝王蟹",ko:"찐 킹크랩",th:"ปูคิงแครบ",tl:"Steamed king crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/029.PNG"},
+{name:{jp:"蒸し黄金タラバガニ",en:"Golden King Crab",zh_cn:"黄金帝王蟹",zh_tw:"黃金帝王蟹",ko:"황금 킹크랩",th:"ปูทอง",tl:"Golden king crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/030.PNG"},
+{name:{jp:"大根おろし肉",en:"Grated Radish Meat",zh_cn:"萝卜泥肉",zh_tw:"蘿蔔泥肉",ko:"무 고기 요리",th:"เนื้อกับหัวไชเท้า",tl:"Karne na may labanos"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/031.PNG"},
+{name:{jp:"大根クリームポタージュ",en:"Radish Cream Soup",zh_cn:"萝卜奶油汤",zh_tw:"蘿蔔奶油湯",ko:"무 크림 스프",th:"ซุปหัวไชเท้า",tl:"Radish cream soup"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/032.PNG"}
+];
+
+const catFoods = [
+{name:{jp:"動物汎用エサ",en:"Animal Feed",zh_cn:"动物饲料",zh_tw:"動物飼料",ko:"동물 사료",th:"อาหารสัตว์",tl:"Pagkain ng hayop"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/001.PNG"},
+{name:{jp:"キャットフード",en:"Cat Food",zh_cn:"猫粮",zh_tw:"貓糧",ko:"고양이 사료",th:"อาหารแมว",tl:"Cat food"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/033.PNG"},
+{name:{jp:"ヨーロピアンパーチ",en:"European Perch",zh_cn:"欧洲鲈鱼",zh_tw:"歐洲鱸魚",ko:"유럽 농어",th:"ปลาคอนยุโรป",tl:"European perch"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/034.PNG"},
+{name:{jp:"チャブ",en:"Chub",zh_cn:"鲢鱼",zh_tw:"白魚",ko:"처브",th:"ปลาชับ",tl:"Chub"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/036.PNG"},
+{name:{jp:"シマドジョウ",en:"Loach",zh_cn:"泥鳅",zh_tw:"泥鰍",ko:"미꾸라지",th:"ปลาช่อนนา",tl:"Loach"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/037.PNG"},
+{name:{jp:"バーベル",en:"Barbel",zh_cn:"须鲤",zh_tw:"鬚鯉",ko:"바벨",th:"ปลาบาร์เบล",tl:"Barbel"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/038.PNG"},
+{name:{jp:"ダヌープストレバー",en:"Danube Sturgeon",zh_cn:"多瑙河鲟",zh_tw:"多瑙河鱘",ko:"다뉴브 철갑상어",th:"ปลาสเตอร์เจียน",tl:"Sturgeon"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/039.PNG"},
+{name:{jp:"ミノー",en:"Minnow",zh_cn:"小鱼",zh_tw:"小魚",ko:"미노우",th:"ปลาตัวเล็ก",tl:"Minnow"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/040.PNG"},
+{name:{jp:"ティラピア",en:"Tilapia",zh_cn:"罗非鱼",zh_tw:"羅非魚",ko:"틸라피아",th:"ปลานิล",tl:"Tilapia"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/041.PNG"},
+{name:{jp:"テンチ",en:"Tench",zh_cn:"丁鱥",zh_tw:"丁鱥",ko:"텐치",th:"ปลาเทนช์",tl:"Tench"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/042.PNG"},
+{name:{jp:"ホワイトフィッシュ",en:"Whitefish",zh_cn:"白鱼",zh_tw:"白魚",ko:"화이트피쉬",th:"ปลาขาว",tl:"Whitefish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/043.PNG"},
+{name:{jp:"マブナ",en:"Crucian Carp",zh_cn:"鲫鱼",zh_tw:"鯽魚",ko:"붕어",th:"ปลาคาร์พ",tl:"Carp"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/044.PNG"},
+{name:{jp:"ブリーク",en:"Bleak",zh_cn:"白条鱼",zh_tw:"白條魚",ko:"블릭",th:"ปลาเบลค",tl:"Bleak"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/045.PNG"},
+{name:{jp:"シュナイダー",en:"Schneider Fish",zh_cn:"施耐德鱼",zh_tw:"施耐德魚",ko:"슈나이더",th:"ปลาシュナイダー",tl:"Schneider"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/046.PNG"},
+{name:{jp:"コウライエビ",en:"Kuruma Shrimp",zh_cn:"斑节虾",zh_tw:"斑節蝦",ko:"중하",th:"กุ้งกุลาดำ",tl:"Shrimp"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/047.PNG"},
+{name:{jp:"ニシイワシ",en:"Sardine",zh_cn:"沙丁鱼",zh_tw:"沙丁魚",ko:"정어리",th:"ปลาซาร์ดีน",tl:"Sardine"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/048.PNG"},
+{name:{jp:"スズキ",en:"Sea Bass",zh_cn:"海鲈鱼",zh_tw:"海鱸魚",ko:"농어",th:"ปลากะพง",tl:"Sea Bass"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/049.PNG"},
+{name:{jp:"カツオ",en:"Bonito",zh_cn:"鲣鱼",zh_tw:"鰹魚",ko:"가다랑어",th:"ปลาโอ",tl:"Bonito"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/050.PNG"},
+{name:{jp:"タチウオ",en:"Cutlassfish",zh_cn:"带鱼",zh_tw:"帶魚",ko:"갈치",th:"ปลาดาบ",tl:"Cutlassfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/051.PNG"},
+{name:{jp:"ウミエビ",en:"Sea Shrimp",zh_cn:"海虾",zh_tw:"海蝦",ko:"바다새우",th:"กุ้งทะเล",tl:"Shrimp"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/052.PNG"},
+{name:{jp:"マアジ",en:"Horse Mackerel",zh_cn:"竹荚鱼",zh_tw:"竹筴魚",ko:"전갱이",th:"ปลาทู",tl:"Mackerel"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/053.PNG"},
+{name:{jp:"カイブツギンザメ",en:"Chimaera",zh_cn:"银鲛",zh_tw:"銀鮫",ko:"키메라",th:"ปลาฉลามผี",tl:"Chimaera"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/054.PNG"},
+{name:{jp:"ウミトゲウオ",en:"Stickleback",zh_cn:"刺鱼",zh_tw:"刺魚",ko:"가시고기",th:"ปลาหนาม",tl:"Stickleback"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/055.PNG"},
+{name:{jp:"ストライプトレッドマレット",en:"Striped Mullet",zh_cn:"条纹鲻鱼",zh_tw:"條紋鯔魚",ko:"줄무늬 숭어",th:"ปลากระบอกลาย",tl:"Mullet"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/056.PNG"},
+{name:{jp:"イシドジョウ",en:"Stone Loach",zh_cn:"石泥鳅",zh_tw:"石泥鰍",ko:"돌미꾸라지",th:"ปลาช่อนหิน",tl:"Loach"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/057.PNG"},
+{name:{jp:"マッドサンフィッシュ",en:"Mud Sunfish",zh_cn:"泥太阳鱼",zh_tw:"泥太陽魚",ko:"머드 선피시",th:"ปลาซันฟิชโคลน",tl:"Sunfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/058.PNG"},
+{name:{jp:"キュウリウオ",en:"Smelt",zh_cn:"胡瓜鱼",zh_tw:"胡瓜魚",ko:"빙어",th:"ปลากลิ่นแตง",tl:"Smelt"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/059.PNG"},
+{name:{jp:"ラッフ",en:"Ruffe",zh_cn:"欧鳜",zh_tw:"歐鱸",ko:"러프",th:"ปลารัฟฟ์",tl:"Ruffe"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/060.PNG"},
+{name:{jp:"フランスアジ",en:"French Jack",zh_cn:"法国鲹鱼",zh_tw:"法國鯵魚",ko:"프랑스 전갱이",th:"ปลาทูฝรั่งเศส",tl:"Jack fish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/061.PNG"},
+{name:{jp:"タツノオトシゴ",en:"Seahorse",zh_cn:"海马",zh_tw:"海馬",ko:"해마",th:"ม้าน้ำ",tl:"Seahorse"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/062.PNG"},
+{name:{jp:"アンコウ",en:"Anglerfish",zh_cn:"鮟鱇鱼",zh_tw:"鮟鱇魚",ko:"아귀",th:"ปลาอังเกลอร์",tl:"Anglerfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/063.PNG"},
+{name:{jp:"イガイ",en:"Mussel",zh_cn:"贻贝",zh_tw:"貽貝",ko:"홍합",th:"หอยแมลงภู่",tl:"Mussel"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/064.PNG"},
+{name:{jp:"パイクパーチ",en:"Pike Perch",zh_cn:"梭鲈",zh_tw:"梭鱸",ko:"파이크 퍼치",th:"ปลาพาइक",tl:"Perch"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/065.PNG"},
+{name:{jp:"オタマジャクシ",en:"Tadpole",zh_cn:"蝌蚪",zh_tw:"蝌蚪",ko:"올챙이",th:"ลูกอ๊อด",tl:"Tadpole"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/066.PNG"},
+{name:{jp:"北欧アカザエビ",en:"Nordic Lobster",zh_cn:"北欧红龙虾",zh_tw:"北歐紅龍蝦",ko:"노르딕 랍스터",th:"กุ้งล็อบสเตอร์ยุโรป",tl:"Lobster"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/067.PNG"},
+{name:{jp:"マダコ",en:"Octopus",zh_cn:"章鱼",zh_tw:"章魚",ko:"문어",th:"ปลาหมึกยักษ์",tl:"Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/068.PNG"},
+{name:{jp:"タイセイヨウサケ",en:"Atlantic Salmon",zh_cn:"大西洋鲑鱼",zh_tw:"大西洋鮭魚",ko:"대서양 연어",th:"ปลาแซลมอนแอตแลนติก",tl:"Salmon"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/069.PNG"},
+{name:{jp:"ピグミータコ",en:"Pygmy Octopus",zh_cn:"小型章鱼",zh_tw:"小型章魚",ko:"피그미 문어",th:"หมึกตัวเล็ก",tl:"Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/070.PNG"},
+{name:{jp:"ヤドカリ",en:"Hermit Crab",zh_cn:"寄居蟹",zh_tw:"寄居蟹",ko:"소라게",th:"ปูเสฉวน",tl:"Hermit crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/071.PNG"},
+{name:{jp:"カクレクマノミ",en:"Clownfish",zh_cn:"小丑鱼",zh_tw:"小丑魚",ko:"흰동가리",th:"ปลาการ์ตูน",tl:"Clownfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/072.PNG"},
+{name:{jp:"オオクチバス",en:"Largemouth Bass",zh_cn:"大口黑鲈",zh_tw:"大口黑鱸",ko:"큰입배스",th:"ปลากะพงปากใหญ่",tl:"Bass"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/073.PNG"},
+{name:{jp:"ヨーロッパコイ",en:"Common Carp",zh_cn:"鲤鱼",zh_tw:"鯉魚",ko:"잉어",th:"ปลาคาร์พ",tl:"Carp"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/074.PNG"},
+{name:{jp:"カワメンタイ",en:"Burbot",zh_cn:"江鳕",zh_tw:"江鱈",ko:"버봇",th:"ปลาบูร์บอต",tl:"Burbot"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/075.PNG"},
+{name:{jp:"ハゼ",en:"Goby",zh_cn:"虾虎鱼",zh_tw:"蝦虎魚",ko:"망둑어",th:"ปลาบู่",tl:"Goby"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/076.PNG"},
+{name:{jp:"サワガニ",en:"Freshwater Crab",zh_cn:"淡水蟹",zh_tw:"淡水蟹",ko:"민물게",th:"ปูน้ำจืด",tl:"Crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/077.PNG"},
+{name:{jp:"イシビラメ",en:"Turbot",zh_cn:"比目鱼",zh_tw:"比目魚",ko:"가자미",th:"ปลาลิ้นหมา",tl:"Flatfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/078.PNG"},
+{name:{jp:"ヨーロッパヒラメ",en:"European Flounder",zh_cn:"欧洲比目鱼",zh_tw:"歐洲比目魚",ko:"유럽 가자미",th:"ปลาลิ้นหมายุโรป",tl:"Flounder"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/079.PNG"},
+{name:{jp:"レッドベリーピラニア",en:"Red-bellied Piranha",zh_cn:"红腹食人鱼",zh_tw:"紅腹食人魚",ko:"피라냐",th:"ปลาปิรันย่า",tl:"Piranha"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/080.PNG"},
+{name:{jp:"バタフライコイ",en:"Butterfly Koi",zh_cn:"锦鲤",zh_tw:"錦鯉",ko:"나비 잉어",th:"ปลาคาร์พแฟนซี",tl:"Koi"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/081.PNG"},
+{name:{jp:"カワギンポ",en:"Blenny",zh_cn:"鳚鱼",zh_tw:"鳚魚",ko:"블레니",th:"ปลาบลินนี",tl:"Blenny"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/082.PNG"},
+{name:{jp:"マス",en:"Trout",zh_cn:"鳟鱼",zh_tw:"鱒魚",ko:"송어",th:"ปลาเทราต์",tl:"Trout"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/083.PNG"},
+{name:{jp:"ラッド",en:"Rudd",zh_cn:"红鳍鲮",zh_tw:"紅鰭鱮",ko:"러드",th:"ปลารัดด์",tl:"Rudd"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/084.PNG"},
+{name:{jp:"タイセイヨウサバ",en:"Atlantic Mackerel",zh_cn:"大西洋鲭鱼",zh_tw:"大西洋鯖魚",ko:"대서양 고등어",th:"ปลาซาบะแอตแลนติก",tl:"Mackerel"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/085.PNG"},
+{name:{jp:"ヨーロッパロブスター",en:"European Lobster",zh_cn:"欧洲龙虾",zh_tw:"歐洲龍蝦",ko:"유럽 랍스터",th:"ล็อบสเตอร์ยุโรป",tl:"Lobster"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/086.PNG"},
+{name:{jp:"ヨーロッパスルメイカ",en:"European Squid",zh_cn:"欧洲鱿鱼",zh_tw:"歐洲魷魚",ko:"유럽 오징어",th:"ปลาหมึกยุโรป",tl:"Squid"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/087.PNG"},
+{name:{jp:"フグ",en:"Pufferfish",zh_cn:"河豚",zh_tw:"河豚",ko:"복어",th:"ปลาปักเป้า",tl:"Pufferfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/089.PNG"},
+{name:{jp:"シロザケ",en:"Chum Salmon",zh_cn:"狗鲑",zh_tw:"狗鮭",ko:"백연어",th:"ปลาแซลมอนชัม",tl:"Salmon"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/090.PNG"},
+{name:{jp:"カワヒメマス",en:"Arctic Char",zh_cn:"北极红点鲑",zh_tw:"北極紅點鮭",ko:"북극이빨고기",th:"ปลาอาร์กติกชาร์",tl:"Char"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/091.PNG"},
+{name:{jp:"タフ・ガーナード",en:"Gurnard",zh_cn:"红鲉",zh_tw:"紅鮋",ko:"거너드",th:"ปลากันนาร์ด",tl:"Gurnard"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/092.PNG"},
+{name:{jp:"イトヨ",en:"Three-spined Stickleback",zh_cn:"三刺鱼",zh_tw:"三刺魚",ko:"가시고기",th:"ปลาหนามสามแฉก",tl:"Stickleback"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/093.PNG"},
+{name:{jp:"アプロケイルス",en:"Aplocheilus",zh_cn:"青鳉鱼",zh_tw:"青鱂魚",ko:"아프로케일루스",th:"ปลาน้ำจืดเล็ก",tl:"Killifish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/094.PNG"},
+{name:{jp:"カジカ",en:"Sculpin",zh_cn:"杜父鱼",zh_tw:"杜父魚",ko:"카지카",th:"ปลากระเบนเล็ก",tl:"Sculpin"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/095.PNG"},
+{name:{jp:"リュウグウノツカイ",en:"Oarfish",zh_cn:"皇带鱼",zh_tw:"皇帶魚",ko:"산갈치",th:"ปลาออร์ฟิช",tl:"Oarfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/096.PNG"},
+{name:{jp:"スペインダイ",en:"Red Seabream",zh_cn:"红鲷鱼",zh_tw:"紅鯛魚",ko:"참돔",th:"ปลากะพงแดง",tl:"Sea bream"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/097.PNG"},
+{name:{jp:"ヨーロッパウナギ",en:"European Eel",zh_cn:"欧洲鳗鱼",zh_tw:"歐洲鰻魚",ko:"유럽 장어",th:"ปลาไหลยุโรป",tl:"Eel"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/098.PNG"},
+{name:{jp:"黄金タラバガニ",en:"Golden King Crab",zh_cn:"黄金帝王蟹",zh_tw:"黃金帝王蟹",ko:"황금 대게",th:"ปูยักษ์ทอง",tl:"King crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/099.PNG"},
+{name:{jp:"マッドミノー",en:"Mud Minnow",zh_cn:"泥鳉鱼",zh_tw:"泥鰷魚",ko:"머드 미노우",th:"ปลาตัวเล็กโคลน",tl:"Minnow"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/100.PNG"},
+{name:{jp:"北欧ブルーアカザエビ",en:"Nordic Blue Shrimp",zh_cn:"北欧蓝虾",zh_tw:"北歐藍蝦",ko:"북유럽 블루 새우",th:"กุ้งสีน้ำเงินนอร์ดิก",tl:"Nordic Blue Shrimp"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/101.PNG"},
+{name:{jp:"キンギョ",en:"Goldfish",zh_cn:"金鱼",zh_tw:"金魚",ko:"금붕어",th:"ปลาทอง",tl:"Goldfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/102.PNG"},
+{name:{jp:"タラバガニ",en:"King Crab",zh_cn:"帝王蟹",zh_tw:"帝王蟹",ko:"킹크랩",th:"ปูคิงแครบ",tl:"King Crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/103.PNG"},
+{name:{jp:"モンツキダラ",en:"Haddock",zh_cn:"黑线鳕",zh_tw:"黑線鱈",ko:"대구류",th:"ปลาฮัดด็อก",tl:"Haddock"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/104.PNG"},
+{name:{jp:"ノーザンパイク",en:"Northern Pike",zh_cn:"北梭鱼",zh_tw:"北梭魚",ko:"노던 파이크",th:"ปลาหอกเหนือ",tl:"Northern Pike"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/105.PNG"},
+{name:{jp:"パンプキンシード",en:"Pumpkinseed Sunfish",zh_cn:"南瓜籽鱼",zh_tw:"南瓜籽魚",ko:"펌킨시드",th:"ปลาพัมพ์คินซีด",tl:"Pumpkinseed"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/106.PNG"},
+{name:{jp:"ドナウイトウ",en:"Danube Salmon",zh_cn:"多瑙鲑",zh_tw:"多瑙鮭",ko:"다뉴브 연어",th:"ปลาแซลมอนดานูบ",tl:"Danube Salmon"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/107.PNG"},
+{name:{jp:"ミナミマグロ",en:"Southern Bluefin Tuna",zh_cn:"南方蓝鳍金枪鱼",zh_tw:"南方黑鮪魚",ko:"남방참다랑어",th:"ปลาทูน่าครีบน้ำเงินใต้",tl:"Southern Bluefin Tuna"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/108.PNG"},
+{name:{jp:"マンボウ",en:"Ocean Sunfish",zh_cn:"翻车鱼",zh_tw:"翻車魚",ko:"개복치",th:"ปลาแสงอาทิตย์",tl:"Sunfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/109.PNG"},
+{name:{jp:"アカマンボウ",en:"Opah",zh_cn:"月鱼",zh_tw:"月魚",ko:"오파",th:"ปลาโอปาห์",tl:"Opah"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/110.PNG"},
+{name:{jp:"ヨーロッパナマズ",en:"Wels Catfish",zh_cn:"欧洲鲶鱼",zh_tw:"歐洲鯰魚",ko:"유럽 메기",th:"ปลาดุกยุโรป",tl:"Wels Catfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/111.PNG"},
+{name:{jp:"ブルーギル",en:"Bluegill",zh_cn:"蓝鳃太阳鱼",zh_tw:"藍鰓太陽魚",ko:"블루길",th:"ปลาบลูกิล",tl:"Bluegill"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/112.PNG"},
+{name:{jp:"ホッキョクイワナ",en:"Arctic Char Trout",zh_cn:"北极红点鲑",zh_tw:"北極紅點鮭",ko:"북극송어",th:"ปลาอาร์กติกเทราต์",tl:"Arctic Char"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/113.PNG"},
+{name:{jp:"メカジキ",en:"Swordfish",zh_cn:"剑鱼",zh_tw:"劍魚",ko:"황새치",th:"ปลากระโทงดาบ",tl:"Swordfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/114.PNG"},
+{name:{jp:"氷晶のタラバガニ",en:"Ice Crystal King Crab",zh_cn:"冰晶帝王蟹",zh_tw:"冰晶帝王蟹",ko:"빙결 킹크랩",th:"ปูคิงคริสตัลน้ำแข็ง",tl:"Ice King Crab"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/115.PNG"},
+{name:{jp:"氷晶のマンボウ",en:"Ice Sunfish",zh_cn:"冰晶翻车鱼",zh_tw:"冰晶翻車魚",ko:"빙결 개복치",th:"ปลาแสงอาทิตย์น้ำแข็ง",tl:"Ice Sunfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/116.PNG"},
+{name:{jp:"氷晶のフグ",en:"Ice Pufferfish",zh_cn:"冰晶河豚",zh_tw:"冰晶河豚",ko:"빙결 복어",th:"ปลาปักเป้าน้ำแข็ง",tl:"Ice Pufferfish"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/117.PNG"},
+{name:{jp:"氷晶のタツノオトシゴ",en:"Ice Seahorse",zh_cn:"冰晶海马",zh_tw:"冰晶海馬",ko:"빙결 해마",th:"ม้าน้ำคริสตัลน้ำแข็ง",tl:"Ice Seahorse"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/118.PNG"},
+{name:{jp:"氷晶のジンベエザメ",en:"Ice Whale Shark",zh_cn:"冰晶鲸鲨",zh_tw:"冰晶鯨鯊",ko:"빙결 고래상어",th:"ฉลามวาฬน้ำแข็ง",tl:"Ice Whale Shark"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/119.PNG"},
+{name:{jp:"紺色帽のディレクタコ",en:"Director Octopus (Navy)",zh_cn:"导演章鱼（海军帽）",zh_tw:"導演章魚（海軍帽）",ko:"감독 문어(네이비)",th:"หมึกผู้กำกับ (หมวกน้ำเงิน)",tl:"Director Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/120.PNG"},
+{name:{jp:"茶色帽のディレクタコ",en:"Director Octopus (Brown)",zh_cn:"导演章鱼（棕帽）",zh_tw:"導演章魚（棕帽）",ko:"감독 문어(갈색)",th:"หมึกผู้กำกับ (หมวกน้ำตาล)",tl:"Director Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/121.PNG"},
+{name:{jp:"青色帽のディレクタコ",en:"Director Octopus (Blue)",zh_cn:"导演章鱼（蓝帽）",zh_tw:"導演章魚（藍帽）",ko:"감독 문어(파랑)",th:"หมึกผู้กำกับ (หมวกฟ้า)",tl:"Director Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/122.PNG"},
+{name:{jp:"褐色帽のディレクタマダコ",en:"Director Octopus (Brown V.)",zh_cn:"导演章鱼（褐色）",zh_tw:"導演章魚（褐色）",ko:"감독 문어(갈색 변형)",th:"หมึกผู้กำกับ (สีน้ำตาล)",tl:"Director Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/123.PNG"},
+{name:{jp:"柄帽のディレクタマダコ",en:"Director Octopus (Pattern)",zh_cn:"导演章鱼（花纹帽）",zh_tw:"導演章魚（花紋帽）",ko:"감독 문어(무늬)",th:"หมึกผู้กำกับ (ลาย)",tl:"Director Octopus"},img:"https://raw.githubusercontent.com/Ram1x0/dog-cheak/main/images/124.PNG"}
+];
+
+/* ===================== 状態管理 ===================== */
+// LocalStorageキープレフィックス（旧サイトと同じ形式）
+// pets → JSON配列
+// pet_{id}_{type}_{index} → {like, dislike, given}
+
+let lang = localStorage.getItem("pet_lang") || "jp";
+let darkMode = JSON.parse(localStorage.getItem("darkMode") || "false");
+let soundOn = JSON.parse(localStorage.getItem("soundOn") ?? "true");
+
+let pets = [];
+let currentPet = null;
+let state = [];
+
+// タブ長押し用タイマー
+let pressTimers = {};
+let tapTimers   = {};
+
+function loadPets() {
+  const saved = localStorage.getItem("pets");
+  try {
+    pets = saved ? JSON.parse(saved) : [];
+  } catch(e) { pets = []; }
+
+  if (pets.length === 0) {
+    pets = [{ id: Date.now(), name: "ペット1", type: "dog" }];
+    savePets();
+  }
+  currentPet = pets[0].id;
+}
+
+function savePets() {
+  localStorage.setItem("pets", JSON.stringify(pets));
+}
+
+function loadState() {
+  const pet = pets.find(p => p.id === currentPet);
+  if (!pet) return;
+  const foods = pet.type === "dog" ? dogFoods : catFoods;
+  state = [];
+  for (let i = 0; i < foods.length; i++) {
+    const raw = localStorage.getItem(`pet_${currentPet}_${pet.type}_${i}`);
+    try {
+      state[i] = raw ? JSON.parse(raw) : { like:false, dislike:false, given:false };
+    } catch(e) {
+      state[i] = { like:false, dislike:false, given:false };
+    }
+  }
+}
+
+function saveState(i) {
+  const pet = pets.find(p => p.id === currentPet);
+  if (!pet) return;
+  localStorage.setItem(`pet_${currentPet}_${pet.type}_${i}`, JSON.stringify(state[i]));
+}
+
+/* ===================== 描画 ===================== */
+function renderPets() {
+  const sel = document.getElementById("petSelector");
+  sel.innerHTML = "";
+  pets.forEach((p, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "pet-tab" + (p.id === currentPet ? " active" : "");
+    btn.textContent = (p.type === "dog" ? "🐶" : "🐱") + " " + p.name;
+
+    // 長押しで削除
+    btn.addEventListener("pointerdown", () => {
+      pressTimers[p.id] = setTimeout(() => deletePet(p.id), 700);
+    });
+    ["pointerup","pointerleave","pointercancel"].forEach(ev =>
+      btn.addEventListener(ev, () => clearTimeout(pressTimers[p.id]))
+    );
+
+    // ダブルタップで名前変更 / シングルで切替
+    btn.addEventListener("click", () => {
+      if (tapTimers[p.id]) {
+        clearTimeout(tapTimers[p.id]);
+        tapTimers[p.id] = null;
+        const n = prompt("名前変更", p.name);
+        if (n && n.trim()) { pets[idx].name = n.trim(); savePets(); renderPets(); }
+      } else {
+        tapTimers[p.id] = setTimeout(() => {
+          currentPet = p.id;
+          loadState();
+          renderPets();
+          render();
+          tapTimers[p.id] = null;
+        }, 260);
+      }
+    });
+
+    sel.appendChild(btn);
+  });
+}
+
+function addPet() {
+  if (pets.length >= 13) { alert("最大13匹まで"); return; }
+  const type = document.getElementById("petTypeSelect").value;
+  const id = Date.now();
+  pets.push({ id, name: "ペット" + (pets.length + 1), type });
+  savePets();
+  currentPet = id;
+  loadState();
+  renderPets();
+  render();
+}
+
+function deletePet(id) {
+  if (!confirm("このペットを削除しますか？")) return;
+  const pet = pets.find(p => p.id === id);
+  if (pet) {
+    const foods = pet.type === "dog" ? dogFoods : catFoods;
+    for (let i = 0; i < foods.length; i++)
+      localStorage.removeItem(`pet_${id}_${pet.type}_${i}`);
+  }
+  pets = pets.filter(p => p.id !== id);
+  if (!pets.length) { pets = [{ id: Date.now(), name: "ペット1", type: "dog" }]; savePets(); }
+  if (currentPet === id) currentPet = pets[0].id;
+  savePets(); loadState(); renderPets(); render();
+}
+
+function getPriority(s) {
+  if (s.like)    return 1;
+  if (s.dislike) return 2;
+  if (!s.given)  return 3;
+  return 4;
+}
+
+function render() {
+  const pet = pets.find(p => p.id === currentPet);
+  if (!pet) return;
+  const foods = pet.type === "dog" ? dogFoods : catFoods;
+  const kw = document.getElementById("searchInput").value.toLowerCase();
+  const grid = document.getElementById("foodGrid");
+  grid.innerHTML = "";
+
+  const order = [...foods.keys()].sort((a,b) => getPriority(state[a]) - getPriority(state[b]));
+
+  order.forEach(i => {
+    const food = foods[i];
+    const s = state[i];
+    const name = food.name[lang] || food.name.jp;
+    if (kw && !name.toLowerCase().includes(kw)) return;
+
+    const card = document.createElement("div");
+    card.className = "food-card"
+      + (s.like ? " like" : s.dislike ? " dislike" : s.given ? " given" : "");
+
+    card.innerHTML = `
+      <div class="img-box">
+        <img src="${food.img}" loading="lazy" alt="${name}">
+        <div class="img-label">${name}</div>
+      </div>
+      <div class="card-btns">
+        <button class="card-btn like-btn">好き</button>
+        <button class="card-btn dislike-btn">嫌い</button>
+      </div>
+    `;
+
+    card.querySelector(".img-box").addEventListener("click", () => {
+      state[i].given = !state[i].given;
+      saveState(i);
+      playSound("given");
+      render();
+    });
+    card.querySelector(".like-btn").addEventListener("click", () => {
+      state[i].like = !state[i].like;
+      state[i].dislike = false;
+      saveState(i);
+      card.classList.add("pop");
+      setTimeout(() => card.classList.remove("pop"), 220);
+      playSound("like");
+      render();
+    });
+    card.querySelector(".dislike-btn").addEventListener("click", () => {
+      state[i].dislike = !state[i].dislike;
+      state[i].like = false;
+      saveState(i);
+      card.classList.add("pop");
+      setTimeout(() => card.classList.remove("pop"), 220);
+      playSound("dislike");
+      render();
+    });
+
+    grid.appendChild(card);
+  });
+
+  updateProgress(foods);
+}
+
+function updateProgress(foods) {
+  if (!foods) {
+    const pet = pets.find(p => p.id === currentPet);
+    foods = pet?.type === "dog" ? dogFoods : catFoods;
+  }
+  const done = state.filter(s => s.like || s.dislike || s.given).length;
+  const total = foods.length;
+  document.getElementById("progressLabel").textContent = `エサリスト ${done} / ${total}`;
+  document.getElementById("progressFill").style.width = total ? (done / total * 100) + "%" : "0%";
+}
+
+function resetData() {
+  if (!confirm("このペットのデータをリセットしますか？")) return;
+  const pet = pets.find(p => p.id === currentPet);
+  if (!pet) return;
+  const foods = pet.type === "dog" ? dogFoods : catFoods;
+  for (let i = 0; i < foods.length; i++) {
+    localStorage.removeItem(`pet_${currentPet}_${pet.type}_${i}`);
+    state[i] = { like:false, dislike:false, given:false };
+  }
+  render();
+}
+
+/* ===================== サウンド ===================== */
+function playSound(type) {
+  if (!soundOn) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = "sine";
+    const base = type === "like" ? 800 : type === "dislike" ? 300 : 500;
+    osc.frequency.setValueAtTime(base, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(base / 2, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.25, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.start(); osc.stop(ctx.currentTime + 0.1);
+  } catch(e) {}
+}
+
+/* ===================== ダークモード ===================== */
+function toggleDark() {
+  darkMode = !darkMode;
+  localStorage.setItem("darkMode", darkMode);
+  applyDark();
+}
+function applyDark() {
+  document.body.classList.toggle("dark", darkMode);
+  document.getElementById("darkBtn").textContent = darkMode ? "☀️" : "🌙";
+}
+
+/* ===================== モーダル ===================== */
+function openInfo()  { document.getElementById("infoModal").classList.add("open"); }
+function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+
+/* ===================== データ移行 ===================== */
+const EXPORT_SCRIPT = `copy(JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('pet_')||k==='pets').map(k=>[k,localStorage.getItem(k)]))))`;
+
+function copyExportScript() {
+  navigator.clipboard.writeText(EXPORT_SCRIPT)
+    .then(() => alert("スクリプトをコピーしました！\n旧サイトのコンソール（F12）に貼り付けて実行してください。"))
+    .catch(() => {
+      prompt("以下をコピーしてください", EXPORT_SCRIPT);
+    });
+}
+
+function importData() {
+  const raw = document.getElementById("importJson").value.trim();
+  if (!raw) { alert("JSONを貼り付けてください"); return; }
+
+  let data;
+  try { data = JSON.parse(raw); }
+  catch(e) { alert("JSONの形式が正しくありません"); return; }
+
+  let count = 0;
+  for (const [k, v] of Object.entries(data)) {
+    if (k === "pets" || k.startsWith("pet_")) {
+      localStorage.setItem(k, v);
+      count++;
+    }
+  }
+
+  alert(`✅ ${count} 件のデータをインポートしました。ページを再読み込みします。`);
+  closeModal("infoModal");
+  location.reload();
+}
+
+function exportData() {
+  const result = {};
+  for (const k of Object.keys(localStorage)) {
+    if (k === "pets" || k.startsWith("pet_")) {
+      result[k] = localStorage.getItem(k);
+    }
+  }
+  const json = JSON.stringify(result, null, 2);
+  navigator.clipboard.writeText(json)
+    .then(() => alert("データをクリップボードにコピーしました！"))
+    .catch(() => {
+      const ta = document.getElementById("importJson");
+      ta.value = json;
+      alert("テキストエリアにデータを出力しました。コピーして保管してください。");
+    });
+}
+
+/* ===================== 言語 ===================== */
+function setLang(l) {
+  lang = l;
+  localStorage.setItem("pet_lang", l);
+  closeModal("langModal");
+  render();
+}
+
+/* ===================== 初期化 ===================== */
+window.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("darkMode") === null) {
+    darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  applyDark();
+  loadPets();
+  loadState();
+  renderPets();
+  render();
+});
+</script>
+</body>
+</html>
