@@ -207,7 +207,7 @@ const foodsData = [
 },
 {
   name:"チョコソース",
-  image:"./images/000.PNG",
+  image:"./images/foods/068.PNG",
   cost:440,
   time:300,
   rarity: [true,true,true,true,true],
@@ -683,7 +683,7 @@ const foodsData = [
 },
 {
   name:"三角の白米ちまき",
-  image:"./images/000.PNG",
+  image:"./images/foods/071.PNG",
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -700,7 +700,7 @@ const foodsData = [
 },
 {
   name:"三角のあずきちまき",
-  image:"./images/000.PNG",
+  image:"./images/foods/072.PNG",
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -717,7 +717,7 @@ const foodsData = [
 },
 {
   name:"三角の卵黄入り肉ちまき",
-  image:"./images/000.PNG",
+  image:"./images/foods/073.PNG",
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
@@ -734,7 +734,7 @@ const foodsData = [
 },
 {
   name:"枕型の白米ちまき",
-  image:"./images/000.PNG",
+  image:"./images/foods/074.PNG",
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -751,7 +751,7 @@ const foodsData = [
 },
 {
   name:"枕型のこしあんちまき",
-  image:"./images/000.PNG",
+  image:"./images/foods/075.PNG",
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -768,7 +768,7 @@ const foodsData = [
 },
 {
   name:"枕型の卵黄入りちまき",
-  image:"./images/000.PNG",
+  image:"./images/foods/076.PNG",
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
@@ -887,7 +887,7 @@ const foodsData = [
 },
 {
   name:"虹のときめきグミ",
-  image:"./images/000.PNG",
+  image:"./images/foods/070.PNG",
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -904,7 +904,7 @@ const foodsData = [
 },
 {
   name:"虹のドキドキグミ",
-  image:"./images/000.PNG",
+  image:"./images/foods/069.PNG",
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1474,7 +1474,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[1630,2445,3260,6520,13040],
   materials:["大根おろし肉(@560)","大根クリームポタージュ(@220)","アイスカップコーヒーの材料ならなんでもOK","シュガーパンケーキの料理ならなんでもOK"],
-  level:10,
+  level:1,
   materials_image:[
     { image:"./images/materials/daikon_meat.jpg" },
     { image:"./images/materials/daikon_potage.jpg" },
