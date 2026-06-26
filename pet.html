@@ -10,145 +10,218 @@
 <meta property="og:title" content="はとぴ図鑑 | ペット好物">
 <meta property="og:description" content="犬・猫のエサの好き嫌いを管理できるツール">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#3c5a6e">
+<meta name="theme-color" content="#ffd6ea">
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon.PNG">
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.PNG">
 <title>はとぴ図鑑｜ペット好物</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 /* =====================
-   はとぴ図鑑 共通トークン
+   デザイントークン（style.css準拠）
 ===================== */
 :root {
-  --bg:        #eaf4f8;
-  --surface:   #ffffff;
-  --nav-bg:    #3c5a6e;
-  --nav-text:  #ffffff;
-  --accent:    #4a90a4;
-  --accent2:   #e07b4a;
-  --text-main: #2c3e50;
-  --text-sub:  #6b8a9a;
-  --border:    #d0e4ec;
-  --like-bg:   #d9f8e3;
-  --like-bd:   #7bd88f;
-  --dislike-bg:#ffd6d6;
-  --dislike-bd:#ff6b6b;
-  --given-bg:  #e8e8e8;
-  --radius:    14px;
-  --shadow:    0 2px 10px rgba(60,90,110,0.10);
-}
-body.dark {
-  --bg:        #1a2630;
-  --surface:   #243040;
-  --nav-bg:    #1e3040;
-  --accent:    #5aa8be;
-  --text-main: #ddeef5;
-  --text-sub:  #7fa8bb;
-  --border:    #2e4458;
-  --like-bg:   #1e4028;
-  --dislike-bg:#401e1e;
-  --given-bg:  #2a3540;
+  --bg-top:       #f7f2e7;
+  --bg-bottom:    #ece2cf;
+  --text:         #34302b;
+  --text-sub:     #7a7164;
+  --indigo:       #3c5a6e;
+  --indigo-soft:  #5a7d92;
+  --vermillion:   #b1503b;
+  --vermillion-soft: #c97058;
+  --gold:         #c8a86b;
+  --card:         #fffdf7;
+  --card-sub:     #f3ecdc;
+  --border:       #e4d9c2;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: "Mochiy Pop One", "Noto Sans JP", sans-serif;
-  background: var(--bg);
-  color: var(--text-main);
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  background-attachment: fixed;
+  color: var(--text);
   min-height: 100vh;
+  padding: 12px;
+  overflow-x: hidden;
+  animation: fadeIn 0.2s ease;
 }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+body::before {
+  content: "";
+  position: fixed;
+  width: 320px; height: 320px;
+  background: rgba(200,168,107,0.12);
+  border-radius: 50%;
+  top: -120px; right: -100px;
+  filter: blur(60px);
+  z-index: -1;
+}
+body::after {
+  content: "";
+  position: fixed;
+  width: 260px; height: 260px;
+  background: rgba(60,90,110,0.08);
+  border-radius: 50%;
+  bottom: -100px; left: -80px;
+  filter: blur(60px);
+  z-index: -1;
+}
+
+/* ダークモード */
+body.dark {
+  background: linear-gradient(180deg, #25221d 0%, #1a1814 100%);
+  color: #ece4d4;
+}
+body.dark::before { background: rgba(200,168,107,0.08); }
+body.dark::after  { background: rgba(143,180,201,0.06); }
+
+body.dark .card,
+body.dark .sticky,
+body.dark .modal-box {
+  background: #2c2823;
+  color: #ece4d4;
+  border: 1px solid #46423b;
+}
+body.dark .filter button,
+body.dark #darkToggle,
+body.dark #helpBtn,
+body.dark #minimizeBtn,
+body.dark .ctrl-btn,
+body.dark .pet-tab,
+body.dark .type-select,
+body.dark .search-input {
+  background: #383329;
+  color: #ece4d4;
+  border: 1px solid #46423b;
+}
+body.dark .active {
+  background: var(--indigo-soft) !important;
+  color: #fdf9ef !important;
+  border-color: var(--indigo-soft) !important;
+}
+body.dark h1 { color: #e8d2a8; }
+body.dark h3 { color: #e8d2a8; }
+body.dark #m_name { color: #e8d2a8; }
+body.dark .weather-now { color: #e8d2a8; }
+body.dark .weather-next { color: #b3a89a; }
+body.dark a { color: var(--vermillion-soft); }
+body.dark .food-card { background: #2c2823; border-color: #46423b; }
+body.dark .food-card.like    { border-color: #5a9e6a; }
+body.dark .food-card.dislike { border-color: #9e4a4a; }
+body.dark .food-card.given   { opacity: 0.45; filter: grayscale(50%); }
+body.dark .img-label { /* unchanged, has its own bg */ }
+body.dark .progress-track { background: #46423b; }
+body.dark .site-nav-item { background: #2c2823; color: #b3a89a; border-color: #46423b; }
+body.dark .site-nav-item.active { background: var(--indigo-soft); border-color: var(--indigo-soft); color: #fdf9ef; }
+body.dark .modal-info-row { color: #b3a89a; }
+body.dark .search-input { background: #383329; color: #ece4d4; }
 
 /* =====================
-   ナビゲーション（図鑑共通）
+   タイトルバー
 ===================== */
-.site-header {
-  background: var(--nav-bg);
-  color: var(--nav-text);
-  padding: 12px 16px 0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-}
-
-.header-top {
+.title-bar {
+  position: relative;
   display: flex;
+  justify-content: flex-start;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  min-height: 40px;
 }
 
-.site-title {
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 0.02em;
+h1 {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 23px;
+  font-weight: 700;
+  color: var(--indigo);
+  letter-spacing: 0.18em;
+  margin: 0;
+  padding-left: 4px;
 }
 
-.header-actions {
+.title-buttons {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   gap: 8px;
 }
 
-.header-actions button {
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: white;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 16px;
+#helpBtn,
+#darkToggle {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--card);
+  color: var(--indigo);
+  box-shadow: 0 3px 8px rgba(52,48,43,0.08);
+  transition: 0.2s;
   cursor: pointer;
-  transition: background 0.15s;
 }
-.header-actions button:hover { background: rgba(255,255,255,0.28); }
+#helpBtn:active, #darkToggle:active { transform: scale(0.96); }
 
+/* =====================
+   サイトナビ（pill型）
+===================== */
 .site-nav {
   display: flex;
-  gap: 2px;
+  gap: 6px;
+  margin-bottom: 10px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 .site-nav::-webkit-scrollbar { display: none; }
 
-.site-nav a {
-  color: rgba(255,255,255,0.75);
+.site-nav-item {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--card-sub);
+  color: var(--text-sub);
   text-decoration: none;
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 8px 8px 0 0;
-  white-space: nowrap;
-  transition: all 0.15s;
+  transition: 0.15s;
 }
-.site-nav a:hover { color: white; background: rgba(255,255,255,0.12); }
-.site-nav a.active {
-  color: var(--nav-bg);
-  background: var(--bg);
-  font-weight: bold;
+.site-nav-item.active {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: #fdf9ef;
+  font-weight: 700;
 }
 
 /* =====================
-   コンテンツ
+   コントロールカード
 ===================== */
-.page-wrap {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 16px 12px 60px;
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  padding: 14px;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 22px rgba(52,48,43,0.07);
 }
 
-/* =====================
-   コントロールバー
-===================== */
-.control-bar {
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 10px;
-  margin-bottom: 12px;
+.sticky {
+  position: sticky;
+  top: 8px;
+  z-index: 100;
+  background: var(--card);
+}
+
+.control-inner {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .control-row {
@@ -158,38 +231,7 @@ body {
   flex-wrap: wrap;
 }
 
-.search-input {
-  flex: 1;
-  min-width: 120px;
-  padding: 8px 12px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text-main);
-  font-size: 14px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.15s;
-}
-.search-input:focus { border-color: var(--accent); }
-
-.ctrl-btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text-main);
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-  border: 1.5px solid var(--border);
-  transition: all 0.12s;
-  white-space: nowrap;
-}
-.ctrl-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
-.ctrl-btn:active { transform: scale(0.96); }
-
-/* ペットセレクター */
+/* ペットタブ */
 .pet-selector {
   display: flex;
   gap: 6px;
@@ -201,33 +243,70 @@ body {
 
 .pet-tab {
   flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1.5px solid var(--border);
-  background: var(--bg);
-  color: var(--text-main);
-  font-size: 13px;
-  font-family: inherit;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--card-sub);
+  color: var(--text-sub);
   cursor: pointer;
-  transition: all 0.15s;
+  transition: 0.15s;
   white-space: nowrap;
 }
 .pet-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: #fdf9ef;
+  font-weight: 700;
 }
 .pet-tab:active { transform: scale(0.95); }
 
+/* セレクト */
 .type-select {
-  padding: 7px 8px;
-  border-radius: 10px;
-  border: 1.5px solid var(--border);
-  background: var(--bg);
-  color: var(--text-main);
-  font-family: inherit;
-  font-size: 13px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  font-size: 12px;
+  background: var(--card-sub);
+  color: var(--text-sub);
+  cursor: pointer;
 }
+
+/* 追加・リセットボタン */
+.ctrl-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--card-sub);
+  color: var(--text-sub);
+  cursor: pointer;
+  transition: 0.15s;
+  white-space: nowrap;
+}
+.ctrl-btn:hover { background: var(--indigo); color: #fdf9ef; border-color: var(--indigo); }
+.ctrl-btn:active { transform: scale(0.96); }
+.ctrl-btn.danger:hover { background: var(--vermillion); border-color: var(--vermillion); color: #fdf9ef; }
+
+/* 検索 */
+.search-input {
+  flex: 1;
+  min-width: 120px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 13px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  outline: none;
+  box-shadow: inset 0 1px 3px rgba(52,48,43,0.05);
+  transition: border-color 0.15s;
+}
+.search-input:focus { border-color: var(--indigo-soft); }
 
 /* 進捗 */
 .progress-bar-wrap {
@@ -236,55 +315,60 @@ body {
   gap: 8px;
 }
 .progress-label {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-sub);
   white-space: nowrap;
 }
 .progress-track {
   flex: 1;
-  height: 6px;
+  height: 5px;
   background: var(--border);
   border-radius: 999px;
   overflow: hidden;
 }
 .progress-fill {
   height: 100%;
-  background: var(--accent);
+  background: var(--indigo);
   border-radius: 999px;
   transition: width 0.3s;
 }
 
 /* =====================
-   グリッド & カード
+   エサグリッド & カード
 ===================== */
 .food-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 10px;
+  margin-top: 14px;
 }
-
 @media (max-width: 360px) {
   .food-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 .food-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  border: 2.5px solid transparent;
-  transition: border-color 0.15s, opacity 0.15s;
+  background: var(--card);
+  border-radius: 18px;
+  padding: 8px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 6px 16px rgba(52,48,43,0.06);
+  transition: 0.15s;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
-.food-card.like    { border-color: var(--like-bd); }
-.food-card.dislike { border-color: var(--dislike-bd); }
+.food-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(52,48,43,0.1); }
+
+/* 状態ボーダー */
+.food-card.like    { border-color: #7bbf8a; }
+.food-card.dislike { border-color: var(--vermillion-soft); }
 .food-card.given   { opacity: 0.45; filter: grayscale(50%); }
 
+/* ポップアニメ */
 .food-card.pop { animation: pop 0.22s ease; }
 @keyframes pop {
   0%   { transform: scale(1); }
-  50%  { transform: scale(1.07); }
+  50%  { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
 
@@ -294,45 +378,56 @@ body {
   position: relative;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  border-radius: 14px;
+  overflow: hidden;
 }
 .img-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  background: var(--card-sub);
 }
 .img-box:active { transform: scale(0.96); transition: 0.08s; }
 
 .img-label {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  padding: 6px 3px 4px;
+  padding: 6px 4px 4px;
   font-size: 9px;
-  color: white;
-  background: linear-gradient(to top, rgba(0,0,0,0.72), transparent);
+  color: #fdf9ef;
+  background: linear-gradient(to top, rgba(52,48,43,0.75), transparent);
   text-align: center;
   line-height: 1.2;
   word-break: break-word;
 }
 
+/* 好き・嫌いボタン */
 .card-btns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  padding: 3px;
+  gap: 4px;
+  padding-top: 6px;
 }
 .card-btn {
-  border: none;
-  border-radius: 8px;
-  padding: 7px 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 0;
   font-size: 10px;
-  font-family: inherit;
+  font-family: 'Zen Maru Gothic', sans-serif;
   cursor: pointer;
-  transition: opacity 0.1s, transform 0.08s;
+  transition: 0.12s;
+  background: var(--card-sub);
+  color: var(--text-sub);
 }
 .card-btn:active { transform: scale(0.94); }
-.like-btn    { background: var(--like-bg);    color: #2a7a3a; }
-.dislike-btn { background: var(--dislike-bg); color: #a03030; }
+
+.like-btn    { }
+.dislike-btn { }
+
+/* ON状態 */
+.food-card.like    .like-btn    { background: #daf0e2; border-color: #7bbf8a; color: #2a6a3a; font-weight: 700; }
+.food-card.dislike .dislike-btn { background: #f5ddd8; border-color: var(--vermillion-soft); color: var(--vermillion); font-weight: 700; }
 
 /* =====================
    モーダル共通
@@ -341,105 +436,134 @@ body {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(6px);
+  background: rgba(40,36,30,0.5);
+  backdrop-filter: blur(5px);
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   z-index: 9999;
 }
 .modal.open { display: flex; }
 
-.modal-card {
-  background: var(--surface);
-  border-radius: 20px;
-  padding: 24px 20px;
-  width: min(88vw, 360px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+.modal-box {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 22px 20px;
+  width: min(90vw, 360px);
+  margin-top: 60px;
+  box-shadow: 0 20px 40px rgba(52,48,43,0.15);
+  border: 1px solid var(--gold);
   position: relative;
-  animation: modalIn 0.3s ease;
+  animation: modalIn 0.25s ease;
 }
 @keyframes modalIn {
-  from { transform: scale(0.85); opacity: 0; }
+  from { transform: scale(0.88); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
 
 .modal-close {
   position: absolute;
   top: 12px; right: 12px;
-  background: var(--bg);
-  border: none;
+  background: var(--card-sub);
+  border: 1px solid var(--border);
   border-radius: 50%;
   width: 28px; height: 28px;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
+  color: var(--text-sub);
 }
 .modal-close:hover { background: var(--border); }
 
 .modal-title {
+  font-family: 'Shippori Mincho', serif;
   font-size: 16px;
+  color: var(--indigo);
+  letter-spacing: 0.06em;
   margin-bottom: 14px;
-  color: var(--accent);
 }
+body.dark .modal-title { color: #e8d2a8; }
 
-.modal-card p, .modal-card li {
+.modal-box p, .modal-box li {
   font-size: 13px;
   line-height: 1.7;
-  color: var(--text-main);
+  color: var(--text);
 }
+body.dark .modal-box p { color: #ece4d4; }
 
-.modal-card button.full-btn {
+/* フルボタン */
+.modal-box button.full-btn {
   width: 100%;
   margin-top: 10px;
   padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: var(--accent);
-  color: white;
-  font-size: 14px;
-  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--indigo);
+  color: #fdf9ef;
+  font-size: 13px;
+  font-family: 'Zen Maru Gothic', sans-serif;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: 0.15s;
 }
-.modal-card button.full-btn:hover { background: #3a7a90; }
-.modal-card button.full-btn.danger {
-  background: #e05555;
-}
-.modal-card button.full-btn.secondary {
-  background: var(--bg);
-  color: var(--text-main);
-  border: 1.5px solid var(--border);
+.modal-box button.full-btn:hover { background: var(--indigo-soft); border-color: var(--indigo-soft); }
+.modal-box button.full-btn.danger { background: var(--vermillion); border-color: var(--vermillion); }
+.modal-box button.full-btn.danger:hover { background: var(--vermillion-soft); }
+.modal-box button.full-btn.secondary {
+  background: var(--card-sub);
+  color: var(--text-sub);
+  border-color: var(--border);
   margin-top: 6px;
 }
+.modal-box button.full-btn.secondary:hover { background: var(--border); color: var(--text); }
 
-.modal-card textarea {
+.modal-box textarea {
   width: 100%;
   margin: 8px 0;
   padding: 10px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card-sub);
+  color: var(--text);
   font-size: 12px;
   font-family: monospace;
   resize: vertical;
   min-height: 120px;
 }
-
-/* フッター */
-.footer {
-  text-align: center;
-  padding: 30px 16px 20px;
-  font-size: 11px;
-  color: var(--text-sub);
-  border-top: 1px solid var(--border);
-  margin-top: 30px;
+body.dark .modal-box textarea {
+  background: #383329;
+  color: #ece4d4;
+  border-color: #46423b;
 }
-.footer a { color: var(--accent); text-decoration: none; }
 
-/* =====================
-   言語ボタングリッド
-===================== */
+/* 移行ステップ */
+.migrate-step {
+  background: var(--card-sub);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text);
+  border-left: 3px solid var(--indigo);
+}
+.migrate-step strong { color: var(--indigo); }
+body.dark .migrate-step { background: #383329; color: #ece4d4; border-left-color: var(--indigo-soft); }
+body.dark .migrate-step strong { color: #8fbdc9; }
+
+.copy-btn {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 4px 12px;
+  background: var(--indigo);
+  color: #fdf9ef;
+  border: none;
+  border-radius: 999px;
+  font-size: 11px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  cursor: pointer;
+}
+.copy-btn:hover { background: var(--indigo-soft); }
+
+/* 言語グリッド */
 .lang-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -448,110 +572,95 @@ body {
 }
 .lang-btn {
   padding: 9px;
-  border: 1.5px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg);
-  color: var(--text-main);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--card-sub);
+  color: var(--text-sub);
   font-size: 13px;
-  font-family: inherit;
+  font-family: 'Zen Maru Gothic', sans-serif;
   cursor: pointer;
-  transition: all 0.12s;
+  transition: 0.12s;
 }
-.lang-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+.lang-btn:hover { background: var(--indigo); color: #fdf9ef; border-color: var(--indigo); }
 
-/* 移行ステップ */
-.migrate-step {
-  background: var(--bg);
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin: 8px 0;
-  font-size: 12px;
-  line-height: 1.7;
-  color: var(--text-main);
-  border-left: 3px solid var(--accent);
-}
-.migrate-step strong { color: var(--accent); }
-
-.copy-btn {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 4px 10px;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: 6px;
+/* フッター */
+.footer {
+  text-align: center;
+  padding: 28px 16px 20px;
   font-size: 11px;
-  cursor: pointer;
+  color: var(--text-sub);
+  border-top: 1px solid var(--border);
+  margin-top: 30px;
 }
+.footer a { color: var(--vermillion); text-decoration: none; }
 </style>
 </head>
 <body>
 
-<!-- ===================== ヘッダー（図鑑共通） ===================== -->
-<header class="site-header">
-  <div class="header-top">
-    <span class="site-title">はとぴ図鑑</span>
-    <div class="header-actions">
-      <button onclick="openInfo()" title="情報">ℹ️</button>
-      <button id="darkBtn" onclick="toggleDark()" title="ダーク切替">🌙</button>
-    </div>
+<!-- ===================== タイトルバー ===================== -->
+<div class="title-bar">
+  <h1>はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openInfo()">ℹ️</button>
+    <button id="darkToggle" onclick="toggleDark()">🌙</button>
   </div>
-  <nav class="site-nav">
-    <a href="index.html">図鑑</a>
-    <a href="foods.html">料理</a>
-    <a href="garden.html">園芸</a>
-    <a href="codes.html">コード</a>
-    <a href="events.html">イベント</a>
-    <a href="faq.html">Q&A</a>
-    <a href="pet.html" class="active">🐾 ペット</a>
-  </nav>
-</header>
+</div>
 
-<!-- ===================== メイン ===================== -->
-<main class="page-wrap">
+<!-- ===================== サイトナビ ===================== -->
+<nav class="site-nav">
+  <a class="site-nav-item" href="index.html">図鑑</a>
+  <a class="site-nav-item" href="foods.html">料理</a>
+  <a class="site-nav-item" href="garden.html">園芸</a>
+  <a class="site-nav-item" href="codes.html">コード</a>
+  <a class="site-nav-item" href="events.html">イベント</a>
+  <a class="site-nav-item" href="faq.html">Q&A</a>
+  <a class="site-nav-item active" href="pet.html">🐾 ペット</a>
+</nav>
 
-  <!-- コントロールバー -->
-  <div class="control-bar">
+<!-- ===================== コントロールカード（sticky） ===================== -->
+<div class="card sticky">
+  <div class="control-inner">
 
-    <!-- ペットタブ + 追加 -->
+    <!-- ペットタブ行 -->
     <div class="control-row">
       <div class="pet-selector" id="petSelector"></div>
       <select id="petTypeSelect" class="type-select">
         <option value="dog">🐶 犬</option>
         <option value="cat">🐱 猫</option>
       </select>
-      <button class="ctrl-btn" onclick="addPet()" title="ペット追加">＋</button>
+      <button class="ctrl-btn" onclick="addPet()">＋ 追加</button>
     </div>
 
-    <!-- 検索 + リセット -->
+    <!-- 検索・リセット行 -->
     <div class="control-row">
-      <input id="searchInput" class="search-input" placeholder="エサを検索…" oninput="render()">
-      <button class="ctrl-btn" onclick="resetData()">🗑 リセット</button>
+      <input id="searchInput" class="search-input" placeholder="🔍 エサを検索…" oninput="render()">
+      <button class="ctrl-btn danger" onclick="resetData()">🗑 リセット</button>
     </div>
 
-    <!-- 進捗 -->
+    <!-- 進捗バー -->
     <div class="progress-bar-wrap">
       <span class="progress-label" id="progressLabel">0 / 0</span>
-      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
     </div>
 
   </div>
+</div>
 
-  <!-- エサグリッド -->
-  <div class="food-grid" id="foodGrid"></div>
+<!-- ===================== エサグリッド ===================== -->
+<div class="food-grid" id="foodGrid"></div>
 
-  <!-- フッター -->
-  <footer class="footer">
-    <p>本サイトではデータはブラウザ内（LocalStorage）のみで管理され、外部に送信されることはありません。</p>
-    <p style="margin-top:6px;">X（旧Twitter）：<a href="https://x.com/_ram1x?s=21" target="_blank">@_Ram1x</a></p>
-    <p style="margin-top:8px; font-size:10px; opacity:0.6;">本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。</p>
-  </footer>
-
-</main>
+<!-- ===================== フッター ===================== -->
+<footer class="footer">
+  <p>本サイトではデータはブラウザ内（LocalStorage）のみで管理され、外部に送信されることはありません。</p>
+  <p style="margin-top:6px;">X（旧Twitter）：<a href="https://x.com/_ram1x?s=21" target="_blank">@_Ram1x</a></p>
+  <p style="margin-top:8px; font-size:10px; opacity:0.6;">本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。</p>
+</footer>
 
 <!-- ===================== モーダル：情報 / データ移行 ===================== -->
 <div class="modal" id="infoModal">
-  <div class="modal-card">
+  <div class="modal-box">
     <button class="modal-close" onclick="closeModal('infoModal')">✕</button>
     <div class="modal-title">🐾 ペット好物について</div>
 
@@ -566,15 +675,13 @@ body {
 
     <div class="migrate-step">
       <strong>STEP 1</strong>　旧サイトを開きエクスポート<br>
-      <a href="https://heartopia-petfood.com" target="_blank" style="color:var(--accent); font-size:12px;">heartopia-petfood.com を開く →</a>
+      <a href="https://heartopia-petfood.com" target="_blank">heartopia-petfood.com を開く →</a>
     </div>
-
     <div class="migrate-step">
       <strong>STEP 2</strong>　旧サイトのブラウザコンソールで下記を実行し、表示されたJSONをコピー<br>
       <code style="font-size:10px; word-break:break-all; color:var(--text-sub);">copy(JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('pet_')||k==='pets').map(k=>[k,localStorage.getItem(k)]))))</code>
       <button class="copy-btn" onclick="copyExportScript()">スクリプトをコピー</button>
     </div>
-
     <div class="migrate-step">
       <strong>STEP 3</strong>　下のテキストエリアにJSONを貼り付けてインポート
     </div>
@@ -587,9 +694,9 @@ body {
   </div>
 </div>
 
-<!-- 言語モーダル -->
+<!-- ===================== 言語モーダル ===================== -->
 <div class="modal" id="langModal">
-  <div class="modal-card">
+  <div class="modal-box">
     <button class="modal-close" onclick="closeModal('langModal')">✕</button>
     <div class="modal-title">🌐 言語 / Language</div>
     <div class="lang-grid">
@@ -736,28 +843,19 @@ const catFoods = [
 ];
 
 /* ===================== 状態管理 ===================== */
-// LocalStorageキープレフィックス（旧サイトと同じ形式）
-// pets → JSON配列
-// pet_{id}_{type}_{index} → {like, dislike, given}
-
-let lang = localStorage.getItem("pet_lang") || "jp";
+let lang     = localStorage.getItem("pet_lang") || "jp";
 let darkMode = JSON.parse(localStorage.getItem("darkMode") || "false");
-let soundOn = JSON.parse(localStorage.getItem("soundOn") ?? "true");
 
 let pets = [];
 let currentPet = null;
 let state = [];
 
-// タブ長押し用タイマー
 let pressTimers = {};
 let tapTimers   = {};
 
 function loadPets() {
   const saved = localStorage.getItem("pets");
-  try {
-    pets = saved ? JSON.parse(saved) : [];
-  } catch(e) { pets = []; }
-
+  try { pets = saved ? JSON.parse(saved) : []; } catch(e) { pets = []; }
   if (pets.length === 0) {
     pets = [{ id: Date.now(), name: "ペット1", type: "dog" }];
     savePets();
@@ -765,9 +863,7 @@ function loadPets() {
   currentPet = pets[0].id;
 }
 
-function savePets() {
-  localStorage.setItem("pets", JSON.stringify(pets));
-}
+function savePets() { localStorage.setItem("pets", JSON.stringify(pets)); }
 
 function loadState() {
   const pet = pets.find(p => p.id === currentPet);
@@ -776,11 +872,8 @@ function loadState() {
   state = [];
   for (let i = 0; i < foods.length; i++) {
     const raw = localStorage.getItem(`pet_${currentPet}_${pet.type}_${i}`);
-    try {
-      state[i] = raw ? JSON.parse(raw) : { like:false, dislike:false, given:false };
-    } catch(e) {
-      state[i] = { like:false, dislike:false, given:false };
-    }
+    try { state[i] = raw ? JSON.parse(raw) : { like:false, dislike:false, given:false }; }
+    catch(e) { state[i] = { like:false, dislike:false, given:false }; }
   }
 }
 
@@ -799,7 +892,6 @@ function renderPets() {
     btn.className = "pet-tab" + (p.id === currentPet ? " active" : "");
     btn.textContent = (p.type === "dog" ? "🐶" : "🐱") + " " + p.name;
 
-    // 長押しで削除
     btn.addEventListener("pointerdown", () => {
       pressTimers[p.id] = setTimeout(() => deletePet(p.id), 700);
     });
@@ -807,7 +899,6 @@ function renderPets() {
       btn.addEventListener(ev, () => clearTimeout(pressTimers[p.id]))
     );
 
-    // ダブルタップで名前変更 / シングルで切替
     btn.addEventListener("click", () => {
       if (tapTimers[p.id]) {
         clearTimeout(tapTimers[p.id]);
@@ -817,9 +908,7 @@ function renderPets() {
       } else {
         tapTimers[p.id] = setTimeout(() => {
           currentPet = p.id;
-          loadState();
-          renderPets();
-          render();
+          loadState(); renderPets(); render();
           tapTimers[p.id] = null;
         }, 260);
       }
@@ -834,11 +923,7 @@ function addPet() {
   const type = document.getElementById("petTypeSelect").value;
   const id = Date.now();
   pets.push({ id, name: "ペット" + (pets.length + 1), type });
-  savePets();
-  currentPet = id;
-  loadState();
-  renderPets();
-  render();
+  savePets(); currentPet = id; loadState(); renderPets(); render();
 }
 
 function deletePet(id) {
@@ -850,7 +935,7 @@ function deletePet(id) {
       localStorage.removeItem(`pet_${id}_${pet.type}_${i}`);
   }
   pets = pets.filter(p => p.id !== id);
-  if (!pets.length) { pets = [{ id: Date.now(), name: "ペット1", type: "dog" }]; savePets(); }
+  if (!pets.length) { pets = [{ id: Date.now(), name: "ペット1", type: "dog" }]; }
   if (currentPet === id) currentPet = pets[0].id;
   savePets(); loadState(); renderPets(); render();
 }
@@ -949,7 +1034,6 @@ function resetData() {
 
 /* ===================== サウンド ===================== */
 function playSound(type) {
-  if (!soundOn) return;
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = ctx.createOscillator();
@@ -973,11 +1057,11 @@ function toggleDark() {
 }
 function applyDark() {
   document.body.classList.toggle("dark", darkMode);
-  document.getElementById("darkBtn").textContent = darkMode ? "☀️" : "🌙";
+  document.getElementById("darkToggle").textContent = darkMode ? "☀️" : "🌙";
 }
 
 /* ===================== モーダル ===================== */
-function openInfo()  { document.getElementById("infoModal").classList.add("open"); }
+function openInfo() { document.getElementById("infoModal").classList.add("open"); }
 function closeModal(id) { document.getElementById(id).classList.remove("open"); }
 
 /* ===================== データ移行 ===================== */
@@ -986,27 +1070,19 @@ const EXPORT_SCRIPT = `copy(JSON.stringify(Object.fromEntries(Object.keys(localS
 function copyExportScript() {
   navigator.clipboard.writeText(EXPORT_SCRIPT)
     .then(() => alert("スクリプトをコピーしました！\n旧サイトのコンソール（F12）に貼り付けて実行してください。"))
-    .catch(() => {
-      prompt("以下をコピーしてください", EXPORT_SCRIPT);
-    });
+    .catch(() => prompt("以下をコピーしてください", EXPORT_SCRIPT));
 }
 
 function importData() {
   const raw = document.getElementById("importJson").value.trim();
   if (!raw) { alert("JSONを貼り付けてください"); return; }
-
   let data;
   try { data = JSON.parse(raw); }
   catch(e) { alert("JSONの形式が正しくありません"); return; }
-
   let count = 0;
   for (const [k, v] of Object.entries(data)) {
-    if (k === "pets" || k.startsWith("pet_")) {
-      localStorage.setItem(k, v);
-      count++;
-    }
+    if (k === "pets" || k.startsWith("pet_")) { localStorage.setItem(k, v); count++; }
   }
-
   alert(`✅ ${count} 件のデータをインポートしました。ページを再読み込みします。`);
   closeModal("infoModal");
   location.reload();
@@ -1015,16 +1091,13 @@ function importData() {
 function exportData() {
   const result = {};
   for (const k of Object.keys(localStorage)) {
-    if (k === "pets" || k.startsWith("pet_")) {
-      result[k] = localStorage.getItem(k);
-    }
+    if (k === "pets" || k.startsWith("pet_")) result[k] = localStorage.getItem(k);
   }
   const json = JSON.stringify(result, null, 2);
   navigator.clipboard.writeText(json)
     .then(() => alert("データをクリップボードにコピーしました！"))
     .catch(() => {
-      const ta = document.getElementById("importJson");
-      ta.value = json;
+      document.getElementById("importJson").value = json;
       alert("テキストエリアにデータを出力しました。コピーして保管してください。");
     });
 }
