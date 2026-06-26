@@ -170,33 +170,50 @@ h1 {
 /* =====================
    サイトナビ（pill型）
 ===================== */
-.site-nav {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 10px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+/* ナビゲーションバー */
+.site-nav{
+  display:flex;
+  gap:6px;
+  margin-bottom:10px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-.site-nav::-webkit-scrollbar { display: none; }
 
-.site-nav-item {
-  flex-shrink: 0;
-  padding: 7px 16px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 12px;
-  font-family: 'Zen Maru Gothic', sans-serif;
-  background: var(--card-sub);
-  color: var(--text-sub);
-  text-decoration: none;
-  transition: 0.15s;
+.site-nav::-webkit-scrollbar{
+  display:none;
 }
-.site-nav-item.active {
-  background: var(--indigo);
-  border-color: var(--indigo);
-  color: #fdf9ef;
-  font-weight: 700;
+
+.site-nav-item{
+  flex-shrink:0;
+  padding:7px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  text-decoration:none;
+  transition:0.15s;
+}
+
+.site-nav-item.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .site-nav-item{
+  background:#f3ecdc;
+  color:#7a7164;
+  border-color:#e4d9c2;
+}
+
+body.dark .site-nav-item.active{
+  background:#5a7d92 !important;
+  border-color:#5a7d92 !important;
+  color:#fdf9ef !important;
 }
 
 /* =====================
