@@ -105,6 +105,12 @@ const codesData = [
     expiry: "2026-08-01 00:59",
     active: true,
   },
+  {
+    code: "oceanguardians",
+    reward: "月の水晶×100",
+    expiry: "2026-08-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
