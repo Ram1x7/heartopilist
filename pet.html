@@ -18,9 +18,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-/* =====================
-   デザイントークン（style.css準拠）
-===================== */
 :root {
   --bg-top:       #f7f2e7;
   --bg-bottom:    #ece2cf;
@@ -87,10 +84,8 @@ body.dark .modal-box {
   color: #ece4d4;
   border: 1px solid #46423b;
 }
-body.dark .filter button,
 body.dark #darkToggle,
 body.dark #helpBtn,
-body.dark #minimizeBtn,
 body.dark .ctrl-btn,
 body.dark .pet-tab,
 body.dark .type-select,
@@ -106,24 +101,23 @@ body.dark .active {
 }
 body.dark h1 { color: #e8d2a8; }
 body.dark h3 { color: #e8d2a8; }
-body.dark #m_name { color: #e8d2a8; }
-body.dark .weather-now { color: #e8d2a8; }
-body.dark .weather-next { color: #b3a89a; }
 body.dark a { color: var(--vermillion-soft); }
 body.dark .food-card { background: #2c2823; border-color: #46423b; }
 body.dark .food-card.like    { border-color: #5a9e6a; }
 body.dark .food-card.dislike { border-color: #9e4a4a; }
 body.dark .food-card.given   { opacity: 0.45; filter: grayscale(50%); }
-body.dark .img-label { /* unchanged, has its own bg */ }
 body.dark .progress-track { background: #46423b; }
 body.dark .site-nav-item { background: #2c2823; color: #b3a89a; border-color: #46423b; }
 body.dark .site-nav-item.active { background: var(--indigo-soft); border-color: var(--indigo-soft); color: #fdf9ef; }
-body.dark .modal-info-row { color: #b3a89a; }
 body.dark .search-input { background: #383329; color: #ece4d4; }
+body.dark .modal-title { color: #e8d2a8; }
+body.dark .modal-box p { color: #ece4d4; }
+body.dark .modal-box textarea { background: #383329; color: #ece4d4; border-color: #46423b; }
+body.dark .migrate-step { background: #383329; color: #ece4d4; border-left-color: var(--indigo-soft); }
+body.dark .migrate-step strong { color: #8fbdc9; }
+body.dark .data-action-btn { background: #383329; color: #ece4d4; border-color: #46423b; }
 
-/* =====================
-   タイトルバー
-===================== */
+/* タイトルバー */
 .title-bar {
   position: relative;
   display: flex;
@@ -167,58 +161,37 @@ h1 {
 }
 #helpBtn:active, #darkToggle:active { transform: scale(0.96); }
 
-/* =====================
-   サイトナビ（pill型）
-===================== */
-/* ナビゲーションバー */
-.site-nav{
-  display:flex;
-  gap:6px;
-  margin-bottom:10px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
+/* サイトナビ */
+.site-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.site-nav::-webkit-scrollbar { display: none; }
+
+.site-nav-item {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--card-sub);
+  color: var(--text-sub);
+  text-decoration: none;
+  transition: 0.15s;
+}
+.site-nav-item.active {
+  background: var(--indigo);
+  border-color: var(--indigo);
+  color: #fdf9ef;
+  font-weight: 700;
 }
 
-.site-nav::-webkit-scrollbar{
-  display:none;
-}
-
-.site-nav-item{
-  flex-shrink:0;
-  padding:7px 16px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-size:12px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  text-decoration:none;
-  transition:0.15s;
-}
-
-.site-nav-item.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .site-nav-item{
-  background:#f3ecdc;
-  color:#7a7164;
-  border-color:#e4d9c2;
-}
-
-body.dark .site-nav-item.active{
-  background:#5a7d92 !important;
-  border-color:#5a7d92 !important;
-  color:#fdf9ef !important;
-}
-
-/* =====================
-   コントロールカード
-===================== */
+/* カード */
 .card {
   background: var(--card);
   border-radius: 18px;
@@ -248,7 +221,6 @@ body.dark .site-nav-item.active{
   flex-wrap: wrap;
 }
 
-/* ペットタブ */
 .pet-selector {
   display: flex;
   gap: 6px;
@@ -279,7 +251,6 @@ body.dark .site-nav-item.active{
 }
 .pet-tab:active { transform: scale(0.95); }
 
-/* セレクト */
 .type-select {
   padding: 7px 10px;
   border: 1px solid var(--border);
@@ -291,7 +262,6 @@ body.dark .site-nav-item.active{
   cursor: pointer;
 }
 
-/* 追加・リセットボタン */
 .ctrl-btn {
   padding: 7px 14px;
   border: 1px solid var(--border);
@@ -308,7 +278,6 @@ body.dark .site-nav-item.active{
 .ctrl-btn:active { transform: scale(0.96); }
 .ctrl-btn.danger:hover { background: var(--vermillion); border-color: var(--vermillion); color: #fdf9ef; }
 
-/* 検索 */
 .search-input {
   flex: 1;
   min-width: 120px;
@@ -325,7 +294,6 @@ body.dark .site-nav-item.active{
 }
 .search-input:focus { border-color: var(--indigo-soft); }
 
-/* 進捗 */
 .progress-bar-wrap {
   display: flex;
   align-items: center;
@@ -350,9 +318,7 @@ body.dark .site-nav-item.active{
   transition: width 0.3s;
 }
 
-/* =====================
-   エサグリッド & カード
-===================== */
+/* エサグリッド */
 .food-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -375,13 +341,10 @@ body.dark .site-nav-item.active{
   overflow: hidden;
 }
 .food-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(52,48,43,0.1); }
-
-/* 状態ボーダー */
 .food-card.like    { border-color: #7bbf8a; }
 .food-card.dislike { border-color: var(--vermillion-soft); }
 .food-card.given   { opacity: 0.45; filter: grayscale(50%); }
 
-/* ポップアニメ */
 .food-card.pop { animation: pop 0.22s ease; }
 @keyframes pop {
   0%   { transform: scale(1); }
@@ -419,7 +382,6 @@ body.dark .site-nav-item.active{
   word-break: break-word;
 }
 
-/* 好き・嫌いボタン */
 .card-btns {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -438,17 +400,10 @@ body.dark .site-nav-item.active{
   color: var(--text-sub);
 }
 .card-btn:active { transform: scale(0.94); }
-
-.like-btn    { }
-.dislike-btn { }
-
-/* ON状態 */
 .food-card.like    .like-btn    { background: #daf0e2; border-color: #7bbf8a; color: #2a6a3a; font-weight: 700; }
 .food-card.dislike .dislike-btn { background: #f5ddd8; border-color: var(--vermillion-soft); color: var(--vermillion); font-weight: 700; }
 
-/* =====================
-   モーダル共通
-===================== */
+/* モーダル共通 */
 .modal {
   display: none;
   position: fixed;
@@ -498,16 +453,13 @@ body.dark .site-nav-item.active{
   letter-spacing: 0.06em;
   margin-bottom: 14px;
 }
-body.dark .modal-title { color: #e8d2a8; }
 
 .modal-box p, .modal-box li {
   font-size: 13px;
   line-height: 1.7;
   color: var(--text);
 }
-body.dark .modal-box p { color: #ece4d4; }
 
-/* フルボタン */
 .modal-box button.full-btn {
   width: 100%;
   margin-top: 10px;
@@ -532,26 +484,36 @@ body.dark .modal-box p { color: #ece4d4; }
 }
 .modal-box button.full-btn.secondary:hover { background: var(--border); color: var(--text); }
 
-.modal-box textarea {
+/* データ管理モーダル内ボタン群 */
+.data-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   width: 100%;
-  margin: 8px 0;
-  padding: 10px;
+  margin-top: 10px;
+  padding: 12px 16px;
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--card-sub);
   color: var(--text);
-  font-size: 12px;
-  font-family: monospace;
-  resize: vertical;
-  min-height: 120px;
+  font-size: 13px;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  cursor: pointer;
+  transition: 0.15s;
+  text-align: left;
 }
-body.dark .modal-box textarea {
-  background: #383329;
-  color: #ece4d4;
-  border-color: #46423b;
-}
+.data-action-btn:hover { border-color: var(--indigo-soft); background: #edf4f8; }
+.data-action-btn:active { transform: scale(0.98); }
+.data-action-btn .btn-icon { font-size: 20px; }
+.data-action-btn .btn-text { display: flex; flex-direction: column; gap: 2px; }
+.data-action-btn .btn-label { font-weight: 700; color: var(--indigo); font-size: 13px; }
+.data-action-btn .btn-desc  { font-size: 11px; color: var(--text-sub); }
 
-/* 移行ステップ */
+body.dark .data-action-btn { background: #383329; color: #ece4d4; border-color: #46423b; }
+body.dark .data-action-btn:hover { border-color: var(--indigo-soft); background: #2c2823; }
+body.dark .data-action-btn .btn-label { color: #8fbdc9; }
+body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
+
 .migrate-step {
   background: var(--card-sub);
   border-radius: 12px;
@@ -563,22 +525,6 @@ body.dark .modal-box textarea {
   border-left: 3px solid var(--indigo);
 }
 .migrate-step strong { color: var(--indigo); }
-body.dark .migrate-step { background: #383329; color: #ece4d4; border-left-color: var(--indigo-soft); }
-body.dark .migrate-step strong { color: #8fbdc9; }
-
-.copy-btn {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 4px 12px;
-  background: var(--indigo);
-  color: #fdf9ef;
-  border: none;
-  border-radius: 999px;
-  font-size: 11px;
-  font-family: 'Zen Maru Gothic', sans-serif;
-  cursor: pointer;
-}
-.copy-btn:hover { background: var(--indigo-soft); }
 
 /* 言語グリッド */
 .lang-grid {
@@ -614,16 +560,24 @@ body.dark .migrate-step strong { color: #8fbdc9; }
 </head>
 <body>
 
-<!-- ===================== タイトルバー ===================== -->
+<!-- ファイル入力（非表示） -->
+<input
+  type="file"
+  id="backupFile"
+  accept=".json,application/json"
+  style="display:none"
+  onchange="importBackup(event)">
+
+<!-- タイトルバー -->
 <div class="title-bar">
   <h1>はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="helpBtn" onclick="openInfo()">ℹ️</button>
+    <button id="helpBtn" onclick="openDataModal()">📦</button>
     <button id="darkToggle" onclick="toggleDark()">🌙</button>
   </div>
 </div>
 
-<!-- ===================== サイトナビ ===================== -->
+<!-- サイトナビ -->
 <nav class="site-nav">
   <a class="site-nav-item" href="index.html">図鑑</a>
   <a class="site-nav-item" href="foods.html">料理</a>
@@ -634,11 +588,9 @@ body.dark .migrate-step strong { color: #8fbdc9; }
   <a class="site-nav-item" href="faq.html">Q&A</a>
 </nav>
 
-<!-- ===================== コントロールカード（sticky） ===================== -->
+<!-- コントロールカード -->
 <div class="card sticky">
   <div class="control-inner">
-
-    <!-- ペットタブ行 -->
     <div class="control-row">
       <div class="pet-selector" id="petSelector"></div>
       <select id="petTypeSelect" class="type-select">
@@ -647,71 +599,58 @@ body.dark .migrate-step strong { color: #8fbdc9; }
       </select>
       <button class="ctrl-btn" onclick="addPet()">＋ 追加</button>
     </div>
-
-    <!-- 検索・リセット行 -->
     <div class="control-row">
       <input id="searchInput" class="search-input" placeholder="🔍 エサを検索…" oninput="render()">
       <button class="ctrl-btn danger" onclick="resetData()">🗑 リセット</button>
     </div>
-
-    <!-- 進捗バー -->
     <div class="progress-bar-wrap">
       <span class="progress-label" id="progressLabel">0 / 0</span>
       <div class="progress-track">
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- ===================== エサグリッド ===================== -->
+<!-- エサグリッド -->
 <div class="food-grid" id="foodGrid"></div>
 
-<!-- ===================== フッター ===================== -->
+<!-- フッター -->
 <footer class="footer">
   <p>本サイトではデータはブラウザ内（LocalStorage）のみで管理され、外部に送信されることはありません。</p>
   <p style="margin-top:6px;">X（旧Twitter）：<a href="https://x.com/_ram1x?s=21" target="_blank">@_Ram1x</a></p>
   <p style="margin-top:8px; font-size:10px; opacity:0.6;">本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。</p>
 </footer>
 
-<!-- ===================== モーダル：情報 / データ移行 ===================== -->
-<div class="modal" id="infoModal">
+<!-- ===================== データ管理モーダル ===================== -->
+<div class="modal" id="dataModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('infoModal')">✕</button>
-    <div class="modal-title">🐾 ペット好物について</div>
+    <button class="modal-close" onclick="closeModal('dataModal')">✕</button>
+    <div class="modal-title">📦 データ管理</div>
 
-    <p>犬・猫ごとにエサの好き/嫌いを管理できます。<br>
-    画像タップ → あげた記録<br>
-    🟢 好き / 🔴 嫌い ボタンで記録。</p>
+    <p>バックアップファイル（.json）の読み込み・書き出しができます。</p>
 
-    <hr style="margin:14px 0; border:none; border-top:1px solid var(--border)">
+    <button class="data-action-btn" onclick="document.getElementById('backupFile').click()">
+      <span class="btn-icon">📥</span>
+      <span class="btn-text">
+        <span class="btn-label">バックアップを読み込む</span>
+        <span class="btn-desc">旧サイトや以前の保存データを復元</span>
+      </span>
+    </button>
 
-    <div class="modal-title" style="margin-top:0;">📦 旧サイトからデータ移行</div>
-    <p style="font-size:12px; color:var(--text-sub);">heartopia-petfood.com で保存したデータをこちらに取り込めます。</p>
+    <button class="data-action-btn" onclick="exportBackup()">
+      <span class="btn-icon">📤</span>
+      <span class="btn-text">
+        <span class="btn-label">バックアップを書き出す</span>
+        <span class="btn-desc">現在のデータをJSONファイルで保存</span>
+      </span>
+    </button>
 
-    <div class="migrate-step">
-      <strong>STEP 1</strong>　旧サイトを開きエクスポート<br>
-      <a href="https://heartopia-petfood.com" target="_blank">heartopia-petfood.com を開く →</a>
-    </div>
-    <div class="migrate-step">
-      <strong>STEP 2</strong>　旧サイトのブラウザコンソールで下記を実行し、表示されたJSONをコピー<br>
-      <code style="font-size:10px; word-break:break-all; color:var(--text-sub);">copy(JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('pet_')||k==='pets').map(k=>[k,localStorage.getItem(k)]))))</code>
-      <button class="copy-btn" onclick="copyExportScript()">スクリプトをコピー</button>
-    </div>
-    <div class="migrate-step">
-      <strong>STEP 3</strong>　下のテキストエリアにJSONを貼り付けてインポート
-    </div>
-
-    <textarea id="importJson" placeholder='{"pets":"[...]","pet_1234_dog_0":"..."} ← ここに貼り付け'></textarea>
-
-    <button class="full-btn" onclick="importData()">📥 インポート実行</button>
-    <button class="full-btn secondary" onclick="exportData()">📤 このサイトのデータをエクスポート</button>
-    <button class="full-btn danger" onclick="closeModal('infoModal')">閉じる</button>
+    <button class="full-btn secondary" style="margin-top:14px;" onclick="closeModal('dataModal')">閉じる</button>
   </div>
 </div>
 
-<!-- ===================== 言語モーダル ===================== -->
+<!-- 言語モーダル -->
 <div class="modal" id="langModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('langModal')">✕</button>
@@ -739,7 +678,6 @@ let darkMode = JSON.parse(localStorage.getItem("darkMode") || "false");
 let pets = [];
 let currentPet = null;
 let state = [];
-
 let pressTimers = {};
 let tapTimers   = {};
 
@@ -788,7 +726,6 @@ function renderPets() {
     ["pointerup","pointerleave","pointercancel"].forEach(ev =>
       btn.addEventListener(ev, () => clearTimeout(pressTimers[p.id]))
     );
-
     btn.addEventListener("click", () => {
       if (tapTimers[p.id]) {
         clearTimeout(tapTimers[p.id]);
@@ -803,7 +740,6 @@ function renderPets() {
         }, 260);
       }
     });
-
     sel.appendChild(btn);
   });
 }
@@ -870,9 +806,7 @@ function render() {
 
     card.querySelector(".img-box").addEventListener("click", () => {
       state[i].given = !state[i].given;
-      saveState(i);
-      playSound("given");
-      render();
+      saveState(i); playSound("given"); render();
     });
     card.querySelector(".like-btn").addEventListener("click", () => {
       state[i].like = !state[i].like;
@@ -880,8 +814,7 @@ function render() {
       saveState(i);
       card.classList.add("pop");
       setTimeout(() => card.classList.remove("pop"), 220);
-      playSound("like");
-      render();
+      playSound("like"); render();
     });
     card.querySelector(".dislike-btn").addEventListener("click", () => {
       state[i].dislike = !state[i].dislike;
@@ -889,8 +822,7 @@ function render() {
       saveState(i);
       card.classList.add("pop");
       setTimeout(() => card.classList.remove("pop"), 220);
-      playSound("dislike");
-      render();
+      playSound("dislike"); render();
     });
 
     grid.appendChild(card);
@@ -951,45 +883,81 @@ function applyDark() {
 }
 
 /* ===================== モーダル ===================== */
-function openInfo() { document.getElementById("infoModal").classList.add("open"); }
-function closeModal(id) { document.getElementById(id).classList.remove("open"); }
+function openDataModal() { document.getElementById("dataModal").classList.add("open"); }
+function closeModal(id)  { document.getElementById(id).classList.remove("open"); }
 
-/* ===================== データ移行 ===================== */
-const EXPORT_SCRIPT = `copy(JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(k=>k.startsWith('pet_')||k==='pets').map(k=>[k,localStorage.getItem(k)]))))`;
+/* ===================== バックアップ読み込み ===================== */
+async function importBackup(event) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-function copyExportScript() {
-  navigator.clipboard.writeText(EXPORT_SCRIPT)
-    .then(() => alert("スクリプトをコピーしました！\n旧サイトのコンソール（F12）に貼り付けて実行してください。"))
-    .catch(() => prompt("以下をコピーしてください", EXPORT_SCRIPT));
-}
-
-function importData() {
-  const raw = document.getElementById("importJson").value.trim();
-  if (!raw) { alert("JSONを貼り付けてください"); return; }
-  let data;
-  try { data = JSON.parse(raw); }
-  catch(e) { alert("JSONの形式が正しくありません"); return; }
-  let count = 0;
-  for (const [k, v] of Object.entries(data)) {
-    if (k === "pets" || k.startsWith("pet_")) { localStorage.setItem(k, v); count++; }
+  if (!confirm("現在のデータをバックアップで上書きしますか？")) {
+    event.target.value = "";
+    return;
   }
-  alert(`✅ ${count} 件のデータをインポートしました。ページを再読み込みします。`);
-  closeModal("infoModal");
-  location.reload();
-}
 
-function exportData() {
-  const result = {};
-  for (const k of Object.keys(localStorage)) {
-    if (k === "pets" || k.startsWith("pet_")) result[k] = localStorage.getItem(k);
-  }
-  const json = JSON.stringify(result, null, 2);
-  navigator.clipboard.writeText(json)
-    .then(() => alert("データをクリップボードにコピーしました！"))
-    .catch(() => {
-      document.getElementById("importJson").value = json;
-      alert("テキストエリアにデータを出力しました。コピーして保管してください。");
+  try {
+    const text = await file.text();
+    const backup = JSON.parse(text);
+
+    if (!backup.version) {
+      alert("バックアップファイルではありません。");
+      event.target.value = "";
+      return;
+    }
+    if (!backup.pets || !backup.data) {
+      alert("データ形式が違います。");
+      event.target.value = "";
+      return;
+    }
+
+    localStorage.setItem("pets", JSON.stringify(backup.pets));
+
+    Object.keys(backup.data).forEach(key => {
+      localStorage.setItem(key, JSON.stringify(backup.data[key]));
     });
+
+    event.target.value = "";
+    alert("バックアップを読み込みました。");
+    location.reload();
+
+  } catch(e) {
+    console.error(e);
+    alert("読み込みに失敗しました。");
+    event.target.value = "";
+  }
+}
+
+/* ===================== バックアップ書き出し ===================== */
+function exportBackup() {
+  // petsとpet_*キーを収集
+  const petsRaw = localStorage.getItem("pets");
+  const petsData = petsRaw ? JSON.parse(petsRaw) : [];
+  const data = {};
+
+  for (const k of Object.keys(localStorage)) {
+    if (k.startsWith("pet_")) {
+      try { data[k] = JSON.parse(localStorage.getItem(k)); }
+      catch(e) { data[k] = localStorage.getItem(k); }
+    }
+  }
+
+  const backup = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    pets: petsData,
+    data
+  };
+
+  const json = JSON.stringify(backup, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  const date = new Date().toISOString().slice(0, 10);
+  a.href     = url;
+  a.download = `hatopi-pet-backup-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 /* ===================== 言語 ===================== */
