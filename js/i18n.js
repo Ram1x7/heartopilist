@@ -1,17 +1,6 @@
 /**
  * i18n.js — はとぴ図鑑 多言語対応スクリプト
  * 対応言語: ja / en / zh-CN / zh-TW / ko / th
- *
- * 使い方:
- *   1. <html lang="ja"> に lang 属性を設定
- *   2. 翻訳したい要素に data-i18n="キー" を付与
- *      (placeholder の場合は data-i18n-placeholder="キー")
- *   3. このスクリプトを読み込む
- *   4. i18n.init() を呼ぶ（または DOMContentLoaded で自動実行）
- *
- * JS から翻訳文字列を取得する:
- *   i18n.t("キー")
- *   i18n.t("level_range_text", { min: 1, max: 13 })
  */
 
 const i18n = (() => {
@@ -19,10 +8,10 @@ const i18n = (() => {
   const DEFAULT_LANG = "ja";
   const STORAGE_KEY = "lang";
 
-  // ベースURL（GitHub Pages 対応）
+  // GitHub Pages対応
   const BASE_URL = (() => {
     const scripts = document.getElementsByTagName("script");
-    for (let s of scripts) {
+    for (const s of scripts) {
       if (s.src && s.src.includes("i18n.js")) {
         return s.src.replace(/js\/i18n\.js.*$/, "");
       }
@@ -33,158 +22,215 @@ const i18n = (() => {
   let _translations = {};
   let _lang = DEFAULT_LANG;
 
-  /** ブラウザ言語から最適なサポート言語を選ぶ */
+  // ▼追加
+  let ready = false;
+  let initialized = false;
+
+  /** ブラウザ言語判定 */
   function detectBrowserLang() {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && SUPPORTED.includes(saved)) return saved;
 
     const nav = navigator.languages || [navigator.language];
+
     for (const l of nav) {
-      const exact = SUPPORTED.find(s => s.toLowerCase() === l.toLowerCase());
+      const exact = SUPPORTED.find(
+        s => s.toLowerCase() === l.toLowerCase()
+      );
       if (exact) return exact;
-      const prefix = SUPPORTED.find(s => s.toLowerCase().startsWith(l.slice(0, 2).toLowerCase()));
+
+      const prefix = SUPPORTED.find(
+        s => s.toLowerCase().startsWith(l.slice(0,2).toLowerCase())
+      );
       if (prefix) return prefix;
     }
+
     return DEFAULT_LANG;
   }
 
-  /** 翻訳ファイルを fetch で読み込む */
-  async function loadTranslations(lang) {
-    try {
+  /** 翻訳JSON読込 */
+  async function loadTranslations(lang){
+    try{
       const url = `${BASE_URL}locales/${lang}.json?v=1`;
       const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      if(!res.ok) throw new Error(res.status);
+
       return await res.json();
-    } catch (e) {
-      console.warn(`[i18n] Failed to load ${lang}, falling back to ${DEFAULT_LANG}`, e);
-      if (lang !== DEFAULT_LANG) {
+
+    }catch(e){
+
+      console.warn(`[i18n] Failed to load ${lang}`,e);
+
+      if(lang!==DEFAULT_LANG){
         const res = await fetch(`${BASE_URL}locales/${DEFAULT_LANG}.json?v=1`);
         return await res.json();
       }
+
       return {};
     }
   }
 
-  /**
-   * 翻訳テキストを取得
-   * @param {string} key
-   * @param {Object} [vars] - {min:1, max:13} のような変数
-   */
-  function t(key, vars) {
+  /** 翻訳取得 */
+  function t(key, vars){
+
     let text = _translations[key] ?? key;
-    if (vars) {
-      Object.entries(vars).forEach(([k, v]) => {
-        text = text.replaceAll(`{${k}}`, v);
+
+    if(vars){
+      Object.entries(vars).forEach(([k,v])=>{
+        text = text.replaceAll(`{${k}}`,v);
       });
     }
+
     return text;
   }
 
-  /** DOM を走査して data-i18n 属性を翻訳 */
-  function applyTranslations() {
-    // テキストコンテンツ
-    document.querySelectorAll("[data-i18n]").forEach(el => {
+  /** DOM翻訳 */
+  function applyTranslations(){
+
+    document.querySelectorAll("[data-i18n]").forEach(el=>{
+
       const key = el.dataset.i18n;
       const text = t(key);
-      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+
+      if(el.tagName==="INPUT" || el.tagName==="TEXTAREA"){
         el.value = text;
-      } else {
+      }else{
         el.textContent = text;
       }
+
     });
 
-    // placeholder
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el=>{
       el.placeholder = t(el.dataset.i18nPlaceholder);
     });
 
-    // title 属性
-    document.querySelectorAll("[data-i18n-title]").forEach(el => {
+    document.querySelectorAll("[data-i18n-title]").forEach(el=>{
       el.title = t(el.dataset.i18nTitle);
     });
 
-    // <html lang>
     document.documentElement.lang = _lang;
   }
 
-  /** 言語セレクターを構築して挿入 */
-  function buildSelector() {
-    const existing = document.getElementById("lang-selector");
-    if (existing) existing.remove();
+  /** 言語セレクター */
+  function buildSelector(){
+
+    const old = document.getElementById("lang-selector");
+    if(old) old.remove();
 
     const langs = [
-      { code: "ja",    label: "🇯🇵 日本語" },
-      { code: "en",    label: "🇺🇸 English" },
-      { code: "zh-CN", label: "🇨🇳 中文(简)" },
-      { code: "zh-TW", label: "🇹🇼 中文(繁)" },
-      { code: "ko",    label: "🇰🇷 한국어" },
-      { code: "th",    label: "🇹🇭 ภาษาไทย" },
+      {code:"ja",label:"🇯🇵 日本語"},
+      {code:"en",label:"🇺🇸 English"},
+      {code:"zh-CN",label:"🇨🇳 中文(简)"},
+      {code:"zh-TW",label:"🇹🇼 中文(繁)"},
+      {code:"ko",label:"🇰🇷 한국어"},
+      {code:"th",label:"🇹🇭 ภาษาไทย"}
     ];
 
     const wrap = document.createElement("div");
-    wrap.id = "lang-selector";
-    wrap.setAttribute("aria-label", "Language selector");
+    wrap.id="lang-selector";
 
     const select = document.createElement("select");
-    select.id = "lang-select";
-    select.setAttribute("aria-label", "Select language");
+    select.id="lang-select";
 
-    langs.forEach(({ code, label }) => {
+    langs.forEach(l=>{
+
       const opt = document.createElement("option");
-      opt.value = code;
-      opt.textContent = label;
-      if (code === _lang) opt.selected = true;
+      opt.value=l.code;
+      opt.textContent=l.label;
+
+      if(l.code===_lang){
+        opt.selected=true;
+      }
+
       select.appendChild(opt);
+
     });
 
-    select.addEventListener("change", async () => {
+    select.onchange = async ()=>{
       await switchLang(select.value);
-    });
+    };
 
     wrap.appendChild(select);
 
-    // title-bar の中に挿入（なければ body 先頭）
-    const titleBar = document.querySelector(".title-bar");
-    const titleButtons = document.querySelector(".title-buttons");
-    if (titleButtons) {
-      titleButtons.insertBefore(wrap, titleButtons.firstChild);
-    } else if (titleBar) {
+    const titleButtons=document.querySelector(".title-buttons");
+    const titleBar=document.querySelector(".title-bar");
+
+    if(titleButtons){
+      titleButtons.insertBefore(wrap,titleButtons.firstChild);
+    }else if(titleBar){
       titleBar.appendChild(wrap);
-    } else {
-      document.body.insertBefore(wrap, document.body.firstChild);
+    }else{
+      document.body.insertBefore(wrap,document.body.firstChild);
     }
+
   }
 
-  /** 言語を切り替える */
-  async function switchLang(lang) {
-    if (!SUPPORTED.includes(lang)) lang = DEFAULT_LANG;
+  /** 言語切替 */
+  async function switchLang(lang){
+
+    if(!SUPPORTED.includes(lang)){
+      lang = DEFAULT_LANG;
+    }
+
     _lang = lang;
-    localStorage.setItem(STORAGE_KEY, lang);
+
+    localStorage.setItem(STORAGE_KEY,lang);
+
+    ready = false;
+
     _translations = await loadTranslations(lang);
+
+    ready = true;
+
     applyTranslations();
 
-    // セレクターの選択状態を同期
-    const sel = document.getElementById("lang-select");
-    if (sel) sel.value = lang;
+    const sel=document.getElementById("lang-select");
+    if(sel) sel.value=lang;
 
-    // カスタムイベント発行（main.js 側でフックできる）
-    document.dispatchEvent(new CustomEvent("langchange", { detail: { lang } }));
+    document.dispatchEvent(
+      new CustomEvent("langchange",{detail:{lang}})
+    );
+
   }
 
   /** 初期化 */
-  async function init() {
+  async function init(){
+
+    if(initialized) return;
+
+    initialized = true;
+
     _lang = detectBrowserLang();
+
+    ready = false;
+
     _translations = await loadTranslations(_lang);
+
+    ready = true;
+
     buildSelector();
+
     applyTranslations();
+
+    document.dispatchEvent(
+      new CustomEvent("langchange",{detail:{lang:_lang}})
+    );
+
   }
 
-  // DOMContentLoaded 後に自動初期化
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
-  } else {
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",init);
+  }else{
     init();
   }
 
-  return { t, switchLang, init, getCurrentLang: () => _lang };
+  return{
+    t,
+    init,
+    switchLang,
+    isReady:()=>ready,
+    getCurrentLang:()=>_lang
+  };
+
 })();
