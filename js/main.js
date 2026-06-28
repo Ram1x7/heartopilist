@@ -291,6 +291,8 @@ function render(){
 // 時間更新
 // ======================================================
 function updateTime(){
+ if (!i18n.isReady()) return;
+  
  const now = new Date();
  const zone = getZone();
  const todayKey    = getDateKey(0);
