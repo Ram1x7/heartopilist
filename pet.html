@@ -162,6 +162,7 @@ h1 {
 }
 
 #helpBtn,
+#dataBtn,
 #darkToggle {
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -587,9 +588,10 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 <div class="title-bar">
   <h1>はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="helpBtn" onclick="openDataModal()">📦</button>
-    <button id="darkToggle" onclick="toggleDark()">🌙</button>
-  </div>
+  <button id="helpBtn" onclick="openHelpModal()">❓</button>
+  <button id="dataBtn" onclick="openDataModal()">📦</button>
+  <button id="darkToggle" onclick="toggleDark()">🌙</button>
+ </div>
 </div>
 
 <!-- サイトナビ -->
@@ -662,6 +664,31 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
     </button>
 
     <button class="full-btn secondary" style="margin-top:14px;" onclick="closeModal('dataModal')">閉じる</button>
+  </div>
+</div>
+
+<!-- ヘルプモーダル -->
+<div class="modal" id="helpModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('helpModal')">✕</button>
+    <div class="modal-title">📖 使い方</div>
+
+    <p><strong>🐶🐱 ペット切替</strong><br>
+    タブをタップでペット切替。<br>
+    ダブルタップで名前変更、長押しで削除。</p>
+
+    <p style="margin-top:10px;"><strong>🍖 エサの記録</strong><br>
+    画像タップ → あげた記録（暗転）<br>
+    好き → 緑枠、嫌い → 朱色枠で表示。</p>
+
+    <p style="margin-top:10px;"><strong>📊 並び順</strong><br>
+    好き・嫌い・未記録・あげた の順に自動整列。</p>
+
+    <p style="margin-top:10px;"><strong>📦 データ管理</strong><br>
+    📦ボタンからバックアップの書き出し・読み込みができます。<br>
+    機種変更時などにご利用ください。</p>
+
+    <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal')">閉じる</button>
   </div>
 </div>
 
@@ -898,6 +925,7 @@ function applyDark() {
 }
 
 /* ===================== モーダル ===================== */
+function openHelpModal() { document.getElementById("helpModal").classList.add("open"); }
 function openDataModal() { document.getElementById("dataModal").classList.add("open"); }
 function closeModal(id)  { document.getElementById(id).classList.remove("open"); }
 
