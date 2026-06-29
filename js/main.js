@@ -946,7 +946,7 @@ function drawShareCard() {
   drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "🌱", "園芸",
     stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal,"#4a7c59");
 
-  // ── ヘルパー：内訳セクション ──
+// ── ヘルパー：内訳セクション ──
   function drawSubSection(titleY, sectionLabel, rows) {
     ctx.textAlign = "left";
     ctx.fillStyle = "#3c5a6e";
@@ -1019,33 +1019,6 @@ function drawShareCard() {
   ctx.fillStyle = "rgba(255,255,255,0.7)";
   ctx.font = "13px sans-serif";
   ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 12);
-}
-
-  // ── 総合コンプ率 ──
-  const totalAll    = stats.total + stats.foodTotal + stats.gardenTotal;
-  const doneAll     = stats.done  + stats.foodDone  + stats.gardenDone;
-  const totalPercent = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
-
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#3c5a6e";
-  ctx.font = "bold 22px sans-serif";
-  ctx.fillText("総合コンプ率", w / 2, y);
-  y += 56;
-
-  ctx.font = "bold 72px sans-serif";
-  ctx.fillStyle = "#b1503b";
-  ctx.fillText(`${totalPercent}%`, w / 2, y);
-  y += 36;
-
-  ctx.font = "18px sans-serif";
-  ctx.fillStyle = "#34302b";
-  ctx.fillText(`${doneAll} / ${totalAll}`, w / 2, y);
-
-  // 日付
-  ctx.font = "13px sans-serif";
-  ctx.fillStyle = "#7a7164";
-  ctx.textAlign = "center";
-  ctx.fillText(new Date().toLocaleDateString(), w / 2, h - 24);
 }
 
 
