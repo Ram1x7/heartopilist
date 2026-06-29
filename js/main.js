@@ -1,4 +1,4 @@
-const APP_VERSION = "2.3.2";
+const APP_VERSION = "2.3.3";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -12,7 +12,7 @@ let currentZone="";
 let currentWeather="";
 
 let minLevel = 1;
-let maxLevel = 13;
+let maxLevel = 14;
   // チェック保存
 let checkedData =
   JSON.parse(localStorage.getItem("checkedData") || "{}");
@@ -751,19 +751,20 @@ shareModal.onclick = (e)=>{
 
 // 集計
 function getStats() {
-  // 図鑑
+
+  // ── 図鑑 ──
   const total = creatures.length;
   const done  = creatures.filter(c => checkedData[c.name]).length;
-  const byType = { fish:0, bug:0, bird:0 };
+
+  const byType      = { fish:0, bug:0, bird:0 };
   const totalByType = { fish:0, bug:0, bird:0 };
   creatures.forEach(c => {
     totalByType[c.type]++;
     if (checkedData[c.name]) byType[c.type]++;
   });
 
-  // 認証（図鑑）種類別
-  const authEligible = creatures.filter(c => c.auth !== false);
-  const authByType = { fish:0, bug:0, bird:0 };
+  const authEligible    = creatures.filter(c => c.auth !== false);
+  const authByType      = { fish:0, bug:0, bird:0 };
   const authTotalByType = { fish:0, bug:0, bird:0 };
   authEligible.forEach(c => {
     authTotalByType[c.type]++;
@@ -772,123 +773,214 @@ function getStats() {
   const authCount = authEligible.filter(c => authData[c.name]).length;
   const authTotal = authEligible.length;
 
-  // 料理
-  const foodChecked = JSON.parse(localStorage.getItem("food_checked") || "{}");
-  const foodAuth    = JSON.parse(localStorage.getItem("food_auth")    || "{}");
-  const foodAll     = typeof foodsData !== "undefined" ? foodsData : [];
-  const foodDone    = foodAll.filter(f => foodChecked[f.name]).length;
-  const foodTotal   = foodAll.length;
-  const foodAuthEligible = foodAll.filter(f => f.auth !== false);
-  const foodAuthDone     = foodAuthEligible.filter(f => foodAuth[f.name]).length;
-  const foodAuthTotal    = foodAuthEligible.length;
+  // ── 料理 ──
+  const foodChecked     = JSON.parse(localStorage.getItem("food_checked") || "{}");
+  const foodAuth        = JSON.parse(localStorage.getItem("food_auth")    || "{}");
+  const foodAll         = typeof foodsData !== "undefined" ? foodsData : [];
+  const foodDone        = foodAll.filter(f => foodChecked[f.name]).length;
+  const foodTotal       = foodAll.length;
+  const foodAuthElig    = foodAll.filter(f => f.auth !== false);
+  const foodAuthDone    = foodAuthElig.filter(f => foodAuth[f.name]).length;
+  const foodAuthTotal   = foodAuthElig.length;
 
-  // 園芸（作物＋花）
-  const gardenChecked = JSON.parse(localStorage.getItem("garden_checked") || "{}");
-  const cropAll       = typeof cropData   !== "undefined" ? cropData   : [];
-  const flowerAll     = typeof flowerData !== "undefined" ? flowerData : [];
-  const gardenAll     = [...cropAll, ...flowerAll];
-  const gardenDone    = gardenAll.filter(g => gardenChecked[g.name]).length;
-  const gardenTotal   = gardenAll.length;
-  const gardenAuthEligible = gardenAll.filter(g => g.auth !== false);
-  const gardenAuthDone     = gardenAuthEligible.filter(g => authData[g.name]).length;
-  const gardenAuthTotal    = gardenAuthEligible.length;
+  // ── 園芸：作物 ──
+  const gardenChecked   = JSON.parse(localStorage.getItem("garden_checked") || "{}");
+  const cropAll         = typeof cropData   !== "undefined" ? cropData   : [];
+  const flowerAll       = typeof flowerData !== "undefined" ? flowerData : [];
+
+  const cropDone        = cropAll.filter(g => gardenChecked[g.name]).length;
+  const cropTotal       = cropAll.length;
+  const cropAuthElig    = cropAll.filter(g => g.auth !== false);
+  const cropAuthDone    = cropAuthElig.filter(g => authData[g.name]).length;
+  const cropAuthTotal   = cropAuthElig.length;
+
+  // ── 園芸：花 ──
+  const flowerDone      = flowerAll.filter(g => gardenChecked[g.name]).length;
+  const flowerTotal     = flowerAll.length;
+  const flowerAuthElig  = flowerAll.filter(g => g.auth !== false);
+  const flowerAuthDone  = flowerAuthElig.filter(g => authData[g.name]).length;
+  const flowerAuthTotal = flowerAuthElig.length;
+
+  // ── 園芸：合計 ──
+  const gardenDone      = cropDone  + flowerDone;
+  const gardenTotal     = cropTotal + flowerTotal;
+  const gardenAuthDone  = cropAuthDone  + flowerAuthDone;
+  const gardenAuthTotal = cropAuthTotal + flowerAuthTotal;
 
   return {
+    // 図鑑
     total, done, byType, totalByType,
     authCount, authTotal, authByType, authTotalByType,
+    // 料理
     foodDone, foodTotal, foodAuthDone, foodAuthTotal,
-    gardenDone, gardenTotal, gardenAuthDone, gardenAuthTotal
+    // 園芸
+    gardenDone, gardenTotal, gardenAuthDone, gardenAuthTotal,
+    cropDone,   cropTotal,   cropAuthDone,   cropAuthTotal,
+    flowerDone, flowerTotal, flowerAuthDone, flowerAuthTotal,
   };
 }
 
 // 画像生成
 function drawShareCard() {
   const stats = getStats();
-  const ctx = shareCanvas.getContext("2d");
-  const w = shareCanvas.width;   // 600
-  const h = shareCanvas.height;  // 800
+  const ctx   = shareCanvas.getContext("2d");
+  const w     = shareCanvas.width;   // 600
+  const h     = shareCanvas.height;  // 1020 ← index.html の canvas height をこの値に変更
 
-  // 背景
+  // ── 背景 ──
   const grad = ctx.createLinearGradient(0, 0, 0, h);
   grad.addColorStop(0, "#f7f2e7");
   grad.addColorStop(1, "#ece2cf");
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
 
-  // タイトル
-  ctx.textAlign = "center";
+  // 装飾円
+  ctx.save();
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = "#c8a86b";
+  ctx.beginPath(); ctx.arc(520, 80,  160, 0, Math.PI*2); ctx.fill();
   ctx.fillStyle = "#3c5a6e";
-  ctx.font = "bold 32px sans-serif";
-  ctx.fillText("はとぴ図鑑 コンプ状況", w / 2, 52);
+  ctx.beginPath(); ctx.arc(80,  940, 140, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
 
-  // 区切り線（ヘッダー下）
-  ctx.strokeStyle = "#e4d9c2";
-  ctx.lineWidth = 1;
+  // ── ヘッダー ──
+  ctx.fillStyle = "#3c5a6e";
+  ctx.fillRect(0, 0, w, 72);
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#fdf9ef";
+  ctx.font = "bold 28px sans-serif";
+  ctx.fillText("はとぴ図鑑  コンプ状況", w / 2, 46);
+
+  // ── 総合コンプ率 ──
+  const totalAll  = stats.total + stats.foodTotal + stats.gardenTotal;
+  const doneAll   = stats.done  + stats.foodDone  + stats.gardenDone;
+  const totalPct  = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
+
+  ctx.save();
   ctx.beginPath();
-  ctx.moveTo(40, 68); ctx.lineTo(w - 40, 68);
+  ctx.arc(w / 2, 172, 72, 0, Math.PI*2);
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  ctx.fill();
+  ctx.strokeStyle = "#c8a86b";
+  ctx.lineWidth = 2.5;
   ctx.stroke();
+  ctx.restore();
 
-  // ── セクション描画ヘルパー ──
-  // 戻り値：次のy座標
-  function drawSection(icon, label, done, total, authDone, authTotal, subtypes, startY) {
-    let y = startY;
-    const percent = total > 0 ? Math.floor(done / total * 100) : 0;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#b1503b";
+  ctx.font = "bold 52px sans-serif";
+  ctx.fillText(`${totalPct}%`, w / 2, 186);
 
-    // セクション名 ＋ パーセント・件数
-    ctx.font = "bold 20px sans-serif";
+  ctx.fillStyle = "#7a7164";
+  ctx.font = "14px sans-serif";
+  ctx.fillText("総合コンプ率", w / 2, 212);
+
+  ctx.fillStyle = "#34302b";
+  ctx.font = "15px sans-serif";
+  ctx.fillText(`${doneAll} / ${totalAll}`, w / 2, 232);
+
+  // ── ヘルパー：プログレスバー ──
+  function drawProgressBar(x, y, bw, bh, pct, color) {
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.beginPath(); ctx.roundRect(x, y, bw, bh, bh / 2); ctx.fill();
+    if (pct > 0) {
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.roundRect(x, y, bw * pct / 100, bh, bh / 2); ctx.fill();
+    }
+  }
+
+  // ── ヘルパー：セクションカード ──
+  function drawCard(x, y, cw, ch, icon, label, done, total, authDone, authTotal, color) {
+    ctx.save();
+    ctx.shadowColor  = "rgba(52,48,43,0.12)";
+    ctx.shadowBlur   = 12;
+    ctx.shadowOffsetY = 4;
+    ctx.fillStyle = "rgba(255,255,255,0.82)";
+    ctx.beginPath(); ctx.roundRect(x, y, cw, ch, 16); ctx.fill();
+    ctx.restore();
+
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.roundRect(x, y, cw, 5, [16, 16, 0, 0]); ctx.fill();
+
+    const cx  = x + cw / 2;
+    const pct = total > 0 ? Math.floor(done / total * 100) : 0;
+
+    ctx.textAlign = "center";
+    ctx.font = "20px sans-serif";
+    ctx.fillText(icon, cx, y + 34);
+
     ctx.fillStyle = "#3c5a6e";
+    ctx.font = "bold 13px sans-serif";
+    ctx.fillText(label, cx, y + 52);
+
+    ctx.fillStyle = color;
+    ctx.font = "bold 30px sans-serif";
+    ctx.fillText(`${pct}%`, cx, y + 90);
+
+    ctx.fillStyle = "#7a7164";
+    ctx.font = "12px sans-serif";
+    ctx.fillText(`${done} / ${total}`, cx, y + 110);
+
+    drawProgressBar(x + 14, y + 120, cw - 28, 7, pct, color);
+
+    ctx.fillStyle = "#c8a86b";
+    ctx.font = "bold 11px sans-serif";
+    ctx.fillText("🎖 認証", cx, y + 148);
+
+    ctx.fillStyle = "#7a7164";
+    ctx.font = "12px sans-serif";
+    ctx.fillText(`${authDone} / ${authTotal}`, cx, y + 165);
+  }
+
+  // ── 3カード横並び ──
+  const cardY  = 258;
+  const cardH  = 178;
+  const cardW  = 172;
+  const gap    = 11;
+  const startX = (w - cardW * 3 - gap * 2) / 2;
+
+  drawCard(startX,                 cardY, cardW, cardH, "📖", "図鑑",
+    stats.done,       stats.total,       stats.authCount,      stats.authTotal,      "#3c5a6e");
+  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "🍳", "料理",
+    stats.foodDone,   stats.foodTotal,   stats.foodAuthDone,   stats.foodAuthTotal,  "#b1503b");
+  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "🌱", "園芸",
+    stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal,"#4a7c59");
+
+  // ── ヘルパー：内訳セクション ──
+  function drawSubSection(titleY, sectionLabel, rows) {
     ctx.textAlign = "left";
-    ctx.fillText(`${icon} ${label}`, 40, y);
+    ctx.fillStyle = "#3c5a6e";
+    ctx.font = "bold 15px sans-serif";
+    ctx.fillText(sectionLabel, 40, titleY);
 
     ctx.textAlign = "right";
-    ctx.fillStyle = "#b1503b";
-    ctx.fillText(`${percent}%  ${done} / ${total}`, w - 40, y);
-    y += 28;
-
-    // サブタイプ（種類別）
-    if (subtypes && subtypes.length > 0) {
-      ctx.font = "13px sans-serif";
-      ctx.fillStyle = "#7a7164";
-      subtypes.forEach(t => {
-        ctx.textAlign = "left";
-        ctx.fillText(`　${t.label}：${t.done} / ${t.total}`, 60, y);
-        y += 20;
-      });
-      y += 2;
-    }
-
-    // 認証
-    ctx.font = "14px sans-serif";
+    ctx.fillStyle = "#7a7164";
+    ctx.font = "11px sans-serif";
+    ctx.fillText("⭐ コンプ", w - 120, titleY);
     ctx.fillStyle = "#c8a86b";
-    ctx.textAlign = "left";
-    ctx.fillText(`🎖 認証：${authDone} / ${authTotal}`, 60, y);
+    ctx.fillText("🎖 認証", w - 40, titleY);
 
-    // 認証サブタイプ
-    if (subtypes && subtypes.length > 0) {
-      subtypes.forEach(t => {
-        if (t.authDone == null) return;
-        ctx.textAlign = "right";
-        ctx.fillStyle = "#c8a86b";
-        ctx.font = "13px sans-serif";
-        ctx.fillText(`${t.label}：${t.authDone} / ${t.authTotal}`, w - 40, y);
-        y += 0; // 同じ行に並べる
-      });
+    const barX = 40;
+    const barW = w - 80;
 
-      // 認証サブタイプを縦並びに
-      y += 18;
-      ctx.font = "13px sans-serif";
-      ctx.fillStyle = "#b3a080";
-      subtypes.forEach(t => {
-        if (t.authDone == null) return;
-        ctx.textAlign = "left";
-        ctx.fillText(`　${t.label}：${t.authDone} / ${t.authTotal}`, 80, y);
-        y += 18;
-      });
-    } else {
-      y += 20;
-    }
+    rows.forEach((t, i) => {
+      const ty   = titleY + 22 + i * 62;
+      const pct  = t.total     > 0 ? Math.floor(t.done     / t.total     * 100) : 0;
+      const aPct = t.authTotal > 0 ? Math.floor(t.authDone / t.authTotal * 100) : 0;
 
-    return y;
+      ctx.fillStyle = "#34302b";
+      ctx.font = "bold 13px sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(t.label, barX, ty + 13);
+
+      ctx.fillStyle = "#7a7164";
+      ctx.font = "12px sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(`⭐ ${t.done}/${t.total}  🎖 ${t.authDone}/${t.authTotal}`, w - 40, ty + 13);
+
+      drawProgressBar(barX, ty + 20, barW, 8, pct,  t.color);
+      drawProgressBar(barX, ty + 34, barW, 6, aPct, "#c8a86b");
+    });
   }
 
   function drawDivider(y) {
@@ -899,32 +991,35 @@ function drawShareCard() {
     ctx.stroke();
   }
 
-  // ── 図鑑 ──
-  let y = 92;
-  const figTypes = [
-    { label:"魚",  done: stats.byType.fish,  total: stats.totalByType.fish,  authDone: stats.authByType.fish,  authTotal: stats.authTotalByType.fish  },
-    { label:"虫",  done: stats.byType.bug,   total: stats.totalByType.bug,   authDone: stats.authByType.bug,   authTotal: stats.authTotalByType.bug   },
-    { label:"野鳥",done: stats.byType.bird,  total: stats.totalByType.bird,  authDone: stats.authByType.bird,  authTotal: stats.authTotalByType.bird  },
-  ];
-  y = drawSection("📖", "図鑑", stats.done, stats.total, stats.authCount, stats.authTotal, figTypes, y);
+  // ── 図鑑内訳 ──
+  const figSubY = 462;
+  drawSubSection(figSubY, "📖 図鑑内訳", [
+    { label:"魚",   done:stats.byType.fish,  total:stats.totalByType.fish,  authDone:stats.authByType.fish,  authTotal:stats.authTotalByType.fish,  color:"#3c5a6e" },
+    { label:"虫",   done:stats.byType.bug,   total:stats.totalByType.bug,   authDone:stats.authByType.bug,   authTotal:stats.authTotalByType.bug,   color:"#4a7c59" },
+    { label:"野鳥", done:stats.byType.bird,  total:stats.totalByType.bird,  authDone:stats.authByType.bird,  authTotal:stats.authTotalByType.bird,  color:"#b1503b" },
+  ]);
 
-  y += 14;
-  drawDivider(y);
-  y += 18;
+  // ── 園芸内訳 ──
+  const gardenSubY = figSubY + 22 + 3 * 62 + 18;
+  drawDivider(gardenSubY - 10);
+  drawSubSection(gardenSubY, "🌱 園芸内訳", [
+    { label:"作物", done:stats.cropDone,   total:stats.cropTotal,   authDone:stats.cropAuthDone,   authTotal:stats.cropAuthTotal,   color:"#4a7c59" },
+    { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal, color:"#b1503b" },
+  ]);
 
-  // ── 料理 ──
-  y = drawSection("🍳", "料理", stats.foodDone, stats.foodTotal, stats.foodAuthDone, stats.foodAuthTotal, null, y);
+  // ── フッター ──
+  ctx.fillStyle = "#3c5a6e";
+  ctx.fillRect(0, h - 52, w, 52);
 
-  y += 14;
-  drawDivider(y);
-  y += 18;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "rgba(255,255,255,0.5)";
+  ctx.font = "12px sans-serif";
+  ctx.fillText("ram1x7.github.io/heartopilist", w / 2, h - 30);
 
-  // ── 園芸 ──
-  y = drawSection("🌱", "園芸", stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal, null, y);
-
-  y += 14;
-  drawDivider(y);
-  y += 24;
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.font = "13px sans-serif";
+  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 12);
+}
 
   // ── 総合コンプ率 ──
   const totalAll    = stats.total + stats.foodTotal + stats.gardenTotal;
@@ -1022,7 +1117,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.3.2";
+const popupVersion = "2.3.3";
 
 if(
  localStorage.getItem("popupVersion")
@@ -1099,7 +1194,7 @@ clearBtn.style.display =
 levelMin.value =
   localStorage.getItem("minLevel") || 1;
 levelMax.value =
-  localStorage.getItem("maxLevel") || 13;
+  localStorage.getItem("maxLevel") || 14;
 updateLevelRange();
 setFilter(
   localStorage.getItem("currentFilter") || "all"
