@@ -80,7 +80,7 @@ const catFoods = [
 {name:{jp:"ブルーギル",en:"Bluegill",zh_cn:"蓝鳃太阳鱼",zh_tw:"藍鰓太陽魚",ko:"블루길",th:"ปลาบลูกิล",tl:"Bluegill"},img:"./images/petfoods/112.PNG"},
 {name:{jp:"ホッキョクイワナ",en:"Arctic Char Trout",zh_cn:"北极红点鲑",zh_tw:"北極紅點鮭",ko:"북극송어",th:"ปลาอาร์กติกเทราต์",tl:"Arctic Char"},img:"./images/petfoods/113.PNG"},
 {name:{jp:"メカジキ",en:"Swordfish",zh_cn:"剑鱼",zh_tw:"劍魚",ko:"황새치",th:"ปลากระโทงดาบ",tl:"Swordfish"},img:"./images/petfoods/114.PNG"},
-{name:{jp:"シマスズメダイ"},img:"./images/001.PNG"},
+{name:{jp:"シマスズメダイ"},img:"./images/000.PNG"},
 {name:{jp:"氷晶のタラバガニ",en:"Ice Crystal King Crab",zh_cn:"冰晶帝王蟹",zh_tw:"冰晶帝王蟹",ko:"빙결 킹크랩",th:"ปูคิงคริสตัลน้ำแข็ง",tl:"Ice King Crab"},img:"./images/petfoods/115.PNG"},
 {name:{jp:"氷晶のマンボウ",en:"Ice Sunfish",zh_cn:"冰晶翻车鱼",zh_tw:"冰晶翻車魚",ko:"빙결 개복치",th:"ปลาแสงอาทิตย์น้ำแข็ง",tl:"Ice Sunfish"},img:"./images/petfoods/116.PNG"},
 {name:{jp:"氷晶のフグ",en:"Ice Pufferfish",zh_cn:"冰晶河豚",zh_tw:"冰晶河豚",ko:"빙결 복어",th:"ปลาปักเป้าน้ำแข็ง",tl:"Ice Pufferfish"},img:"./images/petfoods/117.PNG"},
