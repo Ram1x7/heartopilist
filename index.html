@@ -12,9 +12,10 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
 <link rel="manifest" href="./manifest.json">
 
-<title>はとぴ図鑑｜Heartopia(ハートピアスローライフ)の魚・虫・野鳥の入手方検索ツール</title>
+<title data-i18n="page_title_index">はとぴ図鑑｜Heartopia(ハートピアスローライフ)の魚・虫・野鳥の入手方検索ツール</title>
 <meta
  name="description"
+ data-i18n-content="meta_description"
  content="Heartopia(ハートピアスローライフ)の魚・虫・野鳥の入手方法や出現場所、天気条件や時間帯を検索できる非公式図鑑ツール。今なにがとれるか全部分かる。売価表示対応。"
 />
 <!-- OGP -->
@@ -59,7 +60,7 @@
 <body>
 <div class="title-bar">
 
-  <h1>はとぴ図鑑</h1>
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
 
   <div class="title-buttons">
    <button id="helpBtn">❓</button>
@@ -70,18 +71,18 @@
 </div>
 
 <nav class="site-nav">
-  <a href="./index.html" class="site-nav-item active">図鑑</a>
-  <a href="./foods.html" class="site-nav-item">料理</a>
-  <a href="./garden.html" class="site-nav-item">園芸</a>
-  <a href="./pet.html" class="site-nav-item">ペット</a>
-  <a href="./codes.html" class="site-nav-item">コード</a>
-  <a href="./events.html" class="site-nav-item">イベント</a>
-  <a href="./faq.html" class="site-nav-item">Q&A</a>
+  <a href="./index.html" class="site-nav-item active" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
 </nav>
 
 <div class="page-header">
-  <h1>リアルタイム図鑑</h1>
-  <p class="page-subtitle">
+  <h1 data-i18n="page_header_title">リアルタイム図鑑</h1>
+  <p class="page-subtitle" data-i18n="page_header_subtitle">
     ハートピアの天気と今の時間に合わせた図鑑表示
   </p>
 </div>
@@ -95,6 +96,7 @@
     id="miniSearch"
     class="search mini-search"
     placeholder="🔍 名前・場所で検索"
+    data-i18n-placeholder="search_placeholder"
   >
 
   <div class="mini-status">
@@ -110,50 +112,50 @@
   <div id="weatherNext" class="weather-next"></div>
 </div>
 <div style="position:relative;">
-  <input type="text" id="search" class="search" placeholder="🔍 名前・場所で検索">
+  <input type="text" id="search" class="search" placeholder="🔍 名前・場所で検索" data-i18n-placeholder="search_placeholder">
   <button id="clearBtn">×</button>
 </div>
 
   <div class="filter">
-    <button onclick="setFilter('all')" id="f_all">全部</button>
-    <button onclick="setFilter('fish')" id="f_fish">魚</button>
-    <button onclick="setFilter('bug')" id="f_bug">虫</button>
-    <button onclick="setFilter('bird')" id="f_bird">野鳥</button>
+    <button onclick="setFilter('all')" id="f_all" data-i18n="filter_all">全部</button>
+    <button onclick="setFilter('fish')" id="f_fish" data-i18n="filter_fish">魚</button>
+    <button onclick="setFilter('bug')" id="f_bug" data-i18n="filter_bug">虫</button>
+    <button onclick="setFilter('bird')" id="f_bird" data-i18n="filter_bird">野鳥</button>
   </div>
 
   <div class="filter" style="margin-top:6px;">
-    <button onclick="setWeatherMode('current')" id="w_current">今出現するもの全て</button>
-    <button onclick="setWeatherMode('only')" id="w_only">今の天気でしか出現しない</button>
-    <button onclick="setWeatherMode('hidden')" id="w_hidden">今は出現しない</button>
+    <button onclick="setWeatherMode('current')" id="w_current" data-i18n="weather_current">今出現するもの全て</button>
+    <button onclick="setWeatherMode('only')" id="w_only" data-i18n="weather_only">今の天気でしか出現しない</button>
+    <button onclick="setWeatherMode('hidden')" id="w_hidden" data-i18n="weather_hidden">今は出現しない</button>
   </div>
 
   <div class="filter filter-4" style="margin-top:6px;">
-    <button onclick="setSort('book')" id="s_book">図鑑順</button>
-    <button onclick="setSort('level')" id="s_level">レベル順</button>
-    <button onclick="setSort('unchecked')" id="s_unchecked">未コンプ順</button>
-    <button onclick="setSort('unauth')" id="s_unauth">未認証順</button>
+    <button onclick="setSort('book')" id="s_book" data-i18n="sort_book">図鑑順</button>
+    <button onclick="setSort('level')" id="s_level" data-i18n="sort_level">レベル順</button>
+    <button onclick="setSort('unchecked')" id="s_unchecked" data-i18n="sort_unchecked">未コンプ順</button>
+    <button onclick="setSort('unauth')" id="s_unauth" data-i18n="sort_unauth">未認証順</button>
   </div>
 
 <div class="filter" style="margin-top:6px;">
-  <button id="multiBtn" onclick="toggleMultiSelect()">
+  <button id="multiBtn" onclick="toggleMultiSelect()" data-i18n="multi_select">
     ☑️複数選択
   </button>
 
-  <button id="bulkCheckBtn" onclick="bulkCheck()" style="display:none;">
+  <button id="bulkCheckBtn" onclick="bulkCheck()" style="display:none;" data-i18n="bulk_star_check">
     ⭐一括チェック
   </button>
 
-  <button id="bulkUncheckBtn" onclick="bulkUncheck()" style="display:none;">
+  <button id="bulkUncheckBtn" onclick="bulkUncheck()" style="display:none;" data-i18n="bulk_star_uncheck">
     ⭐️一括解除
   </button>
 </div>
 
   <div class="filter" id="authBulkRow" style="margin-top:6px; display:none;">
-  <button id="bulkAuthCheckBtn" onclick="bulkAuthCheck()">
+  <button id="bulkAuthCheckBtn" onclick="bulkAuthCheck()" data-i18n="bulk_auth_check">
     🎖一括チェック
   </button>
 
-  <button id="bulkAuthUncheckBtn" onclick="bulkAuthUncheck()">
+  <button id="bulkAuthUncheckBtn" onclick="bulkAuthUncheck()" data-i18n="bulk_auth_uncheck">
     🎖一括解除
   </button>
 </div>
@@ -166,7 +168,7 @@
     font-size:11px;
     margin-bottom:6px;
   ">
-    <span>レベル範囲</span>
+    <span data-i18n="level_range_label">レベル範囲</span>
     <span id="levelRangeText">Lv.1〜14</span>
   </div>
 
@@ -193,6 +195,7 @@
 </div>
 
   <div id="list" class="grid"></div>
+  <div id="endedList"></div>
 
 <!-- モーダル -->
 <div id="modal" onclick="if(event.target.id==='modal')closeModal()">
@@ -214,31 +217,31 @@
      <p id="m_price5"></p>
     </div>
    </div>
-    <button onclick="closeModal()">閉じる</button>
+    <button onclick="closeModal()" data-i18n="modal_close">閉じる</button>
   </div>
 </div>
 
 <div style="font-size:12px; padding:10px; opacity:0.8;">
 
-<h3>プライバシーポリシー</h3>
-<p>
+<h3 data-i18n="privacy_title">プライバシーポリシー</h3>
+<p data-i18n="privacy_body">
 本サイトではデータはブラウザ内（LocalStorage）のみで管理され、
 外部に送信されることはありません。
 </p>
 
-<h3>お問い合わせ</h3>
+<h3 data-i18n="contact_title">お問い合わせ</h3>
 <p>
-X（旧Twitter）：
+<span data-i18n="contact_x_label">X（旧Twitter）：</span>
 <a href="https://x.com/_ram1x?s=21" target="_blank">
   @_Ram1x
 </a>
 </p>
 
 <div class="card" style="text-align:center; margin-top:16px;">
-  <p style="margin-top:0;">
+  <p style="margin-top:0;" data-i18n="contact_form_label">
     不具合報告・機能リクエスト・感想などはこちら
   </p>
-  <button onclick="window.open('https://forms.gle/Ns7ZrJyv4b45v5QNA','_blank')">
+  <button onclick="window.open('https://forms.gle/Ns7ZrJyv4b45v5QNA','_blank')" data-i18n="contact_form_btn">
     💌 匿名で送る
   </button>
 </div>
@@ -323,64 +326,64 @@ overflow-y:auto;
 text-align:left;
 ">
 
-<h3 style="text-align:center;">
+<h3 style="text-align:center;" data-i18n="help_title">
 📖 はとぴ図鑑の使い方
 </h3>
 
-<p><strong>🔍 検索</strong><br>
-名前や場所で検索できます。</p>
+<p><strong data-i18n="help_search_title">🔍 検索</strong><br>
+<span data-i18n="help_search_body">名前や場所で検索できます。</span></p>
 
-<p><strong>🐟 種類</strong><br>
-魚・虫・野鳥を切り替えます。</p>
+<p><strong data-i18n="help_type_title">🐟 種類</strong><br>
+<span data-i18n="help_type_body">魚・虫・野鳥を切り替えます。</span></p>
 
-<p><strong>☀️ 出現モード</strong><br>
-・今出現するもの全て<br>
+<p><strong data-i18n="help_mode_title">☀️ 出現モード</strong><br>
+<span data-i18n="help_mode_body">・今出現するもの全て<br>
 ・今の天気でしか出現しない<br>
-・今は出現しない</p>
+・今は出現しない</span></p>
 
-<p><strong>📚 並び替え</strong><br>
-図鑑順・レベル順・未コンプ順で並び替えできます。</p>
+<p><strong data-i18n="help_sort_title">📚 並び替え</strong><br>
+<span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順で並び替えできます。</span></p>
 
-<p><strong>⭐ 星5チェック機能</strong><br>
-右上の〇ボタンをタップでチェックできます。<br>
-複数選択→一括チェックも可能です。</p>
+<p><strong data-i18n="help_star_title">⭐ 星5チェック機能</strong><br>
+<span data-i18n="help_star_body">右上の〇ボタンをタップでチェックできます。<br>
+複数選択→一括チェックも可能です。</span></p>
 
-<p><strong>🎖 マスターチェック機能</strong><br>
-右下の〇ボタンをタップでチェックできます。<br>
-複数選択→一括チェックも可能です。</p>
+<p><strong data-i18n="help_auth_title">🎖 マスターチェック機能</strong><br>
+<span data-i18n="help_auth_body">右下の〇ボタンをタップでチェックできます。<br>
+複数選択→一括チェックも可能です。</span></p>
 
-<p><strong>📍 複数選択機能</strong><br>
-複数選択機能は手順がやや複雑なので説明します。<br>
-１．複数選択を押すと複数選択モードになります。<br>
-２．複数選択モードの状態で、チェックする生き物を全部タップします。<br>
-３．タップし終えたら、星5または認証の一括チェックボタン押します。<br>
-４．一括チェックが終わったら、もう一度複数選択ボタンを押します。<br>
-これで完了です！星5と認証は同時にチェックはできないのでご了承ください。</p>
+<p><strong data-i18n="help_multi_title">📍 複数選択機能</strong><br>
+<span data-i18n="help_multi_body_1">複数選択機能は手順がやや複雑なので説明します。</span><br>
+<span data-i18n="help_multi_body_2">１．複数選択を押すと複数選択モードになります。</span><br>
+<span data-i18n="help_multi_body_3">２．複数選択モードの状態で、チェックする生き物を全部タップします。</span><br>
+<span data-i18n="help_multi_body_4">３．タップし終えたら、星5または認証の一括チェックボタン押します。</span><br>
+<span data-i18n="help_multi_body_5">４．一括チェックが終わったら、もう一度複数選択ボタンを押します。</span><br>
+<span data-i18n="help_multi_body_6">これで完了です！星5と認証は同時にチェックはできないのでご了承ください。</span></p>
 
-<p><strong>🎚 レベル範囲</strong><br>
-表示するLvを絞り込めます。</p>
+<p><strong data-i18n="help_level_title">🎚 レベル範囲</strong><br>
+<span data-i18n="help_level_body">表示するLvを絞り込めます。</span></p>
 
-<p><strong>🌠 流星雨</strong><br>
-流星雨は晴れ扱いで判定しています。</p>
+<p><strong data-i18n="help_meteor_title">🌠 流星雨</strong><br>
+<span data-i18n="help_meteor_body">流星雨は晴れ扱いで判定しています。</span></p>
 
-<p><strong>➖ 最小化</strong><br>
-上部パネルは「－」ボタンで折りたたみできます。</p>
+<p><strong data-i18n="help_minimize_title">➖ 最小化</strong><br>
+<span data-i18n="help_minimize_body">上部パネルは「－」ボタンで折りたたみできます。</span></p>
 
-<p><strong>📥 シェア</strong><br>
-📥ボタンを押すことでシェアが可能です。<br>
-コンプ状況の簡易画像を生成します。</p>
+<p><strong data-i18n="help_share_title">📥 シェア</strong><br>
+<span data-i18n="help_share_body">📥ボタンを押すことでシェアが可能です。<br>
+コンプ状況の簡易画像を生成します。</span></p>
 
-<p><strong>💌 お問い合わせ</strong><br>
-ページ最下部にてお問い合わせが可能です。<br>
-完全匿名で送信できますのでご利用ください。</p>
-(回答掲載用のQ&Aページ追加予定です。)
+<p><strong data-i18n="help_contact_title">💌 お問い合わせ</strong><br>
+<span data-i18n="help_contact_body">ページ最下部にてお問い合わせが可能です。<br>
+完全匿名で送信できますのでご利用ください。</span></p>
+<span data-i18n="help_contact_note">(回答掲載用のQ&Aページ追加予定です。)</span>
 
-<p><strong>⚠️ 注意</strong><br>
-こちらのサイトでは、サイトを閉じる時の状態が保存されます。<br>
-開き直した際には、前に開いていた時の状態が引き継がれます。</p>
+<p><strong data-i18n="help_notice_title">⚠️ 注意</strong><br>
+<span data-i18n="help_notice_body">こちらのサイトでは、サイトを閉じる時の状態が保存されます。<br>
+開き直した際には、前に開いていた時の状態が引き継がれます。</span></p>
   
 <div style="text-align:center; margin-top:20px;">
-<button onclick="closeHelpModal()">
+<button onclick="closeHelpModal()" data-i18n="help_close">
 閉じる
 </button>
 </div>
@@ -390,16 +393,17 @@ text-align:left;
 
   <div id="shareModal">
   <div class="modal-box">
-    <h3>コンプ状況をシェア</h3>
+    <h3 data-i18n="share_title">コンプ状況をシェア</h3>
     <canvas id="shareCanvas" width="600" height="1020"></canvas>
-    <button onclick="shareImage()">画像を保存・共有</button>
-    <button onclick="shareToX()">Xでポスト</button>
-    <button onclick="closeShareModal()">閉じる</button>
+    <button onclick="shareImage()" data-i18n="share_save">画像を保存・共有</button>
+    <button onclick="shareToX()" data-i18n="share_x">Xでポスト</button>
+    <button onclick="closeShareModal()" data-i18n="share_close">閉じる</button>
   </div>
 </div>
 
   
 
+<script src="js/i18n.js"></script>
 <script src="js/data-fish.js"></script>
 <script src="js/data-bugs.js"></script>
 <script src="js/data-birds.js"></script>

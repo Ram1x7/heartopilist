@@ -9,8 +9,8 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#3c5a6e">
-<title>Q&A・不具合対応状況｜はとぴ図鑑</title>
-<meta name="description" content="Heartopia（ハートピアスローライフ）はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。">
+<title data-i18n="page_title_faq">Q&A・不具合対応状況｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_faq" content="Heartopia（ハートピアスローライフ）はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
@@ -441,18 +441,18 @@ body.dark .status-considering{
 <body>
 
 <div class="title-bar">
-  <h1>はとぴ図鑑</h1>
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <button id="darkToggle">🌙</button>
 </div>
 
 <nav class="site-nav">
-  <a href="./index.html" class="site-nav-item">図鑑</a>
-  <a href="./foods.html" class="site-nav-item">料理</a>
-  <a href="./garden.html" class="site-nav-item">園芸</a>
-  <a href="./pet.html" class="site-nav-item">ペット</a>
-  <a href="./codes.html" class="site-nav-item">コード</a>
-  <a href="./events.html" class="site-nav-item">イベント</a>
-  <a href="./faq.html" class="site-nav-item active">Q&A</a>
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./faq.html" class="site-nav-item active" data-i18n="nav_faq">Q&A</a>
 </nav>
 
 <div class="page-header">
@@ -490,6 +490,7 @@ body.dark .status-considering{
   ※本サイトは非公式のファンツールです
 </div>
 
+<script src="js/i18n.js"></script>
 <script src="js/data-faq.js"></script>
 <script>
 

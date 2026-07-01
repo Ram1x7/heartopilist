@@ -9,8 +9,8 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=9">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#3c5a6e">
-<title>料理レシピ図鑑｜はとぴ図鑑</title>
-<meta name="description" content="Heartopia（ハートピアスローライフ）の料理レシピ一覧。材料・材料費・売価・利益を確認できます。">
+<title data-i18n="page_title_foods">料理レシピ図鑑｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_foods" content="Heartopia（ハートピアスローライフ）の料理レシピ一覧。材料・材料費・売価・利益を確認できます。">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css">
@@ -324,20 +324,20 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
 <body>
 
 <div class="title-bar">
-  <h1>はとぴ図鑑</h1>
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
     <button id="darkToggle">🌙</button>
   </div>
 </div>
 
 <nav class="site-nav">
-  <a href="./index.html" class="site-nav-item">図鑑</a>
-  <a href="./foods.html" class="site-nav-item active">料理</a>
-  <a href="./garden.html" class="site-nav-item">園芸</a>
-  <a href="./pet.html" class="site-nav-item">ペット</a>
-  <a href="./codes.html" class="site-nav-item">コード</a>
-  <a href="./events.html" class="site-nav-item">イベント</a>
-  <a href="./faq.html" class="site-nav-item">Q&A</a>
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item active" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
 </nav>
 
 <div class="page-header">
@@ -366,6 +366,7 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
 
 <div id="foodToast"></div>
 
+<script src="js/i18n.js"></script>
 <script src="js/data-foods.js"></script>
 <script>
 

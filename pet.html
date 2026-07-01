@@ -6,14 +6,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
-<meta name="description" content="Heartopia(ハートピアスローライフ)のペットのエサ管理ツール。犬・猫にあげたエサを管理できます。">
+<meta name="description" data-i18n-content="meta_description_pet" content="Heartopia(ハートピアスローライフ)のペットのエサ管理ツール。犬・猫にあげたエサを管理できます。">
 <meta property="og:title" content="はとぴ図鑑 | ペット好物">
 <meta property="og:description" content="犬・猫に何のエサをあげたかを管理できるツール">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#ffd6ea">
+<meta name="theme-color" content="#3c5a6e">
 <link rel="icon" type="image/png" sizes="48x48" href="images/favicon.PNG">
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.PNG">
-<title>ペットエサ管理｜はとぴ図鑑</title>
+<title data-i18n="page_title_pet">ペットエサ管理｜はとぴ図鑑</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
 
@@ -601,7 +601,7 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 
 <!-- タイトルバー -->
 <div class="title-bar">
-  <h1>はとぴ図鑑</h1>
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
   <button id="helpBtn" onclick="openHelpModal()">❓</button>
   <button id="dataBtn" onclick="openDataModal()">📦</button>
@@ -611,13 +611,13 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 
 <!-- サイトナビ -->
 <nav class="site-nav">
-  <a class="site-nav-item" href="index.html">図鑑</a>
-  <a class="site-nav-item" href="foods.html">料理</a>
-  <a class="site-nav-item" href="garden.html">園芸</a>
-  <a class="site-nav-item active" href="pet.html">ペット</a>
-  <a class="site-nav-item" href="codes.html">コード</a>
-  <a class="site-nav-item" href="events.html">イベント</a>
-  <a class="site-nav-item" href="faq.html">Q&A</a>
+  <a class="site-nav-item" href="index.html" data-i18n="nav_zukan">図鑑</a>
+  <a class="site-nav-item" href="foods.html" data-i18n="nav_food">料理</a>
+  <a class="site-nav-item" href="garden.html" data-i18n="nav_garden">園芸</a>
+  <a class="site-nav-item active" href="pet.html" data-i18n="nav_pet">ペット</a>
+  <a class="site-nav-item" href="codes.html" data-i18n="nav_code">コード</a>
+  <a class="site-nav-item" href="events.html" data-i18n="nav_event">イベント</a>
+  <a class="site-nav-item" href="faq.html" data-i18n="nav_faq">Q&A</a>
 </nav>
 
 <!-- コントロールカード -->
@@ -724,6 +724,7 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
   </div>
 </div>
 
+<script src="js/i18n.js"></script>
 <script src="js/data-dogs.js"></script>
 <script src="js/data-cats.js"></script>
 
