@@ -496,6 +496,30 @@ body.dark .weather-next{
   margin-top:14px;
 }
 
+/* 終了フェス・シーズン セクション(図鑑「今は出現しない」用) */
+.section-label{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+  margin:18px 0 8px;
+  padding-left:10px;
+  border-left:3px solid var(--gold);
+}
+
+body.dark .section-label{ color:#e8d2a8; }
+
+.event-ended-banner{
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  margin-bottom:10px;
+}
+
 /* アイテム */
 .item{
   background:var(--card);
