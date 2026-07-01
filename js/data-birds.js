@@ -759,6 +759,8 @@ const birdData = [
 },
 {
  name:"積み木スズメ(ピンク)",
+ fes:true,
+ ended:true,
  level:1,
  price:10,
  star5:"雨・虹 / 全時間",
@@ -770,6 +772,8 @@ const birdData = [
 },
 {
  name:"積み木スズメ(青)",
+ fes:true,
+ ended:true,
  level:1,
  price:10,
  star5:"雨・虹 / 全時間",
@@ -781,6 +785,8 @@ const birdData = [
 },
 {
  name:"積み木スズメ(緑)",
+ fes:true,
+ ended:true,
  level:1,
  price:10,
  star5:"雨・虹 / 全時間",
@@ -792,6 +798,8 @@ const birdData = [
 },
 {
  name:"積み木スズメ(紫)",
+ fes:true,
+ ended:true,
  level:1,
  price:10,
  star5:"雨・虹 / 全時間",
@@ -803,6 +811,8 @@ const birdData = [
 },
 {
  name:"積み木スズメ(虹)",
+ fes:true,
+ ended:true,
  level:1,
  price:15,
  star5:"雨・虹 / 全時間",

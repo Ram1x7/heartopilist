@@ -109,6 +109,10 @@ const i18n = (() => {
       el.title = t(el.dataset.i18nTitle);
     });
 
+    document.querySelectorAll("[data-i18n-content]").forEach(el=>{
+      el.setAttribute("content", t(el.dataset.i18nContent));
+    });
+
     document.documentElement.lang = _lang;
   }
 

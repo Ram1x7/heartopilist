@@ -674,6 +674,8 @@ const bugData = [
 },
 {
  name:"積み木アカイトトンボ(ピンク)",
+ fes:true,
+ ended:true,
  level:1,
  price:75,
  weather:["晴れ","雨","虹"],
@@ -684,6 +686,8 @@ const bugData = [
 },
 {
  name:"積み木アカイトトンボ(黄)",
+ fes:true,
+ ended:true,
  level:1,
  price:75,
  weather:["晴れ","雨","虹"],
@@ -694,6 +698,8 @@ const bugData = [
 },
 {
  name:"積み木アカイトトンボ(青)",
+ fes:true,
+ ended:true,
  level:1,
  price:75,
  weather:["晴れ","雨","虹"],
@@ -704,6 +710,8 @@ const bugData = [
 },
 {
  name:"積み木アカイトトンボ(紫)",
+ fes:true,
+ ended:true,
  level:1,
  price:75,
  weather:["晴れ","雨","虹"],
@@ -714,6 +722,8 @@ const bugData = [
 },
 {
  name:"積み木アカイトトンボ(虹)",
+ fes:true,
+ ended:true,
  level:1,
  price:110,
  weather:["晴れ","雨","虹"],

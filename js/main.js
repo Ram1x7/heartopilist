@@ -61,13 +61,21 @@ function getZone(){
  return"0-6";
 }
 
+// i18n連携用ヘルパー（i18n未準備時は日本語フォールバックを返す）
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  return fallback;
+}
+
 // フォーマット
 function formatTime(arr){
 
   const order = ["0-6","6-12","12-18","18-0"];
 
   // 全部ある場合
-  if(arr.length === 4) return "全時間";
+  if(arr.length === 4) return T("time_all","全時間");
 
   // 並び順に揃える
   const sorted = order.filter(t => arr.includes(t));
@@ -115,8 +123,21 @@ function formatTime(arr){
 
 function formatWeather(arr){
  const all=["晴れ","雨","虹"];
- if(arr.length===all.length)return"全天気";
- return arr.join("・");
+ if(arr.length===all.length)return T("weather_all","全天気");
+ const map = { "晴れ":"weather_sunny", "雨":"weather_rain", "虹":"weather_rainbow" };
+ return arr.map(w => T(map[w], w)).join("・");
+}
+
+// 単一の天気ワード（晴れ/雨/虹/流星雨/不明）をi18n翻訳
+function translateWeatherWord(w){
+ const map = {
+   "晴れ":"weather_sunny",
+   "雨":"weather_rain",
+   "虹":"weather_rainbow",
+   "流星雨":"weather_meteor",
+   "不明":"weather_unknown"
+ };
+ return map[w] ? T(map[w], w) : w;
 }
 
 const searchInput = document.getElementById("search");
@@ -172,12 +193,233 @@ clearBtn.onclick = ()=>{
   render();
 };
 
+// 共通フィルター（タイプ・検索キーワード・レベル範囲）
+function applyCommonFilters(arr){
+  let out = arr;
+
+  if(currentFilter !== "all"){
+    out = out.filter(c => c.type === currentFilter);
+  }
+
+  const keyword = document.getElementById("search").value;
+  if(keyword){
+    out = out.filter(c =>
+      c.name.includes(keyword) ||
+      c.location.includes(keyword)
+    );
+  }
+
+  out = out.filter(c =>
+    c.level >= minLevel &&
+    c.level <= maxLevel
+  );
+
+  return out;
+}
+
+// 並び替え
+function sortList(arr){
+  let out = arr.slice();
+
+  if(currentSort === "level"){
+    out.sort((a,b)=>{
+      const typeOrder = { fish:0, bug:1, bird:2 };
+
+      if(typeOrder[a.type] !== typeOrder[b.type]){
+        return typeOrder[a.type] - typeOrder[b.type];
+      }
+
+      return a.level - b.level;
+    });
+  }
+
+  if(currentSort === "unchecked"){
+    out.sort((a,b)=>{
+      const aChecked = checkedData[a.name] ? 1 : 0;
+      const bChecked = checkedData[b.name] ? 1 : 0;
+
+      // まず未コンプ優先
+      if(aChecked !== bChecked){
+        return aChecked - bChecked;
+      }
+
+      const typeOrder = { fish:0, bug:1, bird:2 };
+
+      // 次に種類順
+      if(typeOrder[a.type] !== typeOrder[b.type]){
+        return typeOrder[a.type] - typeOrder[b.type];
+      }
+
+      // 最後に図鑑順
+      return a.bookIndex - b.bookIndex;
+    });
+  }
+
+  if(currentSort === "unauth"){
+    out = out
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => {
+
+        // 認証マスターの仕様が無い生き物は後ろへ
+        const aEligible = a.c.auth !== false ? 0 : 1;
+        const bEligible = b.c.auth !== false ? 0 : 1;
+        if(aEligible !== bEligible){
+          return aEligible - bEligible;
+        }
+
+        // 未認証優先
+        const aAuth = authData[a.c.name] ? 1 : 0;
+        const bAuth = authData[b.c.name] ? 1 : 0;
+        if(aAuth !== bAuth){
+          return aAuth - bAuth;
+        }
+
+        const typeOrder = { fish:0, bug:1, bird:2 };
+        if(typeOrder[a.c.type] !== typeOrder[b.c.type]){
+          return typeOrder[a.c.type] - typeOrder[b.c.type];
+        }
+
+        // 元の表示順を保持
+        return a.i - b.i;
+      })
+      .map(x => x.c);
+  }
+
+  return out;
+}
+
+// カード生成
+function createCard(c){
+  const div=document.createElement("div");
+  div.className =
+  "item" +
+  (selectedItems[c.name]
+    ? " selected"
+    : "");
+
+  div.innerHTML=`
+
+  <div class="img-wrap">
+
+  <div class="level-badge">
+    Lv.${c.level ?? "-"}
+  </div>
+
+ ${c.shadow ? `
+  <div class="
+    shadow-badge
+    ${c.shadow === "金" ? "shadow-gold" : ""}
+    ${c.shadow === "青" ? "shadow-blue" : ""}
+  ">
+    ${c.shadow}
+  </div>
+` : ""}
+
+  <button class="
+    check-btn
+    ${checkedData[c.name] ? "checked" : ""}
+  ">
+    ${checkedData[c.name] ? "⭐️" : ""}
+  </button>
+
+  ${c.auth !== false ? `
+  <button class="
+    auth-btn
+    ${authData[c.name] ? "checked" : ""}
+  ">
+    ${authData[c.name] ? "🎖" : ""}
+  </button>
+` : ""}
+
+  <img src="${c.img}" loading="lazy" decoding="async">
+
+</div>
+
+  <div class="item-name">
+    ${c.name}
+  </div>
+
+`;
+  // モーダル
+  div.onclick = ()=>{
+    if(multiSelectMode){
+      selectedItems[c.name] =
+        !selectedItems[c.name];
+      div.classList.toggle(
+        "selected",
+        selectedItems[c.name]
+      );
+      return;
+    }
+    openModal(c);
+  };
+
+  // チェックボタン
+  const checkBtn = div.querySelector(".check-btn");
+
+  checkBtn.onclick = (e)=>{
+    e.stopPropagation();
+    // 複数選択中は星ボタン無効
+    if(multiSelectMode){
+      return;
+    }
+    checkedData[c.name] = !checkedData[c.name];
+    localStorage.setItem(
+      "checkedData",
+      JSON.stringify(checkedData)
+    );
+    render();
+  };
+
+  const authBtn = div.querySelector(".auth-btn");
+
+  if(authBtn){
+    authBtn.onclick = (e)=>{
+      e.stopPropagation();
+      if(multiSelectMode) return;
+      authData[c.name] = !authData[c.name];
+      localStorage.setItem("authData", JSON.stringify(authData));
+      render();
+    };
+  }
+
+  return div;
+}
+
+// 終了したフェス・シーズン セクション生成（園芸・料理ページと同じ表示方法）
+function buildEndedSection(items, kind){
+  const wrap = document.createElement("div");
+
+  const lbl = document.createElement("div");
+  lbl.className = "section-label";
+  lbl.textContent = kind === "season" ? "🌸 シーズン限定" : "🎉 フェス限定";
+  wrap.appendChild(lbl);
+
+  const banner = document.createElement("div");
+  banner.className = "event-ended-banner";
+  banner.textContent =
+    kind === "season"
+    ? "⚠️ 現在このシーズンは終了しています"
+    : "⚠️ 現在このフェスは終了しています";
+  wrap.appendChild(banner);
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  items.forEach(c => grid.appendChild(createCard(c)));
+  wrap.appendChild(grid);
+
+  return wrap;
+}
+
 // 表示
 function render(){
 
  if(!currentWeather || !currentZone) return;
 
  let list = creatures.filter(c => {
+
+  // 終了したフェス・シーズン限定は別セクションで表示するためここでは除外
+  if (c.ended) return false;
 
   // 流星雨は晴れ扱い
   const weatherForCheck =
@@ -244,199 +486,34 @@ function render(){
 
   return false;
 });
-// ⭐ここが重要（タイプフィルター）
- if(currentFilter !== "all"){
-   list = list.filter(c => c.type === currentFilter);
- }
-// 検索
- const keyword=document.getElementById("search").value;
- if(keyword){
-  list = list.filter(c =>
-    c.name.includes(keyword) ||
-    c.location.includes(keyword)
-  );
-}
-
-// レベル範囲
- list = list.filter(c =>
-  c.level >= minLevel &&
-  c.level <= maxLevel
-);
-
-if(currentSort === "level"){
-  list.sort((a,b)=>{
-    const typeOrder = { fish:0, bug:1, bird:2 };
-
-    if(typeOrder[a.type] !== typeOrder[b.type]){
-      return typeOrder[a.type] - typeOrder[b.type];
-    }
-
-    return a.level - b.level;
-  });
- }
-  
-if(currentSort === "unchecked"){
-  list.sort((a,b)=>{
-
-    const aChecked = checkedData[a.name] ? 1 : 0;
-    const bChecked = checkedData[b.name] ? 1 : 0;
-
-// まず未コンプ優先
-if(aChecked !== bChecked){
-  return aChecked - bChecked;
-}
-
-const typeOrder = {
-  fish:0,
-  bug:1,
-  bird:2
-};
-
-// 次に種類順
-if(typeOrder[a.type] !== typeOrder[b.type]){
-  return typeOrder[a.type] - typeOrder[b.type];
-}
-
-// 最後に図鑑順
-return a.bookIndex - b.bookIndex;
-  });
-}
-
-if(currentSort === "unauth"){
-  list = list
-    .map((c, i) => ({ c, i }))
-    .sort((a, b) => {
-
-      // 認証マスターの仕様が無い生き物は後ろへ
-      const aEligible = a.c.auth !== false ? 0 : 1;
-      const bEligible = b.c.auth !== false ? 0 : 1;
-      if(aEligible !== bEligible){
-        return aEligible - bEligible;
-      }
-
-      // 未認証優先
-      const aAuth = authData[a.c.name] ? 1 : 0;
-      const bAuth = authData[b.c.name] ? 1 : 0;
-      if(aAuth !== bAuth){
-        return aAuth - bAuth;
-      }
-
-      const typeOrder = { fish:0, bug:1, bird:2 };
-      if(typeOrder[a.c.type] !== typeOrder[b.c.type]){
-        return typeOrder[a.c.type] - typeOrder[b.c.type];
-      }
-
-      // 元の表示順を保持
-      return a.i - b.i;
-    })
-    .map(x => x.c);
-}
+ list = applyCommonFilters(list);
+ list = sortList(list);
 
  const el=document.getElementById("list");
  el.innerHTML="";
 
  // 出現なし
  if(list.length===0){
-  el.innerHTML="<p>出現なし</p>";
-  return;
+  el.innerHTML=`<p>${T("no_results","出現なし")}</p>`;
+ } else {
+  list.forEach(c => el.appendChild(createCard(c)));
  }
 
- list.forEach(c=>{
-  const div=document.createElement("div");
-  div.className =
-  "item" +
-  (selectedItems[c.name]
-    ? " selected"
-    : "");
+ // 終了したフェス・シーズン限定（「今は出現しない」表示時のみ、最下部に表示）
+ const endedEl = document.getElementById("endedList");
+ endedEl.innerHTML = "";
 
-  div.innerHTML=`
+ if(weatherMode === "hidden"){
+  let ended = creatures.filter(c => c.ended === true);
+  ended = applyCommonFilters(ended);
+  ended = sortList(ended);
 
-  <div class="img-wrap">
+  const seasonEnded = ended.filter(c => c.season);
+  const fesEnded    = ended.filter(c => c.fes && !c.season);
 
-  <div class="level-badge">
-    Lv.${c.level ?? "-"}
-  </div>
-
- ${c.shadow ? `
-  <div class="
-    shadow-badge
-    ${c.shadow === "金" ? "shadow-gold" : ""}
-    ${c.shadow === "青" ? "shadow-blue" : ""}
-  ">
-    ${c.shadow}
-  </div>
-` : ""}
-
-  <button class="
-    check-btn
-    ${checkedData[c.name] ? "checked" : ""}
-  ">
-    ${checkedData[c.name] ? "⭐️" : ""}
-  </button>
-
-  ${c.auth !== false ? `
-  <button class="
-    auth-btn
-    ${authData[c.name] ? "checked" : ""}
-  ">
-    ${authData[c.name] ? "🎖" : ""}
-  </button>
-` : ""}
-
-  <img src="${c.img}" loading="lazy" decoding="async">
-
-</div>
-
-  <div class="item-name">
-    ${c.name}
-  </div>
-
-`;
-// モーダル
-div.onclick = ()=>{
-  if(multiSelectMode){
-    selectedItems[c.name] =
-      !selectedItems[c.name];
-    div.classList.toggle(
-      "selected",
-      selectedItems[c.name]
-    );
-    return;
-  }
-  openModal(c);
-};
-
-// チェックボタン
-const checkBtn = div.querySelector(".check-btn");
-   
-checkBtn.onclick = (e)=>{
-  e.stopPropagation();
-  // 複数選択中は星ボタン無効
-  if(multiSelectMode){
-    return;
-  }
-  checkedData[c.name] = !checkedData[c.name];
-  localStorage.setItem(
-    "checkedData",
-    JSON.stringify(checkedData)
-  );
-  render();
-};
-
-const authBtn = div.querySelector(".auth-btn");
-
-if(authBtn){
-  authBtn.onclick = (e)=>{
-    e.stopPropagation();
-    if(multiSelectMode) return;
-    authData[c.name] = !authData[c.name];
-    localStorage.setItem("authData", JSON.stringify(authData));
-    render();
-  };
-}
-
-el.appendChild(div);
- });
+  if(seasonEnded.length) endedEl.appendChild(buildEndedSection(seasonEnded, "season"));
+  if(fesEnded.length)    endedEl.appendChild(buildEndedSection(fesEnded, "fes"));
+ }
 }
 
 let lastZone=getZone();
@@ -473,9 +550,9 @@ function updateTime(){
 
  document.getElementById("time").innerText = now.toLocaleTimeString();
  document.getElementById("weatherNow").innerText =
-  `今： ${weather}`;
+  `${T("weather_now_label","今：")}${translateWeatherWord(weather)}`;
  document.getElementById("weatherNext").innerText =
-  `次：${nextWeather}`;
+  `${T("weather_next_label","次：")}${translateWeatherWord(nextWeather)}`;
  document.getElementById("miniTime").innerText =
   now.toLocaleTimeString([], {
     hour:"2-digit",
@@ -597,8 +674,8 @@ function openModal(c){
  m_name.innerText=c.name;
  m_img.src=c.img;
  m_loc.innerText=c.location;
- m_weather.innerText="天気："+formatWeather(c.weather);
- m_time.innerText="時間："+formatTime(c.time);
+ m_weather.innerText=T("modal_weather","天気：")+formatWeather(c.weather);
+ m_time.innerText=T("modal_time","時間：")+formatTime(c.time);
  const basePrice = c.price ?? 0;
 
  // 野鳥だけ特殊計算
@@ -629,7 +706,7 @@ if(c.type === "bird"){
  }
  m_star5.innerHTML =
   c.star5
-  ? `★5条件：<br>${c.star5}`
+  ? `${T("modal_star5_label","★5条件：")}<br>${c.star5}`
   : "";
 }
   
@@ -1072,7 +1149,7 @@ function updateLevelRange(){
   }
 
   levelRangeText.textContent =
-    `Lv.${minLevel}〜${maxLevel}`;
+    T("level_range_text", `Lv.${minLevel}〜${maxLevel}`, {min:minLevel, max:maxLevel});
 
   localStorage.setItem("minLevel", minLevel);
   localStorage.setItem("maxLevel", maxLevel);
@@ -1184,7 +1261,17 @@ document.getElementById("version").textContent =
   "Ver " + APP_VERSION;
 
 document.getElementById("disclaimer").textContent =
-  "※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。";
+  T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  "最終更新 2026/07/01";
+  T("last_update_label","最終更新") + " 2026/07/01";
+
+// 言語切替時に動的コンテンツを再描画
+document.addEventListener("langchange", ()=>{
+  updateTime();
+  updateLevelRange();
+  document.getElementById("disclaimer").textContent =
+    T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
+  document.getElementById("lastUpdate").textContent =
+    T("last_update_label","最終更新") + " 2026/07/01";
+});
