@@ -89,10 +89,11 @@ body.dark::after{
 
 /* タイトルエリア */
 .title-bar{
-  position:relative;
   display:flex;
-  justify-content:flex-start;
+  flex-wrap:wrap;
   align-items:center;
+  justify-content:flex-start;
+  row-gap:6px;
   margin-bottom:10px;
   min-height:40px;
 }
@@ -100,17 +101,22 @@ body.dark::after{
 .title-bar h1{
   margin:0;
   padding-left:4px;
+  flex-shrink:0;
 }
 
 
 /* ダークモードボタン */
 #darkToggle{
-  position:static;
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
   border:1px solid var(--border);
-  border-radius:999px;
-  padding:8px 14px;
-  font-size:11px;
-  font-family:'Zen Maru Gothic', sans-serif;
+  border-radius:50%;
+  font-size:15px;
+  line-height:1;
   background:var(--card);
   color:var(--indigo);
   box-shadow:0 3px 8px rgba(52,48,43,0.08);
@@ -118,7 +124,7 @@ body.dark::after{
 }
 
 #darkToggle:active{
-  transform:scale(0.96);
+  transform:scale(0.92);
 }
 
 /* ダーク時カード */
@@ -166,21 +172,52 @@ body.dark .active{
 
 /* タイトル右側ボタン群 */
 .title-buttons{
-  position:absolute;
-  right:0;
-  top:50%;
-  transform:translateY(-50%);
   display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  align-items:center;
   gap:8px;
+  margin-left:auto;
+}
+
+/* 言語セレクター */
+#lang-selector{
+  display:flex;
+  align-items:center;
+}
+
+#lang-select{
+  height:36px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:0 10px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  cursor:pointer;
+  text-align:center;
+}
+
+body.dark #lang-select{
+  background:#383329;
+  color:#ece4d4;
+  border:1px solid #46423b;
 }
 
 /* ヘルプボタン */
 #helpBtn{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
   border:1px solid var(--border);
-  border-radius:999px;
-  padding:8px 14px;
-  font-size:11px;
-  font-family:'Zen Maru Gothic', sans-serif;
+  border-radius:50%;
+  font-size:15px;
+  line-height:1;
   background:var(--card);
   color:var(--indigo);
   box-shadow:0 3px 8px rgba(52,48,43,0.08);
@@ -188,7 +225,7 @@ body.dark .active{
 }
 
 #helpBtn:active{
-  transform:scale(0.96);
+  transform:scale(0.92);
 }
 
 /* ダーク時文字 */
@@ -783,12 +820,24 @@ a{
 
 /* シェアボタン */
 #shareBtn{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
   border:1px solid var(--border);
-  border-radius:999px;
-  padding:8px 14px;
-  font-size:14px;
+  border-radius:50%;
+  font-size:15px;
+  line-height:1;
   background:var(--card);
   color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  transition:0.2s;
+}
+
+#shareBtn:active{
+  transform:scale(0.92);
 }
 
 body.dark #shareBtn{
