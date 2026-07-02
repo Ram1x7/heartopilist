@@ -1018,7 +1018,7 @@ const fishData = [
  time:["6-12","12-18","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"fish/085.PNG"
 },
 {
  name:"ライオンヘッド",
@@ -1030,7 +1030,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"fish/086.PNG"
 },
 {
  name:"シマスズメダイ",
