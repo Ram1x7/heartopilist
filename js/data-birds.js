@@ -664,7 +664,7 @@ const birdData = [
  star5:"虹 / 12〜18",
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"温泉山-火山湖",
+ location:"温泉山-温泉山の湖",
  img:"images/000.PNG"
 }, 
 {
