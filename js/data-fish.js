@@ -1015,7 +1015,7 @@ const fishData = [
  shadow:"小",
  price:395,
  weather:["虹"],
- time:["6-12","12-18","0-6"],
+ time:["6-12","18-0","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/085.PNG"
@@ -1076,8 +1076,8 @@ const fishData = [
  price:610,
  weather:["虹"],
  time:["18-0","0-6"],
- location:"郊外の湖",
- locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"郊外の湖畔",
+ locationI18n:{"ja":"郊外の湖畔","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG"
 },
 {
@@ -1139,21 +1139,21 @@ const fishData = [
  img:"images/000.PNG"
 },
 {
- name:"シリキルリスズメダイ",
- nameI18n:{"ja":"シリキルリスズメダイ","en":"Yellowtail Blue Damselfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"レナーズラス",
+ nameI18n:{"ja":"レナーズラス","en":"Rainbow Wrasse","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:14,
- shadow:"小",
+ shadow:"中",
  weather:["晴れ","虹"],
- time:["12-18","18-0","0-6"],
+ time:["6-12","12-18","18-0"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG"
 },
 {
- name:"レナーズラス",
- nameI18n:{"ja":"レナーズラス","en":"Rainbow Wrasse","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"シリキルリスズメダイ",
+ nameI18n:{"ja":"シリキルリスズメダイ","en":"Yellowtail Blue Damselfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:14,
- shadow:"中",
+ shadow:"小",
  weather:["晴れ","虹"],
  time:["12-18","18-0"],
  location:"そよ風の海",
