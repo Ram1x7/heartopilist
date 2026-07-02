@@ -853,7 +853,7 @@ const fishData = [
 {
  name:"ライオンヘッド",
  level:11,
- shadow:"中",
+ shadow:"小",
  price:395,
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
