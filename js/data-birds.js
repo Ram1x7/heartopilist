@@ -812,7 +812,7 @@ const birdData = [
  price:45,
  star5:"虹 / 6〜18",
  weather:["雨","虹"],
- time:["6-12","12-18","18-0","0-6"],
+ time:["6-12","12-18","18-0"],
  location:"旧海の海辺",
  locationI18n:{"ja":"旧海の海辺","en":"Old Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/068.PNG"
@@ -883,7 +883,7 @@ const birdData = [
  level:13,
  price:45,
  star5:"虹 / 12〜18",
- weather:["晴れ","雨","虹"],
+ weather:["晴れ","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
