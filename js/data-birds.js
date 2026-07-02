@@ -791,7 +791,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/066.PNG"
+ img:"birds/066.JPG"
 }, 
 {
  name:"トモエガモ",
@@ -863,7 +863,7 @@ const birdData = [
  time:["12-18","18-0"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/072.PNG"
+ img:"birds/072.JPG"
 },
 {
  name:"クロクジャク",
@@ -875,7 +875,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/073.PNG"
+ img:"birds/073.JPG"
 },
 {
  name:"オオハクチョウ",
@@ -899,7 +899,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/075.PNG"
+ img:"birds/075.JPG"
 },
 {
  name:"ナベコウ",
