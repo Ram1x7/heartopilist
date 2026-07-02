@@ -876,7 +876,7 @@ const fishData = [
  shadow:"金",
  price:850,
  weather:["晴れ","虹"],
- time:["18-0","0-6"],
+ time:["6-12","18-0","0-6"],
  location:"海釣りクエスト",
  img:"images/000.PNG"
 },
