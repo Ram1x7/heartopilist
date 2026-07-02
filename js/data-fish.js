@@ -1024,7 +1024,7 @@ const fishData = [
  name:"ライオンヘッド",
  nameI18n:{"ja":"ライオンヘッド","en":"Lionhead Goldfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
- shadow:"中",
+ shadow:"小",
  price:395,
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
@@ -1051,7 +1051,7 @@ const fishData = [
  shadow:"金",
  price:850,
  weather:["晴れ","虹"],
- time:["18-0","0-6"],
+ time:["6-12","18-0","0-6"],
  location:"海釣りクエスト",
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG"
