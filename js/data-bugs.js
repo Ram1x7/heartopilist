@@ -719,7 +719,7 @@ const bugData = [
  nameI18n:{"ja":"アトラスオオカブト","en":"Atlas Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
  weather:["虹"],
- time:["18-0","0-6"],
+ time:["12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG"
@@ -749,7 +749,7 @@ const bugData = [
  nameI18n:{"ja":"ミイロタイマイ","en":"Tricolor Swallowtail","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
  weather:["雨","虹"],
- time:["6-12","18-0"],
+ time:["6-12","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG"
@@ -770,8 +770,8 @@ const bugData = [
  level:12,
  weather:["雨","虹"],
  time:["6-12","12-18"],
- location:"温泉山-温泉",
- locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"温泉山",
+ locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG"
 },
 {
