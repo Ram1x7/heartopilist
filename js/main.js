@@ -69,6 +69,25 @@ function T(key, fallback, vars){
   return fallback;
 }
 
+// 生き物名・場所名の表示用翻訳（未整備の言語は日本語にフォールバック）
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+
+function displayName(c){
+  if(!c.nameI18n) return c.name;
+  const lang = currentLang();
+  return c.nameI18n[lang] || c.name;
+}
+
+function displayLocation(c){
+  if(!c.locationI18n) return c.location;
+  const lang = currentLang();
+  return c.locationI18n[lang] || c.location;
+}
+
 // フォーマット
 function formatTime(arr){
 
@@ -203,9 +222,12 @@ function applyCommonFilters(arr){
 
   const keyword = document.getElementById("search").value;
   if(keyword){
+    const kw = keyword.toLowerCase();
     out = out.filter(c =>
-      c.name.includes(keyword) ||
-      c.location.includes(keyword)
+      c.name.toLowerCase().includes(kw) ||
+      c.location.toLowerCase().includes(kw) ||
+      displayName(c).toLowerCase().includes(kw) ||
+      displayLocation(c).toLowerCase().includes(kw)
     );
   }
 
@@ -336,7 +358,7 @@ function createCard(c){
 </div>
 
   <div class="item-name">
-    ${c.name}
+    ${displayName(c)}
   </div>
 
 `;
@@ -671,9 +693,10 @@ function forceRepaint(){
 // モーダル
 function openModal(c){
  modal.style.display="block";
- m_name.innerText=c.name;
+ modal.dataset.currentCreature = c.name;
+ m_name.innerText=displayName(c);
  m_img.src=c.img;
- m_loc.innerText=c.location;
+ m_loc.innerText=displayLocation(c);
  m_weather.innerText=T("modal_weather","天気：")+formatWeather(c.weather);
  m_time.innerText=T("modal_time","時間：")+formatTime(c.time);
  const basePrice = c.price ?? 0;
@@ -1274,4 +1297,10 @@ document.addEventListener("langchange", ()=>{
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
     T("last_update_label","最終更新") + " 2026/07/01";
+
+  // モーダル表示中なら翻訳を反映して再表示
+  if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
+    const target = creatures.find(c => c.name === modal.dataset.currentCreature);
+    if(target) openModal(target);
+  }
 });
