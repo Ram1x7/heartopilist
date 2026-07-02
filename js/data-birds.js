@@ -761,155 +761,169 @@ const birdData = [
  name:"コムクドリ",
  nameI18n:{"ja":"コムクドリ","en":"Chestnut-cheeked Starling","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
+ price:30,
  star5:"虹 / 18〜0",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/064.PNG"
 }, 
 {
  name:"クロヒゲバト",
  nameI18n:{"ja":"クロヒゲバト","en":"Black-collared Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
+ price:37,
  star5:"虹 / 12〜0",
  weather:["晴れ","虹"],
  time:["12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/065.PNG"
 }, 
 {
  name:"シロクジャク",
  nameI18n:{"ja":"シロクジャク","en":"White Peafowl","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
+ price:37,
  star5:"虹 / 12〜18",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/066.PNG"
 }, 
 {
  name:"トモエガモ",
  nameI18n:{"ja":"トモエガモ","en":"Baikal Teal","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
+ price:45,
  star5:"虹 / 12〜18",
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"温泉山-火山湖",
- locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ location:"温泉山の湖",
+ locationI18n:{"ja":"温泉の湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"birds/067.PNG"
 }, 
 {
  name:"インカアジサシ",
  nameI18n:{"ja":"インカアジサシ","en":"Inca Tern","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
+ price:45,
  star5:"虹 / 6〜18",
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海の海辺",
  locationI18n:{"ja":"旧海の海辺","en":"Old Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
-},
-{
- name:"ニシツノメドリ",
- nameI18n:{"ja":"ニシツノメドリ","en":"Atlantic Puffin","zh-CN":"","zh-TW":"","ko":"","th":""},
- level:12,
- star5:"虹 / 6〜12",
- weather:["晴れ","虹"],
- time:["6-12","18-0","0-6"],
- location:"クジラ海の海辺",
- locationI18n:{"ja":"クジラ海の海辺","en":"Whale Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/068.PNG"
 },
 {
  name:"フヨウチョウ",
  nameI18n:{"ja":"フヨウチョウ","en":"Bird-of-Paradise","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
+ price:30,
  star5:"虹 / 18〜0",
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"温泉山",
- locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ location:"温泉山-火山湖",
+ locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"birds/069.PNG"
+},
+{
+ name:"ニシツノメドリ",
+ nameI18n:{"ja":"ニシツノメドリ","en":"Atlantic Puffin","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:12,
+ price:45,
+ star5:"虹 / 6〜12",
+ weather:["晴れ","虹"],
+ time:["6-12","18-0","0-6"],
+ location:"クジラ海の海辺",
+ locationI18n:{"ja":"クジラ海の海辺","en":"Whale Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"birds/070.PNG"
 },
 {
  name:"アオアシカツオドリ",
  nameI18n:{"ja":"アオアシカツオドリ","en":"Blue-footed Booby","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
+ price:45,
  star5:"虹 / 12〜18",
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海の海辺",
  locationI18n:{"ja":"そよ風の海の海辺","en":"Breeze Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/071.PNG"
 },
 {
  name:"シロフクロウ",
  nameI18n:{"ja":"シロフクロウ","en":"Snowy Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
+ price:65,
  star5:"虹 / 18〜0",
  weather:["晴れ","雨","虹"],
  time:["12-18","18-0"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
-},
-{
- name:"オオハクチョウ",
- nameI18n:{"ja":"オオハクチョウ","en":"Whooper Swan","zh-CN":"","zh-TW":"","ko":"","th":""},
- level:13,
- star5:"虹 / 12〜18",
- weather:["晴れ","雨","虹"],
- time:["6-12","12-18","18-0","0-6"],
- location:"郊外の湖",
- locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
-},
-{
- name:"コクチョウ",
- nameI18n:{"ja":"コクチョウ","en":"Black Swan","zh-CN":"","zh-TW":"","ko":"","th":""},
- level:13,
- star5:"虹 / 12〜18",
- weather:["雨","虹"],
- time:["6-12","12-18","18-0","0-6"],
- location:"郊外の湖",
- locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/072.PNG"
 },
 {
  name:"クロクジャク",
  nameI18n:{"ja":"クロクジャク","en":"Black-shouldered Peafowl","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:13,
+ price:37,
  star5:"虹 / 12〜18",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/073.PNG"
+},
+{
+ name:"オオハクチョウ",
+ nameI18n:{"ja":"オオハクチョウ","en":"Whooper Swan","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:13,
+ price:45,
+ star5:"虹 / 12〜18",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"郊外の湖",
+ locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"birds/074.PNG"
+},
+{
+ name:"コクチョウ",
+ nameI18n:{"ja":"コクチョウ","en":"Black Swan","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:13,
+ price:45,
+ star5:"虹 / 12〜18",
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"郊外の湖",
+ locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"birds/075.PNG"
 },
 {
  name:"ナベコウ",
  nameI18n:{"ja":"ナベコウ","en":"Black Stork","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:14,
+ price:55,
  star5:"虹 / 12〜18",
  weather:["晴れ","雨","虹"],
  time:["12-18","18-0","0-6"],
- location:"草原の湖",
+ location:"草原の湖畔",
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/076.PNG"
 },
 {
  name:"メガネフクロウ",
  nameI18n:{"ja":"メガネフクロウ","en":"Spectacled Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:14,
+ price:65,
  star5:"虹 / 6〜12",
  weather:["晴れ","雨","虹"],
  time:["6-12","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"birds/077.PNG"
 },
 {
  name:"積み木スズメ(ピンク)",
