@@ -123,12 +123,12 @@ const i18n = (() => {
     if(old) old.remove();
 
     const langs = [
-      {code:"ja",label:"🇯🇵 日本語"},
-      {code:"en",label:"🇺🇸 English"},
-      {code:"zh-CN",label:"🇨🇳 中文(简)"},
-      {code:"zh-TW",label:"🇹🇼 中文(繁)"},
-      {code:"ko",label:"🇰🇷 한국어"},
-      {code:"th",label:"🇹🇭 ภาษาไทย"}
+      {code:"ja",label:"🇯🇵 JA"},
+      {code:"en",label:"🇺🇸 EN"},
+      {code:"zh-CN",label:"🇨🇳 简"},
+      {code:"zh-TW",label:"🇹🇼 繁"},
+      {code:"ko",label:"🇰🇷 KR"},
+      {code:"th",label:"🇹🇭 TH"}
     ];
 
     const wrap = document.createElement("div");
@@ -238,3 +238,6 @@ const i18n = (() => {
   };
 
 })();
+
+// main.js など他スクリプトから window.i18n として参照できるように明示的に公開
+window.i18n = i18n;
