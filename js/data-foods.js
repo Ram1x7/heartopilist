@@ -1198,12 +1198,12 @@ const foodsData = [
   time:480,
   rarity: [true,true,true,true,true],
   prices:[850,1275,1700,3400,6800],
-  materials:["アカザエビ","アカザエビ","アカザエビ","レタス(種@145)"],
+  materials:["アカザエビならなんでもOK","アカザエビならなんでもOK","アカザエビならなんでもOK","レタス(種@145)"],
   level:8,
   materials_image:[
-    { image:"./images/materials/akaza.jpg" },
-    { image:"./images/materials/akaza.jpg" },
-    { image:"./images/materials/akaza.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/lettuce.jpg" }
   ],
   auth:true
@@ -1290,6 +1290,363 @@ const foodsData = [
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/gold_taraba.jpg" },
     { image:"./images/materials/batter.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"香る紅茶",
+  image:"./images/000.PNG",
+  cost:600,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[840,1260,1680,3360,6720],
+  materials:["紅茶(@250)","紅茶(@250)","香る紅茶の材料ならなんでもOK(紅茶or牛乳)","香る紅茶の材料ならなんでもOK(紅茶or牛乳)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"濃厚ミルクティー",
+  image:"./images/000.PNG",
+  cost:600,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[840,1260,1680,3360,6720],
+  materials:["紅茶(@250)","紅茶(@250)","牛乳(@50)","牛乳(@50)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ココアミルクティー",
+  image:"./images/000.PNG",
+  cost:660,
+  time:300,
+  rarity: [true,true,true,true,true],
+  prices:[1120,1680,2240,4480,8960],
+  materials:["紅茶(@250)","紅茶(@250)","牛乳(@50)","カカオ豆(種@110)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/cacao.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"シェイク",
+  image:"./images/000.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[400,600,800,1600,3200],
+  materials:["牛乳(@50)","牛乳(@50)","シェイクの材料ならなんでもOK","シェイクの材料ならなんでもOK"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ココアシェイク",
+  image:"./images/000.PNG",
+  cost:320,
+  time:300,
+  rarity: [true,true,true,true,true],
+  prices:[1120,1680,2240,4480,8960],
+  materials:["牛乳(@50)","牛乳(@50)","カカオ豆(種@110)","カカオ(種@110)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/cacao.jpg" },
+    { image:"./images/materials/cacao.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ラズベリーシェイク",
+  image:"./images/000.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[440,660,880,1760,3520],
+  materials:["牛乳(@50)","牛乳(@50)","ラズベリー","ラズベリー"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/razuberi.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ブルーベリーシェイク",
+  image:"./images/000.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[2980,4470,5960,11920,23840],
+  materials:["牛乳(@50)","牛乳(@50)","ブルーベリー","ブルーベリー"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/buruberi.jpg" },
+    { image:"./images/materials/buruberi.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"リンゴシェイク",
+  image:"./images/000.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["牛乳(@50)","牛乳(@50)","リンゴ","リンゴ"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/apple.jpg" },
+    { image:"./images/materials/apple.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"オレンジシェイク",
+  image:"./images/000.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["牛乳(@50)","牛乳(@50)","オレンジ","オレンジ"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/orange.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"パイナップルシェイク",
+  image:"./images/000.PNG",
+  cost:130,
+  time:30,
+  rarity: [true,true,true,true,true],
+  prices:[440,660,880,1760,3520],
+  materials:["牛乳(@50)","牛乳(@50)","パイナップル(種@15)","パイナップル(種@15)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/pineapple.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"いちごシェイク",
+  image:"./images/000.PNG",
+  cost:250,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[1090,1635,2180,4360,8720],
+  materials:["牛乳(@50)","牛乳(@50)","いちご(種@125)","いちご(種@125)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ブドウシェイク",
+  image:"./images/000.PNG",
+  cost:420,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[1300,1950,2600,5200,10400],
+  materials:["牛乳(@50)","牛乳(@50)","ブドウ(種@160)","ブドウ(種@160)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/grape.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"抹茶シェイク",
+  image:"./images/000.PNG",
+  cost:600,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[840,1260,1680,3360,6720],
+  materials:["牛乳(@50)","牛乳(@50)","抹茶パウダー(@250)","抹茶パウダー(@250)"],
+  level:11,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/mattya.jpg" },
+    { image:"./images/materials/mattya.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"フレッシュ緑茶",
+  image:"./images/000.PNG",
+  cost:100,
+  time:45,
+  rarity: [true,true,true,true,true],
+  prices:[500,750,1000,2000,4000],
+  materials:["茶葉(種@25)","茶葉(種@25)","フレッシュ緑茶の材料ならなんでもOK","フレッシュ緑茶の材料ならなんでもOK"],
+  level:12,
+  materials_image:[
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/materials/all_material.jpg" },
+    { image:"./images/materials/all_material.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"フレッシュミルクティー",
+  image:"./images/000.PNG",
+  cost:150,
+  time:45,
+  rarity: [true,true,true,true,true],
+  prices:[500,750,1000,2000,4000],
+  materials:["茶葉(種@25)","茶葉(種@25)","牛乳(@50)","牛乳(@50)"],
+  level:12,
+  materials_image:[
+    { image:"./images/000.PNG" },
+    { image:"./images/000.png" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"抹茶ミルクティー",
+  image:"./images/000.PNG",
+  cost:350,
+  time:45,
+  rarity: [true,true,true,true,true],
+  prices:[700,1050,1400,2800,5600],
+  materials:["茶葉(種@25)","茶葉(種@25)","牛乳(@50)","抹茶パウダー(@250)"],
+  level:12,
+  materials_image:[
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/mattya.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ヒナギクハーブティー",
+  image:"./images/000.PNG",
+  cost:110,
+  time:1440,
+  rarity: [true,true,true,true,true],
+  prices:[600,900,1200,2400,4800],
+  materials:["茶葉(種@25)","茶葉(種@25)","白いヒナギク(種@30)","白いヒナギク(種@30)"],
+  level:12,
+  materials_image:[
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" }
+  ],
+  auth:true
+},
+{
+  name:"ローズティー",
+  image:"./images/000.PNG",
+  cost:650,
+  time:4320,
+  rarity: [true,true,true,true,true],
+  prices:[1930,2895,3860,7720,15440],
+  materials:["茶葉(種@25)","茶葉(種@25)","赤いバラ(種@300)","赤いバラ(種@300)"],
+  level:12,
+  materials_image:[
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" }
+  ],
+  auth:true
+},
+{
+  name:"アフターヌーンティー",
+  image:"./images/000.PNG",
+  cost:1690,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[2970,4455,5940,11880,23760],
+  materials:["チーズケーキ(@245)","チーズケーキ(@245)","香る紅茶(@600)","香る紅茶(@600)"],
+  level:12,
+  materials_image:[
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" }
+  ],
+  auth:true
+},
+{
+  name:"エビのアボカドカップ詰め",
+  image:"./images/000.PNG",
+  cost:360,
+  time:840,
+  rarity: [true,true,true,true,true],
+  prices:[1560,2340,3120,6240,12480],
+  materials:["アカザエビならなんでもOK","アカザエビならなんでもOK","アボカド(種@180)","アボカド(種@180)"],
+  level:13,
+  materials_image:[
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/000.PNG" },
+    { image:"./images/000.PNG" }
+  ],
+  auth:true
+},
+{
+  name:"チーズカニ爪フライ",
+  image:"./images/000.PNG",
+  cost:0,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[1440,2160,2880,5760,11520],
+  materials:["タラバガニならなんでもOK","タラバガニならなんでもOK","アカザエビならなんでもOK","アカザエビならなんでもOK"],
+  level:13,
+  materials_image:[
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" },
+    { image:"./images/materials/all_kaisen.jpg" }
   ],
   auth:true
 },
