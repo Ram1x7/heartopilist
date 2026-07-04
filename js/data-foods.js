@@ -1424,8 +1424,8 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/milk.jpg" },
-    { image:"./images/materials/apple.jpg" },
-    { image:"./images/materials/apple.jpg" }
+    { image:"./images/materials/ringo.jpg" },
+    { image:"./images/materials/ringo.jpg" }
   ],
   auth:true
 },
