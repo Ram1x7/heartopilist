@@ -1542,7 +1542,7 @@ const foodsData = [
   level:12,
   materials_image:[
     { image:"./images/000.PNG" },
-    { image:"./images/000.png" },
+    { image:"./images/000.PNG" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/milk.jpg" }
   ],
