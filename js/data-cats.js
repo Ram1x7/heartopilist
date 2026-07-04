@@ -28,7 +28,6 @@ const catFoods = [
 {name:{jp:"キュウリウオ",en:"Smelt",zh_cn:"胡瓜鱼",zh_tw:"胡瓜魚",ko:"빙어",th:"ปลากลิ่นแตง",tl:"Smelt"},img:"./images/petfoods/059.PNG"},
 {name:{jp:"ラッフ",en:"Ruffe",zh_cn:"欧鳜",zh_tw:"歐鱸",ko:"러프",th:"ปลารัฟฟ์",tl:"Ruffe"},img:"./images/petfoods/060.PNG"},
 {name:{jp:"フランスアジ",en:"French Jack",zh_cn:"法国鲹鱼",zh_tw:"法國鯵魚",ko:"프랑스 전갱이",th:"ปลาทูฝรั่งเศส",tl:"Jack fish"},img:"./images/petfoods/061.PNG"},
-{name:{jp:"タツノオトシゴ",en:"Seahorse",zh_cn:"海马",zh_tw:"海馬",ko:"해마",th:"ม้าน้ำ",tl:"Seahorse"},img:"./images/petfoods/062.PNG"},
 {name:{jp:"アンコウ",en:"Anglerfish",zh_cn:"鮟鱇鱼",zh_tw:"鮟鱇魚",ko:"아귀",th:"ปลาอังเกลอร์",tl:"Anglerfish"},img:"./images/petfoods/063.PNG"},
 {name:{jp:"イガイ",en:"Mussel",zh_cn:"贻贝",zh_tw:"貽貝",ko:"홍합",th:"หอยแมลงภู่",tl:"Mussel"},img:"./images/petfoods/064.PNG"},
 {name:{jp:"パイクパーチ",en:"Pike Perch",zh_cn:"梭鲈",zh_tw:"梭鱸",ko:"파이크 퍼치",th:"ปลาพาइक",tl:"Perch"},img:"./images/petfoods/065.PNG"},
