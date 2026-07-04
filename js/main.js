@@ -1,4 +1,4 @@
-const APP_VERSION = "2.4.0";
+const APP_VERSION = "2.4.1";
 
 let currentFilter="all";
 let currentSort = "book";
@@ -22,7 +22,7 @@ let authData =
 
 // 天気(毎日入力する) 
 const weatherData = {
- "2026-07-04": {
+ "2026-07-07": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -1190,7 +1190,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "2.4.0";
+const popupVersion = "2.4.1";
 
 if(
  localStorage.getItem("popupVersion")
@@ -1287,7 +1287,7 @@ document.getElementById("disclaimer").textContent =
   T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  T("last_update_label","最終更新") + " 2026/07/04";
+  T("last_update_label","最終更新") + " 2026/07/05";
 
 // 言語切替時に動的コンテンツを再描画
 document.addEventListener("langchange", ()=>{
@@ -1296,7 +1296,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/07/04";
+    T("last_update_label","最終更新") + " 2026/07/05";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
