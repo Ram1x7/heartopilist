@@ -1,4 +1,4 @@
-// Q&Aデータ
+// Q&Aデータ 
 // category: "question" = 質問, "request" = 要望, "bug" = 不具合
 // status  : "fixed"(修正済み) / "progress"(対応中) / "considering"(検討中) / "wontfix"(対応見送り)
 //           質問カテゴリにはstatus不要（null推奨）
