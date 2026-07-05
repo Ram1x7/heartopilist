@@ -1295,7 +1295,7 @@ const foodsData = [
 },
 {
   name:"香る紅茶",
-  image:"./images/000.PNG",
+  image:"./images/foods/077.PNG",
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1312,7 +1312,7 @@ const foodsData = [
 },
 {
   name:"濃厚ミルクティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/078.PNG",
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1329,7 +1329,7 @@ const foodsData = [
 },
 {
   name:"ココアミルクティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/078.PNG",
   cost:660,
   time:300,
   rarity: [true,true,true,true,true],
@@ -1346,7 +1346,7 @@ const foodsData = [
 },
 {
   name:"シェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/079.PNG",
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1363,7 +1363,7 @@ const foodsData = [
 },
 {
   name:"ココアシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/080.PNG",
   cost:320,
   time:300,
   rarity: [true,true,true,true,true],
@@ -1380,7 +1380,7 @@ const foodsData = [
 },
 {
   name:"ラズベリーシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/081.PNG",
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1397,7 +1397,7 @@ const foodsData = [
 },
 {
   name:"ブルーベリーシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/082.PNG",
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1414,7 +1414,7 @@ const foodsData = [
 },
 {
   name:"リンゴシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/083.PNG",
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1431,7 +1431,7 @@ const foodsData = [
 },
 {
   name:"オレンジシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/084.PNG",
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1448,7 +1448,7 @@ const foodsData = [
 },
 {
   name:"パイナップルシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/085.PNG",
   cost:130,
   time:30,
   rarity: [true,true,true,true,true],
@@ -1465,7 +1465,7 @@ const foodsData = [
 },
 {
   name:"いちごシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/086.PNG",
   cost:250,
   time:360,
   rarity: [true,true,true,true,true],
@@ -1482,7 +1482,7 @@ const foodsData = [
 },
 {
   name:"ブドウシェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/087.PNG",
   cost:420,
   time:600,
   rarity: [true,true,true,true,true],
@@ -1499,7 +1499,7 @@ const foodsData = [
 },
 {
   name:"抹茶シェイク",
-  image:"./images/000.PNG",
+  image:"./images/foods/088.PNG",
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1516,7 +1516,7 @@ const foodsData = [
 },
 {
   name:"フレッシュ緑茶",
-  image:"./images/000.PNG",
+  image:"./images/foods/089.PNG",
   cost:100,
   time:45,
   rarity: [true,true,true,true,true],
@@ -1524,8 +1524,8 @@ const foodsData = [
   materials:["茶葉(種@25)","茶葉(種@25)","フレッシュ緑茶の材料ならなんでもOK","フレッシュ緑茶の材料ならなんでもOK"],
   level:12,
   materials_image:[
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
+    { image:"./images/materials/tyaba.jpg" },
+    { image:"./images/materials/tyaba.jpg" },
     { image:"./images/materials/all_material.jpg" },
     { image:"./images/materials/all_material.jpg" }
   ],
@@ -1533,7 +1533,7 @@ const foodsData = [
 },
 {
   name:"フレッシュミルクティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/090.PNG",
   cost:150,
   time:45,
   rarity: [true,true,true,true,true],
@@ -1541,8 +1541,8 @@ const foodsData = [
   materials:["茶葉(種@25)","茶葉(種@25)","牛乳(@50)","牛乳(@50)"],
   level:12,
   materials_image:[
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
+    { image:"./images/materials/tyaba.jpg" },
+    { image:"./images/materials/tyaba.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/milk.jpg" }
   ],
@@ -1550,7 +1550,7 @@ const foodsData = [
 },
 {
   name:"抹茶ミルクティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/091.PNG",
   cost:350,
   time:45,
   rarity: [true,true,true,true,true],
@@ -1558,8 +1558,8 @@ const foodsData = [
   materials:["茶葉(種@25)","茶葉(種@25)","牛乳(@50)","抹茶パウダー(@250)"],
   level:12,
   materials_image:[
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
+    { image:"./images/materials/tyaba.jpg" },
+    { image:"./images/materials/tyaba.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/mattya.jpg" }
   ],
@@ -1567,7 +1567,7 @@ const foodsData = [
 },
 {
   name:"ヒナギクハーブティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/092.PNG",
   cost:110,
   time:1440,
   rarity: [true,true,true,true,true],
@@ -1575,16 +1575,16 @@ const foodsData = [
   materials:["茶葉(種@25)","茶葉(種@25)","白いヒナギク(種@30)","白いヒナギク(種@30)"],
   level:12,
   materials_image:[
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" }
+    { image:"./images/materials/tyaba.jpg" },
+    { image:"./images/materials/tyaba.jpg" },
+    { image:"./images/materials/hinagiku.jpg" },
+    { image:"./images/materials/hinagiku.jpg" }
   ],
   auth:true
 },
 {
   name:"ローズティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/093.PNG",
   cost:650,
   time:4320,
   rarity: [true,true,true,true,true],
@@ -1592,16 +1592,16 @@ const foodsData = [
   materials:["茶葉(種@25)","茶葉(種@25)","赤いバラ(種@300)","赤いバラ(種@300)"],
   level:12,
   materials_image:[
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" }
+    { image:"./materials/tyaba.jpg" },
+    { image:"./materials/tyaba.jpg" },
+    { image:"./materials/rose.jpg" },
+    { image:"./materials/rose.jpg" }
   ],
   auth:true
 },
 {
   name:"アフターヌーンティー",
-  image:"./images/000.PNG",
+  image:"./images/foods/094.PNG",
   cost:1690,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1609,10 +1609,10 @@ const foodsData = [
   materials:["チーズケーキ(@245)","チーズケーキ(@245)","香る紅茶(@600)","香る紅茶(@600)"],
   level:12,
   materials_image:[
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" }
+    { image:"./images/materials/cheese_cake.jpg" },
+    { image:"./images/materials/cheese_cake.jpg" },
+    { image:"./images/materials/k_kotya.jpg" },
+    { image:"./images/materials/k_kotya.jpg" }
   ],
   auth:true
 },
