@@ -1840,4 +1840,42 @@ const foodsData = [
   ],
   auth:false
 },
+{
+  name:"積み木ボウルフルーツかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1011.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[210,315,420,840,1680],
+  materials:["練乳(@50)","積み木アイス(@50)","果物ならなんでもOK","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木ボウルリンゴかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1012.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[260,390,520,1040,2080],
+  materials:["練乳(@50)","積み木アイス(@50)","リンゴ","リンゴ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/ringo.jpg" },
+    { image:"./images/materials/ringo.jpg" }
+  ],
+  auth:false
+},
 ];
