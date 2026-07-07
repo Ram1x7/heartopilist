@@ -2004,7 +2004,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","果物ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/all_fruit.jpg" }
@@ -2023,7 +2023,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","リンゴ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/ringo.jpg" }
@@ -2041,7 +2041,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","オレンジ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/orange.jpg" }
@@ -2060,7 +2060,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ブルーベリー"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/buruberi.jpg" }
@@ -2079,7 +2079,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ラズベリー"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/razuberi.jpg" }
@@ -2097,7 +2097,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","いちご(種@125)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/strawberry.jpg" }
@@ -2116,7 +2116,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ブドウ(種@160)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/grape.jpg" }
@@ -2135,7 +2135,7 @@ const foodsData = [
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","パイナップル(種@15)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/batter.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/lemon_verbena.jpg" },
     { image:"./images/materials/pineapple.jpg" }
@@ -2270,6 +2270,101 @@ const foodsData = [
     { image:"./images/materials/tsumiki_kakigori.jpg" },
     { image:"./images/materials/verbena_pie.jpg" },
     { image:"./images/materials/tsumiki_burger.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"塩味ポップコーンバケツ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1034.PNG",
+  cost:470,
+  time:720,
+  rarity: [true,true,true,true,true],
+  prices:[900,1350,1800,3600,7200],
+  materials:["トウモロコシ(種@170)","キノコならなんでもOK","バター(@150)","バター(@150)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/corn.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/batter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"キャラメルポップコーンバケツ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1035.PNG",
+  cost:420,
+  time:720,
+  rarity: [true,true,true,true,true],
+  prices:[820,1230,1640,3280,6560],
+  materials:["トウモロコシ(種@170)","春のブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)","バター(@150)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/corn.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/batter.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"サルサウェーブポテトチップス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1036.PNG",
+  cost:110,
+  time:60,
+  rarity: [true,true,true,true,true],
+  prices:[280,420,560,1120,2240],
+  materials:["ジャガイモ(種@30)","ジャガイモ(種@30)","サルサソース(@50)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/salsa_source.jpg" },
+    { image:null }
+  ],
+  auth:false
+}, 
+{
+  name:"塩味2種盛りバケツ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1037.PNG",
+  cost:580,
+  time:720,
+  rarity: [true,true,true,true,true],
+  prices:[1230,1845,2460,4920,9840],
+  materials:["塩味ポップコーンバケツ(@470)","サルサウェーブポテトチップス(@110)","",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/b_popcorn.jpg" },
+    { image:"./images/materials/salsa_chips.jpg" },
+    { image:null },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"キャラメルポップコーンバケツ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1038.PNG",
+  cost:530,
+  time:720,
+  rarity: [true,true,true,true,true],
+  prices:[1150,1725,2300,4600,9200],
+  materials:["キャラメルポップコーンバケツ(@420)","サルサウェーブポテトチップス(@110)","",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/r_popcorn.jpg" },
+    { image:"./images/materials/salsa_chips.jpg" },
+    { image:null },
     { image:null }
   ],
   auth:false
