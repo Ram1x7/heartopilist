@@ -1878,4 +1878,400 @@ const foodsData = [
   ],
   auth:false
 },
+{
+  name:"積み木ボウルオレンジかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1013.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[260,390,520,1040,2080],
+  materials:["練乳(@50)","積み木アイス(@50)","オレンジ","オレンジ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/orange.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木ボウブルーベリーかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1014.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[220,330,440,880,1060],
+  materials:["練乳(@50)","積み木アイス(@50)","ブルーベリー","ブルーベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/buruberi.jpg" },
+    { image:"./images/materials/buruberi.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木ボウルラズベリーかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1015.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[260,390,520,1040,2080],
+  materials:["練乳(@50)","積み木アイス(@50)","ラズベリー","ラズベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/razuberi.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木ボウルいちごかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1016.PNG",
+  cost:350,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[900,1350,1800,3600,7200],
+  materials:["練乳(@50)","積み木アイス(@50)","いちご(種@125)","いちご(種@125)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木ボウルブドウかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1017.PNG",
+  cost:420,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[1110,1665,2220,4440,8880],
+  materials:["練乳(@50)","積み木アイス(@50)","リンゴ(種@160)","ブドウ(種@160)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/grape.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木ボウルパイナップルかき氷",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1018.PNG",
+  cost:130,
+  time:30,
+  rarity: [true,true,true,true,true],
+  prices:[1110,1665,2220,4440,8880],
+  materials:["練乳(@50)","積み木アイス(@50)","パイナップル(種@15)","パイナップル(種@15)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/rennyu.jpg" },
+    { image:"./images/materials/tsumiki_ice.jpg" },
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/pineapple.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"フルーツバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1019.PNG",
+  cost:210,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[360,540,720,1480,2960],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"リンゴバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1020.PNG",
+  cost:210,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[390,585,780,1560,3120],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","リンゴ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/ringo.jpg" }
+  ],
+  auth:false
+},{
+  name:"オレンジバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1021.PNG",
+  cost:210,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[360,540,720,1480,2960],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","オレンジ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/orange.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ブルーベリーバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1022.PNG",
+  cost:210,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[360,540,720,1480,2960],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ブルーベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/buruberi.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ラズベリーバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1023.PNG",
+  cost:210,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[380,570,760,1520,3040],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ラズベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
+  ],
+  auth:false
+},{
+  name:"いちごバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1024.PNG",
+  cost:335,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[710,1065,1420,2840,5680],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","いちご(種@125)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ブドウバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1025.PNG",
+  cost:370,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[810,1215,1620,3240,6480],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ブドウ(種@160)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/grape.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"パイナップルバーベナテイスティーパイ",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1026.PNG",
+  cost:225,
+  time:30,
+  rarity: [true,true,true,true,true],
+  prices:[380,570,760,1520,3040],
+  materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","パイナップル(種@15)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/butter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/lemon_verbena.jpg" },
+    { image:"./images/materials/pineapple.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木パティキノコバーガー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1027.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["小麦(種@95)","積み木パティ(@50)","キノコならなんでもOK","キノコならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tsumiki_meat.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" },
+    { image:"./images/materials/all_kinoko.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木パティヒラタケバーガー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1028.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["小麦(種@95)","積み木パティ(@50)","ヒラタケ","ヒラタケ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tsumiki_meat.jpg" },
+    { image:"./images/materials/hiratake.jpg" },
+    { image:"./images/materials/hiratake.jpg" }
+  ],
+  auth:false
+},{
+  name:"積み木パティシイタケバーガー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1029.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["小麦(種@95)","積み木パティ(@50)","シイタケ","シイタケ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tsumiki_meat.jpg" },
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/shitake.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木パティマッシュルームバーガー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1030.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["小麦(種@95)","積み木パティ(@50)","マッシュルーム","マッシュルーム"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tsumiki_meat.jpg" },
+    { image:"./images/materials/mushroom.jpg" },
+    { image:"./images/materials/mushroom.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木パティヤマドリタケバーガー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1031.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["小麦(種@95)","積み木パティ(@50)","ヤマドリタケ","ヤマドリタケ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tsumiki_meat.jpg" },
+    { image:"./images/materials/yamadoritake.jpg" },
+    { image:"./images/materials/yamadoritake.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木パティトリュフバーガー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1032.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[780,1170,1560,3120,6240],
+  materials:["小麦(種@95)","積み木パティ(@50)","トリュフ","トリュフ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/tsumiki_meat.jpg" },
+    { image:"./images/materials/truffle.jpg" },
+    { image:"./images/materials/truffle.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"積み木テーマセット",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1033.PNG",
+  cost:455,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[1070,1605,2140,4280,8560],
+  materials:["積み木ボウルフルーツかき氷ならなんでもOK(@100)","フルーツバーベナテイスティーパイならなんでもOK(@210)","積み木キノコバーガーならなんでもOK(@145)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/tsumiki_kakigori.jpg" },
+    { image:"./images/materials/verbena_pie.jpg" },
+    { image:"./images/materials/tsumiki_burger.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
 ];
