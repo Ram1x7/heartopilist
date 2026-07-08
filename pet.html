@@ -783,13 +783,57 @@ function loadPets() {
 
 function savePets() { localStorage.setItem("pets", JSON.stringify(pets)); }
 
+/* ---- エサ状態の保存キー ----
+   永続ID（データ内の id）で管理する。配列の並び順や要素数が
+   変わっても、あげた／好き／嫌いの記録がズレないようにするため。 */
+function foodStateKey(petId, type, foodId) {
+  return `pet_${petId}_${type}_food_${foodId}`;
+}
+
+function getFoodsFor(pet) {
+  return pet.type === "dog" ? dogFoods : catFoods;
+}
+
+/* ---- 旧形式（インデックス管理）からの自動移行 ----
+   pet_{petId}_{type}_{index} という古いキーが残っている場合、
+   現在のデータ配列の並びに基づいて id ベースの新キーへコピーし、
+   古いキーは削除する。ペットごとに一度だけ実行される。 */
+function migrateLegacyFoodKeys() {
+  pets.forEach(pet => {
+    const flagKey = `pet_${pet.id}_${pet.type}_migrated_v2`;
+    if (localStorage.getItem(flagKey) === "1") return;
+
+    const foods = getFoodsFor(pet);
+    const prefixEsc = `pet_${pet.id}_${pet.type}_`.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const legacyRe = new RegExp("^" + prefixEsc + "(\\d+)$");
+
+    Object.keys(localStorage).forEach(key => {
+      const m = key.match(legacyRe);
+      if (!m) return;
+
+      const idx = parseInt(m[1], 10);
+      const food = foods[idx];
+      if (food) {
+        const newKey = foodStateKey(pet.id, pet.type, food.id);
+        if (localStorage.getItem(newKey) === null) {
+          localStorage.setItem(newKey, localStorage.getItem(key));
+        }
+      }
+      // 移行後（あるいは移行先が無い場合）は古いキーを削除
+      localStorage.removeItem(key);
+    });
+
+    localStorage.setItem(flagKey, "1");
+  });
+}
+
 function loadState() {
   const pet = pets.find(p => p.id === currentPet);
   if (!pet) return;
-  const foods = pet.type === "dog" ? dogFoods : catFoods;
+  const foods = getFoodsFor(pet);
   state = [];
   for (let i = 0; i < foods.length; i++) {
-    const raw = localStorage.getItem(`pet_${currentPet}_${pet.type}_${i}`);
+    const raw = localStorage.getItem(foodStateKey(currentPet, pet.type, foods[i].id));
     try { state[i] = raw ? JSON.parse(raw) : { like:false, dislike:false, given:false }; }
     catch(e) { state[i] = { like:false, dislike:false, given:false }; }
   }
@@ -798,7 +842,10 @@ function loadState() {
 function saveState(i) {
   const pet = pets.find(p => p.id === currentPet);
   if (!pet) return;
-  localStorage.setItem(`pet_${currentPet}_${pet.type}_${i}`, JSON.stringify(state[i]));
+  const foods = getFoodsFor(pet);
+  const food = foods[i];
+  if (!food) return;
+  localStorage.setItem(foodStateKey(currentPet, pet.type, food.id), JSON.stringify(state[i]));
 }
 
 /* ===================== 描画 ===================== */
@@ -846,9 +893,9 @@ function deletePet(id) {
   if (!confirm("このペットを削除しますか？")) return;
   const pet = pets.find(p => p.id === id);
   if (pet) {
-    const foods = pet.type === "dog" ? dogFoods : catFoods;
-    for (let i = 0; i < foods.length; i++)
-      localStorage.removeItem(`pet_${id}_${pet.type}_${i}`);
+    const foods = getFoodsFor(pet);
+    foods.forEach(food => localStorage.removeItem(foodStateKey(id, pet.type, food.id)));
+    localStorage.removeItem(`pet_${id}_${pet.type}_migrated_v2`);
   }
   pets = pets.filter(p => p.id !== id);
   if (!pets.length) { pets = [{ id: Date.now(), name: "ペット1", type: "dog" }]; }
@@ -866,7 +913,7 @@ function getPriority(s) {
 function render() {
   const pet = pets.find(p => p.id === currentPet);
   if (!pet) return;
-  const foods = pet.type === "dog" ? dogFoods : catFoods;
+  const foods = getFoodsFor(pet);
   const kw = document.getElementById("searchInput").value.toLowerCase();
   const grid = document.getElementById("foodGrid");
   grid.innerHTML = "";
@@ -924,7 +971,7 @@ function render() {
 function updateProgress(foods) {
   if (!foods) {
     const pet = pets.find(p => p.id === currentPet);
-    foods = pet?.type === "dog" ? dogFoods : catFoods;
+    foods = pet ? getFoodsFor(pet) : [];
   }
   const done = state.filter(s => s.like || s.dislike || s.given).length;
   const total = foods.length;
@@ -936,9 +983,9 @@ function resetData() {
   if (!confirm("このペットのデータをリセットしますか？")) return;
   const pet = pets.find(p => p.id === currentPet);
   if (!pet) return;
-  const foods = pet.type === "dog" ? dogFoods : catFoods;
+  const foods = getFoodsFor(pet);
   for (let i = 0; i < foods.length; i++) {
-    localStorage.removeItem(`pet_${currentPet}_${pet.type}_${i}`);
+    localStorage.removeItem(foodStateKey(currentPet, pet.type, foods[i].id));
     state[i] = { like:false, dislike:false, given:false };
   }
   render();
@@ -1066,6 +1113,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
   applyDark();
   loadPets();
+  migrateLegacyFoodKeys();
   loadState();
   renderPets();
   render();
