@@ -1300,7 +1300,7 @@ const foodsData = [
   time:0,
   rarity: [true,true,true,true,true],
   prices:[840,1260,1680,3360,6720],
-  materials:["紅茶(@250)","紅茶(@250)","香る紅茶の材料ならなんでもOK(紅茶or牛乳)","香る紅茶の材料ならなんでもOK(紅茶or牛乳)"],
+  materials:["紅茶(@250)","紅茶(@250)","紅茶の食材ならなんでもOK","紅茶の食材ならなんでもOK"],
   level:11,
   materials_image:[
     { image:"./images/materials/kotya.jpg" },
@@ -1351,7 +1351,7 @@ const foodsData = [
   time:0,
   rarity: [true,true,true,true,true],
   prices:[400,600,800,1600,3200],
-  materials:["牛乳(@50)","牛乳(@50)","シェイクの材料ならなんでもOK","シェイクの材料ならなんでもOK"],
+  materials:["牛乳(@50)","牛乳(@50)","シェイクの食材ならなんでもOK","シェイクの食材ならなんでもOK"],
   level:11,
   materials_image:[
     { image:"./images/materials/milk.jpg" },
@@ -1521,7 +1521,7 @@ const foodsData = [
   time:45,
   rarity: [true,true,true,true,true],
   prices:[500,750,1000,2000,4000],
-  materials:["茶葉(種@25)","茶葉(種@25)","フレッシュ緑茶の材料ならなんでもOK","フレッシュ緑茶の材料ならなんでもOK"],
+  materials:["茶葉(種@25)","茶葉(種@25)","緑茶の食材ならなんでもOK","緑茶の食材ならなんでもOK"],
   level:12,
   materials_image:[
     { image:"./images/materials/tyaba.jpg" },
@@ -2351,7 +2351,7 @@ const foodsData = [
   auth:false
 },
 {
-  name:"キャラメルポップコーンバケツ",
+  name:"甘口2種盛りバケツ",
   fes:true,
   ended:true,
   image:"./images/foods/1038.PNG",
@@ -2369,4 +2369,308 @@ const foodsData = [
   ],
   auth:false
 },
-];
+{
+  name:"ロメインレタスタコス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1039.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[260,390,520,1040,2080],
+  materials:["ロメインレタス(種@10)","ロメインレタス(種@10)","サルサソース(@50)","卵(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/romeinn.jpg" },
+    { image:"./images/materials/romeinn.jpg" },
+    { image:"./images/materials/salsa_source.jpg" },
+    { image:"./images/materials/egg.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"山菜レタスタコス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1040.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["野菜類ならなんでもOK","野菜類ならなんでもOK","ロメインレタスタコス(@120)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_vege2.jpg" },
+    { image:"./images/materials/all_vege2.jpg" },
+    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"野シダレタスタコス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1041.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["野シダ","野シダ","ロメインレタスタコス(@120)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/noshida.jpg" },
+    { image:"./images/materials/noshida.jpg" },
+    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"野ニンニクガラシレタスタコス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1042.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["野ニンニクガラシ","野ニンニクガラシ","ロメインレタスタコス(@120)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/noninniku.jpg" },
+    { image:"./images/materials/noninniku.jpg" },
+    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"野ゴボウレタスタコス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1043.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["野ゴボウ","野ゴボウ","ロメインレタスタコス(@120)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/nogobou.jpg" },
+    { image:"./images/materials/nogobou.jpg" },
+    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"野カラシナレタスタコス",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1044.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[330,495,660,1320,2640],
+  materials:["野カラシナ","野カラシナ","ロメインレタス(@110)",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/nokarashina.jpg" },
+    { image:"./images/materials/nokarashina.jpg" },
+    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"春のフルーツティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1045.PNG",
+  cost:350,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[460,690,920,1840,3680],
+  materials:["紅茶(@250)","果物ならなんでもOK","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+
+{
+  name:"春のアップルティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1046.PNG",
+  cost:350,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[480,720,960,1920,3840],
+  materials:["紅茶(@250)","リンゴ","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/ringo.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"春のオレンジティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1047.PNG",
+  cost:350,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[480,720,960,1920,3840],
+  materials:["紅茶(@250)","オレンジ","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"春のブルーベリーティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1048.PNG",
+  cost:350,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[460,690,920,1840,3680],
+  materials:["紅茶(@250)","ブルーベリー","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/buruberi.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"春のラズベリーティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1049.PNG",
+  cost:350,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[480,720,960,1920,3840],
+  materials:["紅茶(@250)","ラズベリー","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/razuberi.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"春のストロベリーティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1050.PNG",
+  cost:475,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[800,1200,1600,3200,6400],
+  materials:["紅茶(@250)","いちご(種@125)","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"春のグレープティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1051.PNG",
+  cost:510,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[910,1365,1820,3640,7280],
+  materials:["紅茶(@250)","ブドウ(種@160)","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"春のパイナップルティー",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1052.PNG",
+  cost:365,
+  time:30,
+  rarity: [true,true,true,true,true],
+  prices:[480,720,960,1920,3840],
+  materials:["紅茶(@250)","パイナップル(種@15)","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kotya.jpg" },
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" },
+    { image:"./images/materials/spring_sugar.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"カラフル映画鑑賞セット",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1053.PNG",
+  cost:1000,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[1960,2940,3920,7840,15680],
+  materials:["春のフルーツティーならなんでもOK","甘口2種盛りバケツ(@530)","山菜レタスタコスならなんでもOK",""],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/spring_tea.jpg" },
+    { image:"./images/materials/r_bucket.jpg" },
+    { image:"./images/materials/sansai_tacos.jpg" },
+    { image:null }
+  ],
+  auth:false
+},
+{
+  name:"プレミアム映画鑑賞セット",
+  fes:true,
+  ended:true,
+  image:"./images/foods/1054.PNG",
+  cost:1170,
+  time:780,
+  rarity: [true,true,true,true,true],
+  prices:[2370,3555,4740,9480,18960],
+  materials:["春のフルーツティーならなんでもOK","塩味2種盛りバケツ(@580)","山菜レタスタコスならなんでもOK","山菜レタスタコスならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/spring_tea.jpg" },
+    { image:"./images/materials/b_bucket.jpg" },
+    { image:"./images/materials/sansai_tacos.jpg" },
+    { image:"./images/materials/sansai_tacos.jpg" }
+  ],
+  auth:false
+},];
