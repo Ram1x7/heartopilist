@@ -17,6 +17,7 @@ const flowerData = [
   // ── 通常の花 ────────────────────────
   {
     name: "ヒナギク",
+    nameI18n:{"ja":"ヒナギク","en":"Daisy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/hinagiku.PNG",
     seedImg: "./images/flowers/seed_hinagiku.jpg",
     level: 3,
@@ -31,6 +32,7 @@ const flowerData = [
   },
   {
     name: "パンジー",
+    nameI18n:{"ja":"パンジー","en":"Pansy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/pansy.PNG",
     seedImg: "./images/flowers/seed_pansy.jpg",
     level: 4,
@@ -45,6 +47,7 @@ const flowerData = [
   },
   {
     name: "アンスリウム",
+    nameI18n:{"ja":"アンスリウム","en":"Anthurium","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/anthurium.PNG",
     seedImg: "./images/flowers/seed_anthurium.jpg",
     level: 5,
@@ -59,6 +62,7 @@ const flowerData = [
   },
   {
     name: "ヒナゲシ",
+    nameI18n:{"ja":"ヒナゲシ","en":"Poppy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/hinageshi.PNG",
     seedImg: "./images/flowers/seed_hinageshi.jpg",
     level: 5,
@@ -73,6 +77,7 @@ const flowerData = [
   },
   {
     name: "オランダカイウ",
+    nameI18n:{"ja":"オランダカイウ","en":"Calla Lily","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/oranda_kaiu.PNG",
     seedImg: "./images/flowers/seed_oranda_kaiu.jpg",
     level: 6,
@@ -87,6 +92,7 @@ const flowerData = [
   },
   {
     name: "アサガオ",
+    nameI18n:{"ja":"アサガオ","en":"Morning Glory","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/asagao.PNG",
     seedImg: "./images/flowers/seed_asagao.jpg",
     level: 6,
@@ -101,6 +107,7 @@ const flowerData = [
   },
   {
     name: "カーネーション",
+    nameI18n:{"ja":"カーネーション","en":"Carnation","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/carnation.PNG",
     seedImg: "./images/flowers/seed_carnation.jpg",
     level: 7,
@@ -115,6 +122,7 @@ const flowerData = [
   },
   {
     name: "チューリップ",
+    nameI18n:{"ja":"チューリップ","en":"Tulip","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/tulip.PNG",
     seedImg: "./images/flowers/seed_tulip.jpg",
     level: 8,
@@ -129,6 +137,7 @@ const flowerData = [
   },
   {
     name: "ユリ",
+    nameI18n:{"ja":"ユリ","en":"Lily","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/yuri.PNG",
     seedImg: "./images/flowers/seed_yuri.jpg",
     level: 9,
@@ -143,6 +152,7 @@ const flowerData = [
   },
   {
     name: "バラ",
+    nameI18n:{"ja":"バラ","en":"Rose","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/bara.PNG",
     seedImg: "./images/flowers/seed_bara.jpg",
     level: 10,
@@ -157,6 +167,7 @@ const flowerData = [
   },
   {
     name: "ヒヤシンス",
+    nameI18n:{"ja":"ヒヤシンス","en":"Hyacinth","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/hyacinth.PNG",
     seedImg: "./images/flowers/seed_hyacinth.jpg",
     level: 11,
@@ -171,6 +182,7 @@ const flowerData = [
   },
   {
     name: "コチョウラン",
+    nameI18n:{"ja":"コチョウラン","en":"Moth Orchid","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/kochoран.PNG",
     seedImg: "./images/flowers/seed_kochoран.jpg",
     level: 12,
@@ -185,6 +197,7 @@ const flowerData = [
   },
   {
     name: "ゼラニウム",
+    nameI18n:{"ja":"ゼラニウム","en":"Geranium","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/geranium.PNG",
     seedImg: "./images/flowers/seed_geranium.jpg",
     level: 13,
@@ -201,6 +214,7 @@ const flowerData = [
   // ── イベントの花 ────────────────────────
   {
     name: "メコノプシス",
+    nameI18n:{"ja":"メコノプシス","en":"Himalayan Blue Poppy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/mekonopsis.PNG",
     seedImg: "./images/flowers/seed_mekonopsis.jpg",
     level: 3,
@@ -216,6 +230,7 @@ const flowerData = [
   },
   {
     name: "タンポポ",
+    nameI18n:{"ja":"タンポポ","en":"Dandelion","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/tanpopo.PNG",
     seedImg: "./images/flowers/seed_tanpopo.jpg",
     level: 3,
@@ -231,6 +246,7 @@ const flowerData = [
   },
   {
     name: "積み木フラワー",
+    nameI18n:{"ja":"積み木フラワー","en":"Building Block Flower","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/tsumiki_flower.PNG",
     seedImg: "./images/flowers/seed_tsumiki_flower.jpg",
     level: 3,

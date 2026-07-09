@@ -11,6 +11,7 @@ const cropData = [
   // ── 通常作物 ────────────────────────
   {
     name: "トマト",
+    nameI18n:{"ja":"トマト","en":"Tomato","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/tomato.PNG",
     seedImg: "./images/crops/seed_tomato.jpg",
     level: 1,
@@ -25,6 +26,7 @@ const cropData = [
   },
   {
     name: "ジャガイモ",
+    nameI18n:{"ja":"ジャガイモ","en":"Potato","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/potato.PNG",
     seedImg: "./images/crops/seed_potato.jpg",
     level: 1,
@@ -39,6 +41,7 @@ const cropData = [
   },
   {
     name: "稲",
+    nameI18n:{"ja":"稲","en":"Rice","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/ine.PNG",
     seedImg: "./images/crops/seed_ine.jpg",
     level: 1,
@@ -53,6 +56,7 @@ const cropData = [
   },
   {
     name: "小麦",
+    nameI18n:{"ja":"小麦","en":"Wheat","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/wheat.PNG",
     seedImg: "./images/crops/seed_wheat.jpg",
     level: 2,
@@ -67,6 +71,7 @@ const cropData = [
   },
   {
     name: "レタス",
+    nameI18n:{"ja":"レタス","en":"Lettuce","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/lettuce.PNG",
     seedImg: "./images/crops/seed_lettuce.jpg",
     level: 3,
@@ -81,6 +86,7 @@ const cropData = [
   },
   {
     name: "パイナップル",
+    nameI18n:{"ja":"パイナップル","en":"Pineapple","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/pineapple.PNG",
     seedImg: "./images/crops/seed_pineapple.jpg",
     level: 4,
@@ -95,6 +101,7 @@ const cropData = [
   },
   {
     name: "ニンジン",
+    nameI18n:{"ja":"ニンジン","en":"Carrot","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/carrot.PNG",
     seedImg: "./images/crops/seed_carrot.jpg",
     level: 5,
@@ -109,6 +116,7 @@ const cropData = [
   },
   {
     name: "いちご",
+    nameI18n:{"ja":"いちご","en":"Strawberry","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/strawberry.PNG",
     seedImg: "./images/crops/seed_strawberry.jpg",
     level: 6,
@@ -123,6 +131,7 @@ const cropData = [
   },
   {
     name: "トウモロコシ",
+    nameI18n:{"ja":"トウモロコシ","en":"Corn","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/corn.PNG",
     seedImg: "./images/crops/seed_corn.jpg",
     level: 6,
@@ -137,6 +146,7 @@ const cropData = [
   },
   {
     name: "ブドウ",
+    nameI18n:{"ja":"ブドウ","en":"Grape","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/grape.PNG",
     seedImg: "./images/crops/seed_grape.jpg",
     level: 7,
@@ -151,6 +161,7 @@ const cropData = [
   },
   {
     name: "ナス",
+    nameI18n:{"ja":"ナス","en":"Eggplant","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/eggplant.PNG",
     seedImg: "./images/crops/seed_eggplant.jpg",
     level: 8,
@@ -165,6 +176,7 @@ const cropData = [
   },
   {
     name: "茶葉",
+    nameI18n:{"ja":"茶葉","en":"Tea Leaves","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/tea.PNG",
     seedImg: "./images/crops/seed_tea.jpg",
     level: 11,
@@ -179,6 +191,7 @@ const cropData = [
   },
   {
     name: "カカオ豆",
+    nameI18n:{"ja":"カカオ豆","en":"Cacao Beans","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/cacao.PNG",
     seedImg: "./images/crops/seed_cacao.jpg",
     level: 12,
@@ -193,6 +206,7 @@ const cropData = [
   },
   {
     name: "アボカド",
+    nameI18n:{"ja":"アボカド","en":"Avocado","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/avocado.PNG",
     seedImg: "./images/crops/seed_avocado.jpg",
     level: 13,
@@ -209,6 +223,7 @@ const cropData = [
   // ── イベント作物 ────────────────────────
   {
     name: "ダイコン",
+    nameI18n:{"ja":"ダイコン","en":"Daikon Radish","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/daikon.PNG",
     seedImg: "./images/crops/seed_daikon.jpg",
     level: 1,
@@ -224,6 +239,7 @@ const cropData = [
   },
   {
     name: "ロメインレタス",
+    nameI18n:{"ja":"ロメインレタス","en":"Romaine Lettuce","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/romaine.PNG",
     seedImg: "./images/crops/seed_romaine.jpg",
     level: 1,
@@ -239,6 +255,7 @@ const cropData = [
   },
   {
     name: "レモンバーベナ",
+    nameI18n:{"ja":"レモンバーベナ","en":"Lemon Verbena","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/crops/lemon_verbena.PNG",
     seedImg: "./images/crops/seed_lemon_verbena.jpg",
     level: 1,
