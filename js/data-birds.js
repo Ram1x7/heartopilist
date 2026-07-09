@@ -928,7 +928,7 @@ const birdData = [
 
 {
  name:"冬服・オオフラミンゴ",
- nameI18n:{"ja":"冬服・オオフラミンゴ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・オオフラミンゴ","en":"Winter Coat Greater Flamingo","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -937,13 +937,13 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外湖畔",
- locationI18n:{"ja":"郊外の湖畔","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"郊外の湖畔","en":"Suburban Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1006.PNG",
  auth:false
 },
 {
  name:"冬服・マガモ",
- nameI18n:{"ja":"冬服・マガモ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・マガモ","en":"Winter Coat Mallard","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -952,14 +952,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
- locationI18n:{"ja":"郊外の湖","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1007.PNG",
  auth:false
 },
 
 {
  name:"冬服・ミコアイサ",
- nameI18n:{"ja":"冬服・ミコアイサ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・ミコアイサ","en":"Winter Coat Smew","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -968,14 +968,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
- locationI18n:{"ja":"郊外の湖","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1008.PNG",
  auth:false
 },
 
 {
  name:"冬服・ヒドリガモ",
- nameI18n:{"ja":"冬服・ヒドリガモ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・ヒドリガモ","en":"Winter Coat Eurasian Wigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -984,14 +984,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
- locationI18n:{"ja":"郊外の湖","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1009.PNG",
  auth:false
 },
 
 {
  name:"冬服・オシドリ",
- nameI18n:{"ja":"冬服・オシドリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・オシドリ","en":"Winter Coat Mandarin Duck","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -1000,14 +1000,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"冬季採録クエスト(追加段階)",
- locationI18n:{"ja":"冬季採録クエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"冬季採録クエスト(追加段階)","en":"Winter Collection Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1010.PNG",
  auth:false
 },
 
 {
  name:"紳士チビアオバト",
- nameI18n:{"ja":"紳士チビアオバト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビアオバト","en":"Gentleman Chibi Green Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1016,14 +1016,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
- locationI18n:{"ja":"森林-ジャンプステージ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1011.PNG",
  auth:false
 },
 
 {
  name:"紳士チビアイバト",
- nameI18n:{"ja":"紳士チビアイバト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビアイバト","en":"Gentleman Chibi Indigo Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1032,14 +1032,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
- locationI18n:{"ja":"森林-不思議な松林","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1012.PNG",
  auth:false
 },
 
 {
  name:"紳士チビハイバト",
- nameI18n:{"ja":"紳士チビハイバト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビハイバト","en":"Gentleman Chibi Gray Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1048,14 +1048,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
- locationI18n:{"ja":"森林-コジカ塔","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1013.PNG",
  auth:false
 },
 
 {
  name:"紳士チビアカバト",
- nameI18n:{"ja":"紳士チビアカバト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビアカバト","en":"Gentleman Chibi Red Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1064,14 +1064,14 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
- locationI18n:{"ja":"森の島","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"森の島","en":"Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1014.PNG",
  auth:false
 },
 
 {
  name:"紳士チビハナバト",
- nameI18n:{"ja":"紳士チビハナバト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビハナバト","en":"Gentleman Chibi Blossom Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1080,7 +1080,7 @@ const birdData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"「アクターバト」クエスト(追加段階)",
- locationI18n:{"ja":"「アクターバト」クエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"「アクターバト」クエスト(追加段階)","en":"'Actor Dove' Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"birds/1015.PNG",
  auth:false
 },
