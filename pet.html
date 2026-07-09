@@ -589,26 +589,6 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 }
 .migrate-step strong { color: var(--indigo); }
 
-/* 言語グリッド */
-.lang-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-top: 8px;
-}
-.lang-btn {
-  padding: 9px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: var(--card-sub);
-  color: var(--text-sub);
-  font-size: 13px;
-  font-family: 'Zen Maru Gothic', sans-serif;
-  cursor: pointer;
-  transition: 0.12s;
-}
-.lang-btn:hover { background: var(--indigo); color: #fdf9ef; border-color: var(--indigo); }
-
 /* フッター */
 .footer {
   text-align: center;
@@ -739,30 +719,22 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
   </div>
 </div>
 
-<!-- 言語モーダル -->
-<div class="modal" id="langModal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('langModal')">✕</button>
-    <div class="modal-title">🌐 言語 / Language</div>
-    <div class="lang-grid">
-      <button class="lang-btn" onclick="setLang('jp')">🇯🇵 日本語</button>
-      <button class="lang-btn" onclick="setLang('en')">🇺🇸 English</button>
-      <button class="lang-btn" onclick="setLang('zh_cn')">🇨🇳 简体中文</button>
-      <button class="lang-btn" onclick="setLang('zh_tw')">🇹🇼 繁體中文</button>
-      <button class="lang-btn" onclick="setLang('ko')">🇰🇷 한국어</button>
-      <button class="lang-btn" onclick="setLang('th')">🇹🇭 ไทย</button>
-      <button class="lang-btn" onclick="setLang('tl')">🇵🇭 Filipino</button>
-    </div>
-  </div>
-</div>
-
 <script src="js/i18n.js"></script>
 <script src="js/data-dogs.js"></script>
 <script src="js/data-cats.js"></script>
 
 <script>
 /* ===================== 状態管理 ===================== */
-let lang     = localStorage.getItem("pet_lang") || "jp";
+// エサ名の表示言語はサイト共通の言語セレクター(#lang-select)に統一
+// data-cats.js/data-dogs.js は jp/en/zh_cn/zh_tw/ko/th/tl というキーを使うため変換する
+function petLangCode(){
+  const siteLang = (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+  const map = { "ja":"jp", "zh-CN":"zh_cn", "zh-TW":"zh_tw" };
+  return map[siteLang] || siteLang; // en / ko / th はそのまま
+}
+let lang     = petLangCode();
 let darkMode = JSON.parse(localStorage.getItem("darkMode") || "false");
 
 let pets = [];
@@ -1099,12 +1071,11 @@ function exportBackup() {
 }
 
 /* ===================== 言語 ===================== */
-function setLang(l) {
-  lang = l;
-  localStorage.setItem("pet_lang", l);
-  closeModal("langModal");
+// サイト共通の言語セレクターが切り替わったら、エサ名の表示言語も追従する
+document.addEventListener("langchange", () => {
+  lang = petLangCode();
   render();
-}
+});
 
 /* ===================== 初期化 ===================== */
 window.addEventListener("DOMContentLoaded", () => {

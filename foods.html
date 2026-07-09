@@ -413,6 +413,24 @@ function forceRepaint(){
 let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
 let authData    = JSON.parse(localStorage.getItem("food_auth") || "{}");
 
+// ── 多言語表示ヘルパー ──
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function displayName(f){
+  if(!f.nameI18n) return f.name;
+  const lang = currentLang();
+  return f.nameI18n[lang] || f.name;
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  return fallback;
+}
+
 // ── 状態 ──
 let currentSort        = "book";
 let currentModalRarity = 1;
@@ -473,15 +491,15 @@ function renderSection(items, type = "normal"){
 
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
-    lbl.textContent = "🌸 シーズン料理";
+    lbl.textContent = T("food_section_season","🌸 シーズン料理");
     frag.appendChild(lbl);
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
     banner.textContent =
       type === "season"
-      ? "📍 現在開催中のシーズン"
-      : "⚠️ 現在このシーズンは終了しています";
+      ? T("food_banner_season_active","📍 現在開催中のシーズン")
+      : T("food_banner_season_ended","⚠️ 現在このシーズンは終了しています");
 
     frag.appendChild(banner);
 
@@ -489,15 +507,15 @@ function renderSection(items, type = "normal"){
 
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
-    lbl.textContent = "🎉 フェス料理";
+    lbl.textContent = T("food_section_fes","🎉 フェス料理");
     frag.appendChild(lbl);
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
     banner.textContent =
       type === "fes"
-      ? "📍 現在開催中のフェス"
-      : "⚠️ 現在このフェスは終了しています";
+      ? T("food_banner_fes_active","📍 現在開催中のフェス")
+      : T("food_banner_fes_ended","⚠️ 現在このフェスは終了しています");
 
     frag.appendChild(banner);
   }
@@ -525,9 +543,9 @@ function renderSection(items, type = "normal"){
             ${authed ? "🎖" : ""}
           </button>
         ` : ''}
-        <img src="${f.image}" alt="${f.name}" loading="lazy">
+        <img src="${f.image}" alt="${displayName(f)}" loading="lazy">
       </div>
-      <div class="item-name">${f.name}</div>
+      <div class="item-name">${displayName(f)}</div>
     `;
 
     div._food = f;
@@ -576,7 +594,9 @@ function render(){
   // キーワード検索
   const filterByKeyword = (list) => list.filter(f => {
     if(!keyword) return true;
-    return f.name.includes(keyword) ||
+    const kw = keyword.toLowerCase();
+    return f.name.toLowerCase().includes(kw) ||
+      displayName(f).toLowerCase().includes(kw) ||
       (f.materials && f.materials.some(m => m.includes(keyword)));
   });
 
@@ -615,7 +635,7 @@ function render(){
 
   if(normalList.length === 0 && seasonActiveList.length === 0 && seasonEndedList.length === 0 &&
    fesActiveList.length === 0 && fesEndedList.length === 0){
-  el.innerHTML = `<p style="text-align:center;color:var(--text-sub);padding:40px 0;">該当なし</p>`;
+  el.innerHTML = `<p style="text-align:center;color:var(--text-sub);padding:40px 0;">${T("food_no_results","該当なし")}</p>`;
   return;
 }
 
@@ -660,7 +680,7 @@ function renderModal(){
   const price = f.prices && f.prices[idx] != null ? f.prices[idx] : null;
   const profit = price != null ? price - (f.cost || 0) : null;
   const profitClass = profit == null ? "" : profit >= 0 ? "profit-plus" : "profit-minus";
-  const profitText = profit == null ? "不明" :
+  const profitText = profit == null ? T("food_unknown","不明") :
     (profit >= 0 ? `+${profit.toLocaleString()}` : `${profit.toLocaleString()}`);
 
   const rarityTabs = [1,2,3,4,5].map(rv => {
@@ -685,7 +705,7 @@ function renderModal(){
         </div>
       `).join("");
       materialsHTML = `
-        <div class="f-section-title">🥕 素材</div>
+        <div class="f-section-title">🥕 ${T("food_materials","素材")}</div>
         <div class="f-materials">${itemsHTML}</div>
       `;
     }
@@ -693,59 +713,63 @@ function renderModal(){
     const lines = f.materials.filter(m => m).map(m => `<div>・${m}</div>`).join("");
     if(lines){
       materialsHTML = `
-        <div class="f-section-title">🥕 素材</div>
+        <div class="f-section-title">🥕 ${T("food_materials","素材")}</div>
         <div class="f-material-text">${lines}</div>
       `;
     }
   }
 
   box.innerHTML = `
-    <div class="f-modal-name">${f.name}</div>
-    <img class="f-modal-img" src="${f.image}" alt="${f.name}">
+    <div class="f-modal-name">${displayName(f)}</div>
+    <img class="f-modal-img" src="${f.image}" alt="${displayName(f)}">
 
     <div class="f-rarity-tabs">${rarityTabs}</div>
 
     <div class="f-price-card">
       <div class="f-info-row">
-        <span class="f-info-label">売価</span>
-        <span class="f-info-value">${price != null ? price.toLocaleString() + " コイン" : "不明"}</span>
+        <span class="f-info-label">${T("food_price","売価")}</span>
+        <span class="f-info-value">${price != null ? price.toLocaleString() + " " + T("food_coin","コイン") : T("food_unknown","不明")}</span>
       </div>
       <div class="f-info-row">
-        <span class="f-info-label">材料費</span>
-        <span class="f-info-value">${(f.cost || 0).toLocaleString()} コイン</span>
+        <span class="f-info-label">${T("food_cost","材料費")}</span>
+        <span class="f-info-value">${(f.cost || 0).toLocaleString()} ${T("food_coin","コイン")}</span>
       </div>
       <div class="f-info-row">
-        <span class="f-info-label">利益</span>
-        <span class="f-info-value ${profitClass}">${profitText} コイン</span>
+        <span class="f-info-label">${T("food_profit","利益")}</span>
+        <span class="f-info-value ${profitClass}">${profitText} ${T("food_coin","コイン")}</span>
       </div>
     </div>
 
     <div class="f-info" style="margin-bottom:12px;">
       <div class="f-info-row">
-        <span class="f-info-label">調理時間</span>
+        <span class="f-info-label">${T("food_time","調理時間")}</span>
         <span class="f-info-value">${formatTime(f.time)}</span>
       </div>
       ${f.level != null ? `
       <div class="f-info-row">
-        <span class="f-info-label">レベル</span>
+        <span class="f-info-label">${T("food_level","レベル")}</span>
         <span class="f-info-value">Lv.${f.level}</span>
       </div>` : ""}
     </div>
 
     ${materialsHTML}
 
-    <button class="f-close-btn" onclick="closeModal()">閉じる</button>
+    <button class="f-close-btn" onclick="closeModal()">${T("food_close","閉じる")}</button>
   `;
 }
 
 // ── 時間フォーマット ──
 function formatTime(min){
-  if(!min || min === 0) return "即時";
-  if(min < 60) return `${min}分`;
+  if(!min || min === 0) return T("food_instant","即時");
+  const minLabel = T("food_min","分");
+  const hourLabel = T("food_hour","時間");
+  const lang = currentLang();
+  const sep = lang === "en" ? " " : "";
+  if(min < 60) return `${min}${sep}${minLabel}`;
   const h = Math.floor(min / 60);
   const m = min % 60;
-  if(m === 0) return `${h}時間`;
-  return `${h}時間${m}分`;
+  if(m === 0) return `${h}${sep}${hourLabel}`;
+  return `${h}${sep}${hourLabel} ${m}${sep}${minLabel}`;
 }
 
 // ── トースト ──
@@ -758,6 +782,13 @@ function showToast(msg){
 
 // 初期化
 render();
+
+// 言語切替時に再描画
+document.addEventListener("langchange", ()=>{
+  render();
+  if(currentModalFood) renderModal();
+});
+
 </script>
 </body>
 </html>

@@ -506,8 +506,8 @@ body.dark .status-considering{
 </nav>
 
 <div class="page-header">
-  <h2>Q&A・対応状況</h2>
-  <p>よくある質問・要望・不具合の対応状況一覧</p>
+  <h2 data-i18n="faq_page_title">Q&A・対応状況</h2>
+  <p data-i18n="faq_page_subtitle">よくある質問・要望・不具合の対応状況一覧</p>
 </div>
 
 <input
@@ -515,13 +515,14 @@ body.dark .status-considering{
   id="faqSearch"
   class="faq-search"
   placeholder="🔍 キーワードで検索"
+  data-i18n-placeholder="faq_search_placeholder"
 >
 
 <div class="cat-tabs">
-  <button class="tab active" id="cat-all" onclick="setCat('all')">すべて</button>
-  <button class="tab" id="cat-question" onclick="setCat('question')">質問</button>
-  <button class="tab" id="cat-request" onclick="setCat('request')">要望</button>
-  <button class="tab" id="cat-bug" onclick="setCat('bug')">不具合</button>
+  <button class="tab active" id="cat-all" onclick="setCat('all')" data-i18n="faq_tab_all">すべて</button>
+  <button class="tab" id="cat-question" onclick="setCat('question')" data-i18n="faq_tab_question">質問</button>
+  <button class="tab" id="cat-request" onclick="setCat('request')" data-i18n="faq_tab_request">要望</button>
+  <button class="tab" id="cat-bug" onclick="setCat('bug')" data-i18n="faq_tab_bug">不具合</button>
 </div>
 
 <div class="faq-list" id="faqList"></div>
@@ -580,13 +581,36 @@ function setCat(cat){
 // アイコン
 const catIcon = { question:"❓", request:"💡", bug:"🛠" };
 
+// 多言語ヘルパー
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  return fallback;
+}
+function displayQuestion(f){
+  if(!f.questionI18n) return f.question;
+  const lang = currentLang();
+  return f.questionI18n[lang] || f.question;
+}
+function displayAnswer(f){
+  if(!f.answerI18n) return f.answer;
+  const lang = currentLang();
+  return f.answerI18n[lang] || f.answer;
+}
+
 // ステータス表示
 function statusBadgeHTML(status){
   const map = {
-    fixed:       { label:"✅ 修正済み", cls:"status-fixed" },
-    progress:    { label:"🔧 対応中",   cls:"status-progress" },
-    considering: { label:"🔄 検討中",   cls:"status-considering" },
-    wontfix:     { label:"— 対応見送り", cls:"status-wontfix" },
+    fixed:       { label:T("faq_status_fixed","✅ 修正済み"), cls:"status-fixed" },
+    progress:    { label:T("faq_status_progress","🔧 対応中"),   cls:"status-progress" },
+    considering: { label:T("faq_status_considering","🔄 検討中"),   cls:"status-considering" },
+    wontfix:     { label:T("faq_status_wontfix","— 対応見送り"), cls:"status-wontfix" },
   };
   if(!status || !map[status]) return "";
   const s = map[status];
@@ -601,9 +625,12 @@ function renderFaq(){
 
   let list = faqData.filter(f => {
     const catMatch = currentCat === "all" || f.category === currentCat;
+    const kw = keyword.toLowerCase();
     const kwMatch = !keyword ||
-      f.question.includes(keyword) ||
-      f.answer.includes(keyword);
+      f.question.toLowerCase().includes(kw) ||
+      f.answer.toLowerCase().includes(kw) ||
+      displayQuestion(f).toLowerCase().includes(kw) ||
+      displayAnswer(f).toLowerCase().includes(kw);
     return catMatch && kwMatch;
   });
 
@@ -611,7 +638,7 @@ function renderFaq(){
   list = list.slice().reverse();
 
   if(list.length === 0){
-    el.innerHTML = `<div class="empty">該当するQ&Aが見つかりませんでした</div>`;
+    el.innerHTML = `<div class="empty">${T("faq_no_results","該当するQ&Aが見つかりませんでした")}</div>`;
     return;
   }
 
@@ -621,12 +648,12 @@ function renderFaq(){
     div.innerHTML = `
       <div class="faq-question" onclick="toggleFaq(${f.id})">
         <span class="faq-icon">${catIcon[f.category] || "❓"}</span>
-        <span class="faq-title">${f.question}</span>
+        <span class="faq-title">${displayQuestion(f)}</span>
         <span class="faq-arrow">▼</span>
       </div>
       ${statusBadgeHTML(f.status)}
       <div class="faq-answer">
-        <div class="faq-answer-inner">${f.answer}</div>
+        <div class="faq-answer-inner">${displayAnswer(f)}</div>
       </div>
     `;
     el.appendChild(div);
@@ -641,6 +668,10 @@ function toggleFaq(id){
 document.getElementById("faqSearch").addEventListener("input", renderFaq);
 
 renderFaq();
+
+// 言語切替時に再描画
+document.addEventListener("langchange", renderFaq);
+
 </script>
 </body>
 </html>

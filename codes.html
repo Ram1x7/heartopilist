@@ -496,13 +496,13 @@ body.dark .receive-btn.received{
 
 
 <div class="page-header">
-  <h1>ギフトコード</h1>
-  <p>コードをタップしてコピーできます</p>
+  <h1 data-i18n="codes_page_title">ギフトコード</h1>
+  <p data-i18n="codes_page_subtitle">コードをタップしてコピーできます</p>
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-active" onclick="setTab('active')">有効なコード</button>
-  <button class="tab" id="tab-expired" onclick="setTab('expired')">期限切れ</button>
+  <button class="tab active" id="tab-active" onclick="setTab('active')" data-i18n="codes_tab_active">有効なコード</button>
+  <button class="tab" id="tab-expired" onclick="setTab('expired')" data-i18n="codes_tab_expired">期限切れ</button>
 </div>
 
 <div class="code-list" id="codeList"></div>
@@ -555,6 +555,24 @@ function isExpired(expiry){
   return new Date(expiry) < new Date();
 }
 
+// 多言語ヘルパー
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  return fallback;
+}
+function displayReward(c){
+  if(!c.rewardI18n) return c.reward;
+  const lang = currentLang();
+  return c.rewardI18n[lang] || c.reward;
+}
+
 
 // コード描画
 // チェック状態の読み込み
@@ -580,8 +598,8 @@ function renderCodes(){
   if(list.length === 0){
     el.innerHTML = `<div class="empty">${
       currentTab === "active"
-        ? "現在有効なコードはありません"
-        : "期限切れのコードはありません"
+        ? T("codes_no_active","現在有効なコードはありません")
+        : T("codes_no_expired","期限切れのコードはありません")
     }</div>`;
     return;
   }
@@ -595,25 +613,25 @@ function renderCodes(){
       <div class="code-card-top">
         <span class="code-value">${c.code}</span>
         <span class="code-badge ${expired ? "badge-expired" : "badge-active"}">
-          ${expired ? "期限切れ" : "有効"}
+          ${expired ? T("codes_badge_expired","期限切れ") : T("codes_badge_active","有効")}
         </span>
       </div>
-      <div class="code-reward">🎁 ${c.reward}</div>
+      <div class="code-reward">🎁 ${displayReward(c)}</div>
       <div class="code-meta">
         <span class="code-expiry">
-           ${c.expiry ? "期限：" + formatExpiry(c.expiry) : "期限：なし"}
+           ${c.expiry ? T("codes_expiry_label","期限：") + formatExpiry(c.expiry) : T("codes_expiry_none","期限：なし")}
         </span>
         <div style="display:flex; gap:8px; align-items:center;">
           <button
             class="receive-btn ${received ? "received" : ""}"
             onclick="toggleReceived('${c.code}')"
-            title="受け取り済みにする"
-          >${received ? "✅ 受取済" : "○ 未受取"}</button>
+            title="${T("codes_receive_title","受け取り済みにする")}"
+          >${received ? T("codes_received","✅ 受取済") : T("codes_not_received","○ 未受取")}</button>
           <button
             class="copy-btn ${expired ? "" : ""}"
             onclick="copyCode('${c.code}', this)"
             ${expired ? "disabled" : ""}
-          >${expired ? "期限切れ" : "コピー"}</button>
+          >${expired ? T("codes_badge_expired","期限切れ") : T("codes_copy","コピー")}</button>
         </div>
       </div>
     `;
@@ -631,13 +649,13 @@ function toggleReceived(code){
 // コピー
 function copyCode(code, btn){
   navigator.clipboard.writeText(code).then(()=>{
-    btn.textContent = "コピー済み";
+    btn.textContent = T("codes_copied","コピー済み");
     btn.classList.add("copied");
     setTimeout(()=>{
-      btn.textContent = "コピー";
+      btn.textContent = T("codes_copy","コピー");
       btn.classList.remove("copied");
     }, 2000);
-    showToast("コピーしました！");
+    showToast(T("codes_copied_toast","コピーしました！"));
   }).catch(()=>{
     // フォールバック
     const ta = document.createElement("textarea");
@@ -646,19 +664,20 @@ function copyCode(code, btn){
     ta.select();
     document.execCommand("copy");
     document.body.removeChild(ta);
-    showToast("コピーしました！");
+    showToast(T("codes_copied_toast","コピーしました！"));
   });
 }
 
 function formatExpiry(expiry){
-  if(!expiry) return "なし";
+  if(!expiry) return T("codes_expiry_none","なし");
   const d = new Date(expiry);
   const yyyy = d.getFullYear();
   const mm = d.getMonth() + 1;
   const dd = d.getDate();
   const hh = String(d.getHours()).padStart(2, "0");
   const min = String(d.getMinutes()).padStart(2, "0");
-  return `${yyyy}/${mm}/${dd} ${hh}:${min}まで`;
+  const suffix = T("codes_expiry_until","まで");
+  return suffix ? `${yyyy}/${mm}/${dd} ${hh}:${min}${suffix}` : `${yyyy}/${mm}/${dd} ${hh}:${min}`;
 }
 
 
@@ -671,6 +690,10 @@ function showToast(msg){
 }
 
 renderCodes();
+
+// 言語切替時に再描画
+document.addEventListener("langchange", renderCodes);
+
 </script>
 </body>
 </html>
