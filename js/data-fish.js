@@ -26,7 +26,7 @@ const fishData = [
 },
 {
  name:"チャブ",
- nameI18n:{"ja":"チャブ","en":"Chub","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"チャブ","en":"Common Chub","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"中",
  price:75,
@@ -38,14 +38,14 @@ const fishData = [
 },
 {
  name:"シマドジョウ",
- nameI18n:{"ja":"シマドジョウ","en":"Striped Loach","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シマドジョウ","en":"Spined Loach","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"小",
  price:50,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"巨木の川",
- locationI18n:{"ja":"巨木の川","en":"Giant Tree River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/004.PNG"
 },
 {
@@ -62,14 +62,14 @@ const fishData = [
 },
 {
  name:"ダヌープストレバー",
- nameI18n:{"ja":"ダヌープストレバー","en":"Danube Streber","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ダヌープストレバー","en":"Streber","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"中",
  price:50,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"霞川",
- locationI18n:{"ja":"霞川","en":"Mist River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/006.PNG"
 },
 {
@@ -81,7 +81,7 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"静川",
- locationI18n:{"ja":"静川","en":"Calm River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/007.PNG"
 },
 {
@@ -110,14 +110,14 @@ const fishData = [
 },
 {
  name:"ホワイトフィッシュ",
- nameI18n:{"ja":"ホワイトフィッシュ","en":"Whitefish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ホワイトフィッシュ","en":"Common Whitefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"中",
  price:105,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/010.PNG"
 },
 {
@@ -134,7 +134,7 @@ const fishData = [
 },
 {
  name:"ブリーク",
- nameI18n:{"ja":"ブリーク","en":"Bleak","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ブリーク","en":"Common Bleak","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"小",
  price:50,
@@ -158,7 +158,7 @@ const fishData = [
 },
 {
  name:"コウライエビ",
- nameI18n:{"ja":"コウライエビ","en":"Fleshy Prawn","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コウライエビ","en":"Oriental Shrimp","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"小",
  price:50,
@@ -177,19 +177,19 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
- locationI18n:{"ja":"海","en":"Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/015.PNG"
 },
 {
  name:"スズキ",
- nameI18n:{"ja":"スズキ","en":"Japanese Seabass","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"スズキ","en":"Sea Bass","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"中",
  price:75,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
- locationI18n:{"ja":"海","en":"Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/016.PNG"
 },
 {
@@ -201,24 +201,24 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
- locationI18n:{"ja":"海","en":"Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/017.PNG"
 },
 {
  name:"タチウオ",
- nameI18n:{"ja":"タチウオ","en":"Largehead Hairtail","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"タチウオ","en":"Beltfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"大",
  price:105,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海",
- locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/018.PNG"
 },
 {
  name:"ウミエビ",
- nameI18n:{"ja":"ウミエビ","en":"Slipper Lobster","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ウミエビ","en":"Common Prawn","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"小",
  price:50,
@@ -230,7 +230,7 @@ const fishData = [
 },
 {
  name:"マアジ",
- nameI18n:{"ja":"マアジ","en":"Japanese Jack Mackerel","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"マアジ","en":"Scad","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"小",
  price:50,
@@ -242,14 +242,14 @@ const fishData = [
 },
 {
  name:"カイブツギンザメ",
- nameI18n:{"ja":"カイブツギンザメ","en":"Giant Chimaera","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カイブツギンザメ","en":"Rabbit Fish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:4,
  shadow:"青",
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海(青魚影)",
- locationI18n:{"ja":"海(青魚影)","en":"Sea (Blue Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海(青魚影)","en":"Ocean (Blue Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/021.PNG"
 },
 {
@@ -273,7 +273,7 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/023.PNG"
 },
 {
@@ -302,14 +302,14 @@ const fishData = [
 },
 {
  name:"キュウリウオ",
- nameI18n:{"ja":"キュウリウオ","en":"Smelt","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キュウリウオ","en":"European Smelt","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:2,
  shadow:"小",
  price:100,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"草原の湖",
- locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/026.PNG"
 },
 {
@@ -321,19 +321,19 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["12-18","18-0"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/027.PNG"
 },
 {
  name:"フランスアジ",
- nameI18n:{"ja":"フランスアジ","en":"French Jack Mackerel","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"フランスアジ","en":"False Scad","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:2,
  shadow:"中",
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海",
- locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/028.PNG"
 },
 {
@@ -350,14 +350,14 @@ const fishData = [
 },
 {
  name:"アンコウ",
- nameI18n:{"ja":"アンコウ","en":"Monkfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アンコウ","en":"Anglerfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:2,
  shadow:"金",
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/030.PNG"
 },
 {
@@ -374,14 +374,14 @@ const fishData = [
 },
 {
  name:"パイクパーチ",
- nameI18n:{"ja":"パイクパーチ","en":"Pikeperch","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"パイクパーチ","en":"Zander","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:3,
  shadow:"中",
  price:230,
  weather:["晴れ","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"巨木の川",
- locationI18n:{"ja":"巨木の川","en":"Giant Tree River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/032.PNG"
 },
 {
@@ -393,12 +393,12 @@ const fishData = [
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/033.PNG"
 },
 {
  name:"北欧アカザエビ",
- nameI18n:{"ja":"北欧アカザエビ","en":"Nordic Norway Lobster","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"北欧アカザエビ","en":"European Crayfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:3,
  shadow:"小",
  price:100,
@@ -417,7 +417,7 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/035.PNG"
 },
 {
@@ -434,14 +434,14 @@ const fishData = [
 },
 {
  name:"ピグミータコ",
- nameI18n:{"ja":"ピグミータコ","en":"Pygmy Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ピグミータコ","en":"Atlantic Pygmy Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  shadow:"小",
  price:150,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海",
- locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/037.PNG"
 },
 {
@@ -482,14 +482,14 @@ const fishData = [
 },
 {
  name:"ヨーロッパコイ",
- nameI18n:{"ja":"ヨーロッパコイ","en":"European Carp","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨーロッパコイ","en":"Common Carp","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:4,
  shadow:"中",
  price:230,
  weather:["晴れ","虹"],
  time:["12-18","18-0"],
  location:"霞川",
- locationI18n:{"ja":"霞川","en":"Mist River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/041.PNG"
 },
 {
@@ -501,7 +501,7 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["12-18","18-0"],
  location:"静川",
- locationI18n:{"ja":"静川","en":"Calm River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/042.PNG"
 },
 {
@@ -518,7 +518,7 @@ const fishData = [
 },
 {
  name:"サワガニ",
- nameI18n:{"ja":"サワガニ","en":"Japanese Freshwater Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"サワガニ","en":"River Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:4,
  shadow:"小",
  price:100,
@@ -537,7 +537,7 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/045.PNG"
 },
 {
@@ -554,14 +554,14 @@ const fishData = [
 },
 {
  name:"レッドベリーピラニア",
- nameI18n:{"ja":"レッドベリーピラニア","en":"Red-bellied Piranha","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"レッドベリーピラニア","en":"Red-Bellied Piranha","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:4,
  shadow:"中",
  price:230,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"巨木の川",
- locationI18n:{"ja":"巨木の川","en":"Giant Tree River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/047.PNG"
 },
 {
@@ -573,19 +573,19 @@ const fishData = [
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"草原の湖",
- locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/048.PNG"
 },
 {
  name:"カワギンポ",
- nameI18n:{"ja":"カワギンポ","en":"River Blenny","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カワギンポ","en":"Freshwater Blenny","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:5,
  shadow:"小",
  price:150,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"霞川",
- locationI18n:{"ja":"霞川","en":"Mist River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/049.PNG"
 },
 {
@@ -597,12 +597,12 @@ const fishData = [
  weather:["晴れ","虹"],
  time:["18-0","0-6"],
  location:"草原の湖",
- locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/050.PNG"
 },
 {
  name:"ラッド",
- nameI18n:{"ja":"ラッド","en":"Rudd","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ラッド","en":"Common Rudd","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:5,
  shadow:"小",
  price:150,
@@ -633,24 +633,24 @@ const fishData = [
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
  location:"そよ風の海",
- locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/053.PNG"
 },
 {
  name:"ヨーロッパスルメイカ",
- nameI18n:{"ja":"ヨーロッパスルメイカ","en":"European Squid","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨーロッパスルメイカ","en":"European Flying Squid","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:5,
  shadow:"金",
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/054.PNG"
 },
 {
  name:"シンジュガイ",
- nameI18n:{"ja":"シンジュガイ","en":"Pearl Mussel","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シンジュガイ","en":"Large Pearl Mussel","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:6,
  shadow:"中",
  price:380,
@@ -662,7 +662,7 @@ const fishData = [
 },
 {
  name:"フグ",
- nameI18n:{"ja":"フグ","en":"Pufferfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"フグ","en":"Puffer Fish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:6,
  shadow:"中",
  price:230,
@@ -681,12 +681,12 @@ const fishData = [
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"静川",
- locationI18n:{"ja":"静川","en":"Calm River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/057.PNG"
 },
 {
  name:"カワヒメマス",
- nameI18n:{"ja":"カワヒメマス","en":"Kokanee Salmon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カワヒメマス","en":"Grayling","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:6,
  shadow:"中",
  price:230,
@@ -710,19 +710,19 @@ const fishData = [
 },
 {
  name:"ネコザメ",
- nameI18n:{"ja":"ネコザメ","en":"Bullhead Shark","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ネコザメ","en":"Nursehound","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:6,
  shadow:"金",
  price:535,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/060.PNG"
 },
 {
  name:"イトヨ",
- nameI18n:{"ja":"イトヨ","en":"Three-spined Stickleback","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イトヨ","en":"Three-Spined Stickleback","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:7,
  shadow:"小",
  price:150,
@@ -734,7 +734,7 @@ const fishData = [
 },
 {
  name:"アプロケイルス",
- nameI18n:{"ja":"アプロケイルス","en":"Aplocheilus Killifish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アプロケイルス","en":"Mediterranean Killifish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:7,
  shadow:"小",
  price:150,
@@ -746,38 +746,38 @@ const fishData = [
 },
 {
  name:"カジカ",
- nameI18n:{"ja":"カジカ","en":"Sculpin","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カジカ","en":"Mottled Sculpin","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:7,
  shadow:"小",
  price:150,
  weather:["雨","虹"],
  time:["6-12","12-18","18-0"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/063.PNG"
 },
 {
  name:"リュウグウノツカイ",
- nameI18n:{"ja":"リュウグウノツカイ","en":"Oarfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"リュウグウノツカイ","en":"Giant Oarfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:7,
  shadow:"金",
  price:535,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/064.PNG"
 },
 {
  name:"スペインダイ",
- nameI18n:{"ja":"スペインダイ","en":"Spanish Bream","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"スペインダイ","en":"Blackspot Seabream","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:7,
  shadow:"中",
  price:230,
  weather:["雨","虹"],
  time:["18-0","0-6"],
  location:"そよ風の海",
- locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/065.PNG"
 },
 {
@@ -801,12 +801,12 @@ const fishData = [
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/067.PNG"
 },
 {
  name:"マッドミノー",
- nameI18n:{"ja":"マッドミノー","en":"Mudminnow","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"マッドミノー","en":"European Mudminnow","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:8,
  shadow:"小",
  price:250,
@@ -818,7 +818,7 @@ const fishData = [
 },
 {
  name:"北欧ブルーアカザエビ",
- nameI18n:{"ja":"北欧ブルーアカザエビ","en":"Nordic Blue Norway Lobster","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"北欧ブルーアカザエビ","en":"Blue European Crayfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:8,
  shadow:"小",
  price:250,
@@ -837,7 +837,7 @@ const fishData = [
  weather:["雨","虹"],
  time:["6-12","12-18","18-0"],
  location:"草原の湖",
- locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/070.PNG"
 },
 {
@@ -885,31 +885,31 @@ const fishData = [
  weather:["晴れ","虹"],
  time:["6-12","12-18","18-0"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/074.PNG"
 },
 {
  name:"ドナウイトウ",
- nameI18n:{"ja":"ドナウイトウ","en":"Danube Huchen","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ドナウイトウ","en":"Huchen","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:9,
  shadow:"中",
  price:380,
  weather:["虹"],
  time:["12-18","18-0","0-6"],
  location:"巨木の川",
- locationI18n:{"ja":"巨木の川","en":"Giant Tree River","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/075.PNG"
 },
 {
  name:"ミナミマグロ",
- nameI18n:{"ja":"ミナミマグロ","en":"Southern Bluefin Tuna","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミナミマグロ","en":"Bluefin Tuna","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:9,
  shadow:"大",
  price:850,
  weather:["虹"],
  time:["6-12","12-18"],
  location:"そよ風の海",
- locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/076.PNG"
 },
 {
@@ -926,14 +926,14 @@ const fishData = [
 },
 {
  name:"アカマンボウ",
- nameI18n:{"ja":"アカマンボウ","en":"Opah","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アカマンボウ","en":"Moonfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:9,
  shadow:"大",
  price:850,
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing Quest (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/078.PNG"
 },
 {
@@ -945,7 +945,7 @@ const fishData = [
  weather:["晴れ","虹"],
  time:["18-0","0-6"],
  location:"草原の湖",
- locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/079.PNG"
 },
 {
@@ -957,7 +957,7 @@ const fishData = [
  weather:["晴れ","虹"],
  time:["18-0","0-6"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/080.PNG"
 },
 {
@@ -986,7 +986,7 @@ const fishData = [
 },
 {
  name:"シュモクザメ",
- nameI18n:{"ja":"シュモクザメ","en":"Hammerhead Shark","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シュモクザメ","en":"Smooth Hammerhead","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:10,
  shadow:"大",
  price:850,
@@ -1005,8 +1005,20 @@ const fishData = [
  weather:["虹"],
  time:["6-12","12-18"],
  location:"海釣りクエスト",
- locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing ","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/084.PNG"
+},
+{
+ name:"ライオンヘッド",
+ nameI18n:{"ja":"ライオンヘッド","en":"Lionhead","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:11,
+ shadow:"小",
+ price:395,
+ weather:["虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"温泉山の湖",
+ locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"fish/086.PNG"
 },
 {
  name:"アジアアロワナ",
@@ -1017,20 +1029,8 @@ const fishData = [
  weather:["虹"],
  time:["6-12","18-0","0-6"],
  location:"草原の湖",
- locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"fish/085.PNG"
-},
-{
- name:"ライオンヘッド",
- nameI18n:{"ja":"ライオンヘッド","en":"Lionhead Goldfish","zh-CN":"","zh-TW":"","ko":"","th":""},
- level:11,
- shadow:"小",
- price:395,
- weather:["虹"],
- time:["6-12","12-18","18-0","0-6"],
- location:"温泉山の湖",
- locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/086.PNG"
 },
 {
  name:"シマスズメダイ",
@@ -1162,7 +1162,7 @@ const fishData = [
 },
 {
  name:"氷晶のタラバガニ",
- nameI18n:{"ja":"氷晶のタラバガニ","en":"Ice Crystal King Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶のタラバガニ","en":"Frostspore King Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -1177,7 +1177,7 @@ const fishData = [
 },
 {
  name:"氷晶のマンボウ",
- nameI18n:{"ja":"氷晶のマンボウ","en":"Ice Crystal Ocean Sunfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶のマンボウ","en":"Frostspore Ocean Sunfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -1192,7 +1192,7 @@ const fishData = [
 },
 {
  name:"氷晶のフグ",
- nameI18n:{"ja":"氷晶のフグ","en":"Ice Crystal Pufferfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶のフグ","en":"Frostspore Puffer Fish","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -1207,7 +1207,7 @@ const fishData = [
 },
 {
  name:"氷晶のタツノオトシゴ",
- nameI18n:{"ja":"氷晶のタツノオトシゴ","en":"Ice Crystal Seahorse","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶のタツノオトシゴ","en":"Frostspore Seahorse","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -1222,7 +1222,7 @@ const fishData = [
 },
 {
  name:"氷晶のジンベエザメ",
- nameI18n:{"ja":"氷晶のジンベエザメ","en":"Ice Crystal Whale Shark","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶のジンベエザメ","en":"Frostspore Whale Shark","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:true,
  level:1,
@@ -1237,7 +1237,7 @@ const fishData = [
 },
 {
  name:"紺色帽のディレクタコ",
- nameI18n:{"ja":"紺色帽のディレクタコ","en":"Navy Hat Director Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紺色帽のディレクタコ","en":"Director Pygmy Octopus w/Navy Hat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1252,7 +1252,7 @@ const fishData = [
 },
 {
  name:"茶色帽のディレクタコ",
- nameI18n:{"ja":"茶色帽のディレクタコ","en":"Brown Hat Director Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"茶色帽のディレクタコ","en":"Director Pygmy Octopus w/Brown Hat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1267,7 +1267,7 @@ const fishData = [
 },
 {
  name:"青色帽のディレクタコ",
- nameI18n:{"ja":"青色帽のディレクタコ","en":"Blue Hat Director Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"青色帽のディレクタコ","en":"Director Pygmy Octopus w/Cyan Hat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1282,7 +1282,7 @@ const fishData = [
 },
 {
  name:"褐色帽のディレクタマダコ",
- nameI18n:{"ja":"褐色帽のディレクタマダコ","en":"Tan Hat Director Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"褐色帽のディレクタマダコ","en":"Director Common Octopus w/Cinnamon Hat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1297,7 +1297,7 @@ const fishData = [
 },
 {
  name:"柄帽のディレクタマダコ",
- nameI18n:{"ja":"柄帽のディレクタマダコ","en":"Patterned Hat Director Octopus","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"柄帽のディレクタマダコ","en":"Director Common Octopus w/Patterned Hat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1312,7 +1312,7 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(青)",
- nameI18n:{"ja":"積み木カクレクマノミ(青)","en":"Building Block Clownfish (Blue)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"積み木カクレクマノミ(青)","en":"Blue Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1327,7 +1327,7 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(赤)",
- nameI18n:{"ja":"積み木カクレクマノミ(赤)","en":"Building Block Clownfish (Red)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"積み木カクレクマノミ(赤)","en":"Red Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1342,7 +1342,7 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(青緑)",
- nameI18n:{"ja":"積み木カクレクマノミ(青緑)","en":"Building Block Clownfish (Teal)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"積み木カクレクマノミ(青緑)","en":"Green Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1357,7 +1357,7 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(紫)",
- nameI18n:{"ja":"積み木カクレクマノミ(紫)","en":"Building Block Clownfish (Purple)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"積み木カクレクマノミ(紫)","en":"Purple Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
@@ -1372,7 +1372,7 @@ const fishData = [
 },
 {
  name:"積み木カクレクマノミ(虹)",
- nameI18n:{"ja":"積み木カクレクマノミ(虹)","en":"Building Block Clownfish (Rainbow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"積み木カクレクマノミ(虹)","en":"Colorful Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  ended:true,
  level:1,
