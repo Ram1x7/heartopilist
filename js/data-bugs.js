@@ -712,7 +712,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/065.PNG"
+ img:"bugs/065.JPG"
 }, 
 {
  name:"アトラスオオカブト",
