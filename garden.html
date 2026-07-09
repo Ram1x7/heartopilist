@@ -489,23 +489,23 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 </nav>
 
 <div class="page-header">
-  <h2>園芸図鑑</h2>
+  <h2 data-i18n="garden_page_title">園芸図鑑</h2>
 </div>
 
 <div id="notifBanner">
-  <span id="notifBannerText">🔔 バックグラウンド通知を受け取るには通知の許可が必要です</span><br>
-  <button class="notif-allow-btn" id="notifAllowBtn">通知を許可する</button>
+  <span id="notifBannerText" data-i18n="garden_notif_permission_text">🔔 バックグラウンド通知を受け取るには通知の許可が必要です</span><br>
+  <button class="notif-allow-btn" id="notifAllowBtn" data-i18n="garden_notif_permission_btn">通知を許可する</button>
 </div>
 
 
 <div class="tab-row">
-  <button class="g-tab active" id="tab-crop" onclick="setTab('crop')">🌾 作物</button>
-  <button class="g-tab" id="tab-flower" onclick="setTab('flower')">🌸 花</button>
+  <button class="g-tab active" id="tab-crop" onclick="setTab('crop')" data-i18n="garden_tab_crop">🌾 作物</button>
+  <button class="g-tab" id="tab-flower" onclick="setTab('flower')" data-i18n="garden_tab_flower">🌸 花</button>
 </div>
 
 <div id="gardenContent"></div>
 
-<div class="garden-footer">※本サイトは非公式のファンツールです</div>  
+<div class="garden-footer" data-i18n="garden_footer">※本サイトは非公式のファンツールです</div>  
 
 <div id="detailModal" onclick="if(event.target.id==='detailModal')closeModal()">
   <div class="g-modal-box" id="modalBox"></div>
@@ -521,6 +521,33 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 
 <script>
+// ── 多言語ヘルパー（他のスクリプトブロックからも参照するため最初に定義） ──
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  if(vars){
+    Object.entries(vars).forEach(([k,v])=>{ fallback = fallback.replaceAll(`{${k}}`, v); });
+  }
+  return fallback;
+}
+function displayName(item){
+  if(!item.nameI18n) return item.name;
+  const lang = currentLang();
+  return item.nameI18n[lang] || item.name;
+}
+function translateEventName(name){
+  return T("garden_event_" + name, name);
+}
+function translateColor(c){
+  return T("garden_color_" + c, c);
+}
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyB6aGH4BCn2NFNUMeon9LTM_ck2vKoWYFI",
   authDomain: "heartopilist-c8b69.firebaseapp.com",
@@ -564,12 +591,12 @@ function updateNotifBanner(){
     banner.style.display = "none";
   } else if(Notification.permission === "denied"){
     banner.style.display = "block";
-    text.innerHTML = "🔕 通知がブロックされています。<br>端末・ブラウザの設定からこのサイトの通知を「許可」に変更後、下のボタンを押してください。";
-    btn.textContent = "再確認する";
+    text.innerHTML = T("garden_notif_blocked_text","🔕 通知がブロックされています。<br>端末・ブラウザの設定からこのサイトの通知を「許可」に変更後、下のボタンを押してください。");
+    btn.textContent = T("garden_notif_recheck_btn","再確認する");
   } else {
     banner.style.display = "block";
-    text.textContent = "🔔 バックグラウンド通知を受け取るには通知の許可が必要です";
-    btn.textContent = "通知を許可する";
+    text.textContent = T("garden_notif_permission_text","🔔 バックグラウンド通知を受け取るには通知の許可が必要です");
+    btn.textContent = T("garden_notif_permission_btn","通知を許可する");
   }
 }
 
@@ -580,9 +607,9 @@ async function requestNotifPermission() {
     updateNotifBanner();
     if(Notification.permission === "granted"){
       const token = await getFCMToken();
-      if(token) showToast("通知が有効になりました！");
+      if(token) showToast(T("garden_toast_notif_enabled","通知が有効になりました！"));
     } else {
-      showToast("まだブロックされています。設定をご確認ください");
+      showToast(T("garden_toast_still_blocked","まだブロックされています。設定をご確認ください"));
     }
     return;
   }
@@ -592,12 +619,12 @@ async function requestNotifPermission() {
   if(permission === "granted"){
     const token = await getFCMToken();
     if(token){
-      showToast("通知が有効になりました！");
+      showToast(T("garden_toast_notif_enabled","通知が有効になりました！"));
     } else {
-      showToast("トークン取得に失敗しました");
+      showToast(T("garden_toast_token_failed","トークン取得に失敗しました"));
     }
   } else {
-    showToast("通知が拒否されました");
+    showToast(T("garden_toast_notif_denied","通知が拒否されました"));
   }
 }
 
@@ -610,7 +637,7 @@ messaging.onMessage((payload) => {
 async function registerNotification(item, mode) {
   const token = localStorage.getItem("fcmToken") || await getFCMToken();
   if(!token){
-    showToast("先に通知を許可してください");
+    showToast(T("garden_toast_allow_first","先に通知を許可してください"));
     return;
   }
 
@@ -634,7 +661,7 @@ async function registerNotification(item, mode) {
   const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
   timers[item.name + "_" + mode] = { end: now + growMs, start: now, total: growMs, mode };
   localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
-  showToast(`通知をセットしました（${formatTime(item.growTime)}後）`);
+  showToast(T("garden_toast_notif_set","通知をセットしました（{time}後）",{time:formatTime(item.growTime)}));
   renderModal(window.currentItem);
   renderContent();
 
@@ -648,7 +675,7 @@ async function registerNotification(item, mode) {
     if(!res.ok){
       delete timers[item.name + "_" + mode];
       localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
-      showToast("通知のセットに失敗しました");
+      showToast(T("garden_toast_notif_set_failed","通知のセットに失敗しました"));
       renderModal(window.currentItem);
       renderContent();
     }
@@ -656,7 +683,7 @@ async function registerNotification(item, mode) {
     console.error(e);
     delete timers[item.name + "_" + mode];
     localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
-    showToast("通知のセットに失敗しました");
+    showToast(T("garden_toast_notif_set_failed","通知のセットに失敗しました"));
     renderModal(window.currentItem);
     renderContent();
   }
@@ -667,7 +694,7 @@ async function cancelNotification(item, mode) {
   const timers = JSON.parse(localStorage.getItem("gardenNotifTimers") || "{}");
   delete timers[item.name + "_" + mode];
   localStorage.setItem("gardenNotifTimers", JSON.stringify(timers));
-  showToast("通知をキャンセルしました");
+  showToast(T("garden_toast_notif_canceled","通知をキャンセルしました"));
   renderModal(window.currentItem);
   renderContent();
 
@@ -789,11 +816,14 @@ function cleanExpiredTimers(){
 
 // ── 時間フォーマット（分） ──
 function formatTime(min){
-  if(min < 60) return `${min}分`;
+  const minLabel = T("food_min","分");
+  const hourLabel = T("food_hour","時間");
+  const sep = currentLang() === "en" ? " " : "";
+  if(min < 60) return `${min}${sep}${minLabel}`;
   const h = Math.floor(min / 60);
   const m = min % 60;
-  if(m === 0) return `${h}時間`;
-  return `${h}時間${m}分`;
+  if(m === 0) return `${h}${sep}${hourLabel}`;
+  return `${h}${sep}${hourLabel} ${m}${sep}${minLabel}`;
 }
 
 // ── 時間フォーマット（秒） ──
@@ -835,7 +865,6 @@ function renderContent(){
   el.innerHTML = "";
 
   const data  = currentTab === "crop" ? cropData : flowerData;
-  const label = currentTab === "crop" ? "作物" : "花";
 
   const normalList       = data.filter(d => !d.season && !d.fes);
   const seasonActiveList = data.filter(d => d.season && !d.ended);
@@ -843,11 +872,18 @@ function renderContent(){
   const fesActiveList    = data.filter(d => d.fes && !d.ended);
   const fesEndedList     = data.filter(d => d.fes && d.ended);
 
-  el.appendChild(renderSection(`通常の${label}`, normalList));
-  if(seasonActiveList.length) el.appendChild(renderSection(`🌸 シーズン${label}`, seasonActiveList, "season"));
-  if(seasonEndedList.length)  el.appendChild(renderSection(`🌸 シーズン${label}`, seasonEndedList, "season_ended"));
-  if(fesActiveList.length)    el.appendChild(renderSection(`🎉 フェス${label}`, fesActiveList, "fes"));
-  if(fesEndedList.length)     el.appendChild(renderSection(`🎉 フェス${label}`, fesEndedList, "fes_ended"));
+  const normalKey = currentTab === "crop" ? "garden_section_normal_crop" : "garden_section_normal_flower";
+  const normalFallback = currentTab === "crop" ? "通常の作物" : "通常の花";
+  const seasonKey = currentTab === "crop" ? "garden_section_season_crop" : "garden_section_season_flower";
+  const seasonFallback = currentTab === "crop" ? "🌸 シーズン作物" : "🌸 シーズン花";
+  const fesKey = currentTab === "crop" ? "garden_section_fes_crop" : "garden_section_fes_flower";
+  const fesFallback = currentTab === "crop" ? "🎉 フェス作物" : "🎉 フェス花";
+
+  el.appendChild(renderSection(T(normalKey, normalFallback), normalList));
+  if(seasonActiveList.length) el.appendChild(renderSection(T(seasonKey, seasonFallback), seasonActiveList, "season"));
+  if(seasonEndedList.length)  el.appendChild(renderSection(T(seasonKey, seasonFallback), seasonEndedList, "season_ended"));
+  if(fesActiveList.length)    el.appendChild(renderSection(T(fesKey, fesFallback), fesActiveList, "fes"));
+  if(fesEndedList.length)     el.appendChild(renderSection(T(fesKey, fesFallback), fesEndedList, "fes_ended"));
 }
 
 // ★ eventStatus: null | "season" | "season_ended" | "fes" | "fes_ended"
@@ -862,12 +898,12 @@ function renderSection(label, items, eventStatus = null){
   if(eventStatus === "season" || eventStatus === "fes"){
     const banner = document.createElement("div");
     banner.className = "event-ended-banner";
-    banner.textContent = "📍 現在開催中です";
+    banner.textContent = T("garden_banner_active","📍 現在開催中です");
     wrap.appendChild(banner);
   } else if(eventStatus === "season_ended" || eventStatus === "fes_ended"){
     const banner = document.createElement("div");
     banner.className = "event-ended-banner";
-    banner.textContent = "⚠️ 現在このイベントは終了しています";
+    banner.textContent = T("garden_banner_ended","⚠️ 現在このイベントは終了しています");
     wrap.appendChild(banner);
   }
 
@@ -895,9 +931,9 @@ function renderSection(label, items, eventStatus = null){
             ${isAuthed ? "🎖" : ""}
           </button>
         ` : ''}
-        <img src="${item.img}" alt="${item.name}" loading="lazy">
+        <img src="${item.img}" alt="${displayName(item)}" loading="lazy">
       </div>
-      <div class="item-name">${item.name}</div>
+      <div class="item-name">${displayName(item)}</div>
       <div class="garden-item-sub">${formatTime(item.growTime)}</div>
       ${hasNotif ? `
         <div class="garden-item-timer" id="timer-${CSS.escape(item.name)}"></div>
@@ -955,7 +991,7 @@ function renderModal(item){
     const p = item.prices[i];
     return `<tr>
       <td>${s}</td>
-      <td>${p !== null ? p.toLocaleString() : '<span class="g-price-null">未確認</span>'}</td>
+      <td>${p !== null ? p.toLocaleString() : '<span class="g-price-null">' + T("garden_price_unknown","未確認") + '</span>'}</td>
     </tr>`;
   }).join("");
 
@@ -963,21 +999,22 @@ function renderModal(item){
   if(isFlower && item.colors && item.colors.length > 0){
     const chips = item.colors.map(c => {
       const r = colorRarity[c] || 1;
-      return `<span class="breeding-chip rarity-${r}">${c}</span>`;
+      return `<span class="breeding-chip rarity-${r}">${translateColor(c)}</span>`;
     }).join("");
 
+    const orLabel = T("garden_breeding_or","または");
     const examples = [
-      { from:["赤","黄","白"], to:"オレンジまたはピンク", rFrom:1, rTo:2 },
-      { from:["オレンジ","ピンク"], to:"黒または桃", rFrom:2, rTo:3 },
-      { from:["黒","桃"], to:"紫・青・緑", rFrom:3, rTo:4 },
-      { from:["紫","青","緑"], to:"輝くまたは夜光", rFrom:4, rTo:5 },
+      { from:["赤","黄","白"], to:`${translateColor("オレンジ")}${orLabel}${translateColor("ピンク")}`, rFrom:1, rTo:2 },
+      { from:["オレンジ","ピンク"], to:`${translateColor("黒")}${orLabel}${translateColor("桃")}`, rFrom:2, rTo:3 },
+      { from:["黒","桃"], to:`${translateColor("紫")}・${translateColor("青")}・${translateColor("緑")}`, rFrom:3, rTo:4 },
+      { from:["紫","青","緑"], to:`${translateColor("輝く")}${orLabel}${translateColor("夜光")}`, rFrom:4, rTo:5 },
     ].filter(ex =>
       ex.from.some(f => item.colors.includes(f)) &&
       item.colors.some(c => colorRarity[c] === ex.rTo)
     ).map(ex => `
       <div class="breeding-combo">
         <span class="breeding-chip rarity-${ex.rFrom}">
-          ${ex.from.filter(f => item.colors.includes(f)).join(" / ")}
+          ${ex.from.filter(f => item.colors.includes(f)).map(translateColor).join(" / ")}
         </span>
         <span class="breeding-combo-arrow">×2 →</span>
         <span class="breeding-chip rarity-${ex.rTo}">${ex.to}</span>
@@ -986,10 +1023,10 @@ function renderModal(item){
 
     breedingHTML = `
       <div style="margin-bottom:12px;">
-        <div class="g-section-title">🌸 交配で作れる色</div>
-        <div class="breeding-note">毎朝6時に交配が行われます。同じ色を2株並べると上のレア度の種ができます。</div>
+        <div class="g-section-title">${T("garden_breeding_title","🌸 交配で作れる色")}</div>
+        <div class="breeding-note">${T("garden_breeding_note","毎朝6時に交配が行われます。同じ色を2株並べると上のレア度の種ができます。")}</div>
         <div class="breeding-grid">${chips}</div>
-        ${examples ? `<div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;">組み合わせ例</div>${examples}` : ""}
+        ${examples ? `<div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;">${T("garden_breeding_examples_label","組み合わせ例")}</div>${examples}` : ""}
       </div>
     `;
   }
@@ -1002,68 +1039,67 @@ function renderModal(item){
 
     notifHTML = `
       <div style="margin-bottom:12px;">
-        <div class="g-section-title">🔔 収穫通知</div>
+        <div class="g-section-title">${T("garden_notif_title","🔔 収穫通知")}</div>
         <div class="notif-btns">
           <button class="notif-btn ${normalSet ? "set" : ""}"
             data-action="${normalSet ? "cancel" : "register"}" data-mode="normal">
-            ${normalSet ? "✅ 通常：通知中" : "🔔 通常モード"}
+            ${normalSet ? T("garden_notif_normal_on","✅ 通常：通知中") : T("garden_notif_normal_off","🔔 通常モード")}
           </button>
           <button class="notif-btn ${weedSet ? "set" : ""}"
             data-action="${weedSet ? "cancel" : "register"}" data-mode="weed">
-            ${weedSet ? "✅ 草抜き：通知中" : "🌿 草抜きモード"}
+            ${weedSet ? T("garden_notif_weed_on","✅ 草抜き：通知中") : T("garden_notif_weed_off","🌿 草抜きモード")}
           </button>
         </div>
         <div class="notif-desc">
-          通常：収穫タイムにバックグラウンド通知<br>
-          草抜き：草抜きタイミング3回＋収穫時に通知
+          ${T("garden_notif_desc","通常：収穫タイムにバックグラウンド通知<br>草抜き：草抜きタイミング3回＋収穫時に通知")}
         </div>
       </div>
     `;
   }
 
   box.innerHTML = `
-    <div class="g-modal-name">${item.name}</div>
+    <div class="g-modal-name">${displayName(item)}</div>
     <div class="g-modal-imgs">
       <div class="g-modal-img-wrap">
-        <img src="${item.seedImg}" alt="${item.name}の種">
-        <div class="g-modal-img-label">種</div>
+        <img src="${item.seedImg}" alt="${displayName(item)} ${T("garden_seed_label","種")}">
+        <div class="g-modal-img-label">${T("garden_seed_label","種")}</div>
       </div>
       <div class="g-modal-img-wrap">
-        <img src="${item.img}" alt="${item.name}">
-        <div class="g-modal-img-label">${isFlower ? "花" : "作物"}</div>
+        <img src="${item.img}" alt="${displayName(item)}">
+        <div class="g-modal-img-label">${isFlower ? T("garden_flower_label","花") : T("garden_crop_label","作物")}</div>
       </div>
     </div>
     <div class="g-info">
       <div class="g-info-row">
-        <span class="g-info-label">レベル</span>
+        <span class="g-info-label">${T("garden_level","レベル")}</span>
         <span class="g-info-value">Lv.${item.level}</span>
       </div>
       <div class="g-info-row">
-        <span class="g-info-label">成長時間</span>
+        <span class="g-info-label">${T("garden_grow_time","成長時間")}</span>
         <span class="g-info-value">${formatTime(item.growTime)}</span>
       </div>
       <div class="g-info-row">
-        <span class="g-info-label">種の値段</span>
-        <span class="g-info-value">${item.seedPrice.toLocaleString()} コイン</span>
+        <span class="g-info-label">${T("garden_seed_price","種の値段")}</span>
+        <span class="g-info-value">${item.seedPrice.toLocaleString()} ${T("garden_coin","コイン")}</span>
       </div>
       ${!isFlower ? `
       <div class="g-info-row">
-        <span class="g-info-label">草抜き</span>
-        <span class="g-info-value">最大${item.weedCount}回</span>
+        <span class="g-info-label">${T("garden_weeding","草抜き")}</span>
+        <span class="g-info-value">${T("garden_weeding_max","最大{count}回",{count:item.weedCount})}</span>
       </div>` : ""}
       ${isEventItem ? `
       <div class="g-info-row">
-        <span class="g-info-label">${item.fes ? "フェス" : "シーズン"}</span>
-        <span class="g-info-value">${item.eventName}${item.ended ? "（終了）" : "（開催中）"}</span>
+        <span class="g-info-label">${item.fes ? T("garden_fes","フェス") : T("garden_season","シーズン")}</span>
+        <span class="g-info-value">${translateEventName(item.eventName)}${item.ended ? T("garden_ended_suffix","（終了）") : T("garden_active_suffix","（開催中）")}</span>
       </div>` : ""}
     </div>
     <table class="g-price-table">
-      <tr><th>レア度</th><th>売価</th></tr>
+      <tr><th>${T("garden_rarity","レア度")}</th><th>${T("garden_price","売価")}</th></tr>
       ${priceRows}
     </table>
     ${breedingHTML}
     ${notifHTML}
-    <button class="g-close-btn" onclick="closeModal()">閉じる</button>
+    <button class="g-close-btn" onclick="closeModal()">${T("garden_close","閉じる")}</button>
   `;
 
   box.querySelectorAll("[data-action]").forEach(btn => {
@@ -1145,19 +1181,11 @@ setInterval(updateTimers, 1000);
 
 document.getElementById("helpBtn").onclick = () => {
   document.getElementById("modalBox").innerHTML = `
-    <div class="g-modal-name">使い方</div>
+    <div class="g-modal-name">${T("garden_help_title","使い方")}</div>
     <div class="g-info" style="text-align:left;">
-      🌱 通常モード：収穫タイミングで1回通知<br>
-      🌿 草抜きモード：草抜き3回＋収穫タイミングで通知<br>
-      🔔：通知ONの作物に表示<br>
-      ⭐️：星5チェック<br>
-      🎖：認証マスターチェック<br><br>
-      ⚠️使用上の注意<br>
-      通知には最大1分の誤差があり、草抜きモードでは、最初の2回は『成長時間÷3の1分前後』のタイミングで通知され、3回目は、『収穫時間の1〜2分前』に通知されます。<br>
-      この通知機能はホーム追加した状態でしか使えず、通知許可をしていないと使えないのでご了承ください。<br>
-      また不具合等あれば急に機能停止させる場合もありますが、そちらも合わせてご了承ください🙇‍♂️
+      ${T("garden_help_body","🌱 通常モード：収穫タイミングで1回通知<br>🌿 草抜きモード：草抜き3回＋収穫タイミングで通知<br>🔔：通知ONの作物に表示<br>⭐️：星5チェック<br>🎖：認証マスターチェック<br><br>⚠️使用上の注意<br>通知には最大1分の誤差があり、草抜きモードでは、最初の2回は『成長時間÷3の1分前後』のタイミングで通知され、3回目は、『収穫時間の1〜2分前』に通知されます。<br>この通知機能はホーム追加した状態でしか使えず、通知許可をしていないと使えないのでご了承ください。<br>また不具合等あれば急に機能停止させる場合もありますが、そちらも合わせてご了承ください🙇‍♂️")}
     </div>
-    <button class="g-close-btn" onclick="closeModal()">閉じる</button>
+    <button class="g-close-btn" onclick="closeModal()">${T("garden_close","閉じる")}</button>
   `;
   document.getElementById("detailModal").style.display = "block";
 };
@@ -1166,6 +1194,14 @@ document.getElementById("helpBtn").onclick = () => {
 // 初期化
 cleanExpiredTimers();
 renderContent();
+
+// 言語切替時に再描画
+document.addEventListener("langchange", () => {
+  renderContent();
+  updateNotifBanner();
+  if(window.currentItem) renderModal(window.currentItem);
+});
+
 </script>
 </body>
 </html>
