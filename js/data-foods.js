@@ -3,6 +3,7 @@
 const foodsData = [
 {
   name:"田園サラダ",
+  nameI18n:{"ja":"田園サラダ","en":"Country Salad","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/001.PNG",
   cost:20,
   time:15,
@@ -20,6 +21,7 @@ const foodsData = [
 },
 {
   name:"ミックスジャム",
+  nameI18n:{"ja":"ミックスジャム","en":"Mixed Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/002.PNG",
   cost:0,
   time:0,
@@ -37,6 +39,7 @@ const foodsData = [
 },
 {
   name:"ラズベリージャム",
+  nameI18n:{"ja":"ラズベリージャム","en":"Raspberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/003.PNG",
   cost:0,
   time:0,
@@ -54,6 +57,7 @@ const foodsData = [
 },
 {
   name:"トマトソース",
+  nameI18n:{"ja":"トマトソース","en":"Tomato Sauce","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/004.PNG",
   cost:40,
   time:15,
@@ -71,6 +75,7 @@ const foodsData = [
 },
 {
   name:"ブルーベリージャム",
+  nameI18n:{"ja":"ブルーベリージャム","en":"Blueberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/005.PNG",
   cost:0,
   time:0,
@@ -88,6 +93,7 @@ const foodsData = [
 },
 {
   name:"リンゴジャム",
+  nameI18n:{"ja":"リンゴジャム","en":"Apple Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/006.PNG",
   cost:0,
   time:0,
@@ -105,6 +111,7 @@ const foodsData = [
 },
 {
   name:"オレンジジャム",
+  nameI18n:{"ja":"オレンジジャム","en":"Orange Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/007.PNG",
   cost:0,
   time:0,
@@ -122,6 +129,7 @@ const foodsData = [
 },
 {
   name:"フィッシュアンドチップス",
+  nameI18n:{"ja":"フィッシュアンドチップス","en":"Fish and Chips","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/008.PNG",
   cost:60,
   time:60,
@@ -139,6 +147,7 @@ const foodsData = [
 },
 {
   name:"不気味な食べ物",
+  nameI18n:{"ja":"不気味な食べ物","en":"Creepy Food","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/009.PNG",
   cost:0,
   time:0,
@@ -156,6 +165,7 @@ const foodsData = [
 },
 {
   name:"不気味な飲み物",
+  nameI18n:{"ja":"不気味な飲み物","en":"Creepy Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/010.PNG",
   cost:0,
   time:0,
@@ -173,6 +183,7 @@ const foodsData = [
 },
 {
   name:"パイナップルジャム",
+  nameI18n:{"ja":"パイナップルジャム","en":"Pineapple Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/012.PNG",
   cost:60,
   time:30,
@@ -190,6 +201,7 @@ const foodsData = [
 },
 {
   name:"ブドウジャム",
+  nameI18n:{"ja":"ブドウジャム","en":"Grape Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/013.PNG",
   cost:640,
   time:600,
@@ -207,6 +219,7 @@ const foodsData = [
 },
 {
   name:"チョコソース",
+  nameI18n:{"ja":"チョコソース","en":"Chocolate Sauce","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/068.PNG",
   cost:440,
   time:300,
@@ -224,6 +237,7 @@ const foodsData = [
 },
 {
   name:"いちごジャム",
+  nameI18n:{"ja":"いちごジャム","en":"Strawberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/011.PNG",
   cost:500,
   time:360,
@@ -241,6 +255,7 @@ const foodsData = [
 },
 {
   name:"チーズケーキ",
+  nameI18n:{"ja":"チーズケーキ","en":"Cheesecake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/014.PNG",
   cost:245,
   time:240,
@@ -258,6 +273,7 @@ const foodsData = [
 },
 {
   name:"オリジナルロールケーキ",
+  nameI18n:{"ja":"オリジナルロールケーキ","en":"Original Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/015.PNG",
   cost:450,
   time:0,
@@ -275,6 +291,7 @@ const foodsData = [
 },
 {
   name:"赤いロールケーキ",
+  nameI18n:{"ja":"赤いロールケーキ","en":"Red Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/016.PNG",
   cost:550,
   time:0,
@@ -292,6 +309,7 @@ const foodsData = [
 },
 {
   name:"オレンジのロールケーキ",
+  nameI18n:{"ja":"オレンジのロールケーキ","en":"Orange Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/017.PNG",
   cost:550,
   time:0,
@@ -309,6 +327,7 @@ const foodsData = [
 },
 {
   name:"黄色いロールケーキ",
+  nameI18n:{"ja":"黄色いロールケーキ","en":"Yellow Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/018.PNG",
   cost:550,
   time:0,
@@ -326,6 +345,7 @@ const foodsData = [
 },
 {
   name:"紫のロールケーキ",
+  nameI18n:{"ja":"紫のロールケーキ","en":"Purple Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/019.PNG",
   cost:450,
   time:1,
@@ -343,6 +363,7 @@ const foodsData = [
 },
 {
   name:"緑のロールケーキ",
+  nameI18n:{"ja":"緑のロールケーキ","en":"Green Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/020.PNG",
   cost:550,
   time:0,
@@ -360,6 +381,7 @@ const foodsData = [
 },
 {
   name:"水色ロールケーキ",
+  nameI18n:{"ja":"水色ロールケーキ","en":"Light Blue Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/021.PNG",
   cost:450,
   time:0,
@@ -377,6 +399,7 @@ const foodsData = [
 },
 {
   name:"青いロールケーキ",
+  nameI18n:{"ja":"青いロールケーキ","en":"Blue Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/022.PNG",
   cost:450,
   time:0,
@@ -394,6 +417,7 @@ const foodsData = [
 },
 {
   name:"キノコパイ",
+  nameI18n:{"ja":"キノコパイ","en":"Mushroom Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/023.PNG",
   cost:195,
   time:240,
@@ -411,6 +435,7 @@ const foodsData = [
 },
 {
   name:"ヒラタケパイ",
+  nameI18n:{"ja":"ヒラタケパイ","en":"Oyster Mushroom Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/024.PNG",
   cost:195,
   time:240,
@@ -428,6 +453,7 @@ const foodsData = [
 },
 {
   name:"シイタケパイ",
+  nameI18n:{"ja":"シイタケパイ","en":"Shiitake Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/025.PNG",
   cost:195,
   time:240,
@@ -445,6 +471,7 @@ const foodsData = [
 },
 {
   name:"マッシュルームパイ",
+  nameI18n:{"ja":"マッシュルームパイ","en":"Button Mushroom Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/026.PNG",
   cost:195,
   time:240,
@@ -462,6 +489,7 @@ const foodsData = [
 },
 {
   name:"ヤマドリタケパイ",
+  nameI18n:{"ja":"ヤマドリタケパイ","en":"Porcini Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/027.PNG",
   cost:195,
   time:240,
@@ -479,6 +507,7 @@ const foodsData = [
 },
 {
   name:"トリュフパイ",
+  nameI18n:{"ja":"トリュフパイ","en":"Truffle Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/028.PNG",
   cost:195,
   time:240,
@@ -496,6 +525,7 @@ const foodsData = [
 },
 {
   name:"焼きキノコ",
+  nameI18n:{"ja":"焼きキノコ","en":"Grilled Mushrooms","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/029.PNG",
   cost:0,
   time:0,
@@ -513,6 +543,7 @@ const foodsData = [
 },
 {
   name:"焼きヒラタケ",
+  nameI18n:{"ja":"焼きヒラタケ","en":"Grilled Oyster Mushroom","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/030.PNG",
   cost:0,
   time:0,
@@ -530,6 +561,7 @@ const foodsData = [
 },
 {
   name:"焼きシイタケ",
+  nameI18n:{"ja":"焼きシイタケ","en":"Grilled Shiitake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/031.PNG",
   cost:0,
   time:0,
@@ -547,6 +579,7 @@ const foodsData = [
 },
 {
   name:"焼きマッシュルーム",
+  nameI18n:{"ja":"焼きマッシュルーム","en":"Grilled Button Mushroom","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/032.PNG",
   cost:0,
   time:0,
@@ -564,6 +597,7 @@ const foodsData = [
 },
 {
   name:"焼きヤマドリタケ",
+  nameI18n:{"ja":"焼きヤマドリタケ","en":"Grilled Porcini","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/033.PNG",
   cost:0,
   time:0,
@@ -581,6 +615,7 @@ const foodsData = [
 },
 {
   name:"温泉卵",
+  nameI18n:{"ja":"温泉卵","en":"Onsen Egg","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/056.PNG",
   cost:100,
   time:0,
@@ -598,6 +633,7 @@ const foodsData = [
 },
 {
   name:"復活のエッグ",
+  nameI18n:{"ja":"復活のエッグ","en":"Egg of Revival","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/058.PNG",
   cost:100,
   time:1,
@@ -615,6 +651,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(紫)",
+  nameI18n:{"ja":"復活祭の模様入り卵(紫)","en":"Easter Patterned Egg (Purple)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/059.PNG",
   cost:260,
   time:600,
@@ -632,6 +669,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(緑)",
+  nameI18n:{"ja":"復活祭の模様入り卵(緑)","en":"Easter Patterned Egg (Green)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/060.PNG",
   cost:245,
   time:480,
@@ -649,6 +687,7 @@ const foodsData = [
 },
 {
   name:"復活祭の模様入り卵(オレンジ)",
+  nameI18n:{"ja":"復活祭の模様入り卵(オレンジ)","en":"Easter Patterned Egg (Orange)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/061.PNG",
   cost:100,
   time:0,
@@ -666,6 +705,7 @@ const foodsData = [
 },
 {
   name:"復活祭のイースターエッグの宴",
+  nameI18n:{"ja":"復活祭のイースターエッグの宴","en":"Easter Egg Feast","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/062.PNG",
   cost:755,
   time:600,
@@ -683,6 +723,7 @@ const foodsData = [
 },
 {
   name:"三角の白米ちまき",
+  nameI18n:{"ja":"三角の白米ちまき","en":"Triangular White Rice Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/071.PNG",
   cost:162,
   time:20,
@@ -700,6 +741,7 @@ const foodsData = [
 },
 {
   name:"三角のあずきちまき",
+  nameI18n:{"ja":"三角のあずきちまき","en":"Triangular Red Bean Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/072.PNG",
   cost:162,
   time:20,
@@ -717,6 +759,7 @@ const foodsData = [
 },
 {
   name:"三角の卵黄入り肉ちまき",
+  nameI18n:{"ja":"三角の卵黄入り肉ちまき","en":"Triangular Meat & Egg Yolk Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/073.PNG",
   cost:362,
   time:20,
@@ -734,6 +777,7 @@ const foodsData = [
 },
 {
   name:"枕型の白米ちまき",
+  nameI18n:{"ja":"枕型の白米ちまき","en":"Pillow-shaped White Rice Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/074.PNG",
   cost:162,
   time:20,
@@ -751,6 +795,7 @@ const foodsData = [
 },
 {
   name:"枕型のこしあんちまき",
+  nameI18n:{"ja":"枕型のこしあんちまき","en":"Pillow-shaped Red Bean Paste Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/075.PNG",
   cost:162,
   time:20,
@@ -768,6 +813,7 @@ const foodsData = [
 },
 {
   name:"枕型の卵黄入りちまき",
+  nameI18n:{"ja":"枕型の卵黄入りちまき","en":"Pillow-shaped Egg Yolk Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/076.PNG",
   cost:362,
   time:20,
@@ -785,6 +831,7 @@ const foodsData = [
 },
 {
   name:"モルチーズカヌレ",
+  nameI18n:{"ja":"モルチーズカヌレ","en":"Maltese Canelé","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/063.PNG",
   cost:370,
   time:240,
@@ -802,6 +849,7 @@ const foodsData = [
 },
 {
   name:"レトリバーカヌレ",
+  nameI18n:{"ja":"レトリバーカヌレ","en":"Retriever Canelé","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/064.PNG",
   cost:295,
   time:240,
@@ -819,6 +867,7 @@ const foodsData = [
 },
 {
   name:"モルチーズコンパンナ",
+  nameI18n:{"ja":"モルチーズコンパンナ","en":"Maltese Con Panna","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/065.PNG",
   cost:350,
   time:0,
@@ -836,6 +885,7 @@ const foodsData = [
 },
 {
   name:"レトリバーコンパンナ",
+  nameI18n:{"ja":"レトリバーコンパンナ","en":"Retriever Con Panna","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/066.PNG",
   cost:350,
   time:0,
@@ -853,6 +903,7 @@ const foodsData = [
 },
 {
   name:"ラブリーMALTESEコンパンナ",
+  nameI18n:{"ja":"ラブリーMALTESEコンパンナ","en":"Lovely Maltese Con Panna","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/067.PNG",
   cost:500,
   time:0,
@@ -870,6 +921,7 @@ const foodsData = [
 },
 {
   name:"若草のケーキ",
+  nameI18n:{"ja":"若草のケーキ","en":"Spring Green Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/057.PNG",
   cost:395,
   time:240,
@@ -887,6 +939,7 @@ const foodsData = [
 },
 {
   name:"虹のときめきグミ",
+  nameI18n:{"ja":"虹のときめきグミ","en":"Rainbow Sparkle Gummy","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/070.PNG",
   cost:0,
   time:0,
@@ -904,6 +957,7 @@ const foodsData = [
 },
 {
   name:"虹のドキドキグミ",
+  nameI18n:{"ja":"虹のドキドキグミ","en":"Rainbow Thrill Gummy","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/069.PNG",
   cost:0,
   time:0,
@@ -921,6 +975,7 @@ const foodsData = [
 },
 {
   name:"コーヒー",
+  nameI18n:{"ja":"コーヒー","en":"Coffee","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/034.PNG",
   cost:200,
   time:0,
@@ -938,6 +993,7 @@ const foodsData = [
 },
 {
   name:"カフェラテ",
+  nameI18n:{"ja":"カフェラテ","en":"Café Latte","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/035.PNG",
   cost:200,
   time:0,
@@ -955,6 +1011,7 @@ const foodsData = [
 },
 {
   name:"スモークサーモンベーグル",
+  nameI18n:{"ja":"スモークサーモンベーグル","en":"Smoked Salmon Bagel","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/036.PNG",
   cost:205,
   time:240,
@@ -972,6 +1029,7 @@ const foodsData = [
 },
 {
   name:"シーフードリゾット",
+  nameI18n:{"ja":"シーフードリゾット","en":"Seafood Risotto","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/037.PNG",
   cost:105,
   time:240,
@@ -989,6 +1047,7 @@ const foodsData = [
 },
 {
   name:"カントリー風煮込み",
+  nameI18n:{"ja":"カントリー風煮込み","en":"Country-style Stew","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/038.PNG",
   cost:185,
   time:640,
@@ -1006,6 +1065,7 @@ const foodsData = [
 },
 {
   name:"トリュフのクリームパスタ",
+  nameI18n:{"ja":"トリュフのクリームパスタ","en":"Truffle Cream Pasta","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/039.PNG",
   cost:240,
   time:240,
@@ -1023,6 +1083,7 @@ const foodsData = [
 },
 {
   name:"シーフードピザ",
+  nameI18n:{"ja":"シーフードピザ","en":"Seafood Pizza","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/040.PNG",
   cost:235,
   time:240,
@@ -1040,6 +1101,7 @@ const foodsData = [
 },
 {
   name:"ミートソースパスタ",
+  nameI18n:{"ja":"ミートソースパスタ","en":"Meat Sauce Pasta","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/041.PNG",
   cost:405,
   time:240,
@@ -1057,6 +1119,7 @@ const foodsData = [
 },
 {
   name:"アップルパイ",
+  nameI18n:{"ja":"アップルパイ","en":"Apple Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/042.PNG",
   cost:345,
   time:240,
@@ -1074,6 +1137,7 @@ const foodsData = [
 },
 {
   name:"ニンジンケーキ",
+  nameI18n:{"ja":"ニンジンケーキ","en":"Carrot Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/043.PNG",
   cost:245,
   time:240,
@@ -1091,6 +1155,7 @@ const foodsData = [
 },
 {
   name:"コーンポタージュ",
+  nameI18n:{"ja":"コーンポタージュ","en":"Corn Potage","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/044.PNG",
   cost:540,
   time:720,
@@ -1108,6 +1173,7 @@ const foodsData = [
 },
 {
   name:"豪華海鮮盛り合わせ",
+  nameI18n:{"ja":"豪華海鮮盛り合わせ","en":"Deluxe Seafood Platter","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/045.PNG",
   cost:0,
   time:0,
@@ -1125,6 +1191,7 @@ const foodsData = [
 },
 {
   name:"ティラミス",
+  nameI18n:{"ja":"ティラミス","en":"Tiramisu","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/046.PNG",
   cost:300,
   time:0,
@@ -1142,6 +1209,7 @@ const foodsData = [
 },
 {
   name:"キャンプセット",
+  nameI18n:{"ja":"キャンプセット","en":"Camping Set","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/047.PNG",
   cost:840,
   time:240,
@@ -1159,6 +1227,7 @@ const foodsData = [
 },
 {
   name:"英式アフタヌーンティー",
+  nameI18n:{"ja":"英式アフタヌーンティー","en":"English Afternoon Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/048.PNG",
   cost:300,
   time:0,
@@ -1176,6 +1245,7 @@ const foodsData = [
 },
 {
   name:"ミートバーガー",
+  nameI18n:{"ja":"ミートバーガー","en":"Meat Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/049.PNG",
   cost:480,
   time:480,
@@ -1193,6 +1263,7 @@ const foodsData = [
 },
 {
   name:"アカザエビの前菜",
+  nameI18n:{"ja":"アカザエビの前菜","en":"Norway Lobster Appetizer","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/050.PNG",
   cost:145,
   time:480,
@@ -1210,6 +1281,7 @@ const foodsData = [
 },
 {
   name:"北欧ブルーアカザエビの前菜",
+  nameI18n:{"ja":"北欧ブルーアカザエビの前菜","en":"Nordic Blue Norway Lobster Appetizer","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/051.PNG",
   cost:145,
   time:480,
@@ -1227,6 +1299,7 @@ const foodsData = [
 },
 {
   name:"ナスとひき肉の炒め物",
+  nameI18n:{"ja":"ナスとひき肉の炒め物","en":"Stir-fried Eggplant and Ground Meat","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/052.PNG",
   cost:475,
   time:420,
@@ -1244,6 +1317,7 @@ const foodsData = [
 },
 {
   name:"キャンドルディナー",
+  nameI18n:{"ja":"キャンドルディナー","en":"Candlelight Dinner","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/053.PNG",
   cost:630,
   time:240,
@@ -1261,6 +1335,7 @@ const foodsData = [
 },
 {
   name:"蒸しタラバガニ",
+  nameI18n:{"ja":"蒸しタラバガニ","en":"Steamed King Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/054.PNG",
   cost:150,
   time:0,
@@ -1278,6 +1353,7 @@ const foodsData = [
 },
 {
   name:"蒸し黄金タラバガニ",
+  nameI18n:{"ja":"蒸し黄金タラバガニ","en":"Steamed Golden King Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/055.PNG",
   cost:150,
   time:0,
@@ -1295,6 +1371,7 @@ const foodsData = [
 },
 {
   name:"香る紅茶",
+  nameI18n:{"ja":"香る紅茶","en":"Fragrant Black Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/077.PNG",
   cost:600,
   time:0,
@@ -1312,6 +1389,7 @@ const foodsData = [
 },
 {
   name:"濃厚ミルクティー",
+  nameI18n:{"ja":"濃厚ミルクティー","en":"Rich Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/078.PNG",
   cost:600,
   time:0,
@@ -1329,6 +1407,7 @@ const foodsData = [
 },
 {
   name:"ココアミルクティー",
+  nameI18n:{"ja":"ココアミルクティー","en":"Cocoa Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/079.PNG",
   cost:660,
   time:300,
@@ -1346,6 +1425,7 @@ const foodsData = [
 },
 {
   name:"シェイク",
+  nameI18n:{"ja":"シェイク","en":"Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/080.PNG",
   cost:100,
   time:0,
@@ -1363,6 +1443,7 @@ const foodsData = [
 },
 {
   name:"ココアシェイク",
+  nameI18n:{"ja":"ココアシェイク","en":"Cocoa Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/081.PNG",
   cost:320,
   time:300,
@@ -1380,6 +1461,7 @@ const foodsData = [
 },
 {
   name:"ラズベリーシェイク",
+  nameI18n:{"ja":"ラズベリーシェイク","en":"Raspberry Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/082.PNG",
   cost:100,
   time:0,
@@ -1397,6 +1479,7 @@ const foodsData = [
 },
 {
   name:"ブルーベリーシェイク",
+  nameI18n:{"ja":"ブルーベリーシェイク","en":"Blueberry Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/083.PNG",
   cost:100,
   time:0,
@@ -1414,6 +1497,7 @@ const foodsData = [
 },
 {
   name:"リンゴシェイク",
+  nameI18n:{"ja":"リンゴシェイク","en":"Apple Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/084.PNG",
   cost:100,
   time:0,
@@ -1431,6 +1515,7 @@ const foodsData = [
 },
 {
   name:"オレンジシェイク",
+  nameI18n:{"ja":"オレンジシェイク","en":"Orange Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/085.PNG",
   cost:100,
   time:0,
@@ -1448,6 +1533,7 @@ const foodsData = [
 },
 {
   name:"パイナップルシェイク",
+  nameI18n:{"ja":"パイナップルシェイク","en":"Pineapple Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/086.PNG",
   cost:130,
   time:30,
@@ -1465,6 +1551,7 @@ const foodsData = [
 },
 {
   name:"いちごシェイク",
+  nameI18n:{"ja":"いちごシェイク","en":"Strawberry Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/087.PNG",
   cost:250,
   time:360,
@@ -1482,6 +1569,7 @@ const foodsData = [
 },
 {
   name:"ブドウシェイク",
+  nameI18n:{"ja":"ブドウシェイク","en":"Grape Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/088.PNG",
   cost:420,
   time:600,
@@ -1499,6 +1587,7 @@ const foodsData = [
 },
 {
   name:"抹茶シェイク",
+  nameI18n:{"ja":"抹茶シェイク","en":"Matcha Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/089.PNG",
   cost:600,
   time:0,
@@ -1516,6 +1605,7 @@ const foodsData = [
 },
 {
   name:"フレッシュ緑茶",
+  nameI18n:{"ja":"フレッシュ緑茶","en":"Fresh Green Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/090.PNG",
   cost:100,
   time:45,
@@ -1533,6 +1623,7 @@ const foodsData = [
 },
 {
   name:"フレッシュミルクティー",
+  nameI18n:{"ja":"フレッシュミルクティー","en":"Fresh Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/091.PNG",
   cost:150,
   time:45,
@@ -1550,6 +1641,7 @@ const foodsData = [
 },
 {
   name:"抹茶ミルクティー",
+  nameI18n:{"ja":"抹茶ミルクティー","en":"Matcha Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/092.PNG",
   cost:350,
   time:45,
@@ -1567,6 +1659,7 @@ const foodsData = [
 },
 {
   name:"ヒナギクハーブティー",
+  nameI18n:{"ja":"ヒナギクハーブティー","en":"Daisy Herbal Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/093.PNG",
   cost:110,
   time:1440,
@@ -1584,6 +1677,7 @@ const foodsData = [
 },
 {
   name:"ローズティー",
+  nameI18n:{"ja":"ローズティー","en":"Rose Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/094.PNG",
   cost:650,
   time:4320,
@@ -1601,6 +1695,7 @@ const foodsData = [
 },
 {
   name:"アフターヌーンティー",
+  nameI18n:{"ja":"アフターヌーンティー","en":"Afternoon Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/095.PNG",
   cost:1690,
   time:240,
@@ -1618,6 +1713,7 @@ const foodsData = [
 },
 {
   name:"エビのアボカドカップ詰め",
+  nameI18n:{"ja":"エビのアボカドカップ詰め","en":"Shrimp-stuffed Avocado Cup","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/000.PNG",
   cost:360,
   time:840,
@@ -1635,6 +1731,7 @@ const foodsData = [
 },
 {
   name:"チーズカニ爪フライ",
+  nameI18n:{"ja":"チーズカニ爪フライ","en":"Fried Cheese Crab Claw","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/000.PNG",
   cost:0,
   time:0,
@@ -1652,6 +1749,7 @@ const foodsData = [
 },
 {
   name:"アイスカップコーヒー",
+  nameI18n:{"ja":"アイスカップコーヒー","en":"Iced Cup Coffee","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1001.PNG",
@@ -1671,6 +1769,7 @@ const foodsData = [
 },
 {
   name:"アイスカップカフェラテ",
+  nameI18n:{"ja":"アイスカップカフェラテ","en":"Iced Cup Café Latte","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1002.PNG",
@@ -1690,6 +1789,7 @@ const foodsData = [
 },
 {
   name:"大根おろし肉",
+  nameI18n:{"ja":"大根おろし肉","en":"Grated Daikon with Meat","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1003.PNG",
@@ -1709,6 +1809,7 @@ const foodsData = [
 },
 {
   name:"大根クリームポタージュ",
+  nameI18n:{"ja":"大根クリームポタージュ","en":"Daikon Cream Potage","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1004.PNG",
@@ -1728,6 +1829,7 @@ const foodsData = [
 },
 {
   name:"シュガーパンケーキ(プレーン)",
+  nameI18n:{"ja":"シュガーパンケーキ(プレーン)","en":"Sugar Pancake (Plain)","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1005.PNG",
@@ -1747,6 +1849,7 @@ const foodsData = [
 },
 {
   name:"シュガーパンケーキ(ブルーベリー)",
+  nameI18n:{"ja":"シュガーパンケーキ(ブルーベリー)","en":"Sugar Pancake (Blueberry)","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1006.PNG",
@@ -1766,6 +1869,7 @@ const foodsData = [
 },
 {
   name:"シュガーパンケーキ(ラズベリー)",
+  nameI18n:{"ja":"シュガーパンケーキ(ラズベリー)","en":"Sugar Pancake (Raspberry)","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1007.PNG",
@@ -1785,6 +1889,7 @@ const foodsData = [
 },
 {
   name:"シュガーパンケーキ(アップル)",
+  nameI18n:{"ja":"シュガーパンケーキ(アップル)","en":"Sugar Pancake (Apple)","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1008.PNG",
@@ -1804,6 +1909,7 @@ const foodsData = [
 },
 {
   name:"シュガーパンケーキ(オレンジ)",
+  nameI18n:{"ja":"シュガーパンケーキ(オレンジ)","en":"Sugar Pancake (Orange)","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1009.PNG",
@@ -1823,6 +1929,7 @@ const foodsData = [
 },
 {
   name:"オーロラディナー",
+  nameI18n:{"ja":"オーロラディナー","en":"Aurora Dinner","zh-CN":"","zh-TW":"","ko":"","th":""},
   season:true,
   ended:true,
   image:"./images/foods/1010.PNG",
@@ -1842,6 +1949,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルフルーツかき氷",
+  nameI18n:{"ja":"積み木ボウルフルーツかき氷","en":"Building Block Bowl Fruit Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1011.PNG",
@@ -1861,6 +1969,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルリンゴかき氷",
+  nameI18n:{"ja":"積み木ボウルリンゴかき氷","en":"Building Block Bowl Apple Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1012.PNG",
@@ -1880,6 +1989,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルオレンジかき氷",
+  nameI18n:{"ja":"積み木ボウルオレンジかき氷","en":"Building Block Bowl Orange Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1013.PNG",
@@ -1899,6 +2009,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウブルーベリーかき氷",
+  nameI18n:{"ja":"積み木ボウブルーベリーかき氷","en":"Building Block Bowl Blueberry Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1014.PNG",
@@ -1918,6 +2029,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルラズベリーかき氷",
+  nameI18n:{"ja":"積み木ボウルラズベリーかき氷","en":"Building Block Bowl Raspberry Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1015.PNG",
@@ -1937,6 +2049,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルいちごかき氷",
+  nameI18n:{"ja":"積み木ボウルいちごかき氷","en":"Building Block Bowl Strawberry Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1016.PNG",
@@ -1956,6 +2069,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルブドウかき氷",
+  nameI18n:{"ja":"積み木ボウルブドウかき氷","en":"Building Block Bowl Grape Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1017.PNG",
@@ -1975,6 +2089,7 @@ const foodsData = [
 },
 {
   name:"積み木ボウルパイナップルかき氷",
+  nameI18n:{"ja":"積み木ボウルパイナップルかき氷","en":"Building Block Bowl Pineapple Shaved Ice","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1018.PNG",
@@ -1994,6 +2109,7 @@ const foodsData = [
 },
 {
   name:"フルーツバーベナテイスティーパイ",
+  nameI18n:{"ja":"フルーツバーベナテイスティーパイ","en":"Fruit Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1019.PNG",
@@ -2013,6 +2129,7 @@ const foodsData = [
 },
 {
   name:"リンゴバーベナテイスティーパイ",
+  nameI18n:{"ja":"リンゴバーベナテイスティーパイ","en":"Apple Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1020.PNG",
@@ -2031,6 +2148,7 @@ const foodsData = [
   auth:false
 },{
   name:"オレンジバーベナテイスティーパイ",
+  nameI18n:{"ja":"オレンジバーベナテイスティーパイ","en":"Orange Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1021.PNG",
@@ -2050,6 +2168,7 @@ const foodsData = [
 },
 {
   name:"ブルーベリーバーベナテイスティーパイ",
+  nameI18n:{"ja":"ブルーベリーバーベナテイスティーパイ","en":"Blueberry Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1022.PNG",
@@ -2069,6 +2188,7 @@ const foodsData = [
 },
 {
   name:"ラズベリーバーベナテイスティーパイ",
+  nameI18n:{"ja":"ラズベリーバーベナテイスティーパイ","en":"Raspberry Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1023.PNG",
@@ -2087,6 +2207,7 @@ const foodsData = [
   auth:false
 },{
   name:"いちごバーベナテイスティーパイ",
+  nameI18n:{"ja":"いちごバーベナテイスティーパイ","en":"Strawberry Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1024.PNG",
@@ -2106,6 +2227,7 @@ const foodsData = [
 },
 {
   name:"ブドウバーベナテイスティーパイ",
+  nameI18n:{"ja":"ブドウバーベナテイスティーパイ","en":"Grape Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1025.PNG",
@@ -2125,6 +2247,7 @@ const foodsData = [
 },
 {
   name:"パイナップルバーベナテイスティーパイ",
+  nameI18n:{"ja":"パイナップルバーベナテイスティーパイ","en":"Pineapple Verbena Tea Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1026.PNG",
@@ -2144,6 +2267,7 @@ const foodsData = [
 },
 {
   name:"積み木パティキノコバーガー",
+  nameI18n:{"ja":"積み木パティキノコバーガー","en":"Building Block Patty Mushroom Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1027.PNG",
@@ -2163,6 +2287,7 @@ const foodsData = [
 },
 {
   name:"積み木パティヒラタケバーガー",
+  nameI18n:{"ja":"積み木パティヒラタケバーガー","en":"Building Block Patty Oyster Mushroom Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1028.PNG",
@@ -2181,6 +2306,7 @@ const foodsData = [
   auth:false
 },{
   name:"積み木パティシイタケバーガー",
+  nameI18n:{"ja":"積み木パティシイタケバーガー","en":"Building Block Patty Shiitake Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1029.PNG",
@@ -2200,6 +2326,7 @@ const foodsData = [
 },
 {
   name:"積み木パティマッシュルームバーガー",
+  nameI18n:{"ja":"積み木パティマッシュルームバーガー","en":"Building Block Patty Button Mushroom Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1030.PNG",
@@ -2219,6 +2346,7 @@ const foodsData = [
 },
 {
   name:"積み木パティヤマドリタケバーガー",
+  nameI18n:{"ja":"積み木パティヤマドリタケバーガー","en":"Building Block Patty Porcini Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1031.PNG",
@@ -2238,6 +2366,7 @@ const foodsData = [
 },
 {
   name:"積み木パティトリュフバーガー",
+  nameI18n:{"ja":"積み木パティトリュフバーガー","en":"Building Block Patty Truffle Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1032.PNG",
@@ -2257,6 +2386,7 @@ const foodsData = [
 },
 {
   name:"積み木テーマセット",
+  nameI18n:{"ja":"積み木テーマセット","en":"Building Block Theme Set","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1033.PNG",
@@ -2276,6 +2406,7 @@ const foodsData = [
 },
 {
   name:"塩味ポップコーンバケツ",
+  nameI18n:{"ja":"塩味ポップコーンバケツ","en":"Salted Popcorn Bucket","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1034.PNG",
@@ -2295,6 +2426,7 @@ const foodsData = [
 },
 {
   name:"キャラメルポップコーンバケツ",
+  nameI18n:{"ja":"キャラメルポップコーンバケツ","en":"Caramel Popcorn Bucket","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1035.PNG",
@@ -2314,6 +2446,7 @@ const foodsData = [
 },
 {
   name:"サルサウェーブポテトチップス",
+  nameI18n:{"ja":"サルサウェーブポテトチップス","en":"Salsa Wave Potato Chips","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1036.PNG",
@@ -2333,6 +2466,7 @@ const foodsData = [
 }, 
 {
   name:"塩味2種盛りバケツ",
+  nameI18n:{"ja":"塩味2種盛りバケツ","en":"Salted Duo Bucket","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1037.PNG",
@@ -2352,6 +2486,7 @@ const foodsData = [
 },
 {
   name:"甘口2種盛りバケツ",
+  nameI18n:{"ja":"甘口2種盛りバケツ","en":"Sweet Duo Bucket","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1038.PNG",
@@ -2371,6 +2506,7 @@ const foodsData = [
 },
 {
   name:"ロメインレタスタコス",
+  nameI18n:{"ja":"ロメインレタスタコス","en":"Romaine Lettuce Taco","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1039.PNG",
@@ -2390,6 +2526,7 @@ const foodsData = [
 },
 {
   name:"山菜レタスタコス",
+  nameI18n:{"ja":"山菜レタスタコス","en":"Wild Vegetable Lettuce Taco","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1040.PNG",
@@ -2409,6 +2546,7 @@ const foodsData = [
 },
 {
   name:"野シダレタスタコス",
+  nameI18n:{"ja":"野シダレタスタコス","en":"Wild Fern Lettuce Taco","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1041.PNG",
@@ -2428,6 +2566,7 @@ const foodsData = [
 },
 {
   name:"野ニンニクガラシレタスタコス",
+  nameI18n:{"ja":"野ニンニクガラシレタスタコス","en":"Wild Garlic Mustard Lettuce Taco","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1042.PNG",
@@ -2447,6 +2586,7 @@ const foodsData = [
 },
 {
   name:"野ゴボウレタスタコス",
+  nameI18n:{"ja":"野ゴボウレタスタコス","en":"Wild Burdock Lettuce Taco","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1043.PNG",
@@ -2466,6 +2606,7 @@ const foodsData = [
 },
 {
   name:"野カラシナレタスタコス",
+  nameI18n:{"ja":"野カラシナレタスタコス","en":"Wild Mustard Greens Lettuce Taco","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1044.PNG",
@@ -2485,6 +2626,7 @@ const foodsData = [
 },
 {
   name:"春のフルーツティー",
+  nameI18n:{"ja":"春のフルーツティー","en":"Spring Fruit Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1045.PNG",
@@ -2505,6 +2647,7 @@ const foodsData = [
 
 {
   name:"春のアップルティー",
+  nameI18n:{"ja":"春のアップルティー","en":"Spring Apple Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1046.PNG",
@@ -2524,6 +2667,7 @@ const foodsData = [
 },
 {
   name:"春のオレンジティー",
+  nameI18n:{"ja":"春のオレンジティー","en":"Spring Orange Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1047.PNG",
@@ -2543,6 +2687,7 @@ const foodsData = [
 },
 {
   name:"春のブルーベリーティー",
+  nameI18n:{"ja":"春のブルーベリーティー","en":"Spring Blueberry Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1048.PNG",
@@ -2562,6 +2707,7 @@ const foodsData = [
 },
 {
   name:"春のラズベリーティー",
+  nameI18n:{"ja":"春のラズベリーティー","en":"Spring Raspberry Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1049.PNG",
@@ -2581,6 +2727,7 @@ const foodsData = [
 },
 {
   name:"春のストロベリーティー",
+  nameI18n:{"ja":"春のストロベリーティー","en":"Spring Strawberry Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1050.PNG",
@@ -2600,6 +2747,7 @@ const foodsData = [
 },
 {
   name:"春のグレープティー",
+  nameI18n:{"ja":"春のグレープティー","en":"Spring Grape Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1051.PNG",
@@ -2619,6 +2767,7 @@ const foodsData = [
 },
 {
   name:"春のパイナップルティー",
+  nameI18n:{"ja":"春のパイナップルティー","en":"Spring Pineapple Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1052.PNG",
@@ -2638,6 +2787,7 @@ const foodsData = [
 },
 {
   name:"カラフル映画鑑賞セット",
+  nameI18n:{"ja":"カラフル映画鑑賞セット","en":"Colorful Movie Night Set","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1053.PNG",
@@ -2657,6 +2807,7 @@ const foodsData = [
 },
 {
   name:"プレミアム映画鑑賞セット",
+  nameI18n:{"ja":"プレミアム映画鑑賞セット","en":"Premium Movie Night Set","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:true,
   image:"./images/foods/1054.PNG",
