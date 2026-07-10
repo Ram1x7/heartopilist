@@ -183,6 +183,13 @@ const codesData = [
     expiry: "2026-08-01 00:59",
     active: true,
   },
+  {
+    code: "together180",
+    reward: "月の水晶×40,願い星×20,そのほか豪華アイテム！",
+    rewardI18n:{"ja":"月の水晶×40,願い星×20,そのほか豪華アイテム！","en":"Moon Crystal ×40, Wish Star ×20, and other deluxe items!","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-08-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
