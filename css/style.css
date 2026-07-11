@@ -346,6 +346,32 @@ body.dark .weather-next{
   color:#b3a89a;
 }
 
+/* サーバー選択 */
+.server-select-wrap{
+  display:flex;
+  justify-content:center;
+  margin-bottom:6px;
+}
+
+.server-select{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:5px 12px;
+  font-size:11px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  cursor:pointer;
+  text-align:center;
+}
+
+body.dark .server-select{
+  background:#383329;
+  color:#ece4d4;
+  border:1px solid #46423b;
+}
+
 /* 時間 */
 .time{
   text-align:center;
