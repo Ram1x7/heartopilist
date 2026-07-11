@@ -42,13 +42,13 @@ const weatherData = {
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
-  "2026-07-09": {
+  "2026-07-12": {
    "6-12":"雨",
    "12-18":"晴れ",
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
-   "2026-07-10": {
+   "2026-07-13": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -1392,7 +1392,7 @@ document.getElementById("disclaimer").textContent =
   T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  T("last_update_label","最終更新") + " 2026/07/08";
+  T("last_update_label","最終更新") + " 2026/07/11";
 
 // 言語切替時に動的コンテンツを再描画
 document.addEventListener("langchange", ()=>{
@@ -1401,7 +1401,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/07/08";
+    T("last_update_label","最終更新") + " 2026/07/11";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
