@@ -1388,7 +1388,7 @@ const fishData = [
 {
  name:"ホタテ",
  nameI18n:{"ja":"ホタテ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"小",
@@ -1403,7 +1403,7 @@ const fishData = [
 {
  name:"ニシキテグリ",
  nameI18n:{"ja":"ニシキテグリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"小",
@@ -1418,7 +1418,7 @@ const fishData = [
 {
  name:"ウミウシ",
  nameI18n:{"ja":"ウミウシ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"小",
@@ -1433,7 +1433,7 @@ const fishData = [
 {
  name:"スルメイカ",
  nameI18n:{"ja":"スルメイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"中",
@@ -1448,7 +1448,7 @@ const fishData = [
 {
  name:"ホタルイカ",
  nameI18n:{"ja":"ホタルイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"小",
@@ -1463,7 +1463,7 @@ const fishData = [
 {
  name:"ヒラタウミガメ",
  nameI18n:{"ja":"ヒラタウミガメ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"中",
@@ -1478,7 +1478,7 @@ const fishData = [
 {
  name:"太平洋ヒメウミガメ",
  nameI18n:{"ja":"太平洋ヒメウミガメ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- fes:true,
+ season:true,
  ended:false,
  level:1,
  shadow:"中",
