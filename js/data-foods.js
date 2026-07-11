@@ -2938,4 +2938,265 @@ const foodsData = [
   ],
   auth:false
 },
+{
+  name:"ミニパールケーキ",
+  nameI18n:{"ja":"ミニパールケーキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1057.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[230,345,460,920,1840],
+  materials:["ホタテ","小麦(種@95)","牛乳(@50)","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/hotate.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ミニスターフルーツパールケーキ",
+  nameI18n:{"ja":"ミニスターフルーツパールケーキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1058.PNG",
+  cost:155,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[230,345,460,920,1840],
+  materials:["ホタテ","小麦(種@95)","牛乳(@50)","スターフルーツ(種@10)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/hotate.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/star_fruit.jpg" }
+  ],
+  auth:false
+},
+
+{
+  name:"ミニアップルパールケーキ",
+  nameI18n:{"ja":"ミニアップルパールケーキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1059.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[240,360,480,960,1920],
+  materials:["ホタテ","小麦(種@95)","牛乳(@50)","リンゴ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/hotate.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/ringo.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ミオレンジパールケーキ",
+  nameI18n:{"ja":"ミニオレンジパールケーキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1060.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[240,360,480,960,1920],
+  materials:["ホタテ","小麦(種@95)","牛乳(@50)","オレンジ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/hotate.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/orange.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ミニブルーベリーパールケーキ",
+  nameI18n:{"ja":"ミニブルーベリーパールケーキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1061.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[230,345,460,920,1840],
+  materials:["ホタテ","小麦(種@95)","牛乳(@50)","ブルーベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/hotate.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/buruberi.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ミニラズベリーパールケーキ",
+  nameI18n:{"ja":"ミニラズベリーパールケーキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1062.PNG",
+  cost:145,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[240,360,480,960,1920],
+  materials:["ホタテ","小麦(種@95)","牛乳(@50)","ラズベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/hotate.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ジャム添えイカ焼き",
+  nameI18n:{"ja":"ジャム添えイカ焼き","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1063.PNG",
+  cost:0,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[440,660,880,1760,3520],
+  materials:["スルメイカ","海ぶどう","ワカメ","ジャムならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/surumeika.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/all_jam.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"リンゴジャム添えイカ焼き",
+  nameI18n:{"ja":"リンゴジャム添えイカ焼き","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1064.PNG",
+  cost:0,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[550,825,1100,2200,4400],
+  materials:["スルメイカ","海ぶどう","ワカメ","リンゴジャム"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/surumeika.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/jam_apple.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"ブルーベリージャム添えイカ焼き",
+  nameI18n:{"ja":"ブルーベリージャム添えイカ焼き","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1065.PNG",
+  cost:0,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[450,675,900,1800,3600],
+  materials:["スルメイカ","海ぶどう","ワカメ","ブルーベリージャム"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/surumeika.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/jam_buruberi.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"スターフルーツジャム添えイカ焼き",
+  nameI18n:{"ja":"スターフルーツジャム添えイカ焼き","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1066.PNG",
+  cost:40,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[480,720,960,1920,3840],
+  materials:["スルメイカ","海ぶどう","ワカメ","スターフルーツジャム(@40)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/surumeika.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/jam_star_fruit.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"パイナップルジャム添えイカ焼き",
+  nameI18n:{"ja":"パイナップルジャム添えイカ焼き","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1067.PNG",
+  cost:60,
+  time:30,
+  rarity: [true,true,true,true,true],
+  prices:[560,840,1120,2240,4480],
+  materials:["スルメイカ","海ぶどう","ワカメ","パイナップルジャム(@60)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/surumeika.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/jam_pineapple.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"いちごジャム添えイカ焼き",
+  nameI18n:{"ja":"いちごジャム添えイカ焼き","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1068.PNG",
+  cost:500,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[1860,2790,3720,7440,14880],
+  materials:["スルメイカ","海ぶどう","ワカメ","いちごジャム(@500)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/surumeika.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/jam_strawberry.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"オーシャンパーティー",
+  nameI18n:{"ja":"オーシャンパーティー","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1069.PNG",
+  cost:370,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[1700,2550,3400,6800,13600],
+  materials:["海鮮トマトポタージュ(@105)","オーシャンアイスドリンク(@120)","ミニパールケーキならなんでもOK","ジャム添えイカ焼きならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/tomato_potage.jpg" },
+    { image:"./images/materials/ocean_ice.jpg" },
+    { image:"./images/materials/all_miniperlcake.jpg" },
+    { image:"./images/materials/all_ikayaki.jpg" }
+  ],
+  auth:false
+},
 ];
