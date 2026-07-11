@@ -128,24 +128,6 @@ const foodsData = [
   auth:true
 },
 {
-  name:"フィッシュアンドチップス",
-  nameI18n:{"ja":"フィッシュアンドチップス","en":"Fish and Chips","zh-CN":"","zh-TW":"","ko":"","th":""},
-  image:"./images/foods/008.PNG",
-  cost:60,
-  time:60,
-  rarity: [true,true,true,true,true],
-  prices:[310,465,620,1240,2480],
-  materials:["魚ならなんでもOK","魚ならなんでもOK","じゃがいも(種@30)","じゃがいも(種@30)"],
-  level:1,
-  materials_image:[
-    { image:"./images/materials/all_fish.jpg" },
-    { image:"./images/materials/all_fish.jpg" },
-    { image:"./images/materials/potato.jpg" },
-    { image:"./images/materials/potato.jpg" }
-  ],
-  auth:true
-},
-{
   name:"不気味な食べ物",
   nameI18n:{"ja":"不気味な食べ物","en":"Creepy Food","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/009.PNG",
@@ -180,6 +162,24 @@ const foodsData = [
     { image:null }
   ],
   auth:false
+},
+{
+  name:"いちごジャム",
+  nameI18n:{"ja":"いちごジャム","en":"Strawberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/011.PNG",
+  cost:500,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[1580,2370,3160,6320,12640],
+  materials:["いちご(種@125)","いちご(種@125)","いちご(種@125)","いちご(種@125)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
+  ],
+  auth:true
 },
 {
   name:"パイナップルジャム",
@@ -235,21 +235,40 @@ const foodsData = [
   ],
   auth:true
 },
+
 {
-  name:"いちごジャム",
-  nameI18n:{"ja":"いちごジャム","en":"Strawberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
-  image:"./images/foods/011.PNG",
-  cost:500,
-  time:360,
+  name:"スターフルーツジャム",
+  nameI18n:{"ja":"スターフルーツジャム","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/096.PNG",
+  cost:40,
+  time:15,
   rarity: [true,true,true,true,true],
-  prices:[1580,2370,3160,6320,12640],
-  materials:["いちご(種@125)","いちご(種@125)","いちご(種@125)","いちご(種@125)"],
+  prices:[200,300,400,800,1600],
+  materials:["スターフルーツ(種@10)","スターフルーツ(種@10)","スターフルーツ(種@10)","スターフルーツ(種@10)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/strawberry.jpg" },
-    { image:"./images/materials/strawberry.jpg" },
-    { image:"./images/materials/strawberry.jpg" },
-    { image:"./images/materials/strawberry.jpg" }
+    { image:"./images/materials/star_fruit.jpg" },
+    { image:"./images/materials/star_fruit.jpg" },
+    { image:"./images/materials/star_fruit.jpg" },
+    { image:"./images/materials/star_fruit.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"フィッシュアンドチップス",
+  nameI18n:{"ja":"フィッシュアンドチップス","en":"Fish and Chips","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/008.PNG",
+  cost:60,
+  time:60,
+  rarity: [true,true,true,true,true],
+  prices:[310,465,620,1240,2480],
+  materials:["魚ならなんでもOK","魚ならなんでもOK","じゃがいも(種@30)","じゃがいも(種@30)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_fish.jpg" },
+    { image:"./images/materials/all_fish.jpg" },
+    { image:"./images/materials/potato.jpg" },
+    { image:"./images/materials/potato.jpg" }
   ],
   auth:true
 },
@@ -1028,6 +1047,42 @@ const foodsData = [
   auth:true
 },
 {
+  name:"海ぶどうとシイタケの茶碗蒸し",
+  nameI18n:{"ja":"海ぶどうとシイタケの茶碗蒸し","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/097.PNG",
+  cost:100,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[230,345,460,980,1960],
+  materials:["海ぶどう","海ぶどう","シイタケ","無菌卵(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/umibudo.jpg" },
+    { image:"./images/materials/shitake.jpg" },
+    { image:"./images/materials/m_egg.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"ワカメと肉団子のスープ",
+  nameI18n:{"ja":"ワカメと肉団子のスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/098.PNG",
+  cost:400,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[500,750,1000,2000,4000],
+  materials:["ワカメ","ワカメ","肉(@200)","肉(@200)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/wakame.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" }
+  ],
+  auth:true
+},
+{
   name:"シーフードリゾット",
   nameI18n:{"ja":"シーフードリゾット","en":"Seafood Risotto","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/037.PNG",
@@ -1078,6 +1133,24 @@ const foodsData = [
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/milk.jpg" }
+  ],
+  auth:true
+},
+{
+  name:"シーアスパラガスのエビチャーハン",
+  nameI18n:{"ja":"シーアスパラガスのエビチャーハン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/099.PNG",
+  cost:12,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[160,240,320,640,1280],
+  materials:["稲(種@12)","シーアスパラガス","シーアスパラガス","ウミエビ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/sea_asupara.jpg" },
+    { image:"./images/materials/sea_asupara.jpg" },
+    { image:"./images/materials/umiebi.jpg" }
   ],
   auth:true
 },
