@@ -2897,4 +2897,45 @@ const foodsData = [
     { image:"./images/materials/sansai_tacos.jpg" }
   ],
   auth:false
-},];
+},
+{
+  name:"オーシャンアイスドリンク",
+  nameI18n:{"ja":"オーシャンアイスドリンク","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1055.PNG",
+  cost:120,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[190,285,380,760,1520],
+  materials:["藍藻パウダー(@50)","藍藻パウダー(@50)","スターフルーツ(種@10)","スターフルーツ(種@10)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/ransou.jpg" },
+    { image:"./images/materials/ransou.jpg" },
+    { image:"./images/materials/star_fruit.jpg" },
+    { image:"./images/materials/star_fruit.jpg" }
+  ],
+  auth:false
+},
+{
+  name:"海鮮トマトポタージュ",
+  nameI18n:{"ja":"海鮮トマトポタージュ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  season:true,
+  ended:false,
+  image:"./images/foods/1056.PNG",
+  cost:105,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[190,285,380,760,1520],
+  materials:["ウミエビ","トマト(種@10)","シーアスパラガス","小麦(種@95)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/umiebi.jpg" },
+    { image:"./images/materials/tomato.jpg" },
+    { image:"./images/materials/sea_asupara.jpg" },
+    { image:"./images/materials/wheat.jpg" }
+  ],
+  auth:false
+},
+];
