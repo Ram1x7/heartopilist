@@ -1053,7 +1053,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[230,345,460,980,1960],
+  prices:[230,345,460,920,1840],
   materials:["海ぶどう","海ぶどう","シイタケ","無菌卵(@100)"],
   level:1,
   materials_image:[
