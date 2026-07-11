@@ -1,5 +1,19 @@
 const APP_VERSION = "2.4.1";
 
+// ── サーバー設定 ──
+// weatherData や生き物の出現時間帯（time配列）は Asia(UTC+9) 基準で入力されている。
+// 選択中サーバーのオフセットに応じて「今が何時・何ゾーンか」を計算し直すことで、
+// 天気判定・出現判定・時計表示すべてを選択サーバーに合わせる。
+const SERVERS = {
+  asia:     { label:"Asia",     short:"JP",  offset: 9  },
+  tw_hk_mo: { label:"TW/HK/MO", short:"TW",  offset: 8  },
+  sea:      { label:"SEA",      short:"SEA", offset: 7  },
+  global:   { label:"Global",   short:"EU",  offset: 1  },
+  america:  { label:"America",  short:"US",  offset: -5 },
+};
+let currentServer = localStorage.getItem("gameServer") || "asia";
+if(!SERVERS[currentServer]) currentServer = "asia";
+
 let currentFilter="all";
 let currentSort = "book";
 let weatherMode = "current"; 
@@ -28,13 +42,13 @@ const weatherData = {
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
-  "2026-07-12": {
+  "2026-07-09": {
    "6-12":"雨",
    "12-18":"晴れ",
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
-   "2026-07-13": {
+   "2026-07-10": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -52,9 +66,29 @@ const creatures = [
  ...birdData
 ];
 
-// 時間帯取得
+// サーバーのUTCオフセット（時間）
+function getServerOffset(){
+  return (SERVERS[currentServer] || SERVERS.asia).offset;
+}
+
+// 実際のUTC時刻（ブラウザのタイムゾーンに依存しない）に、
+// 選択中サーバーのオフセットを足した「サーバー上の今」を返す。
+// ※ これは【表示専用】（時計の表示・生き物の出現時間帯の表示ラベル用）。
+//   天気判定・出現判定は下のgetZone/getDateKeyの通り常にJST(UTC+9)固定。
+// ※ 以降は必ず getUTCHours() / getUTCDate() など UTC系メソッドで読むこと。
+//   （getHours()等で読むとブラウザのタイムゾーンが二重に適用されてしまう）
+function getServerDate(){
+  return new Date(Date.now() + getServerOffset() * 3600 * 1000);
+}
+
+// 実際のJST(UTC+9)の「今」を返す（天気データ・出現判定はこれが基準＝サーバー選択の影響を受けない）
+function getJstDate(){
+  return new Date(Date.now() + 9 * 3600 * 1000);
+}
+
+// 時間帯取得（天気判定・出現判定用／常にJST固定）
 function getZone(){
- const h=new Date().getHours();
+ const h = getJstDate().getUTCHours();
  if(h>=6&&h<12)return"6-12";
  if(h>=12&&h<18)return"12-18";
  if(h>=18&&h<24)return"18-0";
@@ -138,6 +172,58 @@ function formatTime(arr){
   }
 
   return result.join("/");
+}
+
+// 生き物の出現時間帯（JST基準のゾーン配列）を、選択中サーバーの現地時間に変換する
+function shiftedHourRanges(arr){
+  const zoneHours = { "0-6":[0,6], "6-12":[6,12], "12-18":[12,18], "18-0":[18,24] };
+  const delta = getServerOffset() - 9; // Asiaとの差分（時間）
+
+  const covered = new Array(24).fill(false);
+  arr.forEach(z => {
+    const range = zoneHours[z];
+    if(!range) return;
+    const [s,e] = range;
+    for(let h=s; h<e; h++){
+      const shifted = ((h + delta) % 24 + 24) % 24;
+      covered[shifted] = true;
+    }
+  });
+
+  if(covered.every(v => v)) return [[0,24]];
+  if(covered.every(v => !v)) return [];
+
+  const ranges = [];
+  let start = null;
+  for(let h=0; h<24; h++){
+    if(covered[h] && start === null) start = h;
+    if(!covered[h] && start !== null){ ranges.push([start,h]); start = null; }
+  }
+  if(start !== null) ranges.push([start,24]);
+
+  // 深夜0時をまたいで連続している場合（末尾と先頭がどちらも埋まっている）は1つに繋げる
+  if(ranges.length > 1 && ranges[0][0] === 0 && ranges[ranges.length-1][1] === 24){
+    const first = ranges.shift();
+    const last = ranges[ranges.length-1];
+    last[1] = 24 + first[1];
+  }
+
+  return ranges;
+}
+
+// 出現時間帯を選択中サーバーの現地時間表記にして返す（Asia選択時はformatTimeと同じ表記）
+function formatTimeForServer(arr){
+  if(arr.length === 4) return T("time_all","全時間");
+
+  const delta = getServerOffset() - 9;
+  if(delta === 0) return formatTime(arr);
+
+  const ranges = shiftedHourRanges(arr);
+  if(ranges.length === 0) return "";
+
+  return ranges
+    .map(([s,e]) => `${s % 24}〜${e % 24}`)
+    .join("/");
 }
 
 function formatWeather(arr){
@@ -540,8 +626,22 @@ function render(){
 
 let lastZone=getZone();
 
+// サーバー切替
+function setServer(server){
+  if(!SERVERS[server]) return;
+  currentServer = server;
+  localStorage.setItem("gameServer", server);
+  updateTime();
+
+  // モーダル表示中なら出現時間の表記を再計算して反映
+  if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
+    const target = creatures.find(c => c.name === modal.dataset.currentCreature);
+    if(target) openModal(target);
+  }
+}
+
 function updateTime(){
- const now = new Date();
+ const now = getServerDate();
  const zone = getZone();
 
  const todayKey = getDateKey(0);
@@ -570,16 +670,16 @@ function updateTime(){
    nextWeather = todayWeather[nextZone] || "不明";
  }
 
- document.getElementById("time").innerText = now.toLocaleTimeString();
+ const hh = String(now.getUTCHours()).padStart(2,"0");
+ const mm = String(now.getUTCMinutes()).padStart(2,"0");
+ const ss = String(now.getUTCSeconds()).padStart(2,"0");
+
+ document.getElementById("time").innerText = `${hh}:${mm}:${ss}`;
  document.getElementById("weatherNow").innerText =
   `${T("weather_now_label","今：")}${translateWeatherWord(weather)}`;
  document.getElementById("weatherNext").innerText =
   `${T("weather_next_label","次：")}${translateWeatherWord(nextWeather)}`;
- document.getElementById("miniTime").innerText =
-  now.toLocaleTimeString([], {
-    hour:"2-digit",
-    minute:"2-digit"
-  });
+ document.getElementById("miniTime").innerText = `${hh}:${mm}`;
 
 document.getElementById("miniWeather").innerText =
   weather;
@@ -590,15 +690,10 @@ document.getElementById("miniWeather").innerText =
  }
 }
 
-// 今日の日付取得
+// 今日の日付取得（天気データのルックアップ用／常にJST固定）
 function getDateKey(offset=0){
-  const d = new Date();
-
-  // JSTに補正（+9時間）
-  d.setHours(d.getHours() + 9);
-
-  d.setDate(d.getDate() + offset);
-
+  const d = getJstDate();
+  d.setUTCDate(d.getUTCDate() + offset);
   return d.toISOString().slice(0,10);
 }
   
@@ -698,7 +793,7 @@ function openModal(c){
  m_img.src=c.img;
  m_loc.innerText=displayLocation(c);
  m_weather.innerText=T("modal_weather","天気：")+formatWeather(c.weather);
- m_time.innerText=T("modal_time","時間：")+formatTime(c.time);
+ m_time.innerText=T("modal_time","時間：")+formatTimeForServer(c.time);
  const basePrice = c.price ?? 0;
 
  // 野鳥だけ特殊計算
@@ -1278,6 +1373,16 @@ setSort(
 setWeatherMode(
   localStorage.getItem("weatherMode") || "current"
 );
+
+// サーバー選択の初期化
+const serverSelect = document.getElementById("serverSelect");
+if(serverSelect){
+  serverSelect.value = currentServer;
+  serverSelect.addEventListener("change", (e)=>{
+    setServer(e.target.value);
+  });
+}
+
 setInterval(updateTime,1000);
 
 document.getElementById("version").textContent =
