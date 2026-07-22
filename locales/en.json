@@ -1,10 +1,8 @@
 {
   "lang_name": "English",
-
   "site_title": "Hatopi Dex",
   "page_title_index": "Hatopi Dex | Heartopia Fish, Bug & Bird Search Tool",
   "meta_description": "Unofficial Heartopia dex tool to search fish, bugs, and birds by location, weather, and time. See what's available right now. Sell price display included.",
-
   "nav_zukan": "Dex",
   "nav_food": "Recipes",
   "nav_garden": "Garden",
@@ -12,7 +10,6 @@
   "nav_code": "Codes",
   "nav_event": "Events",
   "nav_faq": "Q&A",
-
   "page_title_foods": "Recipe Dex | Hatopi Dex",
   "meta_description_foods": "Full list of Heartopia recipes. Check ingredients, ingredient cost, sell price, and profit.",
   "page_title_garden": "Garden Dex | Hatopi Dex",
@@ -25,38 +22,29 @@
   "meta_description_events": "List of ongoing and upcoming Heartopia events and gacha info.",
   "page_title_faq": "Q&A / Bug Status | Hatopi Dex",
   "meta_description_faq": "Frequently asked questions, requests, and bug fix status for Hatopi Encyclopedia.",
-
   "page_header_title": "Realtime Dex",
   "page_header_subtitle": "Displays creatures based on Heartopia's current weather and time",
-
   "search_placeholder": "🔍 Search by name or location",
-
   "filter_all": "All",
   "filter_fish": "Fish",
   "filter_bug": "Bugs",
   "filter_bird": "Birds",
-
   "weather_current": "All currently appearing",
   "weather_only": "Current weather only",
   "weather_hidden": "Not appearing now",
-
   "sort_book": "Pokédex order",
   "sort_level": "Level order",
   "sort_unchecked": "Incomplete first",
   "sort_unauth": "Uncertified first",
-
   "multi_select": "☑️ Multi-select",
   "bulk_star_check": "⭐ Bulk check",
   "bulk_star_uncheck": "⭐️ Bulk uncheck",
   "bulk_auth_check": "🎖 Bulk check",
   "bulk_auth_uncheck": "🎖 Bulk uncheck",
-
   "level_range_label": "Level range",
   "level_range_text": "Lv.{min}–{max}",
-
   "weather_now_label": "Now: ",
   "weather_next_label": "Next: ",
-
   "no_results": "Nothing appearing",
   "food_no_results": "No results",
   "food_section_season": "🌸 Seasonal Recipes",
@@ -174,14 +162,12 @@
   "garden_color_紫": "Purple",
   "garden_color_青": "Blue",
   "garden_color_輝く": "Shining",
-
   "modal_weather": "Weather: ",
   "modal_time": "Time: ",
   "modal_close": "Close",
   "modal_star5_label": "★5 condition: ",
   "modal_all_weather": "All weather",
   "modal_all_time": "All hours",
-
   "share_title": "Share completion status",
   "share_save": "Save / Share image",
   "share_x": "Post to X",
@@ -194,7 +180,6 @@
   "share_card_auth": "Certified Master",
   "share_card_auth_unit": " species",
   "share_tweet_text": "Hatopi Dex completion rate {percent}%!\nCertified Master: {authCount} species!\n#Heartopia\n#HatopiEncyclopedia",
-
   "help_title": "📖 How to use Hatopi Dex",
   "help_search_title": "🔍 Search",
   "help_search_body": "Search by creature name or location.",
@@ -229,22 +214,34 @@
   "help_notice_title": "⚠️ Note",
   "help_notice_body": "This site saves your state when you close it.\nYour previous state will be restored when you reopen it.",
   "help_close": "Close",
-
   "privacy_title": "Privacy Policy",
   "privacy_body": "All data on this site is managed within your browser (LocalStorage) only and is never sent externally.",
   "contact_title": "Contact",
   "contact_x_label": "X (formerly Twitter): ",
   "contact_form_label": "Bug reports, feature requests, and feedback welcome",
   "contact_form_btn": "💌 Send anonymously",
-
   "disclaimer": "※ This is an unofficial tool created by an individual. It is not affiliated with the official game.",
   "last_update_label": "Last updated",
-
   "time_all": "All hours",
   "weather_all": "All weather",
   "weather_sunny": "Sunny",
   "weather_rain": "Rain",
   "weather_rainbow": "Rainbow",
   "weather_meteor": "Meteor shower",
-  "weather_unknown": "Unknown"
+  "weather_unknown": "Unknown",
+  "food_calc_open": "Master Certification Calculator",
+  "food_calc_title": "Master Certification Calculator",
+  "food_calc_no_target": "No recipes currently have a master certification target set.",
+  "food_calc_select_label": "Recipe",
+  "food_calc_made_label": "Already made",
+  "food_calc_target_label": "Master target",
+  "food_calc_remaining_label": "Remaining",
+  "food_calc_dish_unit": "",
+  "food_calc_no_materials": "This recipe has no materials to calculate.",
+  "food_calc_inventory_title": "Materials on hand",
+  "food_calc_shortage_title": "Materials needed",
+  "food_calc_need_label": "Need: ",
+  "food_calc_have_label": "Have: ",
+  "food_calc_short_label": "Short by ",
+  "food_calc_enough_label": "Enough"
 }

@@ -1,10 +1,8 @@
 {
   "lang_name": "日本語",
-
   "site_title": "はとぴ図鑑",
   "page_title_index": "はとぴ図鑑｜Heartopia(ハートピアスローライフ)の魚・虫・野鳥の入手方検索ツール",
   "meta_description": "Heartopia(ハートピアスローライフ)の魚・虫・野鳥の入手方法や出現場所、天気条件や時間帯を検索できる非公式図鑑ツール。今なにがとれるか全部分かる。売価表示対応。",
-
   "nav_zukan": "図鑑",
   "nav_food": "料理",
   "nav_garden": "園芸",
@@ -12,7 +10,6 @@
   "nav_code": "コード",
   "nav_event": "イベント",
   "nav_faq": "Q&A",
-
   "page_title_foods": "料理レシピ図鑑｜はとぴ図鑑",
   "meta_description_foods": "Heartopia（ハートピアスローライフ）の料理レシピ一覧。材料・材料費・売価・利益を確認できます。",
   "page_title_garden": "園芸図鑑｜はとぴ図鑑",
@@ -25,38 +22,29 @@
   "meta_description_events": "Heartopia（ハートピアスローライフ）の開催中・近日開催のイベント・ガチャ情報一覧。",
   "page_title_faq": "Q&A・不具合対応状況｜はとぴ図鑑",
   "meta_description_faq": "Heartopia（ハートピアスローライフ）はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。",
-
   "page_header_title": "リアルタイム図鑑",
   "page_header_subtitle": "ハートピアの天気と今の時間に合わせた図鑑表示",
-
   "search_placeholder": "🔍 名前・場所で検索",
-
   "filter_all": "全部",
   "filter_fish": "魚",
   "filter_bug": "虫",
   "filter_bird": "野鳥",
-
   "weather_current": "今出現するもの全て",
   "weather_only": "今の天気でしか出現しない",
   "weather_hidden": "今は出現しない",
-
   "sort_book": "図鑑順",
   "sort_level": "レベル順",
   "sort_unchecked": "未コンプ順",
   "sort_unauth": "未認証順",
-
   "multi_select": "☑️複数選択",
   "bulk_star_check": "⭐一括チェック",
   "bulk_star_uncheck": "⭐️一括解除",
   "bulk_auth_check": "🎖一括チェック",
   "bulk_auth_uncheck": "🎖一括解除",
-
   "level_range_label": "レベル範囲",
   "level_range_text": "Lv.{min}〜{max}",
-
   "weather_now_label": "今：",
   "weather_next_label": "次：",
-
   "no_results": "出現なし",
   "food_no_results": "該当なし",
   "food_section_season": "🌸 シーズン料理",
@@ -174,14 +162,12 @@
   "garden_color_紫": "紫",
   "garden_color_青": "青",
   "garden_color_輝く": "輝く",
-
   "modal_weather": "天気：",
   "modal_time": "時間：",
   "modal_close": "閉じる",
   "modal_star5_label": "★5条件：",
   "modal_all_weather": "全天気",
   "modal_all_time": "全時間",
-
   "share_title": "コンプ状況をシェア",
   "share_save": "画像を保存・共有",
   "share_x": "Xでポスト",
@@ -194,7 +180,6 @@
   "share_card_auth": "認証マスター",
   "share_card_auth_unit": "種",
   "share_tweet_text": "はとぴ図鑑 コンプ率 {percent}%！\n認証マスター {authCount}種獲得！\n#ハートピア\n#ハートピアスローライフ\n#Heartopia\n#はとぴ図鑑",
-
   "help_title": "📖 はとぴ図鑑の使い方",
   "help_search_title": "🔍 検索",
   "help_search_body": "名前や場所で検索できます。",
@@ -229,22 +214,34 @@
   "help_notice_title": "⚠️ 注意",
   "help_notice_body": "こちらのサイトでは、サイトを閉じる時の状態が保存されます。\n開き直した際には、前に開いていた時の状態が引き継がれます。",
   "help_close": "閉じる",
-
   "privacy_title": "プライバシーポリシー",
   "privacy_body": "本サイトではデータはブラウザ内（LocalStorage）のみで管理され、外部に送信されることはありません。",
   "contact_title": "お問い合わせ",
   "contact_x_label": "X（旧Twitter）：",
   "contact_form_label": "不具合報告・機能リクエスト・感想などはこちら",
   "contact_form_btn": "💌 匿名で送る",
-
   "disclaimer": "※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。",
   "last_update_label": "最終更新",
-
   "time_all": "全時間",
   "weather_all": "全天気",
   "weather_sunny": "晴れ",
   "weather_rain": "雨",
   "weather_rainbow": "虹",
   "weather_meteor": "流星雨",
-  "weather_unknown": "不明"
+  "weather_unknown": "不明",
+  "food_calc_open": "認証マスター計算",
+  "food_calc_title": "認証マスター計算",
+  "food_calc_no_target": "現在、認証マスターの目標数が設定されている料理がありません。",
+  "food_calc_select_label": "料理",
+  "food_calc_made_label": "現在作成済み",
+  "food_calc_target_label": "認証マスター",
+  "food_calc_remaining_label": "残り",
+  "food_calc_dish_unit": "皿",
+  "food_calc_no_materials": "この料理には計算対象の素材がありません。",
+  "food_calc_inventory_title": "所持素材数",
+  "food_calc_shortage_title": "不足素材",
+  "food_calc_need_label": "必要",
+  "food_calc_have_label": "所持",
+  "food_calc_short_label": "あと",
+  "food_calc_enough_label": "充足"
 }
