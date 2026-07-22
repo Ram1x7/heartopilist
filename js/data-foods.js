@@ -1267,7 +1267,7 @@ const foodsData = [
   materials:["リンゴ","小麦(種@95)","卵(@100)","バター(@150)"],
   level:5,
   materials_image:[
-    { image:"./images/materials/apple.jpg" },
+    { image:"./images/materials/ringo.jpg" },
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/batter.jpg" }
@@ -1606,7 +1606,7 @@ const foodsData = [
   time:300,
   rarity: [true,true,true,true,true],
   prices:[1120,1680,2240,4480,8960],
-  materials:["牛乳(@50)","牛乳(@50)","カカオ豆(種@110)","カカオ(種@110)"],
+  materials:["牛乳(@50)","牛乳(@50)","カカオ豆(種@110)","カカオ豆(種@110)"],
   level:11,
   materials_image:[
     { image:"./images/materials/milk.jpg" },
