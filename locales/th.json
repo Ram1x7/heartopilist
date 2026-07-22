@@ -197,5 +197,11 @@
   "food_calc_need_label": "ต้องการ: ",
   "food_calc_have_label": "มีอยู่: ",
   "food_calc_short_label": "ขาดอีก: ",
-  "food_calc_enough_label": "เพียงพอ"
+  "food_calc_enough_label": "เพียงพอ",
+  "food_calc_breakdown_label": "แยกส่วนคำนวณ",
+  "food_calc_breakdown_no_recipe": "ไม่พบสูตร",
+  "food_calc_freeform_name_placeholder": "ชื่อวัตถุดิบ",
+  "food_calc_freeform_qty_placeholder": "จำนวน/จาน",
+  "food_calc_freeform_have_placeholder": "มีอยู่",
+  "food_calc_freeform_add": "เพิ่มวัตถุดิบ"
 }

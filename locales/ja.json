@@ -243,5 +243,11 @@
   "food_calc_need_label": "必要",
   "food_calc_have_label": "所持",
   "food_calc_short_label": "あと",
-  "food_calc_enough_label": "充足"
+  "food_calc_enough_label": "充足",
+  "food_calc_breakdown_label": "分解して計算",
+  "food_calc_breakdown_no_recipe": "レシピが見つかりませんでした",
+  "food_calc_freeform_name_placeholder": "素材名",
+  "food_calc_freeform_qty_placeholder": "個数/1皿",
+  "food_calc_freeform_have_placeholder": "所持",
+  "food_calc_freeform_add": "素材を追加"
 }

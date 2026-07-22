@@ -243,5 +243,11 @@
   "food_calc_need_label": "Need: ",
   "food_calc_have_label": "Have: ",
   "food_calc_short_label": "Short by ",
-  "food_calc_enough_label": "Enough"
+  "food_calc_enough_label": "Enough",
+  "food_calc_breakdown_label": "Break down",
+  "food_calc_breakdown_no_recipe": "No recipe found",
+  "food_calc_freeform_name_placeholder": "Material name",
+  "food_calc_freeform_qty_placeholder": "Qty/dish",
+  "food_calc_freeform_have_placeholder": "Have",
+  "food_calc_freeform_add": "Add material"
 }

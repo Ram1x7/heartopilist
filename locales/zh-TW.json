@@ -197,5 +197,11 @@
   "food_calc_need_label": "需要：",
   "food_calc_have_label": "持有：",
   "food_calc_short_label": "還差：",
-  "food_calc_enough_label": "充足"
+  "food_calc_enough_label": "充足",
+  "food_calc_breakdown_label": "分解計算",
+  "food_calc_breakdown_no_recipe": "未找到配方",
+  "food_calc_freeform_name_placeholder": "食材名稱",
+  "food_calc_freeform_qty_placeholder": "數量/份",
+  "food_calc_freeform_have_placeholder": "持有",
+  "food_calc_freeform_add": "新增食材"
 }
