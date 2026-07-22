@@ -1333,11 +1333,11 @@ function renderCalcResult(food, madeCount){
       <div class="calc-progress-row">
         <div class="calc-progress-item">
           <div class="calc-progress-label">${T("food_calc_target_label","認証マスター")}</div>
-          <div class="calc-progress-value">${result.target.toLocaleString()}<span class="calc-progress-unit">${T("food_calc_dish_unit","皿")}</span></div>
+          <div class="calc-progress-value">${result.target.toLocaleString()}<span class="calc-progress-unit">${T("food_calc_dish_unit","個")}</span></div>
         </div>
         <div class="calc-progress-item">
           <div class="calc-progress-label">${T("food_calc_remaining_label","残り")}</div>
-          <div class="calc-progress-value highlight">${result.remaining.toLocaleString()}<span class="calc-progress-unit">${T("food_calc_dish_unit","皿")}</span></div>
+          <div class="calc-progress-value highlight">${result.remaining.toLocaleString()}<span class="calc-progress-unit">${T("food_calc_dish_unit","個")}</span></div>
         </div>
       </div>
     </div>
@@ -1475,7 +1475,7 @@ function renderFreeformBreakdownHTML(food, m){
     <div class="calc-freeform-item" data-freeform-index="${p.index}">
       <input type="text" class="calc-freeform-name" placeholder="${T("food_calc_freeform_name_placeholder","素材名")}"
         data-material-key="${encodeURIComponent(m.key)}" data-field="name" value="${p.name}">
-      <input type="number" min="0" class="calc-freeform-qty" placeholder="${T("food_calc_freeform_qty_placeholder","個数/1皿")}"
+      <input type="number" min="0" class="calc-freeform-qty" placeholder="${T("food_calc_freeform_qty_placeholder","個数/1個")}"
         data-material-key="${encodeURIComponent(m.key)}" data-field="qty" value="${p.qty}">
       <input type="number" min="0" class="calc-freeform-have" placeholder="${T("food_calc_freeform_have_placeholder","所持")}"
         data-material-key="${encodeURIComponent(m.key)}" data-field="have" value="${p.have}">
