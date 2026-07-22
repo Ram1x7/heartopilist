@@ -616,6 +616,167 @@ body.dark .calc-shortage-enough-tag{ color:#7ec89a; }
   padding:12px 0;
   line-height:1.7;
 }
+
+/* ── 分解機能 ── */
+.calc-shortage-item-wrap{
+  margin-bottom:8px;
+}
+
+.calc-shortage-item-wrap .calc-shortage-item{
+  margin-bottom:0;
+}
+
+.calc-breakdown-toggle{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:10px;
+  color:var(--text-sub);
+  padding:6px 4px 2px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.calc-breakdown-toggle input[type="checkbox"]{
+  width:14px;
+  height:14px;
+  accent-color:var(--indigo);
+  cursor:pointer;
+}
+
+.calc-breakdown-box{
+  background:var(--card);
+  border:1px dashed var(--border);
+  border-radius:10px;
+  padding:8px 10px;
+  margin:4px 0 4px 14px;
+}
+
+body.dark .calc-breakdown-box{ background:#2c2823; border-color:#46423b; }
+
+.calc-breakdown-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 0;
+  border-bottom:1px solid var(--border);
+}
+
+body.dark .calc-breakdown-item{ border-color:#46423b; }
+.calc-breakdown-item:last-child{ border-bottom:none; }
+.calc-breakdown-item.enough{ opacity:0.55; }
+
+.calc-breakdown-img{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:6px;
+  padding:2px;
+  flex-shrink:0;
+}
+
+body.dark .calc-breakdown-img{ background:#383329; }
+
+.calc-breakdown-info{ flex:1; min-width:0; }
+
+.calc-breakdown-name{
+  font-size:10px;
+  color:var(--text);
+  margin-bottom:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+body.dark .calc-breakdown-name{ color:#ece4d4; }
+
+.calc-breakdown-detail{
+  font-size:9px;
+  color:var(--text-sub);
+  display:flex;
+  gap:6px;
+}
+
+.calc-breakdown-empty{
+  font-size:10px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:8px 0;
+}
+
+/* なんでもOK系：自由入力 */
+.calc-freeform-box{ border-style:solid; }
+
+.calc-freeform-item{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  padding:5px 0;
+  border-bottom:1px solid var(--border);
+}
+
+body.dark .calc-freeform-item{ border-color:#46423b; }
+.calc-freeform-item:last-child{ border-bottom:none; }
+
+.calc-freeform-name{
+  flex:2;
+  min-width:0;
+  padding:5px 6px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:10px;
+}
+
+.calc-freeform-qty,
+.calc-freeform-have{
+  flex:1;
+  width:0;
+  min-width:36px;
+  padding:5px 4px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:10px;
+  text-align:right;
+}
+
+body.dark .calc-freeform-name,
+body.dark .calc-freeform-qty,
+body.dark .calc-freeform-have{ background:#383329; color:#ece4d4; border-color:#46423b; }
+
+.calc-freeform-remove{
+  flex-shrink:0;
+  width:22px;
+  height:22px;
+  border:none;
+  border-radius:50%;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+  line-height:1;
+}
+
+body.dark .calc-freeform-remove{ background:#46423b; color:#ece4d4; }
+
+.calc-freeform-add{
+  width:100%;
+  margin-top:6px;
+  padding:6px;
+  border:1px dashed var(--border);
+  border-radius:8px;
+  background:transparent;
+  color:var(--indigo);
+  font-size:10px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  cursor:pointer;
+}
+
+body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 </style>
 </head>
 
@@ -1201,9 +1362,68 @@ function renderCalcResult(food, madeCount){
     </div>
   `).join("");
 
-  const shortageHTML = result.materials.map(m => {
-    const enough = m.short <= 0;
-    return `
+  area.innerHTML = progressHTML + `
+    <div class="calc-material-section-title">${T("food_calc_inventory_title","所持素材数")}</div>
+    ${materialInputsHTML}
+
+    <div class="calc-shortage-section">
+      <div class="calc-material-section-title">${T("food_calc_shortage_title","不足素材")}</div>
+      <div id="calcShortageList"></div>
+    </div>
+  `;
+
+  // 所持数入力イベント（グローバル在庫に保存 → 不足素材セクションのみ再計算）
+  area.querySelectorAll(".calc-material-input").forEach(input => {
+    input.addEventListener("input", (e)=>{
+      const key = decodeURIComponent(e.target.dataset.materialKey);
+      const val = parseInt(e.target.value, 10) || 0;
+      setInventoryQty(key, val);
+      refreshShortageList(food);
+    });
+  });
+
+  refreshShortageList(food);
+}
+
+// ── 不足素材セクションの描画（トップレベル素材＋分解パーツ） ──
+function refreshShortageList(food){
+  const listEl = document.getElementById("calcShortageList");
+  if(!listEl) return;
+
+  const madeInput = document.getElementById("calcMadeInput");
+  const made = madeInput ? (parseInt(madeInput.value, 10) || 0) : 0;
+  const result = calcAuthProgress(food, made);
+
+  listEl.innerHTML = result.materials.map(m => renderShortageItemHTML(food, m)).join("");
+  bindShortageEvents(food, listEl);
+}
+
+// 1つの素材（トップレベル）の不足表示HTML（分解トグル・分解結果込み）
+function renderShortageItemHTML(food, m){
+  const enough = m.short <= 0;
+
+  const toggleHTML = m.breakdownAvailable ? `
+    <label class="calc-breakdown-toggle">
+      <input type="checkbox" class="calc-breakdown-checkbox"
+        data-material-key="${encodeURIComponent(m.key)}"
+        ${m.breakdownOn ? "checked" : ""}>
+      <span>${T("food_calc_breakdown_label","分解して計算")}</span>
+    </label>
+  ` : "";
+
+  let breakdownHTML = "";
+  if(m.breakdownOn && m.breakdown){
+    if(m.breakdown.isFreeform){
+      breakdownHTML = renderFreeformBreakdownHTML(food, m);
+    } else if(m.breakdown.parts.length > 0){
+      breakdownHTML = renderRecipeBreakdownHTML(m);
+    } else {
+      breakdownHTML = `<div class="calc-breakdown-empty">${T("food_calc_breakdown_no_recipe","レシピが見つかりませんでした")}</div>`;
+    }
+  }
+
+  return `
+    <div class="calc-shortage-item-wrap">
       <div class="calc-shortage-item ${enough ? "enough" : ""}">
         ${m.image ? `<img class="calc-shortage-img" src="${m.image}" alt="${m.name}" onerror="this.style.display='none'">` : `<div class="calc-shortage-img"></div>`}
         <div class="calc-shortage-info">
@@ -1217,54 +1437,117 @@ function renderCalcResult(food, madeCount){
           ? `<span class="calc-shortage-enough-tag">${T("food_calc_enough_label","充足")}</span>`
           : `<span class="calc-shortage-need">${T("food_calc_short_label","あと")}${m.short.toLocaleString()}</span>`}
       </div>
+      ${toggleHTML}
+      ${breakdownHTML}
+    </div>
+  `;
+}
+
+// 実在レシピによる自動分解のHTML
+function renderRecipeBreakdownHTML(m){
+  const rows = m.breakdown.parts.map(p => {
+    const enough = p.short <= 0;
+    return `
+      <div class="calc-breakdown-item ${enough ? "enough" : ""}">
+        ${p.image ? `<img class="calc-breakdown-img" src="${p.image}" alt="${p.name}" onerror="this.style.display='none'">` : `<div class="calc-breakdown-img"></div>`}
+        <div class="calc-breakdown-info">
+          <div class="calc-breakdown-name">${p.name}</div>
+          <div class="calc-breakdown-detail">
+            <span>${T("food_calc_need_label","必要")}${p.need.toLocaleString()}</span>
+            <span>${T("food_calc_have_label","所持")}${p.have.toLocaleString()}</span>
+          </div>
+        </div>
+        ${enough
+          ? `<span class="calc-shortage-enough-tag">${T("food_calc_enough_label","充足")}</span>`
+          : `<span class="calc-shortage-need">${T("food_calc_short_label","あと")}${p.short.toLocaleString()}</span>`}
+      </div>
     `;
   }).join("");
 
-  area.innerHTML = progressHTML + `
-    <div class="calc-material-section-title">${T("food_calc_inventory_title","所持素材数")}</div>
-    ${materialInputsHTML}
+  return `<div class="calc-breakdown-box">${rows}</div>`;
+}
 
-    <div class="calc-shortage-section">
-      <div class="calc-material-section-title">${T("food_calc_shortage_title","不足素材")}</div>
-      ${shortageHTML}
+// 「なんでもOK」系の自由入力分解HTML
+function renderFreeformBreakdownHTML(food, m){
+  const parts = m.breakdown.parts;
+
+  const rows = parts.map(p => `
+    <div class="calc-freeform-item" data-freeform-index="${p.index}">
+      <input type="text" class="calc-freeform-name" placeholder="${T("food_calc_freeform_name_placeholder","素材名")}"
+        data-material-key="${encodeURIComponent(m.key)}" data-field="name" value="${p.name}">
+      <input type="number" min="0" class="calc-freeform-qty" placeholder="${T("food_calc_freeform_qty_placeholder","個数/1皿")}"
+        data-material-key="${encodeURIComponent(m.key)}" data-field="qty" value="${p.qty}">
+      <input type="number" min="0" class="calc-freeform-have" placeholder="${T("food_calc_freeform_have_placeholder","所持")}"
+        data-material-key="${encodeURIComponent(m.key)}" data-field="have" value="${p.have}">
+      <button type="button" class="calc-freeform-remove" data-material-key="${encodeURIComponent(m.key)}" data-remove-index="${p.index}">✕</button>
+    </div>
+  `).join("");
+
+  return `
+    <div class="calc-breakdown-box calc-freeform-box">
+      ${rows}
+      <button type="button" class="calc-freeform-add" data-material-key="${encodeURIComponent(m.key)}">
+        ＋ ${T("food_calc_freeform_add","素材を追加")}
+      </button>
     </div>
   `;
+}
 
-  // 所持数入力イベント（グローバル在庫に保存 → 即座に再計算）
-  area.querySelectorAll(".calc-material-input").forEach(input => {
-    input.addEventListener("input", (e)=>{
+// 不足素材リスト内のイベントを束ねてバインド（トグル・分解入力・追加削除）
+function bindShortageEvents(food, listEl){
+  // 分解トグル
+  listEl.querySelectorAll(".calc-breakdown-checkbox").forEach(cb => {
+    cb.addEventListener("change", (e)=>{
       const key = decodeURIComponent(e.target.dataset.materialKey);
-      const val = parseInt(e.target.value, 10) || 0;
-      setInventoryQty(key, val);
-      // 不足素材セクションのみ再計算（入力中のフォーカスを保持するため所持数欄は再描画しない）
-      const madeInput = document.getElementById("calcMadeInput");
-      const made = madeInput ? (parseInt(madeInput.value, 10) || 0) : 0;
-      const newResult = calcAuthProgress(food, made);
-      const shortageSection = area.querySelector(".calc-shortage-section");
-      if(shortageSection){
-        const newShortageHTML = newResult.materials.map(m => {
-          const enough = m.short <= 0;
-          return `
-            <div class="calc-shortage-item ${enough ? "enough" : ""}">
-              ${m.image ? `<img class="calc-shortage-img" src="${m.image}" alt="${m.name}" onerror="this.style.display='none'">` : `<div class="calc-shortage-img"></div>`}
-              <div class="calc-shortage-info">
-                <div class="calc-shortage-name">${m.name}</div>
-                <div class="calc-shortage-detail">
-                  <span>${T("food_calc_need_label","必要")}${m.need.toLocaleString()}</span>
-                  <span>${T("food_calc_have_label","所持")}${m.have.toLocaleString()}</span>
-                </div>
-              </div>
-              ${enough
-                ? `<span class="calc-shortage-enough-tag">${T("food_calc_enough_label","充足")}</span>`
-                : `<span class="calc-shortage-need">${T("food_calc_short_label","あと")}${m.short.toLocaleString()}</span>`}
-            </div>
-          `;
-        }).join("");
-        shortageSection.innerHTML = `
-          <div class="calc-material-section-title">${T("food_calc_shortage_title","不足素材")}</div>
-          ${newShortageHTML}
-        `;
+      setBreakdownOn(food.name, key, e.target.checked);
+      refreshShortageList(food);
+    });
+  });
+
+  // なんでもOK系：自由入力の値変更
+  listEl.querySelectorAll(".calc-freeform-name, .calc-freeform-qty, .calc-freeform-have").forEach(input => {
+    input.addEventListener("input", (e)=>{
+      const key   = decodeURIComponent(e.target.dataset.materialKey);
+      const field = e.target.dataset.field;
+      const wrap  = e.target.closest(".calc-freeform-item");
+      const index = parseInt(wrap.dataset.freeformIndex, 10);
+
+      const parts = getFreeformParts(food.name, key);
+      if(!parts[index]) parts[index] = { name: "", qty: 0, have: 0 };
+
+      if(field === "name") parts[index].name = e.target.value;
+      if(field === "qty")  parts[index].qty  = parseInt(e.target.value, 10) || 0;
+      if(field === "have") parts[index].have = parseInt(e.target.value, 10) || 0;
+
+      setFreeformParts(food.name, key, parts);
+
+      // 数値変更時のみ即時再計算（テキスト入力中のフォーカス維持のため、name入力時は再描画しない）
+      if(field !== "name"){
+        refreshShortageList(food);
       }
+    });
+  });
+
+  // なんでもOK系：素材追加ボタン
+  listEl.querySelectorAll(".calc-freeform-add").forEach(btn => {
+    btn.addEventListener("click", (e)=>{
+      const key = decodeURIComponent(e.target.dataset.materialKey);
+      const parts = getFreeformParts(food.name, key);
+      parts.push({ name: "", qty: 0, have: 0 });
+      setFreeformParts(food.name, key, parts);
+      refreshShortageList(food);
+    });
+  });
+
+  // なんでもOK系：素材削除ボタン
+  listEl.querySelectorAll(".calc-freeform-remove").forEach(btn => {
+    btn.addEventListener("click", (e)=>{
+      const key = decodeURIComponent(e.target.dataset.materialKey);
+      const idx = parseInt(e.target.dataset.removeIndex, 10);
+      const parts = getFreeformParts(food.name, key);
+      parts.splice(idx, 1);
+      setFreeformParts(food.name, key, parts);
+      refreshShortageList(food);
     });
   });
 }
