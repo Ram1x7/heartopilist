@@ -201,7 +201,7 @@
   "food_calc_breakdown_label": "분해하여 계산",
   "food_calc_breakdown_no_recipe": "레시피를 찾을 수 없습니다",
   "food_calc_freeform_name_placeholder": "재료명",
-  "food_calc_freeform_qty_placeholder": "개수/1접시",
+  "food_calc_freeform_qty_placeholder": "개수/1개",
   "food_calc_freeform_have_placeholder": "보유",
   "food_calc_freeform_add": "재료 추가"
 }

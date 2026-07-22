@@ -236,7 +236,7 @@
   "food_calc_made_label": "現在作成済み",
   "food_calc_target_label": "認証マスター",
   "food_calc_remaining_label": "残り",
-  "food_calc_dish_unit": "皿",
+  "food_calc_dish_unit": "個",
   "food_calc_no_materials": "この料理には計算対象の素材がありません。",
   "food_calc_inventory_title": "所持素材数",
   "food_calc_shortage_title": "不足素材",
@@ -247,7 +247,7 @@
   "food_calc_breakdown_label": "分解して計算",
   "food_calc_breakdown_no_recipe": "レシピが見つかりませんでした",
   "food_calc_freeform_name_placeholder": "素材名",
-  "food_calc_freeform_qty_placeholder": "個数/1皿",
+  "food_calc_freeform_qty_placeholder": "個数/1個",
   "food_calc_freeform_have_placeholder": "所持",
   "food_calc_freeform_add": "素材を追加"
 }

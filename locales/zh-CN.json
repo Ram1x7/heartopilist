@@ -190,7 +190,7 @@
   "food_calc_made_label": "当前已制作",
   "food_calc_target_label": "认证大师",
   "food_calc_remaining_label": "剩余",
-  "food_calc_dish_unit": "份",
+  "food_calc_dish_unit": "个",
   "food_calc_no_materials": "该料理没有可计算的食材。",
   "food_calc_inventory_title": "持有食材数量",
   "food_calc_shortage_title": "缺少的食材",
@@ -201,7 +201,7 @@
   "food_calc_breakdown_label": "分解计算",
   "food_calc_breakdown_no_recipe": "未找到配方",
   "food_calc_freeform_name_placeholder": "食材名称",
-  "food_calc_freeform_qty_placeholder": "数量/份",
+  "food_calc_freeform_qty_placeholder": "数量/1个",
   "food_calc_freeform_have_placeholder": "持有",
   "food_calc_freeform_add": "添加食材"
 }

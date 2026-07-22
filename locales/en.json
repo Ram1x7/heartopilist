@@ -247,7 +247,7 @@
   "food_calc_breakdown_label": "Break down",
   "food_calc_breakdown_no_recipe": "No recipe found",
   "food_calc_freeform_name_placeholder": "Material name",
-  "food_calc_freeform_qty_placeholder": "Qty/dish",
+  "food_calc_freeform_qty_placeholder": "Qty/item",
   "food_calc_freeform_have_placeholder": "Have",
   "food_calc_freeform_add": "Add material"
 }

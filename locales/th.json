@@ -190,7 +190,7 @@
   "food_calc_made_label": "ทำไปแล้ว",
   "food_calc_target_label": "เป้าหมายมาสเตอร์",
   "food_calc_remaining_label": "เหลืออีก",
-  "food_calc_dish_unit": " จาน",
+  "food_calc_dish_unit": " ชิ้น",
   "food_calc_no_materials": "เมนูนี้ไม่มีวัตถุดิบให้คำนวณ",
   "food_calc_inventory_title": "วัตถุดิบที่มีอยู่",
   "food_calc_shortage_title": "วัตถุดิบที่ขาด",
@@ -201,7 +201,7 @@
   "food_calc_breakdown_label": "แยกส่วนคำนวณ",
   "food_calc_breakdown_no_recipe": "ไม่พบสูตร",
   "food_calc_freeform_name_placeholder": "ชื่อวัตถุดิบ",
-  "food_calc_freeform_qty_placeholder": "จำนวน/จาน",
+  "food_calc_freeform_qty_placeholder": "จำนวน/1ชิ้น",
   "food_calc_freeform_have_placeholder": "มีอยู่",
   "food_calc_freeform_add": "เพิ่มวัตถุดิบ"
 }
