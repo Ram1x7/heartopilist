@@ -318,6 +318,304 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
   opacity:1;
   transform:translateX(-50%) translateY(0);
 }
+
+/* ── 認証マスター計算ツール ── */
+.calc-toggle-btn{
+  width:100%;
+  padding:12px;
+  margin-bottom:14px;
+  border:1px solid var(--gold);
+  border-radius:16px;
+  background:var(--card-sub);
+  color:var(--indigo);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+body.dark .calc-toggle-btn{ background:#383329; color:#e8d2a8; border-color:#7a6030; }
+
+#calcModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(40,36,30,0.5);
+  backdrop-filter:blur(5px);
+  z-index:1000;
+  overflow-y:auto;
+}
+
+.calc-modal-box{
+  background:var(--card);
+  margin:30px auto;
+  padding:20px;
+  width:90%;
+  max-width:340px;
+  border-radius:22px;
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
+}
+
+body.dark .calc-modal-box{ background:#2c2823; border-color:#46423b; }
+
+.calc-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.calc-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:17px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.04em;
+}
+
+body.dark .calc-title{ color:#e8d2a8; }
+
+.calc-close-x{
+  border:none;
+  background:none;
+  font-size:18px;
+  color:var(--text-sub);
+  cursor:pointer;
+  line-height:1;
+  padding:4px;
+}
+
+.calc-field-label{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+.calc-select{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+  margin-bottom:14px;
+}
+
+body.dark .calc-select{ background:#383329; color:#ece4d4; border-color:#46423b; }
+
+.calc-input-row{
+  margin-bottom:14px;
+}
+
+.calc-input{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:14px;
+  text-align:right;
+  box-sizing:border-box;
+}
+
+body.dark .calc-input{ background:#383329; color:#ece4d4; border-color:#46423b; }
+
+.calc-divider{
+  height:1px;
+  background:var(--border);
+  margin:14px 0;
+  opacity:0.6;
+}
+
+.calc-progress-card{
+  background:var(--card-sub);
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:14px;
+  text-align:center;
+}
+
+body.dark .calc-progress-card{ background:#383329; }
+
+.calc-progress-row{
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+}
+
+.calc-progress-item{ flex:1; }
+
+.calc-progress-label{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-bottom:4px;
+}
+
+.calc-progress-value{
+  font-size:20px;
+  font-weight:700;
+  color:var(--indigo);
+}
+
+body.dark .calc-progress-value{ color:#e8d2a8; }
+
+.calc-progress-value.highlight{ color:var(--vermillion); }
+body.dark .calc-progress-value.highlight{ color:#e07060; }
+
+.calc-progress-unit{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-left:2px;
+}
+
+.calc-material-section-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  margin-bottom:10px;
+  padding-left:8px;
+  border-left:3px solid var(--gold);
+}
+
+body.dark .calc-material-section-title{ color:#e8d2a8; }
+
+.calc-material-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid var(--border);
+}
+
+body.dark .calc-material-item{ border-color:#46423b; }
+
+.calc-material-item:last-child{ border-bottom:none; }
+
+.calc-material-img{
+  width:40px;
+  height:40px;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:8px;
+  padding:3px;
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+
+body.dark .calc-material-img{ background:#2c2823; border-color:#46423b; }
+
+.calc-material-info{ flex:1; min-width:0; }
+
+.calc-material-name{
+  font-size:11px;
+  color:var(--text);
+  margin-bottom:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+body.dark .calc-material-name{ color:#ece4d4; }
+
+.calc-material-input{
+  width:70px;
+  padding:6px 8px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text);
+  font-size:12px;
+  text-align:right;
+  flex-shrink:0;
+}
+
+body.dark .calc-material-input{ background:#2c2823; color:#ece4d4; border-color:#46423b; }
+
+.calc-shortage-section{
+  margin-top:16px;
+}
+
+.calc-shortage-item{
+  background:var(--card-sub);
+  border-radius:12px;
+  padding:10px 12px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+body.dark .calc-shortage-item{ background:#383329; }
+
+.calc-shortage-item.enough{ opacity:0.55; }
+
+.calc-shortage-img{
+  width:36px;
+  height:36px;
+  object-fit:contain;
+  background:var(--card);
+  border-radius:8px;
+  padding:2px;
+  flex-shrink:0;
+}
+
+body.dark .calc-shortage-img{ background:#2c2823; }
+
+.calc-shortage-info{ flex:1; min-width:0; }
+
+.calc-shortage-name{
+  font-size:11px;
+  color:var(--text);
+  margin-bottom:3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+body.dark .calc-shortage-name{ color:#ece4d4; }
+
+.calc-shortage-detail{
+  font-size:10px;
+  color:var(--text-sub);
+  display:flex;
+  gap:8px;
+}
+
+.calc-shortage-need{ font-weight:700; color:var(--vermillion); }
+body.dark .calc-shortage-need{ color:#e07060; }
+
+.calc-shortage-enough-tag{
+  font-size:10px;
+  font-weight:700;
+  color:#4a7c59;
+  white-space:nowrap;
+}
+
+body.dark .calc-shortage-enough-tag{ color:#7ec89a; }
+
+.calc-empty-note{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:20px 0;
+  line-height:1.7;
+}
+
+.calc-no-target-note{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:12px 0;
+  line-height:1.7;
+}
 </style>
 </head>
 
@@ -344,6 +642,8 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
   <h2>料理レシピ図鑑</h2>
 </div>
 
+<button class="calc-toggle-btn" id="calcOpenBtn">🏆 <span data-i18n="food_calc_open">認証マスター計算</span></button>
+
 <div class="f-search-wrap">
   <input type="text" id="search" class="search" placeholder="🔍 料理名・素材名で検索">
   <button id="clearBtn">×</button>
@@ -364,10 +664,21 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
   <div class="f-modal-box" id="modalBox"></div>
 </div>
 
+<div id="calcModal" onclick="if(event.target.id==='calcModal')closeCalcModal()">
+  <div class="calc-modal-box" id="calcModalBox">
+    <div class="calc-header">
+      <div class="calc-title">🏆 <span data-i18n="food_calc_title">認証マスター計算</span></div>
+      <button class="calc-close-x" onclick="closeCalcModal()">✕</button>
+    </div>
+    <div id="calcModalBody"></div>
+  </div>
+</div>
+
 <div id="foodToast"></div>
 
 <script src="js/i18n.js"></script>
 <script src="js/data-foods.js"></script>
+<script src="js/food-auth-calc.js"></script>
 <script>
 
 // ── ダークモード ──
@@ -780,6 +1091,184 @@ function showToast(msg){
   setTimeout(()=> t.classList.remove("show"), 2500);
 }
 
+// ══════════════════════════════════════
+// 認証マスター計算ツール
+// ══════════════════════════════════════
+const calcOpenBtn   = document.getElementById("calcOpenBtn");
+const calcModal     = document.getElementById("calcModal");
+const calcModalBody = document.getElementById("calcModalBody");
+
+calcOpenBtn.onclick = () => {
+  renderCalcModal();
+  calcModal.style.display = "block";
+};
+
+function closeCalcModal(){
+  calcModal.style.display = "none";
+}
+
+function renderCalcModal(){
+  const targets = getAuthTargetFoods();
+  const state = loadCalcState();
+
+  if(targets.length === 0){
+    calcModalBody.innerHTML = `
+      <div class="calc-no-target-note">${T("food_calc_no_target","現在、認証マスターの目標数が設定されている料理がありません。")}</div>
+    `;
+    return;
+  }
+
+  // 選択中の料理を決定（保存済み優先、なければ先頭）
+  let selectedName = state.foodName;
+  let selectedFood = targets.find(f => f.name === selectedName);
+  if(!selectedFood){
+    selectedFood = targets[0];
+    selectedName = selectedFood.name;
+  }
+
+  const madeCount = (state.foodName === selectedName && state.madeCount != null) ? state.madeCount : 0;
+
+  const options = targets.map(f =>
+    `<option value="${f.name}" ${f.name === selectedName ? "selected" : ""}>${displayName(f)}</option>`
+  ).join("");
+
+  calcModalBody.innerHTML = `
+    <div class="calc-field-label">${T("food_calc_select_label","料理")}</div>
+    <select class="calc-select" id="calcFoodSelect">${options}</select>
+
+    <div class="calc-field-label">${T("food_calc_made_label","現在作成済み")}</div>
+    <div class="calc-input-row">
+      <input type="number" min="0" class="calc-input" id="calcMadeInput" value="${madeCount}">
+    </div>
+
+    <div id="calcResultArea"></div>
+
+    <button class="f-close-btn" onclick="closeCalcModal()">${T("food_close","閉じる")}</button>
+  `;
+
+  document.getElementById("calcFoodSelect").addEventListener("change", (e)=>{
+    saveCalcState({ foodName: e.target.value, madeCount: 0 });
+    renderCalcModal();
+  });
+
+  document.getElementById("calcMadeInput").addEventListener("input", (e)=>{
+    const val = parseInt(e.target.value, 10) || 0;
+    saveCalcState({ foodName: selectedName, madeCount: val });
+    renderCalcResult(selectedFood, val);
+  });
+
+  renderCalcResult(selectedFood, madeCount);
+}
+
+function renderCalcResult(food, madeCount){
+  const area = document.getElementById("calcResultArea");
+  if(!area) return;
+
+  const result = calcAuthProgress(food, madeCount);
+
+  const progressHTML = `
+    <div class="calc-divider"></div>
+    <div class="calc-progress-card">
+      <div class="calc-progress-row">
+        <div class="calc-progress-item">
+          <div class="calc-progress-label">${T("food_calc_target_label","認証マスター")}</div>
+          <div class="calc-progress-value">${result.target.toLocaleString()}<span class="calc-progress-unit">${T("food_calc_dish_unit","皿")}</span></div>
+        </div>
+        <div class="calc-progress-item">
+          <div class="calc-progress-label">${T("food_calc_remaining_label","残り")}</div>
+          <div class="calc-progress-value highlight">${result.remaining.toLocaleString()}<span class="calc-progress-unit">${T("food_calc_dish_unit","皿")}</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  if(result.materials.length === 0){
+    area.innerHTML = progressHTML + `
+      <div class="calc-empty-note">${T("food_calc_no_materials","この料理には計算対象の素材がありません。")}</div>
+    `;
+    return;
+  }
+
+  const materialInputsHTML = result.materials.map(m => `
+    <div class="calc-material-item">
+      ${m.image ? `<img class="calc-material-img" src="${m.image}" alt="${m.name}" onerror="this.style.display='none'">` : `<div class="calc-material-img"></div>`}
+      <div class="calc-material-info">
+        <div class="calc-material-name">${m.name}</div>
+      </div>
+      <input type="number" min="0" class="calc-material-input"
+        data-material-key="${encodeURIComponent(m.key)}"
+        value="${m.have}">
+    </div>
+  `).join("");
+
+  const shortageHTML = result.materials.map(m => {
+    const enough = m.short <= 0;
+    return `
+      <div class="calc-shortage-item ${enough ? "enough" : ""}">
+        ${m.image ? `<img class="calc-shortage-img" src="${m.image}" alt="${m.name}" onerror="this.style.display='none'">` : `<div class="calc-shortage-img"></div>`}
+        <div class="calc-shortage-info">
+          <div class="calc-shortage-name">${m.name}</div>
+          <div class="calc-shortage-detail">
+            <span>${T("food_calc_need_label","必要")}${m.need.toLocaleString()}</span>
+            <span>${T("food_calc_have_label","所持")}${m.have.toLocaleString()}</span>
+          </div>
+        </div>
+        ${enough
+          ? `<span class="calc-shortage-enough-tag">${T("food_calc_enough_label","充足")}</span>`
+          : `<span class="calc-shortage-need">${T("food_calc_short_label","あと")}${m.short.toLocaleString()}</span>`}
+      </div>
+    `;
+  }).join("");
+
+  area.innerHTML = progressHTML + `
+    <div class="calc-material-section-title">${T("food_calc_inventory_title","所持素材数")}</div>
+    ${materialInputsHTML}
+
+    <div class="calc-shortage-section">
+      <div class="calc-material-section-title">${T("food_calc_shortage_title","不足素材")}</div>
+      ${shortageHTML}
+    </div>
+  `;
+
+  // 所持数入力イベント（グローバル在庫に保存 → 即座に再計算）
+  area.querySelectorAll(".calc-material-input").forEach(input => {
+    input.addEventListener("input", (e)=>{
+      const key = decodeURIComponent(e.target.dataset.materialKey);
+      const val = parseInt(e.target.value, 10) || 0;
+      setInventoryQty(key, val);
+      // 不足素材セクションのみ再計算（入力中のフォーカスを保持するため所持数欄は再描画しない）
+      const madeInput = document.getElementById("calcMadeInput");
+      const made = madeInput ? (parseInt(madeInput.value, 10) || 0) : 0;
+      const newResult = calcAuthProgress(food, made);
+      const shortageSection = area.querySelector(".calc-shortage-section");
+      if(shortageSection){
+        const newShortageHTML = newResult.materials.map(m => {
+          const enough = m.short <= 0;
+          return `
+            <div class="calc-shortage-item ${enough ? "enough" : ""}">
+              ${m.image ? `<img class="calc-shortage-img" src="${m.image}" alt="${m.name}" onerror="this.style.display='none'">` : `<div class="calc-shortage-img"></div>`}
+              <div class="calc-shortage-info">
+                <div class="calc-shortage-name">${m.name}</div>
+                <div class="calc-shortage-detail">
+                  <span>${T("food_calc_need_label","必要")}${m.need.toLocaleString()}</span>
+                  <span>${T("food_calc_have_label","所持")}${m.have.toLocaleString()}</span>
+                </div>
+              </div>
+              ${enough
+                ? `<span class="calc-shortage-enough-tag">${T("food_calc_enough_label","充足")}</span>`
+                : `<span class="calc-shortage-need">${T("food_calc_short_label","あと")}${m.short.toLocaleString()}</span>`}
+            </div>
+          `;
+        }).join("");
+        shortageSection.innerHTML = `
+          <div class="calc-material-section-title">${T("food_calc_shortage_title","不足素材")}</div>
+          ${newShortageHTML}
+        `;
+      }
+    });
+  });
+}
+
 // 初期化
 render();
 
@@ -787,6 +1276,7 @@ render();
 document.addEventListener("langchange", ()=>{
   render();
   if(currentModalFood) renderModal();
+  if(calcModal.style.display === "block") renderCalcModal();
 });
 
 </script>
