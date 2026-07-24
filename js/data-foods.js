@@ -1048,6 +1048,63 @@ const foodsData = [
   auth:false
 },
 {
+  name:"シナモロールのクレープ",
+  nameI18n:{"ja":"シナモロールのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/102.PNG",
+  cost:395,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[670,1005,1340,2680,5360],
+  materials:["小麦(種@95)","バター(@150)","卵(@100)","コーヒー豆(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/coffee.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"クロミのクレープ",
+  nameI18n:{"ja":"クロミのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/103.PNG",
+  cost:345,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[670,1005,1340,2680,5360],
+  materials:["小麦(種@95)","バター(@150)","卵(@100)","ラズベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"マイメロのクレープ",
+  nameI18n:{"ja":"マイメロのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/104.PNG",
+  cost:395,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[670,1005,1340,2680,5360],
+  materials:["小麦(種@95)","バター(@150)","卵(@100)","牛乳(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/milk.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
   name:"コーヒー",
   nameI18n:{"ja":"コーヒー","en":"Coffee","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/034.PNG",
@@ -1886,7 +1943,7 @@ const foodsData = [
 {
   name:"エビのアボカドカップ詰め",
   nameI18n:{"ja":"エビのアボカドカップ詰め","en":"Shrimp-stuffed Avocado Cup","zh-CN":"","zh-TW":"","ko":"","th":""},
-  image:"./images/000.PNG",
+  image:"./images/foods/100.PNG",
   cost:360,
   time:840,
   rarity: [true,true,true,true,true],
@@ -1896,8 +1953,8 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/all_kaisen.jpg" },
-    { image:"./images/000.PNG" },
-    { image:"./images/000.PNG" }
+    { image:"./images/materials/avocado.jpg" },
+    { image:"./images/materials/avocado.jpg" }
   ],
   authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
@@ -1905,7 +1962,7 @@ const foodsData = [
 {
   name:"チーズカニ爪フライ",
   nameI18n:{"ja":"チーズカニ爪フライ","en":"Fried Cheese Crab Claw","zh-CN":"","zh-TW":"","ko":"","th":""},
-  image:"./images/000.PNG",
+  image:"./images/foods/101.PNG",
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
