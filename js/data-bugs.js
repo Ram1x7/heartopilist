@@ -742,7 +742,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/068.PNG"
 }, 
 {
  name:"ミイロタイマイ",
@@ -752,7 +752,7 @@ const bugData = [
  time:["6-12","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/069.PNG"
 },
 {
  name:"オオサマゴライアス",
@@ -772,7 +772,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"温泉山",
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/071.PNG"
 },
 {
  name:"ベニトンボ",
@@ -1033,7 +1033,77 @@ const bugData = [
  locationI18n:{"ja":"特殊積み木虫クエスト","en":"Special Building Block Bug Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"bugs/1005.PNG",
  auth:false
-}
+},
+{
+ name:"アオカナブン",
+ nameI18n:{"ja":"アオカナブン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ season:true,
+ ended:false,
+ level:1,
+ price:60,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-コジカ塔",
+ locationI18n:{"ja":"森林-コジカ塔","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"bugs/1016.PNG",
+ auth:false
+},
+{
+ name:"オオサルハムシ",
+ nameI18n:{"ja":"オオサルハムシ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ season:true,
+ ended:false,
+ level:1,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-森の島",
+ locationI18n:{"ja":"森林-森の島","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"bugs/1017.PNG",
+ auth:false
+},
+{
+ name:"ミイロタテハ",
+ nameI18n:{"ja":"ミイロタテハ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ season:true,
+ ended:false,
+ level:1,
+ price:110,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-ジャンプステージ",
+ locationI18n:{"ja":"森林-ジャンプステージ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"bugs/1018.PNG",
+ auth:false
+},
+{
+ name:"タマフチマガンヤガ",
+ nameI18n:{"ja":"タマフチマガンヤガ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ season:true,
+ ended:false,
+ level:1,
+ price:60,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-不思議な松林",
+ locationI18n:{"ja":"森林-不思議な松林","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"bugs/1019.PNG",
+ auth:false
+},
+{
+ name:"？？？",
+ nameI18n:{"ja":"？？？","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ season:true,
+ ended:false,
+ level:1,
+ price:0,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"虫クエスト（追加段階）",
+ locationI18n:{"ja":"虫クエスト（追加段階）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/000.PNG",
+ auth:false
+},
  // ここに追加していく
 ].map((c,i) => ({
   ...c,
