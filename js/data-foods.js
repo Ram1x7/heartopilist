@@ -1538,7 +1538,7 @@ const foodsData = [
     { image:"./images/materials/all_material.jpg" },
     { image:"./images/materials/all_material.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1557,7 +1557,7 @@ const foodsData = [
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/milk.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1576,7 +1576,7 @@ const foodsData = [
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/cacao.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1595,7 +1595,7 @@ const foodsData = [
     { image:"./images/materials/all_material.jpg" },
     { image:"./images/materials/all_material.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1614,7 +1614,7 @@ const foodsData = [
     { image:"./images/materials/cacao.jpg" },
     { image:"./images/materials/cacao.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1633,7 +1633,7 @@ const foodsData = [
     { image:"./images/materials/razuberi.jpg" },
     { image:"./images/materials/razuberi.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1652,7 +1652,7 @@ const foodsData = [
     { image:"./images/materials/buruberi.jpg" },
     { image:"./images/materials/buruberi.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1671,7 +1671,7 @@ const foodsData = [
     { image:"./images/materials/ringo.jpg" },
     { image:"./images/materials/ringo.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1690,7 +1690,7 @@ const foodsData = [
     { image:"./images/materials/orange.jpg" },
     { image:"./images/materials/orange.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1709,7 +1709,7 @@ const foodsData = [
     { image:"./images/materials/pineapple.jpg" },
     { image:"./images/materials/pineapple.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1728,7 +1728,7 @@ const foodsData = [
     { image:"./images/materials/strawberry.jpg" },
     { image:"./images/materials/strawberry.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1747,7 +1747,7 @@ const foodsData = [
     { image:"./images/materials/grape.jpg" },
     { image:"./images/materials/grape.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1766,7 +1766,7 @@ const foodsData = [
     { image:"./images/materials/mattya.jpg" },
     { image:"./images/materials/mattya.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1785,7 +1785,7 @@ const foodsData = [
     { image:"./images/materials/all_material.jpg" },
     { image:"./images/materials/all_material.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1804,7 +1804,7 @@ const foodsData = [
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/milk.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1823,7 +1823,7 @@ const foodsData = [
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/mattya.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1842,7 +1842,7 @@ const foodsData = [
     { image:"./images/materials/hinagiku.jpg" },
     { image:"./images/materials/hinagiku.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1861,7 +1861,7 @@ const foodsData = [
     { image:"./images/materials/rose.jpg" },
     { image:"./images/materials/rose.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1880,7 +1880,7 @@ const foodsData = [
     { image:"./images/materials/k_kotya.jpg" },
     { image:"./images/materials/k_kotya.jpg" }
   ],
-  authTarget: 240, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1899,7 +1899,7 @@ const foodsData = [
     { image:"./images/000.PNG" },
     { image:"./images/000.PNG" }
   ],
-  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
@@ -1918,7 +1918,7 @@ const foodsData = [
     { image:"./images/materials/all_kaisen.jpg" },
     { image:"./images/materials/all_kaisen.jpg" }
   ],
-  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  authTarget: 360, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:true
 },
 {
