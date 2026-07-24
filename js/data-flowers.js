@@ -221,7 +221,7 @@ const flowerData = [
     growTime: 1440,   // 24時間
     seedPrice: 30,
     prices: [125, null, null, null, null],
-    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","青","緑","夜光"],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","青","夜光"],
     auth: false,
     season: true,
     ended: true,
@@ -259,6 +259,23 @@ const flowerData = [
     ended: true,
     eventName: "ブロック市街地",
     bookIndex: 16,
+  },
+  
+  {
+    name: "スイセン",
+    nameI18n:{"ja":"スイセン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    img: "./images/flowers/suisen.PNG",
+    seedImg: "./images/flowers/seed_suisen.jpg",
+    level: 3,
+    growTime: 1440,   // 24時間
+    seedPrice: 30,
+    prices: [125, null, null, null, null],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","青","夜光"],
+    auth: false,
+    season: true,
+    ended: false,
+    eventName: "ホエールシーズン",
+    bookIndex: 17,
   },
 ];
 
