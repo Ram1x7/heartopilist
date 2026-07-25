@@ -208,6 +208,15 @@ const codesData = [
     expiry: "2026-08-01 00:59",
     active: true,
   },
+  {
+    code: "2026summerlights",
+    reward: "虹のロケット花火×5、虹の手持ち花火×5",
+    rewardI18n:{"ja":"虹のロケット花火×5、虹の手持ち花火×5","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"虹のロケット花火×5、虹の手持ち花火×5","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"虹のロケット花火×5、虹の手持ち花火×5","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-08-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
