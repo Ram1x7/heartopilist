@@ -115,7 +115,6 @@ body.dark::after{
   padding:0;
   border:1px solid var(--border);
   border-radius:50%;
-  font-size:15px;
   line-height:1;
   background:var(--card);
   color:var(--indigo);
@@ -216,7 +215,6 @@ body.dark #lang-select{
   padding:0;
   border:1px solid var(--border);
   border-radius:50%;
-  font-size:15px;
   line-height:1;
   background:var(--card);
   color:var(--indigo);
@@ -502,8 +500,9 @@ body.dark .server-select{
   border-radius:50%;
   background:var(--card);
   box-shadow:0 2px 6px rgba(52,48,43,0.08);
-  font-size:15px;
   display:none;
+  align-items:center;
+  justify-content:center;
   color:var(--text-sub);
 }
 
@@ -974,7 +973,10 @@ body.dark h3{
   border-radius:999px;
   width:32px;
   height:32px;
-  font-size:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
   background:var(--card);
   color:var(--indigo);
   box-shadow:0 3px 8px rgba(52,48,43,0.08);
@@ -1071,7 +1073,6 @@ a{
   padding:0;
   border:1px solid var(--border);
   border-radius:50%;
-  font-size:15px;
   line-height:1;
   background:var(--card);
   color:var(--indigo);
@@ -1154,5 +1155,225 @@ body.dark .site-nav-item.active{
   background:var(--indigo-soft);
   border-color:var(--indigo-soft);
   color:#fdf9ef;
+}
+
+/* ══════════════════════════════════════
+   SVGアイコン共通
+   ══════════════════════════════════════ */
+.icon{
+  display:inline-block;
+  vertical-align:middle;
+  flex-shrink:0;
+}
+
+/* ヘッダーアイコンボタン（ヘルプ・シェア・ダーク切替） */
+#helpBtn, #shareBtn, #darkToggle{
+  color:var(--indigo);
+}
+
+body.dark #helpBtn, body.dark #shareBtn, body.dark #darkToggle{
+  color:#e8d2a8;
+}
+
+/* ボタン内アイコン＋テキストのレイアウト */
+.filter button,
+.accordion-toggle,
+.modal-box button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+
+.btn-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.btn-icon .icon{
+  opacity:0.75;
+}
+
+.active .btn-icon .icon{
+  opacity:1;
+}
+
+/* 検索欄（アイコン付き） */
+.search-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.search-icon{
+  position:absolute;
+  left:14px;
+  display:flex;
+  align-items:center;
+  color:var(--text-sub);
+  pointer-events:none;
+}
+
+.search-wrap .search{
+  padding-left:38px;
+}
+
+/* サーバー選択（アイコン付き） */
+.server-select-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.server-select-icon{
+  display:flex;
+  align-items:center;
+  color:var(--indigo);
+}
+
+body.dark .server-select-icon{
+  color:#e8d2a8;
+}
+
+/* ══════════════════════════════════════
+   アコーディオン（絞り込み・並び替え / 複数選択・一括操作）
+   ══════════════════════════════════════ */
+.accordion{
+  margin-top:10px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  background:var(--card-sub);
+}
+
+body.dark .accordion{
+  background:#383329;
+  border-color:#46423b;
+}
+
+.accordion-toggle{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 14px;
+  border:none;
+  background:transparent;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  cursor:pointer;
+  border-radius:0;
+}
+
+body.dark .accordion-toggle{
+  color:#ece4d4;
+}
+
+.accordion-toggle-label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.accordion-toggle-icon{
+  display:flex;
+  align-items:center;
+  color:var(--indigo);
+}
+
+body.dark .accordion-toggle-icon{
+  color:#e8d2a8;
+}
+
+.accordion-chevron{
+  display:flex;
+  align-items:center;
+  color:var(--text-sub);
+  transition:transform 0.2s;
+}
+
+.accordion-toggle.open .accordion-chevron{
+  transform:rotate(180deg);
+}
+
+.accordion-body{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.25s ease, padding 0.25s ease;
+  padding:0 14px;
+}
+
+.accordion-body.open{
+  max-height:600px;
+  padding:2px 14px 14px;
+}
+
+.filter-group{
+  margin-top:12px;
+}
+
+.filter-group:first-child{
+  margin-top:2px;
+}
+
+.filter-group-label{
+  font-size:10.5px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+  padding-left:2px;
+}
+
+.filter-group-label-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+.level-slider{
+  width:100%;
+  display:block;
+  margin-top:4px;
+}
+
+/* 種類フィルター行は常時表示のまま、絞り込みセクションと視覚的に区切る */
+#typeFilterRow{
+  margin-bottom:2px;
+}
+
+/* ヘルプモーダル内のアイコン */
+.help-title-icon{
+  display:inline-flex;
+  vertical-align:middle;
+  margin-right:6px;
+  color:var(--indigo);
+}
+
+body.dark .help-title-icon{
+  color:#e8d2a8;
+}
+
+.help-icon{
+  display:inline-flex;
+  vertical-align:middle;
+  margin-right:5px;
+  color:var(--indigo);
+}
+
+body.dark .help-icon{
+  color:#e8d2a8;
+}
+
+.contact-form-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
 }
 
