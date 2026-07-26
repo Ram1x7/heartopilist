@@ -406,6 +406,7 @@ body.dark .server-select{
 .img-wrap{
   position:relative;
   width:100%;
+  aspect-ratio:1/1;
 }
 
 /* レベル表示 */
