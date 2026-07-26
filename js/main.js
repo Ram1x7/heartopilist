@@ -1,4 +1,4 @@
-const APP_VERSION = "2.4.2";
+const APP_VERSION = "3.0.0";
 
 // ── サーバー設定 ──
 // weatherData や生き物の出現時間帯（time配列）は Asia(UTC+9) 基準で入力されている。
@@ -36,19 +36,19 @@ let authData =
 
 // 天気(毎日入力する) 
 const weatherData = {
- "2026-07-25": {
+ "2026-07-26": {
    "6-12":"雨",
-   "12-18":"虹",
-   "18-0":"晴れ",
-   "0-6":"晴れ"
- },
-  "2026-07-26": {
-   "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
+   "0-6":"雨"
+ },
+  "2026-07-27": {
+   "6-12":"晴れ",
+   "12-18":"雨",
+   "18-0":"晴れ",
    "0-6":"晴れ"
  },
-   "2026-07-24": {
+   "2026-07-28": {
    "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
@@ -1454,7 +1454,7 @@ document.getElementById("disclaimer").textContent =
   T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  T("last_update_label","最終更新") + " 2026/07/22";
+  T("last_update_label","最終更新") + " 2026/07/26";
 
 // 言語切替時に動的コンテンツを再描画
 document.addEventListener("langchange", ()=>{
@@ -1463,7 +1463,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/07/22";
+    T("last_update_label","最終更新") + " 2026/07/26";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
