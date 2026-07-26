@@ -11,7 +11,7 @@
   "nav_faq": "Q&A",
   "page_header_title": "即時圖鑑",
   "page_header_subtitle": "依據 Heartopia 當前天氣與時間顯示圖鑑",
-  "search_placeholder": "🔍 依名稱或地點搜尋",
+  "search_placeholder": "依名稱或地點搜尋",
   "filter_all": "全部",
   "filter_fish": "魚",
   "filter_bug": "蟲",
@@ -77,9 +77,9 @@
   "help_meteor_body": "流星雨按晴天處理。",
   "help_minimize_title": "最小化",
   "help_minimize_body": "可用摺疊按鈕展開或收起頂部面板。",
-  "help_share_title": "📥 分享",
+  "help_share_title": "分享",
   "help_share_body": "點擊分享按鈕即可分享。\n生成簡易收集進度圖片。",
-  "help_contact_title": "💌 聯絡我們",
+  "help_contact_title": "聯絡我們",
   "help_contact_body": "可在頁面底部聯絡我們。\n支援完全匿名提交。",
   "help_contact_note": "（計劃新增問答Q&A頁面。）",
   "help_notice_title": "注意",
@@ -222,5 +222,6 @@
   "label_season_limited": "季節限定",
   "label_fes_limited": "節日限定",
   "banner_season_ended_note": "該季節已結束",
-  "banner_fes_ended_note": "該節日已結束"
+  "banner_fes_ended_note": "該節日已結束",
+  "faq_search_placeholder": "依關鍵字搜尋"
 }

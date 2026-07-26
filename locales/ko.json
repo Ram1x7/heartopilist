@@ -11,7 +11,7 @@
   "nav_faq": "Q&A",
   "page_header_title": "실시간 도감",
   "page_header_subtitle": "Heartopia의 현재 날씨와 시간에 맞춘 도감 표시",
-  "search_placeholder": "🔍 이름·장소로 검색",
+  "search_placeholder": "이름·장소로 검색",
   "filter_all": "전체",
   "filter_fish": "물고기",
   "filter_bug": "벌레",
@@ -77,9 +77,9 @@
   "help_meteor_body": "유성우는 맑음으로 판정됩니다.",
   "help_minimize_title": "최소화",
   "help_minimize_body": "상단 패널은 접기 버튼으로 열고 닫을 수 있습니다.",
-  "help_share_title": "📥 공유",
+  "help_share_title": "공유",
   "help_share_body": "공유 버튼을 누르면 공유할 수 있습니다.\n완성도 간이 이미지를 생성합니다.",
-  "help_contact_title": "💌 문의",
+  "help_contact_title": "문의",
   "help_contact_body": "페이지 하단에서 문의하실 수 있습니다.\n완전 익명으로 전송할 수 있습니다.",
   "help_contact_note": "（답변 게재용 Q&A 페이지 추가 예정입니다.）",
   "help_notice_title": "주의",
@@ -222,5 +222,6 @@
   "label_season_limited": "시즌 한정",
   "label_fes_limited": "페스 한정",
   "banner_season_ended_note": "현재 이 시즌은 종료되었습니다",
-  "banner_fes_ended_note": "현재 이 페스는 종료되었습니다"
+  "banner_fes_ended_note": "현재 이 페스는 종료되었습니다",
+  "faq_search_placeholder": "키워드로 검색"
 }
