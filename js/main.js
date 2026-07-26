@@ -36,17 +36,17 @@ let authData =
 
 // 天気(毎日入力する) 
 const weatherData = {
- "2026-07-28": {
+ "2026-07-25": {
    "6-12":"雨",
    "12-18":"虹",
    "18-0":"晴れ",
    "0-6":"晴れ"
  },
   "2026-07-26": {
-   "6-12":"雨",
+   "6-12":"晴れ",
    "12-18":"晴れ",
    "18-0":"晴れ",
-   "0-6":"雨"
+   "0-6":"晴れ"
  },
    "2026-07-24": {
    "6-12":"晴れ",
@@ -63,7 +63,10 @@ const ALL_TIME = ["6-12","12-18","18-0","0-6"];
 const creatures = [
  ...fishData,
  ...bugData,
- ...birdData
+ ...birdData,
+ ...(typeof sandData  !== "undefined" ? sandData  : []),
+ ...(typeof snowData  !== "undefined" ? snowData  : []),
+ ...(typeof shellData !== "undefined" ? shellData : [])
 ];
 
 // サーバーのUTCオフセット（時間）
@@ -117,9 +120,9 @@ function displayName(c){
 }
 
 function displayLocation(c){
-  if(!c.locationI18n) return c.location;
+  if(!c.locationI18n) return c.location || "";
   const lang = currentLang();
-  return c.locationI18n[lang] || c.location;
+  return c.locationI18n[lang] || c.location || "";
 }
 
 // フォーマット
@@ -331,7 +334,7 @@ function sortList(arr){
 
   if(currentSort === "level"){
     out.sort((a,b)=>{
-      const typeOrder = { fish:0, bug:1, bird:2 };
+      const typeOrder = { fish:0, bug:1, bird:2, sand:3, snow:4, shell:5 };
 
       if(typeOrder[a.type] !== typeOrder[b.type]){
         return typeOrder[a.type] - typeOrder[b.type];
@@ -351,7 +354,7 @@ function sortList(arr){
         return aChecked - bChecked;
       }
 
-      const typeOrder = { fish:0, bug:1, bird:2 };
+      const typeOrder = { fish:0, bug:1, bird:2, sand:3, snow:4, shell:5 };
 
       // 次に種類順
       if(typeOrder[a.type] !== typeOrder[b.type]){
@@ -382,7 +385,7 @@ function sortList(arr){
           return aAuth - bAuth;
         }
 
-        const typeOrder = { fish:0, bug:1, bird:2 };
+        const typeOrder = { fish:0, bug:1, bird:2, sand:3, snow:4, shell:5 };
         if(typeOrder[a.c.type] !== typeOrder[b.c.type]){
           return typeOrder[a.c.type] - typeOrder[b.c.type];
         }
@@ -420,6 +423,12 @@ function createCard(c){
     ${c.shadow === "青" ? "shadow-blue" : ""}
   ">
     ${c.shadow}
+  </div>
+` : ""}
+
+ ${(c.season || c.fes) ? `
+  <div class="season-badge" title="${c.seasonName || ""}">
+    ${c.fes ? "🎉" : "🌸"}
   </div>
 ` : ""}
 
@@ -714,7 +723,7 @@ function setWeatherMode(mode){
 function setFilter(t){
  currentFilter=t;
  localStorage.setItem("currentFilter", t);
- ["all","fish","bug","bird"].forEach(x=>{
+ ["all","fish","bug","bird","sand","snow","shell"].forEach(x=>{
   document.getElementById("f_"+x).classList.remove("active");
  });
  document.getElementById("f_"+t).classList.add("active");
@@ -792,9 +801,15 @@ function openModal(c){
  m_name.innerText=displayName(c);
  m_img.src=c.img;
  m_loc.innerText=displayLocation(c);
+ if(c.seasonName){
+   m_loc.innerText += (m_loc.innerText ? "　" : "") + `(${(c.fes?"🎉":"🌸")}${c.seasonName})`;
+ }
  m_weather.innerText=T("modal_weather","天気：")+formatWeather(c.weather);
  m_time.innerText=T("modal_time","時間：")+formatTimeForServer(c.time);
  const basePrice = c.price ?? 0;
+
+ // 星1しか存在しないアイテム（失敗作・壊れ物など）は★2〜5を非表示にする
+ const star1Only = c.star1Only === true;
 
  // 野鳥だけ特殊計算
 if(c.type === "bird"){
@@ -815,17 +830,64 @@ if(c.type === "bird"){
   m_price4.innerText =`★4｜${basePrice ? star2 * 4 : "-"}`;
   m_price5.innerText =`★5｜${basePrice ? star2 * 8 : "-"}`;
 }else{
-  // 魚・虫
+  // 魚・虫・砂像・雪像・貝殻
   m_price1.innerText =`★1｜${basePrice || "-"}`;
   m_price2.innerText =`★2｜${basePrice ? Math.floor(basePrice * 1.5) : "-"}`;
   m_price3.innerText =`★3｜${basePrice ? Math.floor(basePrice * 2) : "-"}`;
   m_price4.innerText =`★4｜${basePrice ? Math.floor(basePrice * 4) : "-"}`;
   m_price5.innerText =`★5｜${basePrice ? Math.floor(basePrice * 8) : "-"}`;
  }
+
+ // 星1しか存在しない場合は★2〜5の行を隠す
+ [m_price2, m_price3, m_price4, m_price5].forEach(el=>{
+   el.style.display = star1Only ? "none" : "";
+ });
+
  m_star5.innerHTML =
   c.star5
   ? `${T("modal_star5_label","★5条件：")}<br>${c.star5}`
   : "";
+
+ // 作り方情報（砂像のデザイン形状・三択回答など）
+ const craftEl = document.getElementById("m_craftInfo");
+ if(craftEl){
+   const craftRows = [];
+   if(c.designShape){
+     craftRows.push(`<div class="modal-craft-row"><span class="modal-craft-label">${T("modal_craft_design_label","デザイン形状")}</span><span>${c.designShape}</span></div>`);
+   }
+   if(c.craftAnswer){
+     craftRows.push(`<div class="modal-craft-row"><span class="modal-craft-label">${T("modal_craft_answer_label","三択回答")}</span><span>${c.craftAnswer}</span></div>`);
+   }
+   if(craftRows.length){
+     craftEl.innerHTML = `
+       <div class="modal-make-steps-title">${T("modal_craft_info_title","作り方情報")}</div>
+       ${craftRows.join("")}
+     `;
+     craftEl.style.display = "block";
+   } else {
+     craftEl.innerHTML = "";
+     craftEl.style.display = "none";
+   }
+ }
+
+ // 作り方（砂像など、決まった手順があるもの用）
+ const stepsEl = document.getElementById("m_makeSteps");
+ const stepsList = (c.makeStepsI18n && c.makeStepsI18n[i18n.getCurrentLang()] && c.makeStepsI18n[i18n.getCurrentLang()].length)
+   ? c.makeStepsI18n[i18n.getCurrentLang()]
+   : c.makeSteps;
+
+ if(stepsList && stepsList.length){
+   stepsEl.innerHTML = `
+     <div class="modal-make-steps-title">${T("modal_make_steps_title","作り方")}</div>
+     <ol class="modal-make-steps-list">
+       ${stepsList.map(s => `<li>${s.replace(/^\d+\.\s*/, "")}</li>`).join("")}
+     </ol>
+   `;
+   stepsEl.style.display = "block";
+ } else {
+   stepsEl.innerHTML = "";
+   stepsEl.style.display = "none";
+ }
 }
   
 function closeModal(){
@@ -1408,4 +1470,105 @@ document.addEventListener("langchange", ()=>{
     const target = creatures.find(c => c.name === modal.dataset.currentCreature);
     if(target) openModal(target);
   }
+
+  renderDailySpots();
+  updateDailySpotCalendarTabLabels();
+  if(dailySpotCalendarModal && dailySpotCalendarModal.style.display === "block"){
+    renderDailySpotCalendar();
+  }
 });
+
+// ══════════════════════════════════════
+// 蛍石・オークの木：今日の場所
+// ══════════════════════════════════════
+
+function dailySpotLabel(key){
+  const spot = dailySpots[key];
+  if(!spot) return key;
+  const lang = i18n.getCurrentLang();
+  return (spot.labelI18n && spot.labelI18n[lang]) ? spot.labelI18n[lang] : spot.label;
+}
+
+function renderDailySpots(){
+  const grid = document.getElementById("dailySpotGrid");
+  if(!grid || typeof dailySpots === "undefined") return;
+
+  grid.innerHTML = Object.keys(dailySpots).map(key => {
+    const today = getDailySpotFor(key, 0);
+    const spot = dailySpots[key];
+    if(!today) return "";
+
+    const img = today.image || spot.itemImg || "";
+
+    return `
+      <div class="daily-spot-item">
+        ${img ? `<img src="${img}" alt="${dailySpotLabel(key)}" onerror="this.style.display='none'">` : ""}
+        <div class="daily-spot-item-info">
+          <div class="daily-spot-item-label">${spot.icon || ""} ${dailySpotLabel(key)}</div>
+          <div class="daily-spot-item-location">${today.location}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// ── カレンダーモーダル ──
+const dailySpotCalendarModal = document.getElementById("dailySpotCalendarModal");
+const dailySpotCalendarBtn   = document.getElementById("dailySpotCalendarBtn");
+let currentDailySpotCalendarTab = "hotaru";
+
+if(dailySpotCalendarBtn){
+  dailySpotCalendarBtn.onclick = () => {
+    updateDailySpotCalendarTabLabels();
+    renderDailySpotCalendar();
+    dailySpotCalendarModal.style.display = "block";
+  };
+}
+
+function closeDailySpotCalendar(){
+  if(dailySpotCalendarModal) dailySpotCalendarModal.style.display = "none";
+}
+
+function setDailySpotCalendarTab(key){
+  currentDailySpotCalendarTab = key;
+  ["hotaru","oak"].forEach(k=>{
+    const btn = document.getElementById("calTab_"+k);
+    if(btn) btn.classList.toggle("active", k === key);
+  });
+  renderDailySpotCalendar();
+}
+
+function updateDailySpotCalendarTabLabels(){
+  if(typeof dailySpots === "undefined") return;
+  ["hotaru","oak"].forEach(key=>{
+    const btn = document.getElementById("calTab_"+key);
+    if(btn){
+      const spot = dailySpots[key];
+      btn.textContent = `${spot && spot.icon ? spot.icon + " " : ""}${dailySpotLabel(key)}`;
+    }
+  });
+}
+
+function renderDailySpotCalendar(){
+  const listEl = document.getElementById("dailySpotCalendarList");
+  if(!listEl || typeof getDailySpotCalendar === "undefined") return;
+
+  const days = getDailySpotCalendar(currentDailySpotCalendarTab, 30);
+
+  listEl.innerHTML = days.map(d => {
+    const isToday = d.offset === 0;
+    // 表示用の日付ラベル（例: 07/26）
+    const [, m, day] = d.dateKey.split("-");
+    const dateLabel = `${m}/${day}`;
+    return `
+      <div class="daily-spot-calendar-row ${isToday ? "today" : ""}">
+        <span class="daily-spot-calendar-date">${dateLabel}${isToday ? " " + T("daily_spot_today_tag","(今日)") : ""}</span>
+        <span>${d.location}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+// 初期描画
+renderDailySpots();
+updateDailySpotCalendarTabLabels();
