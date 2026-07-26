@@ -361,8 +361,8 @@ function applyCommonFilters(arr){
   if(keyword){
     const kw = keyword.toLowerCase();
     out = out.filter(c =>
-      c.name.toLowerCase().includes(kw) ||
-      c.location.toLowerCase().includes(kw) ||
+      (c.name || "").toLowerCase().includes(kw) ||
+      (c.location || "").toLowerCase().includes(kw) ||
       displayName(c).toLowerCase().includes(kw) ||
       displayLocation(c).toLowerCase().includes(kw)
     );
