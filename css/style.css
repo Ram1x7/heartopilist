@@ -757,6 +757,20 @@ body.dark .daily-spot-calendar-row.today{
     scale(0.97);
 }
 
+/* モーダル下部の単独「閉じる」ボタン
+   .modal-box button の共通ルール（flex:1 / display:flex）を全て打ち消し、
+   ブロック要素として幅100%・中央配置にする */
+.modal-box .modal-close-btn{
+  display:flex !important;
+  flex:none !important;
+  width:100% !important;
+  max-width:100%;
+  margin:12px auto 0 !important;
+  box-sizing:border-box;
+  align-items:center;
+  justify-content:center;
+}
+
 /* ON状態（藍色） */
 .active{
   background:var(--indigo) !important;
@@ -1098,10 +1112,15 @@ body.dark #shareBtn{
   background:rgba(40,36,30,0.5);
   backdrop-filter:blur(5px);
   z-index:999;
+  overflow-y:auto;
+  padding:20px 0;
+  box-sizing:border-box;
 }
 
 #shareModal .modal-box{
   max-width:340px;
+  margin:0 auto;
+  max-height:none;
 }
 
 #shareCanvas{
