@@ -52,10 +52,17 @@ const dailySpots = {
 };
 
 // JST基準の日付キー（YYYY-MM-DD）を取得
+// ゲーム内の「今日」の日付キー（YYYY-MM-DD）を取得
+// このゲームは JST 6:00 が日付更新のため、JST 0:00〜5:59 はまだ「前日」扱いになる。
+// 例）7/26 5:59 JST までは "2026-07-26" ではなく "2026-07-25" を返す
+//     7/26 6:00 JST になった瞬間から "2026-07-26" を返す
+// offsetDays はこの「ゲーム内の今日」からさらに何日後/前かを指定する
 function getDailySpotDateKey(offsetDays = 0){
-  const d = new Date(Date.now() + 9 * 3600 * 1000); // JST
-  d.setUTCDate(d.getUTCDate() + offsetDays);
-  return d.toISOString().slice(0, 10);
+  const jstNow = new Date(Date.now() + 9 * 3600 * 1000); // JSTの現在時刻
+  // 6時間分を引くことで「6:00更新」を「0:00更新」の暦日計算に変換する
+  jstNow.setUTCHours(jstNow.getUTCHours() - 6);
+  jstNow.setUTCDate(jstNow.getUTCDate() + offsetDays);
+  return jstNow.toISOString().slice(0, 10);
 }
 
 // 2つの日付キー（YYYY-MM-DD）の日数差を計算
