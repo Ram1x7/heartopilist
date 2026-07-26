@@ -426,12 +426,6 @@ function createCard(c){
   </div>
 ` : ""}
 
- ${(c.season || c.fes) ? `
-  <div class="season-badge" title="${c.seasonName || ""}">
-    ${c.fes ? "🎉" : "🌸"}
-  </div>
-` : ""}
-
   <button class="
     check-btn
     ${checkedData[c.name] ? "checked" : ""}
