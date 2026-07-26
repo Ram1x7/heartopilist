@@ -251,6 +251,54 @@ function translateWeatherWord(w){
 const searchInput = document.getElementById("search");
 const miniSearch = document.getElementById("miniSearch");
 const clearBtn = document.getElementById("clearBtn");
+clearBtn.innerHTML = icon("close", {size:13});
+
+const searchIconEl = document.querySelector(".search-icon");
+if(searchIconEl) searchIconEl.innerHTML = icon("search", {size:15});
+const serverSelectIconEl = document.querySelector(".server-select-icon");
+if(serverSelectIconEl) serverSelectIconEl.innerHTML = icon("globe", {size:13});
+
+// data-icon 属性を持つ .btn-icon / .help-icon 要素にまとめてSVGを流し込む
+document.querySelectorAll(".btn-icon[data-icon]").forEach(el=>{
+  el.innerHTML = icon(el.dataset.icon, {size:13});
+});
+document.querySelectorAll(".help-icon[data-icon]").forEach(el=>{
+  el.innerHTML = icon(el.dataset.icon, {size:14});
+});
+const helpTitleIconEl = document.getElementById("helpTitleIcon");
+if(helpTitleIconEl) helpTitleIconEl.innerHTML = icon("info", {size:17});
+
+// ══════════════════════════════════════
+// アコーディオン（絞り込み・並び替え / 複数選択・一括操作）
+// ══════════════════════════════════════
+function setupAccordion(toggleId, bodyId, storageKey, iconSelector, defaultOpen){
+  const toggle = document.getElementById(toggleId);
+  const body   = document.getElementById(bodyId);
+  if(!toggle || !body) return;
+
+  const iconEl = toggle.querySelector(iconSelector);
+  if(iconEl) iconEl.innerHTML = icon("chevronDown", {size:15, className:"accordion-chevron-svg"});
+
+  const saved = localStorage.getItem(storageKey);
+  const isOpen = saved !== null ? saved === "true" : defaultOpen;
+  toggle.classList.toggle("open", isOpen);
+  body.classList.toggle("open", isOpen);
+
+  toggle.addEventListener("click", ()=>{
+    const nowOpen = !body.classList.contains("open");
+    toggle.classList.toggle("open", nowOpen);
+    body.classList.toggle("open", nowOpen);
+    localStorage.setItem(storageKey, nowOpen);
+  });
+}
+
+setupAccordion("filterAccordionToggle", "filterAccordionBody", "filterAccordionOpen", ".accordion-chevron", false);
+setupAccordion("bulkAccordionToggle", "bulkAccordionBody", "bulkAccordionOpen", ".accordion-chevron", false);
+
+const filterAccordionIconEl = document.querySelector("#filterAccordionToggle .accordion-toggle-icon");
+if(filterAccordionIconEl) filterAccordionIconEl.innerHTML = icon("level", {size:15});
+const bulkAccordionIconEl = document.querySelector("#bulkAccordionToggle .accordion-toggle-icon");
+if(bulkAccordionIconEl) bulkAccordionIconEl.innerHTML = icon("checkSquare", {size:15});
 
 // 入力時
 let searchTimer;
@@ -261,7 +309,7 @@ searchInput.addEventListener("input", ()=>{
   miniSearch.value = searchInput.value;
 
   clearBtn.style.display =
-    searchInput.value ? "block" : "none";
+    searchInput.value ? "flex" : "none";
 
   localStorage.setItem(
     "searchKeyword",
@@ -282,7 +330,7 @@ miniSearch.addEventListener("input", ()=>{
   searchInput.value = miniSearch.value;
 
   clearBtn.style.display =
-    miniSearch.value ? "block" : "none";
+    miniSearch.value ? "flex" : "none";
 
   localStorage.setItem(
     "searchKeyword",
@@ -430,7 +478,7 @@ function createCard(c){
     check-btn
     ${checkedData[c.name] ? "checked" : ""}
   ">
-    ${checkedData[c.name] ? "⭐️" : ""}
+    ${icon(checkedData[c.name] ? "star" : "starOutline", {size:13})}
   </button>
 
   ${c.auth !== false ? `
@@ -438,7 +486,7 @@ function createCard(c){
     auth-btn
     ${authData[c.name] ? "checked" : ""}
   ">
-    ${authData[c.name] ? "🎖" : ""}
+    ${icon(authData[c.name] ? "medal" : "medalOutline", {size:13})}
   </button>
 ` : ""}
 
@@ -503,15 +551,18 @@ function buildEndedSection(items, kind){
 
   const lbl = document.createElement("div");
   lbl.className = "section-label";
-  lbl.textContent = kind === "season" ? "🌸 シーズン限定" : "🎉 フェス限定";
+  lbl.innerHTML = kind === "season"
+    ? `${icon("calendar", {size:15})} ${T("label_season_limited","シーズン限定")}`
+    : `${icon("calendar", {size:15})} ${T("label_fes_limited","フェス限定")}`;
   wrap.appendChild(lbl);
 
   const banner = document.createElement("div");
   banner.className = "event-ended-banner";
-  banner.textContent =
-    kind === "season"
-    ? "⚠️ 現在このシーズンは終了しています"
-    : "⚠️ 現在このフェスは終了しています";
+  banner.innerHTML =
+    `${icon("warning", {size:14})} ` +
+    (kind === "season"
+    ? T("banner_season_ended_note","現在このシーズンは終了しています")
+    : T("banner_fes_ended_note","現在このフェスは終了しています"));
   wrap.appendChild(banner);
 
   const grid = document.createElement("div");
@@ -772,11 +823,10 @@ darkToggle.onclick = ()=>{
 
 // ボタン表示
 function updateDarkButton(){
-
-  darkToggle.textContent =
+  darkToggle.innerHTML =
     document.body.classList.contains("dark")
-    ? "☀️"
-    : "🌙";
+    ? icon("sun")
+    : icon("moon");
 }
 
 function forceRepaint(){
@@ -794,10 +844,11 @@ function openModal(c){
  modal.dataset.currentCreature = c.name;
  m_name.innerText=displayName(c);
  m_img.src=c.img;
- m_loc.innerText=displayLocation(c);
+ let locHtml = displayLocation(c);
  if(c.seasonName){
-   m_loc.innerText += (m_loc.innerText ? "　" : "") + `(${(c.fes?"🎉":"🌸")}${c.seasonName})`;
+   locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
  }
+ m_loc.innerHTML = locHtml;
  m_weather.innerText=T("modal_weather","天気：")+formatWeather(c.weather);
  m_time.innerText=T("modal_time","時間：")+formatTimeForServer(c.time);
  const basePrice = c.price ?? 0;
@@ -892,10 +943,8 @@ function toggleMultiSelect(){
   multiSelectMode = !multiSelectMode;
   document.getElementById("multiBtn")
     .classList.toggle("active", multiSelectMode);
-  document.getElementById("bulkCheckBtn").style.display =
-    multiSelectMode ? "block" : "none";
-  document.getElementById("bulkUncheckBtn").style.display =
-    multiSelectMode ? "block" : "none";
+  document.getElementById("bulkStarRow").style.display =
+    multiSelectMode ? "flex" : "none";
   document.getElementById("authBulkRow").style.display =
     multiSelectMode ? "flex" : "none";
   if(!multiSelectMode){
@@ -964,6 +1013,7 @@ function bulkAuthUncheck(){
 const shareBtn = document.getElementById("shareBtn");
 const shareModal = document.getElementById("shareModal");
 const shareCanvas = document.getElementById("shareCanvas");
+shareBtn.innerHTML = icon("share");
 
 shareBtn.onclick = async () => {
   // 未読み込みのデータを動的に読み込む
@@ -1372,9 +1422,10 @@ const minimizeBtn =
 
 // 保存読み込み
 if(localStorage.getItem("topMinimized") === "true"){
-
   topPanel.classList.add("minimized");
-  minimizeBtn.textContent = "＋";
+  minimizeBtn.innerHTML = icon("chevronDown");
+}else{
+  minimizeBtn.innerHTML = icon("minus");
 }
 
 // ボタン
@@ -1382,10 +1433,10 @@ minimizeBtn.onclick = ()=>{
   topPanel.classList.toggle("minimized");
   const minimized =
     topPanel.classList.contains("minimized");
-  minimizeBtn.textContent =
+  minimizeBtn.innerHTML =
     minimized
-    ? "＋"
-    : "－";
+    ? icon("chevronDown")
+    : icon("minus");
   localStorage.setItem(
     "topMinimized",
     minimized
@@ -1394,6 +1445,7 @@ minimizeBtn.onclick = ()=>{
 
 const helpBtn = document.getElementById("helpBtn");
 const helpModal = document.getElementById("helpModal");
+helpBtn.innerHTML = icon("help");
 helpBtn.onclick = ()=>{
   helpModal.style.display = "block";
 };
@@ -1414,7 +1466,7 @@ updateTime();
 searchInput.value =
   localStorage.getItem("searchKeyword") || "";
 clearBtn.style.display =
-  searchInput.value ? "block" : "none";
+  searchInput.value ? "flex" : "none";
 levelMin.value =
   localStorage.getItem("minLevel") || 1;
 levelMax.value =
@@ -1487,6 +1539,13 @@ function renderDailySpots(){
   const grid = document.getElementById("dailySpotGrid");
   if(!grid || typeof dailySpots === "undefined") return;
 
+  const pinIconEl = document.getElementById("dailySpotPinIcon");
+  if(pinIconEl) pinIconEl.innerHTML = icon("pin", {size:15});
+  const calIconEl = document.getElementById("dailySpotCalIcon");
+  if(calIconEl) calIconEl.innerHTML = icon("calendar", {size:13});
+  const calTitleIconEl = document.getElementById("dailySpotCalTitleIcon");
+  if(calTitleIconEl) calTitleIconEl.innerHTML = icon("calendar", {size:16});
+
   grid.innerHTML = Object.keys(dailySpots).map(key => {
     const today = getDailySpotFor(key, 0);
     const spot = dailySpots[key];
@@ -1498,7 +1557,7 @@ function renderDailySpots(){
       <div class="daily-spot-item">
         ${img ? `<img src="${img}" alt="${dailySpotLabel(key)}" onerror="this.style.display='none'">` : ""}
         <div class="daily-spot-item-info">
-          <div class="daily-spot-item-label">${spot.icon || ""} ${dailySpotLabel(key)}</div>
+          <div class="daily-spot-item-label">${dailySpotLabel(key)}</div>
           <div class="daily-spot-item-location">${today.location}</div>
         </div>
       </div>
@@ -1537,8 +1596,7 @@ function updateDailySpotCalendarTabLabels(){
   ["hotaru","oak"].forEach(key=>{
     const btn = document.getElementById("calTab_"+key);
     if(btn){
-      const spot = dailySpots[key];
-      btn.textContent = `${spot && spot.icon ? spot.icon + " " : ""}${dailySpotLabel(key)}`;
+      btn.textContent = dailySpotLabel(key);
     }
   });
 }
