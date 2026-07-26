@@ -1,0 +1,193 @@
+// 雪像
+// star1Only : true の場合、★1価格のみ持ち★2〜5は非表示にする（失敗作など）
+// season    : シーズン限定表示のバッジを出すが、endedは付けないため
+//             期間終了後も通常通り出現し続ける（一覧から消えない）
+
+const snowData = [
+{
+ name:"立方体雪ブロック",
+ nameI18n:{"ja":"立方体雪ブロック","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:155,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/001.PNG",
+ auth:false
+},
+{
+ name:"雪小屋パーツ",
+ nameI18n:{"ja":"雪小屋パーツ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:155,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/002.PNG",
+ auth:false
+},
+{
+ name:"アイスコーンの雪像",
+ nameI18n:{"ja":"アイスコーンの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:155,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/003.PNG",
+ auth:false
+},
+{
+ name:"怪しい雪像",
+ nameI18n:{"ja":"怪しい雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:155,
+ star1Only:true,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/004.PNG",
+ auth:false
+},
+{
+ name:"微笑みスギ",
+ nameI18n:{"ja":"微笑みスギ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:155,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/005.PNG",
+ auth:false
+},
+{
+ name:"シフゾウ・タタの雪像",
+ nameI18n:{"ja":"シフゾウ・タタの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:165,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/006.PNG",
+ auth:false
+},
+{
+ name:"ビーバー・ボブの雪像",
+ nameI18n:{"ja":"ビーバー・ボブの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:165,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/007.PNG",
+ auth:false
+},
+{
+ name:"ヒツジ・ジョーンの雪像",
+ nameI18n:{"ja":"ヒツジ・ジョーンの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:190,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/008.PNG",
+ auth:false
+},
+{
+ name:"ハクチョウ・ロロの雪像",
+ nameI18n:{"ja":"ハクチョウ・ロロの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:190,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/009.PNG",
+ auth:false
+},
+{
+ name:"ウサギ・アニーの雪像",
+ nameI18n:{"ja":"ウサギ・アニーの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:225,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/010.PNG",
+ auth:false
+},
+{
+ name:"シェフ・モモの雪像",
+ nameI18n:{"ja":"シェフ・モモの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:225,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/011.PNG",
+ auth:false
+},
+{
+ name:"ハチ・ナニワの雪像",
+ nameI18n:{"ja":"ハチ・ナニワの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:225,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/012.PNG",
+ auth:false
+},
+{
+ name:"コアラ・ベイリーの雪像",
+ nameI18n:{"ja":"コアラ・ベイリーの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:225,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/013.PNG",
+ auth:false
+},
+{
+ name:"トム・ブランクの雪像",
+ nameI18n:{"ja":"トム・ブランクの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:280,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/014.PNG",
+ auth:false
+},
+{
+ name:"クマ・ヴァンニアの雪像",
+ nameI18n:{"ja":"クマ・ヴァンニアの雪像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:280,
+ weather:["雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"スノーシーズン",
+ img:"./images/snows/015.PNG",
+ auth:false
+}
+ // ここに追加していく
+].map((c,i) => ({
+  ...c,
+  type:"snow",
+  bookIndex:i
+}));

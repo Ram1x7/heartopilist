@@ -1,0 +1,244 @@
+// 貝殻
+// star1Only : true の場合、★1価格のみ持ち★2〜5は非表示にする（壊れ物など）
+// auth      : false の場合、認証マスター対象外
+//
+// ※ 以下の5種は天気・時間帯が未確認のため、判明次第追加してください。
+//   ハリナガリンボウ / ミガキウラシマ / リュウキュウアオイ /
+//   ランタンアヤネジレガイ / ウスムラサキイモ
+
+const shellData = [
+{
+ name:"壊れた貝殻",
+ nameI18n:{"ja":"壊れた貝殻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:2,
+ star1Only:true,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/001.PNG",
+ auth:false
+},
+{
+ name:"ゴトウオキナエビス",
+ nameI18n:{"ja":"ゴトウオキナエビス","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:50,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/002.PNG",
+ auth:true
+},
+{
+ name:"ツキガイ",
+ nameI18n:{"ja":"ツキガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:85,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/003.PNG",
+ auth:true
+},
+{
+ name:"アダムクモガイ",
+ nameI18n:{"ja":"アダムクモガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:50,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","12-18"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/004.PNG",
+ auth:true
+},
+{
+ name:"マツカワガイ",
+ nameI18n:{"ja":"マツカワガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:50,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/005.PNG",
+ auth:true
+},
+{
+ name:"シルバークラム",
+ nameI18n:{"ja":"シルバークラム","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:65,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","12-18"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/006.PNG",
+ auth:true
+},
+{
+ name:"カトレアバショウ",
+ nameI18n:{"ja":"カトレアバショウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:65,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/007.PNG",
+ auth:true
+},
+{
+ name:"船首桜ハマグリ",
+ nameI18n:{"ja":"船首桜ハマグリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:85,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","12-18"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/008.PNG",
+ auth:true
+},
+{
+ name:"ホネガイ",
+ nameI18n:{"ja":"ホネガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:50,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/009.PNG",
+ auth:true
+},
+{
+ name:"サフランシャコガイ",
+ nameI18n:{"ja":"サフランシャコガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:65,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","12-18"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/010.PNG",
+ auth:true
+},
+{
+ name:"ホソロクセンニンガイ",
+ nameI18n:{"ja":"ホソロクセンニンガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:68,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/011.PNG",
+ auth:true
+},
+{
+ name:"シロスジグルマ",
+ nameI18n:{"ja":"シロスジグルマ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:85,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/012.PNG",
+ auth:true
+},
+{
+ name:"ボタンウミウサギ",
+ nameI18n:{"ja":"ボタンウミウサギ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:65,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/013.PNG",
+ auth:true
+},
+{
+ name:"ミズスイ",
+ nameI18n:{"ja":"ミズスイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:50,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/014.PNG",
+ auth:true
+},
+{
+ name:"カブラガイ",
+ nameI18n:{"ja":"カブラガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:85,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/015.PNG",
+ auth:true
+},
+{
+ name:"ツリフネキヌヅツミ",
+ nameI18n:{"ja":"ツリフネキヌヅツミ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:6,
+ price:65,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/016.PNG",
+ auth:true
+},
+{
+ name:"ショウジョウラ",
+ nameI18n:{"ja":"ショウジョウラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:7,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","12-18","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/017.PNG",
+ auth:true
+},
+{
+ name:"オウムガイ",
+ nameI18n:{"ja":"オウムガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:7,
+ price:165,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/018.PNG",
+ auth:true
+},
+{
+ name:"ルリガイ",
+ nameI18n:{"ja":"ルリガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:7,
+ price:85,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","12-18"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/019.PNG",
+ auth:true
+}
+ // ここに追加していく
+].map((c,i) => ({
+  ...c,
+  type:"shell",
+  bookIndex:i
+}));
