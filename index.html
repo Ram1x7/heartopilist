@@ -86,6 +86,30 @@
     ハートピアの天気と今の時間に合わせた図鑑表示
   </p>
 </div>
+
+<!-- 蛍石・オークの木：今日の場所 -->
+<div class="card daily-spot-card">
+  <div class="daily-spot-header">
+    <span data-i18n="daily_spot_title">📍 今日の場所</span>
+    <button id="dailySpotCalendarBtn" class="daily-spot-calendar-btn" data-i18n="daily_spot_calendar_btn">📅 カレンダー</button>
+  </div>
+  <div class="daily-spot-grid" id="dailySpotGrid">
+    <!-- JSで動的生成 -->
+  </div>
+</div>
+
+<!-- カレンダーモーダル -->
+<div id="dailySpotCalendarModal" onclick="if(event.target.id==='dailySpotCalendarModal')closeDailySpotCalendar()">
+  <div class="modal-box daily-spot-calendar-modal">
+    <h3 data-i18n="daily_spot_calendar_title">📅 出現カレンダー</h3>
+    <div class="daily-spot-calendar-tabs">
+      <button id="calTab_hotaru" class="daily-spot-calendar-tab active" onclick="setDailySpotCalendarTab('hotaru')"></button>
+      <button id="calTab_oak" class="daily-spot-calendar-tab" onclick="setDailySpotCalendarTab('oak')"></button>
+    </div>
+    <div class="daily-spot-calendar-list" id="dailySpotCalendarList"></div>
+    <button onclick="closeDailySpotCalendar()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
   
 <div class="card sticky" id="topPanel">
 <button id="minimizeBtn">－</button>
@@ -125,11 +149,14 @@
   <button id="clearBtn">×</button>
 </div>
 
-  <div class="filter">
+  <div class="filter filter-wrap">
     <button onclick="setFilter('all')" id="f_all" data-i18n="filter_all">全部</button>
     <button onclick="setFilter('fish')" id="f_fish" data-i18n="filter_fish">魚</button>
     <button onclick="setFilter('bug')" id="f_bug" data-i18n="filter_bug">虫</button>
     <button onclick="setFilter('bird')" id="f_bird" data-i18n="filter_bird">野鳥</button>
+    <button onclick="setFilter('sand')" id="f_sand" data-i18n="filter_sand">砂像</button>
+    <button onclick="setFilter('snow')" id="f_snow" data-i18n="filter_snow">雪像</button>
+    <button onclick="setFilter('shell')" id="f_shell" data-i18n="filter_shell">貝殻</button>
   </div>
 
   <div class="filter" style="margin-top:6px;">
@@ -226,6 +253,8 @@
      <p id="m_price5"></p>
     </div>
    </div>
+    <div id="m_craftInfo" class="modal-make-steps"></div>
+    <div id="m_makeSteps" class="modal-make-steps"></div>
     <button onclick="closeModal()" data-i18n="modal_close">閉じる</button>
   </div>
 </div>
@@ -413,6 +442,10 @@ text-align:left;
 <script src="js/data-fish.js"></script>
 <script src="js/data-bugs.js"></script>
 <script src="js/data-birds.js"></script>
+<script src="js/data-sand.js"></script>
+<script src="js/data-snow.js"></script>
+<script src="js/data-shell.js"></script>
+<script src="js/data-daily-spots.js"></script>
 <script src="js/main.js"></script>
 
 </body>
