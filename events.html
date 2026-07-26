@@ -450,6 +450,9 @@ body.dark .event-name{
   font-size:11px;
   color:var(--text-sub);
   margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  gap:4px;
 }
 
 /* 詳細テキスト */
@@ -467,7 +470,9 @@ body.dark .event-detail{
 
 /* 公式リンク */
 .event-link{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
   margin-top:10px;
   font-size:11px;
   color:var(--vermillion);
@@ -500,7 +505,7 @@ body.dark .event-detail{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="darkToggle">🌙</button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
 
@@ -540,6 +545,7 @@ body.dark .event-detail{
 </div>
 
 <script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/data-events.js"></script>
 <script>
 
@@ -554,8 +560,8 @@ if(savedDark === "true"){
   }
 }
 function updateDarkBtn(){
-  darkToggle.textContent =
-    document.body.classList.contains("dark") ? "☀️" : "🌙";
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
 }
 updateDarkBtn();
 darkToggle.onclick = ()=>{
@@ -686,36 +692,36 @@ function renderEvents(){
     let daysBadgeHTML = "";
     if(status === "active"){
       if(daysLeft === null){
-        daysBadgeHTML = `<span class="days-badge normal">🟢 開催中（期限なし）</span>`;
+        daysBadgeHTML = `<span class="days-badge normal">開催中（期限なし）</span>`;
       } else if(daysLeft <= 3){
-        daysBadgeHTML = `<span class="days-badge urgent">🔴 あと${daysLeft}日で終了</span>`;
+        daysBadgeHTML = `<span class="days-badge urgent">あと${daysLeft}日で終了</span>`;
       } else {
-        daysBadgeHTML = `<span class="days-badge normal">🟢 あと${daysLeft}日</span>`;
+        daysBadgeHTML = `<span class="days-badge normal">あと${daysLeft}日</span>`;
       }
     } else if(status === "upcoming"){
       daysBadgeHTML = daysUntil !== null
-        ? `<span class="days-badge upcoming">🔵 あと${daysUntil}日で開始</span>`
-        : `<span class="days-badge upcoming">🔵 近日開催</span>`;
+        ? `<span class="days-badge upcoming">あと${daysUntil}日で開始</span>`
+        : `<span class="days-badge upcoming">近日開催</span>`;
     } else {
-      daysBadgeHTML = `<span class="days-badge ended">⚫ 終了</span>`;
+      daysBadgeHTML = `<span class="days-badge ended">終了</span>`;
     }
 
     // 交換期限バッジ
     let exchangeBadgeHTML = "";
     if(ev.exchangeEnd){
       if(exDaysLeft === null || exDaysLeft <= 0){
-        exchangeBadgeHTML = `<span class="exchange-badge ended">🔄 交換期限終了</span>`;
+        exchangeBadgeHTML = `<span class="exchange-badge ended">${icon("close",{size:11})} 交換期限終了</span>`;
       } else if(exDaysLeft <= 3){
-        exchangeBadgeHTML = `<span class="exchange-badge urgent">🔄 交換期限 あと${exDaysLeft}日</span>`;
+        exchangeBadgeHTML = `<span class="exchange-badge urgent">${icon("warning",{size:11})} 交換期限 あと${exDaysLeft}日</span>`;
       } else {
-        exchangeBadgeHTML = `<span class="exchange-badge active">🔄 交換期限 あと${exDaysLeft}日</span>`;
+        exchangeBadgeHTML = `<span class="exchange-badge active">${icon("calendar",{size:11})} 交換期限 あと${exDaysLeft}日</span>`;
       }
     }
 
     // バナー
     const bannerHTML = ev.img
       ? `<img class="event-banner" src="${ev.img}" alt="${ev.name}" loading="lazy">`
-      : `<div class="event-banner-placeholder">${ev.category === "gacha" ? "🎰" : "🎪"}</div>`;
+      : `<div class="event-banner-placeholder">${icon(ev.category === "gacha" ? "dice" : "tent", {size:28})}</div>`;
 
     // 期間
     const periodHTML = ev.start
@@ -724,7 +730,7 @@ function renderEvents(){
 
     // 公式リンク
     const linkHTML = ev.link
-      ? `<a class="event-link" href="${ev.link}" target="_blank">🔗 公式Xで確認</a>`
+      ? `<a class="event-link" href="${ev.link}" target="_blank">${icon("link",{size:12})} 公式Xで確認</a>`
       : "";
 
     const div = document.createElement("div");
@@ -737,7 +743,7 @@ function renderEvents(){
           ${exchangeBadgeHTML}
         </div>
         <div class="event-name">${ev.name}</div>
-        <div class="event-period">📅 ${periodHTML}</div>
+        <div class="event-period">${icon("calendar",{size:12})} ${periodHTML}</div>
         ${ev.detail ? `<div class="event-detail">${ev.detail}</div>` : ""}
         ${linkHTML}
       </div>

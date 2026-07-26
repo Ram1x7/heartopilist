@@ -80,6 +80,21 @@ body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--
 .f-search-wrap{
   position:relative;
   margin-bottom:10px;
+  display:flex;
+  align-items:center;
+}
+
+.f-search-wrap .search-icon{
+  position:absolute;
+  left:14px;
+  display:flex;
+  align-items:center;
+  color:var(--text-sub);
+  pointer-events:none;
+}
+
+.f-search-wrap .search{
+  padding-left:38px;
 }
 
 .f-section-label{
@@ -90,6 +105,9 @@ body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--
   margin:16px 0 8px;
   padding-left:10px;
   border-left:3px solid var(--gold);
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
 
 body.dark .f-section-label{ color:#e8d2a8; }
@@ -103,6 +121,10 @@ body.dark .f-section-label{ color:#e8d2a8; }
   color:var(--text-sub);
   text-align:center;
   margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
 }
 
 #foodModal{
@@ -227,6 +249,9 @@ body.dark .f-price-card{ background:#383329; }
   margin-bottom:8px;
   padding-left:8px;
   border-left:3px solid var(--gold);
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
 
 body.dark .f-section-title{ color:#e8d2a8; }
@@ -383,11 +408,13 @@ body.dark .calc-title{ color:#e8d2a8; }
 .calc-close-x{
   border:none;
   background:none;
-  font-size:18px;
   color:var(--text-sub);
   cursor:pointer;
   line-height:1;
   padding:4px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .calc-field-label{
@@ -756,9 +783,11 @@ body.dark .calc-freeform-have{ background:#383329; color:#ece4d4; border-color:#
   border-radius:50%;
   background:var(--card-sub);
   color:var(--text-sub);
-  font-size:11px;
   cursor:pointer;
   line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 body.dark .calc-freeform-remove{ background:#46423b; color:#ece4d4; }
@@ -785,7 +814,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="darkToggle">🌙</button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
 
@@ -803,11 +832,12 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
   <h2>料理レシピ図鑑</h2>
 </div>
 
-<button class="calc-toggle-btn" id="calcOpenBtn">🏆 <span data-i18n="food_calc_open">認証マスター計算</span></button>
+<button class="calc-toggle-btn" id="calcOpenBtn"><span class="btn-icon" data-icon="trophy"></span><span data-i18n="food_calc_open">認証マスター計算</span></button>
 
 <div class="f-search-wrap">
-  <input type="text" id="search" class="search" placeholder="🔍 料理名・素材名で検索">
-  <button id="clearBtn">×</button>
+  <span class="search-icon"></span>
+  <input type="text" id="search" class="search" placeholder="料理名・素材名で検索">
+  <button id="clearBtn"></button>
 </div>
 
 <div class="f-sort">
@@ -828,8 +858,8 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 <div id="calcModal" onclick="if(event.target.id==='calcModal')closeCalcModal()">
   <div class="calc-modal-box" id="calcModalBox">
     <div class="calc-header">
-      <div class="calc-title">🏆 <span data-i18n="food_calc_title">認証マスター計算</span></div>
-      <button class="calc-close-x" onclick="closeCalcModal()">✕</button>
+      <div class="calc-title"><span class="btn-icon" data-icon="trophy"></span><span data-i18n="food_calc_title">認証マスター計算</span></div>
+      <button class="calc-close-x" onclick="closeCalcModal()"><span class="btn-icon" data-icon="close"></span></button>
     </div>
     <div id="calcModalBody"></div>
   </div>
@@ -838,6 +868,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 <div id="foodToast"></div>
 
 <script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/data-foods.js"></script>
 <script src="js/food-auth-calc.js"></script>
 <script>
@@ -866,12 +897,19 @@ darkToggle.onclick = ()=>{
 
 // ボタン表示
 function updateDarkButton(){
-
-  darkToggle.textContent =
+  darkToggle.innerHTML =
     document.body.classList.contains("dark")
-    ? "☀️"
-    : "🌙";
+    ? icon("sun")
+    : icon("moon");
 }
+updateDarkButton();
+
+// アイコン一括初期化（検索・クリア・btn-icon系）
+const foodsSearchIconEl = document.querySelector(".f-search-wrap .search-icon");
+if(foodsSearchIconEl) foodsSearchIconEl.innerHTML = icon("search", {size:15});
+document.querySelectorAll(".btn-icon[data-icon]").forEach(el=>{
+  el.innerHTML = icon(el.dataset.icon, {size:13});
+});
 
 function forceRepaint(){
   // Safari/iPad再描画バグ対策
@@ -929,9 +967,10 @@ const foodImgObserver = new IntersectionObserver((entries, obs) => {
 // ── 検索 ──
 const searchInput = document.getElementById("search");
 const clearBtn    = document.getElementById("clearBtn");
+clearBtn.innerHTML = icon("close", {size:13});
 
 searchInput.addEventListener("input", ()=>{
-  clearBtn.style.display = searchInput.value ? "block" : "none";
+  clearBtn.style.display = searchInput.value ? "flex" : "none";
   render();
 });
 
@@ -963,15 +1002,15 @@ function renderSection(items, type = "normal"){
 
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
-    lbl.textContent = T("food_section_season","🌸 シーズン料理");
+    lbl.innerHTML = `${icon("calendar",{size:15})} ${T("food_section_season","シーズン料理")}`;
     frag.appendChild(lbl);
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    banner.textContent =
+    banner.innerHTML =
       type === "season"
-      ? T("food_banner_season_active","📍 現在開催中のシーズン")
-      : T("food_banner_season_ended","⚠️ 現在このシーズンは終了しています");
+      ? `${icon("pin",{size:13})} ${T("food_banner_season_active","現在開催中のシーズン")}`
+      : `${icon("warning",{size:13})} ${T("food_banner_season_ended","現在このシーズンは終了しています")}`;
 
     frag.appendChild(banner);
 
@@ -979,15 +1018,15 @@ function renderSection(items, type = "normal"){
 
     const lbl = document.createElement("div");
     lbl.className = "f-section-label";
-    lbl.textContent = T("food_section_fes","🎉 フェス料理");
+    lbl.innerHTML = `${icon("calendar",{size:15})} ${T("food_section_fes","フェス料理")}`;
     frag.appendChild(lbl);
 
     const banner = document.createElement("div");
     banner.className = "f-event-banner";
-    banner.textContent =
+    banner.innerHTML =
       type === "fes"
-      ? T("food_banner_fes_active","📍 現在開催中のフェス")
-      : T("food_banner_fes_ended","⚠️ 現在このフェスは終了しています");
+      ? `${icon("pin",{size:13})} ${T("food_banner_fes_active","現在開催中のフェス")}`
+      : `${icon("warning",{size:13})} ${T("food_banner_fes_ended","現在このフェスは終了しています")}`;
 
     frag.appendChild(banner);
   }
@@ -1008,11 +1047,11 @@ function renderSection(items, type = "normal"){
       <div class="img-wrap">
         ${f.level != null ? `<div class="level-badge">Lv.${f.level}</div>` : ''}
         <button class="check-btn ${checked ? "checked" : ""}">
-          ${checked ? "⭐️" : ""}
+          ${icon(checked ? "star" : "starOutline", {size:13})}
         </button>
         ${f.auth !== false ? `
           <button class="auth-btn ${authed ? "checked" : ""}">
-            ${authed ? "🎖" : ""}
+            ${icon(authed ? "medal" : "medalOutline", {size:13})}
           </button>
         ` : ''}
         <img src="${f.image}" alt="${displayName(f)}" loading="lazy">
@@ -1021,7 +1060,7 @@ function renderSection(items, type = "normal"){
     `;
 
     div._food = f;
-    foodImgObserver.observe(div);   // ★追加
+    foodImgObserver.observe(div);
     
     div.onclick = () => openModal(f);
 
@@ -1177,7 +1216,7 @@ function renderModal(){
         </div>
       `).join("");
       materialsHTML = `
-        <div class="f-section-title">🥕 ${T("food_materials","素材")}</div>
+        <div class="f-section-title">${icon("ingredient",{size:14})} ${T("food_materials","素材")}</div>
         <div class="f-materials">${itemsHTML}</div>
       `;
     }
@@ -1185,7 +1224,7 @@ function renderModal(){
     const lines = f.materials.filter(m => m).map(m => `<div>・${m}</div>`).join("");
     if(lines){
       materialsHTML = `
-        <div class="f-section-title">🥕 ${T("food_materials","素材")}</div>
+        <div class="f-section-title">${icon("ingredient",{size:14})} ${T("food_materials","素材")}</div>
         <div class="f-material-text">${lines}</div>
       `;
     }
@@ -1479,7 +1518,7 @@ function renderFreeformBreakdownHTML(food, m){
         data-material-key="${encodeURIComponent(m.key)}" data-field="qty" value="${p.qty}">
       <input type="number" min="0" class="calc-freeform-have" placeholder="${T("food_calc_freeform_have_placeholder","所持")}"
         data-material-key="${encodeURIComponent(m.key)}" data-field="have" value="${p.have}">
-      <button type="button" class="calc-freeform-remove" data-material-key="${encodeURIComponent(m.key)}" data-remove-index="${p.index}">✕</button>
+      <button type="button" class="calc-freeform-remove" data-material-key="${encodeURIComponent(m.key)}" data-remove-index="${p.index}">${icon("close", {size:11})}</button>
     </div>
   `).join("");
 

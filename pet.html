@@ -336,6 +336,10 @@ body.dark .site-nav-item.active{
   cursor: pointer;
   transition: 0.15s;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 .ctrl-btn:hover { background: var(--indigo); color: #fdf9ef; border-color: var(--indigo); }
 .ctrl-btn:active { transform: scale(0.96); }
@@ -356,6 +360,26 @@ body.dark .site-nav-item.active{
   transition: border-color 0.15s;
 }
 .search-input:focus { border-color: var(--indigo-soft); }
+
+.pet-search-wrap{
+  position: relative;
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+}
+.pet-search-wrap .search-input{
+  width: 100%;
+  padding-left: 38px;
+}
+.pet-search-wrap .search-icon{
+  position: absolute;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  color: var(--text-sub);
+  pointer-events: none;
+}
 
 .progress-bar-wrap {
   display: flex;
@@ -515,6 +539,9 @@ body.dark .site-nav-item.active{
   color: var(--indigo);
   letter-spacing: 0.06em;
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .modal-box p, .modal-box li {
@@ -567,7 +594,6 @@ body.dark .site-nav-item.active{
 }
 .data-action-btn:hover { border-color: var(--indigo-soft); background: #edf4f8; }
 .data-action-btn:active { transform: scale(0.98); }
-.data-action-btn .btn-icon { font-size: 20px; }
 .data-action-btn .btn-text { display: flex; flex-direction: column; gap: 2px; }
 .data-action-btn .btn-label { font-weight: 700; color: var(--indigo); font-size: 13px; }
 .data-action-btn .btn-desc  { font-size: 11px; color: var(--text-sub); }
@@ -615,9 +641,9 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-  <button id="helpBtn" onclick="openHelpModal()">❓</button>
-  <button id="dataBtn" onclick="openDataModal()">📦</button>
-  <button id="darkToggle" onclick="toggleDark()">🌙</button>
+  <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+  <button id="dataBtn" onclick="openDataModal()" aria-label="data management"></button>
+  <button id="darkToggle" onclick="toggleDark()" aria-label="toggle dark mode"></button>
  </div>
 </div>
 
@@ -641,11 +667,14 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
         <option value="dog">🐶 犬</option>
         <option value="cat">🐱 猫</option>
       </select>
-      <button class="ctrl-btn" onclick="addPet()">＋ 追加</button>
+      <button class="ctrl-btn" onclick="addPet()"><span class="btn-icon" data-icon="plus"></span> 追加</button>
     </div>
     <div class="control-row">
-      <input id="searchInput" class="search-input" placeholder="🔍 エサを検索…" oninput="render()">
-      <button class="ctrl-btn danger" onclick="resetData()">🗑 リセット</button>
+      <div class="pet-search-wrap">
+        <span class="search-icon" id="petSearchIcon"></span>
+        <input id="searchInput" class="search-input" placeholder="エサを検索…" oninput="render()">
+      </div>
+      <button class="ctrl-btn danger" onclick="resetData()"><span class="btn-icon" data-icon="trash"></span> リセット</button>
     </div>
     <div class="progress-bar-wrap">
       <span class="progress-label" id="progressLabel">0 / 0</span>
@@ -669,13 +698,13 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 <!-- ===================== データ管理モーダル ===================== -->
 <div class="modal" id="dataModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('dataModal')">✕</button>
-    <div class="modal-title">📦 データ管理</div>
+    <button class="modal-close" onclick="closeModal('dataModal')"><span class="btn-icon" data-icon="close"></span></button>
+    <div class="modal-title"><span class="btn-icon" data-icon="archive"></span> データ管理</div>
 
     <p>バックアップファイル（.json）の読み込み・書き出しができます。</p>
 
     <button class="data-action-btn" onclick="document.getElementById('backupFile').click()">
-      <span class="btn-icon">📥</span>
+      <span class="btn-icon" data-icon="upload"></span>
       <span class="btn-text">
         <span class="btn-label">バックアップを読み込む</span>
         <span class="btn-desc">旧サイトや以前の保存データを復元</span>
@@ -683,7 +712,7 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
     </button>
 
     <button class="data-action-btn" onclick="exportBackup()">
-      <span class="btn-icon">📤</span>
+      <span class="btn-icon" data-icon="download"></span>
       <span class="btn-text">
         <span class="btn-label">バックアップを書き出す</span>
         <span class="btn-desc">現在のデータをJSONファイルで保存</span>
@@ -697,22 +726,22 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 <!-- ヘルプモーダル -->
 <div class="modal" id="helpModal">
   <div class="modal-box">
-    <button class="modal-close" onclick="closeModal('helpModal')">✕</button>
-    <div class="modal-title">📖 使い方</div>
+    <button class="modal-close" onclick="closeModal('helpModal')"><span class="btn-icon" data-icon="close"></span></button>
+    <div class="modal-title"><span class="btn-icon" data-icon="info"></span> 使い方</div>
 
-    <p><strong>🐶🐱 ペット切替</strong><br>
+    <p><strong>ペット切替</strong><br>
     タブをタップでペット切替。<br>
     ダブルタップで名前変更、長押しで削除。</p>
 
-    <p style="margin-top:10px;"><strong>🍖 エサの記録</strong><br>
+    <p style="margin-top:10px;"><strong>エサの記録</strong><br>
     画像タップ → あげた記録（暗転）<br>
     好き → 緑枠、嫌い → 朱色枠で表示。</p>
 
-    <p style="margin-top:10px;"><strong>📊 並び順</strong><br>
+    <p style="margin-top:10px;"><strong>並び順</strong><br>
     好き・嫌い・未記録・あげた の順に自動整列。</p>
 
-    <p style="margin-top:10px;"><strong>📦 データ管理</strong><br>
-    📦ボタンからバックアップの書き出し・読み込みができます。<br>
+    <p style="margin-top:10px;"><strong>データ管理</strong><br>
+    データ管理ボタンからバックアップの書き出し・読み込みができます。<br>
     機種変更時などにご利用ください。</p>
 
     <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal')">閉じる</button>
@@ -720,6 +749,7 @@ body.dark .data-action-btn .btn-desc  { color: #b3a89a; }
 </div>
 
 <script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/data-dogs.js"></script>
 <script src="js/data-cats.js"></script>
 
@@ -988,7 +1018,7 @@ function toggleDark() {
 }
 function applyDark() {
   document.body.classList.toggle("dark", darkMode);
-  document.getElementById("darkToggle").textContent = darkMode ? "☀️" : "🌙";
+  document.getElementById("darkToggle").innerHTML = darkMode ? icon("sun") : icon("moon");
 }
 
 /* ===================== モーダル ===================== */
@@ -1088,6 +1118,18 @@ window.addEventListener("DOMContentLoaded", () => {
   loadState();
   renderPets();
   render();
+
+  // アイコン初期化（全てデフォルトサイズで適用後、データ管理ボタンだけ大きめに上書き）
+  document.getElementById("helpBtn").innerHTML = icon("help");
+  document.getElementById("dataBtn").innerHTML = icon("archive");
+  const petSearchIconEl = document.getElementById("petSearchIcon");
+  if(petSearchIconEl) petSearchIconEl.innerHTML = icon("search", {size:15});
+  document.querySelectorAll(".btn-icon[data-icon]").forEach(el=>{
+    el.innerHTML = icon(el.dataset.icon, {size:14});
+  });
+  document.querySelectorAll(".data-action-btn .btn-icon[data-icon]").forEach(el=>{
+    el.innerHTML = icon(el.dataset.icon, {size:20});
+  });
 });
 </script>
 <script src="js/sw-register.js"></script>

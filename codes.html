@@ -294,6 +294,9 @@ body.dark .badge-active{
   color:var(--text);
   margin-bottom:6px;
   line-height:1.6;
+  display:flex;
+  align-items:center;
+  gap:4px;
 }
 
 body.dark .code-reward{
@@ -452,6 +455,9 @@ body.dark .code-card.received{
   cursor:pointer;
   transition:0.15s;
   white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:4px;
 }
 
 .receive-btn.received{
@@ -480,7 +486,7 @@ body.dark .receive-btn.received{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="darkToggle">🌙</button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
 
@@ -515,6 +521,7 @@ body.dark .receive-btn.received{
 <div id="toast">コピーしました！</div>
 
 <script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/data-codes.js"></script>
 <script>
 // ダークモード
@@ -528,8 +535,8 @@ if(savedDark === "true"){
   }
 }
 function updateDarkBtn(){
-  darkToggle.textContent =
-    document.body.classList.contains("dark") ? "☀️" : "🌙";
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
 }
 updateDarkBtn();
 darkToggle.onclick = ()=>{
@@ -616,7 +623,7 @@ function renderCodes(){
           ${expired ? T("codes_badge_expired","期限切れ") : T("codes_badge_active","有効")}
         </span>
       </div>
-      <div class="code-reward">🎁 ${displayReward(c)}</div>
+      <div class="code-reward">${icon("gift",{size:13})} ${displayReward(c)}</div>
       <div class="code-meta">
         <span class="code-expiry">
            ${c.expiry ? T("codes_expiry_label","期限：") + formatExpiry(c.expiry) : T("codes_expiry_none","期限：なし")}
@@ -626,7 +633,7 @@ function renderCodes(){
             class="receive-btn ${received ? "received" : ""}"
             onclick="toggleReceived('${c.code}')"
             title="${T("codes_receive_title","受け取り済みにする")}"
-          >${received ? T("codes_received","✅ 受取済") : T("codes_not_received","○ 未受取")}</button>
+          >${received ? `${icon("check",{size:12})} ${T("codes_received","受取済")}` : T("codes_not_received","○ 未受取")}</button>
           <button
             class="copy-btn ${expired ? "" : ""}"
             onclick="copyCode('${c.code}', this)"

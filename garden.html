@@ -97,6 +97,10 @@ body.dark .page-header h2{ color:#e8d2a8; }
   cursor:pointer;
   transition:0.15s;
   text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
 }
 
 .g-tab.active{
@@ -118,6 +122,10 @@ body.dark .g-tab.active{ background:var(--indigo-soft); border-color:var(--indig
   color:var(--text-sub);
   text-align:center;
   margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
 }
 
 .section-label{
@@ -176,12 +184,14 @@ body.dark .garden-item .img-wrap img{ background:#383329; }
   bottom:6px;
   left:6px;
   z-index:5;
-  padding:1px 4px;
+  padding:3px;
   border-radius:999px;
-  font-size:7px;
   color:#fdf9ef;
   background:var(--green);
-  line-height:1.4;
+  line-height:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .garden-item-sub{
@@ -338,6 +348,9 @@ body.dark .g-price-table td{ color:#ece4d4; border-color:#46423b; }
   margin-bottom:8px;
   padding-left:8px;
   border-left:3px solid var(--gold);
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
 
 body.dark .g-section-title{ color:#e8d2a8; }
@@ -396,6 +409,10 @@ body.dark .breeding-combo{ background:#383329; }
   cursor:pointer;
   transition:0.15s;
   text-align:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
 }
 
 .notif-btn.set{
@@ -473,8 +490,8 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="helpBtn">❓</button>
-    <button id="darkToggle">🌙</button>
+    <button id="helpBtn" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
 
@@ -493,14 +510,15 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 </div>
 
 <div id="notifBanner">
-  <span id="notifBannerText" data-i18n="garden_notif_permission_text">🔔 バックグラウンド通知を受け取るには通知の許可が必要です</span><br>
+  <span class="btn-icon" data-icon="bell"></span>
+  <span id="notifBannerText" data-i18n="garden_notif_permission_text">バックグラウンド通知を受け取るには通知の許可が必要です</span><br>
   <button class="notif-allow-btn" id="notifAllowBtn" data-i18n="garden_notif_permission_btn">通知を許可する</button>
 </div>
 
 
 <div class="tab-row">
-  <button class="g-tab active" id="tab-crop" onclick="setTab('crop')" data-i18n="garden_tab_crop">🌾 作物</button>
-  <button class="g-tab" id="tab-flower" onclick="setTab('flower')" data-i18n="garden_tab_flower">🌸 花</button>
+  <button class="g-tab active" id="tab-crop" onclick="setTab('crop')"><span class="btn-icon" data-icon="crop"></span><span data-i18n="garden_tab_crop">作物</span></button>
+  <button class="g-tab" id="tab-flower" onclick="setTab('flower')"><span class="btn-icon" data-icon="flower"></span><span data-i18n="garden_tab_flower">花</span></button>
 </div>
 
 <div id="gardenContent"></div>
@@ -514,6 +532,7 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 <div id="gardenToast"></div>
 
 <script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
 
@@ -586,16 +605,19 @@ function updateNotifBanner(){
   const banner = document.getElementById("notifBanner");
   const text   = document.getElementById("notifBannerText");
   const btn    = document.getElementById("notifAllowBtn");
+  const iconEl = banner ? banner.querySelector(".btn-icon") : null;
 
   if(Notification.permission === "granted"){
     banner.style.display = "none";
   } else if(Notification.permission === "denied"){
     banner.style.display = "block";
-    text.innerHTML = T("garden_notif_blocked_text","🔕 通知がブロックされています。<br>端末・ブラウザの設定からこのサイトの通知を「許可」に変更後、下のボタンを押してください。");
+    if(iconEl) iconEl.innerHTML = icon("bellOff", {size:14});
+    text.innerHTML = T("garden_notif_blocked_text","通知がブロックされています。<br>端末・ブラウザの設定からこのサイトの通知を「許可」に変更後、下のボタンを押してください。");
     btn.textContent = T("garden_notif_recheck_btn","再確認する");
   } else {
     banner.style.display = "block";
-    text.textContent = T("garden_notif_permission_text","🔔 バックグラウンド通知を受け取るには通知の許可が必要です");
+    if(iconEl) iconEl.innerHTML = icon("bell", {size:14});
+    text.textContent = T("garden_notif_permission_text","バックグラウンド通知を受け取るには通知の許可が必要です");
     btn.textContent = T("garden_notif_permission_btn","通知を許可する");
   }
 }
@@ -742,7 +764,7 @@ else if(savedDark === null && window.matchMedia("(prefers-color-scheme: dark)").
   document.body.classList.add("dark");
 
 function updateDarkBtn(){
-  darkToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+  darkToggle.innerHTML = document.body.classList.contains("dark") ? icon("sun") : icon("moon");
 }
 updateDarkBtn();
 darkToggle.onclick = ()=>{
@@ -875,9 +897,9 @@ function renderContent(){
   const normalKey = currentTab === "crop" ? "garden_section_normal_crop" : "garden_section_normal_flower";
   const normalFallback = currentTab === "crop" ? "通常の作物" : "通常の花";
   const seasonKey = currentTab === "crop" ? "garden_section_season_crop" : "garden_section_season_flower";
-  const seasonFallback = currentTab === "crop" ? "🌸 シーズン作物" : "🌸 シーズン花";
+  const seasonFallback = currentTab === "crop" ? "シーズン作物" : "シーズン花";
   const fesKey = currentTab === "crop" ? "garden_section_fes_crop" : "garden_section_fes_flower";
-  const fesFallback = currentTab === "crop" ? "🎉 フェス作物" : "🎉 フェス花";
+  const fesFallback = currentTab === "crop" ? "フェス作物" : "フェス花";
 
   el.appendChild(renderSection(T(normalKey, normalFallback), normalList));
   if(seasonActiveList.length) el.appendChild(renderSection(T(seasonKey, seasonFallback), seasonActiveList, "season"));
@@ -886,24 +908,27 @@ function renderContent(){
   if(fesEndedList.length)     el.appendChild(renderSection(T(fesKey, fesFallback), fesEndedList, "fes_ended"));
 }
 
-// ★ eventStatus: null | "season" | "season_ended" | "fes" | "fes_ended"
+// eventStatus: null | "season" | "season_ended" | "fes" | "fes_ended"
 function renderSection(label, items, eventStatus = null){
   const wrap = document.createElement("div");
 
   const lbl = document.createElement("div");
   lbl.className = "section-label";
-  lbl.textContent = label;
+  const sectionIcon = (eventStatus === "season" || eventStatus === "season_ended") ? "flower"
+                    : (eventStatus === "fes" || eventStatus === "fes_ended") ? "calendar"
+                    : "sprout";
+  lbl.innerHTML = `${icon(sectionIcon,{size:14})} ${label}`;
   wrap.appendChild(lbl);
 
   if(eventStatus === "season" || eventStatus === "fes"){
     const banner = document.createElement("div");
     banner.className = "event-ended-banner";
-    banner.textContent = T("garden_banner_active","📍 現在開催中です");
+    banner.innerHTML = `${icon("pin",{size:13})} ${T("garden_banner_active","現在開催中です")}`;
     wrap.appendChild(banner);
   } else if(eventStatus === "season_ended" || eventStatus === "fes_ended"){
     const banner = document.createElement("div");
     banner.className = "event-ended-banner";
-    banner.textContent = T("garden_banner_ended","⚠️ 現在このイベントは終了しています");
+    banner.innerHTML = `${icon("warning",{size:13})} ${T("garden_banner_ended","現在このイベントは終了しています")}`;
     wrap.appendChild(banner);
   }
 
@@ -922,13 +947,13 @@ function renderSection(label, items, eventStatus = null){
     div.innerHTML = `
       <div class="img-wrap">
         <div class="level-badge">Lv.${item.level}</div>
-        ${hasNotif ? '<div class="notif-badge">🔔</div>' : ''}
+        ${hasNotif ? `<div class="notif-badge">${icon("bell",{size:9})}</div>` : ''}
         <button class="check-btn ${isChecked ? "checked" : ""}">
-          ${isChecked ? "⭐️" : ""}
+          ${icon(isChecked ? "star" : "starOutline", {size:13})}
         </button>
         ${item.auth !== false ? `
           <button class="auth-btn ${isAuthed ? "checked" : ""}">
-            ${isAuthed ? "🎖" : ""}
+            ${icon(isAuthed ? "medal" : "medalOutline", {size:13})}
           </button>
         ` : ''}
         <img src="${item.img}" alt="${displayName(item)}" loading="lazy">
@@ -1023,7 +1048,7 @@ function renderModal(item){
 
     breedingHTML = `
       <div style="margin-bottom:12px;">
-        <div class="g-section-title">${T("garden_breeding_title","🌸 交配で作れる色")}</div>
+        <div class="g-section-title">${icon("flower",{size:14})} ${T("garden_breeding_title","交配で作れる色")}</div>
         <div class="breeding-note">${T("garden_breeding_note","毎朝6時に交配が行われます。同じ色を2株並べると上のレア度の種ができます。")}</div>
         <div class="breeding-grid">${chips}</div>
         ${examples ? `<div style="font-size:11px;color:var(--text-sub);margin-bottom:6px;">${T("garden_breeding_examples_label","組み合わせ例")}</div>${examples}` : ""}
@@ -1039,15 +1064,15 @@ function renderModal(item){
 
     notifHTML = `
       <div style="margin-bottom:12px;">
-        <div class="g-section-title">${T("garden_notif_title","🔔 収穫通知")}</div>
+        <div class="g-section-title">${icon("bell",{size:14})} ${T("garden_notif_title","収穫通知")}</div>
         <div class="notif-btns">
           <button class="notif-btn ${normalSet ? "set" : ""}"
             data-action="${normalSet ? "cancel" : "register"}" data-mode="normal">
-            ${normalSet ? T("garden_notif_normal_on","✅ 通常：通知中") : T("garden_notif_normal_off","🔔 通常モード")}
+            ${normalSet ? `${icon("check",{size:12})} ${T("garden_notif_normal_on","通常：通知中")}` : `${icon("bell",{size:12})} ${T("garden_notif_normal_off","通常モード")}`}
           </button>
           <button class="notif-btn ${weedSet ? "set" : ""}"
             data-action="${weedSet ? "cancel" : "register"}" data-mode="weed">
-            ${weedSet ? T("garden_notif_weed_on","✅ 草抜き：通知中") : T("garden_notif_weed_off","🌿 草抜きモード")}
+            ${weedSet ? `${icon("check",{size:12})} ${T("garden_notif_weed_on","草抜き：通知中")}` : `${icon("sprout",{size:12})} ${T("garden_notif_weed_off","草抜きモード")}`}
           </button>
         </div>
         <div class="notif-desc">
@@ -1179,13 +1204,14 @@ function updateTimers(){
 
 setInterval(updateTimers, 1000);
 
+document.getElementById("helpBtn").innerHTML = icon("help");
 document.getElementById("helpBtn").onclick = () => {
   document.getElementById("modalBox").innerHTML = `
     <div class="g-modal-name">${T("garden_help_title","使い方")}</div>
-    <div class="g-info" style="text-align:left;">
-      ${T("garden_help_body","🌱 通常モード：収穫タイミングで1回通知<br>🌿 草抜きモード：草抜き3回＋収穫タイミングで通知<br>🔔：通知ONの作物に表示<br>⭐️：星5チェック<br>🎖：認証マスターチェック<br><br>⚠️使用上の注意<br>通知には最大1分の誤差があり、草抜きモードでは、最初の2回は『成長時間÷3の1分前後』のタイミングで通知され、3回目は、『収穫時間の1〜2分前』に通知されます。<br>この通知機能はホーム追加した状態でしか使えず、通知許可をしていないと使えないのでご了承ください。<br>また不具合等あれば急に機能停止させる場合もありますが、そちらも合わせてご了承ください🙇‍♂️")}
+    <div class="g-info" style="text-align:left; white-space:pre-line;">
+      ${T("garden_help_body","通常モード：収穫タイミングで1回通知\n草抜きモード：草抜き3回＋収穫タイミングで通知\n通知ONの作物にはベルアイコンを表示\n星5チェック・認証マスターチェックが可能\n\n使用上の注意\n通知には最大1分の誤差があり、草抜きモードでは、最初の2回は『成長時間÷3の1分前後』のタイミングで通知され、3回目は、『収穫時間の1〜2分前』に通知されます。\nこの通知機能はホーム追加した状態でしか使えず、通知許可をしていないと使えないのでご了承ください。\nまた不具合等あれば急に機能停止させる場合もありますが、そちらも合わせてご了承ください🙇‍♂️")}
     </div>
-    <button class="g-close-btn" onclick="closeModal()">${T("garden_close","閉じる")}</button>
+    <button class="g-close-btn modal-close-btn" onclick="closeModal()">${T("garden_close","閉じる")}</button>
   `;
   document.getElementById("detailModal").style.display = "block";
 };

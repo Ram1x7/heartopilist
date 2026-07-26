@@ -233,9 +233,25 @@ body.dark .page-header h2{
 }
 
 /* 検索 */
+.faq-search-wrap{
+  position:relative;
+  margin:14px 0;
+  display:flex;
+  align-items:center;
+}
+
+.faq-search-wrap .search-icon{
+  position:absolute;
+  left:14px;
+  display:flex;
+  align-items:center;
+  color:var(--text-sub);
+  pointer-events:none;
+}
+
 .faq-search{
   width:100%;
-  padding:11px 16px;
+  padding:11px 16px 11px 38px;
   border:1px solid var(--border);
   outline:none;
   border-radius:999px;
@@ -243,7 +259,6 @@ body.dark .page-header h2{
   font-family:'Zen Maru Gothic', sans-serif;
   font-size:13px;
   color:var(--text);
-  margin:14px 0;
   box-sizing:border-box;
 }
 
@@ -321,9 +336,13 @@ body.dark .tab.active{
 
 .faq-icon{
   flex-shrink:0;
-  font-size:16px;
+  display:flex;
+  align-items:center;
   margin-top:1px;
+  color:var(--indigo);
 }
+
+body.dark .faq-icon{ color:#e8d2a8; }
 
 .faq-title{
   flex:1;
@@ -462,7 +481,10 @@ body.dark .status-considering{
 }
 
 .contact-btn{
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
   padding:10px 24px;
   border:1px solid var(--indigo);
   border-radius:999px;
@@ -491,7 +513,7 @@ body.dark .status-considering{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="darkToggle">🌙</button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
 
@@ -510,13 +532,16 @@ body.dark .status-considering{
   <p data-i18n="faq_page_subtitle">よくある質問・要望・不具合の対応状況一覧</p>
 </div>
 
-<input
-  type="text"
-  id="faqSearch"
-  class="faq-search"
-  placeholder="🔍 キーワードで検索"
-  data-i18n-placeholder="faq_search_placeholder"
->
+<div class="faq-search-wrap">
+  <span class="search-icon" id="faqSearchIcon"></span>
+  <input
+    type="text"
+    id="faqSearch"
+    class="faq-search"
+    placeholder="キーワードで検索"
+    data-i18n-placeholder="faq_search_placeholder"
+  >
+</div>
 
 <div class="cat-tabs">
   <button class="tab active" id="cat-all" onclick="setCat('all')" data-i18n="faq_tab_all">すべて</button>
@@ -533,7 +558,7 @@ body.dark .status-considering{
     匿名フォームからお気軽にどうぞ
   </p>
   <a class="contact-btn" href="https://forms.gle/Ns7ZrJyv4b45v5QNA" target="_blank">
-    💌 匿名で送る
+    <span class="btn-icon" data-icon="mail"></span> 匿名で送る
   </a>
 </div>
 
@@ -542,6 +567,7 @@ body.dark .status-considering{
 </div>
 
 <script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
 <script src="js/data-faq.js"></script>
 <script>
 
@@ -556,8 +582,8 @@ if(savedDark === "true"){
   }
 }
 function updateDarkBtn(){
-  darkToggle.textContent =
-    document.body.classList.contains("dark") ? "☀️" : "🌙";
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
 }
 updateDarkBtn();
 darkToggle.onclick = ()=>{
@@ -579,7 +605,7 @@ function setCat(cat){
 }
 
 // アイコン
-const catIcon = { question:"❓", request:"💡", bug:"🛠" };
+const catIcon = { question:"help", request:"idea", bug:"wrench" };
 
 // 多言語ヘルパー
 function currentLang(){
@@ -607,14 +633,15 @@ function displayAnswer(f){
 // ステータス表示
 function statusBadgeHTML(status){
   const map = {
-    fixed:       { label:T("faq_status_fixed","✅ 修正済み"), cls:"status-fixed" },
-    progress:    { label:T("faq_status_progress","🔧 対応中"),   cls:"status-progress" },
-    considering: { label:T("faq_status_considering","🔄 検討中"),   cls:"status-considering" },
-    wontfix:     { label:T("faq_status_wontfix","— 対応見送り"), cls:"status-wontfix" },
+    fixed:       { label:T("faq_status_fixed","修正済み"), cls:"status-fixed", icon:"check" },
+    progress:    { label:T("faq_status_progress","対応中"),   cls:"status-progress", icon:"wrench" },
+    considering: { label:T("faq_status_considering","検討中"),   cls:"status-considering", icon:"info" },
+    wontfix:     { label:T("faq_status_wontfix","対応見送り"), cls:"status-wontfix", icon:null },
   };
   if(!status || !map[status]) return "";
   const s = map[status];
-  return `<div class="status-row"><span class="status-badge ${s.cls}">${s.label}</span></div>`;
+  const iconHTML = s.icon ? icon(s.icon,{size:11}) : "";
+  return `<div class="status-row"><span class="status-badge ${s.cls}">${iconHTML} ${s.label}</span></div>`;
 }
 
 // 描画
@@ -647,7 +674,7 @@ function renderFaq(){
     div.className = "faq-card" + (openId === f.id ? " open" : "");
     div.innerHTML = `
       <div class="faq-question" onclick="toggleFaq(${f.id})">
-        <span class="faq-icon">${catIcon[f.category] || "❓"}</span>
+        <span class="faq-icon">${icon(catIcon[f.category] || "help", {size:15})}</span>
         <span class="faq-title">${displayQuestion(f)}</span>
         <span class="faq-arrow">▼</span>
       </div>
@@ -666,6 +693,12 @@ function toggleFaq(id){
 }
 
 document.getElementById("faqSearch").addEventListener("input", renderFaq);
+
+const faqSearchIconEl = document.getElementById("faqSearchIcon");
+if(faqSearchIconEl) faqSearchIconEl.innerHTML = icon("search", {size:15});
+document.querySelectorAll(".btn-icon[data-icon]").forEach(el=>{
+  el.innerHTML = icon(el.dataset.icon, {size:13});
+});
 
 renderFaq();
 
