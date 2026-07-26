@@ -454,19 +454,6 @@ body.dark .server-select{
   color:#fdf9ef;
 }
 
-/* シーズン・フェス限定バッジ（終了後も出現し続けるアイテム用） */
-.season-badge{
-  position:absolute;
-  top:6px;
-  right:28px;
-  z-index:5;
-  padding:2px 5px;
-  border-radius:999px;
-  font-size:10px;
-  background:rgba(52,48,43,0.7);
-  line-height:1.3;
-}
-
 /* チェックボタン */
 .check-btn{
   position:absolute;
