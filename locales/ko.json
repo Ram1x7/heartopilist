@@ -203,5 +203,16 @@
   "food_calc_freeform_name_placeholder": "재료명",
   "food_calc_freeform_qty_placeholder": "개수/1개",
   "food_calc_freeform_have_placeholder": "보유",
-  "food_calc_freeform_add": "재료 추가"
+  "food_calc_freeform_add": "재료 추가",
+  "filter_sand": "모래상",
+  "filter_snow": "눈사람",
+  "filter_shell": "조개껍데기",
+  "modal_make_steps_title": "만드는 방법",
+  "daily_spot_title": "📍 오늘의 장소",
+  "daily_spot_calendar_btn": "📅 캘린더",
+  "daily_spot_calendar_title": "📅 출현 캘린더",
+  "daily_spot_today_tag": "(오늘)",
+  "modal_craft_info_title": "제작 정보",
+  "modal_craft_design_label": "디자인 형태",
+  "modal_craft_answer_label": "선택 답변"
 }

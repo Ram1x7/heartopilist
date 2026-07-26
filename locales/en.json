@@ -249,5 +249,16 @@
   "food_calc_freeform_name_placeholder": "Material name",
   "food_calc_freeform_qty_placeholder": "Qty/item",
   "food_calc_freeform_have_placeholder": "Have",
-  "food_calc_freeform_add": "Add material"
+  "food_calc_freeform_add": "Add material",
+  "filter_sand": "Sand",
+  "filter_snow": "Snow",
+  "filter_shell": "Shells",
+  "modal_make_steps_title": "How to make",
+  "daily_spot_title": "📍 Today's Location",
+  "daily_spot_calendar_btn": "📅 Calendar",
+  "daily_spot_calendar_title": "📅 Location Calendar",
+  "daily_spot_today_tag": "(Today)",
+  "modal_craft_info_title": "Crafting Info",
+  "modal_craft_design_label": "Design shape",
+  "modal_craft_answer_label": "Answer"
 }

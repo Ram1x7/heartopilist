@@ -203,5 +203,16 @@
   "food_calc_freeform_name_placeholder": "ชื่อวัตถุดิบ",
   "food_calc_freeform_qty_placeholder": "จำนวน/1ชิ้น",
   "food_calc_freeform_have_placeholder": "มีอยู่",
-  "food_calc_freeform_add": "เพิ่มวัตถุดิบ"
+  "food_calc_freeform_add": "เพิ่มวัตถุดิบ",
+  "filter_sand": "ประติมากรรมทราย",
+  "filter_snow": "ประติมากรรมหิมะ",
+  "filter_shell": "เปลือกหอย",
+  "modal_make_steps_title": "วิธีทำ",
+  "daily_spot_title": "📍 สถานที่วันนี้",
+  "daily_spot_calendar_btn": "📅 ปฏิทิน",
+  "daily_spot_calendar_title": "📅 ปฏิทินสถานที่",
+  "daily_spot_today_tag": "(วันนี้)",
+  "modal_craft_info_title": "ข้อมูลการสร้าง",
+  "modal_craft_design_label": "รูปทรงดีไซน์",
+  "modal_craft_answer_label": "คำตอบ"
 }

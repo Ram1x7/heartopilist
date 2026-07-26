@@ -249,5 +249,16 @@
   "food_calc_freeform_name_placeholder": "素材名",
   "food_calc_freeform_qty_placeholder": "個数/1個",
   "food_calc_freeform_have_placeholder": "所持",
-  "food_calc_freeform_add": "素材を追加"
+  "food_calc_freeform_add": "素材を追加",
+  "filter_sand": "砂像",
+  "filter_snow": "雪像",
+  "filter_shell": "貝殻",
+  "modal_make_steps_title": "作り方",
+  "daily_spot_title": "📍 今日の場所",
+  "daily_spot_calendar_btn": "📅 カレンダー",
+  "daily_spot_calendar_title": "📅 出現カレンダー",
+  "daily_spot_today_tag": "(今日)",
+  "modal_craft_info_title": "作り方情報",
+  "modal_craft_design_label": "デザイン形状",
+  "modal_craft_answer_label": "三択回答"
 }

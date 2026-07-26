@@ -203,5 +203,16 @@
   "food_calc_freeform_name_placeholder": "食材名称",
   "food_calc_freeform_qty_placeholder": "数量/1个",
   "food_calc_freeform_have_placeholder": "持有",
-  "food_calc_freeform_add": "添加食材"
+  "food_calc_freeform_add": "添加食材",
+  "filter_sand": "沙雕",
+  "filter_snow": "雪雕",
+  "filter_shell": "贝壳",
+  "modal_make_steps_title": "制作方法",
+  "daily_spot_title": "📍 今日地点",
+  "daily_spot_calendar_btn": "📅 日历",
+  "daily_spot_calendar_title": "📅 地点日历",
+  "daily_spot_today_tag": "（今天）",
+  "modal_craft_info_title": "制作信息",
+  "modal_craft_design_label": "设计形状",
+  "modal_craft_answer_label": "三选回答"
 }
