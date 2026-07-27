@@ -1042,7 +1042,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"fish/087.PNG"
 },
 {
  name:"ジンベエザメ",
@@ -1054,7 +1054,7 @@ const fishData = [
  time:["6-12","18-0","0-6"],
  location:"海釣りクエスト",
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"fish/088.PNG"
 },
 {
  name:"ベタ",
@@ -1066,7 +1066,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"fish/089.PNG"
 },
 {
  name:"エンゼルフィッシュ",
@@ -1081,16 +1081,16 @@ const fishData = [
  img:"images/000.PNG"
 },
 {
- name:"シイラ",
- nameI18n:{"ja":"シイラ","en":"Mahi-mahi","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"ミズクラゲ",
+ nameI18n:{"ja":"ミズクラゲ","en":"Moon Jellyfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
- shadow:"大",
+ shadow:"金",
  price:850,
- weather:["虹"],
- time:["6-12","12-18"],
- location:"旧海",
- locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ weather:["雨","虹"],
+ time:["12-18","18-0","0-6"],
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"fish/093.PNG"
 },
 {
  name:"アオウミガメ",
@@ -1102,19 +1102,19 @@ const fishData = [
  time:["12-18","18-0"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"fish/092.PNG"
 },
 {
- name:"ミズクラゲ",
- nameI18n:{"ja":"ミズクラゲ","en":"Moon Jellyfish","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"シイラ",
+ nameI18n:{"ja":"シイラ","en":"Mahi-mahi","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
- shadow:"金",
+ shadow:"大",
  price:850,
- weather:["雨","虹"],
- time:["12-18","18-0","0-6"],
- location:"海釣りクエスト",
- locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ weather:["虹"],
+ time:["6-12","12-18"],
+ location:"旧海",
+ locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"fish/091.PNG"
 },
 {
  name:"ニザダイ",
