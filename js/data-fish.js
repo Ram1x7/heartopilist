@@ -1066,7 +1066,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/089.PNG"
+ img:"fish/090.PNG"
 },
 {
  name:"エンゼルフィッシュ",
