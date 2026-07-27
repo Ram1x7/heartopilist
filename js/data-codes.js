@@ -217,6 +217,15 @@ const codesData = [
     expiry: "2026-08-01 00:59",
     active: true,
   },
+  {
+    code: "p3m7r5q9k2",
+    reward: "願い星×3，ツルツルウォーク×1，コーヒー豆×3",
+    rewardI18n:{"ja":"願い星×3，ツルツルウォーク×1，コーヒー豆×3","en":"Wish Star ×3, Smooth Oak ×1, Coffee Beans ×3","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"願い星×3，ツルツルウォーク×1，コーヒー豆×3","en":"Wish Star ×3, Smooth Oak ×1, Coffee Beans ×3","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"願い星×3，ツルツルウォーク×1，コーヒー豆×3","en":"Wish Star ×3, Smooth Oak ×1, Coffee Beans ×3","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-08-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
