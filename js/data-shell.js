@@ -235,6 +235,18 @@ const shellData = [
  locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/shells/019.PNG",
  auth:true
+},
+{
+ name:"チョウセンフデ",
+ nameI18n:{"ja":"チョウセンフデ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:8,
+ price:85,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/020.PNG",
+ auth:true
 }
  // ここに追加していく
 ].map((c,i) => ({
