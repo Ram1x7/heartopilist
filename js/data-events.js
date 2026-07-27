@@ -315,6 +315,17 @@ const eventData = [
     detail: "展示会パスを使用。同一展示内のアイテムは重複せず、10回以内にすべて獲得可能です。",
     link: "https://x.com/heartopia_jp/status/2076592478669701249?s=61",
   },
+  {
+    id: 29,
+    category: "gacha",
+    name: "月の宝箱：さわやかレモンコースト",
+    img: "./images/events/e027.jpg",
+    start: "2026-07-30 07:00",
+    end: "2026-09-11 05:59",
+    exchangeEnd: null,
+    detail: "月の水晶を使用。同一展示内のアイテムは重複せず、12回以内にすべて獲得可能です。",
+    link: "https://x.com/heartopia_jp/status/2080941132444492074?s=61",
+  },
   // 以下、イベントを追加していく
   // {
   //   id: 3,
