@@ -1090,7 +1090,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"海釣りクエスト",
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/093.PNG"
+ img:"fish/091.PNG"
 },
 {
  name:"アオウミガメ",
@@ -1114,7 +1114,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/091.PNG"
+ img:"fish/093.PNG"
 },
 {
  name:"ニザダイ",
