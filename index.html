@@ -91,12 +91,26 @@
 <div class="card daily-spot-card">
   <div class="daily-spot-header">
     <span class="daily-spot-title"><span id="dailySpotPinIcon"></span><span data-i18n="daily_spot_title">今日の場所</span></span>
-    <button id="dailySpotCalendarBtn" class="daily-spot-calendar-btn">
-      <span id="dailySpotCalIcon"></span><span data-i18n="daily_spot_calendar_btn">カレンダー</span>
-    </button>
+    <div class="daily-spot-header-btns">
+      <button id="dailyTasksBtn" class="daily-spot-calendar-btn">
+        <span id="dailyTasksIcon"></span><span data-i18n="daily_tasks_btn">今日やることリスト</span>
+      </button>
+      <button id="dailySpotCalendarBtn" class="daily-spot-calendar-btn">
+        <span id="dailySpotCalIcon"></span><span data-i18n="daily_spot_calendar_btn">カレンダー</span>
+      </button>
+    </div>
   </div>
   <div class="daily-spot-grid" id="dailySpotGrid">
     <!-- JSで動的生成 -->
+  </div>
+</div>
+
+<!-- 今日やることリスト モーダル -->
+<div id="dailyTasksModal" onclick="if(event.target.id==='dailyTasksModal')closeDailyTasksModal()">
+  <div class="modal-box daily-tasks-modal">
+    <h3><span id="dailyTasksTitleIcon"></span><span data-i18n="daily_tasks_title">今日やることリスト</span></h3>
+    <div class="daily-tasks-body" id="dailyTasksBody"></div>
+    <button class="modal-close-btn" onclick="closeDailyTasksModal()" data-i18n="modal_close">閉じる</button>
   </div>
 </div>
 

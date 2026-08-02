@@ -242,5 +242,18 @@
   "food_section_fes": "节日料理",
   "food_section_season": "季节料理",
   "food_time": "烹饪时间",
-  "food_unknown": "未知"
+  "food_unknown": "未知",
+  "daily_tasks_btn": "今日待办清单",
+  "daily_tasks_title": "今日待办清单",
+  "daily_tasks_section_spots": "萤石·橡树",
+  "daily_tasks_section_weather": "今日天气",
+  "daily_tasks_section_quests": "定时任务",
+  "daily_tasks_section_updates": "每日更新项目",
+  "daily_tasks_section_ending": "即将结束",
+  "daily_tasks_type_event_end": "活动结束",
+  "daily_tasks_type_event_exchange": "兑换期限",
+  "daily_tasks_type_code_expiry": "兑换码期限",
+  "daily_tasks_days_left": "还剩{n}天",
+  "daily_tasks_empty": "目前没有可显示的信息",
+  "daily_tasks_no_data": "暂无数据"
 }

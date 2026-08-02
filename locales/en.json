@@ -268,5 +268,18 @@
   "label_season_limited": "Seasonal",
   "label_fes_limited": "Festival",
   "banner_season_ended_note": "This season has ended",
-  "banner_fes_ended_note": "This festival has ended"
+  "banner_fes_ended_note": "This festival has ended",
+  "daily_tasks_btn": "Today's Checklist",
+  "daily_tasks_title": "Today's Checklist",
+  "daily_tasks_section_spots": "Firefly Stone / Oak Tree",
+  "daily_tasks_section_weather": "Today's Weather",
+  "daily_tasks_section_quests": "Scheduled Quests",
+  "daily_tasks_section_updates": "Daily Refreshes",
+  "daily_tasks_section_ending": "Ending Soon",
+  "daily_tasks_type_event_end": "Event ends",
+  "daily_tasks_type_event_exchange": "Exchange deadline",
+  "daily_tasks_type_code_expiry": "Code expires",
+  "daily_tasks_days_left": "{n} day(s) left",
+  "daily_tasks_empty": "No information to show right now",
+  "daily_tasks_no_data": "No data yet"
 }
