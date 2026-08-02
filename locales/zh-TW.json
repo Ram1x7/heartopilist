@@ -255,5 +255,14 @@
   "daily_tasks_type_code_expiry": "兌換碼期限",
   "daily_tasks_days_left": "還剩{n}天",
   "daily_tasks_empty": "目前沒有可顯示的資訊",
-  "daily_tasks_no_data": "暫無資料"
+  "daily_tasks_no_data": "暫無資料",
+  "data_sync_title": "資料同步",
+  "data_sync_body": "本站的資料（圖鑑完成狀態、認證大師記錄、料理計算機、花園通知設定、寵物、禮包碼領取狀態、今日待辦清單勾選等）僅保存在本裝置的瀏覽器中。如果想轉移到其他裝置，或在清除瀏覽器資料前進行備份，可以在下方匯出/匯入。",
+  "data_sync_export": "匯出備份",
+  "data_sync_import": "匯入備份",
+  "data_sync_note": "匯入後將覆蓋目前資料。通知設定（fcmToken）為裝置專屬，不會被帶入。",
+  "data_sync_confirm_overwrite": "要用備份覆蓋目前資料嗎？",
+  "data_sync_invalid_format": "備份檔案格式不正確。",
+  "data_sync_import_done": "已匯入備份。",
+  "data_sync_import_failed": "匯入失敗。"
 }

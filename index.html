@@ -65,6 +65,7 @@
   <div class="title-buttons">
    <button id="helpBtn" aria-label="help"></button>
    <button id="shareBtn" aria-label="share"></button>
+   <button id="dataSyncBtn" aria-label="data sync"></button>
    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
     
@@ -458,6 +459,60 @@ text-align:left;
 </div>
 </div>
 
+<!-- データ同期（手動バックアップ） -->
+<input
+  type="file"
+  id="dataSyncFile"
+  accept=".json,application/json"
+  style="display:none"
+  onchange="importAllData(event)">
+
+<div id="dataSyncModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(4px);
+z-index:3000;
+">
+
+<div class="modal-box" style="
+width:90%;
+max-width:340px;
+margin:50px auto;
+padding:20px;
+border-radius:28px;
+max-height:80vh;
+overflow-y:auto;
+text-align:left;
+">
+
+<h3 style="text-align:center;"><span id="dataSyncTitleIcon"></span><span data-i18n="data_sync_title">データ同期</span></h3>
+
+<p style="font-size:12px; line-height:1.7;" data-i18n="data_sync_body">
+このサイトのデータ（コンプ状況・認証記録・料理計算機・園芸通知設定・ペット・ギフトコード受取状況・今日やることリストのチェックなど）は端末のブラウザ内にのみ保存されています。<br>
+別の端末に移したり、ブラウザのデータを消してしまう前にバックアップしたい場合は、以下から書き出し・読み込みができます。
+</p>
+
+<button onclick="exportAllData()">
+<span class="btn-icon" data-icon="download"></span><span data-i18n="data_sync_export">バックアップを書き出す</span>
+</button>
+
+<button onclick="document.getElementById('dataSyncFile').click()">
+<span class="btn-icon" data-icon="upload"></span><span data-i18n="data_sync_import">バックアップを読み込む</span>
+</button>
+
+<p style="font-size:10px; opacity:0.6; margin-top:10px;" data-i18n="data_sync_note">
+読み込むと現在のデータは上書きされます。通知設定（fcmToken）は端末固有のため引き継がれません。
+</p>
+
+<div style="text-align:center; margin-top:16px;">
+<button class="modal-close-btn" onclick="closeDataSyncModal()" data-i18n="modal_close">閉じる</button>
+</div>
+
+</div>
+</div>
+
   <div id="shareModal">
   <div class="modal-box">
     <h3 data-i18n="share_title">コンプ状況をシェア</h3>
@@ -480,6 +535,7 @@ text-align:left;
 <script src="js/data-snow.js"></script>
 <script src="js/data-shell.js"></script>
 <script src="js/data-daily-spots.js"></script>
+<script src="js/data-sync.js"></script>
 <script src="js/main.js"></script>
 
 <script src="js/sw-register.js"></script>

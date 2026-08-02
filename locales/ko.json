@@ -255,5 +255,14 @@
   "daily_tasks_type_code_expiry": "코드 기한",
   "daily_tasks_days_left": "{n}일 남음",
   "daily_tasks_empty": "현재 표시할 정보가 없습니다",
-  "daily_tasks_no_data": "데이터 미등록"
+  "daily_tasks_no_data": "데이터 미등록",
+  "data_sync_title": "데이터 동기화",
+  "data_sync_body": "이 사이트의 데이터(컴플리트 현황·인증 마스터 기록·요리 계산기·정원 알림 설정·펫·기프트 코드 수령 현황·오늘 할 일 목록 체크 등)는 기기의 브라우저 안에만 저장되어 있습니다. 다른 기기로 옮기거나 브라우저 데이터를 지우기 전에 백업하고 싶다면 아래에서 내보내기·불러오기를 할 수 있습니다.",
+  "data_sync_export": "백업 내보내기",
+  "data_sync_import": "백업 불러오기",
+  "data_sync_note": "불러오면 현재 데이터가 덮어써집니다. 알림 설정(fcmToken)은 기기별로 다르므로 유지되지 않습니다.",
+  "data_sync_confirm_overwrite": "현재 데이터를 백업으로 덮어쓸까요?",
+  "data_sync_invalid_format": "백업 파일 형식이 올바르지 않습니다.",
+  "data_sync_import_done": "백업을 불러왔습니다.",
+  "data_sync_import_failed": "불러오기에 실패했습니다."
 }

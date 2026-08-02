@@ -1249,6 +1249,33 @@ a{
   transform:scale(0.92);
 }
 
+/* データ同期ボタン */
+#dataSyncBtn{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  line-height:1;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  transition:0.2s;
+}
+
+#dataSyncBtn:active{
+  transform:scale(0.92);
+}
+
+body.dark #dataSyncBtn{
+  background:#383329;
+  color:#ece4d4;
+  border-color:#46423b;
+}
+
 body.dark #shareBtn{
   background:#383329;
   color:#ece4d4;
@@ -1336,12 +1363,12 @@ body.dark .site-nav-item.active{
   flex-shrink:0;
 }
 
-/* ヘッダーアイコンボタン（ヘルプ・シェア・ダーク切替） */
-#helpBtn, #shareBtn, #darkToggle{
+/* ヘッダーアイコンボタン（ヘルプ・シェア・データ同期・ダーク切替） */
+#helpBtn, #shareBtn, #dataSyncBtn, #darkToggle{
   color:var(--indigo);
 }
 
-body.dark #helpBtn, body.dark #shareBtn, body.dark #darkToggle{
+body.dark #helpBtn, body.dark #shareBtn, body.dark #dataSyncBtn, body.dark #darkToggle{
   color:#e8d2a8;
 }
 

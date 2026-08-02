@@ -255,5 +255,14 @@
   "daily_tasks_type_code_expiry": "兑换码期限",
   "daily_tasks_days_left": "还剩{n}天",
   "daily_tasks_empty": "目前没有可显示的信息",
-  "daily_tasks_no_data": "暂无数据"
+  "daily_tasks_no_data": "暂无数据",
+  "data_sync_title": "数据同步",
+  "data_sync_body": "本站的数据（图鉴完成状态、认证大师记录、料理计算器、花园通知设置、宠物、礼包码领取状态、今日待办清单勾选等）仅保存在本设备的浏览器中。如果想转移到其他设备，或在清除浏览器数据前进行备份，可以在下方导出/导入。",
+  "data_sync_export": "导出备份",
+  "data_sync_import": "导入备份",
+  "data_sync_note": "导入后将覆盖当前数据。通知设置（fcmToken）为设备专属，不会被带入。",
+  "data_sync_confirm_overwrite": "要用备份覆盖当前数据吗？",
+  "data_sync_invalid_format": "备份文件格式不正确。",
+  "data_sync_import_done": "已导入备份。",
+  "data_sync_import_failed": "导入失败。"
 }
