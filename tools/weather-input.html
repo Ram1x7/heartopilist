@@ -38,6 +38,7 @@
 };'></textarea>
 
 <h2>2. 追加・上書きする日付の天気を入力</h2>
+<p class="note">生成時に、今日（JST基準）より前の日付は自動的に削除されます。</p>
 <fieldset>
   <label for="dateInput">日付</label>
   <input type="date" id="dateInput">
@@ -126,6 +127,24 @@ function parseExisting(text){
   return Function('"use strict"; return (' + objText + ");")();
 }
 
+// main.js の getJstDate()/getDateKey(0) と同じ基準（常にJST固定）で「今日」を求める
+function getJstTodayKey(){
+  const d = new Date(Date.now() + 9 * 3600 * 1000);
+  return d.toISOString().slice(0, 10);
+}
+
+// 今日より前の日付を取り除く（ゲーム内で確認できなくなった過去データの掃除）
+function dropPastDates(data){
+  const todayKey = getJstTodayKey();
+  const removed = [];
+  const kept = {};
+  for(const [date, zones] of Object.entries(data)){
+    if(date < todayKey) removed.push(date);
+    else kept[date] = zones;
+  }
+  return { kept, removed };
+}
+
 function validate(data){
   const errors = [];
   const dateRe = /^\d{4}-\d{2}-\d{2}$/;
@@ -205,13 +224,19 @@ document.getElementById("generateBtn").addEventListener("click", () => {
   }
   data[dateStr] = entry;
 
+  const { kept, removed } = dropPastDates(data);
+  data = kept;
+
   const errors = validate(data);
   if(errors.length > 0){
     resultEl.innerHTML = `<div class="errors">${errors.length}件の問題があります:\n` + errors.join("\n") + `</div>`;
     return;
   }
 
-  resultEl.innerHTML = `<div class="ok">OK：${Object.keys(data).length}件の日付データを検証しました。問題ありません。</div>`;
+  const removedNote = removed.length > 0
+    ? `（過去日付を${removed.length}件削除: ${removed.join(", ")}）`
+    : "";
+  resultEl.innerHTML = `<div class="ok">OK：${Object.keys(data).length}件の日付データを検証しました。問題ありません。${removedNote}</div>`;
   outputEl.value = buildFileText(data);
 });
 
