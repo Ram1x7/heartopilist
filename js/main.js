@@ -1657,11 +1657,16 @@ function renderDailyTasks(){
   if(typeof weatherData !== "undefined"){
     const todayKey = getDateKey(0);
     const todayWeather = weatherData[todayKey] || {};
-    const zones = ["0-6","6-12","12-18","18-0"];
-    const zoneLabels = { "6-12":"6:00〜12:00", "12-18":"12:00〜18:00", "18-0":"18:00〜24:00", "0-6":"0:00〜6:00" };
-    const weatherRows = zones.map(z => `
+    // [zoneキー, JST開始時, JST終了時]
+    const zones = [
+      ["0-6", 0, 6],
+      ["6-12", 6, 12],
+      ["12-18", 12, 18],
+      ["18-0", 18, 24],
+    ];
+    const weatherRows = zones.map(([z, startH, endH]) => `
       <div class="daily-task-row">
-        <span class="daily-task-label">${zoneLabels[z]}</span>
+        <span class="daily-task-label">${formatServerZoneLabel(startH, endH)}</span>
         <span class="daily-task-value">${translateWeatherWord(todayWeather[z] || "不明")}</span>
       </div>
     `).join("");
@@ -1677,7 +1682,8 @@ function renderDailyTasks(){
         const label = q.nameI18n && q.nameI18n[currentLang()] ? q.nameI18n[currentLang()] : q.name;
         // 末尾の「（〇〇主催）」部分は見やすいよう改行する
         const labelWithBreak = label.replace(/(.+?)(（[^）]*）)$/, "$1<br>$2");
-        const timesLabel = (q.times || []).join(" / ");
+        // 表示時刻は選択中サーバーのタイムゾーンに変換する（開催判定自体はJST固定のまま）
+        const timesLabel = (q.times || []).map(jstTimeStrToServerDisplay).join(" / ");
         return `
           <div class="daily-task-row">
             <span class="daily-task-label">${labelWithBreak}<span class="daily-task-sub">${timesLabel}</span></span>
@@ -1690,19 +1696,31 @@ function renderDailyTasks(){
 
   // ④ 毎日更新系
   if(typeof dailyUpdates !== "undefined" && dailyUpdates.length > 0){
-    const updateRows = dailyUpdates
-      .filter(u => !u.weekdays || u.weekdays.includes(todayWeekday))
-      .map(u => {
-        const next = getNextUpdateTime(u);
-        const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
-        return `
-          <div class="daily-task-row">
-            <span class="daily-task-label">${label}</span>
-            <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
-          </div>
-        `;
-      }).join("");
-    sections.push(sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows));
+    const visibleUpdates = dailyUpdates.filter(u => !u.weekdays || u.weekdays.includes(todayWeekday));
+    const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
+
+    // 表示中の項目はほぼ全て同じ更新時刻（デフォルト6:00）なので、
+    // 一番近い次回更新までの時間をタイトル右側にまとめて表示する
+    const nextTimes = visibleUpdates
+      .map(getNextUpdateTime)
+      .filter(Boolean)
+      .sort((a,b) => a.minutesUntil - b.minutesUntil);
+    const titleCountdown = nextTimes.length ? formatMinutesUntil(nextTimes[0].minutesUntil) : "";
+
+    const updateRows = visibleUpdates.map(u => {
+      const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
+      const cycleKey = getUpdateCycleKey(u.resetTime);
+      const isChecked = checks[u.name] === cycleKey;
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${label}</span>
+          <label class="daily-task-checkbox">
+            <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleDailyUpdateCheck(this, '${u.name}', ${u.resetTime ? `'${u.resetTime}'` : "undefined"})">
+          </label>
+        </div>
+      `;
+    }).join("");
+    sections.push(sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows, titleCountdown));
   }
 
   // ⑤ もうすぐ終わるもの
@@ -1729,11 +1747,62 @@ function renderDailyTasks(){
     : `<div class="daily-task-empty">${T("daily_tasks_empty","現在表示できる情報がありません")}</div>`;
 }
 
-function sectionHTML(iconName, title, rowsHTML){
+function sectionHTML(iconName, title, rowsHTML, titleRight){
   return `
     <div class="daily-task-section">
-      <div class="daily-task-section-title">${icon(iconName,{size:14})} ${title}</div>
+      <div class="daily-task-section-title">
+        <span class="daily-task-section-title-main">${icon(iconName,{size:14})} ${title}</span>
+        ${titleRight ? `<span class="daily-task-section-title-right">${titleRight}</span>` : ""}
+      </div>
       ${rowsHTML || `<div class="daily-task-empty">${T("daily_tasks_no_data","データ未登録")}</div>`}
     </div>
   `;
+}
+
+// JST基準の時刻(0〜24)を、現在選択中サーバーのタイムゾーンでの時刻に変換（表示専用）
+// ※ 出現判定・更新判定などのロジックには使わないこと（常にJST固定のため）
+function jstHourToServerDisplayHour(hour){
+  const diff = getServerOffset() - 9;
+  return ((hour + diff) % 24 + 24) % 24;
+}
+
+// "HH:MM"（JST）をサーバー選択に応じた表示用の "H:MM" に変換
+function jstTimeStrToServerDisplay(hhmm){
+  const [h, m] = hhmm.split(":").map(Number);
+  const displayHour = jstHourToServerDisplayHour(h);
+  return `${displayHour}:${String(m).padStart(2,"0")}`;
+}
+
+// 天気の時間帯（開始・終了ともJST）を、サーバー選択に応じた表示ラベルに変換
+// 終了時刻がちょうど0時になる場合は「24:00」表記にする（既存の表記に合わせるため）
+function formatServerZoneLabel(startHourJst, endHourJst){
+  const start = jstHourToServerDisplayHour(startHourJst);
+  let end = jstHourToServerDisplayHour(endHourJst);
+  if(end === 0) end = 24;
+  return `${start}:00〜${end}:00`;
+}
+
+// ── 毎日更新系チェックボックス ──
+// 更新サイクル（resetTimeの時刻を境に切り替わる「今のサイクル」を表すYYYY-MM-DD）を計算
+function getUpdateCycleKey(resetTime){
+  const [h, m] = (resetTime || "06:00").split(":").map(Number);
+  const jstNow = getJstDate();
+  const base = new Date(jstNow);
+  base.setUTCHours(h, m, 0, 0);
+  const d = new Date(jstNow);
+  if(jstNow.getTime() < base.getTime()){
+    d.setUTCDate(d.getUTCDate() - 1);
+  }
+  return d.toISOString().slice(0,10);
+}
+
+function toggleDailyUpdateCheck(checkboxEl, name, resetTime){
+  const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
+  const cycleKey = getUpdateCycleKey(resetTime);
+  if(checkboxEl.checked){
+    checks[name] = cycleKey;
+  } else {
+    delete checks[name];
+  }
+  localStorage.setItem("dailyUpdateChecks", JSON.stringify(checks));
 }
