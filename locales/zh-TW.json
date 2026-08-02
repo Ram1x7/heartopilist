@@ -242,5 +242,18 @@
   "food_section_fes": "節日料理",
   "food_section_season": "季節料理",
   "food_time": "製作時間",
-  "food_unknown": "未知"
+  "food_unknown": "未知",
+  "daily_tasks_btn": "今日待辦清單",
+  "daily_tasks_title": "今日待辦清單",
+  "daily_tasks_section_spots": "螢石·橡樹",
+  "daily_tasks_section_weather": "今日天氣",
+  "daily_tasks_section_quests": "定時任務",
+  "daily_tasks_section_updates": "每日更新項目",
+  "daily_tasks_section_ending": "即將結束",
+  "daily_tasks_type_event_end": "活動結束",
+  "daily_tasks_type_event_exchange": "兌換期限",
+  "daily_tasks_type_code_expiry": "兌換碼期限",
+  "daily_tasks_days_left": "還剩{n}天",
+  "daily_tasks_empty": "目前沒有可顯示的資訊",
+  "daily_tasks_no_data": "暫無資料"
 }

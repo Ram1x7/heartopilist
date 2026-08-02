@@ -268,5 +268,18 @@
   "label_season_limited": "シーズン限定",
   "label_fes_limited": "フェス限定",
   "banner_season_ended_note": "現在このシーズンは終了しています",
-  "banner_fes_ended_note": "現在このフェスは終了しています"
+  "banner_fes_ended_note": "現在このフェスは終了しています",
+  "daily_tasks_btn": "今日やることリスト",
+  "daily_tasks_title": "今日やることリスト",
+  "daily_tasks_section_spots": "蛍石・オークの木",
+  "daily_tasks_section_weather": "今日の天気",
+  "daily_tasks_section_quests": "定時クエスト",
+  "daily_tasks_section_updates": "毎日更新系",
+  "daily_tasks_section_ending": "もうすぐ終わるもの",
+  "daily_tasks_type_event_end": "イベント終了",
+  "daily_tasks_type_event_exchange": "交換期限",
+  "daily_tasks_type_code_expiry": "コード期限",
+  "daily_tasks_days_left": "あと{n}日",
+  "daily_tasks_empty": "現在表示できる情報がありません",
+  "daily_tasks_no_data": "データ未登録"
 }

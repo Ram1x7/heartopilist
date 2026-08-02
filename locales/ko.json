@@ -242,5 +242,18 @@
   "food_section_fes": "페스 요리",
   "food_section_season": "시즌 요리",
   "food_time": "조리 시간",
-  "food_unknown": "불명"
+  "food_unknown": "불명",
+  "daily_tasks_btn": "오늘 할 일 목록",
+  "daily_tasks_title": "오늘 할 일 목록",
+  "daily_tasks_section_spots": "반딧불이 돌·참나무",
+  "daily_tasks_section_weather": "오늘의 날씨",
+  "daily_tasks_section_quests": "정기 퀘스트",
+  "daily_tasks_section_updates": "매일 갱신되는 것",
+  "daily_tasks_section_ending": "곧 종료되는 것",
+  "daily_tasks_type_event_end": "이벤트 종료",
+  "daily_tasks_type_event_exchange": "교환 기한",
+  "daily_tasks_type_code_expiry": "코드 기한",
+  "daily_tasks_days_left": "{n}일 남음",
+  "daily_tasks_empty": "현재 표시할 정보가 없습니다",
+  "daily_tasks_no_data": "데이터 미등록"
 }

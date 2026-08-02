@@ -1525,6 +1525,10 @@ function renderDailySpots(){
   if(calIconEl) calIconEl.innerHTML = icon("calendar", {size:13});
   const calTitleIconEl = document.getElementById("dailySpotCalTitleIcon");
   if(calTitleIconEl) calTitleIconEl.innerHTML = icon("calendar", {size:16});
+  const tasksIconEl = document.getElementById("dailyTasksIcon");
+  if(tasksIconEl) tasksIconEl.innerHTML = icon("checklist", {size:13});
+  const tasksTitleIconEl = document.getElementById("dailyTasksTitleIcon");
+  if(tasksTitleIconEl) tasksTitleIconEl.innerHTML = icon("checklist", {size:16});
 
   grid.innerHTML = Object.keys(dailySpots).map(key => {
     const today = getDailySpotFor(key, 0);
@@ -1604,3 +1608,125 @@ function renderDailySpotCalendar(){
 // 初期描画
 renderDailySpots();
 updateDailySpotCalendarTabLabels();
+
+// ══════════════════════════════════════
+// 今日やることリスト ダッシュボード
+// ══════════════════════════════════════
+const dailyTasksModal = document.getElementById("dailyTasksModal");
+const dailyTasksBtn   = document.getElementById("dailyTasksBtn");
+
+if(dailyTasksBtn){
+  dailyTasksBtn.onclick = async () => {
+    await Promise.all([
+      loadScriptOnce("js/data-daily-tasks.js"),
+      loadScriptOnce("js/data-events.js"),
+      loadScriptOnce("js/data-codes.js"),
+    ]);
+    renderDailyTasks();
+    dailyTasksModal.style.display = "block";
+  };
+}
+
+function closeDailyTasksModal(){
+  if(dailyTasksModal) dailyTasksModal.style.display = "none";
+}
+
+function renderDailyTasks(){
+  const body = document.getElementById("dailyTasksBody");
+  if(!body) return;
+
+  const sections = [];
+
+  // ① 蛍石・オークの木
+  if(typeof dailySpots !== "undefined" && typeof getDailySpotFor === "function"){
+    const spotRows = Object.keys(dailySpots).map(key => {
+      const today = getDailySpotFor(key, 0);
+      if(!today) return "";
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${dailySpotLabel(key)}</span>
+          <span class="daily-task-value">${today.location}</span>
+        </div>
+      `;
+    }).join("");
+    sections.push(sectionHTML("pin", T("daily_tasks_section_spots","蛍石・オークの木"), spotRows));
+  }
+
+  // ② 今日の天気予報
+  if(typeof weatherData !== "undefined"){
+    const todayKey = getDateKey(0);
+    const todayWeather = weatherData[todayKey] || {};
+    const zones = ["6-12","12-18","18-0","0-6"];
+    const zoneLabels = { "6-12":"6:00〜12:00", "12-18":"12:00〜18:00", "18-0":"18:00〜24:00", "0-6":"0:00〜6:00" };
+    const weatherRows = zones.map(z => `
+      <div class="daily-task-row">
+        <span class="daily-task-label">${zoneLabels[z]}</span>
+        <span class="daily-task-value">${translateWeatherWord(todayWeather[z] || "不明")}</span>
+      </div>
+    `).join("");
+    sections.push(sectionHTML("weatherSun", T("daily_tasks_section_weather","今日の天気"), weatherRows));
+  }
+
+  // ③ 定時クエスト
+  if(typeof dailyQuests !== "undefined" && dailyQuests.length > 0){
+    const questRows = dailyQuests.map(q => {
+      const next = getNextQuestTime(q);
+      const label = q.nameI18n && q.nameI18n[currentLang()] ? q.nameI18n[currentLang()] : q.name;
+      const timesLabel = (q.times || []).join(" / ");
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${label}<span class="daily-task-sub">${timesLabel}</span></span>
+          <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
+        </div>
+      `;
+    }).join("");
+    sections.push(sectionHTML("clock", T("daily_tasks_section_quests","定時クエスト"), questRows));
+  }
+
+  // ④ 毎日更新系
+  if(typeof dailyUpdates !== "undefined" && dailyUpdates.length > 0){
+    const updateRows = dailyUpdates.map(u => {
+      const next = getNextUpdateTime(u);
+      const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${label}</span>
+          <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
+        </div>
+      `;
+    }).join("");
+    sections.push(sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows));
+  }
+
+  // ⑤ もうすぐ終わるもの
+  if(typeof getEndingSoonItems === "function"){
+    const endingSoon = getEndingSoonItems(3);
+    if(endingSoon.length > 0){
+      const typeLabel = {
+        event_end: T("daily_tasks_type_event_end","イベント終了"),
+        event_exchange: T("daily_tasks_type_event_exchange","交換期限"),
+        code_expiry: T("daily_tasks_type_code_expiry","コード期限"),
+      };
+      const endingRows = endingSoon.map(item => `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${item.name}<span class="daily-task-sub">${typeLabel[item.type] || ""}</span></span>
+          <span class="daily-task-value highlight">${T("daily_tasks_days_left","あと{n}日").replace("{n}", item.daysLeft)}</span>
+        </div>
+      `).join("");
+      sections.push(sectionHTML("warning", T("daily_tasks_section_ending","もうすぐ終わるもの"), endingRows));
+    }
+  }
+
+  body.innerHTML = sections.length
+    ? sections.join("")
+    : `<div class="daily-task-empty">${T("daily_tasks_empty","現在表示できる情報がありません")}</div>`;
+}
+
+function sectionHTML(iconName, title, rowsHTML){
+  return `
+    <div class="daily-task-section">
+      <div class="daily-task-section-title">${icon(iconName,{size:14})} ${title}</div>
+      ${rowsHTML || `<div class="daily-task-empty">${T("daily_tasks_no_data","データ未登録")}</div>`}
+    </div>
+  `;
+}

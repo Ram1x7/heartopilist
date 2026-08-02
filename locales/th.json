@@ -242,5 +242,18 @@
   "food_section_fes": "อาหารเทศกาล",
   "food_section_season": "อาหารตามฤดูกาล",
   "food_time": "เวลาทำอาหาร",
-  "food_unknown": "ไม่ทราบ"
+  "food_unknown": "ไม่ทราบ",
+  "daily_tasks_btn": "รายการสิ่งที่ต้องทำวันนี้",
+  "daily_tasks_title": "รายการสิ่งที่ต้องทำวันนี้",
+  "daily_tasks_section_spots": "หินหิ่งห้อย·ต้นโอ๊ก",
+  "daily_tasks_section_weather": "สภาพอากาศวันนี้",
+  "daily_tasks_section_quests": "เควสตามเวลา",
+  "daily_tasks_section_updates": "รายการที่อัปเดตทุกวัน",
+  "daily_tasks_section_ending": "ใกล้สิ้นสุด",
+  "daily_tasks_type_event_end": "อีเวนต์สิ้นสุด",
+  "daily_tasks_type_event_exchange": "กำหนดแลกเปลี่ยน",
+  "daily_tasks_type_code_expiry": "โค้ดหมดอายุ",
+  "daily_tasks_days_left": "เหลืออีก {n} วัน",
+  "daily_tasks_empty": "ไม่มีข้อมูลให้แสดงในขณะนี้",
+  "daily_tasks_no_data": "ยังไม่มีข้อมูล"
 }
