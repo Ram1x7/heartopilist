@@ -1636,6 +1636,7 @@ function renderDailyTasks(){
   if(!body) return;
 
   const sections = [];
+  const todayWeekday = getJstDate().getUTCDay();
 
   // ① 蛍石・オークの木
   if(typeof dailySpots !== "undefined" && typeof getDailySpotFor === "function"){
@@ -1669,7 +1670,6 @@ function renderDailyTasks(){
 
   // ③ 定時クエスト
   if(typeof dailyQuests !== "undefined" && dailyQuests.length > 0){
-    const todayWeekday = getJstDate().getUTCDay();
     const questRows = dailyQuests
       .filter(q => !q.weekdays || q.weekdays.includes(todayWeekday))
       .map(q => {
@@ -1690,16 +1690,18 @@ function renderDailyTasks(){
 
   // ④ 毎日更新系
   if(typeof dailyUpdates !== "undefined" && dailyUpdates.length > 0){
-    const updateRows = dailyUpdates.map(u => {
-      const next = getNextUpdateTime(u);
-      const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
-      return `
-        <div class="daily-task-row">
-          <span class="daily-task-label">${label}</span>
-          <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
-        </div>
-      `;
-    }).join("");
+    const updateRows = dailyUpdates
+      .filter(u => !u.weekdays || u.weekdays.includes(todayWeekday))
+      .map(u => {
+        const next = getNextUpdateTime(u);
+        const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
+        return `
+          <div class="daily-task-row">
+            <span class="daily-task-label">${label}</span>
+            <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
+          </div>
+        `;
+      }).join("");
     sections.push(sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows));
   }
 
