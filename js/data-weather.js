@@ -13,6 +13,12 @@
 // 入力は tools/weather-input.html で生成すると楽です。
 // 追加・修正後は `node tools/validate-weather-data.js` で形式チェックできます。
 const weatherData = {
+ "2026-08-02": {
+   "6-12":"晴れ",
+   "12-18":"晴れ",
+   "18-0":"晴れ",
+   "0-6":"晴れ"
+ },
  "2026-08-03": {
    "6-12":"雨",
    "12-18":"虹",
@@ -24,7 +30,7 @@ const weatherData = {
    "12-18":"晴れ",
    "18-0":"晴れ",
    "0-6":"晴れ"
- },
+ }
 };
 
 // tools/validate-weather-data.js（Node）から読み込めるようにする
