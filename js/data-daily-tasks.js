@@ -13,13 +13,13 @@ const dailyQuests = [
   {
     name: "虫コイコイ（浪花主催）",
     nameI18n: {"ja":"虫コイコイ（浪花主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-    times: ["11:00", "20:00"],
+    times: ["11:00"],
     icon: "bug",
   },
   {
     name: "海釣り1号,2号（ビル主催）",
     nameI18n: {"ja":"海釣り1号,2号（ビル主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-    times: ["12:00", "21:00"],
+    times: ["12:00"],
     icon: "fish",
   },
   {
@@ -66,10 +66,22 @@ const dailyQuests = [
     icon: "clock",
   },
   {
+    name: "虫コイコイ（浪花主催）",
+    nameI18n: {"ja":"虫コイコイ（浪花主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["20:00"],
+    icon: "bug",
+  },
+  {
     name: "海洋清掃クエスト（オリバー主催）",
     nameI18n: {"ja":"海洋清掃クエスト（オリバー主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     times: ["20:30"],
     icon: "clock",
+  },
+  {
+    name: "海釣り1号,2号（ビル主催）",
+    nameI18n: {"ja":"海釣り1号,2号（ビル主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["21:00"],
+    icon: "fish",
   },
 ];
 
