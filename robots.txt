@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /tools/
 
 Sitemap: https://ram1x7.github.io/heartopilist/sitemap.xml
