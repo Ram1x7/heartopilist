@@ -757,6 +757,7 @@ body.dark .daily-task-row{
 .daily-task-label{
   display:flex;
   flex-direction:column;
+  text-align:left;
   color:var(--text);
   min-width:0;
 }
