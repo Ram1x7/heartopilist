@@ -1656,7 +1656,7 @@ function renderDailyTasks(){
   if(typeof weatherData !== "undefined"){
     const todayKey = getDateKey(0);
     const todayWeather = weatherData[todayKey] || {};
-    const zones = ["6-12","12-18","18-0","0-6"];
+    const zones = ["0-6","6-12","12-18","18-0"];
     const zoneLabels = { "6-12":"6:00〜12:00", "12-18":"12:00〜18:00", "18-0":"18:00〜24:00", "0-6":"0:00〜6:00" };
     const weatherRows = zones.map(z => `
       <div class="daily-task-row">
@@ -1672,10 +1672,12 @@ function renderDailyTasks(){
     const questRows = dailyQuests.map(q => {
       const next = getNextQuestTime(q);
       const label = q.nameI18n && q.nameI18n[currentLang()] ? q.nameI18n[currentLang()] : q.name;
+      // 末尾の「（〇〇主催）」部分は見やすいよう改行する
+      const labelWithBreak = label.replace(/(.+?)(（[^）]*）)$/, "$1<br>$2");
       const timesLabel = (q.times || []).join(" / ");
       return `
         <div class="daily-task-row">
-          <span class="daily-task-label">${label}<span class="daily-task-sub">${timesLabel}</span></span>
+          <span class="daily-task-label">${labelWithBreak}<span class="daily-task-sub">${timesLabel}</span></span>
           <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
         </div>
       `;
