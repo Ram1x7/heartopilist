@@ -1669,19 +1669,22 @@ function renderDailyTasks(){
 
   // ③ 定時クエスト
   if(typeof dailyQuests !== "undefined" && dailyQuests.length > 0){
-    const questRows = dailyQuests.map(q => {
-      const next = getNextQuestTime(q);
-      const label = q.nameI18n && q.nameI18n[currentLang()] ? q.nameI18n[currentLang()] : q.name;
-      // 末尾の「（〇〇主催）」部分は見やすいよう改行する
-      const labelWithBreak = label.replace(/(.+?)(（[^）]*）)$/, "$1<br>$2");
-      const timesLabel = (q.times || []).join(" / ");
-      return `
-        <div class="daily-task-row">
-          <span class="daily-task-label">${labelWithBreak}<span class="daily-task-sub">${timesLabel}</span></span>
-          <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
-        </div>
-      `;
-    }).join("");
+    const todayWeekday = getJstDate().getUTCDay();
+    const questRows = dailyQuests
+      .filter(q => !q.weekdays || q.weekdays.includes(todayWeekday))
+      .map(q => {
+        const next = getNextQuestTime(q);
+        const label = q.nameI18n && q.nameI18n[currentLang()] ? q.nameI18n[currentLang()] : q.name;
+        // 末尾の「（〇〇主催）」部分は見やすいよう改行する
+        const labelWithBreak = label.replace(/(.+?)(（[^）]*）)$/, "$1<br>$2");
+        const timesLabel = (q.times || []).join(" / ");
+        return `
+          <div class="daily-task-row">
+            <span class="daily-task-label">${labelWithBreak}<span class="daily-task-sub">${timesLabel}</span></span>
+            <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
+          </div>
+        `;
+      }).join("");
     sections.push(sectionHTML("clock", T("daily_tasks_section_quests","定時クエスト"), questRows));
   }
 
