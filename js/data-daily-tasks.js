@@ -98,11 +98,6 @@ const dailyUpdates = [
     icon: "flower",
   },
   {
-    name: "動物の餌やり",
-    nameI18n: {"ja":"動物の餌やり","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-    icon: "meat",
-  },
-  {
     name: "ドロシーの服屋の服更新",
     nameI18n: {"ja":"ドロシーの服屋の服更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     icon: "shirt",

@@ -725,7 +725,8 @@ body.dark .daily-spot-item-location{
 .daily-task-section-title{
   display:flex;
   align-items:center;
-  gap:5px;
+  justify-content:space-between;
+  gap:8px;
   font-family:'Shippori Mincho', serif;
   font-size:12.5px;
   color:var(--indigo);
@@ -734,8 +735,37 @@ body.dark .daily-spot-item-location{
   border-left:3px solid var(--gold);
 }
 
+.daily-task-section-title-main{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.daily-task-section-title-right{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
 body.dark .daily-task-section-title{
   color:#e8d2a8;
+}
+
+.daily-task-checkbox{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+}
+
+.daily-task-checkbox input{
+  width:19px;
+  height:19px;
+  accent-color:var(--indigo);
+}
+
+body.dark .daily-task-checkbox input{
+  accent-color:#e8d2a8;
 }
 
 .daily-task-row{
