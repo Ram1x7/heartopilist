@@ -1440,6 +1440,24 @@ helpModal.onclick = (e)=>{
   }
 };
 
+const dataSyncBtn = document.getElementById("dataSyncBtn");
+const dataSyncModal = document.getElementById("dataSyncModal");
+if(dataSyncBtn){
+  dataSyncBtn.innerHTML = icon("archive");
+  dataSyncBtn.onclick = ()=>{
+    dataSyncModal.style.display = "block";
+  };
+}
+if(dataSyncModal){
+  const dataSyncTitleIconEl = document.getElementById("dataSyncTitleIcon");
+  if(dataSyncTitleIconEl) dataSyncTitleIconEl.innerHTML = icon("archive", {size:17});
+  dataSyncModal.onclick = (e)=>{
+    if(e.target === dataSyncModal){
+      closeDataSyncModal();
+    }
+  };
+}
+
 // 初期化
 updateTime();
 // 保存データ読込

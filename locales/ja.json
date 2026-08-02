@@ -281,5 +281,14 @@
   "daily_tasks_type_code_expiry": "コード期限",
   "daily_tasks_days_left": "あと{n}日",
   "daily_tasks_empty": "現在表示できる情報がありません",
-  "daily_tasks_no_data": "データ未登録"
+  "daily_tasks_no_data": "データ未登録",
+  "data_sync_title": "データ同期",
+  "data_sync_body": "このサイトのデータ（コンプ状況・認証記録・料理計算機・園芸通知設定・ペット・ギフトコード受取状況・今日やることリストのチェックなど）は端末のブラウザ内にのみ保存されています。別の端末に移したり、ブラウザのデータを消してしまう前にバックアップしたい場合は、以下から書き出し・読み込みができます。",
+  "data_sync_export": "バックアップを書き出す",
+  "data_sync_import": "バックアップを読み込む",
+  "data_sync_note": "読み込むと現在のデータは上書きされます。通知設定（fcmToken）は端末固有のため引き継がれません。",
+  "data_sync_confirm_overwrite": "現在のデータをバックアップで上書きしますか？",
+  "data_sync_invalid_format": "バックアップファイルの形式が違います。",
+  "data_sync_import_done": "バックアップを読み込みました。",
+  "data_sync_import_failed": "読み込みに失敗しました。"
 }

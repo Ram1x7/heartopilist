@@ -281,5 +281,14 @@
   "daily_tasks_type_code_expiry": "Code expires",
   "daily_tasks_days_left": "{n} day(s) left",
   "daily_tasks_empty": "No information to show right now",
-  "daily_tasks_no_data": "No data yet"
+  "daily_tasks_no_data": "No data yet",
+  "data_sync_title": "Data Sync",
+  "data_sync_body": "This site's data (completion status, master certifications, the recipe calculator, garden notification settings, pets, gift code claim status, today's checklist checkboxes, etc.) is stored only in your device's browser. If you want to move it to another device or back it up before clearing your browser data, you can export/import it below.",
+  "data_sync_export": "Export Backup",
+  "data_sync_import": "Import Backup",
+  "data_sync_note": "Importing will overwrite your current data. Notification settings (fcmToken) are device-specific and won't carry over.",
+  "data_sync_confirm_overwrite": "Overwrite your current data with this backup?",
+  "data_sync_invalid_format": "This doesn't look like a valid backup file.",
+  "data_sync_import_done": "Backup imported.",
+  "data_sync_import_failed": "Failed to import."
 }
