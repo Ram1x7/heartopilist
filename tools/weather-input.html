@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>天気データ入力ツール（開発者用）</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:720px;margin:24px auto;padding:0 16px;line-height:1.6;color:#222;}
+  h1{font-size:18px;}
+  h2{font-size:15px;margin-top:28px;}
+  p.note{font-size:13px;color:#666;}
+  fieldset{border:1px solid #ccc;border-radius:8px;padding:12px 16px;margin-bottom:16px;}
+  label{display:block;margin:8px 0 2px;font-size:13px;font-weight:bold;}
+  input[type=date],select{font-size:14px;padding:6px;width:100%;box-sizing:border-box;}
+  .zones{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;}
+  button{font-size:14px;padding:8px 16px;margin-top:8px;cursor:pointer;}
+  textarea{width:100%;box-sizing:border-box;font-family:monospace;font-size:12px;height:220px;margin-top:8px;}
+  .errors{color:#b00020;font-size:13px;white-space:pre-wrap;}
+  .ok{color:#0a7a2f;font-size:13px;}
+</style>
+</head>
+<body>
+
+<h1>天気データ入力ツール（開発者用）</h1>
+<p class="note">
+  このページはサイトの一部ではありません。<code>js/data-weather.js</code> を更新するための
+  ローカル専用ツールです（本番には公開/リンクしていません）。
+</p>
+
+<h2>1. 現在の js/data-weather.js の中身を貼り付け</h2>
+<p class="note"><code>const weatherData = { ... };</code> の部分をそのまま貼ってください。</p>
+<textarea id="currentData" placeholder='const weatherData = {
+ &quot;2026-08-01&quot;: {
+   &quot;6-12&quot;:&quot;晴れ&quot;,
+   &quot;12-18&quot;:&quot;晴れ&quot;,
+   &quot;18-0&quot;:&quot;晴れ&quot;,
+   &quot;0-6&quot;:&quot;晴れ&quot;
+ }
+};'></textarea>
+
+<h2>2. 追加・上書きする日付の天気を入力</h2>
+<fieldset>
+  <label for="dateInput">日付</label>
+  <input type="date" id="dateInput">
+
+  <div class="zones">
+    <div>
+      <label for="zone_6_12">6:00〜12:00</label>
+      <select id="zone_6_12"></select>
+    </div>
+    <div>
+      <label for="zone_12_18">12:00〜18:00</label>
+      <select id="zone_12_18"></select>
+    </div>
+    <div>
+      <label for="zone_18_0">18:00〜0:00</label>
+      <select id="zone_18_0"></select>
+    </div>
+    <div>
+      <label for="zone_0_6">0:00〜6:00</label>
+      <select id="zone_0_6"></select>
+    </div>
+  </div>
+</fieldset>
+
+<button id="generateBtn">追加してファイル内容を生成</button>
+
+<h2>3. 検証結果</h2>
+<div id="result"></div>
+
+<h2>4. 生成された js/data-weather.js（このまま上書き保存）</h2>
+<textarea id="output" readonly></textarea>
+<button id="copyBtn">クリップボードにコピー</button>
+
+<script>
+const WEATHER_OPTIONS = ["晴れ","雨","虹","流星雨"];
+const ZONES = [
+  ["6-12","zone_6_12"],
+  ["12-18","zone_12_18"],
+  ["18-0","zone_18_0"],
+  ["0-6","zone_0_6"],
+];
+const REQUIRED_ZONES = ZONES.map(z => z[0]);
+
+for(const [, selectId] of ZONES){
+  const sel = document.getElementById(selectId);
+  for(const w of WEATHER_OPTIONS){
+    const opt = document.createElement("option");
+    opt.value = w;
+    opt.textContent = w;
+    sel.appendChild(opt);
+  }
+}
+
+// 日付初期値：今日
+document.getElementById("dateInput").valueAsDate = new Date();
+
+function parseExisting(text){
+  const trimmed = text.trim();
+  if(!trimmed) return {};
+
+  // "weatherData" というキーワードの後ろの最初の "{" から、
+  // 対応する "}" までをブレースの深さで数えて切り出す
+  // （コメント中の "{" "}" に惑わされないように、コメント行は先に除去する）
+  const withoutComments = trimmed
+    .split("\n")
+    .filter(line => !line.trim().startsWith("//"))
+    .join("\n");
+
+  const nameIdx = withoutComments.indexOf("weatherData");
+  if(nameIdx === -1) throw new Error("weatherData が見つかりません");
+
+  const braceStart = withoutComments.indexOf("{", nameIdx);
+  if(braceStart === -1) throw new Error("weatherData のオブジェクト（{...}）が見つかりません");
+
+  let depth = 0, end = -1;
+  for(let i = braceStart; i < withoutComments.length; i++){
+    if(withoutComments[i] === "{") depth++;
+    else if(withoutComments[i] === "}"){
+      depth--;
+      if(depth === 0){ end = i + 1; break; }
+    }
+  }
+  if(end === -1) throw new Error("weatherData オブジェクトの閉じ括弧が見つかりません");
+
+  const objText = withoutComments.slice(braceStart, end);
+  return Function('"use strict"; return (' + objText + ");")();
+}
+
+function validate(data){
+  const errors = [];
+  const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+  for(const [date, zones] of Object.entries(data)){
+    if(!dateRe.test(date)){
+      errors.push(`[${date}] 日付形式が不正です（YYYY-MM-DD）`);
+    }
+    for(const zone of REQUIRED_ZONES){
+      if(!(zone in zones)) errors.push(`[${date}] 時間帯 "${zone}" が抜けています`);
+    }
+    for(const zone of Object.keys(zones)){
+      if(!REQUIRED_ZONES.includes(zone)) errors.push(`[${date}] 未知の時間帯キー "${zone}"`);
+    }
+    for(const [zone, w] of Object.entries(zones)){
+      if(!WEATHER_OPTIONS.includes(w)){
+        errors.push(`[${date}] "${zone}" の天気 "${w}" が不正です（${WEATHER_OPTIONS.join("/")}）`);
+      }
+    }
+  }
+  return errors;
+}
+
+function buildFileText(data){
+  const dates = Object.keys(data).sort();
+  const body = dates.map(date => {
+    const zones = data[date];
+    const lines = REQUIRED_ZONES.map(z => `   "${z}":"${zones[z]}"`).join(",\n");
+    return ` "${date}": {\n${lines}\n }`;
+  }).join(",\n");
+
+  return `// js/data-weather.js
+// 天気データ（毎日ゲーム内で確認できる範囲＝最大30時間先まで手入力する）
+//
+// フォーマット:
+//   "YYYY-MM-DD": {
+//     "6-12":  <天気>,
+//     "12-18": <天気>,
+//     "18-0":  <天気>,
+//     "0-6":   <天気>
+//   }
+// 天気に使える値: "晴れ" / "雨" / "虹" / "流星雨"（流星雨は判定上「晴れ」と同じ扱い）
+//
+// 入力は tools/weather-input.html で生成すると楽です。
+// 追加・修正後は \`node tools/validate-weather-data.js\` で形式チェックできます。
+const weatherData = {
+${body}
+};
+
+// tools/validate-weather-data.js（Node）から読み込めるようにする
+if (typeof module !== "undefined") module.exports = weatherData;
+`;
+}
+
+document.getElementById("generateBtn").addEventListener("click", () => {
+  const resultEl = document.getElementById("result");
+  const outputEl = document.getElementById("output");
+  resultEl.innerHTML = "";
+  outputEl.value = "";
+
+  let data;
+  try{
+    data = parseExisting(document.getElementById("currentData").value);
+  }catch(e){
+    resultEl.innerHTML = `<div class="errors">貼り付けデータの読み込みに失敗しました: ${e.message}</div>`;
+    return;
+  }
+
+  const dateStr = document.getElementById("dateInput").value;
+  if(!dateStr){
+    resultEl.innerHTML = `<div class="errors">日付を入力してください</div>`;
+    return;
+  }
+
+  const entry = {};
+  for(const [zone, selectId] of ZONES){
+    entry[zone] = document.getElementById(selectId).value;
+  }
+  data[dateStr] = entry;
+
+  const errors = validate(data);
+  if(errors.length > 0){
+    resultEl.innerHTML = `<div class="errors">${errors.length}件の問題があります:\n` + errors.join("\n") + `</div>`;
+    return;
+  }
+
+  resultEl.innerHTML = `<div class="ok">OK：${Object.keys(data).length}件の日付データを検証しました。問題ありません。</div>`;
+  outputEl.value = buildFileText(data);
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const outputEl = document.getElementById("output");
+  if(!outputEl.value){
+    alert("先に「追加してファイル内容を生成」を押してください");
+    return;
+  }
+  await navigator.clipboard.writeText(outputEl.value);
+  alert("コピーしました。js/data-weather.js に上書き保存してください。");
+});
+</script>
+
+</body>
+</html>
