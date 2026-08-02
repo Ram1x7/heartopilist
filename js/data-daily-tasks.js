@@ -86,28 +86,98 @@ const dailyQuests = [
 ];
 
 const dailyUpdates = [
-  // 例：
-  // {
-  //   name: "家具屋1階の家具更新",
-  //   nameI18n: {"ja":"家具屋1階の家具更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-  //   resetTime: "06:00",
-  //   icon: "sofa",
-  //   note: ""
-  // },
-  // {
-  //   name: "服屋の服更新",
-  //   nameI18n: {"ja":"服屋の服更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-  //   resetTime: "06:00",
-  //   icon: "shirt",
-  //   note: ""
-  // },
-  // {
-  //   name: "ベイリーへ情報カード提出",
-  //   nameI18n: {"ja":"ベイリーへ情報カード提出","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-  //   resetTime: "06:00",
-  //   icon: "cardId",
-  //   note: ""
-  // },
+  // ── 毎日 ──
+  {
+    name: "デイリー任務5個",
+    nameI18n: {"ja":"デイリー任務5個","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "checklist",
+  },
+  {
+    name: "花の交配",
+    nameI18n: {"ja":"花の交配","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "flower",
+  },
+  {
+    name: "動物の餌やり",
+    nameI18n: {"ja":"動物の餌やり","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "meat",
+  },
+  {
+    name: "ドロシーの服屋の服更新",
+    nameI18n: {"ja":"ドロシーの服屋の服更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "shirt",
+  },
+  {
+    name: "ボブおじさんの家具屋の１階家具更新",
+    nameI18n: {"ja":"ボブおじさんの家具屋の１階家具更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "sofa",
+  },
+  {
+    name: "ジョーンさんのペットショップのペット衣装更新",
+    nameI18n: {"ja":"ジョーンさんのペットショップのペット衣装更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "shirt",
+  },
+  {
+    name: "ベイリーへの情報カード提出",
+    nameI18n: {"ja":"ベイリーへの情報カード提出","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "cardId",
+  },
+  {
+    name: "カー・チンのパズル更新",
+    nameI18n: {"ja":"カー・チンのパズル更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "dice",
+  },
+  {
+    name: "マッシモから食材購入",
+    nameI18n: {"ja":"マッシモから食材購入","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    icon: "ingredient",
+  },
+
+  // ── 金曜日 ──
+  {
+    name: "ホーム評価提出",
+    nameI18n: {"ja":"ホーム評価提出","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [5],
+    icon: "star",
+  },
+  {
+    name: "週間購入制限系アイテムの買い忘れチェック",
+    nameI18n: {"ja":"週間購入制限系アイテムの買い忘れチェック","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [5],
+    icon: "warning",
+  },
+  {
+    name: "週間リセット系アイテムの買い忘れチェック",
+    nameI18n: {"ja":"週間リセット系アイテムの買い忘れチェック","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [5],
+    icon: "warning",
+  },
+  {
+    name: "ピンクバブルの取り忘れチェック",
+    nameI18n: {"ja":"ピンクバブルの取り忘れチェック","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [5],
+    icon: "warning",
+  },
+
+  // ── 土曜日 ──
+  {
+    name: "週間購入制限系アイテムのリセット",
+    nameI18n: {"ja":"週間購入制限系アイテムのリセット","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [6],
+    icon: "gift",
+  },
+  {
+    name: "週間系アイテムのリセット",
+    nameI18n: {"ja":"週間系アイテムのリセット","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [6],
+    icon: "checklist",
+  },
+  {
+    name: "ピンクバブル更新",
+    nameI18n: {"ja":"ピンクバブル更新","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    weekdays: [6],
+    icon: "gift",
+  },
 ];
 
 // ── ヘルパー関数 ──
@@ -154,17 +224,20 @@ function getNextQuestTime(quest){
 }
 
 // 毎日更新系の「次の更新までの残り時間」を計算（更新時刻を過ぎていたら今日はもう更新済み扱い）
+// weekdays が指定されている項目（金曜・土曜限定など）は、次に該当する曜日まで探す
 function getNextUpdateTime(update){
   const resetTime = update.resetTime || "06:00";
   const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
 
-  let next = timeStrToTodayDate(resetTime, 0);
-  if(next.getTime() <= jstNow.getTime()){
-    next = timeStrToTodayDate(resetTime, 1);
+  for(let offset = 0; offset <= 7; offset++){
+    const candidate = timeStrToTodayDate(resetTime, offset);
+    if(update.weekdays && !update.weekdays.includes(candidate.getUTCDay())) continue;
+    if(candidate.getTime() > jstNow.getTime()){
+      const minutesUntil = Math.round((candidate.getTime() - jstNow.getTime()) / 60000);
+      return { nextTime: candidate, minutesUntil };
+    }
   }
-
-  const minutesUntil = Math.round((next.getTime() - jstNow.getTime()) / 60000);
-  return { nextTime: next, minutesUntil };
+  return null;
 }
 
 // 分数を "n分後" / "n時間m分後" / "n日m時間後" 形式の文字列に変換

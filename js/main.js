@@ -1691,7 +1691,7 @@ function renderDailyTasks(){
       return `
         <div class="daily-task-row">
           <span class="daily-task-label">${label}</span>
-          <span class="daily-task-value">${formatMinutesUntil(next.minutesUntil)}</span>
+          <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
         </div>
       `;
     }).join("");
