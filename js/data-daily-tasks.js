@@ -3,22 +3,74 @@
 // ── 定時クエスト ──
 // time: "HH:MM"（JST）で開催される毎日決まった時刻のクエスト
 // 複数の時刻がある場合は times 配列に複数入れてください
+// weekdays: 開催曜日を限定する場合のみ指定（0=日,1=月,...6=土）。省略時は毎日開催。
 //
 // ── 毎日更新系 ──
 // 「家具屋の家具が毎日変わる」のような、時刻ではなく「1日1回更新される」タイプの項目
 // resetTime: 更新される時刻（"HH:MM"、JST）。省略した場合は6:00（ゲーム内の日付更新時刻）扱い
 
 const dailyQuests = [
-  // 例：
-  // {
-  //   name: "虫コイコイクエスト",
-  //   nameI18n: {"ja":"虫コイコイクエスト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-  //   times: ["10:00", "22:00"],
-  //   location: "森林",
-  //   locationI18n: {"ja":"森林","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-  //   icon: "bug",
-  //   note: ""
-  // },
+  {
+    name: "虫コイコイ（浪花主催）",
+    nameI18n: {"ja":"虫コイコイ（浪花主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["11:00", "20:00"],
+    icon: "bug",
+  },
+  {
+    name: "海釣り1号,2号（ビル主催）",
+    nameI18n: {"ja":"海釣り1号,2号（ビル主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["12:00", "21:00"],
+    icon: "fish",
+  },
+  {
+    name: "迷子の虫クエスト（浪花主催）",
+    nameI18n: {"ja":"迷子の虫クエスト（浪花主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["13:00"],
+    icon: "bug",
+  },
+  {
+    name: "アヒルのジャンプステージ（ハリー主催）",
+    nameI18n: {"ja":"アヒルのジャンプステージ（ハリー主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["14:00"],
+    icon: "clock",
+  },
+  {
+    name: "シャボン玉マシンチャレンジ（ビーチ客主催）",
+    nameI18n: {"ja":"シャボン玉マシンチャレンジ（ビーチ客主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["15:00"],
+    icon: "clock",
+  },
+  {
+    name: "迷子鳥クエスト（ベイリー主催）",
+    nameI18n: {"ja":"迷子鳥クエスト（ベイリー主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["16:00"],
+    icon: "bird",
+  },
+  {
+    name: "クエスト「巣ごもり」（ベイリー主催）",
+    nameI18n: {"ja":"クエスト「巣ごもり」（ベイリー主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["17:00"],
+    icon: "clock",
+  },
+  {
+    name: "浅海の魚群クエスト（ヴァンニア主催）",
+    nameI18n: {"ja":"浅海の魚群クエスト（ヴァンニア主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["18:00"],
+    icon: "fish",
+  },
+  {
+    name: "ホエールシーズン週末音楽会（アタラ主催）（土日限定）",
+    nameI18n: {"ja":"ホエールシーズン週末音楽会（アタラ主催）（土日限定）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["19:00"],
+    weekdays: [0, 6], // 日・土のみ
+    icon: "clock",
+  },
+  {
+    name: "海洋清掃クエスト（オリバー主催）",
+    nameI18n: {"ja":"海洋清掃クエスト（オリバー主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    times: ["20:30"],
+    icon: "clock",
+  },
 ];
 
 const dailyUpdates = [
@@ -65,15 +117,20 @@ function getNextQuestTime(quest){
   const jstNow = new Date(Date.now() + 9 * 3600 * 1000);
   const candidates = [];
 
-  // 今日と明日の候補を作る
-  [0, 1].forEach(offset => {
+  // 今日から7日先までの候補を作る（weekdays指定のクエストが1週間以上先になることはないため）
+  for(let offset = 0; offset <= 7; offset++){
     quest.times.forEach(t => {
       candidates.push(timeStrToTodayDate(t, offset));
     });
-  });
+  }
+
+  // 開催曜日が指定されている場合はそれ以外を除外
+  const onAllowedDay = quest.weekdays
+    ? candidates.filter(d => quest.weekdays.includes(d.getUTCDay()))
+    : candidates;
 
   // 現在時刻より後で最も近いものを選ぶ
-  const future = candidates
+  const future = onAllowedDay
     .filter(d => d.getTime() > jstNow.getTime())
     .sort((a, b) => a - b);
 
@@ -98,13 +155,17 @@ function getNextUpdateTime(update){
   return { nextTime: next, minutesUntil };
 }
 
-// 分数を "n時間m分" 形式の文字列に変換
+// 分数を "n分後" / "n時間m分後" / "n日m時間後" 形式の文字列に変換
 function formatMinutesUntil(minutes){
   if(minutes < 60) return `${minutes}分後`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if(m === 0) return `${h}時間後`;
-  return `${h}時間${m}分後`;
+  if(minutes < 1440){
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m === 0 ? `${h}時間後` : `${h}時間${m}分後`;
+  }
+  const d = Math.floor(minutes / 1440);
+  const h = Math.floor((minutes % 1440) / 60);
+  return h === 0 ? `${d}日後` : `${d}日${h}時間後`;
 }
 
 // ── 「もうすぐ終わるもの」抽出 ──
