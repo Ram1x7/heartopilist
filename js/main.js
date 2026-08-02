@@ -1635,10 +1635,10 @@ function renderDailyTasks(){
   const body = document.getElementById("dailyTasksBody");
   if(!body) return;
 
-  const sections = [];
   const todayWeekday = getJstDate().getUTCDay();
+  let sectionSpots, sectionWeather, sectionQuests, sectionUpdates, sectionEnding;
 
-  // ① 蛍石・オークの木
+  // 蛍石・オークの木
   if(typeof dailySpots !== "undefined" && typeof getDailySpotFor === "function"){
     const spotRows = Object.keys(dailySpots).map(key => {
       const today = getDailySpotFor(key, 0);
@@ -1650,10 +1650,10 @@ function renderDailyTasks(){
         </div>
       `;
     }).join("");
-    sections.push(sectionHTML("pin", T("daily_tasks_section_spots","蛍石・オークの木"), spotRows));
+    sectionSpots = sectionHTML("pin", T("daily_tasks_section_spots","蛍石・オークの木"), spotRows);
   }
 
-  // ② 今日の天気予報
+  // 今日の天気予報
   if(typeof weatherData !== "undefined"){
     const todayKey = getDateKey(0);
     const todayWeather = weatherData[todayKey] || {};
@@ -1670,10 +1670,10 @@ function renderDailyTasks(){
         <span class="daily-task-value">${translateWeatherWord(todayWeather[z] || "不明")}</span>
       </div>
     `).join("");
-    sections.push(sectionHTML("weatherSun", T("daily_tasks_section_weather","今日の天気"), weatherRows));
+    sectionWeather = sectionHTML("weatherSun", T("daily_tasks_section_weather","今日の天気"), weatherRows);
   }
 
-  // ③ 定時クエスト
+  // 定時クエスト
   if(typeof dailyQuests !== "undefined" && dailyQuests.length > 0){
     const questRows = dailyQuests
       .filter(q => !q.weekdays || q.weekdays.includes(todayWeekday))
@@ -1691,10 +1691,10 @@ function renderDailyTasks(){
           </div>
         `;
       }).join("");
-    sections.push(sectionHTML("clock", T("daily_tasks_section_quests","定時クエスト"), questRows));
+    sectionQuests = sectionHTML("clock", T("daily_tasks_section_quests","定時クエスト"), questRows);
   }
 
-  // ④ 毎日更新系
+  // 毎日更新系
   if(typeof dailyUpdates !== "undefined" && dailyUpdates.length > 0){
     const visibleUpdates = dailyUpdates.filter(u => !u.weekdays || u.weekdays.includes(todayWeekday));
     const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
@@ -1720,10 +1720,10 @@ function renderDailyTasks(){
         </div>
       `;
     }).join("");
-    sections.push(sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows, titleCountdown));
+    sectionUpdates = sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows, titleCountdown);
   }
 
-  // ⑤ もうすぐ終わるもの
+  // もうすぐ終わるもの
   if(typeof getEndingSoonItems === "function"){
     const endingSoon = getEndingSoonItems(3);
     if(endingSoon.length > 0){
@@ -1738,9 +1738,12 @@ function renderDailyTasks(){
           <span class="daily-task-value highlight">${T("daily_tasks_days_left","あと{n}日").replace("{n}", item.daysLeft)}</span>
         </div>
       `).join("");
-      sections.push(sectionHTML("warning", T("daily_tasks_section_ending","もうすぐ終わるもの"), endingRows));
+      sectionEnding = sectionHTML("warning", T("daily_tasks_section_ending","もうすぐ終わるもの"), endingRows);
     }
   }
+
+  // 表示順: もうすぐ終わるもの → 蛍石・オークの木 → 今日の天気 → 毎日更新系 → 定時クエスト
+  const sections = [sectionEnding, sectionSpots, sectionWeather, sectionUpdates, sectionQuests].filter(Boolean);
 
   body.innerHTML = sections.length
     ? sections.join("")
