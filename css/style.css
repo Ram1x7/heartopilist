@@ -477,6 +477,18 @@ body.dark .server-select{
   color:#fdf9ef;
 }
 
+body.dark .check-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#e8d2a8;
+}
+
+body.dark .check-btn.checked{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
+}
+
 /* 名前 */
 .item-name{
   height:34px;
@@ -503,6 +515,12 @@ body.dark .server-select{
   align-items:center;
   justify-content:center;
   color:var(--text-sub);
+}
+
+body.dark #clearBtn{
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 /* フィルター */
@@ -613,7 +631,8 @@ body.dark .daily-spot-header{
 
 body.dark .daily-spot-calendar-btn{
   background:#383329;
-  color:var(--text-sub);
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 .daily-spot-grid{
@@ -658,6 +677,10 @@ body.dark .daily-spot-item img{
   display:flex;
   align-items:center;
   gap:4px;
+}
+
+body.dark .daily-spot-item-label{
+  color:#b3a89a;
 }
 
 .daily-spot-item-location{
@@ -1185,6 +1208,10 @@ body.dark h3{
   color:var(--text-sub);
 }
 
+body.dark .mini-status{
+  color:#b3a89a;
+}
+
 #miniTime{
   font-size:14px;
   font-family:'Shippori Mincho', serif;
@@ -1223,6 +1250,17 @@ a{
 }
 
 .auth-btn.checked{
+  background:var(--gold);
+  border-color:var(--gold);
+}
+
+body.dark .auth-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#e8d2a8;
+}
+
+body.dark .auth-btn.checked{
   background:var(--gold);
   border-color:var(--gold);
 }
@@ -1305,6 +1343,10 @@ body.dark #shareBtn{
   border-radius:14px;
   border:1px solid var(--border);
   margin-bottom:10px;
+}
+
+body.dark #shareCanvas{
+  border-color:#46423b;
 }
 
 /* ナビゲーションバー */
@@ -1412,6 +1454,10 @@ body.dark #helpBtn, body.dark #shareBtn, body.dark #dataSyncBtn, body.dark #dark
   pointer-events:none;
 }
 
+body.dark .search-icon{
+  color:#b3a89a;
+}
+
 .search-wrap .search{
   padding-left:38px;
 }
@@ -1493,6 +1539,10 @@ body.dark .accordion-toggle-icon{
   transition:transform 0.2s;
 }
 
+body.dark .accordion-chevron{
+  color:#b3a89a;
+}
+
 .accordion-toggle.open .accordion-chevron{
   transform:rotate(180deg);
 }
@@ -1530,6 +1580,11 @@ body.dark .accordion-toggle-icon{
   font-size:11px;
   color:var(--text-sub);
   margin-bottom:6px;
+}
+
+body.dark .filter-group-label,
+body.dark .filter-group-label-row{
+  color:#b3a89a;
 }
 
 .level-slider{
