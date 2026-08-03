@@ -12,6 +12,7 @@ darkToggle.onclick = ()=>{
   document.body.classList.toggle("dark");
   localStorage.setItem("darkMode", document.body.classList.contains("dark"));
   updateDarkButton();
+  forceRepaint();
 };
 
 function updateDarkButton(){
@@ -19,6 +20,13 @@ function updateDarkButton(){
     document.body.classList.contains("dark") ? icon("sun") : icon("moon");
 }
 updateDarkButton();
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
 
 // ── 多言語表示ヘルパー ──
 function currentLang(){
@@ -45,6 +53,57 @@ let shopChecked = JSON.parse(localStorage.getItem("shopChecked") || "{}");
 
 function saveShopChecked(){
   localStorage.setItem("shopChecked", JSON.stringify(shopChecked));
+}
+
+// ── 検索・並び替え ──
+let shopSearchKeyword = "";
+let shopSortMode = "book"; // "book" = 並び順 / "unchecked" = 未所持順
+
+const shopSearchInput = document.getElementById("shopSearch");
+const shopClearBtn = document.getElementById("shopClearBtn");
+shopClearBtn.innerHTML = icon("close", {size:13});
+const shopSearchIconEl = document.querySelector(".shop-controls .search-icon");
+if(shopSearchIconEl) shopSearchIconEl.innerHTML = icon("search", {size:15});
+
+shopSearchInput.addEventListener("input", ()=>{
+  shopSearchKeyword = shopSearchInput.value.trim();
+  shopClearBtn.style.display = shopSearchKeyword ? "flex" : "none";
+  render();
+});
+
+shopClearBtn.onclick = ()=>{
+  shopSearchInput.value = "";
+  shopSearchKeyword = "";
+  shopClearBtn.style.display = "none";
+  render();
+};
+
+function setShopSort(mode){
+  shopSortMode = mode;
+  document.getElementById("shopSort_book").classList.toggle("active", mode === "book");
+  document.getElementById("shopSort_unchecked").classList.toggle("active", mode === "unchecked");
+  render();
+}
+
+function matchesShopSearch(item){
+  if(!shopSearchKeyword) return true;
+  const keyword = shopSearchKeyword.toLowerCase();
+  return item.name.toLowerCase().includes(keyword)
+    || displayName(item).toLowerCase().includes(keyword);
+}
+
+function sortShopItems(items){
+  if(shopSortMode !== "unchecked") return items;
+  // 未所持（未購入）を先に、購入済みを後ろに（同じ状態内は元の並び順を維持）
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const aChecked = shopChecked[a.item.id] ? 1 : 0;
+      const bChecked = shopChecked[b.item.id] ? 1 : 0;
+      if(aChecked !== bChecked) return aChecked - bChecked;
+      return a.index - b.index;
+    })
+    .map(x => x.item);
 }
 
 // ── シーズン判定（開催期間はJST固定） ──
@@ -147,8 +206,11 @@ function render(){
   const content = document.getElementById("shopContent");
   content.innerHTML = "";
 
+  const visibleData = shopData.filter(matchesShopSearch);
+  let anyResult = false;
+
   SHOP_CATEGORIES.forEach(catDef => {
-    const catItems = shopData.filter(i => i.category === catDef.category);
+    const catItems = visibleData.filter(i => i.category === catDef.category);
     if(catItems.length === 0) return;
 
     const catTitle = document.createElement("div");
@@ -158,8 +220,9 @@ function render(){
 
     if(catDef.subcategories){
       catDef.subcategories.forEach(subDef => {
-        const subItems = catItems.filter(i => i.subcategory === subDef.key);
+        const subItems = sortShopItems(catItems.filter(i => i.subcategory === subDef.key));
         if(subItems.length === 0) return;
+        anyResult = true;
 
         const subTitle = document.createElement("div");
         subTitle.className = "section-label";
@@ -172,12 +235,17 @@ function render(){
         content.appendChild(grid);
       });
     } else {
+      anyResult = true;
       const grid = document.createElement("div");
       grid.className = "shop-grid";
-      catItems.forEach(item => grid.appendChild(createShopCard(item)));
+      sortShopItems(catItems).forEach(item => grid.appendChild(createShopCard(item)));
       content.appendChild(grid);
     }
   });
+
+  if(!anyResult){
+    content.innerHTML = `<div class="daily-task-empty">${T("shop_no_results","該当するアイテムがありません")}</div>`;
+  }
 }
 
 // 言語切替時に再描画

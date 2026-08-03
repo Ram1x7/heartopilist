@@ -49,6 +49,17 @@
   color:var(--text-sub);
 }
 
+body.dark .shop-season-banner{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .shop-season-banner.ended{
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
 .shop-progress{
   display:flex;
   align-items:center;
@@ -62,12 +73,22 @@
   font-size:12px;
 }
 
+body.dark .shop-progress{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
 .shop-progress-track{
   flex:1;
   height:8px;
   border-radius:999px;
   background:var(--card-sub);
   overflow:hidden;
+}
+
+body.dark .shop-progress-track{
+  background:#383329;
 }
 
 .shop-progress-fill{
@@ -123,6 +144,41 @@ body.dark .shop-item-price{ color:#e07060; }
   color:var(--text-sub);
   margin-top:1px;
 }
+
+body.dark .shop-item-limit{
+  color:#b3a89a;
+}
+
+.shop-controls{
+  margin-bottom:14px;
+}
+
+.shop-controls .search-wrap{
+  margin-bottom:8px;
+}
+
+#shopClearBtn{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  border:1px solid var(--border);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--card);
+  box-shadow:0 2px 6px rgba(52,48,43,0.08);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-sub);
+}
+
+body.dark #shopClearBtn{
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
+}
 </style>
 </head>
 
@@ -157,6 +213,19 @@ body.dark .shop-item-price{ color:#e07060; }
   <span id="shopProgressLabel">0 / 0</span>
   <div class="shop-progress-track">
     <div class="shop-progress-fill" id="shopProgressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<div class="shop-controls">
+  <div class="search-wrap">
+    <span class="search-icon"></span>
+    <input type="text" id="shopSearch" class="search" data-i18n-placeholder="shop_search_placeholder" placeholder="アイテム名で検索">
+    <button id="shopClearBtn" aria-label="clear search"></button>
+  </div>
+
+  <div class="filter" id="shopSortRow">
+    <button id="shopSort_book" class="active" onclick="setShopSort('book')" data-i18n="shop_sort_book">並び順</button>
+    <button id="shopSort_unchecked" onclick="setShopSort('unchecked')" data-i18n="shop_sort_unchecked">未所持順</button>
   </div>
 </div>
 

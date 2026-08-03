@@ -309,5 +309,9 @@
   "shop_limit_label": "上限{n}個",
   "shop_currency": "トレンドコイン",
   "shop_season_active_suffix": " 開催中",
-  "shop_season_ended_suffix": " は終了しています"
+  "shop_season_ended_suffix": " は終了しています",
+  "shop_search_placeholder": "アイテム名で検索",
+  "shop_sort_book": "並び順",
+  "shop_sort_unchecked": "未所持順",
+  "shop_no_results": "該当するアイテムがありません"
 }

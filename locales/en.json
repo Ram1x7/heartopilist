@@ -309,5 +309,9 @@
   "shop_limit_label": "Limit {n}",
   "shop_currency": "Trend Coins",
   "shop_season_active_suffix": " is ongoing",
-  "shop_season_ended_suffix": " has ended"
+  "shop_season_ended_suffix": " has ended",
+  "shop_search_placeholder": "Search by item name",
+  "shop_sort_book": "Default",
+  "shop_sort_unchecked": "Unpurchased first",
+  "shop_no_results": "No matching items"
 }
