@@ -477,18 +477,6 @@ body.dark .server-select{
   color:#fdf9ef;
 }
 
-body.dark .check-btn{
-  background:#2c2823;
-  border-color:#46423b;
-  color:#e8d2a8;
-}
-
-body.dark .check-btn.checked{
-  background:var(--vermillion);
-  border-color:var(--vermillion);
-  color:#fdf9ef;
-}
-
 /* 名前 */
 .item-name{
   height:34px;
@@ -1250,17 +1238,6 @@ a{
 }
 
 .auth-btn.checked{
-  background:var(--gold);
-  border-color:var(--gold);
-}
-
-body.dark .auth-btn{
-  background:#2c2823;
-  border-color:#46423b;
-  color:#e8d2a8;
-}
-
-body.dark .auth-btn.checked{
   background:var(--gold);
   border-color:var(--gold);
 }
