@@ -32,7 +32,6 @@ body{
   color:var(--text);
   overflow-x:hidden;
   position:relative;
-  background-attachment:fixed;
   animation:fadeIn 0.2s ease;
 }
 
