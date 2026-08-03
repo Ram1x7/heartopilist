@@ -1,4 +1,4 @@
-const APP_VERSION = "3.0.0";
+const APP_VERSION = "3.1.0";
 
 // ── サーバー設定 ──
 // weatherData や生き物の出現時間帯（time配列）は Asia(UTC+9) 基準で入力されている。
@@ -1371,7 +1371,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "3.0.0";
+const popupVersion = "3.1.0";
 
 if(
  localStorage.getItem("popupVersion")
@@ -1507,7 +1507,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/07/27";
+    T("last_update_label","最終更新") + " 2026/08/03";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
