@@ -12,6 +12,20 @@
 <title data-i18n="page_title_faq">Q&A・不具合対応状況｜はとぴ図鑑</title>
 <meta name="description" data-i18n-content="meta_description_faq" content="Heartopia（ハートピアスローライフ）はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。">
 
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | Q&A">
+<meta property="og:description" content="はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.PNG?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/faq.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | Q&A">
+<meta name="twitter:description" content="はとぴ図鑑へよく寄せられる質問・要望・不具合の対応状況一覧。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.PNG?raw=true">
+
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 <link rel="prefetch" href="./index.html">
@@ -705,6 +719,27 @@ renderFaq();
 
 // 言語切替時に再描画
 document.addEventListener("langchange", renderFaq);
+
+// 構造化データ（FAQPage）を動的に生成
+(function injectFaqStructuredData(){
+  if(typeof faqData === "undefined" || faqData.length === 0) return;
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.map(f => ({
+      "@type": "Question",
+      "name": f.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": f.answer,
+      },
+    })),
+  };
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(data);
+  document.head.appendChild(script);
+})();
 
 </script>
 <script src="js/sw-register.js"></script>
