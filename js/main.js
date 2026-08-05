@@ -470,7 +470,7 @@ function createCard(c){
   </button>
 ` : ""}
 
-  <img src="${c.img}" loading="lazy" decoding="async">
+  <img src="${c.img}" alt="${displayName(c)}" loading="lazy" decoding="async">
 
 </div>
 
@@ -824,6 +824,7 @@ function openModal(c){
  modal.dataset.currentCreature = c.name;
  m_name.innerText=displayName(c);
  m_img.src=c.img;
+ m_img.alt=displayName(c);
  let locHtml = displayLocation(c);
  if(c.seasonName){
    locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
