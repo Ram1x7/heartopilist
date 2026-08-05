@@ -708,6 +708,7 @@ const bugData = [
  name:"アレクサンドラトリバネアゲハ",
  nameI18n:{"ja":"アレクサンドラトリバネアゲハ","en":"Queen Alexandra's Birdwing","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
+ prise:240,
  weather:["晴れ","虹"],
  time:["18-0","0-6"],
  location:"郊外の湖",
@@ -722,7 +723,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/066.PNG"
 }, 
 {
  name:"ジュウサンホシテントウ",
@@ -732,7 +733,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/067.PNG"
 }, 
 {
  name:"ハナカマキリ",
@@ -748,6 +749,7 @@ const bugData = [
  name:"ミイロタイマイ",
  nameI18n:{"ja":"ミイロタイマイ","en":"Tricolor Swallowtail","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
+ prise:240,
  weather:["雨","虹"],
  time:["6-12","18-0","0-6"],
  location:"花畑-風車の花畑",
@@ -782,7 +784,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/072.PNG"
 },
 {
  name:"デイダミアモルフォ",
@@ -792,7 +794,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/073.PNG"
 },
 {
  name:"ミドリカワトンボ",
@@ -802,7 +804,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/074.PNG"
 },
 {
  name:"グラスウィングバタフライ",
@@ -812,7 +814,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/075.PNG"
 },
 {
  name:"アオミオカタニシ",
@@ -822,7 +824,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"bugs/076.PNG"
 },
 {
  name:"氷晶・シンジュタテハ",
@@ -1091,8 +1093,8 @@ const bugData = [
  auth:false
 },
 {
- name:"？？？",
- nameI18n:{"ja":"？？？","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"キセイスモルフォ",
+ nameI18n:{"ja":"キセイスモルフォ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
  ended:false,
  level:1,
@@ -1101,7 +1103,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫クエスト（追加段階）",
  locationI18n:{"ja":"虫クエスト（追加段階）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG",
+ img:"bugs/1020.PNG",
  auth:false
 },
  // ここに追加していく
