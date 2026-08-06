@@ -326,6 +326,28 @@ const eventData = [
     detail: "月の水晶を使用。同一展示内のアイテムは重複せず、12回以内にすべて獲得可能です。",
     link: "https://x.com/heartopia_jp/status/2080941132444492074?s=61",
   },
+  {
+    id: 30,
+    category: "event",
+    name: "『ハートピアスローライフ』× 『デイヴ・ザ・ダイバー』",
+    img: "./images/events/e028.jpg",
+    start: "2026-08-08 06:00",
+    end: "2026-09-07 05:59",
+    exchangeEnd: null,
+    detail: "コラボイベントに参加すると、コラボ限定の衣装アクセサリー・家具・レシピと交換できる報酬を獲得できます🎁デイヴと一緒にレギュレーターパーツを探し、酸素ボンベを修理して、海底での冒険を続けましょう🌊",
+    link: "https://x.com/heartopia_jp/status/2085289787729023064?s=61",
+  },
+  {
+    id: 31,
+    category: "event",
+    name: "エア漏れ厳禁！",
+    img: "./images/events/e029.jpg",
+    start: "2026-08-08 06:00",
+    end: "2026-09-07 05:59",
+    exchangeEnd: null,
+    detail: "イベント期間中、コラボイベントアイテム【レギュレーターパーツ】を集めると、コラボ限定のレシピや衣装アクセサリー、家具などの豪華報酬と交換できます🎁",
+    link: "https://x.com/heartopia_jp/status/2085297328865321171?s=61",
+  },
   // 以下、イベントを追加していく
   // {
   //   id: 3,
