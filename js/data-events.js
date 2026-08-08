@@ -348,6 +348,17 @@ const eventData = [
     detail: "イベント期間中、コラボイベントアイテム【レギュレーターパーツ】を集めると、コラボ限定のレシピや衣装アクセサリー、家具などの豪華報酬と交換できます🎁",
     link: "https://x.com/heartopia_jp/status/2085297328865321171?s=61",
   },
+  {
+    id: 32,
+    category: "gacha",
+    name: "金ドングリ展示会：森林探検",
+    img: "./images/events/e030.jpg",
+    start: "2026-08-15 07:00",
+    end: "2026-10-17 05:59",
+    exchangeEnd: null,
+    detail: "展示会パスを使用。「展示会記念チケット半券」を使用すると、展示会記念グッズ商店にて色違いと交換可能。",
+    link: "https://x.com/heartopia_jp/status/2086014555713421415?s=61",
+  },
   // 以下、イベントを追加していく
   // {
   //   id: 3,
