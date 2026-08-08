@@ -1061,22 +1061,25 @@ function renderModal(item){
       return `<span class="breeding-chip rarity-${r}">${translateColor(c)}</span>`;
     }).join("");
 
-    const orLabel = T("garden_breeding_or","または");
     const examples = [
-      { from:["赤","黄","白"], to:`${translateColor("オレンジ")}${orLabel}${translateColor("ピンク")}`, rFrom:1, rTo:2 },
-      { from:["オレンジ","ピンク"], to:`${translateColor("黒")}${orLabel}${translateColor("桃")}`, rFrom:2, rTo:3 },
-      { from:["黒","桃"], to:`${translateColor("紫")}・${translateColor("青")}・${translateColor("緑")}`, rFrom:3, rTo:4 },
-      { from:["紫","青","緑"], to:`${translateColor("輝く")}${orLabel}${translateColor("夜光")}`, rFrom:4, rTo:5 },
-    ].filter(ex =>
-      ex.from.some(f => item.colors.includes(f)) &&
-      item.colors.some(c => colorRarity[c] === ex.rTo)
-    ).map(ex => `
+      { from:["赤","黄","白"], to:["オレンジ","ピンク"], rFrom:1, rTo:2 },
+      { from:["オレンジ","ピンク"], to:["黒","桃"], rFrom:2, rTo:3 },
+      { from:["黒","桃"], to:["紫","青","緑"], rFrom:3, rTo:4 },
+      { from:["紫","青","緑"], to:["輝く","夜光"], rFrom:4, rTo:5 },
+    ].map(ex => ({
+      ...ex,
+      fromMatched: ex.from.filter(f => item.colors.includes(f)),
+      toMatched: ex.to.filter(t => item.colors.includes(t)),
+    })).filter(ex => ex.fromMatched.length > 0 && ex.toMatched.length > 0)
+      .map(ex => `
       <div class="breeding-combo">
         <span class="breeding-chip rarity-${ex.rFrom}">
-          ${ex.from.filter(f => item.colors.includes(f)).map(translateColor).join(" / ")}
+          ${ex.fromMatched.map(translateColor).join(" / ")}
         </span>
         <span class="breeding-combo-arrow">×2 →</span>
-        <span class="breeding-chip rarity-${ex.rTo}">${ex.to}</span>
+        <span class="breeding-chip rarity-${ex.rTo}">
+          ${ex.toMatched.map(translateColor).join(" / ")}
+        </span>
       </div>
     `).join("");
 
@@ -1242,8 +1245,26 @@ document.getElementById("helpBtn").innerHTML = icon("help");
 document.getElementById("helpBtn").onclick = () => {
   document.getElementById("modalBox").innerHTML = `
     <div class="g-modal-name">${T("garden_help_title","使い方")}</div>
-    <div class="g-info" style="text-align:left; white-space:pre-line;">
-      ${T("garden_help_body","通常モード：収穫タイミングで1回通知\n草抜きモード：草抜き3回＋収穫タイミングで通知\n通知ONの作物にはベルアイコンを表示\n星5チェック・認証マスターチェックが可能\n\n使用上の注意\n通知には最大1分の誤差があり、草抜きモードでは、最初の2回は『成長時間÷3の1分前後』のタイミングで通知され、3回目は、『収穫時間の1〜2分前』に通知されます。\nこの通知機能はホーム追加した状態でしか使えず、通知許可をしていないと使えないのでご了承ください。\nまた不具合等あれば急に機能停止させる場合もありますが、そちらも合わせてご了承ください🙇‍♂️")}
+    <div style="text-align:left;">
+
+      <p><strong>${icon("crop",{size:13})} ${T("garden_help_tabs_title","作物・花の切替")}</strong><br>
+      ${T("garden_help_tabs_body","画面上部の「作物」「花」タブで表示を切り替えられます。成長時間・種の値段・売却額の一覧を確認できます。")}</p>
+
+      <p><strong>${icon("info",{size:13})} ${T("garden_help_detail_title","詳しい情報を見る")}</strong><br>
+      ${T("garden_help_detail_body","カードをタップすると、レア度（☆1〜☆5）ごとの売却額を確認できます。花の場合は交配で作れる色の一覧も表示されます。")}</p>
+
+      <p><strong>${icon("star",{size:13})} ${T("garden_help_check_title","コンプリート・認証マスターチェック")}</strong><br>
+      ${T("garden_help_check_body","カード右上の丸ボタンでコンプリート状況、右下の丸ボタン（対象のみ表示）で認証マスター取得状況を記録できます。")}</p>
+
+      <p><strong>${icon("flower",{size:13})} ${T("garden_help_breeding_title","花の交配について")}</strong><br>
+      ${T("garden_help_breeding_body","花の詳細画面では、その花で作れる色の一覧と組み合わせ例を確認できます。交配は毎朝6時に行われ、同じ色の花を2株隣り合わせて植えると、1つ上のレア度の色の種ができます。組み合わせ例には、その花で実際に作れる色のみを表示しています。")}</p>
+
+      <p><strong>${icon("bell",{size:13})} ${T("garden_help_notif_title","収穫通知")}</strong><br>
+      ${T("garden_help_notif_body","作物の詳細画面から通知を登録できます。<br>通常モード：収穫タイミングで1回通知<br>草抜きモード：草抜きタイミング3回＋収穫タイミングで通知<br>登録した作物にはベルアイコンが表示され、カード上にタイマーと進行バーが表示されます。")}</p>
+
+      <p><strong>${icon("warning",{size:13})} ${T("garden_help_notice_title","ご利用にあたって")}</strong><br>
+      ${T("garden_help_notice_body","収穫通知は、ホーム画面に追加し、通知を許可した状態でのみ利用できます。<br>通知には最大1分程度の誤差があります。草抜きモードでは、1〜2回目は成長時間の3分の1ごとのタイミング前後、3回目は収穫時刻の1〜2分前に通知されます。<br>不具合が発生した場合、通知機能を予告なく一時停止する場合があります。あらかじめご了承ください。")}</p>
+
     </div>
     <button class="g-close-btn modal-close-btn" onclick="closeModal()">${T("garden_close","閉じる")}</button>
   `;

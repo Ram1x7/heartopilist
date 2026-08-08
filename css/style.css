@@ -1118,6 +1118,10 @@ body.dark .update-popup-box h3{
   border:1px solid var(--gold);
 }
 
+.help-modal-box p{
+  white-space:pre-line;
+}
+
 /* ダークモード */
 body.dark .help-modal-box{
   background:#2c2823;
