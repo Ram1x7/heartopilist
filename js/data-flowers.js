@@ -204,7 +204,7 @@ const flowerData = [
     growTime: 4320,   // 72時間
     seedPrice: 300,
     prices: [825, null, null, null, null],
-    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","緑","輝く","夜光"],
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","青","緑","輝く","夜光"],
     auth: true,
     isEvent: false,
     eventName: null,
