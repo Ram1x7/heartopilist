@@ -30,5 +30,16 @@ const dogFoods = [
 {id:"029",name:{jp:"蒸しタラバガニ",en:"Steamed King Crab",zh_cn:"清蒸帝王蟹",zh_tw:"清蒸帝王蟹",ko:"찐 킹크랩",th:"ปูคิงแครบ",tl:"Steamed king crab"},img:"./images/petfoods/029.PNG"},
 {id:"030",name:{jp:"蒸し黄金タラバガニ",en:"Golden King Crab",zh_cn:"黄金帝王蟹",zh_tw:"黃金帝王蟹",ko:"황금 킹크랩",th:"ปูทอง",tl:"Golden king crab"},img:"./images/petfoods/030.PNG"},
 {id:"031",name:{jp:"大根おろし肉",en:"Grated Radish Meat",zh_cn:"萝卜泥肉",zh_tw:"蘿蔔泥肉",ko:"무 고기 요리",th:"เนื้อกับหัวไชเท้า",tl:"Karne na may labanos"},img:"./images/petfoods/031.PNG"},
-{id:"032",name:{jp:"大根クリームポタージュ",en:"Radish Cream Soup",zh_cn:"萝卜奶油汤",zh_tw:"蘿蔔奶油湯",ko:"무 크림 스프",th:"ซุปหัวไชเท้า",tl:"Radish cream soup"},img:"./images/petfoods/032.PNG"}
+{id:"032",name:{jp:"大根クリームポタージュ",en:"Radish Cream Soup",zh_cn:"萝卜奶油汤",zh_tw:"蘿蔔奶油湯",ko:"무 크림 스프",th:"ซุปหัวไชเท้า",tl:"Radish cream soup"},img:"./images/petfoods/032.PNG"},
+{id:"033",name:{jp:"ジャム添えイカ焼き",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/033.PNG"},
+{id:"034",name:{jp:"リンゴジャム添えイカ焼き",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/034.PNG"},
+{id:"035",name:{jp:"ブルーベリージャム添えイカ焼き",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/035.PNG"},
+{id:"036",name:{jp:"スターフルーツジャム添えイカ焼き",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/036.PNG"},
+{id:"037",name:{jp:"パイナップルジャム添えイカ焼き",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/037.PNG"},
+{id:"038",name:{jp:"いちごジャム添えイカ焼き",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/038.PNG"},
+{id:"039",name:{jp:"海ぶどうとシイタケの茶碗蒸し",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/039.PNG"},
+{id:"040",name:{jp:"ワカメと肉団子のスープ",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/040.PNG"},
+{id:"041",name:{jp:"シーアスパラガスのエビチャーハン",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/041.PNG"},
+{id:"042",name:{jp:"バンチョおすすめエビフライ寿司",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/042.PNG"},
+{id:"043",name:{jp:"バンチョおすすめ玉子丼",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/043.PNG"},
 ];
