@@ -1048,6 +1048,44 @@ const foodsData = [
   auth:false
 },
 {
+  name:"バンチョおすすめエビフライ寿司",
+  nameI18n:{"ja":"バンチョおすすめエビフライ寿司","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/105.PNG",
+  cost:112,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[430,645,860,1720,3440],
+  materials:["稲(種@12)","料理油(@100)","コウライエビ","ウミエビ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/oil.jpg" },
+    { image:"./images/materials/kouraiebi.jpg" },
+    { image:"./images/materials/umiebi.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"バンチョおすすめ玉子丼",
+  nameI18n:{"ja":"バンチョおすすめ玉子丼","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/106.PNG",
+  cost:124,
+  time:20,
+  rarity: [true,true,true,true,true],
+  prices:[310,465,620,1240,2480],
+  materials:["稲(種@12)","稲(種@12)","卵(@100)","海ぶどう"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/ine.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/umibudo.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
   name:"シナモロールのクレープ",
   nameI18n:{"ja":"シナモロールのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/102.PNG",
