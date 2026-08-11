@@ -52,17 +52,6 @@
   --green-soft:#dff0e5;
 }
 
-body.dark{
-  --bg-top:#25221d;
-  --bg-bottom:#1a1814;
-  --text:#ece4d4;
-  --text-sub:#b3a89a;
-  --card:#2c2823;
-  --card-sub:#383329;
-  --border:#46423b;
-  --green-soft:#1e3328;
-}
-
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
@@ -89,6 +78,10 @@ body.dark .page-header h2{
   margin-top:4px;
 }
 
+body.dark .page-header p{
+  color:#b3a89a;
+}
+
 /* 検索 */
 .faq-search-wrap{
   position:relative;
@@ -106,6 +99,10 @@ body.dark .page-header h2{
   pointer-events:none;
 }
 
+body.dark .faq-search-wrap .search-icon{
+  color:#b3a89a;
+}
+
 .faq-search{
   width:100%;
   padding:11px 16px 11px 38px;
@@ -117,6 +114,12 @@ body.dark .page-header h2{
   font-size:13px;
   color:var(--text);
   box-sizing:border-box;
+}
+
+body.dark .faq-search{
+  background:#2c2823;
+  color:#ece4d4;
+  border-color:#46423b;
 }
 
 .faq-search:focus{
@@ -156,9 +159,9 @@ body.dark .page-header h2{
 }
 
 body.dark .tab{
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border-color:var(--border);
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 body.dark .tab.active{
@@ -181,6 +184,11 @@ body.dark .tab.active{
   border-radius:16px;
   overflow:hidden;
   box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .faq-card{
+  background:#2c2823;
+  border-color:#46423b;
 }
 
 .faq-question{
@@ -210,7 +218,7 @@ body.dark .faq-icon{ color:#e8d2a8; }
 }
 
 body.dark .faq-title{
-  color:var(--text);
+  color:#ece4d4;
 }
 
 .faq-arrow{
@@ -219,6 +227,10 @@ body.dark .faq-title{
   color:var(--text-sub);
   transition:transform 0.2s;
   margin-top:2px;
+}
+
+body.dark .faq-arrow{
+  color:#b3a89a;
 }
 
 .faq-card.open .faq-arrow{
@@ -241,6 +253,10 @@ body.dark .faq-title{
   color:var(--text-sub);
   line-height:1.8;
   white-space:pre-wrap;
+}
+
+body.dark .faq-answer-inner{
+  color:#b3a89a;
 }
 
 /* ステータスバッジ */
@@ -283,7 +299,7 @@ body.dark .faq-title{
 }
 
 body.dark .status-fixed{
-  background:var(--green-soft);
+  background:#1e3328;
   color:#7ec89a;
   border-color:#4a7c59;
 }
@@ -295,9 +311,15 @@ body.dark .status-progress{
 }
 
 body.dark .status-considering{
-  background:var(--card-sub);
+  background:#383329;
   color:#8fb4c9;
   border-color:var(--indigo-soft);
+}
+
+body.dark .status-wontfix{
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 /* カテゴリラベル(カード内) */
@@ -311,6 +333,11 @@ body.dark .status-considering{
   margin-bottom:6px;
 }
 
+body.dark .cat-label{
+  background:#383329;
+  color:#b3a89a;
+}
+
 /* 空表示 */
 .empty{
   text-align:center;
@@ -318,6 +345,10 @@ body.dark .status-considering{
   color:var(--text-sub);
   font-size:13px;
   line-height:2;
+}
+
+body.dark .empty{
+  color:#b3a89a;
 }
 
 /* お問い合わせ誘導 */
@@ -330,11 +361,20 @@ body.dark .status-considering{
   margin-top:20px;
 }
 
+body.dark .contact-box{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
 .contact-box p{
   font-size:12px;
   color:var(--text-sub);
   margin-bottom:10px;
   line-height:1.7;
+}
+
+body.dark .contact-box p{
+  color:#b3a89a;
 }
 
 .contact-btn{
@@ -361,6 +401,10 @@ body.dark .status-considering{
   color:var(--text-sub);
   opacity:0.6;
   line-height:1.8;
+}
+
+body.dark .footer{
+  color:#b3a89a;
 }
 </style>
 </head>

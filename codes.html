@@ -52,17 +52,6 @@
   --green-soft:#dff0e5;
 }
 
-body.dark{
-  --bg-top:#25221d;
-  --bg-bottom:#1a1814;
-  --text:#ece4d4;
-  --text-sub:#b3a89a;
-  --card:#2c2823;
-  --card-sub:#383329;
-  --border:#46423b;
-  --green-soft:#1e3328;
-}
-
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
@@ -95,9 +84,9 @@ body{ min-height:100vh; }
 }
 
 body.dark .tab{
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border-color:var(--border);
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 body.dark .tab.active{
@@ -119,6 +108,11 @@ body.dark .tab.active{
   border-radius:16px;
   padding:14px 16px;
   box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .code-card{
+  background:#2c2823;
+  border-color:#46423b;
 }
 
 .code-card.expired{
@@ -160,7 +154,7 @@ body.dark .code-value{
 }
 
 body.dark .badge-active{
-  background:var(--green-soft);
+  background:#1e3328;
   color:#7ec89a;
   border-color:#4a7c59;
 }
@@ -169,6 +163,12 @@ body.dark .badge-active{
   background:var(--card-sub);
   color:var(--text-sub);
   border:1px solid var(--border);
+}
+
+body.dark .badge-expired{
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 .code-reward{
@@ -182,7 +182,7 @@ body.dark .badge-active{
 }
 
 body.dark .code-reward{
-  color:var(--text);
+  color:#ece4d4;
 }
 
 .code-meta{
@@ -195,6 +195,10 @@ body.dark .code-reward{
 .code-expiry{
   font-size:10px;
   color:var(--text-sub);
+}
+
+body.dark .code-expiry{
+  color:#b3a89a;
 }
 
 /* コピーボタン */
@@ -228,12 +232,22 @@ body.dark .code-reward{
   pointer-events:none;
 }
 
+body.dark .code-card.expired .copy-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
 /* 空表示 */
 .empty{
   text-align:center;
   padding:40px 0;
   color:var(--text-sub);
   font-size:13px;
+}
+
+body.dark .empty{
+  color:#b3a89a;
 }
 
 /* フッター */
@@ -244,6 +258,10 @@ body.dark .code-reward{
   color:var(--text-sub);
   opacity:0.6;
   line-height:1.8;
+}
+
+body.dark .footer{
+  color:#b3a89a;
 }
 
 /* トースト */
@@ -277,7 +295,7 @@ body.dark .code-reward{
 
 body.dark .code-card.received{
   border-color:#4a7c59;
-  background:var(--green-soft);
+  background:#1e3328;
 }
 
 /* 受取ボタン */
@@ -297,6 +315,12 @@ body.dark .code-card.received{
   gap:4px;
 }
 
+body.dark .receive-btn{
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
+}
+
 .receive-btn.received{
   background:var(--green-soft);
   border-color:var(--green);
@@ -305,7 +329,7 @@ body.dark .code-card.received{
 }
 
 body.dark .receive-btn.received{
-  background:var(--green-soft);
+  background:#1e3328;
   border-color:#4a7c59;
   color:#7ec89a;
 }
