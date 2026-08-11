@@ -1013,6 +1013,13 @@ shareBtn.onclick = async () => {
     loadScriptOnce("js/data-crops.js"),
     loadScriptOnce("js/data-flowers.js"),
   ]);
+  // カード内の文字に使う明朝体を読み込んでおく（未読み込みだとcanvas描画時にフォールバック体になる）
+  try {
+    await Promise.all([
+      document.fonts.load('700 32px "Shippori Mincho"'),
+      document.fonts.load('600 16px "Shippori Mincho"'),
+    ]);
+  } catch(e) {}
   drawShareCard();
   shareModal.style.display = "block";
 };
@@ -1048,16 +1055,16 @@ function getStats() {
   const total = creatures.length;
   const done  = creatures.filter(c => checkedData[c.name]).length;
 
-  const byType      = { fish:0, bug:0, bird:0 };
-  const totalByType = { fish:0, bug:0, bird:0 };
+  const byType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const totalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   creatures.forEach(c => {
     totalByType[c.type]++;
     if (checkedData[c.name]) byType[c.type]++;
   });
 
   const authEligible    = creatures.filter(c => c.auth !== false);
-  const authByType      = { fish:0, bug:0, bird:0 };
-  const authTotalByType = { fish:0, bug:0, bird:0 };
+  const authByType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const authTotalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   authEligible.forEach(c => {
     authTotalByType[c.type]++;
     if (authData[c.name]) authByType[c.type]++;
@@ -1112,205 +1119,301 @@ function getStats() {
   };
 }
 
-// 画像生成
+// 画像生成（深緑×金の高級和風デザイン）
 function drawShareCard() {
   const stats = getStats();
-  const ctx   = shareCanvas.getContext("2d");
-  const w     = shareCanvas.width;   // 600
-  const h     = shareCanvas.height;  // 1020 ← index.html の canvas height をこの値に変更
+
+  // ── 配色 ──
+  const GOLD        = "#c9a96a";
+  const GOLD_BRIGHT = "#e8d3a0";
+  const GOLD_DIM    = "rgba(201,169,106,0.35)";
+  const CREAM       = "#ece4d4";
+  const CREAM_DIM   = "#a89a80";
+  const BG_TOP      = "#182922";
+  const BG_BOTTOM   = "#0e1712";
+  const PANEL       = "#1f3329";
+  const PANEL_LINE  = "rgba(201,169,106,0.4)";
+  const TRACK       = "rgba(232,224,212,0.1)";
+  const SERIF       = "'Shippori Mincho', serif";
+
+  // ── 内訳データ ──
+  const dexRows = [
+    { label:"魚",   done:stats.byType.fish,  total:stats.totalByType.fish,  authDone:stats.authByType.fish,  authTotal:stats.authTotalByType.fish  },
+    { label:"虫",   done:stats.byType.bug,   total:stats.totalByType.bug,   authDone:stats.authByType.bug,   authTotal:stats.authTotalByType.bug   },
+    { label:"野鳥", done:stats.byType.bird,  total:stats.totalByType.bird,  authDone:stats.authByType.bird,  authTotal:stats.authTotalByType.bird  },
+    { label:"砂像", done:stats.byType.sand,  total:stats.totalByType.sand,  authDone:stats.authByType.sand,  authTotal:stats.authTotalByType.sand  },
+    { label:"雪像", done:stats.byType.snow,  total:stats.totalByType.snow,  authDone:stats.authByType.snow,  authTotal:stats.authTotalByType.snow  },
+    { label:"貝殻", done:stats.byType.shell, total:stats.totalByType.shell, authDone:stats.authByType.shell, authTotal:stats.authTotalByType.shell },
+  ];
+  const gardenRows = [
+    { label:"作物", done:stats.cropDone,   total:stats.cropTotal,   authDone:stats.cropAuthDone,   authTotal:stats.cropAuthTotal   },
+    { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal },
+  ];
+
+  // ── レイアウト（先にキャンバスの高さを確定させる） ──
+  const w      = 640;
+  const M      = 44;               // 左右の余白
+  const rowH   = 54;
+  const cardY  = 372;
+  const cardH  = 196;
+  let   y      = cardY + cardH + 46;
+  const dexTitleY = y;
+  y += 30 + dexRows.length * rowH + 34;
+  const gardenTitleY = y;
+  y += 30 + gardenRows.length * rowH + 54;
+  const h = y + 66; // フッター分
+
+  shareCanvas.width  = w;
+  shareCanvas.height = h;
+  const ctx = shareCanvas.getContext("2d");
 
   // ── 背景 ──
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, "#f7f2e7");
-  grad.addColorStop(1, "#ece2cf");
-  ctx.fillStyle = grad;
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+  bgGrad.addColorStop(0, BG_TOP);
+  bgGrad.addColorStop(1, BG_BOTTOM);
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // 装飾円
+  // 隅の淡い金の装飾円（控えめに）
   ctx.save();
-  ctx.globalAlpha = 0.06;
-  ctx.fillStyle = "#c8a86b";
-  ctx.beginPath(); ctx.arc(520, 80,  160, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = "#3c5a6e";
-  ctx.beginPath(); ctx.arc(80,  940, 140, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 0.05;
+  ctx.fillStyle = GOLD;
+  ctx.beginPath(); ctx.arc(w - 40, 30, 190, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(30, h - 40, 160, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 
-  // ── ヘッダー ──
-  ctx.fillStyle = "#3c5a6e";
-  ctx.fillRect(0, 0, w, 72);
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#fdf9ef";
-  ctx.font = "bold 28px sans-serif";
-  ctx.fillText("はとぴ図鑑  コンプ状況", w / 2, 46);
+  // ── 外枠（二重の金の罫線） ──
+  ctx.save();
+  ctx.strokeStyle = GOLD_DIM;
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(14, 14, w - 28, h - 28, 14); ctx.stroke();
+  ctx.strokeStyle = "rgba(201,169,106,0.22)";
+  ctx.beginPath(); ctx.roundRect(20, 20, w - 40, h - 40, 10); ctx.stroke();
+  ctx.restore();
 
-  // ── 総合コンプ率 ──
-  const totalAll  = stats.total + stats.foodTotal + stats.gardenTotal;
-  const doneAll   = stats.done  + stats.foodDone  + stats.gardenDone;
-  const totalPct  = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
+  // ── ヘルパー：角の飾り（額縁のコーナー金具風） ──
+  function drawCorner(cx, cy, len, rot) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.strokeStyle = GOLD;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, len); ctx.lineTo(0, 0); ctx.lineTo(len, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── ヘッダー ──
+  ctx.textAlign = "center";
+  ctx.fillStyle = GOLD_BRIGHT;
+  ctx.font = `700 34px ${SERIF}`;
+  ctx.fillText("はとぴ図鑑", w / 2, 76);
+
+  ctx.fillStyle = CREAM_DIM;
+  ctx.font = `13px ${SERIF}`;
+  ctx.save();
+  ctx.letterSpacing = "0.3em";
+  ctx.fillText("C O M P L E T E   S T A T U S", w / 2, 100);
+  ctx.restore();
+
+  // タイトル下の飾り罫（線 - 菱形 - 線）
+  const dividerY = 122;
+  ctx.strokeStyle = GOLD_DIM;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(w / 2 - 120, dividerY); ctx.lineTo(w / 2 - 14, dividerY);
+  ctx.moveTo(w / 2 + 14, dividerY);  ctx.lineTo(w / 2 + 120, dividerY);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(w / 2, dividerY);
+  ctx.rotate(Math.PI / 4);
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(-5, -5, 10, 10);
+  ctx.restore();
+
+  // ── 総合コンプ率（メダル風の二重リング） ──
+  const totalAll = stats.total + stats.foodTotal + stats.gardenTotal;
+  const doneAll  = stats.done  + stats.foodDone  + stats.gardenDone;
+  const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
+  const medalCx  = w / 2;
+  const medalCy  = 232;
+  const medalR   = 84;
 
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(w / 2, 172, 72, 0, Math.PI*2);
-  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  const medalGrad = ctx.createRadialGradient(medalCx, medalCy - 20, 10, medalCx, medalCy, medalR);
+  medalGrad.addColorStop(0, "#2a4536");
+  medalGrad.addColorStop(1, PANEL);
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR, 0, Math.PI * 2);
+  ctx.fillStyle = medalGrad;
   ctx.fill();
-  ctx.strokeStyle = "#c8a86b";
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = GOLD;
+  ctx.stroke();
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR - 9, 0, Math.PI * 2);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = GOLD_DIM;
   ctx.stroke();
   ctx.restore();
 
   ctx.textAlign = "center";
-  ctx.fillStyle = "#b1503b";
-  ctx.font = "bold 52px sans-serif";
-  ctx.fillText(`${totalPct}%`, w / 2, 186);
+  ctx.fillStyle = GOLD_BRIGHT;
+  ctx.font = `700 46px ${SERIF}`;
+  ctx.fillText(`${totalPct}%`, medalCx, medalCy + 10);
 
-  ctx.fillStyle = "#7a7164";
-  ctx.font = "14px sans-serif";
-  ctx.fillText("総合コンプ率", w / 2, 212);
+  ctx.fillStyle = CREAM_DIM;
+  ctx.font = `12px ${SERIF}`;
+  ctx.fillText("総 合 コ ン プ 率", medalCx, medalCy + 38);
 
-  ctx.fillStyle = "#34302b";
-  ctx.font = "15px sans-serif";
-  ctx.fillText(`${doneAll} / ${totalAll}`, w / 2, 232);
+  ctx.fillStyle = CREAM;
+  ctx.font = "13px sans-serif";
+  ctx.fillText(`${doneAll} / ${totalAll}`, medalCx, medalCy + medalR + 30);
 
-  // ── ヘルパー：プログレスバー ──
-  function drawProgressBar(x, y, bw, bh, pct, color) {
-    ctx.fillStyle = "rgba(0,0,0,0.08)";
-    ctx.beginPath(); ctx.roundRect(x, y, bw, bh, bh / 2); ctx.fill();
+  // ── ヘルパー：プログレスバー（金のグラデーション） ──
+  function drawProgressBar(x, py, bw, bh, pct) {
+    ctx.fillStyle = TRACK;
+    ctx.beginPath(); ctx.roundRect(x, py, bw, bh, bh / 2); ctx.fill();
     if (pct > 0) {
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.roundRect(x, y, bw * pct / 100, bh, bh / 2); ctx.fill();
+      const g = ctx.createLinearGradient(x, 0, x + bw, 0);
+      g.addColorStop(0, "#a3854f");
+      g.addColorStop(1, GOLD_BRIGHT);
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.roundRect(x, py, bw * pct / 100, bh, bh / 2); ctx.fill();
     }
   }
 
-  // ── ヘルパー：セクションカード ──
-  function drawCard(x, y, cw, ch, icon, label, done, total, authDone, authTotal, color) {
+  // ── ヘルパー：カテゴリカード（漢字の印章風バッジ付き） ──
+  function drawCard(x, cy, cw, ch, glyph, label, done, total, authDone, authTotal) {
     ctx.save();
-    ctx.shadowColor  = "rgba(52,48,43,0.12)";
-    ctx.shadowBlur   = 12;
-    ctx.shadowOffsetY = 4;
-    ctx.fillStyle = "rgba(255,255,255,0.82)";
-    ctx.beginPath(); ctx.roundRect(x, y, cw, ch, 16); ctx.fill();
+    ctx.fillStyle = PANEL;
+    ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.fill();
+    ctx.strokeStyle = PANEL_LINE;
+    ctx.lineWidth = 1;
+    ctx.stroke();
     ctx.restore();
 
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(x, y, cw, 5, [16, 16, 0, 0]); ctx.fill();
+    const cornerLen = 12;
+    drawCorner(x + 6,      cy + 6,      cornerLen, 0);
+    drawCorner(x + cw - 6, cy + 6,      cornerLen, Math.PI / 2);
+    drawCorner(x + cw - 6, cy + ch - 6, cornerLen, Math.PI);
+    drawCorner(x + 6,      cy + ch - 6, cornerLen, -Math.PI / 2);
 
     const cx  = x + cw / 2;
     const pct = total > 0 ? Math.floor(done / total * 100) : 0;
 
+    // 印章風バッジ
+    const badgeR = 21;
+    const badgeCy = cy + 38;
+    ctx.beginPath(); ctx.arc(cx, badgeCy, badgeR, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(201,169,106,0.1)";
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = GOLD;
+    ctx.stroke();
     ctx.textAlign = "center";
-    ctx.font = "20px sans-serif";
-    ctx.fillText(icon, cx, y + 34);
+    ctx.fillStyle = GOLD_BRIGHT;
+    ctx.font = `700 20px ${SERIF}`;
+    ctx.fillText(glyph, cx, badgeCy + 7);
 
-    ctx.fillStyle = "#3c5a6e";
-    ctx.font = "bold 13px sans-serif";
-    ctx.fillText(label, cx, y + 52);
+    ctx.fillStyle = CREAM;
+    ctx.font = `600 14px ${SERIF}`;
+    ctx.fillText(label, cx, cy + 82);
 
-    ctx.fillStyle = color;
-    ctx.font = "bold 30px sans-serif";
-    ctx.fillText(`${pct}%`, cx, y + 90);
+    ctx.fillStyle = GOLD_BRIGHT;
+    ctx.font = `700 28px ${SERIF}`;
+    ctx.fillText(`${pct}%`, cx, cy + 114);
 
-    ctx.fillStyle = "#7a7164";
-    ctx.font = "12px sans-serif";
-    ctx.fillText(`${done} / ${total}`, cx, y + 110);
+    ctx.fillStyle = CREAM_DIM;
+    ctx.font = "11px sans-serif";
+    ctx.fillText(`${done} / ${total}`, cx, cy + 132);
 
-    drawProgressBar(x + 14, y + 120, cw - 28, 7, pct, color);
+    drawProgressBar(x + 16, cy + 144, cw - 32, 6, pct);
 
-    ctx.fillStyle = "#c8a86b";
-    ctx.font = "bold 11px sans-serif";
-    ctx.fillText("🎖 認証", cx, y + 148);
-
-    ctx.fillStyle = "#7a7164";
-    ctx.font = "12px sans-serif";
-    ctx.fillText(`${authDone} / ${authTotal}`, cx, y + 165);
+    ctx.fillStyle = CREAM_DIM;
+    ctx.font = "10px sans-serif";
+    ctx.fillText(`認証 ${authDone} / ${authTotal}`, cx, cy + 172);
   }
 
   // ── 3カード横並び ──
-  const cardY  = 258;
-  const cardH  = 178;
-  const cardW  = 172;
-  const gap    = 11;
+  const cardW  = 176;
+  const gap    = 14;
   const startX = (w - cardW * 3 - gap * 2) / 2;
 
-  drawCard(startX,                 cardY, cardW, cardH, "📖", "図鑑",
-    stats.done,       stats.total,       stats.authCount,      stats.authTotal,      "#3c5a6e");
-  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "🍳", "料理",
-    stats.foodDone,   stats.foodTotal,   stats.foodAuthDone,   stats.foodAuthTotal,  "#b1503b");
-  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "🌱", "園芸",
-    stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal,"#4a7c59");
+  drawCard(startX,                 cardY, cardW, cardH, "図", "図鑑",
+    stats.done,       stats.total,       stats.authCount,      stats.authTotal);
+  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "食", "料理",
+    stats.foodDone,   stats.foodTotal,   stats.foodAuthDone,   stats.foodAuthTotal);
+  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "苗", "園芸",
+    stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal);
 
-// ── ヘルパー：内訳セクション ──
+  // ── ヘルパー：内訳セクション ──
   function drawSubSection(titleY, sectionLabel, rows) {
     ctx.textAlign = "left";
-    ctx.fillStyle = "#3c5a6e";
-    ctx.font = "bold 15px sans-serif";
-    ctx.fillText(sectionLabel, 40, titleY);
+    ctx.fillStyle = GOLD_BRIGHT;
+    ctx.font = `700 17px ${SERIF}`;
+    ctx.fillText(sectionLabel, M, titleY);
 
     ctx.textAlign = "right";
-    ctx.fillStyle = "#7a7164";
-    ctx.font = "11px sans-serif";
-    ctx.fillText("⭐ コンプ", w - 120, titleY);
-    ctx.fillStyle = "#c8a86b";
-    ctx.fillText("🎖 認証", w - 40, titleY);
+    ctx.fillStyle = CREAM_DIM;
+    ctx.font = "10.5px sans-serif";
+    ctx.fillText("コンプ / 認証", w - M, titleY);
 
-    const barX = 40;
-    const barW = w - 80;
+    const barX = M;
+    const barW = w - M * 2;
 
     rows.forEach((t, i) => {
-      const ty   = titleY + 22 + i * 62;
+      const ty   = titleY + 26 + i * rowH;
       const pct  = t.total     > 0 ? Math.floor(t.done     / t.total     * 100) : 0;
       const aPct = t.authTotal > 0 ? Math.floor(t.authDone / t.authTotal * 100) : 0;
 
-      ctx.fillStyle = "#34302b";
-      ctx.font = "bold 13px sans-serif";
+      // 金の菱形ブレット
+      ctx.save();
+      ctx.translate(barX + 3, ty - 2);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = GOLD;
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.restore();
+
+      ctx.fillStyle = CREAM;
+      ctx.font = `600 13.5px ${SERIF}`;
       ctx.textAlign = "left";
-      ctx.fillText(t.label, barX, ty + 13);
+      ctx.fillText(t.label, barX + 16, ty + 2);
 
-      ctx.fillStyle = "#7a7164";
-      ctx.font = "12px sans-serif";
+      ctx.fillStyle = CREAM_DIM;
+      ctx.font = "11px sans-serif";
       ctx.textAlign = "right";
-      ctx.fillText(`⭐ ${t.done}/${t.total}  🎖 ${t.authDone}/${t.authTotal}`, w - 40, ty + 13);
+      ctx.fillText(`${t.done}/${t.total}（${pct}%） ・ 認証 ${t.authDone}/${t.authTotal}`, w - M, ty + 2);
 
-      drawProgressBar(barX, ty + 20, barW, 8, pct,  t.color);
-      drawProgressBar(barX, ty + 34, barW, 6, aPct, "#c8a86b");
+      drawProgressBar(barX, ty + 12, barW, 7, pct);
+      drawProgressBar(barX, ty + 24, barW, 3, aPct);
     });
   }
 
-  function drawDivider(y) {
-    ctx.strokeStyle = "#e4d9c2";
+  function drawDivider(dy) {
+    ctx.strokeStyle = GOLD_DIM;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(40, y); ctx.lineTo(w - 40, y);
+    ctx.moveTo(M, dy); ctx.lineTo(w - M, dy);
     ctx.stroke();
   }
 
   // ── 図鑑内訳 ──
-  const figSubY = 462;
-  drawSubSection(figSubY, "📖 図鑑内訳", [
-    { label:"魚",   done:stats.byType.fish,  total:stats.totalByType.fish,  authDone:stats.authByType.fish,  authTotal:stats.authTotalByType.fish,  color:"#3c5a6e" },
-    { label:"虫",   done:stats.byType.bug,   total:stats.totalByType.bug,   authDone:stats.authByType.bug,   authTotal:stats.authTotalByType.bug,   color:"#4a7c59" },
-    { label:"野鳥", done:stats.byType.bird,  total:stats.totalByType.bird,  authDone:stats.authByType.bird,  authTotal:stats.authTotalByType.bird,  color:"#b1503b" },
-  ]);
+  drawSubSection(dexTitleY, "図鑑内訳", dexRows);
 
   // ── 園芸内訳 ──
-  const gardenSubY = figSubY + 22 + 3 * 62 + 18;
-  drawDivider(gardenSubY - 10);
-  drawSubSection(gardenSubY, "🌱 園芸内訳", [
-    { label:"作物", done:stats.cropDone,   total:stats.cropTotal,   authDone:stats.cropAuthDone,   authTotal:stats.cropAuthTotal,   color:"#4a7c59" },
-    { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal, color:"#b1503b" },
-  ]);
+  drawDivider(dexTitleY + 30 + dexRows.length * rowH + 16);
+  drawSubSection(gardenTitleY, "園芸内訳", gardenRows);
 
   // ── フッター ──
-  ctx.fillStyle = "#3c5a6e";
-  ctx.fillRect(0, h - 52, w, 52);
-
+  drawDivider(h - 60);
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.5)";
-  ctx.font = "12px sans-serif";
-  ctx.fillText("ram1x7.github.io/heartopilist", w / 2, h - 30);
+  ctx.fillStyle = CREAM_DIM;
+  ctx.font = "11px sans-serif";
+  ctx.fillText("ram1x7.github.io/heartopilist", w / 2, h - 34);
 
-  ctx.fillStyle = "rgba(255,255,255,0.7)";
-  ctx.font = "13px sans-serif";
-  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 12);
+  ctx.fillStyle = GOLD;
+  ctx.font = `600 13px ${SERIF}`;
+  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 16);
 }
 
 
