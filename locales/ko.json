@@ -309,5 +309,7 @@
   "data_sync_confirm_overwrite": "현재 데이터를 백업으로 덮어쓸까요?",
   "data_sync_invalid_format": "백업 파일 형식이 올바르지 않습니다.",
   "data_sync_import_done": "백업을 불러왔습니다.",
-  "data_sync_import_failed": "불러오기에 실패했습니다."
+  "data_sync_import_failed": "불러오기에 실패했습니다.",
+  "aria_check_label": "완료로 표시",
+  "aria_auth_label": "인증 마스터로 표시"
 }

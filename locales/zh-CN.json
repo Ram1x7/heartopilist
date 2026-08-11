@@ -309,5 +309,7 @@
   "data_sync_confirm_overwrite": "要用备份覆盖当前数据吗？",
   "data_sync_invalid_format": "备份文件格式不正确。",
   "data_sync_import_done": "已导入备份。",
-  "data_sync_import_failed": "导入失败。"
+  "data_sync_import_failed": "导入失败。",
+  "aria_check_label": "标记为已完成",
+  "aria_auth_label": "标记为认证大师"
 }

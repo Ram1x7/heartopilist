@@ -309,5 +309,7 @@
   "data_sync_confirm_overwrite": "เขียนทับข้อมูลปัจจุบันด้วยข้อมูลสำรองนี้หรือไม่?",
   "data_sync_invalid_format": "รูปแบบไฟล์สำรองไม่ถูกต้อง",
   "data_sync_import_done": "นำเข้าข้อมูลสำรองแล้ว",
-  "data_sync_import_failed": "นำเข้าล้มเหลว"
+  "data_sync_import_failed": "นำเข้าล้มเหลว",
+  "aria_check_label": "ทำเครื่องหมายว่าเสร็จสมบูรณ์",
+  "aria_auth_label": "ทำเครื่องหมายว่าผ่านการรับรอง"
 }

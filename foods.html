@@ -1096,11 +1096,11 @@ function renderSection(items, type = "normal"){
     div.innerHTML = `
       <div class="img-wrap">
         ${f.level != null ? `<div class="level-badge">Lv.${f.level}</div>` : ''}
-        <button class="check-btn ${checked ? "checked" : ""}">
+        <button class="check-btn ${checked ? "checked" : ""}" aria-pressed="${checked ? "true" : "false"}" aria-label="${displayName(f)} ${T("aria_check_label","コンプ済みにする")}">
           ${icon(checked ? "star" : "starOutline", {size:13})}
         </button>
         ${f.auth !== false ? `
-          <button class="auth-btn ${authed ? "checked" : ""}">
+          <button class="auth-btn ${authed ? "checked" : ""}" aria-pressed="${authed ? "true" : "false"}" aria-label="${displayName(f)} ${T("aria_auth_label","認証マスターにする")}">
             ${icon(authed ? "medal" : "medalOutline", {size:13})}
           </button>
         ` : ''}

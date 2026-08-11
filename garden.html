@@ -644,7 +644,16 @@ function updateNotifBanner(){
 
   if(Notification.permission === "granted"){
     banner.style.display = "none";
-  } else if(Notification.permission === "denied"){
+    return;
+  }
+
+  // 収穫通知を実際に使おうとするまでは、初回訪問時からこのバナーを常時表示しない
+  if(!localStorage.getItem("gardenNotifEngaged")){
+    banner.style.display = "none";
+    return;
+  }
+
+  if(Notification.permission === "denied"){
     banner.style.display = "block";
     if(iconEl) iconEl.innerHTML = icon("bellOff", {size:14});
     text.innerHTML = T("garden_notif_blocked_text","通知がブロックされています。<br>端末・ブラウザの設定からこのサイトの通知を「許可」に変更後、下のボタンを押してください。");
@@ -694,6 +703,10 @@ messaging.onMessage((payload) => {
 async function registerNotification(item, mode) {
   const token = localStorage.getItem("fcmToken") || await getFCMToken();
   if(!token){
+    // ここで初めて通知許可の案内バナーを表示する（初回訪問時からの常時表示はしない）
+    localStorage.setItem("gardenNotifEngaged", "1");
+    updateNotifBanner();
+    document.getElementById("notifBanner")?.scrollIntoView({ behavior:"smooth", block:"start" });
     showToast(T("garden_toast_allow_first","先に通知を許可してください"));
     return;
   }
@@ -1028,11 +1041,11 @@ function renderSection(label, items, eventStatus = null){
       <div class="img-wrap">
         <div class="level-badge">Lv.${item.level}</div>
         ${hasNotif ? `<div class="notif-badge">${icon("bell",{size:9})}</div>` : ''}
-        <button class="check-btn ${isChecked ? "checked" : ""}">
+        <button class="check-btn ${isChecked ? "checked" : ""}" aria-pressed="${isChecked ? "true" : "false"}" aria-label="${displayName(item)} ${T("aria_check_label","コンプ済みにする")}">
           ${icon(isChecked ? "star" : "starOutline", {size:13})}
         </button>
         ${item.auth !== false ? `
-          <button class="auth-btn ${isAuthed ? "checked" : ""}">
+          <button class="auth-btn ${isAuthed ? "checked" : ""}" aria-pressed="${isAuthed ? "true" : "false"}" aria-label="${displayName(item)} ${T("aria_auth_label","認証マスターにする")}">
             ${icon(isAuthed ? "medal" : "medalOutline", {size:13})}
           </button>
         ` : ''}

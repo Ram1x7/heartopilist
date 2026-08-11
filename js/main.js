@@ -469,7 +469,7 @@ function createCard(c){
   <button class="
     check-btn
     ${checkedData[c.name] ? "checked" : ""}
-  ">
+  " aria-pressed="${checkedData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_check_label","コンプ済みにする")}">
     ${icon(checkedData[c.name] ? "star" : "starOutline", {size:13})}
   </button>
 
@@ -477,7 +477,7 @@ function createCard(c){
   <button class="
     auth-btn
     ${authData[c.name] ? "checked" : ""}
-  ">
+  " aria-pressed="${authData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_auth_label","認証マスターにする")}">
     ${icon(authData[c.name] ? "medal" : "medalOutline", {size:13})}
   </button>
 ` : ""}
