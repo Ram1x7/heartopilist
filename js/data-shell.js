@@ -8,8 +8,8 @@
 
 const shellData = [
 {
- name:"壊れた貝殻",
- nameI18n:{"ja":"壊れた貝殻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"破損した貝殻",
+ nameI18n:{"ja":"破損した貝殻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  price:2,
  star1Only:true,
@@ -307,7 +307,19 @@ const shellData = [
  locationI18n:{"ja":"海洋清掃クエスト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/shells/025.PNG",
  auth:true
-} 
+},
+{
+ name:"イチゴナツモモ",
+ nameI18n:{"ja":"イチゴナツモモ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:9,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/026.PNG",
+ auth:true
+}
  // ここに追加していく
 ].map((c,i) => ({
   ...c,
