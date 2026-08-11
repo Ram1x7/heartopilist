@@ -8,6 +8,9 @@ if(savedDark === "true") document.body.classList.add("dark");
 else if(savedDark === null && window.matchMedia("(prefers-color-scheme: dark)").matches)
   document.body.classList.add("dark");
 
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")) forceRepaint();
+
 darkToggle.onclick = ()=>{
   document.body.classList.toggle("dark");
   localStorage.setItem("darkMode", document.body.classList.contains("dark"));
