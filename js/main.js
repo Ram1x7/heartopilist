@@ -1526,16 +1526,27 @@ function drawShareCard() {
 }
 
 
-// 画像を保存・共有(Web Share API)
+// シェア用の共通キャプション文言（画像シェア・Xポストで揃える）
+function buildShareText(){
+  const stats = getStats();
+  const totalAll  = stats.total + stats.foodTotal + stats.gardenTotal;
+  const doneAll   = stats.done  + stats.foodDone  + stats.gardenDone;
+  const percent   = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
+  const authAll   = stats.authCount + stats.foodAuthDone + stats.gardenAuthDone;
+  return `はとぴ図鑑 コンプ率 ${percent}%！\n認証マスター ${authAll}種獲得！\n#ハートピア\n#ハートピアスローライフ\n#Heartopia\n#はとぴ図鑑`;
+}
+
+// 画像を保存・共有(Web Share API。対応端末では画像とテキストを同時に共有できる)
 async function shareImage(){
   shareCanvas.toBlob(async (blob)=>{
     const file = new File([blob], "hatopi-comp.png", {type:"image/png"});
+    const text = buildShareText();
     if(navigator.canShare && navigator.canShare({files:[file]})){
       try{
         await navigator.share({
           files:[file],
           title:"はとぴ図鑑 コンプ状況",
-          text:"はとぴ図鑑のコンプ状況をシェア！"
+          text
         });
       }catch(e){}
     }else{
@@ -1548,16 +1559,12 @@ async function shareImage(){
   });
 }
 
-// Xへテキスト投稿(画像は別途手動添付)
+// Xへテキスト投稿
+// ※ X(Twitter)の投稿画面URLの仕様上、URLパラメータで画像を一緒に渡すことができないため
+//   （X側の仕様であり回避不可）、画像は別途「画像を保存・共有」から添付する必要がある。
+//   端末がWeb Share APIに対応していれば、そちらのボタンから画像とテキストを同時に共有できる。
 function shareToX(){
-  const stats = getStats();
-  const totalAll  = stats.total + stats.foodTotal + stats.gardenTotal;
-  const doneAll   = stats.done  + stats.foodDone  + stats.gardenDone;
-  const percent   = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
-  const authAll   = stats.authCount + stats.foodAuthDone + stats.gardenAuthDone;
-  const text = encodeURIComponent(
-    `はとぴ図鑑 コンプ率 ${percent}%！\n認証マスター ${authAll}種獲得！\n#ハートピア\n#ハートピアスローライフ\n#Heartopia\n#はとぴ図鑑`
-  );
+  const text = encodeURIComponent(buildShareText());
   window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
 }
 
