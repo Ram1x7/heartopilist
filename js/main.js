@@ -1559,16 +1559,6 @@ async function shareImage(){
   });
 }
 
-// Xへテキスト投稿
-// ※ X(Twitter)の投稿画面URLの仕様上、URLパラメータで画像を一緒に渡すことができないため
-//   （X側の仕様であり回避不可）、画像は別途「画像を保存・共有」から添付する必要がある。
-//   端末がWeb Share APIに対応していれば、そちらのボタンから画像とテキストを同時に共有できる。
-function shareToX(){
-  const text = encodeURIComponent(buildShareText());
-  window.open(`https://twitter.com/intent/tweet?text=${text}`, "_blank");
-}
-
-
 const levelMin = document.getElementById("levelMin");
 const levelMax = document.getElementById("levelMax");
 const levelRangeText =
