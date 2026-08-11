@@ -1160,9 +1160,9 @@ function drawShareCard() {
     { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal },
   ];
 
-  // ── レイアウト（カーソルを積み上げて要素の重なりを防ぐ） ──
-  const w      = 640;
-  const M      = 44;               // 左右の余白
+  // ── レイアウト（3:4比率。カーソルを積み上げて要素の重なりを防ぐ） ──
+  const w      = 960;
+  const M      = 64;               // 左右の余白
   const rowH   = 54;
   const mascotR = 56;
   const medalR  = 76;
@@ -1171,26 +1171,26 @@ function drawShareCard() {
   let cur = 34;
   cur += mascotR * 2;
   const mascotCy = cur - mascotR;
-  cur += 22;                       // マスコット下の余白
+  cur += 18;                       // マスコット下の余白
 
   const titleY = cur + 26;
   cur = titleY + 8;
   const subtitleY = cur + 14;
   cur = subtitleY + 16;
   const dividerY = cur;
-  cur += 42;
+  cur += 34;
 
   const medalCy = cur + medalR;
   cur += medalR * 2;
-  cur += 42;                       // メダル下の「done / total」表示分
+  cur += 34;                       // メダル下の「done / total」表示分
 
   const cardY = cur;
   cur += cardH;
-  cur += 44;
+  cur += 38;
 
   const dexTitleY = cur;
   cur += 30 + dexRows.length * rowH;
-  cur += 30;
+  cur += 24;
 
   const dexDividerY = cur;
   cur += 26;
@@ -1448,9 +1448,9 @@ function drawShareCard() {
   }
 
   // ── 3カード横並び ──
-  const cardW  = 176;
-  const gap    = 14;
-  const startX = (w - cardW * 3 - gap * 2) / 2;
+  const gap    = 20;
+  const cardW  = (w - M * 2 - gap * 2) / 3;
+  const startX = M;
 
   drawCard(startX,                 cardY, cardW, cardH, "図鑑",
     stats.done,       stats.total,       stats.authCount,      stats.authTotal);
