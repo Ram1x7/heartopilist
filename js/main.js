@@ -1006,6 +1006,14 @@ const shareModal = document.getElementById("shareModal");
 const shareCanvas = document.getElementById("shareCanvas");
 shareBtn.innerHTML = icon("share");
 
+// カード上部に飾るマスコット画像（サイトのアプリアイコンを流用）
+const shareMascotImg = new Image();
+shareMascotImg.src = "apple-touch-icon.png?v=10";
+const shareMascotReady = new Promise((resolve) => {
+  shareMascotImg.onload  = () => resolve(true);
+  shareMascotImg.onerror = () => resolve(false);
+});
+
 shareBtn.onclick = async () => {
   // 未読み込みのデータを動的に読み込む
   await Promise.all([
@@ -1013,6 +1021,14 @@ shareBtn.onclick = async () => {
     loadScriptOnce("js/data-crops.js"),
     loadScriptOnce("js/data-flowers.js"),
   ]);
+  // カード内の文字に使う明朝体を読み込んでおく（未読み込みだとcanvas描画時にフォールバック体になる）
+  try {
+    await Promise.all([
+      document.fonts.load('700 32px "Shippori Mincho"'),
+      document.fonts.load('600 16px "Shippori Mincho"'),
+    ]);
+  } catch(e) {}
+  await shareMascotReady;
   drawShareCard();
   shareModal.style.display = "block";
 };
@@ -1048,16 +1064,16 @@ function getStats() {
   const total = creatures.length;
   const done  = creatures.filter(c => checkedData[c.name]).length;
 
-  const byType      = { fish:0, bug:0, bird:0 };
-  const totalByType = { fish:0, bug:0, bird:0 };
+  const byType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const totalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   creatures.forEach(c => {
     totalByType[c.type]++;
     if (checkedData[c.name]) byType[c.type]++;
   });
 
   const authEligible    = creatures.filter(c => c.auth !== false);
-  const authByType      = { fish:0, bug:0, bird:0 };
-  const authTotalByType = { fish:0, bug:0, bird:0 };
+  const authByType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const authTotalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   authEligible.forEach(c => {
     authTotalByType[c.type]++;
     if (authData[c.name]) authByType[c.type]++;
@@ -1112,205 +1128,405 @@ function getStats() {
   };
 }
 
-// 画像生成
+// 画像生成（サイトのアイコン/OGP画像に合わせた、生成り×金の線画×藍色の高級和風デザイン）
 function drawShareCard() {
   const stats = getStats();
-  const ctx   = shareCanvas.getContext("2d");
-  const w     = shareCanvas.width;   // 600
-  const h     = shareCanvas.height;  // 1020 ← index.html の canvas height をこの値に変更
+
+  // ── 配色（サイト本体の配色に統一） ──
+  const INDIGO      = "#3c5a6e";
+  const VERMILLION  = "#b1503b";
+  const GOLD        = "#c8a86b";
+  const GOLD_DEEP    = "#a3854f";
+  const TEXT        = "#34302b";
+  const TEXT_SUB     = "#7a7164";
+  const BG_TOP      = "#f8f3e8";
+  const BG_BOTTOM   = "#efe4cd";
+  const PANEL       = "rgba(255,253,247,0.86)";
+  const PANEL_LINE  = "rgba(200,168,107,0.55)";
+  const TRACK       = "rgba(122,113,100,0.12)";
+  const SERIF       = "'Shippori Mincho', serif";
+
+  // ── 内訳データ ──
+  const dexRows = [
+    { label:"魚",   done:stats.byType.fish,  total:stats.totalByType.fish,  authDone:stats.authByType.fish,  authTotal:stats.authTotalByType.fish  },
+    { label:"虫",   done:stats.byType.bug,   total:stats.totalByType.bug,   authDone:stats.authByType.bug,   authTotal:stats.authTotalByType.bug   },
+    { label:"野鳥", done:stats.byType.bird,  total:stats.totalByType.bird,  authDone:stats.authByType.bird,  authTotal:stats.authTotalByType.bird  },
+    { label:"砂像", done:stats.byType.sand,  total:stats.totalByType.sand,  authDone:stats.authByType.sand,  authTotal:stats.authTotalByType.sand  },
+    { label:"雪像", done:stats.byType.snow,  total:stats.totalByType.snow,  authDone:stats.authByType.snow,  authTotal:stats.authTotalByType.snow  },
+    { label:"貝殻", done:stats.byType.shell, total:stats.totalByType.shell, authDone:stats.authByType.shell, authTotal:stats.authTotalByType.shell },
+  ];
+  const gardenRows = [
+    { label:"作物", done:stats.cropDone,   total:stats.cropTotal,   authDone:stats.cropAuthDone,   authTotal:stats.cropAuthTotal   },
+    { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal },
+  ];
+
+  // ── レイアウト（カーソルを積み上げて要素の重なりを防ぐ） ──
+  const w      = 640;
+  const M      = 44;               // 左右の余白
+  const rowH   = 54;
+  const mascotR = 56;
+  const medalR  = 76;
+  const cardH   = 190;
+
+  let cur = 34;
+  cur += mascotR * 2;
+  const mascotCy = cur - mascotR;
+  cur += 22;                       // マスコット下の余白
+
+  const titleY = cur + 26;
+  cur = titleY + 8;
+  const subtitleY = cur + 14;
+  cur = subtitleY + 16;
+  const dividerY = cur;
+  cur += 42;
+
+  const medalCy = cur + medalR;
+  cur += medalR * 2;
+  cur += 42;                       // メダル下の「done / total」表示分
+
+  const cardY = cur;
+  cur += cardH;
+  cur += 44;
+
+  const dexTitleY = cur;
+  cur += 30 + dexRows.length * rowH;
+  cur += 30;
+
+  const dexDividerY = cur;
+  cur += 26;
+
+  const gardenTitleY = cur;
+  cur += 30 + gardenRows.length * rowH;
+  cur += 44;
+
+  const h = cur + 36; // フッター分（URL行は省略し日付のみ）
+
+  shareCanvas.width  = w;
+  shareCanvas.height = h;
+  const ctx = shareCanvas.getContext("2d");
 
   // ── 背景 ──
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, "#f7f2e7");
-  grad.addColorStop(1, "#ece2cf");
-  ctx.fillStyle = grad;
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+  bgGrad.addColorStop(0, BG_TOP);
+  bgGrad.addColorStop(1, BG_BOTTOM);
+  ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // 装飾円
+  // ── ヘルパー：細い金の弧を重ねた装飾（青海波・流水紋風のあしらい） ──
+  function drawFlourish(cx, cy, scale, rot, alpha) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = GOLD_DEEP;
+    ctx.lineWidth = 1.4;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(i * 26, 0, 30, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2);
+    ctx.fillStyle = GOLD_DEEP;
+    ctx.fill();
+    ctx.restore();
+  }
+  drawFlourish(w - 70, 44, 1, 0.15, 0.28);
+  drawFlourish(70, h - 44, 1, Math.PI + 0.15, 0.28);
+
+  // ── ヘルパー：桜の花びら（和のあしらい、控えめに散らす） ──
+  function drawSakura(cx, cy, r, rot, alpha) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "rgba(177,80,59,0.16)";
+    for (let i = 0; i < 5; i++) {
+      ctx.save();
+      ctx.rotate((Math.PI * 2 / 5) * i);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(r * 0.55, -r * 0.4, 0, -r);
+      ctx.quadraticCurveTo(-r * 0.55, -r * 0.4, 0, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.16, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(200,168,107,0.35)";
+    ctx.fill();
+    ctx.restore();
+  }
+  drawSakura(56,     mascotCy - 30, 20, -0.3, 1);
+  drawSakura(w - 52, mascotCy + 60, 16,  1.9, 1);
+  drawSakura(w - 44, h - 190,       18,  0.7, 1);
+  drawSakura(50,     h - 90,        14, -1.4, 1);
+
+  // 隅の淡い金の光暈
   ctx.save();
-  ctx.globalAlpha = 0.06;
-  ctx.fillStyle = "#c8a86b";
-  ctx.beginPath(); ctx.arc(520, 80,  160, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = "#3c5a6e";
-  ctx.beginPath(); ctx.arc(80,  940, 140, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 0.10;
+  ctx.fillStyle = GOLD;
+  ctx.beginPath(); ctx.arc(w - 20, 10, 170, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(20, h - 10, 150, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 
-  // ── ヘッダー ──
-  ctx.fillStyle = "#3c5a6e";
-  ctx.fillRect(0, 0, w, 72);
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#fdf9ef";
-  ctx.font = "bold 28px sans-serif";
-  ctx.fillText("はとぴ図鑑  コンプ状況", w / 2, 46);
-
-  // ── 総合コンプ率 ──
-  const totalAll  = stats.total + stats.foodTotal + stats.gardenTotal;
-  const doneAll   = stats.done  + stats.foodDone  + stats.gardenDone;
-  const totalPct  = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
-
+  // ── 外枠（二重の金の罫線） ──
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(w / 2, 172, 72, 0, Math.PI*2);
-  ctx.fillStyle = "rgba(255,255,255,0.6)";
-  ctx.fill();
-  ctx.strokeStyle = "#c8a86b";
-  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = "rgba(163,133,79,0.55)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(14, 14, w - 28, h - 28, 14); ctx.stroke();
+  ctx.strokeStyle = "rgba(163,133,79,0.3)";
+  ctx.beginPath(); ctx.roundRect(20, 20, w - 40, h - 40, 10); ctx.stroke();
+  ctx.restore();
+
+  // ── ヘルパー：角の飾り（額縁のコーナー金具風） ──
+  function drawCorner(cx, cy, len, rot) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.strokeStyle = GOLD_DEEP;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(0, len); ctx.lineTo(0, 0); ctx.lineTo(len, 0);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── マスコット（アプリアイコン画像を円形フレームで） ──
+  const mascotCx = w / 2;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  if (shareMascotImg.complete && shareMascotImg.naturalWidth > 0) {
+    ctx.drawImage(
+      shareMascotImg,
+      mascotCx - mascotR, mascotCy - mascotR, mascotR * 2, mascotR * 2
+    );
+  } else {
+    ctx.fillStyle = PANEL;
+    ctx.fillRect(mascotCx - mascotR, mascotCy - mascotR, mascotR * 2, mascotR * 2);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = GOLD;
+  ctx.stroke();
+  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR + 6, 0, Math.PI * 2);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(163,133,79,0.4)";
   ctx.stroke();
   ctx.restore();
 
+  // ── ヘッダー ──
   ctx.textAlign = "center";
-  ctx.fillStyle = "#b1503b";
-  ctx.font = "bold 52px sans-serif";
-  ctx.fillText(`${totalPct}%`, w / 2, 186);
+  ctx.fillStyle = INDIGO;
+  ctx.font = `700 32px ${SERIF}`;
+  ctx.fillText("はとぴ図鑑", w / 2, titleY);
 
-  ctx.fillStyle = "#7a7164";
-  ctx.font = "14px sans-serif";
-  ctx.fillText("総合コンプ率", w / 2, 212);
+  ctx.fillStyle = TEXT_SUB;
+  ctx.font = `12px ${SERIF}`;
+  ctx.save();
+  ctx.letterSpacing = "0.28em";
+  ctx.fillText("C O M P L E T E   S T A T U S", w / 2, subtitleY);
+  ctx.restore();
 
-  ctx.fillStyle = "#34302b";
-  ctx.font = "15px sans-serif";
-  ctx.fillText(`${doneAll} / ${totalAll}`, w / 2, 232);
+  // タイトル下の飾り罫（線 - 菱形 - 線）
+  ctx.strokeStyle = "rgba(163,133,79,0.5)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(w / 2 - 120, dividerY); ctx.lineTo(w / 2 - 14, dividerY);
+  ctx.moveTo(w / 2 + 14, dividerY);  ctx.lineTo(w / 2 + 120, dividerY);
+  ctx.stroke();
+  ctx.save();
+  ctx.translate(w / 2, dividerY);
+  ctx.rotate(Math.PI / 4);
+  ctx.fillStyle = GOLD;
+  ctx.fillRect(-5, -5, 10, 10);
+  ctx.restore();
 
-  // ── ヘルパー：プログレスバー ──
-  function drawProgressBar(x, y, bw, bh, pct, color) {
-    ctx.fillStyle = "rgba(0,0,0,0.08)";
-    ctx.beginPath(); ctx.roundRect(x, y, bw, bh, bh / 2); ctx.fill();
+  // ── 総合コンプ率（二重リングのメダル） ──
+  const totalAll = stats.total + stats.foodTotal + stats.gardenTotal;
+  const doneAll  = stats.done  + stats.foodDone  + stats.gardenDone;
+  const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
+  const medalCx  = w / 2;
+
+  ctx.save();
+  ctx.shadowColor  = "rgba(120,100,60,0.18)";
+  ctx.shadowBlur   = 16;
+  ctx.shadowOffsetY = 6;
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR, 0, Math.PI * 2);
+  ctx.fillStyle = PANEL;
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = GOLD;
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR, 0, Math.PI * 2); ctx.stroke();
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(163,133,79,0.45)";
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR - 8, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = VERMILLION;
+  ctx.font = `700 44px ${SERIF}`;
+  ctx.fillText(`${totalPct}%`, medalCx, medalCy + 8);
+
+  ctx.fillStyle = TEXT_SUB;
+  ctx.font = `12px ${SERIF}`;
+  ctx.fillText("総 合 コ ン プ 率", medalCx, medalCy + 34);
+
+  ctx.fillStyle = TEXT;
+  ctx.font = "13px sans-serif";
+  ctx.fillText(`${doneAll} / ${totalAll}`, medalCx, medalCy + medalR + 28);
+
+  // ── ヘルパー：プログレスバー（金のグラデーション） ──
+  function drawProgressBar(x, py, bw, bh, pct) {
+    ctx.fillStyle = TRACK;
+    ctx.beginPath(); ctx.roundRect(x, py, bw, bh, bh / 2); ctx.fill();
     if (pct > 0) {
-      ctx.fillStyle = color;
-      ctx.beginPath(); ctx.roundRect(x, y, bw * pct / 100, bh, bh / 2); ctx.fill();
+      const g = ctx.createLinearGradient(x, 0, x + bw, 0);
+      g.addColorStop(0, GOLD_DEEP);
+      g.addColorStop(1, GOLD);
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.roundRect(x, py, bw * pct / 100, bh, bh / 2); ctx.fill();
     }
   }
 
-  // ── ヘルパー：セクションカード ──
-  function drawCard(x, y, cw, ch, icon, label, done, total, authDone, authTotal, color) {
+  // ── ヘルパー：カテゴリカード（漢字の印章風バッジ付き） ──
+  function drawCard(x, cy, cw, ch, glyph, label, done, total, authDone, authTotal) {
     ctx.save();
-    ctx.shadowColor  = "rgba(52,48,43,0.12)";
+    ctx.shadowColor  = "rgba(120,100,60,0.14)";
     ctx.shadowBlur   = 12;
     ctx.shadowOffsetY = 4;
-    ctx.fillStyle = "rgba(255,255,255,0.82)";
-    ctx.beginPath(); ctx.roundRect(x, y, cw, ch, 16); ctx.fill();
+    ctx.fillStyle = PANEL;
+    ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.fill();
+    ctx.restore();
+    ctx.save();
+    ctx.strokeStyle = PANEL_LINE;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.stroke();
     ctx.restore();
 
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(x, y, cw, 5, [16, 16, 0, 0]); ctx.fill();
+    const cornerLen = 12;
+    drawCorner(x + 6,      cy + 6,      cornerLen, 0);
+    drawCorner(x + cw - 6, cy + 6,      cornerLen, Math.PI / 2);
+    drawCorner(x + cw - 6, cy + ch - 6, cornerLen, Math.PI);
+    drawCorner(x + 6,      cy + ch - 6, cornerLen, -Math.PI / 2);
 
     const cx  = x + cw / 2;
     const pct = total > 0 ? Math.floor(done / total * 100) : 0;
 
+    // 印章風バッジ
+    const badgeR = 20;
+    const badgeCy = cy + 36;
+    ctx.beginPath(); ctx.arc(cx, badgeCy, badgeR, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(200,168,107,0.12)";
+    ctx.fill();
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = GOLD;
+    ctx.stroke();
     ctx.textAlign = "center";
-    ctx.font = "20px sans-serif";
-    ctx.fillText(icon, cx, y + 34);
+    ctx.fillStyle = INDIGO;
+    ctx.font = `700 19px ${SERIF}`;
+    ctx.fillText(glyph, cx, badgeCy + 6);
 
-    ctx.fillStyle = "#3c5a6e";
-    ctx.font = "bold 13px sans-serif";
-    ctx.fillText(label, cx, y + 52);
+    ctx.fillStyle = TEXT;
+    ctx.font = `600 14px ${SERIF}`;
+    ctx.fillText(label, cx, cy + 78);
 
-    ctx.fillStyle = color;
-    ctx.font = "bold 30px sans-serif";
-    ctx.fillText(`${pct}%`, cx, y + 90);
+    ctx.fillStyle = VERMILLION;
+    ctx.font = `700 27px ${SERIF}`;
+    ctx.fillText(`${pct}%`, cx, cy + 110);
 
-    ctx.fillStyle = "#7a7164";
-    ctx.font = "12px sans-serif";
-    ctx.fillText(`${done} / ${total}`, cx, y + 110);
+    ctx.fillStyle = TEXT_SUB;
+    ctx.font = "11px sans-serif";
+    ctx.fillText(`${done} / ${total}`, cx, cy + 128);
 
-    drawProgressBar(x + 14, y + 120, cw - 28, 7, pct, color);
+    drawProgressBar(x + 16, cy + 140, cw - 32, 6, pct);
 
-    ctx.fillStyle = "#c8a86b";
-    ctx.font = "bold 11px sans-serif";
-    ctx.fillText("🎖 認証", cx, y + 148);
-
-    ctx.fillStyle = "#7a7164";
-    ctx.font = "12px sans-serif";
-    ctx.fillText(`${authDone} / ${authTotal}`, cx, y + 165);
+    ctx.fillStyle = TEXT_SUB;
+    ctx.font = "10px sans-serif";
+    ctx.fillText(`認証 ${authDone} / ${authTotal}`, cx, cy + 168);
   }
 
   // ── 3カード横並び ──
-  const cardY  = 258;
-  const cardH  = 178;
-  const cardW  = 172;
-  const gap    = 11;
+  const cardW  = 176;
+  const gap    = 14;
   const startX = (w - cardW * 3 - gap * 2) / 2;
 
-  drawCard(startX,                 cardY, cardW, cardH, "📖", "図鑑",
-    stats.done,       stats.total,       stats.authCount,      stats.authTotal,      "#3c5a6e");
-  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "🍳", "料理",
-    stats.foodDone,   stats.foodTotal,   stats.foodAuthDone,   stats.foodAuthTotal,  "#b1503b");
-  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "🌱", "園芸",
-    stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal,"#4a7c59");
+  drawCard(startX,                 cardY, cardW, cardH, "図", "図鑑",
+    stats.done,       stats.total,       stats.authCount,      stats.authTotal);
+  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "食", "料理",
+    stats.foodDone,   stats.foodTotal,   stats.foodAuthDone,   stats.foodAuthTotal);
+  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "苗", "園芸",
+    stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal);
 
-// ── ヘルパー：内訳セクション ──
-  function drawSubSection(titleY, sectionLabel, rows) {
+  // ── ヘルパー：内訳セクション ──
+  function drawSubSection(titleY2, sectionLabel, rows) {
     ctx.textAlign = "left";
-    ctx.fillStyle = "#3c5a6e";
-    ctx.font = "bold 15px sans-serif";
-    ctx.fillText(sectionLabel, 40, titleY);
+    ctx.fillStyle = INDIGO;
+    ctx.font = `700 17px ${SERIF}`;
+    ctx.fillText(sectionLabel, M, titleY2);
 
     ctx.textAlign = "right";
-    ctx.fillStyle = "#7a7164";
-    ctx.font = "11px sans-serif";
-    ctx.fillText("⭐ コンプ", w - 120, titleY);
-    ctx.fillStyle = "#c8a86b";
-    ctx.fillText("🎖 認証", w - 40, titleY);
+    ctx.fillStyle = TEXT_SUB;
+    ctx.font = "10.5px sans-serif";
+    ctx.fillText("コンプ / 認証", w - M, titleY2);
 
-    const barX = 40;
-    const barW = w - 80;
+    const barX = M;
+    const barW = w - M * 2;
 
     rows.forEach((t, i) => {
-      const ty   = titleY + 22 + i * 62;
+      const ty   = titleY2 + 26 + i * rowH;
       const pct  = t.total     > 0 ? Math.floor(t.done     / t.total     * 100) : 0;
       const aPct = t.authTotal > 0 ? Math.floor(t.authDone / t.authTotal * 100) : 0;
 
-      ctx.fillStyle = "#34302b";
-      ctx.font = "bold 13px sans-serif";
+      // 金の菱形ブレット
+      ctx.save();
+      ctx.translate(barX + 3, ty - 2);
+      ctx.rotate(Math.PI / 4);
+      ctx.fillStyle = GOLD;
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.restore();
+
+      ctx.fillStyle = TEXT;
+      ctx.font = `600 13.5px ${SERIF}`;
       ctx.textAlign = "left";
-      ctx.fillText(t.label, barX, ty + 13);
+      ctx.fillText(t.label, barX + 16, ty + 2);
 
-      ctx.fillStyle = "#7a7164";
-      ctx.font = "12px sans-serif";
+      ctx.fillStyle = TEXT_SUB;
+      ctx.font = "11px sans-serif";
       ctx.textAlign = "right";
-      ctx.fillText(`⭐ ${t.done}/${t.total}  🎖 ${t.authDone}/${t.authTotal}`, w - 40, ty + 13);
+      ctx.fillText(`${t.done}/${t.total}（${pct}%） ・ 認証 ${t.authDone}/${t.authTotal}`, w - M, ty + 2);
 
-      drawProgressBar(barX, ty + 20, barW, 8, pct,  t.color);
-      drawProgressBar(barX, ty + 34, barW, 6, aPct, "#c8a86b");
+      drawProgressBar(barX, ty + 12, barW, 7, pct);
+      drawProgressBar(barX, ty + 24, barW, 3, aPct);
     });
   }
 
-  function drawDivider(y) {
-    ctx.strokeStyle = "#e4d9c2";
+  function drawDivider(dy) {
+    ctx.strokeStyle = "rgba(163,133,79,0.4)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(40, y); ctx.lineTo(w - 40, y);
+    ctx.moveTo(M, dy); ctx.lineTo(w - M, dy);
     ctx.stroke();
   }
 
   // ── 図鑑内訳 ──
-  const figSubY = 462;
-  drawSubSection(figSubY, "📖 図鑑内訳", [
-    { label:"魚",   done:stats.byType.fish,  total:stats.totalByType.fish,  authDone:stats.authByType.fish,  authTotal:stats.authTotalByType.fish,  color:"#3c5a6e" },
-    { label:"虫",   done:stats.byType.bug,   total:stats.totalByType.bug,   authDone:stats.authByType.bug,   authTotal:stats.authTotalByType.bug,   color:"#4a7c59" },
-    { label:"野鳥", done:stats.byType.bird,  total:stats.totalByType.bird,  authDone:stats.authByType.bird,  authTotal:stats.authTotalByType.bird,  color:"#b1503b" },
-  ]);
+  drawSubSection(dexTitleY, "図鑑内訳", dexRows);
 
   // ── 園芸内訳 ──
-  const gardenSubY = figSubY + 22 + 3 * 62 + 18;
-  drawDivider(gardenSubY - 10);
-  drawSubSection(gardenSubY, "🌱 園芸内訳", [
-    { label:"作物", done:stats.cropDone,   total:stats.cropTotal,   authDone:stats.cropAuthDone,   authTotal:stats.cropAuthTotal,   color:"#4a7c59" },
-    { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal, color:"#b1503b" },
-  ]);
+  drawDivider(dexDividerY);
+  drawSubSection(gardenTitleY, "園芸内訳", gardenRows);
 
-  // ── フッター ──
-  ctx.fillStyle = "#3c5a6e";
-  ctx.fillRect(0, h - 52, w, 52);
-
+  // ── フッター（日付のみ。URL表記は省略） ──
+  drawDivider(h - 34);
   ctx.textAlign = "center";
-  ctx.fillStyle = "rgba(255,255,255,0.5)";
-  ctx.font = "12px sans-serif";
-  ctx.fillText("ram1x7.github.io/heartopilist", w / 2, h - 30);
-
-  ctx.fillStyle = "rgba(255,255,255,0.7)";
-  ctx.font = "13px sans-serif";
-  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 12);
+  ctx.fillStyle = GOLD_DEEP;
+  ctx.font = `600 13px ${SERIF}`;
+  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 14);
 }
 
 
