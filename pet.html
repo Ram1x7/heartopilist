@@ -945,6 +945,7 @@ function toggleDark() {
 }
 function applyDark() {
   document.body.classList.toggle("dark", darkMode);
+  document.documentElement.classList.toggle("dark", darkMode);
   document.getElementById("darkToggle").innerHTML = darkMode ? icon("sun") : icon("moon");
 }
 function forceRepaint() {

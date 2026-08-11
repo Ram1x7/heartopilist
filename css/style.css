@@ -19,6 +19,26 @@
   --border:#e4d9c2;
 }
 
+/* Safari で body の背景がスクロール全域に伸びきらないことがあるため、
+   html側にも同じ背景を敷いて白い隙間が見えないようにする */
+html{
+  background:
+    linear-gradient(
+      180deg,
+      var(--bg-top) 0%,
+      var(--bg-bottom) 100%
+    );
+}
+
+html.dark{
+  background:
+    linear-gradient(
+      180deg,
+      #25221d 0%,
+      #1a1814 100%
+    );
+}
+
 body{
   margin:0;
   padding:12px;

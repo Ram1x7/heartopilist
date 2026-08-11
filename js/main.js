@@ -786,6 +786,9 @@ if(savedDark === "true"){
 
 }
 
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
 // 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
 if(document.body.classList.contains("dark")){
   forceRepaint();
@@ -795,6 +798,7 @@ if(document.body.classList.contains("dark")){
 darkToggle.onclick = ()=>{
   // 切替
   document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
   // 保存
   localStorage.setItem(
     "darkMode",
