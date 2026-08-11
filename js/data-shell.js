@@ -309,6 +309,18 @@ const shellData = [
  auth:true
 },
 {
+ name:"マンボウガイ",
+ nameI18n:{"ja":"マンボウガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:9,
+ price:165,
+ weather:["虹"],
+ time:["0-6","6-12","18-0"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/shells/027.PNG",
+ auth:true
+},
+{
  name:"イチゴナツモモ",
  nameI18n:{"ja":"イチゴナツモモ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:9,
