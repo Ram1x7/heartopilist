@@ -1166,7 +1166,7 @@ function drawShareCard() {
   const rowH   = 54;
   const mascotR = 56;
   const medalR  = 76;
-  const cardH   = 190;
+  const cardH   = 172;
 
   let cur = 34;
   cur += mascotR * 2;
@@ -1394,8 +1394,8 @@ function drawShareCard() {
     }
   }
 
-  // ── ヘルパー：カテゴリカード（漢字の印章風バッジ付き） ──
-  function drawCard(x, cy, cw, ch, glyph, label, done, total, authDone, authTotal) {
+  // ── ヘルパー：カテゴリカード（印章風の〇の中に項目名を入れる） ──
+  function drawCard(x, cy, cw, ch, label, done, total, authDone, authTotal) {
     ctx.save();
     ctx.shadowColor  = "rgba(120,100,60,0.14)";
     ctx.shadowBlur   = 12;
@@ -1418,9 +1418,9 @@ function drawShareCard() {
     const cx  = x + cw / 2;
     const pct = total > 0 ? Math.floor(done / total * 100) : 0;
 
-    // 印章風バッジ
-    const badgeR = 20;
-    const badgeCy = cy + 36;
+    // 印章風バッジ（〇の中に項目名を表示）
+    const badgeR = 26;
+    const badgeCy = cy + 40;
     ctx.beginPath(); ctx.arc(cx, badgeCy, badgeR, 0, Math.PI * 2);
     ctx.fillStyle = "rgba(200,168,107,0.12)";
     ctx.fill();
@@ -1429,26 +1429,22 @@ function drawShareCard() {
     ctx.stroke();
     ctx.textAlign = "center";
     ctx.fillStyle = INDIGO;
-    ctx.font = `700 19px ${SERIF}`;
-    ctx.fillText(glyph, cx, badgeCy + 6);
-
-    ctx.fillStyle = TEXT;
-    ctx.font = `600 14px ${SERIF}`;
-    ctx.fillText(label, cx, cy + 78);
+    ctx.font = `700 14px ${SERIF}`;
+    ctx.fillText(label, cx, badgeCy + 5);
 
     ctx.fillStyle = VERMILLION;
     ctx.font = `700 27px ${SERIF}`;
-    ctx.fillText(`${pct}%`, cx, cy + 110);
+    ctx.fillText(`${pct}%`, cx, cy + 96);
 
     ctx.fillStyle = TEXT_SUB;
     ctx.font = "11px sans-serif";
-    ctx.fillText(`${done} / ${total}`, cx, cy + 128);
+    ctx.fillText(`${done} / ${total}`, cx, cy + 114);
 
-    drawProgressBar(x + 16, cy + 140, cw - 32, 6, pct);
+    drawProgressBar(x + 16, cy + 126, cw - 32, 6, pct);
 
     ctx.fillStyle = TEXT_SUB;
     ctx.font = "10px sans-serif";
-    ctx.fillText(`認証 ${authDone} / ${authTotal}`, cx, cy + 168);
+    ctx.fillText(`認証 ${authDone} / ${authTotal}`, cx, cy + 154);
   }
 
   // ── 3カード横並び ──
@@ -1456,11 +1452,11 @@ function drawShareCard() {
   const gap    = 14;
   const startX = (w - cardW * 3 - gap * 2) / 2;
 
-  drawCard(startX,                 cardY, cardW, cardH, "図", "図鑑",
+  drawCard(startX,                 cardY, cardW, cardH, "図鑑",
     stats.done,       stats.total,       stats.authCount,      stats.authTotal);
-  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "食", "料理",
+  drawCard(startX + cardW + gap,   cardY, cardW, cardH, "料理",
     stats.foodDone,   stats.foodTotal,   stats.foodAuthDone,   stats.foodAuthTotal);
-  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "苗", "園芸",
+  drawCard(startX + cardW*2+gap*2, cardY, cardW, cardH, "園芸",
     stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal);
 
   // ── ヘルパー：内訳セクション ──
