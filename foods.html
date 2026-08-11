@@ -961,6 +961,18 @@ function forceRepaint(){
 let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
 let authData    = JSON.parse(localStorage.getItem("food_auth") || "{}");
 
+// 「未完了順」「未認証順」ソート中はチェック/認証をつけた直後に対象が
+// リストの下へ移動し、別の項目が同じ画面位置に入れ替わる。連続タップ時に
+// 意図しない項目を巻き込んで切り替えてしまわないよう、切り替え直後は
+// 短時間だけ再操作を無視する。
+let toggleGuard = false;
+function guardToggle(){
+  if(toggleGuard) return true;
+  toggleGuard = true;
+  setTimeout(()=>{ toggleGuard = false; }, 400);
+  return false;
+}
+
 // ── 多言語表示ヘルパー ──
 function currentLang(){
   return (window.i18n && typeof window.i18n.getCurrentLang === "function")
@@ -1104,6 +1116,7 @@ function renderSection(items, type = "normal"){
 
     div.querySelector(".check-btn").onclick = (e)=>{
       e.stopPropagation();
+      if(guardToggle()) return;
       checkedData[f.name] = !checkedData[f.name];
       localStorage.setItem("food_checked", JSON.stringify(checkedData));
       render();
@@ -1113,6 +1126,7 @@ function renderSection(items, type = "normal"){
     if(authBtn){
       authBtn.onclick = (e)=>{
         e.stopPropagation();
+        if(guardToggle()) return;
         authData[f.name] = !authData[f.name];
         localStorage.setItem("food_auth", JSON.stringify(authData));
         render();

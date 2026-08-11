@@ -34,6 +34,18 @@ let checkedData =
 let authData =
   JSON.parse(localStorage.getItem("authData") || "{}");
 
+// 「未完了順」「未認証順」ソート中はチェック/認証をつけた直後に対象が
+// リストの下へ移動し、別の項目が同じ画面位置に入れ替わる。連続タップ時に
+// 意図しない項目を巻き込んで切り替えてしまわないよう、切り替え直後は
+// 短時間だけ再操作を無視する。
+let toggleGuard = false;
+function guardToggle(){
+  if(toggleGuard) return true;
+  toggleGuard = true;
+  setTimeout(()=>{ toggleGuard = false; }, 400);
+  return false;
+}
+
 // 天気データは js/data-weather.js の weatherData を使用（毎日手入力・別ファイル管理）
 
 const ALL_WEATHER = ["晴れ","雨","虹"];
@@ -502,6 +514,7 @@ function createCard(c){
     if(multiSelectMode){
       return;
     }
+    if(guardToggle()) return;
     checkedData[c.name] = !checkedData[c.name];
     localStorage.setItem(
       "checkedData",
@@ -516,6 +529,7 @@ function createCard(c){
     authBtn.onclick = (e)=>{
       e.stopPropagation();
       if(multiSelectMode) return;
+      if(guardToggle()) return;
       authData[c.name] = !authData[c.name];
       localStorage.setItem("authData", JSON.stringify(authData));
       render();
