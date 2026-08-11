@@ -1,4 +1,4 @@
-const APP_VERSION = "3.1.0";
+const APP_VERSION = "3.2.0";
 
 // ── サーバー設定 ──
 // weatherData や生き物の出現時間帯（time配列）は Asia(UTC+9) 基準で入力されている。
@@ -808,6 +808,7 @@ function updateDarkButton(){
     ? icon("sun")
     : icon("moon");
 }
+updateDarkButton();
 
 function forceRepaint(){
   // Safari/iPad再描画バグ対策
@@ -1372,7 +1373,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "3.1.0";
+const popupVersion = "3.2.0";
 
 if(
  localStorage.getItem("popupVersion")
