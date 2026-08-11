@@ -1006,6 +1006,14 @@ const shareModal = document.getElementById("shareModal");
 const shareCanvas = document.getElementById("shareCanvas");
 shareBtn.innerHTML = icon("share");
 
+// カード上部に飾るマスコット画像（サイトのアプリアイコンを流用）
+const shareMascotImg = new Image();
+shareMascotImg.src = "apple-touch-icon.png?v=10";
+const shareMascotReady = new Promise((resolve) => {
+  shareMascotImg.onload  = () => resolve(true);
+  shareMascotImg.onerror = () => resolve(false);
+});
+
 shareBtn.onclick = async () => {
   // 未読み込みのデータを動的に読み込む
   await Promise.all([
@@ -1020,6 +1028,7 @@ shareBtn.onclick = async () => {
       document.fonts.load('600 16px "Shippori Mincho"'),
     ]);
   } catch(e) {}
+  await shareMascotReady;
   drawShareCard();
   shareModal.style.display = "block";
 };
@@ -1119,21 +1128,22 @@ function getStats() {
   };
 }
 
-// 画像生成（深緑×金の高級和風デザイン）
+// 画像生成（サイトのアイコン/OGP画像に合わせた、生成り×金の線画×藍色の高級和風デザイン）
 function drawShareCard() {
   const stats = getStats();
 
-  // ── 配色 ──
-  const GOLD        = "#c9a96a";
-  const GOLD_BRIGHT = "#e8d3a0";
-  const GOLD_DIM    = "rgba(201,169,106,0.35)";
-  const CREAM       = "#ece4d4";
-  const CREAM_DIM   = "#a89a80";
-  const BG_TOP      = "#182922";
-  const BG_BOTTOM   = "#0e1712";
-  const PANEL       = "#1f3329";
-  const PANEL_LINE  = "rgba(201,169,106,0.4)";
-  const TRACK       = "rgba(232,224,212,0.1)";
+  // ── 配色（サイト本体の配色に統一） ──
+  const INDIGO      = "#3c5a6e";
+  const VERMILLION  = "#b1503b";
+  const GOLD        = "#c8a86b";
+  const GOLD_DEEP    = "#a3854f";
+  const TEXT        = "#34302b";
+  const TEXT_SUB     = "#7a7164";
+  const BG_TOP      = "#f8f3e8";
+  const BG_BOTTOM   = "#efe4cd";
+  const PANEL       = "rgba(255,253,247,0.86)";
+  const PANEL_LINE  = "rgba(200,168,107,0.55)";
+  const TRACK       = "rgba(122,113,100,0.12)";
   const SERIF       = "'Shippori Mincho', serif";
 
   // ── 内訳データ ──
@@ -1154,14 +1164,14 @@ function drawShareCard() {
   const w      = 640;
   const M      = 44;               // 左右の余白
   const rowH   = 54;
-  const cardY  = 372;
-  const cardH  = 196;
+  const cardY  = 400;
+  const cardH  = 190;
   let   y      = cardY + cardH + 46;
   const dexTitleY = y;
   y += 30 + dexRows.length * rowH + 34;
   const gardenTitleY = y;
-  y += 30 + gardenRows.length * rowH + 54;
-  const h = y + 66; // フッター分
+  y += 30 + gardenRows.length * rowH + 50;
+  const h = y + 40; // 余白のみ（URL行は省略）
 
   shareCanvas.width  = w;
   shareCanvas.height = h;
@@ -1174,20 +1184,42 @@ function drawShareCard() {
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // 隅の淡い金の装飾円（控えめに）
+  // ── ヘルパー：細い金の弧を重ねた装飾（雲形・波形のあしらい） ──
+  function drawFlourish(cx, cy, scale, rot, alpha) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.scale(scale, scale);
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = GOLD_DEEP;
+    ctx.lineWidth = 1.4;
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath();
+      ctx.arc(i * 26, 0, 30, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.stroke();
+    }
+    ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2);
+    ctx.fillStyle = GOLD_DEEP;
+    ctx.fill();
+    ctx.restore();
+  }
+  drawFlourish(w - 70, 44, 1, 0.15, 0.28);
+  drawFlourish(70, h - 44, 1, Math.PI + 0.15, 0.28);
+
+  // 隅の淡い金の光暈
   ctx.save();
-  ctx.globalAlpha = 0.05;
+  ctx.globalAlpha = 0.10;
   ctx.fillStyle = GOLD;
-  ctx.beginPath(); ctx.arc(w - 40, 30, 190, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(30, h - 40, 160, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w - 20, 10, 170, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(20, h - 10, 150, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 
   // ── 外枠（二重の金の罫線） ──
   ctx.save();
-  ctx.strokeStyle = GOLD_DIM;
+  ctx.strokeStyle = "rgba(163,133,79,0.55)";
   ctx.lineWidth = 1.5;
   ctx.beginPath(); ctx.roundRect(14, 14, w - 28, h - 28, 14); ctx.stroke();
-  ctx.strokeStyle = "rgba(201,169,106,0.22)";
+  ctx.strokeStyle = "rgba(163,133,79,0.3)";
   ctx.beginPath(); ctx.roundRect(20, 20, w - 40, h - 40, 10); ctx.stroke();
   ctx.restore();
 
@@ -1196,30 +1228,60 @@ function drawShareCard() {
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(rot);
-    ctx.strokeStyle = GOLD;
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = GOLD_DEEP;
+    ctx.lineWidth = 1.6;
     ctx.beginPath();
     ctx.moveTo(0, len); ctx.lineTo(0, 0); ctx.lineTo(len, 0);
     ctx.stroke();
     ctx.restore();
   }
 
-  // ── ヘッダー ──
-  ctx.textAlign = "center";
-  ctx.fillStyle = GOLD_BRIGHT;
-  ctx.font = `700 34px ${SERIF}`;
-  ctx.fillText("はとぴ図鑑", w / 2, 76);
-
-  ctx.fillStyle = CREAM_DIM;
-  ctx.font = `13px ${SERIF}`;
+  // ── マスコット（アプリアイコン画像を円形フレームで） ──
+  const mascotR  = 58;
+  const mascotCx = w / 2;
+  const mascotCy = 88;
   ctx.save();
-  ctx.letterSpacing = "0.3em";
-  ctx.fillText("C O M P L E T E   S T A T U S", w / 2, 100);
+  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  if (shareMascotImg.complete && shareMascotImg.naturalWidth > 0) {
+    ctx.drawImage(
+      shareMascotImg,
+      mascotCx - mascotR, mascotCy - mascotR, mascotR * 2, mascotR * 2
+    );
+  } else {
+    ctx.fillStyle = PANEL;
+    ctx.fillRect(mascotCx - mascotR, mascotCy - mascotR, mascotR * 2, mascotR * 2);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = GOLD;
+  ctx.stroke();
+  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR + 6, 0, Math.PI * 2);
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = "rgba(163,133,79,0.4)";
+  ctx.stroke();
+  ctx.restore();
+
+  // ── ヘッダー ──
+  const titleY = mascotCy + mascotR + 46;
+  ctx.textAlign = "center";
+  ctx.fillStyle = INDIGO;
+  ctx.font = `700 32px ${SERIF}`;
+  ctx.fillText("はとぴ図鑑", w / 2, titleY);
+
+  ctx.fillStyle = TEXT_SUB;
+  ctx.font = `12px ${SERIF}`;
+  ctx.save();
+  ctx.letterSpacing = "0.28em";
+  ctx.fillText("C O M P L E T E   S T A T U S", w / 2, titleY + 22);
   ctx.restore();
 
   // タイトル下の飾り罫（線 - 菱形 - 線）
-  const dividerY = 122;
-  ctx.strokeStyle = GOLD_DIM;
+  const dividerY = titleY + 42;
+  ctx.strokeStyle = "rgba(163,133,79,0.5)";
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(w / 2 - 120, dividerY); ctx.lineTo(w / 2 - 14, dividerY);
@@ -1232,42 +1294,43 @@ function drawShareCard() {
   ctx.fillRect(-5, -5, 10, 10);
   ctx.restore();
 
-  // ── 総合コンプ率（メダル風の二重リング） ──
+  // ── 総合コンプ率（二重リングのメダル） ──
   const totalAll = stats.total + stats.foodTotal + stats.gardenTotal;
   const doneAll  = stats.done  + stats.foodDone  + stats.gardenDone;
   const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
   const medalCx  = w / 2;
-  const medalCy  = 232;
-  const medalR   = 84;
+  const medalCy  = dividerY + 92;
+  const medalR   = 78;
 
   ctx.save();
-  const medalGrad = ctx.createRadialGradient(medalCx, medalCy - 20, 10, medalCx, medalCy, medalR);
-  medalGrad.addColorStop(0, "#2a4536");
-  medalGrad.addColorStop(1, PANEL);
+  ctx.shadowColor  = "rgba(120,100,60,0.18)";
+  ctx.shadowBlur   = 16;
+  ctx.shadowOffsetY = 6;
   ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR, 0, Math.PI * 2);
-  ctx.fillStyle = medalGrad;
+  ctx.fillStyle = PANEL;
   ctx.fill();
-  ctx.lineWidth = 3;
+  ctx.restore();
+  ctx.save();
+  ctx.lineWidth = 2.5;
   ctx.strokeStyle = GOLD;
-  ctx.stroke();
-  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR - 9, 0, Math.PI * 2);
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR, 0, Math.PI * 2); ctx.stroke();
   ctx.lineWidth = 1;
-  ctx.strokeStyle = GOLD_DIM;
-  ctx.stroke();
+  ctx.strokeStyle = "rgba(163,133,79,0.45)";
+  ctx.beginPath(); ctx.arc(medalCx, medalCy, medalR - 8, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
   ctx.textAlign = "center";
-  ctx.fillStyle = GOLD_BRIGHT;
-  ctx.font = `700 46px ${SERIF}`;
-  ctx.fillText(`${totalPct}%`, medalCx, medalCy + 10);
+  ctx.fillStyle = VERMILLION;
+  ctx.font = `700 44px ${SERIF}`;
+  ctx.fillText(`${totalPct}%`, medalCx, medalCy + 8);
 
-  ctx.fillStyle = CREAM_DIM;
+  ctx.fillStyle = TEXT_SUB;
   ctx.font = `12px ${SERIF}`;
-  ctx.fillText("総 合 コ ン プ 率", medalCx, medalCy + 38);
+  ctx.fillText("総 合 コ ン プ 率", medalCx, medalCy + 34);
 
-  ctx.fillStyle = CREAM;
+  ctx.fillStyle = TEXT;
   ctx.font = "13px sans-serif";
-  ctx.fillText(`${doneAll} / ${totalAll}`, medalCx, medalCy + medalR + 30);
+  ctx.fillText(`${doneAll} / ${totalAll}`, medalCx, medalCy + medalR + 28);
 
   // ── ヘルパー：プログレスバー（金のグラデーション） ──
   function drawProgressBar(x, py, bw, bh, pct) {
@@ -1275,8 +1338,8 @@ function drawShareCard() {
     ctx.beginPath(); ctx.roundRect(x, py, bw, bh, bh / 2); ctx.fill();
     if (pct > 0) {
       const g = ctx.createLinearGradient(x, 0, x + bw, 0);
-      g.addColorStop(0, "#a3854f");
-      g.addColorStop(1, GOLD_BRIGHT);
+      g.addColorStop(0, GOLD_DEEP);
+      g.addColorStop(1, GOLD);
       ctx.fillStyle = g;
       ctx.beginPath(); ctx.roundRect(x, py, bw * pct / 100, bh, bh / 2); ctx.fill();
     }
@@ -1285,11 +1348,16 @@ function drawShareCard() {
   // ── ヘルパー：カテゴリカード（漢字の印章風バッジ付き） ──
   function drawCard(x, cy, cw, ch, glyph, label, done, total, authDone, authTotal) {
     ctx.save();
+    ctx.shadowColor  = "rgba(120,100,60,0.14)";
+    ctx.shadowBlur   = 12;
+    ctx.shadowOffsetY = 4;
     ctx.fillStyle = PANEL;
     ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.fill();
+    ctx.restore();
+    ctx.save();
     ctx.strokeStyle = PANEL_LINE;
     ctx.lineWidth = 1;
-    ctx.stroke();
+    ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.stroke();
     ctx.restore();
 
     const cornerLen = 12;
@@ -1302,36 +1370,36 @@ function drawShareCard() {
     const pct = total > 0 ? Math.floor(done / total * 100) : 0;
 
     // 印章風バッジ
-    const badgeR = 21;
-    const badgeCy = cy + 38;
+    const badgeR = 20;
+    const badgeCy = cy + 36;
     ctx.beginPath(); ctx.arc(cx, badgeCy, badgeR, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(201,169,106,0.1)";
+    ctx.fillStyle = "rgba(200,168,107,0.12)";
     ctx.fill();
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = GOLD;
     ctx.stroke();
     ctx.textAlign = "center";
-    ctx.fillStyle = GOLD_BRIGHT;
-    ctx.font = `700 20px ${SERIF}`;
-    ctx.fillText(glyph, cx, badgeCy + 7);
+    ctx.fillStyle = INDIGO;
+    ctx.font = `700 19px ${SERIF}`;
+    ctx.fillText(glyph, cx, badgeCy + 6);
 
-    ctx.fillStyle = CREAM;
+    ctx.fillStyle = TEXT;
     ctx.font = `600 14px ${SERIF}`;
-    ctx.fillText(label, cx, cy + 82);
+    ctx.fillText(label, cx, cy + 78);
 
-    ctx.fillStyle = GOLD_BRIGHT;
-    ctx.font = `700 28px ${SERIF}`;
-    ctx.fillText(`${pct}%`, cx, cy + 114);
+    ctx.fillStyle = VERMILLION;
+    ctx.font = `700 27px ${SERIF}`;
+    ctx.fillText(`${pct}%`, cx, cy + 110);
 
-    ctx.fillStyle = CREAM_DIM;
+    ctx.fillStyle = TEXT_SUB;
     ctx.font = "11px sans-serif";
-    ctx.fillText(`${done} / ${total}`, cx, cy + 132);
+    ctx.fillText(`${done} / ${total}`, cx, cy + 128);
 
-    drawProgressBar(x + 16, cy + 144, cw - 32, 6, pct);
+    drawProgressBar(x + 16, cy + 140, cw - 32, 6, pct);
 
-    ctx.fillStyle = CREAM_DIM;
+    ctx.fillStyle = TEXT_SUB;
     ctx.font = "10px sans-serif";
-    ctx.fillText(`認証 ${authDone} / ${authTotal}`, cx, cy + 172);
+    ctx.fillText(`認証 ${authDone} / ${authTotal}`, cx, cy + 168);
   }
 
   // ── 3カード横並び ──
@@ -1347,22 +1415,22 @@ function drawShareCard() {
     stats.gardenDone, stats.gardenTotal, stats.gardenAuthDone, stats.gardenAuthTotal);
 
   // ── ヘルパー：内訳セクション ──
-  function drawSubSection(titleY, sectionLabel, rows) {
+  function drawSubSection(titleY2, sectionLabel, rows) {
     ctx.textAlign = "left";
-    ctx.fillStyle = GOLD_BRIGHT;
+    ctx.fillStyle = INDIGO;
     ctx.font = `700 17px ${SERIF}`;
-    ctx.fillText(sectionLabel, M, titleY);
+    ctx.fillText(sectionLabel, M, titleY2);
 
     ctx.textAlign = "right";
-    ctx.fillStyle = CREAM_DIM;
+    ctx.fillStyle = TEXT_SUB;
     ctx.font = "10.5px sans-serif";
-    ctx.fillText("コンプ / 認証", w - M, titleY);
+    ctx.fillText("コンプ / 認証", w - M, titleY2);
 
     const barX = M;
     const barW = w - M * 2;
 
     rows.forEach((t, i) => {
-      const ty   = titleY + 26 + i * rowH;
+      const ty   = titleY2 + 26 + i * rowH;
       const pct  = t.total     > 0 ? Math.floor(t.done     / t.total     * 100) : 0;
       const aPct = t.authTotal > 0 ? Math.floor(t.authDone / t.authTotal * 100) : 0;
 
@@ -1374,12 +1442,12 @@ function drawShareCard() {
       ctx.fillRect(-3, -3, 6, 6);
       ctx.restore();
 
-      ctx.fillStyle = CREAM;
+      ctx.fillStyle = TEXT;
       ctx.font = `600 13.5px ${SERIF}`;
       ctx.textAlign = "left";
       ctx.fillText(t.label, barX + 16, ty + 2);
 
-      ctx.fillStyle = CREAM_DIM;
+      ctx.fillStyle = TEXT_SUB;
       ctx.font = "11px sans-serif";
       ctx.textAlign = "right";
       ctx.fillText(`${t.done}/${t.total}（${pct}%） ・ 認証 ${t.authDone}/${t.authTotal}`, w - M, ty + 2);
@@ -1390,7 +1458,7 @@ function drawShareCard() {
   }
 
   function drawDivider(dy) {
-    ctx.strokeStyle = GOLD_DIM;
+    ctx.strokeStyle = "rgba(163,133,79,0.4)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(M, dy); ctx.lineTo(w - M, dy);
@@ -1404,16 +1472,12 @@ function drawShareCard() {
   drawDivider(dexTitleY + 30 + dexRows.length * rowH + 16);
   drawSubSection(gardenTitleY, "園芸内訳", gardenRows);
 
-  // ── フッター ──
-  drawDivider(h - 60);
+  // ── フッター（日付のみ。URL表記は省略） ──
+  drawDivider(h - 34);
   ctx.textAlign = "center";
-  ctx.fillStyle = CREAM_DIM;
-  ctx.font = "11px sans-serif";
-  ctx.fillText("ram1x7.github.io/heartopilist", w / 2, h - 34);
-
-  ctx.fillStyle = GOLD;
+  ctx.fillStyle = GOLD_DEEP;
   ctx.font = `600 13px ${SERIF}`;
-  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 16);
+  ctx.fillText(new Date().toLocaleDateString("ja-JP"), w / 2, h - 14);
 }
 
 
