@@ -333,5 +333,7 @@
   "shop_search_placeholder": "アイテム名で検索",
   "shop_sort_book": "並び順",
   "shop_sort_unchecked": "未所持順",
-  "shop_no_results": "該当するアイテムがありません"
+  "shop_no_results": "該当するアイテムがありません",
+  "aria_check_label": "コンプ済みにする",
+  "aria_auth_label": "認証マスターにする"
 }

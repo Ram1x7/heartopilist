@@ -333,5 +333,7 @@
   "shop_search_placeholder": "Search by item name",
   "shop_sort_book": "Default",
   "shop_sort_unchecked": "Unpurchased first",
-  "shop_no_results": "No matching items"
+  "shop_no_results": "No matching items",
+  "aria_check_label": "Mark as complete",
+  "aria_auth_label": "Mark as authenticated"
 }
