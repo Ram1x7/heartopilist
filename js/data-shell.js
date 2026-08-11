@@ -81,8 +81,8 @@ const shellData = [
  auth:true
 },
 {
- name:"シルバークラム",
- nameI18n:{"ja":"シルバークラム","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"ナミマガシワ",
+ nameI18n:{"ja":"ナミマガシワ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  price:65,
  weather:["晴れ","雨","虹"],
@@ -105,8 +105,8 @@ const shellData = [
  auth:true
 },
 {
- name:"船首桜ハマグリ",
- nameI18n:{"ja":"船首桜ハマグリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"ヘサキザクラ",
+ nameI18n:{"ja":"ヘサキザクラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:2,
  price:85,
  weather:["晴れ","雨","虹"],
@@ -153,8 +153,8 @@ const shellData = [
  auth:true
 },
 {
- name:"サフランシャコガイ",
- nameI18n:{"ja":"サフランシャコガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"ヒメジャコ",
+ nameI18n:{"ja":"ヒメジャコ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:3,
  price:65,
  weather:["晴れ","雨","虹"],
@@ -165,8 +165,8 @@ const shellData = [
  auth:true
 },
 {
- name:"ホソロクセンニンガイ",
- nameI18n:{"ja":"ホソロクセンニンガイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"ヌノメイトカケ",
+ nameI18n:{"ja":"ヌノメイトカケ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:4,
  price:68,
  weather:["晴れ","雨","虹"],
