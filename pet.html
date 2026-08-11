@@ -1046,6 +1046,8 @@ window.addEventListener("DOMContentLoaded", () => {
     darkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
   }
   applyDark();
+  // 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+  if(darkMode) forceRepaint();
   loadPets();
   migrateLegacyFoodKeys();
   loadState();

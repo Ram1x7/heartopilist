@@ -1365,9 +1365,9 @@ body.dark #shareCanvas{
 }
 
 body.dark .site-nav-item{
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border-color:var(--border);
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
 }
 
 body.dark .site-nav-item.active{
