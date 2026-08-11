@@ -567,6 +567,7 @@ body.dark .garden-footer{
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/price-calc.js"></script>
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
 
@@ -1046,13 +1047,12 @@ function renderModal(item){
   const isEventItem = !!(item.season || item.fes);
 
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
-  const priceRows = stars.map((s,i) => {
-    const p = item.prices[i];
-    return `<tr>
+  const derivedPrices = derivePrices(item.prices[0], isFlower ? "flower" : "crop");
+  const priceRows = stars.map((s,i) => `
+    <tr>
       <td>${s}</td>
-      <td>${p !== null ? p.toLocaleString() : '<span class="g-price-null">' + T("garden_price_unknown","未確認") + '</span>'}</td>
-    </tr>`;
-  }).join("");
+      <td>${derivedPrices[i].toLocaleString()}</td>
+    </tr>`).join("");
 
   let breedingHTML = "";
   if(isFlower && item.colors && item.colors.length > 0){

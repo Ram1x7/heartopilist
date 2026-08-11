@@ -1,6 +1,6 @@
 // 花データ
 // growTime: 分単位（例：18時間=1080分）
-// prices: [☆1, ☆2, ☆3, ☆4, ☆5] null = 未確認
+// prices: [☆1の売価]。☆2〜5はjs/price-calc.jsのderivePrices()で自動計算する
 // colors: 交配で作れる色の一覧
 //   ☆1：赤・黄・白
 //   ☆2：オレンジ・ピンク
@@ -23,7 +23,7 @@ const flowerData = [
     level: 3,
     growTime: 1080,   // 18時間
     seedPrice: 30,
-    prices: [100, 150, 200, 250, 400],
+    prices: [100],
     colors: ["赤","白","ピンク","桃","緑","夜光"],
     auth: true,
     isEvent: false,
@@ -38,7 +38,7 @@ const flowerData = [
     level: 4,
     growTime: 1080,   // 18時間
     seedPrice: 30,
-    prices: [100, null, null, null, null],
+    prices: [100],
     colors: ["赤","黄","オレンジ","黒","紫","輝く"],
     auth: true,
     isEvent: false,
@@ -53,7 +53,7 @@ const flowerData = [
     level: 5,
     growTime: 1440,   // 24時間
     seedPrice: 60,
-    prices: [185, null, null, null, null],
+    prices: [185],
     colors: ["赤","黄","白","オレンジ","ピンク","桃","緑","夜光"],
     auth: true,
     isEvent: false,
@@ -68,7 +68,7 @@ const flowerData = [
     level: 5,
     growTime: 1440,   // 24時間
     seedPrice: 60,
-    prices: [185, null, null, null, null],
+    prices: [185],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","紫","輝く"],
     auth: true,
     isEvent: false,
@@ -83,7 +83,7 @@ const flowerData = [
     level: 6,
     growTime: 1800,   // 30時間
     seedPrice: 90,
-    prices: [250, null, null, null, null],
+    prices: [250],
     colors: ["赤","黄","オレンジ","ピンク","黒","桃","紫","輝く"],
     auth: true,
     isEvent: false,
@@ -98,7 +98,7 @@ const flowerData = [
     level: 6,
     growTime: 1800,   // 30時間
     seedPrice: 90,
-    prices: [250, null, null, null, null],
+    prices: [250],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","夜光"],
     auth: true,
     isEvent: false,
@@ -113,7 +113,7 @@ const flowerData = [
     level: 7,
     growTime: 1800,   // 30時間
     seedPrice: 120,
-    prices: [305, null, null, null, null],
+    prices: [305],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","夜光"],
     auth: true,
     isEvent: false,
@@ -128,7 +128,7 @@ const flowerData = [
     level: 8,
     growTime: 2880,   // 48時間
     seedPrice: 150,
-    prices: [415, null, null, null, null],
+    prices: [415],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く"],
     auth: true,
     isEvent: false,
@@ -143,7 +143,7 @@ const flowerData = [
     level: 9,
     growTime: 2880,   // 48時間
     seedPrice: 200,
-    prices: [485, null, null, null, null],
+    prices: [485],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","緑","夜光"],
     auth: true,
     isEvent: false,
@@ -158,7 +158,7 @@ const flowerData = [
     level: 10,
     growTime: 4320,   // 72時間
     seedPrice: 300,
-    prices: [765, null, null, null, null],
+    prices: [765],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く","夜光"],
     auth: true,
     isEvent: false,
@@ -173,7 +173,7 @@ const flowerData = [
     level: 11,
     growTime: 4320,   // 72時間
     seedPrice: 300,
-    prices: [785, 1180, 1570, 1965, 3140],
+    prices: [785],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く"],
     auth: true,
     isEvent: false,
@@ -188,7 +188,7 @@ const flowerData = [
     level: 12,
     growTime: 4320,   // 72時間
     seedPrice: 300,
-    prices: [805, null, null, null, null],
+    prices: [805],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く","夜光"],
     auth: true,
     isEvent: false,
@@ -203,7 +203,7 @@ const flowerData = [
     level: 13,
     growTime: 4320,   // 72時間
     seedPrice: 300,
-    prices: [825, null, null, null, null],
+    prices: [825],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","青","緑","輝く","夜光"],
     auth: true,
     isEvent: false,
@@ -220,7 +220,7 @@ const flowerData = [
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
-    prices: [125, null, null, null, null],
+    prices: [125],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","青","夜光"],
     auth: false,
     season: true,
@@ -236,7 +236,7 @@ const flowerData = [
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
-    prices: [125, null, null, null, null],
+    prices: [125],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","夜光"],
     auth: false,
     fes: true,
@@ -252,7 +252,7 @@ const flowerData = [
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
-    prices: [125, null, null, null, null],
+    prices: [125],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","夜光"],
     auth: false,
     fes: true,
@@ -269,7 +269,7 @@ const flowerData = [
     level: 3,
     growTime: 1440,   // 24時間
     seedPrice: 30,
-    prices: [125, null, null, null, null],
+    prices: [125],
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","青","夜光"],
     auth: false,
     season: true,

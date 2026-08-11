@@ -14,6 +14,7 @@ const CACHE_FILES = [
   "./faq.html",
   "./css/style.css",
   "./js/main.js",
+  "./js/price-calc.js",
   "./js/shop.js",
   "./js/data-shop.js",
   "./js/data-sync.js",

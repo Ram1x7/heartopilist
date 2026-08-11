@@ -899,6 +899,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/price-calc.js"></script>
 <script src="js/data-foods.js"></script>
 <script src="js/food-auth-calc.js"></script>
 <script>
@@ -1218,7 +1219,8 @@ function renderModal(){
   const r = currentModalRarity;
   const idx = rarityIdx(r);
 
-  const price = f.prices && f.prices[idx] != null ? f.prices[idx] : null;
+  const prices = f.prices ? derivePrices(f.prices[0], "food", f.rarity) : null;
+  const price = prices && prices[idx] != null ? prices[idx] : null;
   const profit = price != null ? price - (f.cost || 0) : null;
   const profitClass = profit == null ? "" : profit >= 0 ? "profit-plus" : "profit-minus";
   const profitText = profit == null ? T("food_unknown","不明") :
