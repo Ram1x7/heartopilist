@@ -1092,21 +1092,23 @@ function getStats() {
   const foodAuthTotal   = foodAuthElig.length;
 
   // ── 園芸：作物 ──
+  // 認証データは園芸専用の "garden_auth" キー（図鑑の authData とは分離済み）
   const gardenChecked   = JSON.parse(localStorage.getItem("garden_checked") || "{}");
+  const gardenAuth      = JSON.parse(localStorage.getItem("garden_auth")    || "{}");
   const cropAll         = typeof cropData   !== "undefined" ? cropData   : [];
   const flowerAll       = typeof flowerData !== "undefined" ? flowerData : [];
 
   const cropDone        = cropAll.filter(g => gardenChecked[g.name]).length;
   const cropTotal       = cropAll.length;
   const cropAuthElig    = cropAll.filter(g => g.auth !== false);
-  const cropAuthDone    = cropAuthElig.filter(g => authData[g.name]).length;
+  const cropAuthDone    = cropAuthElig.filter(g => gardenAuth[g.name]).length;
   const cropAuthTotal   = cropAuthElig.length;
 
   // ── 園芸：花 ──
   const flowerDone      = flowerAll.filter(g => gardenChecked[g.name]).length;
   const flowerTotal     = flowerAll.length;
   const flowerAuthElig  = flowerAll.filter(g => g.auth !== false);
-  const flowerAuthDone  = flowerAuthElig.filter(g => authData[g.name]).length;
+  const flowerAuthDone  = flowerAuthElig.filter(g => gardenAuth[g.name]).length;
   const flowerAuthTotal = flowerAuthElig.length;
 
   // ── 園芸：合計 ──
