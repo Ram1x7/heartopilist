@@ -833,11 +833,35 @@ function toggleChecked(name){
 }
 
 // ── 認証データ ──
-let authData = JSON.parse(localStorage.getItem("authData") || "{}");
+// 以前は図鑑（index.html）と同じ "authData" キーを共有していたため、
+// 両ページを行き来する間に互いの変更が上書きされて消えることがあった。
+// 園芸専用の "garden_auth" キーに分離する（初回のみ、混ざっていた分を移行）。
+(function migrateGardenAuthData(){
+  if(localStorage.getItem("garden_auth") !== null) return;
+  const shared = JSON.parse(localStorage.getItem("authData") || "{}");
+  const gardenNames = new Set([
+    ...(typeof cropData   !== "undefined" ? cropData   : []),
+    ...(typeof flowerData !== "undefined" ? flowerData : []),
+  ].map(item => item.name));
+  const gardenAuth = {};
+  let touched = false;
+  Object.keys(shared).forEach(name => {
+    if(gardenNames.has(name)){
+      gardenAuth[name] = shared[name];
+      delete shared[name];
+      touched = true;
+    }
+  });
+  localStorage.setItem("garden_auth", JSON.stringify(gardenAuth));
+  if(touched){
+    localStorage.setItem("authData", JSON.stringify(shared));
+  }
+})();
+let authData = JSON.parse(localStorage.getItem("garden_auth") || "{}");
 
 function toggleAuth(name){
   authData[name] = !authData[name];
-  localStorage.setItem("authData", JSON.stringify(authData));
+  localStorage.setItem("garden_auth", JSON.stringify(authData));
   renderContent();
 }
 
