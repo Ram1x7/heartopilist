@@ -1160,18 +1160,46 @@ function drawShareCard() {
     { label:"花",   done:stats.flowerDone, total:stats.flowerTotal, authDone:stats.flowerAuthDone, authTotal:stats.flowerAuthTotal },
   ];
 
-  // ── レイアウト（先にキャンバスの高さを確定させる） ──
+  // ── レイアウト（カーソルを積み上げて要素の重なりを防ぐ） ──
   const w      = 640;
   const M      = 44;               // 左右の余白
   const rowH   = 54;
-  const cardY  = 400;
-  const cardH  = 190;
-  let   y      = cardY + cardH + 46;
-  const dexTitleY = y;
-  y += 30 + dexRows.length * rowH + 34;
-  const gardenTitleY = y;
-  y += 30 + gardenRows.length * rowH + 50;
-  const h = y + 40; // 余白のみ（URL行は省略）
+  const mascotR = 56;
+  const medalR  = 76;
+  const cardH   = 190;
+
+  let cur = 34;
+  cur += mascotR * 2;
+  const mascotCy = cur - mascotR;
+  cur += 22;                       // マスコット下の余白
+
+  const titleY = cur + 26;
+  cur = titleY + 8;
+  const subtitleY = cur + 14;
+  cur = subtitleY + 16;
+  const dividerY = cur;
+  cur += 42;
+
+  const medalCy = cur + medalR;
+  cur += medalR * 2;
+  cur += 42;                       // メダル下の「done / total」表示分
+
+  const cardY = cur;
+  cur += cardH;
+  cur += 44;
+
+  const dexTitleY = cur;
+  cur += 30 + dexRows.length * rowH;
+  cur += 30;
+
+  const dexDividerY = cur;
+  cur += 26;
+
+  const gardenTitleY = cur;
+  cur += 30 + gardenRows.length * rowH;
+  cur += 44;
+
+  const h = cur + 36; // フッター分（URL行は省略し日付のみ）
 
   shareCanvas.width  = w;
   shareCanvas.height = h;
@@ -1184,7 +1212,7 @@ function drawShareCard() {
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // ── ヘルパー：細い金の弧を重ねた装飾（雲形・波形のあしらい） ──
+  // ── ヘルパー：細い金の弧を重ねた装飾（青海波・流水紋風のあしらい） ──
   function drawFlourish(cx, cy, scale, rot, alpha) {
     ctx.save();
     ctx.translate(cx, cy);
@@ -1205,6 +1233,33 @@ function drawShareCard() {
   }
   drawFlourish(w - 70, 44, 1, 0.15, 0.28);
   drawFlourish(70, h - 44, 1, Math.PI + 0.15, 0.28);
+
+  // ── ヘルパー：桜の花びら（和のあしらい、控えめに散らす） ──
+  function drawSakura(cx, cy, r, rot, alpha) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rot);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "rgba(177,80,59,0.16)";
+    for (let i = 0; i < 5; i++) {
+      ctx.save();
+      ctx.rotate((Math.PI * 2 / 5) * i);
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.quadraticCurveTo(r * 0.55, -r * 0.4, 0, -r);
+      ctx.quadraticCurveTo(-r * 0.55, -r * 0.4, 0, 0);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(0, 0, r * 0.16, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(200,168,107,0.35)";
+    ctx.fill();
+    ctx.restore();
+  }
+  drawSakura(56,     mascotCy - 30, 20, -0.3, 1);
+  drawSakura(w - 52, mascotCy + 60, 16,  1.9, 1);
+  drawSakura(w - 44, h - 190,       18,  0.7, 1);
+  drawSakura(50,     h - 90,        14, -1.4, 1);
 
   // 隅の淡い金の光暈
   ctx.save();
@@ -1237,9 +1292,7 @@ function drawShareCard() {
   }
 
   // ── マスコット（アプリアイコン画像を円形フレームで） ──
-  const mascotR  = 58;
   const mascotCx = w / 2;
-  const mascotCy = 88;
   ctx.save();
   ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
   ctx.closePath();
@@ -1266,7 +1319,6 @@ function drawShareCard() {
   ctx.restore();
 
   // ── ヘッダー ──
-  const titleY = mascotCy + mascotR + 46;
   ctx.textAlign = "center";
   ctx.fillStyle = INDIGO;
   ctx.font = `700 32px ${SERIF}`;
@@ -1276,11 +1328,10 @@ function drawShareCard() {
   ctx.font = `12px ${SERIF}`;
   ctx.save();
   ctx.letterSpacing = "0.28em";
-  ctx.fillText("C O M P L E T E   S T A T U S", w / 2, titleY + 22);
+  ctx.fillText("C O M P L E T E   S T A T U S", w / 2, subtitleY);
   ctx.restore();
 
   // タイトル下の飾り罫（線 - 菱形 - 線）
-  const dividerY = titleY + 42;
   ctx.strokeStyle = "rgba(163,133,79,0.5)";
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -1299,8 +1350,6 @@ function drawShareCard() {
   const doneAll  = stats.done  + stats.foodDone  + stats.gardenDone;
   const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
   const medalCx  = w / 2;
-  const medalCy  = dividerY + 92;
-  const medalR   = 78;
 
   ctx.save();
   ctx.shadowColor  = "rgba(120,100,60,0.18)";
@@ -1469,7 +1518,7 @@ function drawShareCard() {
   drawSubSection(dexTitleY, "図鑑内訳", dexRows);
 
   // ── 園芸内訳 ──
-  drawDivider(dexTitleY + 30 + dexRows.length * rowH + 16);
+  drawDivider(dexDividerY);
   drawSubSection(gardenTitleY, "園芸内訳", gardenRows);
 
   // ── フッター（日付のみ。URL表記は省略） ──
