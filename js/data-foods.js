@@ -8,7 +8,7 @@ const foodsData = [
   cost:20,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[90,135,180,360,720],
+  prices:[90],
   materials:["野菜ならなんでもOK","野菜ならなんでもOK","",""],
   level:1,
   materials_image:[
@@ -27,7 +27,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[160,240,320,640,1280],
+  prices:[160],
   materials:["ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK","ジャムの材料ならなんでもOK"],
   level:1,
   materials_image:[
@@ -46,7 +46,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[160,240,320,640,1280],
+  prices:[160],
   materials:["ラズベリー","ラズベリー","ラズベリー","ラズベリー"],
   level:1,
   materials_image:[
@@ -65,7 +65,7 @@ const foodsData = [
   cost:40,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[180,270,360,720,1440],
+  prices:[180],
   materials:["トマト(種@10)","トマト(種@10)","トマト(種@10)","トマト(種@10)"],
   level:1,
   materials_image:[
@@ -84,7 +84,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[170,255,340,680,1360],
+  prices:[170],
   materials:["ブルーベリー","ブルーベリー","ブルーベリー","ブルーベリー"],
   level:1,
   materials_image:[
@@ -103,7 +103,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[270,405,540,1080,2160],
+  prices:[270],
   materials:["リンゴ","リンゴ","リンゴ","リンゴ"],
   level:1,
   materials_image:[
@@ -122,7 +122,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[270,405,540,1080,2160],
+  prices:[270],
   materials:["オレンジ","オレンジ","オレンジ","オレンジ"],
   level:1,
   materials_image:[
@@ -141,7 +141,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,false,false,false,false],
-  prices:[30,null,null,null,null],
+  prices:[30],
   materials:["食べ物の失敗作"],
   level:1,
   materials_image:[
@@ -160,7 +160,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,false,false,false,false],
-  prices:[30,null,null,null,null],
+  prices:[30],
   materials:["飲み物の失敗作"],
   level:1,
   materials_image:[
@@ -179,7 +179,7 @@ const foodsData = [
   cost:500,
   time:360,
   rarity: [true,true,true,true,true],
-  prices:[1580,2370,3160,6320,12640],
+  prices:[1580],
   materials:["いちご(種@125)","いちご(種@125)","いちご(種@125)","いちご(種@125)"],
   level:1,
   materials_image:[
@@ -198,7 +198,7 @@ const foodsData = [
   cost:60,
   time:30,
   rarity: [true,true,true,true,true],
-  prices:[280,420,560,1120,2240],
+  prices:[280],
   materials:["パイナップル(種@15)","パイナップル(種@15)","パイナップル(種@15)","パイナップル(種@15)"],
   level:1,
   materials_image:[
@@ -217,7 +217,7 @@ const foodsData = [
   cost:640,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[2020,3030,4040,8080,16160],
+  prices:[2020],
   materials:["ブドウ(種@160)","ブドウ(種@160)","ブドウ(種@160)","ブドウ(種@160)"],
   level:1,
   materials_image:[
@@ -236,7 +236,7 @@ const foodsData = [
   cost:440,
   time:300,
   rarity: [true,true,true,true,true],
-  prices:[1400,2100,2800,5600,11200],
+  prices:[1400],
   materials:["カカオ豆(種@110)","カカオ豆(種@110)","カカオ豆(種@110)","カカオ豆(種@110)"],
   level:1,
   materials_image:[
@@ -256,7 +256,7 @@ const foodsData = [
   cost:40,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[200,300,400,800,1600],
+  prices:[200],
   materials:["スターフルーツ(種@10)","スターフルーツ(種@10)","スターフルーツ(種@10)","スターフルーツ(種@10)"],
   level:1,
   materials_image:[
@@ -275,7 +275,7 @@ const foodsData = [
   cost:60,
   time:60,
   rarity: [true,true,true,true,true],
-  prices:[310,465,620,1240,2480],
+  prices:[310],
   materials:["魚ならなんでもOK","魚ならなんでもOK","じゃがいも(種@30)","じゃがいも(種@30)"],
   level:1,
   materials_image:[
@@ -294,7 +294,7 @@ const foodsData = [
   cost:245,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[480,720,960,1920,3840],
+  prices:[480],
   materials:["チーズ(@100)","牛乳(@50)","小麦(種@95)","小麦(種@95)"],
   level:1,
   materials_image:[
@@ -313,7 +313,7 @@ const foodsData = [
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[550,825,1100,2200,4400],
+  prices:[550],
   materials:["卵(@100)","牛乳(@50)","虹色キャンディならなんでもOK","虹キャンディならなんでもOK"],
   level:1,
   materials_image:[
@@ -332,7 +332,7 @@ const foodsData = [
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["卵(@100)","牛乳(@50)","赤いキャンディ(@200)","赤いキャンディ(@200)"],
   level:1,
   materials_image:[
@@ -351,7 +351,7 @@ const foodsData = [
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["卵(@100)","牛乳(@50)","オレンジのキャンディ(@200)","オレンジのキャンディ(@200)"],
   level:1,
   materials_image:[
@@ -370,7 +370,7 @@ const foodsData = [
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["卵(@100)","牛乳(@50)","黄色いキャンディ(@200)","黄色いキャンディ(@200)"],
   level:1,
   materials_image:[
@@ -389,7 +389,7 @@ const foodsData = [
   cost:450,
   time:1,
   rarity: [true,true,true,true,true],
-  prices:[570,855,1140,2280,4560],
+  prices:[570],
   materials:["卵(@100)","牛乳(@50)","紫のキャンディ(@150)","紫のキャンディ(@150)"],
   level:1,
   materials_image:[
@@ -408,7 +408,7 @@ const foodsData = [
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["卵(@100)","牛乳(@50)","緑のキャンディ(@200)","緑のキャンディ(@200)"],
   level:1,
   materials_image:[
@@ -427,7 +427,7 @@ const foodsData = [
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[570,855,1140,2280,4560],
+  prices:[570],
   materials:["卵(@100)","牛乳(@50)","青のキャンディ(@150)","青のキャンディ(@150)"],
   level:1,
   materials_image:[
@@ -446,7 +446,7 @@ const foodsData = [
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[570,855,1140,2280,4560],
+  prices:[570],
   materials:["卵(@100)","牛乳(@50)","ブルーキャンディ(@150)","ブルーキャンディ(@150)"],
   level:1,
   materials_image:[
@@ -465,7 +465,7 @@ const foodsData = [
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["キノコならなんでもOK","キノコならなんでもOK","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
@@ -484,7 +484,7 @@ const foodsData = [
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["ヒラタケ","ヒラタケ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
@@ -503,7 +503,7 @@ const foodsData = [
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["シイタケ","シイタケ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
@@ -522,7 +522,7 @@ const foodsData = [
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["マッシュルーム","マッシュルーム","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
@@ -541,7 +541,7 @@ const foodsData = [
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["ヤマドリタケ","ヤマドリタケ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
@@ -560,7 +560,7 @@ const foodsData = [
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[830,1245,1660,3320,6640],
+  prices:[830],
   materials:["トリュフ","トリュフ","小麦(種@95)","卵(@100)"],
   level:1,
   materials_image:[
@@ -579,7 +579,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[180,270,360,720,1440],
+  prices:[180],
   materials:["キノコならなんでもOK","キノコならなんでもOK","キノコならなんでもOK","キノコならなんでもOK"],
   level:1,
   materials_image:[
@@ -598,7 +598,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[180,270,360,720,1440],
+  prices:[180],
   materials:["ヒラタケ","ヒラタケ","ヒラタケ","ヒラタケ"],
   level:1,
   materials_image:[
@@ -617,7 +617,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[180,270,360,720,1440],
+  prices:[180],
   materials:["シイタケ","シイタケ","シイタケ","シイタケ"],
   level:1,
   materials_image:[
@@ -636,7 +636,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[180,270,360,720,1440],
+  prices:[180],
   materials:["マッシュルーム","マッシュルーム","マッシュルーム","マッシュルーム"],
   level:1,
   materials_image:[
@@ -655,7 +655,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[180,270,360,720,1440],
+  prices:[180],
   materials:["ヤマドリタケ","ヤマドリタケ","ヤマドリタケ","ヤマドリタケ"],
   level:1,
   materials_image:[
@@ -674,7 +674,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[130,195,260,520,1140],
+  prices:[130],
   materials:["無菌卵(@100)","","",""],
   level:1,
   materials_image:[
@@ -693,7 +693,7 @@ const foodsData = [
   cost:100,
   time:1,
   rarity: [true,true,true,true,true],
-  prices:[190,285,380,760,1520],
+  prices:[190],
   materials:["卵(@100)","復活のエッグの素材ならなんでもOK"],
   level:1,
   materials_image:[
@@ -712,7 +712,7 @@ const foodsData = [
   cost:260,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[620,930,1240,2480,4960],
+  prices:[620],
   materials:["卵(@100)","ブドウ(種@160)"],
   level:1,
   materials_image:[
@@ -731,7 +731,7 @@ const foodsData = [
   cost:245,
   time:480,
   rarity: [true,true,true,true,true],
-  prices:[570,855,1140,2280,4560],
+  prices:[570],
   materials:["卵(@100)","レタス(種@145)"],
   level:1,
   materials_image:[
@@ -750,7 +750,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[190,285,380,760,1520],
+  prices:[190],
   materials:["卵(@100)","リンゴ"],
   level:1,
   materials_image:[
@@ -769,7 +769,7 @@ const foodsData = [
   cost:755,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[1650,2475,3300,6600,13200],
+  prices:[1650],
   materials:["復活のエッグ","復活祭の模様入り卵(紫)","復活祭の模様入り卵(緑)","復活祭の模様入り卵(オレンジ)"],
   level:1,
   materials_image:[
@@ -788,7 +788,7 @@ const foodsData = [
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[240,360,480,960,1920],
+  prices:[240],
   materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
   level:1,
   materials_image:[
@@ -807,7 +807,7 @@ const foodsData = [
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[260,390,520,1040,2080],
+  prices:[260],
   materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
   level:1,
   materials_image:[
@@ -826,7 +826,7 @@ const foodsData = [
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[460,690,920,1840,3680],
+  prices:[460],
   materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
   level:1,
   materials_image:[
@@ -845,7 +845,7 @@ const foodsData = [
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[240,360,480,960,1920],
+  prices:[240],
   materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
   level:1,
   materials_image:[
@@ -864,7 +864,7 @@ const foodsData = [
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[260,390,520,1040,2080],
+  prices:[260],
   materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
   level:1,
   materials_image:[
@@ -883,7 +883,7 @@ const foodsData = [
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[460,690,920,1840,3680],
+  prices:[460],
   materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
   level:1,
   materials_image:[
@@ -902,7 +902,7 @@ const foodsData = [
   cost:370,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[910],
   materials:["卵(@100)","牛乳(@50)","小麦(種@95)","イチゴ(種@125)"],
   level:1,
   materials_image:[
@@ -921,7 +921,7 @@ const foodsData = [
   cost:295,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[590,885,1180,2360,4720],
+  prices:[590],
   materials:["卵(@100)","牛乳(@50)","小麦(種@95)","コーヒー豆(@50)"],
   level:1,
   materials_image:[
@@ -940,7 +940,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[520,780,1040,2080,4160],
+  prices:[520],
   materials:["牛乳(@50)","牛乳(@50)","牛乳(@50)","コーヒー(@200)"],
   level:1,
   materials_image:[
@@ -959,7 +959,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[520,780,1040,2080,4160],
+  prices:[520],
   materials:["牛乳(@50)","牛乳(@50)","コーヒー豆(@50)","コーヒー(@200)"],
   level:1,
   materials_image:[
@@ -978,7 +978,7 @@ const foodsData = [
   cost:500,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[1220,1830,2440,4880,9760],
+  prices:[1220],
   materials:["牛乳(@50)","牛乳(@50)","コーヒー(@200)","コーヒー(@200)"],
   level:1,
   materials_image:[
@@ -997,7 +997,7 @@ const foodsData = [
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[690,1035,1380,2760,5520],
+  prices:[690],
   materials:["小麦(種@95)","牛乳(@50)","抹茶パウダー(@250)","雑草"],
   level:1,
   materials_image:[
@@ -1016,7 +1016,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[170,255,340,680,1360],
+  prices:[170],
   materials:["果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -1035,7 +1035,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[170,255,340,680,1360],
+  prices:[170],
   materials:["果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -1054,7 +1054,7 @@ const foodsData = [
   cost:112,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[430,645,860,1720,3440],
+  prices:[430],
   materials:["稲(種@12)","料理油(@100)","コウライエビ","ウミエビ"],
   level:1,
   materials_image:[
@@ -1073,7 +1073,7 @@ const foodsData = [
   cost:124,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[310,465,620,1240,2480],
+  prices:[310],
   materials:["稲(種@12)","稲(種@12)","卵(@100)","海ぶどう"],
   level:1,
   materials_image:[
@@ -1092,7 +1092,7 @@ const foodsData = [
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["小麦(種@95)","バター(@150)","卵(@100)","コーヒー豆(@50)"],
   level:1,
   materials_image:[
@@ -1111,7 +1111,7 @@ const foodsData = [
   cost:345,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["小麦(種@95)","バター(@150)","卵(@100)","ラズベリー"],
   level:1,
   materials_image:[
@@ -1130,7 +1130,7 @@ const foodsData = [
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["小麦(種@95)","バター(@150)","卵(@100)","牛乳(@50)"],
   level:1,
   materials_image:[
@@ -1149,7 +1149,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[290,435,580,1160,2320],
+  prices:[290],
   materials:["コーヒー豆(@50)","コーヒー豆(@50)","コーヒーの材料ならなんでもOK","コーヒーの材料ならなんでもOK"],
   level:2,
   materials_image:[
@@ -1168,7 +1168,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[300,450,600,1200,2400],
+  prices:[300],
   materials:["コーヒー豆×2(@50×2)","牛乳×2(@50×2)"],
   level:2,
   materials_image:[
@@ -1187,7 +1187,7 @@ const foodsData = [
   cost:205,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[520,780,1040,2080,4160],
+  prices:[520],
   materials:["魚ならなんでもOK","チーズ(@100)","野菜ならなんでもOK","小麦(種@95)"],
   level:2,
   materials_image:[
@@ -1206,7 +1206,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[230,345,460,920,1840],
+  prices:[230],
   materials:["海ぶどう","海ぶどう","シイタケ","無菌卵(@100)"],
   level:1,
   materials_image:[
@@ -1225,7 +1225,7 @@ const foodsData = [
   cost:400,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["ワカメ","ワカメ","肉(@200)","肉(@200)"],
   level:1,
   materials_image:[
@@ -1244,7 +1244,7 @@ const foodsData = [
   cost:105,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[490,735,980,1960,3920],
+  prices:[490],
   materials:["海鮮ならなんでもOK","海鮮ならなんでもOK","小麦(種@95)","トマト(種@10)"],
   level:3,
   materials_image:[
@@ -1263,7 +1263,7 @@ const foodsData = [
   cost:185,
   time:640,
   rarity: [true,true,true,true,true],
-  prices:[640,960,1280,2560,5120],
+  prices:[640],
   materials:["トマト(種@10)","じゃがいも(種@30)","レタス(種@145)",""],
   level:3,
   materials_image:[
@@ -1282,7 +1282,7 @@ const foodsData = [
   cost:240,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[900,1350,1800,3600,7200],
+  prices:[900],
   materials:["トリュフ","小麦(種@95)","小麦(種@95)","牛乳(@50)"],
   level:3,
   materials_image:[
@@ -1301,7 +1301,7 @@ const foodsData = [
   cost:12,
   time:20,
   rarity: [true,true,true,true,true],
-  prices:[160,240,320,640,1280],
+  prices:[160],
   materials:["稲(種@12)","シーアスパラガス","シーアスパラガス","ウミエビ"],
   level:1,
   materials_image:[
@@ -1320,7 +1320,7 @@ const foodsData = [
   cost:235,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[780,1170,1560,3120,6240],
+  prices:[780],
   materials:["チーズ(@100)","トマトソース(@40)","小麦(種@95)","魚ならなんでもOK"],
   level:4,
   materials_image:[
@@ -1339,7 +1339,7 @@ const foodsData = [
   cost:405,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[670,1005,1340,2680,5360],
+  prices:[670],
   materials:["肉(@200)","小麦(種@95)","トマト(種@10)","チーズ(@100)"],
   level:4,
   materials_image:[
@@ -1358,7 +1358,7 @@ const foodsData = [
   cost:345,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[730,1095,1460,2920,5840],
+  prices:[730],
   materials:["リンゴ","小麦(種@95)","卵(@100)","バター(@150)"],
   level:5,
   materials_image:[
@@ -1377,7 +1377,7 @@ const foodsData = [
   cost:245,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[840,1260,1680,3360,6720],
+  prices:[840],
   materials:["ニンジン(種@25)","ニンジン(種@25)","卵(@100)","小麦(種@95)"],
   level:5,
   materials_image:[
@@ -1396,7 +1396,7 @@ const foodsData = [
   cost:540,
   time:720,
   rarity: [true,true,true,true,true],
-  prices:[1340,2010,2680,5360,10720],
+  prices:[1340],
   materials:["トウモロコシ(種@170)","トウモロコシ(種@170)","牛乳(@50)","バター(@150)"],
   level:5,
   materials_image:[
@@ -1415,7 +1415,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[410,615,820,1640,3280],
+  prices:[410],
   materials:["北欧アカザエビ","北欧アカザエビ","魚ならなんでもOK","魚ならなんでもOK"],
   level:6,
   materials_image:[
@@ -1434,7 +1434,7 @@ const foodsData = [
   cost:300,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[530,795,1060,2120,4240],
+  prices:[530],
   materials:["コーヒー豆(@50)","卵(@100)","牛乳(@50)","チーズ(@100)"],
   level:6,
   materials_image:[
@@ -1453,7 +1453,7 @@ const foodsData = [
   cost:840,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[2260,3390,4520,9040,18080],
+  prices:[2260],
   materials:["コーヒー(@200)","シーフードピザ(@235)","アップルパイ(@345)","フィッシュアンドチップス(@60)"],
   level:7,
   materials_image:[
@@ -1472,7 +1472,7 @@ const foodsData = [
   cost:300,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[710,1065,1420,2840,5680],
+  prices:[710],
   materials:["ティラミス(@300)","ジャムの材料ならなんでもOK","",""],
   level:7,
   materials_image:[
@@ -1491,7 +1491,7 @@ const foodsData = [
   cost:480,
   time:480,
   rarity: [true,true,true,true,true],
-  prices:[1350,2025,2700,5400,10800],
+  prices:[1350],
   materials:["小麦(種@95)","肉(@200)","レタス(種@145)","トマトソース(@40)"],
   level:8,
   materials_image:[
@@ -1510,7 +1510,7 @@ const foodsData = [
   cost:145,
   time:480,
   rarity: [true,true,true,true,true],
-  prices:[850,1275,1700,3400,6800],
+  prices:[850],
   materials:["アカザエビならなんでもOK","アカザエビならなんでもOK","アカザエビならなんでもOK","レタス(種@145)"],
   level:8,
   materials_image:[
@@ -1529,7 +1529,7 @@ const foodsData = [
   cost:145,
   time:480,
   rarity: [true,true,true,true,true],
-  prices:[1310,1965,2620,5240,10480],
+  prices:[1310],
   materials:["北欧ブルーアカザエビ","北欧ブルーアカザエビ","北欧ブルーアカザエビ","レタス(種@145)"],
   level:8,
   materials_image:[
@@ -1548,7 +1548,7 @@ const foodsData = [
   cost:475,
   time:420,
   rarity: [true,true,true,true,true],
-  prices:[1230,1845,2460,4920,9840],
+  prices:[1230],
   materials:["ナス(種@135)","肉(@200)","料理油(@100)","トマトソース(@40)"],
   level:10,
   materials_image:[
@@ -1567,7 +1567,7 @@ const foodsData = [
   cost:630,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[1760,2640,3520,7040,14080],
+  prices:[1760],
   materials:["田園サラダ(@20)","スモークサーモンベーグル(@205)","シーフードリゾット(@105)","ティラミス(@300)"],
   level:9,
   materials_image:[
@@ -1586,7 +1586,7 @@ const foodsData = [
   cost:150,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[1990,2985,3980,7960,15920],
+  prices:[1990],
   materials:["タラバガニならなんでもOK","タラバガニならなんでもOK","タラバガニならなんでもOK","バター(@150)"],
   level:10,
   materials_image:[
@@ -1605,7 +1605,7 @@ const foodsData = [
   cost:150,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[2980,4470,5960,11920,23840],
+  prices:[2980],
   materials:["黄金タラバガニ","黄金タラバガニ","黄金タラバガニ","バター(@150)"],
   level:10,
   materials_image:[
@@ -1624,7 +1624,7 @@ const foodsData = [
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[840,1260,1680,3360,6720],
+  prices:[840],
   materials:["紅茶(@250)","紅茶(@250)","紅茶の食材ならなんでもOK","紅茶の食材ならなんでもOK"],
   level:11,
   materials_image:[
@@ -1643,7 +1643,7 @@ const foodsData = [
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[840,1260,1680,3360,6720],
+  prices:[840],
   materials:["紅茶(@250)","紅茶(@250)","牛乳(@50)","牛乳(@50)"],
   level:11,
   materials_image:[
@@ -1662,7 +1662,7 @@ const foodsData = [
   cost:660,
   time:300,
   rarity: [true,true,true,true,true],
-  prices:[1120,1680,2240,4480,8960],
+  prices:[1120],
   materials:["紅茶(@250)","紅茶(@250)","牛乳(@50)","カカオ豆(種@110)"],
   level:11,
   materials_image:[
@@ -1681,7 +1681,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[400,600,800,1600,3200],
+  prices:[400],
   materials:["牛乳(@50)","牛乳(@50)","シェイクの食材ならなんでもOK","シェイクの食材ならなんでもOK"],
   level:11,
   materials_image:[
@@ -1700,7 +1700,7 @@ const foodsData = [
   cost:320,
   time:300,
   rarity: [true,true,true,true,true],
-  prices:[1120,1680,2240,4480,8960],
+  prices:[1120],
   materials:["牛乳(@50)","牛乳(@50)","カカオ豆(種@110)","カカオ豆(種@110)"],
   level:11,
   materials_image:[
@@ -1719,7 +1719,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[440,660,880,1760,3520],
+  prices:[440],
   materials:["牛乳(@50)","牛乳(@50)","ラズベリー","ラズベリー"],
   level:11,
   materials_image:[
@@ -1738,7 +1738,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[2980,4470,5960,11920,23840],
+  prices:[2980],
   materials:["牛乳(@50)","牛乳(@50)","ブルーベリー","ブルーベリー"],
   level:11,
   materials_image:[
@@ -1757,7 +1757,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["牛乳(@50)","牛乳(@50)","リンゴ","リンゴ"],
   level:11,
   materials_image:[
@@ -1776,7 +1776,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["牛乳(@50)","牛乳(@50)","オレンジ","オレンジ"],
   level:11,
   materials_image:[
@@ -1795,7 +1795,7 @@ const foodsData = [
   cost:130,
   time:30,
   rarity: [true,true,true,true,true],
-  prices:[440,660,880,1760,3520],
+  prices:[440],
   materials:["牛乳(@50)","牛乳(@50)","パイナップル(種@15)","パイナップル(種@15)"],
   level:11,
   materials_image:[
@@ -1814,7 +1814,7 @@ const foodsData = [
   cost:250,
   time:360,
   rarity: [true,true,true,true,true],
-  prices:[1090,1635,2180,4360,8720],
+  prices:[1090],
   materials:["牛乳(@50)","牛乳(@50)","いちご(種@125)","いちご(種@125)"],
   level:11,
   materials_image:[
@@ -1833,7 +1833,7 @@ const foodsData = [
   cost:420,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[1300,1950,2600,5200,10400],
+  prices:[1300],
   materials:["牛乳(@50)","牛乳(@50)","ブドウ(種@160)","ブドウ(種@160)"],
   level:11,
   materials_image:[
@@ -1852,7 +1852,7 @@ const foodsData = [
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[840,1260,1680,3360,6720],
+  prices:[840],
   materials:["牛乳(@50)","牛乳(@50)","抹茶パウダー(@250)","抹茶パウダー(@250)"],
   level:11,
   materials_image:[
@@ -1871,7 +1871,7 @@ const foodsData = [
   cost:100,
   time:45,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["茶葉(種@25)","茶葉(種@25)","緑茶の食材ならなんでもOK","緑茶の食材ならなんでもOK"],
   level:12,
   materials_image:[
@@ -1890,7 +1890,7 @@ const foodsData = [
   cost:150,
   time:45,
   rarity: [true,true,true,true,true],
-  prices:[500,750,1000,2000,4000],
+  prices:[500],
   materials:["茶葉(種@25)","茶葉(種@25)","牛乳(@50)","牛乳(@50)"],
   level:12,
   materials_image:[
@@ -1909,7 +1909,7 @@ const foodsData = [
   cost:350,
   time:45,
   rarity: [true,true,true,true,true],
-  prices:[700,1050,1400,2800,5600],
+  prices:[700],
   materials:["茶葉(種@25)","茶葉(種@25)","牛乳(@50)","抹茶パウダー(@250)"],
   level:12,
   materials_image:[
@@ -1928,7 +1928,7 @@ const foodsData = [
   cost:110,
   time:1440,
   rarity: [true,true,true,true,true],
-  prices:[600,900,1200,2400,4800],
+  prices:[600],
   materials:["茶葉(種@25)","茶葉(種@25)","白いヒナギク(種@30)","白いヒナギク(種@30)"],
   level:12,
   materials_image:[
@@ -1947,7 +1947,7 @@ const foodsData = [
   cost:650,
   time:4320,
   rarity: [true,true,true,true,true],
-  prices:[1930,2895,3860,7720,15440],
+  prices:[1930],
   materials:["茶葉(種@25)","茶葉(種@25)","赤いバラ(種@300)","赤いバラ(種@300)"],
   level:12,
   materials_image:[
@@ -1966,7 +1966,7 @@ const foodsData = [
   cost:1690,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[2970,4455,5940,11880,23760],
+  prices:[2970],
   materials:["チーズケーキ(@245)","チーズケーキ(@245)","香る紅茶(@600)","香る紅茶(@600)"],
   level:12,
   materials_image:[
@@ -1985,7 +1985,7 @@ const foodsData = [
   cost:360,
   time:840,
   rarity: [true,true,true,true,true],
-  prices:[1560,2340,3120,6240,12480],
+  prices:[1560],
   materials:["アカザエビならなんでもOK","アカザエビならなんでもOK","アボカド(種@180)","アボカド(種@180)"],
   level:13,
   materials_image:[
@@ -2004,7 +2004,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[1440,2160,2880,5760,11520],
+  prices:[1440],
   materials:["タラバガニならなんでもOK","タラバガニならなんでもOK","アカザエビならなんでもOK","アカザエビならなんでもOK"],
   level:13,
   materials_image:[
@@ -2025,7 +2025,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[280,420,560,1120,2240],
+  prices:[280],
   materials:["シュガー(@50)","コーヒー豆(@50)","コーヒーの材料ならなんでもOK","コーヒーの材料ならなんでもOK"],
   level:1,
   materials_image:[
@@ -2046,7 +2046,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[280,420,560,1120,2240],
+  prices:[280],
   materials:["シュガー(@50)","コーヒー豆(@50)","牛乳(@50)","牛乳(@50)"],
   level:1,
   materials_image:[
@@ -2067,7 +2067,7 @@ const foodsData = [
   cost:560,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[630,945,1260,2520,5040],
+  prices:[630],
   materials:["肉(@200)","肉(@200)","バター(@150)","大根(種@10)"],
   level:1,
   materials_image:[
@@ -2088,7 +2088,7 @@ const foodsData = [
   cost:220,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[340,510,680,1360,2720],
+  prices:[340],
   materials:["牛乳(@50)","バター(@150)","大根(種@10)","大根(種@10)"],
   level:1,
   materials_image:[
@@ -2109,7 +2109,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -2130,7 +2130,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","ブルーベリー"],
   level:1,
   materials_image:[
@@ -2151,7 +2151,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[350,525,700,1400,2800],
+  prices:[350],
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","ラズベリー"],
   level:1,
   materials_image:[
@@ -2172,7 +2172,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[360,540,720,1440,2880],
+  prices:[360],
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","リンゴ"],
   level:1,
   materials_image:[
@@ -2193,7 +2193,7 @@ const foodsData = [
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[360,540,720,1440,2880],
+  prices:[360],
   materials:["卵(@100)","牛乳(@50)","シュガー(@50)","オレンジ"],
   level:1,
   materials_image:[
@@ -2214,7 +2214,7 @@ const foodsData = [
   cost:1180,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[1630,2445,3260,6520,13040],
+  prices:[1630],
   materials:["大根おろし肉(@560)","大根クリームポタージュ(@220)","アイスカップコーヒーの材料ならなんでもOK","シュガーパンケーキの料理ならなんでもOK"],
   level:1,
   materials_image:[
@@ -2235,7 +2235,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[210,315,420,840,1680],
+  prices:[210],
   materials:["練乳(@50)","積み木アイス(@50)","果物ならなんでもOK","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -2256,7 +2256,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[260,390,520,1040,2080],
+  prices:[260],
   materials:["練乳(@50)","積み木アイス(@50)","リンゴ","リンゴ"],
   level:1,
   materials_image:[
@@ -2277,7 +2277,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[260,390,520,1040,2080],
+  prices:[260],
   materials:["練乳(@50)","積み木アイス(@50)","オレンジ","オレンジ"],
   level:1,
   materials_image:[
@@ -2298,7 +2298,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[220,330,440,880,1060],
+  prices:[220],
   materials:["練乳(@50)","積み木アイス(@50)","ブルーベリー","ブルーベリー"],
   level:1,
   materials_image:[
@@ -2319,7 +2319,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[260,390,520,1040,2080],
+  prices:[260],
   materials:["練乳(@50)","積み木アイス(@50)","ラズベリー","ラズベリー"],
   level:1,
   materials_image:[
@@ -2340,7 +2340,7 @@ const foodsData = [
   cost:350,
   time:360,
   rarity: [true,true,true,true,true],
-  prices:[900,1350,1800,3600,7200],
+  prices:[900],
   materials:["練乳(@50)","積み木アイス(@50)","いちご(種@125)","いちご(種@125)"],
   level:1,
   materials_image:[
@@ -2361,7 +2361,7 @@ const foodsData = [
   cost:420,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[1110,1665,2220,4440,8880],
+  prices:[1110],
   materials:["練乳(@50)","積み木アイス(@50)","リンゴ(種@160)","ブドウ(種@160)"],
   level:1,
   materials_image:[
@@ -2382,7 +2382,7 @@ const foodsData = [
   cost:130,
   time:30,
   rarity: [true,true,true,true,true],
-  prices:[1110,1665,2220,4440,8880],
+  prices:[1110],
   materials:["練乳(@50)","積み木アイス(@50)","パイナップル(種@15)","パイナップル(種@15)"],
   level:1,
   materials_image:[
@@ -2403,7 +2403,7 @@ const foodsData = [
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[360,540,720,1480,2960],
+  prices:[360],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -2424,7 +2424,7 @@ const foodsData = [
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[390,585,780,1560,3120],
+  prices:[390],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","リンゴ"],
   level:1,
   materials_image:[
@@ -2444,7 +2444,7 @@ const foodsData = [
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[360,540,720,1480,2960],
+  prices:[360],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","オレンジ"],
   level:1,
   materials_image:[
@@ -2465,7 +2465,7 @@ const foodsData = [
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[360,540,720,1480,2960],
+  prices:[360],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ブルーベリー"],
   level:1,
   materials_image:[
@@ -2486,7 +2486,7 @@ const foodsData = [
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[380,570,760,1520,3040],
+  prices:[380],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ラズベリー"],
   level:1,
   materials_image:[
@@ -2506,7 +2506,7 @@ const foodsData = [
   cost:335,
   time:360,
   rarity: [true,true,true,true,true],
-  prices:[710,1065,1420,2840,5680],
+  prices:[710],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","いちご(種@125)"],
   level:1,
   materials_image:[
@@ -2527,7 +2527,7 @@ const foodsData = [
   cost:370,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[810,1215,1620,3240,6480],
+  prices:[810],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","ブドウ(種@160)"],
   level:1,
   materials_image:[
@@ -2548,7 +2548,7 @@ const foodsData = [
   cost:225,
   time:30,
   rarity: [true,true,true,true,true],
-  prices:[380,570,760,1520,3040],
+  prices:[380],
   materials:["バター(@150)","卵(@50)","レモンバーベナ(種@10)","パイナップル(種@15)"],
   level:1,
   materials_image:[
@@ -2569,7 +2569,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["小麦(種@95)","積み木パティ(@50)","キノコならなんでもOK","キノコならなんでもOK"],
   level:1,
   materials_image:[
@@ -2590,7 +2590,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["小麦(種@95)","積み木パティ(@50)","ヒラタケ","ヒラタケ"],
   level:1,
   materials_image:[
@@ -2610,7 +2610,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["小麦(種@95)","積み木パティ(@50)","シイタケ","シイタケ"],
   level:1,
   materials_image:[
@@ -2631,7 +2631,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["小麦(種@95)","積み木パティ(@50)","マッシュルーム","マッシュルーム"],
   level:1,
   materials_image:[
@@ -2652,7 +2652,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["小麦(種@95)","積み木パティ(@50)","ヤマドリタケ","ヤマドリタケ"],
   level:1,
   materials_image:[
@@ -2673,7 +2673,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[780,1170,1560,3120,6240],
+  prices:[780],
   materials:["小麦(種@95)","積み木パティ(@50)","トリュフ","トリュフ"],
   level:1,
   materials_image:[
@@ -2694,7 +2694,7 @@ const foodsData = [
   cost:455,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[1070,1605,2140,4280,8560],
+  prices:[1070],
   materials:["積み木ボウルフルーツかき氷ならなんでもOK(@100)","フルーツバーベナテイスティーパイならなんでもOK(@210)","積み木キノコバーガーならなんでもOK(@145)",""],
   level:1,
   materials_image:[
@@ -2715,7 +2715,7 @@ const foodsData = [
   cost:470,
   time:720,
   rarity: [true,true,true,true,true],
-  prices:[900,1350,1800,3600,7200],
+  prices:[900],
   materials:["トウモロコシ(種@170)","キノコならなんでもOK","バター(@150)","バター(@150)"],
   level:1,
   materials_image:[
@@ -2736,7 +2736,7 @@ const foodsData = [
   cost:420,
   time:720,
   rarity: [true,true,true,true,true],
-  prices:[820,1230,1640,3280,6560],
+  prices:[820],
   materials:["トウモロコシ(種@170)","春のブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)","バター(@150)"],
   level:1,
   materials_image:[
@@ -2757,7 +2757,7 @@ const foodsData = [
   cost:110,
   time:60,
   rarity: [true,true,true,true,true],
-  prices:[280,420,560,1120,2240],
+  prices:[280],
   materials:["ジャガイモ(種@30)","ジャガイモ(種@30)","サルサソース(@50)",""],
   level:1,
   materials_image:[
@@ -2778,7 +2778,7 @@ const foodsData = [
   cost:580,
   time:720,
   rarity: [true,true,true,true,true],
-  prices:[1230,1845,2460,4920,9840],
+  prices:[1230],
   materials:["塩味ポップコーンバケツ(@470)","サルサウェーブポテトチップス(@110)","",""],
   level:1,
   materials_image:[
@@ -2799,7 +2799,7 @@ const foodsData = [
   cost:530,
   time:720,
   rarity: [true,true,true,true,true],
-  prices:[1150,1725,2300,4600,9200],
+  prices:[1150],
   materials:["キャラメルポップコーンバケツ(@420)","サルサウェーブポテトチップス(@110)","",""],
   level:1,
   materials_image:[
@@ -2820,7 +2820,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[260,390,520,1040,2080],
+  prices:[260],
   materials:["ロメインレタス(種@10)","ロメインレタス(種@10)","サルサソース(@50)","卵(@50)"],
   level:1,
   materials_image:[
@@ -2841,7 +2841,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["野菜類ならなんでもOK","野菜類ならなんでもOK","ロメインレタスタコス(@120)",""],
   level:1,
   materials_image:[
@@ -2862,7 +2862,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["野シダ","野シダ","ロメインレタスタコス(@120)",""],
   level:1,
   materials_image:[
@@ -2883,7 +2883,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["野ニンニクガラシ","野ニンニクガラシ","ロメインレタスタコス(@120)",""],
   level:1,
   materials_image:[
@@ -2904,7 +2904,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["野ゴボウ","野ゴボウ","ロメインレタスタコス(@120)",""],
   level:1,
   materials_image:[
@@ -2925,7 +2925,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[330,495,660,1320,2640],
+  prices:[330],
   materials:["野カラシナ","野カラシナ","ロメインレタス(@110)",""],
   level:1,
   materials_image:[
@@ -2946,7 +2946,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[460,690,920,1840,3680],
+  prices:[460],
   materials:["紅茶(@250)","果物ならなんでもOK","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -2968,7 +2968,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[480,720,960,1920,3840],
+  prices:[480],
   materials:["紅茶(@250)","リンゴ","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -2989,7 +2989,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[480,720,960,1920,3840],
+  prices:[480],
   materials:["紅茶(@250)","オレンジ","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -3010,7 +3010,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[460,690,920,1840,3680],
+  prices:[460],
   materials:["紅茶(@250)","ブルーベリー","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -3031,7 +3031,7 @@ const foodsData = [
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[480,720,960,1920,3840],
+  prices:[480],
   materials:["紅茶(@250)","ラズベリー","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -3052,7 +3052,7 @@ const foodsData = [
   cost:475,
   time:360,
   rarity: [true,true,true,true,true],
-  prices:[800,1200,1600,3200,6400],
+  prices:[800],
   materials:["紅茶(@250)","いちご(種@125)","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -3073,7 +3073,7 @@ const foodsData = [
   cost:510,
   time:600,
   rarity: [true,true,true,true,true],
-  prices:[910,1365,1820,3640,7280],
+  prices:[910],
   materials:["紅茶(@250)","ブドウ(種@160)","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -3094,7 +3094,7 @@ const foodsData = [
   cost:365,
   time:30,
   rarity: [true,true,true,true,true],
-  prices:[480,720,960,1920,3840],
+  prices:[480],
   materials:["紅茶(@250)","パイナップル(種@15)","春ブラウンシュガーパック(@50)","春のブラウンシュガーパック(@50)"],
   level:1,
   materials_image:[
@@ -3115,7 +3115,7 @@ const foodsData = [
   cost:1000,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[1960,2940,3920,7840,15680],
+  prices:[1960],
   materials:["春のフルーツティーならなんでもOK","甘口2種盛りバケツ(@530)","山菜レタスタコスならなんでもOK",""],
   level:1,
   materials_image:[
@@ -3136,7 +3136,7 @@ const foodsData = [
   cost:1170,
   time:780,
   rarity: [true,true,true,true,true],
-  prices:[2370,3555,4740,9480,18960],
+  prices:[2370],
   materials:["春のフルーツティーならなんでもOK","塩味2種盛りバケツ(@580)","山菜レタスタコスならなんでもOK","山菜レタスタコスならなんでもOK"],
   level:1,
   materials_image:[
@@ -3157,7 +3157,7 @@ const foodsData = [
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[190,285,380,760,1520],
+  prices:[190],
   materials:["藍藻パウダー(@50)","藍藻パウダー(@50)","スターフルーツ(種@10)","スターフルーツ(種@10)"],
   level:1,
   materials_image:[
@@ -3178,7 +3178,7 @@ const foodsData = [
   cost:105,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[190,285,380,760,1520],
+  prices:[190],
   materials:["ウミエビ","トマト(種@10)","シーアスパラガス","小麦(種@95)"],
   level:1,
   materials_image:[
@@ -3199,7 +3199,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[230,345,460,920,1840],
+  prices:[230],
   materials:["ホタテ","小麦(種@95)","牛乳(@50)","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -3220,7 +3220,7 @@ const foodsData = [
   cost:155,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[230,345,460,920,1840],
+  prices:[230],
   materials:["ホタテ","小麦(種@95)","牛乳(@50)","スターフルーツ(種@10)"],
   level:1,
   materials_image:[
@@ -3242,7 +3242,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[240,360,480,960,1920],
+  prices:[240],
   materials:["ホタテ","小麦(種@95)","牛乳(@50)","リンゴ"],
   level:1,
   materials_image:[
@@ -3263,7 +3263,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[240,360,480,960,1920],
+  prices:[240],
   materials:["ホタテ","小麦(種@95)","牛乳(@50)","オレンジ"],
   level:1,
   materials_image:[
@@ -3284,7 +3284,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[230,345,460,920,1840],
+  prices:[230],
   materials:["ホタテ","小麦(種@95)","牛乳(@50)","ブルーベリー"],
   level:1,
   materials_image:[
@@ -3305,7 +3305,7 @@ const foodsData = [
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[240,360,480,960,1920],
+  prices:[240],
   materials:["ホタテ","小麦(種@95)","牛乳(@50)","ラズベリー"],
   level:1,
   materials_image:[
@@ -3326,7 +3326,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[440,660,880,1760,3520],
+  prices:[440],
   materials:["スルメイカ","海ぶどう","ワカメ","ジャムならなんでもOK"],
   level:1,
   materials_image:[
@@ -3347,7 +3347,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[550,825,1100,2200,4400],
+  prices:[550],
   materials:["スルメイカ","海ぶどう","ワカメ","リンゴジャム"],
   level:1,
   materials_image:[
@@ -3368,7 +3368,7 @@ const foodsData = [
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[450,675,900,1800,3600],
+  prices:[450],
   materials:["スルメイカ","海ぶどう","ワカメ","ブルーベリージャム"],
   level:1,
   materials_image:[
@@ -3389,7 +3389,7 @@ const foodsData = [
   cost:40,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:[480,720,960,1920,3840],
+  prices:[480],
   materials:["スルメイカ","海ぶどう","ワカメ","スターフルーツジャム(@40)"],
   level:1,
   materials_image:[
@@ -3410,7 +3410,7 @@ const foodsData = [
   cost:60,
   time:30,
   rarity: [true,true,true,true,true],
-  prices:[560,840,1120,2240,4480],
+  prices:[560],
   materials:["スルメイカ","海ぶどう","ワカメ","パイナップルジャム(@60)"],
   level:1,
   materials_image:[
@@ -3431,7 +3431,7 @@ const foodsData = [
   cost:500,
   time:360,
   rarity: [true,true,true,true,true],
-  prices:[1860,2790,3720,7440,14880],
+  prices:[1860],
   materials:["スルメイカ","海ぶどう","ワカメ","いちごジャム(@500)"],
   level:1,
   materials_image:[
@@ -3452,7 +3452,7 @@ const foodsData = [
   cost:370,
   time:240,
   rarity: [true,true,true,true,true],
-  prices:[1700,2550,3400,6800,13600],
+  prices:[1700],
   materials:["海鮮トマトポタージュ(@105)","オーシャンアイスドリンク(@120)","ミニパールケーキならなんでもOK","ジャム添えイカ焼きならなんでもOK"],
   level:1,
   materials_image:[

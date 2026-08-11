@@ -7,15 +7,29 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
 <meta name="description" data-i18n-content="meta_description_pet" content="Heartopia(ハートピアスローライフ)のペットのエサ管理ツール。犬・猫にあげたエサを管理できます。">
+
+<!-- OGP -->
 <meta property="og:title" content="はとぴ図鑑 | ペット好物">
 <meta property="og:description" content="犬・猫に何のエサをあげたかを管理できるツール">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/pet.html">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | ペット好物">
+<meta name="twitter:description" content="犬・猫に何のエサをあげたかを管理できるツール">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
 <meta name="theme-color" content="#3c5a6e">
-<link rel="icon" type="image/png" sizes="48x48" href="images/favicon.PNG">
-<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.PNG">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
 <title data-i18n="page_title_pet">ペットエサ管理｜はとぴ図鑑</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -33,63 +47,10 @@
 </script>
   
 <style>
-:root {
-  --bg-top:       #f7f2e7;
-  --bg-bottom:    #ece2cf;
-  --text:         #34302b;
-  --text-sub:     #7a7164;
-  --indigo:       #3c5a6e;
-  --indigo-soft:  #5a7d92;
-  --vermillion:   #b1503b;
-  --vermillion-soft: #c97058;
-  --gold:         #c8a86b;
-  --card:         #fffdf7;
-  --card-sub:     #f3ecdc;
-  --border:       #e4d9c2;
-}
-
+/* pet.html 専用CSS（共通の見た目はcss/style.cssを参照） */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-body {
-  font-family: 'Zen Maru Gothic', sans-serif;
-  background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
-  color: var(--text);
-  min-height: 100vh;
-  padding: 12px;
-  overflow-x: hidden;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-body::before {
-  content: "";
-  position: fixed;
-  width: 320px; height: 320px;
-  background: rgba(200,168,107,0.12);
-  border-radius: 50%;
-  top: -120px; right: -100px;
-  filter: blur(60px);
-  z-index: -1;
-}
-body::after {
-  content: "";
-  position: fixed;
-  width: 260px; height: 260px;
-  background: rgba(60,90,110,0.08);
-  border-radius: 50%;
-  bottom: -100px; left: -80px;
-  filter: blur(60px);
-  z-index: -1;
-}
-
-/* ダークモード */
-body.dark {
-  background: linear-gradient(180deg, #25221d 0%, #1a1814 100%);
-  color: #ece4d4;
-}
-body.dark::before { background: rgba(200,168,107,0.08); }
-body.dark::after  { background: rgba(143,180,201,0.06); }
+body { min-height: 100vh; }
 
 body.dark .card,
 body.dark .sticky,
@@ -152,15 +113,6 @@ h1 {
   flex-shrink: 0;
 }
 
-.title-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-}
-
 #helpBtn,
 #dataBtn,
 #darkToggle {
@@ -181,77 +133,6 @@ h1 {
   cursor: pointer;
 }
 #helpBtn:active, #dataBtn:active, #darkToggle:active { transform: scale(0.92); }
-
-#lang-selector{
-  display: flex;
-  align-items: center;
-}
-
-#lang-select{
-  height: 36px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0 10px;
-  font-size: 12px;
-  font-family: 'Zen Maru Gothic', sans-serif;
-  background: var(--card);
-  color: var(--indigo);
-  box-shadow: 0 3px 8px rgba(52,48,43,0.08);
-  cursor: pointer;
-  text-align: center;
-}
-
-body.dark #lang-select{
-  background: #383329;
-  color: #ece4d4;
-  border: 1px solid #46423b;
-}
-
-/* ナビゲーションバー */
-.site-nav{
-  display:flex;
-  gap:6px;
-  margin-bottom:10px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-
-.site-nav::-webkit-scrollbar{
-  display:none;
-}
-
-.site-nav-item{
-  flex-shrink:0;
-  padding:7px 16px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-size:12px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  text-decoration:none;
-  transition:0.15s;
-}
-
-.site-nav-item.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .site-nav-item{
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border-color:var(--border);
-}
-
-body.dark .site-nav-item.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
-}
 
 /* カード */
 .card {
