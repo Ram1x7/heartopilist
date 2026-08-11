@@ -10,7 +10,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"川",
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/001.PNG"
+ img:"images/fish/001.PNG"
 },
 {
  name:"ヨーロッパトノサマガエル",
@@ -22,7 +22,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"湖",
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/002.PNG"
+ img:"images/fish/002.PNG"
 },
 {
  name:"チャブ",
@@ -34,7 +34,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"湖",
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/003.PNG"
+ img:"images/fish/003.PNG"
 },
 {
  name:"シマドジョウ",
@@ -46,7 +46,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巨木の川",
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/004.PNG"
+ img:"images/fish/004.PNG"
 },
 {
  name:"バーベル",
@@ -58,7 +58,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"浅水川",
  locationI18n:{"ja":"浅水川","en":"Shallow River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/005.PNG"
+ img:"images/fish/005.PNG"
 },
 {
  name:"ダヌープストレバー",
@@ -70,7 +70,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"霞川",
  locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/006.PNG"
+ img:"images/fish/006.PNG"
 },
 {
  name:"ミノー",
@@ -82,7 +82,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"静川",
  locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/007.PNG"
+ img:"images/fish/007.PNG"
 },
 {
  name:"ティラピア",
@@ -94,7 +94,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"川(青魚影)",
  locationI18n:{"ja":"川(青魚影)","en":"River (Blue Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/008.PNG"
+ img:"images/fish/008.PNG"
 },
 {
  name:"テンチ",
@@ -106,7 +106,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/009.PNG"
+ img:"images/fish/009.PNG"
 },
 {
  name:"ホワイトフィッシュ",
@@ -118,7 +118,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/010.PNG"
+ img:"images/fish/010.PNG"
 },
 {
  name:"マブナ",
@@ -130,7 +130,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/011.PNG"
+ img:"images/fish/011.PNG"
 },
 {
  name:"ブリーク",
@@ -142,7 +142,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"湖",
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/012.PNG"
+ img:"images/fish/012.PNG"
 },
 {
  name:"シュナイダー",
@@ -154,7 +154,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/013.PNG"
+ img:"images/fish/013.PNG"
 },
 {
  name:"コウライエビ",
@@ -166,7 +166,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"川",
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/014.PNG"
+ img:"images/fish/014.PNG"
 },
 {
  name:"ニシイワシ",
@@ -178,7 +178,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/015.PNG"
+ img:"images/fish/015.PNG"
 },
 {
  name:"スズキ",
@@ -190,7 +190,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/016.PNG"
+ img:"images/fish/016.PNG"
 },
 {
  name:"カツオ",
@@ -202,7 +202,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/017.PNG"
+ img:"images/fish/017.PNG"
 },
 {
  name:"タチウオ",
@@ -214,7 +214,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/018.PNG"
+ img:"images/fish/018.PNG"
 },
 {
  name:"ウミエビ",
@@ -226,7 +226,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/019.PNG"
+ img:"images/fish/019.PNG"
 },
 {
  name:"マアジ",
@@ -238,7 +238,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/020.PNG"
+ img:"images/fish/020.PNG"
 },
 {
  name:"カイブツギンザメ",
@@ -250,7 +250,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海(青魚影)",
  locationI18n:{"ja":"海(青魚影)","en":"Ocean (Blue Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/021.PNG"
+ img:"images/fish/021.PNG"
 },
 {
  name:"ウミトゲウオ",
@@ -262,7 +262,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/022.PNG"
+ img:"images/fish/022.PNG"
 },
 {
  name:"ストライプトレッドマレット",
@@ -274,7 +274,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/023.PNG"
+ img:"images/fish/023.PNG"
 },
 {
  name:"イシドジョウ",
@@ -286,7 +286,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/024.PNG"
+ img:"images/fish/024.PNG"
 },
 {
  name:"マッドサンフィッシュ",
@@ -298,7 +298,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/025.PNG"
+ img:"images/fish/025.PNG"
 },
 {
  name:"キュウリウオ",
@@ -310,7 +310,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/026.PNG"
+ img:"images/fish/026.PNG"
 },
 {
  name:"ラッフ",
@@ -322,7 +322,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/027.PNG"
+ img:"images/fish/027.PNG"
 },
 {
  name:"フランスアジ",
@@ -334,7 +334,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/028.PNG"
+ img:"images/fish/028.PNG"
 },
 {
  name:"タツノオトシゴ",
@@ -346,7 +346,7 @@ const fishData = [
  time:["6-12","12-18","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/029.PNG"
+ img:"images/fish/029.PNG"
 },
 {
  name:"アンコウ",
@@ -358,7 +358,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/030.PNG"
+ img:"images/fish/030.PNG"
 },
 {
  name:"イガイ",
@@ -370,7 +370,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/031.PNG"
+ img:"images/fish/031.PNG"
 },
 {
  name:"パイクパーチ",
@@ -382,7 +382,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巨木の川",
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/032.PNG"
+ img:"images/fish/032.PNG"
 },
 {
  name:"オタマジャクシ",
@@ -394,7 +394,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/033.PNG"
+ img:"images/fish/033.PNG"
 },
 {
  name:"北欧アカザエビ",
@@ -406,7 +406,7 @@ const fishData = [
  time:["6-12","18-0","0-6"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/034.PNG"
+ img:"images/fish/034.PNG"
 },
 {
  name:"マダコ",
@@ -418,7 +418,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/035.PNG"
+ img:"images/fish/035.PNG"
 },
 {
  name:"タイセイヨウサケ",
@@ -430,7 +430,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/036.PNG"
+ img:"images/fish/036.PNG"
 },
 {
  name:"ピグミータコ",
@@ -442,7 +442,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/037.PNG"
+ img:"images/fish/037.PNG"
 },
 {
  name:"ヤドカリ",
@@ -454,7 +454,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/038.PNG"
+ img:"images/fish/038.PNG"
 },
 {
  name:"カクレクマノミ",
@@ -466,7 +466,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/039.PNG"
+ img:"images/fish/039.PNG"
 },
 {
  name:"オオクチバス",
@@ -478,7 +478,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/040.PNG"
+ img:"images/fish/040.PNG"
 },
 {
  name:"ヨーロッパコイ",
@@ -490,7 +490,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"霞川",
  locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/041.PNG"
+ img:"images/fish/041.PNG"
 },
 {
  name:"カワメンタイ",
@@ -502,7 +502,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"静川",
  locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/042.PNG"
+ img:"images/fish/042.PNG"
 },
 {
  name:"ハゼ",
@@ -514,7 +514,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/043.PNG"
+ img:"images/fish/043.PNG"
 },
 {
  name:"サワガニ",
@@ -526,7 +526,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/044.PNG"
+ img:"images/fish/044.PNG"
 },
 {
  name:"イシビラメ",
@@ -538,7 +538,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/045.PNG"
+ img:"images/fish/045.PNG"
 },
 {
  name:"ヨーロッパヒラメ",
@@ -550,7 +550,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/046.PNG"
+ img:"images/fish/046.PNG"
 },
 {
  name:"レッドベリーピラニア",
@@ -562,7 +562,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巨木の川",
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/047.PNG"
+ img:"images/fish/047.PNG"
 },
 {
  name:"バタフライコイ",
@@ -574,7 +574,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/048.PNG"
+ img:"images/fish/048.PNG"
 },
 {
  name:"カワギンポ",
@@ -586,7 +586,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"霞川",
  locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/049.PNG"
+ img:"images/fish/049.PNG"
 },
 {
  name:"マス",
@@ -598,7 +598,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/050.PNG"
+ img:"images/fish/050.PNG"
 },
 {
  name:"ラッド",
@@ -610,7 +610,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/051.PNG"
+ img:"images/fish/051.PNG"
 },
 {
  name:"タイセイヨウサバ",
@@ -622,7 +622,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/052.PNG"
+ img:"images/fish/052.PNG"
 },
 {
  name:"ヨーロッパロブスター",
@@ -634,7 +634,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/053.PNG"
+ img:"images/fish/053.PNG"
 },
 {
  name:"ヨーロッパスルメイカ",
@@ -646,7 +646,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/054.PNG"
+ img:"images/fish/054.PNG"
 },
 {
  name:"シンジュガイ",
@@ -658,7 +658,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/055.PNG"
+ img:"images/fish/055.PNG"
 },
 {
  name:"フグ",
@@ -670,7 +670,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/056.PNG"
+ img:"images/fish/056.PNG"
 },
 {
  name:"シロザケ",
@@ -682,7 +682,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"静川",
  locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/057.PNG"
+ img:"images/fish/057.PNG"
 },
 {
  name:"カワヒメマス",
@@ -694,7 +694,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/058.PNG"
+ img:"images/fish/058.PNG"
 },
 {
  name:"タブ・ガーナード",
@@ -706,7 +706,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/059.PNG"
+ img:"images/fish/059.PNG"
 },
 {
  name:"ネコザメ",
@@ -718,7 +718,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/060.PNG"
+ img:"images/fish/060.PNG"
 },
 {
  name:"イトヨ",
@@ -730,7 +730,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"浅水川",
  locationI18n:{"ja":"浅水川","en":"Shallow River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/061.PNG"
+ img:"images/fish/061.PNG"
 },
 {
  name:"アプロケイルス",
@@ -742,7 +742,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/062.PNG"
+ img:"images/fish/062.PNG"
 },
 {
  name:"カジカ",
@@ -754,7 +754,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/063.PNG"
+ img:"images/fish/063.PNG"
 },
 {
  name:"リュウグウノツカイ",
@@ -766,7 +766,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/064.PNG"
+ img:"images/fish/064.PNG"
 },
 {
  name:"スペインダイ",
@@ -778,7 +778,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/065.PNG"
+ img:"images/fish/065.PNG"
 },
 {
  name:"ヨーロッパウナギ",
@@ -790,7 +790,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/066.PNG"
+ img:"images/fish/066.PNG"
 },
 {
  name:"黄金タラバガニ",
@@ -802,7 +802,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/067.PNG"
+ img:"images/fish/067.PNG"
 },
 {
  name:"マッドミノー",
@@ -814,7 +814,7 @@ const fishData = [
  time:["6-12","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/068.PNG"
+ img:"images/fish/068.PNG"
 },
 {
  name:"北欧ブルーアカザエビ",
@@ -826,7 +826,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/069.PNG"
+ img:"images/fish/069.PNG"
 },
 {
  name:"キンギョ",
@@ -838,7 +838,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/070.PNG"
+ img:"images/fish/070.PNG"
 },
 {
  name:"タラバガニ",
@@ -850,7 +850,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/071.PNG"
+ img:"images/fish/071.PNG"
 },
 {
  name:"モンツキダラ",
@@ -862,7 +862,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/072.PNG"
+ img:"images/fish/072.PNG"
 },
 {
  name:"ノーザンパイク",
@@ -874,7 +874,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/073.PNG"
+ img:"images/fish/073.PNG"
 },
 {
  name:"パンプキンシード",
@@ -886,7 +886,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/074.PNG"
+ img:"images/fish/074.PNG"
 },
 {
  name:"ドナウイトウ",
@@ -898,7 +898,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"巨木の川",
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/075.PNG"
+ img:"images/fish/075.PNG"
 },
 {
  name:"ミナミマグロ",
@@ -910,7 +910,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/076.PNG"
+ img:"images/fish/076.PNG"
 },
 {
  name:"マンボウ",
@@ -922,7 +922,7 @@ const fishData = [
  time:["6-12","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/077.PNG"
+ img:"images/fish/077.PNG"
 },
 {
  name:"アカマンボウ",
@@ -934,7 +934,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"海釣りクエスト(金魚影)",
  locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/078.PNG"
+ img:"images/fish/078.PNG"
 },
 {
  name:"ヨーロッパナマズ",
@@ -946,7 +946,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/079.PNG"
+ img:"images/fish/079.PNG"
 },
 {
  name:"ブルーギル",
@@ -958,7 +958,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/080.PNG"
+ img:"images/fish/080.PNG"
 },
 {
  name:"ホッキョクイワナ",
@@ -970,7 +970,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/081.PNG"
+ img:"images/fish/081.PNG"
 },
 {
  name:"メカジキ",
@@ -982,7 +982,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/082.PNG"
+ img:"images/fish/082.PNG"
 },
 {
  name:"シュモクザメ",
@@ -994,7 +994,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/083.PNG"
+ img:"images/fish/083.PNG"
 },
 {
  name:"アオザメ",
@@ -1006,7 +1006,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"海釣りクエスト",
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing ","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/084.PNG"
+ img:"images/fish/084.PNG"
 },
 {
  name:"ライオンヘッド",
@@ -1018,7 +1018,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/086.PNG"
+ img:"images/fish/086.PNG"
 },
 {
  name:"アジアアロワナ",
@@ -1030,7 +1030,7 @@ const fishData = [
  time:["6-12","18-0","0-6"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/085.PNG"
+ img:"images/fish/085.PNG"
 },
 {
  name:"シマスズメダイ",
@@ -1042,7 +1042,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/087.PNG"
+ img:"images/fish/087.PNG"
 },
 {
  name:"ジンベエザメ",
@@ -1054,7 +1054,7 @@ const fishData = [
  time:["6-12","18-0","0-6"],
  location:"海釣りクエスト",
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/088.PNG"
+ img:"images/fish/088.PNG"
 },
 {
  name:"ベタ",
@@ -1066,7 +1066,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/090.PNG"
+ img:"images/fish/090.PNG"
 },
 {
  name:"エンゼルフィッシュ",
@@ -1090,7 +1090,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"海釣りクエスト",
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/091.PNG"
+ img:"images/fish/091.PNG"
 },
 {
  name:"アオウミガメ",
@@ -1102,7 +1102,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/092.PNG"
+ img:"images/fish/092.PNG"
 },
 {
  name:"シイラ",
@@ -1114,7 +1114,7 @@ const fishData = [
  time:["6-12","12-18"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/093.PNG"
+ img:"images/fish/093.PNG"
 },
 {
  name:"ニザダイ",
@@ -1172,7 +1172,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1006.PNG",
+ img:"images/fish/1006.PNG",
  auth:false
 },
 {
@@ -1187,7 +1187,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1007.PNG",
+ img:"images/fish/1007.PNG",
  auth:false
 },
 {
@@ -1202,7 +1202,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1008.PNG",
+ img:"images/fish/1008.PNG",
  auth:false
 },
 {
@@ -1217,7 +1217,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1009.PNG",
+ img:"images/fish/1009.PNG",
  auth:false
 },
 {
@@ -1232,7 +1232,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1010.PNG",
+ img:"images/fish/1010.PNG",
  auth:false
 },
 {
@@ -1247,7 +1247,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1011.PNG",
+ img:"images/fish/1011.PNG",
  auth:false
 },
 {
@@ -1262,7 +1262,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1012.PNG",
+ img:"images/fish/1012.PNG",
  auth:false
 },
 {
@@ -1277,7 +1277,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1013.PNG",
+ img:"images/fish/1013.PNG",
  auth:false
 },
 {
@@ -1292,7 +1292,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1014.PNG",
+ img:"images/fish/1014.PNG",
  auth:false
 },
 {
@@ -1307,7 +1307,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1015.PNG",
+ img:"images/fish/1015.PNG",
  auth:false
 },
 {
@@ -1322,7 +1322,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1001.PNG",
+ img:"images/fish/1001.PNG",
  auth:false
 },
 {
@@ -1337,7 +1337,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1002.PNG",
+ img:"images/fish/1002.PNG",
  auth:false
 },
 {
@@ -1352,7 +1352,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1003.PNG",
+ img:"images/fish/1003.PNG",
  auth:false
 },
 {
@@ -1367,7 +1367,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1004.PNG",
+ img:"images/fish/1004.PNG",
  auth:false
 },
 {
@@ -1382,7 +1382,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1005.PNG",
+ img:"images/fish/1005.PNG",
  auth:false
 },
 {
@@ -1397,7 +1397,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1016.PNG",
+ img:"images/fish/1016.PNG",
  auth:false
 },
 {
@@ -1412,7 +1412,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1017.PNG",
+ img:"images/fish/1017.PNG",
  auth:false
 },
 {
@@ -1427,7 +1427,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"浅海の魚群クエスト(追加段階)",
  locationI18n:{"ja":"浅海の魚群クエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1018.PNG",
+ img:"images/fish/1018.PNG",
  auth:false
 },
 {
@@ -1442,7 +1442,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1019.PNG",
+ img:"images/fish/1019.PNG",
  auth:false
 },
 {
@@ -1457,7 +1457,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1020.PNG",
+ img:"images/fish/1020.PNG",
  auth:false
 },
 {
@@ -1472,7 +1472,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1021.PNG",
+ img:"images/fish/1021.PNG",
  auth:false
 },
 {
@@ -1487,7 +1487,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"fish/1022.PNG",
+ img:"images/fish/1022.PNG",
  auth:false
 }
   // ここに追加していく

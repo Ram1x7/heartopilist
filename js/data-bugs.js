@@ -9,7 +9,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林",
  locationI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/001.PNG"
+ img:"images/bugs/001.PNG"
 },
 {
  name:"クモマツマキチョウ",
@@ -20,7 +20,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"中心街",
  locationI18n:{"ja":"中心街","en":"Downtown","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/002.PNG"
+ img:"images/bugs/002.PNG"
 },
 {
  name:"ヤマキチョウ",
@@ -31,7 +31,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/003.PNG"
+ img:"images/bugs/003.PNG"
 },
 {
  name:"モンシロチョウ",
@@ -42,7 +42,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村",
  locationI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/004.PNG"
+ img:"images/bugs/004.PNG"
 },
 {
  name:"アポロウスバシロチョウ",
@@ -53,7 +53,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫コイコイクエスト",
  locationI18n:{"ja":"虫コイコイクエスト","en":"Bug Luring Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/005.PNG"
+ img:"images/bugs/005.PNG"
 },
 {
  name:"ベニモンアゲハ",
@@ -64,7 +64,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫コイコイクエスト",
  locationI18n:{"ja":"虫コイコイクエスト","en":"Bug Luring Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/006.PNG"
+ img:"images/bugs/006.PNG"
 },
 {
  name:"スルコウスキーモルフォ",
@@ -75,7 +75,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"エアーミツバチ虫寄せ装置",
  locationI18n:{"ja":"エアーミツバチ虫寄せ装置","en":"Air Bee Bug Attractor","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/007.PNG"
+ img:"images/bugs/007.PNG"
 },
 {
  name:"アスバラカズハムシ",
@@ -86,7 +86,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑",
  locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/008.PNG"
+ img:"images/bugs/008.PNG"
 },
 {
  name:"クリソクラオン",
@@ -97,7 +97,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山",
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/009.PNG"
+ img:"images/bugs/009.PNG"
 },
 {
  name:"コバネアカホシカメムシ",
@@ -108,7 +108,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ホーム",
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/010.PNG"
+ img:"images/bugs/010.PNG"
 },
 {
  name:"アカイトトンボ",
@@ -119,7 +119,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"水辺",
  locationI18n:{"ja":"水辺","en":"Waterside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/011.PNG"
+ img:"images/bugs/011.PNG"
 },
 {
  name:"イカルスヒメシジミ",
@@ -130,7 +130,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"中心街",
  locationI18n:{"ja":"中心街","en":"Downtown","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/012.PNG"
+ img:"images/bugs/012.PNG"
 },
 {
  name:"ミドリニワハンミョウ",
@@ -141,7 +141,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山",
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/013.PNG"
+ img:"images/bugs/013.PNG"
 },
 {
  name:"コウホウトラカミキリ",
@@ -152,7 +152,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林",
  locationI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/014.PNG"
+ img:"images/bugs/014.PNG"
 },
 {
  name:"アオホシハナムグリ",
@@ -163,7 +163,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ホーム",
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/015.PNG"
+ img:"images/bugs/015.PNG"
 },
 {
  name:"シベリアヒナバッタ",
@@ -174,7 +174,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村",
  locationI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/016.PNG"
+ img:"images/bugs/016.PNG"
 },
 {
  name:"ナナホシテントウ",
@@ -185,7 +185,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/017.PNG"
+ img:"images/bugs/017.PNG"
 },
 {
  name:"ヨツボシトンボ",
@@ -196,7 +196,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖畔",
  locationI18n:{"ja":"郊外の湖畔","en":"Suburban Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/018.PNG"
+ img:"images/bugs/018.PNG"
 },
 {
  name:"クマバチ",
@@ -207,7 +207,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑",
  locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/019.PNG"
+ img:"images/bugs/019.PNG"
 },
 {
  name:"イリスコムラサキ",
@@ -218,7 +218,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/020.PNG"
+ img:"images/bugs/020.PNG"
 },
 {
  name:"アカエリトリバネアゲハ",
@@ -229,7 +229,7 @@ const bugData = [
  time:["6-12","18-0","0-6"],
  location:"ホーム",
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/021.PNG"
+ img:"images/bugs/021.PNG"
 },
 {
  name:"ヒメオナガミズアオ",
@@ -240,7 +240,7 @@ const bugData = [
  time:["6-12","12-18","18-0"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/022.PNG"
+ img:"images/bugs/022.PNG"
 },
 {
  name:"アカハネムシ",
@@ -251,7 +251,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-温泉",
  locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/024.PNG"
+ img:"images/bugs/024.PNG"
 },
 {
  name:"ピンクタイワンクツワムシ",
@@ -262,7 +262,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫コイコイクエスト",
  locationI18n:{"ja":"虫コイコイクエスト","en":"Bug Luring Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/023.PNG"
+ img:"images/bugs/023.PNG"
 },
 {
  name:"キリギリス",
@@ -273,7 +273,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/025.PNG"
+ img:"images/bugs/025.PNG"
 },
 {
  name:"シロマダラオバチ",
@@ -284,7 +284,7 @@ const bugData = [
  time:["6-12","12-18","18-0"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/026.PNG"
+ img:"images/bugs/026.PNG"
 },
 {
  name:"アリ",
@@ -295,7 +295,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村-漁村広場",
  locationI18n:{"ja":"漁村-漁村広場","en":"Fishing Village - Village Square","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/027.PNG"
+ img:"images/bugs/027.PNG"
 },
 {
  name:"ツマグロヒョウモン",
@@ -306,7 +306,7 @@ const bugData = [
  time:["6-12","18-0","0-6"],
  location:"漁村-波止場",
  locationI18n:{"ja":"漁村-波止場","en":"Fishing Village - Pier","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/028.PNG"
+ img:"images/bugs/028.PNG"
 },
 {
  name:"アルキプテラフスカ",
@@ -317,7 +317,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/029.PNG"
+ img:"images/bugs/029.PNG"
 },
 {
  name:"ヨツボシテントウ",
@@ -328,7 +328,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/030.PNG"
+ img:"images/bugs/030.PNG"
 },
 {
  name:"セミ",
@@ -339,7 +339,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/031.PNG"
+ img:"images/bugs/031.PNG"
 },
 {
  name:"シオカラトンボ",
@@ -350,7 +350,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"川辺",
  locationI18n:{"ja":"川辺","en":"Riverside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/032.PNG"
+ img:"images/bugs/032.PNG"
 },
 {
  name:"ニジイロカマキリ",
@@ -361,7 +361,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"温泉山-石海岸の崖",
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/033.PNG"
+ img:"images/bugs/033.PNG"
 },
 {
  name:"クジャクチョウ",
@@ -372,7 +372,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/034.PNG"
+ img:"images/bugs/034.PNG"
 },
 {
  name:"キベリタテハ",
@@ -383,7 +383,7 @@ const bugData = [
  time:["6-12","12-18","0-6"],
  location:"温泉山-温泉",
  locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/035.PNG"
+ img:"images/bugs/035.PNG"
 },
 {
  name:"ナンベイオオヤガ",
@@ -394,7 +394,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫コイコイクエスト",
  locationI18n:{"ja":"虫コイコイクエスト","en":"Bug Luring Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/036.PNG"
+ img:"images/bugs/036.PNG"
 },
 {
  name:"タケウチトゲムネカミキリ",
@@ -405,7 +405,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/037.PNG"
+ img:"images/bugs/037.PNG"
 },
 {
  name:"ナミテントウ",
@@ -416,7 +416,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/038.PNG"
+ img:"images/bugs/038.PNG"
 },
 {
  name:"パプアハラビロカマキリ",
@@ -427,7 +427,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/039.PNG"
+ img:"images/bugs/039.PNG"
 },
 {
  name:"ムラサキクマバチ",
@@ -438,7 +438,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/040.PNG"
+ img:"images/bugs/040.PNG"
 },
 {
  name:"オオミドリトリバネアゲハ",
@@ -449,7 +449,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/041.PNG"
+ img:"images/bugs/041.PNG"
 },
 {
  name:"ミヤマクワガタ",
@@ -460,7 +460,7 @@ const bugData = [
  time:["6-12","12-18","18-0"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/042.PNG"
+ img:"images/bugs/042.PNG"
 },
 {
  name:"シルバージュエルコガネ",
@@ -471,7 +471,7 @@ const bugData = [
  time:["6-12","12-18","0-6"],
  location:"温泉山-石海岸の崖",
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/043.PNG"
+ img:"images/bugs/043.PNG"
 },
 {
  name:"ルリクチブトカメムシ",
@@ -482,7 +482,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"漁村-灯台",
  locationI18n:{"ja":"漁村-灯台","en":"Fishing Village - Lighthouse","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/044.PNG"
+ img:"images/bugs/044.PNG"
 },
 {
  name:"アオハダトンボ",
@@ -493,7 +493,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森の湖畔",
  locationI18n:{"ja":"森の湖畔","en":"Forest Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/045.PNG"
+ img:"images/bugs/045.PNG"
 },
 {
  name:"メネラウスモルフォ",
@@ -504,7 +504,7 @@ const bugData = [
  time:["6-12","12-18","18-0"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/046.PNG"
+ img:"images/bugs/046.PNG"
 },
 {
  name:"アサギマダラ",
@@ -515,7 +515,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫コイコイクエスト",
  locationI18n:{"ja":"虫コイコイクエスト","en":"Bug Luring Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/047.PNG"
+ img:"images/bugs/047.PNG"
 },
 {
  name:"ミノタウロスコガネ",
@@ -526,7 +526,7 @@ const bugData = [
  time:["6-12","12-18","0-6"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/048.PNG"
+ img:"images/bugs/048.PNG"
 },
 {
  name:"ビューティースペキオーサ",
@@ -537,7 +537,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/049.PNG"
+ img:"images/bugs/049.PNG"
 },
 {
  name:"ゴールドジュエルコガネ",
@@ -548,7 +548,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/050.PNG"
+ img:"images/bugs/050.PNG"
 },
 {
  name:"ロサトンボ",
@@ -559,7 +559,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"温泉山の湖畔",
  locationI18n:{"ja":"温泉山の湖畔","en":"Hot Spring Mountain Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/051.PNG"
+ img:"images/bugs/051.PNG"
 },
 {
  name:"イザベラミズアオ",
@@ -570,7 +570,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/052.PNG"
+ img:"images/bugs/052.PNG"
 },
 {
  name:"マダガスカルムーンモス",
@@ -581,7 +581,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/053.PNG"
+ img:"images/bugs/053.PNG"
 },
 {
  name:"カブトムシ",
@@ -592,7 +592,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"漁村-漁村東桟橋",
  locationI18n:{"ja":"漁村-漁村東桟橋","en":"Fishing Village - East Pier","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/054.PNG"
+ img:"images/bugs/054.PNG"
 },
 {
  name:"ピカソバグ",
@@ -603,7 +603,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/055.PNG"
+ img:"images/bugs/055.PNG"
 },
 {
  name:"シンジュタテハ",
@@ -614,7 +614,7 @@ const bugData = [
  time:["6-12","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/056.PNG"
+ img:"images/bugs/056.PNG"
 },
 {
  name:"オウゴンオニクワガタ",
@@ -625,7 +625,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/057.PNG"
+ img:"images/bugs/057.PNG"
 },
 {
  name:"ニジイロクワガタ",
@@ -636,7 +636,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫コイコイクエスト-遺跡(追加段階)",
  locationI18n:{"ja":"虫コイコイクエスト-遺跡(追加段階)","en":"Bug Luring Quest - Ruins (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/058.PNG"
+ img:"images/bugs/058.PNG"
 },
 {
  name:"ヨウカイカマキリ",
@@ -647,7 +647,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/059.PNG"
+ img:"images/bugs/059.PNG"
 },
 {
  name:"青いクマバチ",
@@ -658,7 +658,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"漁村-漁村広場",
  locationI18n:{"ja":"漁村-漁村広場","en":"Fishing Village - Village Square","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/060.PNG"
+ img:"images/bugs/060.PNG"
 },
 {
  name:"ヘレナモルフォ",
@@ -669,7 +669,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/061.PNG"
+ img:"images/bugs/061.PNG"
 },
 {
  name:"タイヨウモルフォ",
@@ -680,7 +680,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/062.PNG"
+ img:"images/bugs/062.PNG"
 },
 {
  name:"ヘラクレスオオカブト",
@@ -691,7 +691,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/063.PNG"
+ img:"images/bugs/063.PNG"
 },
 {
  name:"クロツヤミノガ",
@@ -702,7 +702,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/064.PNG"
+ img:"images/bugs/064.PNG"
 },
 {
  name:"アレクサンドラトリバネアゲハ",
@@ -713,7 +713,7 @@ const bugData = [
  time:["18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/065.JPG"
+ img:"images/bugs/065.JPG"
 }, 
 {
  name:"アトラスオオカブト",
@@ -723,7 +723,7 @@ const bugData = [
  time:["12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/066.PNG"
+ img:"images/bugs/066.PNG"
 }, 
 {
  name:"ジュウサンホシテントウ",
@@ -733,7 +733,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/067.PNG"
+ img:"images/bugs/067.PNG"
 }, 
 {
  name:"ハナカマキリ",
@@ -743,7 +743,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/068.PNG"
+ img:"images/bugs/068.PNG"
 }, 
 {
  name:"ミイロタイマイ",
@@ -754,7 +754,7 @@ const bugData = [
  time:["6-12","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/069.PNG"
+ img:"images/bugs/069.PNG"
 },
 {
  name:"オオサマゴライアス",
@@ -774,7 +774,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"温泉山",
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/071.PNG"
+ img:"images/bugs/071.PNG"
 },
 {
  name:"ベニトンボ",
@@ -784,7 +784,7 @@ const bugData = [
  time:["6-12","12-18"],
  location:"草原の湖",
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/072.PNG"
+ img:"images/bugs/072.PNG"
 },
 {
  name:"デイダミアモルフォ",
@@ -794,7 +794,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/073.PNG"
+ img:"images/bugs/073.PNG"
 },
 {
  name:"ミドリカワトンボ",
@@ -804,7 +804,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/074.PNG"
+ img:"images/bugs/074.PNG"
 },
 {
  name:"グラスウィングバタフライ",
@@ -814,7 +814,7 @@ const bugData = [
  time:["12-18","18-0"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/075.PNG"
+ img:"images/bugs/075.PNG"
 },
 {
  name:"アオミオカタニシ",
@@ -824,7 +824,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/076.PNG"
+ img:"images/bugs/076.PNG"
 },
 {
  name:"氷晶・シンジュタテハ",
@@ -837,7 +837,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1006.PNG",
+ img:"images/bugs/1006.PNG",
  auth:false
 },
 {
@@ -851,7 +851,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1007.PNG",
+ img:"images/bugs/1007.PNG",
  auth:false
 },
 {
@@ -865,7 +865,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1008.PNG",
+ img:"images/bugs/1008.PNG",
  auth:false
 },
 {
@@ -879,7 +879,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1009.PNG",
+ img:"images/bugs/1009.PNG",
  auth:false
 },
 {
@@ -893,7 +893,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"「氷晶の蝶」クエスト(追加段階)",
  locationI18n:{"ja":"「氷晶の蝶」クエスト(追加段階)","en":"'Ice Crystal Butterfly' Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1010.PNG",
+ img:"images/bugs/1010.PNG",
  auth:false
 },
 {
@@ -907,7 +907,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1011.PNG",
+ img:"images/bugs/1011.PNG",
  auth:false
 },
 {
@@ -921,7 +921,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1012.PNG",
+ img:"images/bugs/1012.PNG",
  auth:false
 },
 {
@@ -935,7 +935,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1013.PNG",
+ img:"images/bugs/1013.PNG",
  auth:false
 },
 {
@@ -949,7 +949,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1014.PNG",
+ img:"images/bugs/1014.PNG",
  auth:false
 },
 {
@@ -963,7 +963,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"「スクリプター・ビー」クエスト(追加段階)",
  locationI18n:{"ja":"「スクリプター・ビー」クエスト(追加段階)","en":"'Scripter Bee' Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1015.PNG",
+ img:"images/bugs/1015.PNG",
  auth:false
 },
 {
@@ -977,7 +977,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1001.PNG",
+ img:"images/bugs/1001.PNG",
  auth:false
 },
 {
@@ -991,7 +991,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1002.PNG",
+ img:"images/bugs/1002.PNG",
  auth:false
 },
 {
@@ -1005,7 +1005,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1003.PNG",
+ img:"images/bugs/1003.PNG",
  auth:false
 },
 {
@@ -1019,7 +1019,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1004.PNG",
+ img:"images/bugs/1004.PNG",
  auth:false
 },
 {
@@ -1033,7 +1033,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"特殊積み木虫クエスト",
  locationI18n:{"ja":"特殊積み木虫クエスト","en":"Special Building Block Bug Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1005.PNG",
+ img:"images/bugs/1005.PNG",
  auth:false
 },
 {
@@ -1047,7 +1047,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1016.PNG",
+ img:"images/bugs/1016.PNG",
  auth:false
 },
 {
@@ -1061,7 +1061,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1017.PNG",
+ img:"images/bugs/1017.PNG",
  auth:false
 },
 {
@@ -1075,7 +1075,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1018.PNG",
+ img:"images/bugs/1018.PNG",
  auth:false
 },
 {
@@ -1089,7 +1089,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1019.PNG",
+ img:"images/bugs/1019.PNG",
  auth:false
 },
 {
@@ -1103,7 +1103,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"虫クエスト（追加段階）",
  locationI18n:{"ja":"虫クエスト（追加段階）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"bugs/1020.PNG",
+ img:"images/bugs/1020.PNG",
  auth:false
 },
  // ここに追加していく

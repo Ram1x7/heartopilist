@@ -10,7 +10,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"中心街",
  locationI18n:{"ja":"中心街","en":"Downtown","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/001.PNG"
+ img:"images/birds/001.PNG"
 },
 {
  name:"シジュウカラ",
@@ -22,7 +22,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山",
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/002.PNG"
+ img:"images/birds/002.PNG"
 },
 {
  name:"ミソサザイ",
@@ -34,7 +34,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林",
  locationI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/003.PNG"
+ img:"images/birds/003.PNG"
 },
 {
  name:"ウソ",
@@ -46,7 +46,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/004.PNG"
+ img:"images/birds/004.PNG"
 },
 {
  name:"ズアオアトリ",
@@ -58,7 +58,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑",
  locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/005.PNG"
+ img:"images/birds/005.PNG"
 },
 {
  name:"ルリコンゴウインコ",
@@ -70,7 +70,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト",
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/006.PNG"
+ img:"images/birds/006.PNG"
 },
 {
  name:"ヒメモリバト",
@@ -82,7 +82,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"中心街",
  locationI18n:{"ja":"中心街","en":"Downtown","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/007.PNG"
+ img:"images/birds/007.PNG"
 },
 {
  name:"シラコバト",
@@ -94,7 +94,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ホーム",
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/008.PNG"
+ img:"images/birds/008.PNG"
 },
 {
  name:"ソデグロバト",
@@ -106,7 +106,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村",
  locationI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/009.PNG"
+ img:"images/birds/009.PNG"
 },
 {
  name:"オオフラミンゴ",
@@ -118,7 +118,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"水辺",
  locationI18n:{"ja":"水辺","en":"Waterside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/010.PNG"
+ img:"images/birds/010.PNG"
 },
 {
  name:"インドクジャク",
@@ -130,7 +130,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト",
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/011.PNG"
+ img:"images/birds/011.PNG"
 },
 {
  name:"マガモ",
@@ -142,7 +142,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"湖",
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/012.PNG"
+ img:"images/birds/012.PNG"
 },
 {
  name:"エナガ",
@@ -154,7 +154,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ブランクの頭上",
  locationI18n:{"ja":"ブランクの頭上","en":"Above Blanc","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/013.PNG",
+ img:"images/birds/013.PNG",
  auth:false
 },
 {
@@ -167,7 +167,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村",
  locationI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/014.PNG"
+ img:"images/birds/014.PNG"
 },
 {
  name:"ヒゲガラ",
@@ -179,7 +179,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山",
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/015.PNG"
+ img:"images/birds/015.PNG"
 },
 {
  name:"ズアカモズ",
@@ -191,7 +191,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/016.PNG"
+ img:"images/birds/016.PNG"
 },
 {
  name:"ウォンガバト",
@@ -203,7 +203,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林",
  locationI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/017.PNG"
+ img:"images/birds/017.PNG"
 },
 {
  name:"コアオバト",
@@ -215,7 +215,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑",
  locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/018.PNG"
+ img:"images/birds/018.PNG"
 },
 {
  name:"ヒドリガモ",
@@ -227,7 +227,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"川",
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/019.PNG"
+ img:"images/birds/019.PNG"
 },
 {
  name:"カモメ",
@@ -239,7 +239,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海辺",
  locationI18n:{"ja":"海辺","en":"Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/020.PNG"
+ img:"images/birds/020.PNG"
 },
 {
  name:"ニシコウライウグイス",
@@ -251,7 +251,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ホーム",
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/021.PNG"
+ img:"images/birds/021.PNG"
 },
 {
  name:"カノコスズメ",
@@ -263,7 +263,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村-灯台",
  locationI18n:{"ja":"漁村-灯台","en":"Fishing Village - Lighthouse","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/022.PNG"
+ img:"images/birds/022.PNG"
 },
 {
  name:"シマエナガ",
@@ -275,7 +275,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/023.PNG"
+ img:"images/birds/023.PNG"
 },
 {
  name:"ベニコンゴウインコ",
@@ -287,7 +287,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト",
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/024.PNG"
+ img:"images/birds/024.PNG"
 },
 {
  name:"アカツクシガモ",
@@ -299,7 +299,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖街",
  locationI18n:{"ja":"郊外の湖街","en":"Suburban Lake Town","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/025.PNG"
+ img:"images/birds/025.PNG"
 },
 {
  name:"ケワタガモ",
@@ -311,7 +311,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"川",
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/026.PNG"
+ img:"images/birds/026.PNG"
 },
 {
  name:"オデュアンカモメ",
@@ -323,7 +323,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"クジラ海の海辺",
  locationI18n:{"ja":"クジラ海の海辺","en":"Whale Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/027.PNG"
+ img:"images/birds/027.PNG"
 },
 {
  name:"ヨーロッパヒメウ",
@@ -335,7 +335,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"海",
  locationI18n:{"ja":"海","en":"Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/028.PNG"
+ img:"images/birds/028.PNG"
 },
 {
  name:"タイリクハクセキレイ",
@@ -347,7 +347,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/029.PNG"
+ img:"images/birds/029.PNG"
 },
 {
  name:"ハイズキンダルマエナガ",
@@ -359,7 +359,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村-漁村広場",
  locationI18n:{"ja":"漁村-漁村広場","en":"Fishing Village - Village Square","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/030.PNG"
+ img:"images/birds/030.PNG"
 },
 {
  name:"ギンザンマシコ",
@@ -371,7 +371,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/031.PNG"
+ img:"images/birds/031.PNG"
 },
 {
  name:"フウチョウモドキ",
@@ -383,7 +383,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/032.PNG"
+ img:"images/birds/032.PNG"
 },
 {
  name:"キンミノヒメアオバト",
@@ -395,7 +395,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/033.PNG"
+ img:"images/birds/033.PNG"
 },
 {
  name:"ギンケイ",
@@ -407,7 +407,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/034.PNG"
+ img:"images/birds/034.PNG"
 },
 {
  name:"ミコアイサ",
@@ -419,7 +419,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森の湖",
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/035.PNG"
+ img:"images/birds/035.PNG"
 },
 {
  name:"キバラメジロハエトリ",
@@ -431,7 +431,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村-波止場",
  locationI18n:{"ja":"漁村-波止場","en":"Fishing Village - Pier","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/036.PNG"
+ img:"images/birds/036.PNG"
 },
 {
  name:"ヨーロッパハチクイ",
@@ -443,7 +443,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖畔",
  locationI18n:{"ja":"温泉山の湖畔","en":"Hot Spring Mountain Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/037.PNG"
+ img:"images/birds/037.PNG"
 },
 {
  name:"ヒワコンゴウインコ",
@@ -455,7 +455,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト",
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/038.PNG"
+ img:"images/birds/038.PNG"
 },
 {
  name:"オリーブバト",
@@ -467,7 +467,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-温泉",
  locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/039.PNG"
+ img:"images/birds/039.PNG"
 },
 {
  name:"コフラミンゴ",
@@ -479,7 +479,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森の湖畔",
  locationI18n:{"ja":"森の湖畔","en":"Forest Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/040.PNG"
+ img:"images/birds/040.PNG"
 },
 {
  name:"クロアジサシ",
@@ -491,7 +491,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海の海辺",
  locationI18n:{"ja":"旧海の海辺","en":"Old Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/041.PNG"
+ img:"images/birds/041.PNG"
 },
 {
  name:"シメ",
@@ -503,7 +503,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/042.PNG"
+ img:"images/birds/042.PNG"
 },
 {
  name:"キンムネバト",
@@ -515,7 +515,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村-漁村東桟橋",
  locationI18n:{"ja":"漁村-漁村東桟橋","en":"Fishing Village - East Pier","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/043.PNG"
+ img:"images/birds/043.PNG"
 },
 {
  name:"チシマウガラス",
@@ -527,7 +527,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"旧海・クジラ海",
  locationI18n:{"ja":"旧海・クジラ海","en":"Old Sea / Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/044.PNG"
+ img:"images/birds/044.PNG"
 },
 {
  name:"トラフズク",
@@ -539,7 +539,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-石海岸の崖",
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/045.PNG"
+ img:"images/birds/045.PNG"
 },
 {
  name:"ルリガラ",
@@ -551,7 +551,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/046.PNG"
+ img:"images/birds/046.PNG"
 },
 {
  name:"スミレコンゴウインコ",
@@ -563,7 +563,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト",
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/047.PNG"
+ img:"images/birds/047.PNG"
 },
 {
  name:"ボタンバト",
@@ -575,7 +575,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/048.PNG"
+ img:"images/birds/048.PNG"
 },
 {
  name:"アジサシ",
@@ -587,7 +587,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海の海辺",
  locationI18n:{"ja":"東海の海辺","en":"East Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/049.PNG"
+ img:"images/birds/049.PNG"
 },
 {
  name:"チョウゲンボウ",
@@ -599,7 +599,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔(木のてっぺん)",
  locationI18n:{"ja":"森林-コジカ塔(木のてっぺん)","en":"Forest - Fawn Tower (Treetop)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/050.PNG"
+ img:"images/birds/050.PNG"
 },
 {
  name:"ルリツグミ",
@@ -611,7 +611,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/051.PNG"
+ img:"images/birds/051.PNG"
 },
 {
  name:"ベニヒワ",
@@ -623,7 +623,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/052.PNG"
+ img:"images/birds/052.PNG"
 },
 {
  name:"モモイロバト",
@@ -635,7 +635,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/053.PNG"
+ img:"images/birds/053.PNG"
 },
 {
  name:"ハヤブサ",
@@ -647,7 +647,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-温泉(崖の上)",
  locationI18n:{"ja":"温泉山-温泉(崖の上)","en":"Hot Spring Mountain - Hot Spring (Cliff Top)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/054.PNG"
+ img:"images/birds/054.PNG"
 },
 {
  name:"ナナイロフウキンチョウ",
@@ -659,7 +659,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/055.PNG"
+ img:"images/birds/055.PNG"
 },
 {
  name:"ベニイロフラミンゴ",
@@ -671,7 +671,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/056.PNG"
+ img:"images/birds/056.PNG"
 },
 {
  name:"マクジャク",
@@ -683,7 +683,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/057.PNG"
+ img:"images/birds/057.PNG"
 },
 {
  name:"カオジロオタテガモ",
@@ -695,7 +695,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/058.PNG"
+ img:"images/birds/058.PNG"
 },
 {
  name:"インペリアルシャグ",
@@ -707,7 +707,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"東海・そよ風の海",
  locationI18n:{"ja":"東海・そよ風の海","en":"East Sea / Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/059.PNG"
+ img:"images/birds/059.PNG"
 },
 {
  name:"アゾレスウソ",
@@ -719,7 +719,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"漁村-灯台",
  locationI18n:{"ja":"漁村-灯台","en":"Fishing Village - Lighthouse","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/060.PNG"
+ img:"images/birds/060.PNG"
 },
 {
  name:"ロクショウヒタキ",
@@ -731,7 +731,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/061.PNG"
+ img:"images/birds/061.PNG"
 },
 {
  name:"アカアシチョウゲンボウ",
@@ -743,7 +743,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-遺跡(崖の上)",
  locationI18n:{"ja":"温泉山-遺跡(崖の上)","en":"Hot Spring Mountain - Ruins (Cliff Top)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/062.PNG"
+ img:"images/birds/062.PNG"
 },
 {
  name:"ワシミミズク",
@@ -755,7 +755,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔(木のてっぺん)",
  locationI18n:{"ja":"森林-コジカ塔(木のてっぺん)","en":"Forest - Fawn Tower (Treetop)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/063.PNG"
+ img:"images/birds/063.PNG"
 }, 
 {
  name:"コムクドリ",
@@ -767,7 +767,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-風車の花畑",
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/064.PNG"
+ img:"images/birds/064.PNG"
 }, 
 {
  name:"クロヒゲバト",
@@ -779,7 +779,7 @@ const birdData = [
  time:["12-18","18-0","0-6"],
  location:"郊外",
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/065.PNG"
+ img:"images/birds/065.PNG"
 }, 
 {
  name:"シロクジャク",
@@ -791,7 +791,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/066.JPG"
+ img:"images/birds/066.JPG"
 }, 
 {
  name:"トモエガモ",
@@ -803,7 +803,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
  locationI18n:{"ja":"温泉の湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/067.PNG"
+ img:"images/birds/067.PNG"
 }, 
 {
  name:"インカアジサシ",
@@ -815,7 +815,7 @@ const birdData = [
  time:["6-12","12-18","18-0"],
  location:"旧海の海辺",
  locationI18n:{"ja":"旧海の海辺","en":"Old Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/068.PNG"
+ img:"images/birds/068.PNG"
 },
 {
  name:"フヨウチョウ",
@@ -827,7 +827,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/069.PNG"
+ img:"images/birds/069.PNG"
 },
 {
  name:"ニシツノメドリ",
@@ -839,7 +839,7 @@ const birdData = [
  time:["6-12","18-0","0-6"],
  location:"クジラ海の海辺",
  locationI18n:{"ja":"クジラ海の海辺","en":"Whale Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/070.PNG"
+ img:"images/birds/070.PNG"
 },
 {
  name:"アオアシカツオドリ",
@@ -851,7 +851,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"そよ風の海の海辺",
  locationI18n:{"ja":"そよ風の海の海辺","en":"Breeze Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/071.PNG"
+ img:"images/birds/071.PNG"
 },
 {
  name:"シロフクロウ",
@@ -863,7 +863,7 @@ const birdData = [
  time:["12-18","18-0"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/072.JPG"
+ img:"images/birds/072.JPG"
 },
 {
  name:"クロクジャク",
@@ -875,7 +875,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト(追加段階)",
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/073.JPG"
+ img:"images/birds/073.JPG"
 },
 {
  name:"オオハクチョウ",
@@ -887,7 +887,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/074.PNG"
+ img:"images/birds/074.PNG"
 },
 {
  name:"コクチョウ",
@@ -899,7 +899,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/075.JPG"
+ img:"images/birds/075.JPG"
 },
 {
  name:"ナベコウ",
@@ -911,7 +911,7 @@ const birdData = [
  time:["12-18","18-0","0-6"],
  location:"草原の湖畔",
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/076.PNG"
+ img:"images/birds/076.PNG"
 },
 {
  name:"メガネフクロウ",
@@ -923,7 +923,7 @@ const birdData = [
  time:["6-12","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/077.PNG"
+ img:"images/birds/077.PNG"
 },
 
 {
@@ -938,7 +938,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外湖畔",
  locationI18n:{"ja":"郊外の湖畔","en":"Suburban Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1006.PNG",
+ img:"images/birds/1006.PNG",
  auth:false
 },
 {
@@ -953,7 +953,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1007.PNG",
+ img:"images/birds/1007.PNG",
  auth:false
 },
 
@@ -969,7 +969,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1008.PNG",
+ img:"images/birds/1008.PNG",
  auth:false
 },
 
@@ -985,7 +985,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1009.PNG",
+ img:"images/birds/1009.PNG",
  auth:false
 },
 
@@ -1001,7 +1001,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"冬季採録クエスト(追加段階)",
  locationI18n:{"ja":"冬季採録クエスト(追加段階)","en":"Winter Collection Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1010.PNG",
+ img:"images/birds/1010.PNG",
  auth:false
 },
 
@@ -1017,7 +1017,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-ジャンプステージ",
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1011.PNG",
+ img:"images/birds/1011.PNG",
  auth:false
 },
 
@@ -1033,7 +1033,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1012.PNG",
+ img:"images/birds/1012.PNG",
  auth:false
 },
 
@@ -1049,7 +1049,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1013.PNG",
+ img:"images/birds/1013.PNG",
  auth:false
 },
 
@@ -1065,7 +1065,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森の島","en":"Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1014.PNG",
+ img:"images/birds/1014.PNG",
  auth:false
 },
 
@@ -1081,7 +1081,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"「アクターバト」クエスト(追加段階)",
  locationI18n:{"ja":"「アクターバト」クエスト(追加段階)","en":"'Actor Dove' Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1015.PNG",
+ img:"images/birds/1015.PNG",
  auth:false
 },
 {
@@ -1096,7 +1096,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-石海岸の崖",
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1001.PNG",
+ img:"images/birds/1001.PNG",
  auth:false
 },
 {
@@ -1111,7 +1111,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-温泉",
  locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1002.PNG",
+ img:"images/birds/1002.PNG",
  auth:false
 },
 {
@@ -1126,7 +1126,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1003.PNG",
+ img:"images/birds/1003.PNG",
  auth:false
 },
 {
@@ -1141,7 +1141,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1004.PNG",
+ img:"images/birds/1004.PNG",
  auth:false
 },
 {
@@ -1156,7 +1156,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"特殊積み木鳥クエスト",
  locationI18n:{"ja":"特殊積み木鳥クエスト","en":"Special Building Block Bird Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1005.PNG",
+ img:"images/birds/1005.PNG",
  auth:false
 },
 {
@@ -1171,7 +1171,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1016.PNG",
+ img:"images/birds/1016.PNG",
  auth:false
 },
 {
@@ -1186,7 +1186,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑",
  locationI18n:{"ja":"花畑","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1017.PNG",
+ img:"images/birds/1017.PNG",
  auth:false
 },
 {
@@ -1201,7 +1201,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖畔",
  locationI18n:{"ja":"温泉山の湖畔","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1018.PNG",
+ img:"images/birds/1018.PNG",
  auth:false
 },
 {
@@ -1216,7 +1216,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"花畑-パープルビーチ",
  locationI18n:{"ja":"花畑-パープルビーチ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1019.PNG",
+ img:"images/birds/1019.PNG",
  auth:false
 },
 {
@@ -1231,7 +1231,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-石海岸の崖",
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"birds/1020.PNG",
+ img:"images/birds/1020.PNG",
  auth:false
 }
  // ここに追加していく
