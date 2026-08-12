@@ -380,7 +380,7 @@ function idOf(v, i){
   return v.category + "_" + v.date + "_" + i;
 }
 
-// 各動画の「対象期間の終了時刻」を求める（openIdの初期値判定に使用）
+// 各動画の「対象期間の終了時刻」を求める（自動展開の判定に使用）
 // ・ピンクバブル：dateの6:00始まり〜7日後6:00まで（メモは使わない）
 // ・虹の日/流星雨：メモ内の「H:MM~H:MM」から終了時刻を読み取る（読めない場合は当日いっぱいとみなす）
 function computeEventEnd(v){
@@ -408,28 +408,23 @@ function isDefaultOpen(v){
   return now < info.end + info.windowMs;
 }
 
-// カテゴリ内で直近性の条件を満たす動画のうち、最も新しいものを開いた状態のidとして返す
-function computeDefaultOpenId(cat){
+// カテゴリ内で直近性の条件を満たす動画のidを全て返す（複数あれば全て開く）
+function computeDefaultOpenIds(cat){
   const list = getSortedList(cat);
-  let bestIdx = -1, bestEnd = -Infinity;
+  const ids = [];
   list.forEach((v, i) => {
-    if(!isDefaultOpen(v)) return;
-    const info = computeEventEnd(v);
-    if(info && info.end > bestEnd){
-      bestEnd = info.end;
-      bestIdx = i;
-    }
+    if(isDefaultOpen(v)) ids.push(idOf(v, i));
   });
-  return bestIdx === -1 ? null : idOf(list[bestIdx], bestIdx);
+  return ids;
 }
 
 // 状態
 let currentCat = "pink_bubble";
-let openId = computeDefaultOpenId(currentCat);
+let openIds = new Set(computeDefaultOpenIds(currentCat));
 
 function setCat(cat){
   currentCat = cat;
-  openId = computeDefaultOpenId(cat);
+  openIds = new Set(computeDefaultOpenIds(cat));
   Object.keys(CATS).forEach(c=>{
     document.getElementById("cat-"+c).classList.toggle("active", c === cat);
   });
@@ -458,7 +453,7 @@ function renderVideos(){
 
   list.forEach((v, i) => {
     const id = idOf(v, i);
-    const isOpen = openId === id;
+    const isOpen = openIds.has(id);
     const div = document.createElement("div");
     div.className = "video-card" + (isOpen ? " open" : "");
     div.innerHTML = `
@@ -489,7 +484,8 @@ function renderVideos(){
 }
 
 function toggleVideo(id){
-  openId = openId === id ? null : id;
+  if(openIds.has(id)) openIds.delete(id);
+  else openIds.add(id);
   renderVideos();
 }
 
