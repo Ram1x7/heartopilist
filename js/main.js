@@ -1610,7 +1610,7 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "3.2.0";
+const popupVersion = "3.3.0";
 
 if(
  localStorage.getItem("popupVersion")
