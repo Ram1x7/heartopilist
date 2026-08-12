@@ -11,6 +11,13 @@
 
 const videoData = [
   { category:"rainbow_day", date:"2026-01-17", videoId:"sSAFnXMJEyc", note:"18:00~24:00" },
+  { category:"rainbow_day", date:"2026-05-01", videoId:"YBZOtaKhsWQ", note:"12:00~18:00" },
+  { category:"rainbow_day", date:"2026-05-12", videoId:"0UoSwTeZ9jc", note:"18:00~24:00" },
+  { category:"rainbow_day", date:"2026-06-19", videoId:"gXL38RFU2Ag", note:"12:00~18:00" },
+  { category:"rainbow_day", date:"2026-07-02", videoId:"vTG5PXzpOoQ", note:"6:00~12:00" },
+  { category:"rainbow_day", date:"2026-07-25", videoId:"vbCaKkgRWW0", note:"12:00~18:00" },
+  { category:"rainbow_day", date:"2026-08-03", videoId:"o_o_UUZY_oo", note:"12:00~18:00" },
+  { category:"rainbow_day", date:"2026-08-11", videoId:"7XNrbCLftgk", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-01-24", videoId:"NseJtUPwK7g", note:"18:00~24:00" },
   { category:"pink_bubble", date:"2026-03-28", videoId:"_R5hpYsCPBc", note:"3/28 6:00~4/3 5:59" },
   { category:"pink_bubble", date:"2026-04-04", videoId:"6l-OgjGEZCM", note:"4/4~4/10" },
