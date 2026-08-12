@@ -814,6 +814,17 @@ body.dark .daily-task-row{
   background:#383329;
 }
 
+.daily-task-link{
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.daily-task-link .daily-task-label{
+  flex-direction:row;
+  align-items:center;
+  gap:5px;
+}
+
 .daily-task-label{
   display:flex;
   flex-direction:column;
