@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title data-i18n="page_title_videos">場所動画｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_videos" content="Heartopia（ハートピアスローライフ）のピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | 場所動画">
+<meta property="og:description" content="ピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/videos.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | 場所動画">
+<meta name="twitter:description" content="ピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=1">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* videos.html 専用CSS（共通の見た目はcss/style.cssを参照） */
+:root{
+  --green:#4a7c59;
+  --green-soft:#dff0e5;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{ min-height:100vh; }
+
+/* ページヘッダー */
+.page-header{
+  margin-bottom:6px;
+}
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{
+  color:#e8d2a8;
+}
+
+.page-header p{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
+
+body.dark .page-header p{
+  color:#b3a89a;
+}
+
+/* カテゴリタブ */
+.cat-tabs{
+  display:flex;
+  gap:6px;
+  margin:14px 0 16px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.cat-tabs::-webkit-scrollbar{ display:none; }
+
+.tab{
+  flex-shrink:0;
+  padding:9px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+.tab.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .tab{
+  background:#383329;
+  color:#b3a89a;
+  border-color:#46423b;
+}
+
+body.dark .tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* リスト */
+.video-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* カード */
+.video-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .video-card{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.video-question{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  cursor:pointer;
+}
+
+.video-icon{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  color:var(--indigo);
+}
+
+body.dark .video-icon{ color:#e8d2a8; }
+
+.video-title{
+  flex:1;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:0.02em;
+}
+
+body.dark .video-title{
+  color:#ece4d4;
+}
+
+.video-arrow{
+  flex-shrink:0;
+  font-size:11px;
+  color:var(--text-sub);
+  transition:transform 0.2s;
+}
+
+body.dark .video-arrow{
+  color:#b3a89a;
+}
+
+.video-card.open .video-arrow{
+  transform:rotate(180deg);
+}
+
+.video-answer{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.25s ease;
+}
+
+.video-card.open .video-answer{
+  max-height:900px;
+}
+
+.video-answer-inner{
+  padding:0 16px 16px;
+}
+
+.video-embed{
+  position:relative;
+  width:100%;
+  aspect-ratio:16/9;
+  border-radius:10px;
+  overflow:hidden;
+  background:#000;
+}
+
+.video-embed iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+.video-note{
+  font-size:12px;
+  color:var(--text-sub);
+  line-height:1.7;
+  margin-top:10px;
+  white-space:pre-wrap;
+}
+
+body.dark .video-note{
+  color:#b3a89a;
+}
+
+/* 空表示 */
+.empty{
+  text-align:center;
+  padding:48px 0;
+  color:var(--text-sub);
+  font-size:13px;
+  line-height:2;
+}
+
+body.dark .empty{
+  color:#b3a89a;
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+body.dark .footer{
+  color:#b3a89a;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item active" data-i18n="nav_videos">場所動画</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+</nav>
+
+<div class="page-header">
+  <h2 data-i18n="videos_page_title">場所動画</h2>
+  <p data-i18n="videos_page_subtitle">ピンクバブル・虹の日・流星雨の発生記録動画</p>
+</div>
+
+<div class="cat-tabs">
+  <button class="tab active" id="cat-pink_bubble" onclick="setCat('pink_bubble')"></button>
+  <button class="tab" id="cat-rainbow_day" onclick="setCat('rainbow_day')"></button>
+  <button class="tab" id="cat-meteor_shower" onclick="setCat('meteor_shower')"></button>
+</div>
+
+<div class="video-list" id="videoList"></div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-videos.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// 多言語ヘルパー
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  return fallback;
+}
+
+// カテゴリ定義
+const CATS = {
+  pink_bubble:   { label:()=>T("videos_cat_pink_bubble","ピンクバブル"), icon:"bubbles" },
+  rainbow_day:   { label:()=>T("videos_cat_rainbow_day","虹の日"),       icon:"weatherRainbow" },
+  meteor_shower: { label:()=>T("videos_cat_meteor_shower","流星雨"),     icon:"weatherMeteor" },
+};
+
+// 状態
+let currentCat = "pink_bubble";
+let openId = null;
+
+function setCat(cat){
+  currentCat = cat;
+  openId = null;
+  Object.keys(CATS).forEach(c=>{
+    document.getElementById("cat-"+c).classList.toggle("active", c === cat);
+  });
+  renderVideos();
+}
+
+// 日付フォーマット（YYYY-MM-DD → YYYY/M/D）
+function formatDate(str){
+  const d = new Date(str + "T00:00:00");
+  if(isNaN(d.getTime())) return str;
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+}
+
+function renderCatTabs(){
+  Object.keys(CATS).forEach(c=>{
+    const btn = document.getElementById("cat-"+c);
+    btn.innerHTML = `${icon(CATS[c].icon,{size:14})} ${CATS[c].label()}`;
+  });
+}
+
+// 描画
+function renderVideos(){
+  renderCatTabs();
+  const el = document.getElementById("videoList");
+  el.innerHTML = "";
+
+  const list = (typeof videoData !== "undefined" ? videoData : [])
+    .filter(v => v.category === currentCat)
+    .slice()
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  if(list.length === 0){
+    el.innerHTML = `<div class="empty">${T("videos_no_results","まだ動画がありません")}</div>`;
+    return;
+  }
+
+  list.forEach((v, i) => {
+    const id = v.category + "_" + v.date + "_" + i;
+    const isOpen = openId === id;
+    const div = document.createElement("div");
+    div.className = "video-card" + (isOpen ? " open" : "");
+    div.innerHTML = `
+      <div class="video-question" onclick="toggleVideo('${id}')">
+        <span class="video-icon">${icon("calendar", {size:15})}</span>
+        <span class="video-title">${formatDate(v.date)}</span>
+        <span class="video-arrow">▼</span>
+      </div>
+      <div class="video-answer">
+        <div class="video-answer-inner">
+          ${isOpen ? `
+            <div class="video-embed">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/${v.videoId}"
+                title="${formatDate(v.date)}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            ${v.note ? `<div class="video-note">${v.note}</div>` : ""}
+          ` : ""}
+        </div>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function toggleVideo(id){
+  openId = openId === id ? null : id;
+  renderVideos();
+}
+
+renderVideos();
+
+// 言語切替時に再描画
+document.addEventListener("langchange", renderVideos);
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

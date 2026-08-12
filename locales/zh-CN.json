@@ -311,5 +311,14 @@
   "data_sync_import_done": "已导入备份。",
   "data_sync_import_failed": "导入失败。",
   "aria_check_label": "标记为已完成",
-  "aria_auth_label": "标记为认证大师"
+  "aria_auth_label": "标记为认证大师",
+  "nav_videos": "地点视频",
+  "page_title_videos": "地点视频｜哈托皮图鉴",
+  "meta_description_videos": "可以在这里集中观看Heartopia的粉色气泡、彩虹之日、流星雨的记录视频。",
+  "videos_page_title": "地点视频",
+  "videos_page_subtitle": "粉色气泡・彩虹之日・流星雨的记录视频",
+  "videos_cat_pink_bubble": "粉色气泡",
+  "videos_cat_rainbow_day": "彩虹之日",
+  "videos_cat_meteor_shower": "流星雨",
+  "videos_no_results": "暂时还没有视频"
 }

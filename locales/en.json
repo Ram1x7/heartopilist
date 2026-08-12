@@ -335,5 +335,14 @@
   "shop_sort_unchecked": "Unpurchased first",
   "shop_no_results": "No matching items",
   "aria_check_label": "Mark as complete",
-  "aria_auth_label": "Mark as authenticated"
+  "aria_auth_label": "Mark as authenticated",
+  "nav_videos": "Location Videos",
+  "page_title_videos": "Location Videos | Hatopi Dex",
+  "meta_description_videos": "Watch recorded videos of Heartopia's Pink Bubble, Rainbow Day, and Meteor Shower occurrences.",
+  "videos_page_title": "Location Videos",
+  "videos_page_subtitle": "Recorded videos of Pink Bubble, Rainbow Day, and Meteor Shower occurrences",
+  "videos_cat_pink_bubble": "Pink Bubble",
+  "videos_cat_rainbow_day": "Rainbow Day",
+  "videos_cat_meteor_shower": "Meteor Shower",
+  "videos_no_results": "No videos yet"
 }

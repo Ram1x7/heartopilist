@@ -335,5 +335,14 @@
   "shop_sort_unchecked": "未所持順",
   "shop_no_results": "該当するアイテムがありません",
   "aria_check_label": "コンプ済みにする",
-  "aria_auth_label": "認証マスターにする"
+  "aria_auth_label": "認証マスターにする",
+  "nav_videos": "場所動画",
+  "page_title_videos": "場所動画｜はとぴ図鑑",
+  "meta_description_videos": "Heartopia（ハートピアスローライフ）のピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。",
+  "videos_page_title": "場所動画",
+  "videos_page_subtitle": "ピンクバブル・虹の日・流星雨の発生記録動画",
+  "videos_cat_pink_bubble": "ピンクバブル",
+  "videos_cat_rainbow_day": "虹の日",
+  "videos_cat_meteor_shower": "流星雨",
+  "videos_no_results": "まだ動画がありません"
 }

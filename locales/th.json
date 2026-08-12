@@ -311,5 +311,14 @@
   "data_sync_import_done": "นำเข้าข้อมูลสำรองแล้ว",
   "data_sync_import_failed": "นำเข้าล้มเหลว",
   "aria_check_label": "ทำเครื่องหมายว่าเสร็จสมบูรณ์",
-  "aria_auth_label": "ทำเครื่องหมายว่าผ่านการรับรอง"
+  "aria_auth_label": "ทำเครื่องหมายว่าผ่านการรับรอง",
+  "nav_videos": "วิดีโอสถานที่",
+  "page_title_videos": "วิดีโอสถานที่｜Hatopi Dex",
+  "meta_description_videos": "ชมวิดีโอบันทึกการเกิด Pink Bubble, วันสายรุ้ง และฝนดาวตกของ Heartopia ได้ในที่เดียว",
+  "videos_page_title": "วิดีโอสถานที่",
+  "videos_page_subtitle": "วิดีโอบันทึกการเกิด Pink Bubble, วันสายรุ้ง และฝนดาวตก",
+  "videos_cat_pink_bubble": "Pink Bubble",
+  "videos_cat_rainbow_day": "วันสายรุ้ง",
+  "videos_cat_meteor_shower": "ฝนดาวตก",
+  "videos_no_results": "ยังไม่มีวิดีโอ"
 }
