@@ -1935,19 +1935,26 @@ function renderDailyTasks(){
     const HOUR = 3600000;
     const now = Date.now();
 
-    // 指定の天気が発生したゾーンの終了から、windowHours以内かどうか（今日・昨日の2日分をチェック）
+    // "YYYY-MM-DD"（JST基準のカレンダー日付）を、そのJST 0:00に対応する絶対時刻(ms)に変換
+    // ※ブラウザのローカルタイムゾーンに依存させないため、UTC解釈から9時間分を差し引く
+    const jstMidnight = (dateStr) => {
+      const t = Date.parse(dateStr + "T00:00:00Z");
+      return isNaN(t) ? NaN : t - 9 * HOUR;
+    };
+
+    // 指定の天気が発生したゾーンの開始から、windowHours以内かどうか（今日・昨日の2日分をチェック）
     const isRecentWeatherZone = (targetWeather, windowHours) => {
       if(typeof weatherData === "undefined") return false;
-      const zoneDefs = [["6-12", 12], ["12-18", 18], ["18-0", 24], ["0-6", 6]];
+      const zoneDefs = [["6-12", 6], ["12-18", 12], ["18-0", 18], ["0-6", 0]];
       for(let offset = 0; offset <= 1; offset++){
         const dateKey = getDateKey(-offset);
         const dayWeather = weatherData[dateKey];
         if(!dayWeather) continue;
-        const base = new Date(dateKey + "T00:00:00").getTime();
-        for(const [z, endH] of zoneDefs){
+        const base = jstMidnight(dateKey);
+        for(const [z, startH] of zoneDefs){
           if(dayWeather[z] !== targetWeather) continue;
-          const end = base + endH * HOUR;
-          if(now < end + windowHours * HOUR) return true;
+          const start = base + startH * HOUR;
+          if(now >= start && now < start + windowHours * HOUR) return true;
         }
       }
       return false;
