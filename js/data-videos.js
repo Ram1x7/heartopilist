@@ -10,5 +10,7 @@
 // { category:"pink_bubble", date:"2026-08-10", videoId:"dQw4w9WgXcQ", note:"" },
 
 const videoData = [
-
+  { category:"rainbow_day", date:"2026-01-17", videoId:"sSAFnXMJEyc", note:"18:00~24:00" },
+  { category:"meteor_shower", date:"2026-01-24", videoId:"NseJtUPwK7g", note:"18:00~24:00" },
+  { category:"pink_bubble", date:"2026-03-28", videoId:"_R5hpYsCPBc", note:"3/28 6:00~4/3 5:59" },
 ];
