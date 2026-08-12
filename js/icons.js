@@ -34,6 +34,8 @@ const ICONS = {
   weatherRain: `<path d="M7 15a4.5 4.5 0 0 1 .8-9 5.5 5.5 0 0 1 10.6 1.6A4 4 0 0 1 17.5 15Z"/><path d="M8.5 18v2M12 18v2M15.5 18v2"/>`,
   weatherRainbow: `<path d="M4 19a8 8 0 0 1 16 0"/><path d="M7 19a5 5 0 0 1 10 0"/>`,
   weatherMeteor: `<path d="M14 4 5 13a4 4 0 1 0 6 6l9-9"/><path d="M13.5 8.5 15.5 10.5M4 19h16"/>`,
+  bubbles: `<circle cx="10" cy="13" r="6"/><circle cx="17" cy="7.5" r="3"/><circle cx="8" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="6.5" r="0.6" fill="currentColor" stroke="none"/>`,
+  play: `<path d="M7 4.5v15l13-7.5Z"/>`,
 
   // 並び替え・絞り込み
   sortBook: `<path d="M6 4.5h6.5A2.5 2.5 0 0 1 15 7v13H8.5A2.5 2.5 0 0 1 6 17.5Z"/><path d="M15 7a2.5 2.5 0 0 1 2.5-2.5H18v13a2.5 2.5 0 0 1-2.5 2.5H15"/>`,
