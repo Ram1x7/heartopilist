@@ -1893,7 +1893,7 @@ function renderDailyTasks(){
   if(!body) return;
 
   const todayWeekday = getJstDate().getUTCDay();
-  let sectionSpots, sectionWeather, sectionQuests, sectionUpdates, sectionEnding;
+  let sectionSpots, sectionWeather, sectionQuests, sectionUpdates, sectionEnding, sectionVideos;
 
   // 蛍石・オークの木
   if(typeof dailySpots !== "undefined" && typeof getDailySpotFor === "function"){
@@ -1928,6 +1928,51 @@ function renderDailyTasks(){
       </div>
     `).join("");
     sectionWeather = sectionHTML("weatherSun", T("daily_tasks_section_weather","今日の天気"), weatherRows);
+  }
+
+  // 場所動画への誘導（流星雨・虹の日は天気から、ピンクバブルは曜日から判定。タップでvideos.htmlの該当カテゴリへ）
+  {
+    const HOUR = 3600000;
+    const now = Date.now();
+
+    // 指定の天気が発生したゾーンの終了から、windowHours以内かどうか（今日・昨日の2日分をチェック）
+    const isRecentWeatherZone = (targetWeather, windowHours) => {
+      if(typeof weatherData === "undefined") return false;
+      const zoneDefs = [["6-12", 12], ["12-18", 18], ["18-0", 24], ["0-6", 6]];
+      for(let offset = 0; offset <= 1; offset++){
+        const dateKey = getDateKey(-offset);
+        const dayWeather = weatherData[dateKey];
+        if(!dayWeather) continue;
+        const base = new Date(dateKey + "T00:00:00").getTime();
+        for(const [z, endH] of zoneDefs){
+          if(dayWeather[z] !== targetWeather) continue;
+          const end = base + endH * HOUR;
+          if(now < end + windowHours * HOUR) return true;
+        }
+      }
+      return false;
+    };
+
+    const videoLinkRow = (iconName, label, cat) => `
+      <a class="daily-task-row daily-task-link" href="videos.html?cat=${cat}">
+        <span class="daily-task-label">${icon(iconName,{size:13})} ${label}</span>
+        <span class="daily-task-value">›</span>
+      </a>
+    `;
+
+    let videoRows = "";
+    if(isRecentWeatherZone("流星雨", 24)){
+      videoRows += videoLinkRow("weatherMeteor", T("daily_tasks_video_meteor","流星雨の欠片が拾えます"), "meteor_shower");
+    }
+    if(isRecentWeatherZone("虹", 6)){
+      videoRows += videoLinkRow("weatherRainbow", T("daily_tasks_video_rainbow","虹の日が発生中です"), "rainbow_day");
+    }
+    if(todayWeekday === 5){
+      videoRows += videoLinkRow("bubbles", T("daily_tasks_video_pink_bubble","明日までのピンクバブルはこちら"), "pink_bubble");
+    }
+    if(videoRows){
+      sectionVideos = sectionHTML("play", T("daily_tasks_section_videos","場所動画"), videoRows);
+    }
   }
 
   // 定時クエスト
@@ -1999,8 +2044,8 @@ function renderDailyTasks(){
     }
   }
 
-  // 表示順: もうすぐ終わるもの → 蛍石・オークの木 → 今日の天気 → 毎日更新系 → 定時クエスト
-  const sections = [sectionEnding, sectionSpots, sectionWeather, sectionUpdates, sectionQuests].filter(Boolean);
+  // 表示順: もうすぐ終わるもの → 場所動画 → 蛍石・オークの木 → 今日の天気 → 毎日更新系 → 定時クエスト
+  const sections = [sectionEnding, sectionVideos, sectionSpots, sectionWeather, sectionUpdates, sectionQuests].filter(Boolean);
 
   body.innerHTML = sections.length
     ? sections.join("")
