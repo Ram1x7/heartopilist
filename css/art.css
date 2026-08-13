@@ -1,0 +1,126 @@
+/* art-*.html 専用CSS（共通の見た目はcss/style.cssを参照。既存ページのスタイルには一切影響しない） */
+
+/* 開発中バナー */
+.art-notice{
+  margin:10px 0 16px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  color:var(--text-sub);
+  font-size:12px;
+  line-height:1.6;
+  text-align:center;
+}
+
+body.dark .art-notice{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+/* レイアウト（モバイル：縦積み） */
+.art-layout{
+  display:grid;
+  grid-template-areas:
+    "toolbar"
+    "canvas"
+    "panel";
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:4px;
+}
+
+.art-toolbar{
+  grid-area:toolbar;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:52px;
+  padding:10px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.art-canvas-area{
+  grid-area:canvas;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.art-panel{
+  grid-area:panel;
+  min-height:120px;
+  padding:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .art-toolbar,
+body.dark .art-canvas-area,
+body.dark .art-panel{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+#artCanvas{
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  background:
+    linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    linear-gradient(-45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    var(--card);
+}
+
+body.dark #artCanvas{
+  background:
+    linear-gradient(45deg, #383329 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, #383329 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(45deg, transparent 75%, #383329 75%) -8px 0/16px 16px,
+    linear-gradient(-45deg, transparent 75%, #383329 75%) -8px 0/16px 16px,
+    #2c2823;
+}
+
+/* iPad（768px〜）：ツールバー上／Canvas中央／パネル下、余白を広めに */
+@media (min-width:768px){
+  .art-canvas-area{
+    padding:28px;
+  }
+  #artCanvas{
+    width:420px;
+  }
+}
+
+/* PC（1200px〜）：ツールバー左／Canvas中央／パネル右の3カラム */
+@media (min-width:1200px){
+  .art-layout{
+    grid-template-areas:"toolbar canvas panel";
+    grid-template-columns:180px 1fr 280px;
+    align-items:start;
+  }
+  .art-toolbar{
+    flex-direction:column;
+    align-items:stretch;
+    overflow-x:visible;
+    overflow-y:auto;
+    max-height:70vh;
+  }
+  #artCanvas{
+    width:480px;
+  }
+}

@@ -324,5 +324,11 @@
   "videos_cat_pink_bubble": "핑크버블",
   "videos_cat_rainbow_day": "무지개의 날",
   "videos_cat_meteor_shower": "유성우",
-  "videos_no_results": "아직 영상이 없습니다"
+  "videos_no_results": "아직 영상이 없습니다",
+  "nav_art": "아트",
+  "page_title_art": "아트｜하토피 도감",
+  "meta_description_art": "Heartopia용 도트 디자인을 브라우저에서 만들고 저장할 수 있는 그림 도구입니다.",
+  "art_page_title": "아트",
+  "art_page_subtitle": "브라우저에서 도트 디자인을 만들고 저장할 수 있습니다",
+  "art_coming_soon": "현재 개발 중인 기능입니다. 향후 업데이트를 통해 순차적으로 이용할 수 있게 됩니다."
 }

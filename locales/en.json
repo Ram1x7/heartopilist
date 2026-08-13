@@ -348,5 +348,11 @@
   "videos_cat_pink_bubble": "Pink Bubble",
   "videos_cat_rainbow_day": "Rainbow Day",
   "videos_cat_meteor_shower": "Meteor Shower",
-  "videos_no_results": "No videos yet"
+  "videos_no_results": "No videos yet",
+  "nav_art": "Art",
+  "page_title_art": "Art | Hatopi Dex",
+  "meta_description_art": "A browser-based pixel art tool for creating and saving Heartopia design layouts.",
+  "art_page_title": "Art",
+  "art_page_subtitle": "Create and save pixel art designs right in your browser",
+  "art_coming_soon": "This feature is currently under development. It will become available in a future update."
 }

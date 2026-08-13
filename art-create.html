@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title data-i18n="page_title_art">アート｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_art" content="Heartopia（ハートピアスローライフ）向けのドット絵デザインを、ブラウザ上で作成・保存できるお絵かきツールです。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | アート">
+<meta property="og:description" content="Heartopia向けのドット絵デザインをブラウザ上で作成・保存できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/art-create.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | アート">
+<meta name="twitter:description" content="Heartopia向けのドット絵デザインをブラウザ上で作成・保存できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=2">
+<link rel="stylesheet" href="./css/art.css?v=1">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item active" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+</nav>
+
+<div class="page-header">
+  <h2 data-i18n="art_page_title">アート</h2>
+  <p data-i18n="art_page_subtitle">ドット絵デザインをブラウザで作成・保存</p>
+</div>
+
+<div class="art-notice" data-i18n="art_coming_soon">
+  現在開発中の機能です。今後のアップデートで順次使えるようになります。
+</div>
+
+<div class="art-layout">
+  <div class="art-toolbar" id="artToolbar">
+    <!-- Phase 2で描画ツールボタンを追加 -->
+  </div>
+  <div class="art-canvas-area">
+    <canvas id="artCanvas" width="320" height="320"></canvas>
+  </div>
+  <div class="art-panel" id="artPanel">
+    <!-- Phase 2でカラーパレット・設定を追加 -->
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>
