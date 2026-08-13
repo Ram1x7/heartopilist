@@ -1893,6 +1893,8 @@ function renderDailyTasks(){
   if(!body) return;
 
   const todayWeekday = getJstDate().getUTCDay();
+  // 毎日更新系の曜日指定は6:00〜5:59を1日とみなして判定する（更新サイクルの境目に合わせるため）
+  const resetDayWeekday = new Date(getJstDate().getTime() - 6 * 3600000).getUTCDay();
   let sectionSpots, sectionWeather, sectionQuests, sectionUpdates, sectionEnding, sectionVideos;
 
   // 蛍石・オークの木
@@ -2005,7 +2007,7 @@ function renderDailyTasks(){
 
   // 毎日更新系
   if(typeof dailyUpdates !== "undefined" && dailyUpdates.length > 0){
-    const visibleUpdates = dailyUpdates.filter(u => !u.weekdays || u.weekdays.includes(todayWeekday));
+    const visibleUpdates = dailyUpdates.filter(u => !u.weekdays || u.weekdays.includes(resetDayWeekday));
     const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
 
     // 表示中の項目はほぼ全て同じ更新時刻（デフォルト6:00）なので、
