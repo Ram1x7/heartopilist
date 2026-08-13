@@ -79,6 +79,9 @@ body.dark .art-panel{
   max-width:100%;
   height:auto;
   border-radius:8px;
+  touch-action:none;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
   background:
     linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
     linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
@@ -101,9 +104,6 @@ body.dark #artCanvas{
   .art-canvas-area{
     padding:28px;
   }
-  #artCanvas{
-    width:420px;
-  }
 }
 
 /* PC（1200px〜）：ツールバー左／Canvas中央／パネル右の3カラム */
@@ -120,7 +120,257 @@ body.dark #artCanvas{
     overflow-y:auto;
     max-height:70vh;
   }
-  #artCanvas{
-    width:480px;
-  }
+}
+
+/* ツールバーのボタン */
+.art-tool-btn{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:38px;
+  height:38px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.art-tool-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .art-tool-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-tool-btn.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* 設定パネル */
+.art-panel-section{
+  margin-bottom:16px;
+}
+
+.art-panel-section:last-child{
+  margin-bottom:0;
+}
+
+.art-panel-title{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:8px;
+  letter-spacing:0.04em;
+}
+
+body.dark .art-panel-title{
+  color:#b3a89a;
+}
+
+/* ズームコントロール */
+.art-zoom-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.art-zoom-controls button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  height:30px;
+  padding:0 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+}
+
+body.dark .art-zoom-controls button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.art-zoom-label{
+  min-width:44px;
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .art-zoom-label{
+  color:#ece4d4;
+}
+
+/* カラーパレット */
+.art-palette{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.art-swatch{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  border:2px solid var(--border);
+  cursor:pointer;
+  padding:0;
+}
+
+.art-swatch.active{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo);
+}
+
+body.dark .art-swatch{
+  border-color:#46423b;
+}
+
+body.dark .art-swatch.active{
+  border-color:var(--indigo-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
+}
+
+.art-custom-color{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.art-custom-color input[type="color"]{
+  width:32px;
+  height:32px;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:none;
+  cursor:pointer;
+}
+
+.art-custom-color input[type="text"]{
+  flex:1;
+  min-width:0;
+  height:32px;
+  padding:0 10px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+}
+
+.art-custom-color button{
+  flex-shrink:0;
+  height:32px;
+  padding:0 12px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:12px;
+  cursor:pointer;
+}
+
+body.dark .art-custom-color input[type="text"]{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-custom-color button{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* 使用色リスト */
+.art-color-usage{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:180px;
+  overflow-y:auto;
+}
+
+.art-usage-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 8px;
+  border-radius:8px;
+  background:var(--card-sub);
+  cursor:pointer;
+}
+
+.art-usage-row.active{
+  outline:2px solid var(--indigo);
+}
+
+body.dark .art-usage-row{
+  background:#383329;
+}
+
+body.dark .art-usage-row.active{
+  outline-color:var(--indigo-soft);
+}
+
+.art-usage-swatch{
+  width:16px;
+  height:16px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+
+body.dark .art-usage-swatch{
+  border-color:#46423b;
+}
+
+.art-usage-count{
+  font-size:12px;
+  color:var(--text);
+}
+
+body.dark .art-usage-count{
+  color:#ece4d4;
+}
+
+.art-usage-empty{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:10px 0;
+}
+
+body.dark .art-usage-empty{
+  color:#b3a89a;
+}
+
+/* キャンバスサイズ選択モーダル */
+.art-gridsize-options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.art-gridsize-options button{
+  flex:1 1 40%;
 }

@@ -354,5 +354,22 @@
   "meta_description_art": "A browser-based pixel art tool for creating and saving Heartopia design layouts.",
   "art_page_title": "Art",
   "art_page_subtitle": "Create and save pixel art designs right in your browser",
-  "art_coming_soon": "This feature is currently under development. It will become available in a future update."
+  "art_coming_soon": "This feature is currently under development. It will become available in a future update.",
+  "art_gridsize_title": "Choose a canvas size",
+  "art_tool_pen": "Pen",
+  "art_tool_eraser": "Eraser",
+  "art_tool_bucket": "Fill",
+  "art_tool_eyedropper": "Eyedropper",
+  "art_tool_clear": "Clear all",
+  "art_zoom_label": "Zoom",
+  "art_zoom_out": "Zoom out",
+  "art_zoom_in": "Zoom in",
+  "art_zoom_fit": "Fit to screen",
+  "art_palette_label": "Color",
+  "art_add_color": "Add",
+  "art_usage_label": "Colors used",
+  "art_usage_empty": "Nothing painted yet",
+  "art_unit_cells": " cells",
+  "art_invalid_hex": "That doesn't look like a valid color code (e.g. #FF0000)",
+  "art_confirm_clear": "Clear everything? This can't be undone (Undo support is coming in a future update)."
 }

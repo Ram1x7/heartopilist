@@ -330,5 +330,22 @@
   "meta_description_art": "可以在瀏覽器中製作、儲存Heartopia像素畫設計的繪圖工具。",
   "art_page_title": "美術",
   "art_page_subtitle": "在瀏覽器中製作、儲存像素畫設計",
-  "art_coming_soon": "該功能目前正在開發中，將於今後的更新中逐步開放。"
+  "art_coming_soon": "該功能目前正在開發中，將於今後的更新中逐步開放。",
+  "art_gridsize_title": "選擇畫布尺寸",
+  "art_tool_pen": "畫筆",
+  "art_tool_eraser": "橡皮擦",
+  "art_tool_bucket": "填色",
+  "art_tool_eyedropper": "取色器",
+  "art_tool_clear": "全部清除",
+  "art_zoom_label": "縮放",
+  "art_zoom_out": "縮小",
+  "art_zoom_in": "放大",
+  "art_zoom_fit": "適應畫面",
+  "art_palette_label": "顏色",
+  "art_add_color": "新增",
+  "art_usage_label": "已使用的顏色",
+  "art_usage_empty": "尚未上色",
+  "art_unit_cells": "格",
+  "art_invalid_hex": "色碼格式不正確（例：#FF0000）",
+  "art_confirm_clear": "確定要全部清除嗎？此操作無法復原（復原功能將於後續更新加入）。"
 }

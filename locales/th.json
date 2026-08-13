@@ -330,5 +330,22 @@
   "meta_description_art": "เครื่องมือวาดพิกเซลอาร์ตสำหรับ Heartopia ที่สร้างและบันทึกได้จากเบราว์เซอร์",
   "art_page_title": "อาร์ต",
   "art_page_subtitle": "สร้างและบันทึกดีไซน์พิกเซลอาร์ตได้จากเบราว์เซอร์",
-  "art_coming_soon": "ฟีเจอร์นี้อยู่ระหว่างการพัฒนา จะเปิดให้ใช้งานทีละส่วนในอัปเดตถัดไป"
+  "art_coming_soon": "ฟีเจอร์นี้อยู่ระหว่างการพัฒนา จะเปิดให้ใช้งานทีละส่วนในอัปเดตถัดไป",
+  "art_gridsize_title": "เลือกขนาดผืนผ้าใบ",
+  "art_tool_pen": "ปากกา",
+  "art_tool_eraser": "ยางลบ",
+  "art_tool_bucket": "เทสี",
+  "art_tool_eyedropper": "หลอดดูดสี",
+  "art_tool_clear": "ล้างทั้งหมด",
+  "art_zoom_label": "ระดับซูม",
+  "art_zoom_out": "ซูมออก",
+  "art_zoom_in": "ซูมเข้า",
+  "art_zoom_fit": "พอดีหน้าจอ",
+  "art_palette_label": "สี",
+  "art_add_color": "เพิ่ม",
+  "art_usage_label": "สีที่ใช้",
+  "art_usage_empty": "ยังไม่มีการระบายสี",
+  "art_unit_cells": " ช่อง",
+  "art_invalid_hex": "รูปแบบรหัสสีไม่ถูกต้อง (เช่น #FF0000)",
+  "art_confirm_clear": "ล้างทั้งหมดหรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้ (ฟีเจอร์ Undo จะมาในอัปเดตถัดไป)"
 }

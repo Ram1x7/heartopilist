@@ -330,5 +330,22 @@
   "meta_description_art": "Heartopia용 도트 디자인을 브라우저에서 만들고 저장할 수 있는 그림 도구입니다.",
   "art_page_title": "아트",
   "art_page_subtitle": "브라우저에서 도트 디자인을 만들고 저장할 수 있습니다",
-  "art_coming_soon": "현재 개발 중인 기능입니다. 향후 업데이트를 통해 순차적으로 이용할 수 있게 됩니다."
+  "art_coming_soon": "현재 개발 중인 기능입니다. 향후 업데이트를 통해 순차적으로 이용할 수 있게 됩니다.",
+  "art_gridsize_title": "캔버스 크기를 선택하세요",
+  "art_tool_pen": "펜",
+  "art_tool_eraser": "지우개",
+  "art_tool_bucket": "채우기",
+  "art_tool_eyedropper": "스포이드",
+  "art_tool_clear": "전체 지우기",
+  "art_zoom_label": "확대율",
+  "art_zoom_out": "축소",
+  "art_zoom_in": "확대",
+  "art_zoom_fit": "화면에 맞추기",
+  "art_palette_label": "색상",
+  "art_add_color": "추가",
+  "art_usage_label": "사용한 색상",
+  "art_usage_empty": "아직 칠한 부분이 없습니다",
+  "art_unit_cells": "칸",
+  "art_invalid_hex": "컬러 코드 형식이 올바르지 않습니다 (예: #FF0000)",
+  "art_confirm_clear": "모두 지우시겠습니까? 이 작업은 되돌릴 수 없습니다 (Undo 기능은 추후 업데이트 예정입니다)."
 }

@@ -354,5 +354,22 @@
   "meta_description_art": "Heartopia（ハートピアスローライフ）向けのドット絵デザインを、ブラウザ上で作成・保存できるお絵かきツールです。",
   "art_page_title": "アート",
   "art_page_subtitle": "ドット絵デザインをブラウザで作成・保存",
-  "art_coming_soon": "現在開発中の機能です。今後のアップデートで順次使えるようになります。"
+  "art_coming_soon": "現在開発中の機能です。今後のアップデートで順次使えるようになります。",
+  "art_gridsize_title": "キャンバスサイズを選択",
+  "art_tool_pen": "ペン",
+  "art_tool_eraser": "消しゴム",
+  "art_tool_bucket": "バケツ",
+  "art_tool_eyedropper": "スポイト",
+  "art_tool_clear": "全消去",
+  "art_zoom_label": "拡大率",
+  "art_zoom_out": "縮小",
+  "art_zoom_in": "拡大",
+  "art_zoom_fit": "画面に合わせる",
+  "art_palette_label": "カラー",
+  "art_add_color": "追加",
+  "art_usage_label": "使用色",
+  "art_usage_empty": "まだ何も塗られていません",
+  "art_unit_cells": "マス",
+  "art_invalid_hex": "カラーコードの形式が正しくありません（例：#FF0000）",
+  "art_confirm_clear": "すべて消去しますか？この操作は取り消せません（Undo機能は今後のアップデートで追加予定です）"
 }
