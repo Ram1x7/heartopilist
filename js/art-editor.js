@@ -905,4 +905,19 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+// 言語切替時に動的コンテンツ（i18n読み込み前に描画されたUI）を再描画
+document.addEventListener("langchange", () => {
+  renderToolbar();
+  renderZoomControls();
+  updateColorUsage();
+  updateSelectionButtons();
+  if(document.getElementById("gridSizeModal").style.display !== "none"){
+    renderHeartopiaPresets();
+    updateNewCanvasPreview();
+  }
+  if(document.getElementById("resizeModal").style.display !== "none"){
+    renderAnchorGrid();
+  }
+});
+
 initArtEditor();

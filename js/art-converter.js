@@ -57,22 +57,11 @@ function initArtConverter(){
     scheduleConvert();
   });
 
-  renderOptionGroup("artConvertFitOptions", FIT_MODES.map(f => ({ id: f.id, label: T(f.labelKey, f.labelFallback) })), settings.fitMode, (v) => {
-    settings.fitMode = v;
-    scheduleConvert();
-  });
   renderOptionGroup("artConvertColorOptions", COLOR_COUNTS.map(c => ({ id: c, label: `${c}` })), settings.colors, (v) => {
     settings.colors = Number(v);
     scheduleConvert();
   });
-  renderOptionGroup("artConvertEdgeOptions", EDGE_LEVELS.map(e => ({ id: e.id, label: T(e.labelKey, e.labelFallback) })), settings.edge, (v) => {
-    settings.edge = v;
-    scheduleConvert();
-  });
-  renderOptionGroup("artConvertBgOptions", BG_MODES.map(b => ({ id: b.id, label: T(b.labelKey, b.labelFallback) })), settings.background, (v) => {
-    settings.background = v;
-    scheduleConvert();
-  });
+  renderConvertOptionLabels();
 
   document.getElementById("artDitherToggle").addEventListener("change", (e) => {
     settings.dither = e.target.checked;
@@ -94,6 +83,22 @@ function initArtConverter(){
   });
 
   document.getElementById("artUseInEditorBtn").addEventListener("click", useResultInEditor);
+}
+
+// T()に依存するラベルのみ再描画（言語切替時にも呼び直す）
+function renderConvertOptionLabels(){
+  renderOptionGroup("artConvertFitOptions", FIT_MODES.map(f => ({ id: f.id, label: T(f.labelKey, f.labelFallback) })), settings.fitMode, (v) => {
+    settings.fitMode = v;
+    scheduleConvert();
+  });
+  renderOptionGroup("artConvertEdgeOptions", EDGE_LEVELS.map(e => ({ id: e.id, label: T(e.labelKey, e.labelFallback) })), settings.edge, (v) => {
+    settings.edge = v;
+    scheduleConvert();
+  });
+  renderOptionGroup("artConvertBgOptions", BG_MODES.map(b => ({ id: b.id, label: T(b.labelKey, b.labelFallback) })), settings.background, (v) => {
+    settings.background = v;
+    scheduleConvert();
+  });
 }
 
 function renderOptionGroup(containerId, options, currentValue, onSelect){
@@ -424,5 +429,10 @@ function useResultInEditor(){
   }));
   location.href = "art-create.html";
 }
+
+// 言語切替時に動的コンテンツ（i18n読み込み前に描画されたUI）を再描画
+document.addEventListener("langchange", () => {
+  renderConvertOptionLabels();
+});
 
 initArtConverter();
