@@ -371,11 +371,17 @@ function formatDate(str){
 }
 
 // カテゴリ内の動画を新しい順に並べたリストを返す
+// ※同じ日付でも実際の発生開始時刻（メモから読み取り）が新しいものを上に表示する
+//   （例：流星雨の同日「18:00~24:00」と「24:00~30:00」なら後者が上）
 function getSortedList(cat){
   return (typeof videoData !== "undefined" ? videoData : [])
     .filter(v => v.category === cat)
     .slice()
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => {
+      const sa = computeEventEnd(a)?.start ?? 0;
+      const sb = computeEventEnd(b)?.start ?? 0;
+      return sb - sa;
+    });
 }
 
 function idOf(v, i){
