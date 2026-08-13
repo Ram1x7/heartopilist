@@ -16,6 +16,7 @@ https://ram1x7.github.io/heartopilist/
 | 商店（`shop.html`） | シーズン限定アイテムの購入状況トラッキング |
 | コード（`codes.html`） | 有効なギフトコード一覧 |
 | イベント（`events.html`） | 開催中・開催予定のイベント／ガチャ情報 |
+| 場所動画（`videos.html`） | ピンクバブル・虹の日・流星雨の発生記録動画 |
 | Q&A（`faq.html`） | よくある質問・要望・不具合の対応状況 |
 
 ## 主な機能
@@ -74,6 +75,12 @@ https://ram1x7.github.io/heartopilist/
 - 開催中・開催予定のガチャ／イベント情報
 - 開催期間・アイテム交換期限の表示
 
+### 場所動画
+- ピンクバブル（毎週）・虹の日（不定期）・流星雨（不定期）の発生記録動画をカテゴリごとにまとめて視聴
+- カテゴリタブ切り替え、日付をタップすると動画がその場で展開再生
+- 直近発生したものは自動的に展開表示（流星雨は発生から24時間以内、虹の日は6時間以内、ピンクバブルはその週の間）
+- 図鑑ページの「今日やることリスト」から、該当カテゴリへワンタップで移動可能
+
 ### Q&A
 - 質問・要望・不具合の対応状況を一覧表示（対応済み／対応中／検討中／対応見送り）
 - 匿名フォームからの問い合わせ受付
@@ -111,7 +118,7 @@ https://ram1x7.github.io/heartopilist/
 ```
 heartopilist/
 ├── index.html / foods.html / garden.html / pet.html / shop.html
-├── codes.html / events.html / faq.html
+├── codes.html / events.html / videos.html / faq.html
 ├── js/
 │   ├── data-*.js          … 各ページのデータ定義
 │   ├── main.js             … 図鑑ページのロジック
@@ -163,6 +170,7 @@ https://ram1x7.github.io/heartopilist/
 | Shop (`shop.html`) | Seasonal trend shop purchase tracking |
 | Codes (`codes.html`) | List of active gift codes |
 | Events (`events.html`) | Ongoing and upcoming events/gacha info |
+| Location Videos (`videos.html`) | Pink Bubble / Rainbow Day / Meteor Shower footage archive |
 | Q&A (`faq.html`) | FAQ, feature requests, and bug status |
 
 ## Features
@@ -220,6 +228,12 @@ https://ram1x7.github.io/heartopilist/
 ### Events
 - Ongoing and upcoming gacha/event info
 - Event duration and item exchange deadlines
+
+### Location Videos
+- Watch footage of Pink Bubble (weekly), Rainbow Day (irregular), and Meteor Shower (irregular) occurrences, grouped by category
+- Switch categories with tabs; tap a date to expand and play the video in place
+- The most recent occurrence auto-expands (Meteor Shower within 24 hours of starting, Rainbow Day within 6 hours, Pink Bubble for the rest of its week)
+- One tap from the Encyclopedia page's daily to-do dashboard jumps straight to the relevant category
 
 ### Q&A
 - Status tracking for questions, feature requests, and bug reports
