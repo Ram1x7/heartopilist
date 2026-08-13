@@ -433,5 +433,8 @@
   "art_convert_fit_label": "配置方法",
   "art_fit_crop": "Crop",
   "art_fit_fit": "Fit",
-  "art_fit_fill": "Fill"
+  "art_fit_fill": "Fill",
+  "art_convert_fit_bg_label": "余白の色",
+  "art_fit_bg_transparent": "透明",
+  "art_fit_bg_custom": "色を指定"
 }

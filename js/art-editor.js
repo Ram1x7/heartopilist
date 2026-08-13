@@ -19,12 +19,14 @@ const MAX_HISTORY = 50;
 
 // キャンバスプリセット。Heartopia専用の実サイズは確認できるまでnullのまま
 // （推測値は絶対に入れない）。自由サイズのみユーザーが任意のwidth/heightを指定できる。
+// width/height/maxColorsがnullのプリセットは実際のゲーム内仕様が未確認のため、
+// 推測値を入れずプレースホルダーのまま残している（確認でき次第、値を登録するだけで対応可能な構造）
 const CANVAS_PRESETS = {
-  freeSize: { id: "free-size", nameKey: "art_preset_free_size", nameFallback: "自由サイズ", width: 32, height: 32, blockSize: 10, confirmed: true },
-  heartopiaClothing: { id: "heartopia-clothing", nameKey: "art_preset_clothing", nameFallback: "服・衣類", width: null, height: null, blockSize: 10, confirmed: false },
-  heartopiaCanvas: { id: "heartopia-canvas", nameKey: "art_preset_canvas", nameFallback: "キャンバス", width: null, height: null, blockSize: 10, confirmed: false },
-  heartopiaSign: { id: "heartopia-sign", nameKey: "art_preset_sign", nameFallback: "看板", width: null, height: null, blockSize: 10, confirmed: false },
-  heartopiaFurniture: { id: "heartopia-furniture", nameKey: "art_preset_furniture", nameFallback: "家具・装飾", width: null, height: null, blockSize: 10, confirmed: false },
+  freeSize: { id: "free-size", nameKey: "art_preset_free_size", nameFallback: "自由サイズ", width: 32, height: 32, blockSize: 10, maxColors: null, confirmed: true },
+  heartopiaClothing: { id: "heartopia-clothing", nameKey: "art_preset_clothing", nameFallback: "服・衣類", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
+  heartopiaCanvas: { id: "heartopia-canvas", nameKey: "art_preset_canvas", nameFallback: "キャンバス", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
+  heartopiaSign: { id: "heartopia-sign", nameKey: "art_preset_sign", nameFallback: "看板", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
+  heartopiaFurniture: { id: "heartopia-furniture", nameKey: "art_preset_furniture", nameFallback: "家具・装飾", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
 };
 
 const BLOCK_SIZE = 10;

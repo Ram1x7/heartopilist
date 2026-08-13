@@ -409,5 +409,8 @@
   "art_convert_fit_label": "放置方式",
   "art_fit_crop": "Crop",
   "art_fit_fit": "Fit",
-  "art_fit_fill": "Fill"
+  "art_fit_fill": "Fill",
+  "art_convert_fit_bg_label": "边距颜色",
+  "art_fit_bg_transparent": "透明",
+  "art_fit_bg_custom": "自定义颜色"
 }

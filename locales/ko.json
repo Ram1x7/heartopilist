@@ -409,5 +409,8 @@
   "art_convert_fit_label": "배치 방법",
   "art_fit_crop": "Crop",
   "art_fit_fit": "Fit",
-  "art_fit_fill": "Fill"
+  "art_fit_fill": "Fill",
+  "art_convert_fit_bg_label": "여백 색상",
+  "art_fit_bg_transparent": "투명",
+  "art_fit_bg_custom": "색상 지정"
 }

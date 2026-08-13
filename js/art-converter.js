@@ -22,12 +22,18 @@ const FIT_MODES = [
   { id: "fit", labelKey: "art_fit_fit", labelFallback: "Fit" },
   { id: "fill", labelKey: "art_fit_fill", labelFallback: "Fill" },
 ];
+const FIT_BG_MODES = [
+  { id: "transparent", labelKey: "art_fit_bg_transparent", labelFallback: "透明" },
+  { id: "custom", labelKey: "art_fit_bg_custom", labelFallback: "色を指定" },
+];
 
 let sourceImage = null;
 let settings = {
   width: 32,
   height: 32,
   fitMode: "fill",
+  fitBgMode: "transparent",
+  fitBgColor: "#ffffff",
   colors: 16,
   dither: false,
   edge: "off",
@@ -62,6 +68,12 @@ function initArtConverter(){
     scheduleConvert();
   });
   renderConvertOptionLabels();
+  updateFitBgRowVisibility();
+
+  document.getElementById("artConvertFitBgColor").addEventListener("input", (e) => {
+    settings.fitBgColor = e.target.value;
+    scheduleConvert();
+  });
 
   document.getElementById("artDitherToggle").addEventListener("change", (e) => {
     settings.dither = e.target.checked;
@@ -89,6 +101,12 @@ function initArtConverter(){
 function renderConvertOptionLabels(){
   renderOptionGroup("artConvertFitOptions", FIT_MODES.map(f => ({ id: f.id, label: T(f.labelKey, f.labelFallback) })), settings.fitMode, (v) => {
     settings.fitMode = v;
+    updateFitBgRowVisibility();
+    scheduleConvert();
+  });
+  renderOptionGroup("artConvertFitBgOptions", FIT_BG_MODES.map(b => ({ id: b.id, label: T(b.labelKey, b.labelFallback) })), settings.fitBgMode, (v) => {
+    settings.fitBgMode = v;
+    updateFitBgRowVisibility();
     scheduleConvert();
   });
   renderOptionGroup("artConvertEdgeOptions", EDGE_LEVELS.map(e => ({ id: e.id, label: T(e.labelKey, e.labelFallback) })), settings.edge, (v) => {
@@ -99,6 +117,12 @@ function renderConvertOptionLabels(){
     settings.background = v;
     scheduleConvert();
   });
+}
+
+// Fitモード選択時のみ余白色の設定行を表示し、「色を指定」選択時のみカラーピッカーを表示
+function updateFitBgRowVisibility(){
+  document.getElementById("artConvertFitBgRow").style.display = settings.fitMode === "fit" ? "block" : "none";
+  document.getElementById("artConvertFitBgColorWrap").style.display = settings.fitBgMode === "custom" ? "flex" : "none";
 }
 
 function renderOptionGroup(containerId, options, currentValue, onSelect){
@@ -153,7 +177,11 @@ function convert(){
   const octx = off.getContext("2d");
 
   if(settings.fitMode === "fit"){
-    // 画像全体を表示（コンテイン）。はみ出す部分の余白は透明のまま残す
+    // 画像全体を表示（コンテイン）。余白は透明のまま、または指定色で塗りつぶす
+    if(settings.fitBgMode === "custom"){
+      octx.fillStyle = settings.fitBgColor;
+      octx.fillRect(0, 0, w, h);
+    }
     const scale = Math.min(w / sourceImage.naturalWidth, h / sourceImage.naturalHeight);
     const dw = sourceImage.naturalWidth * scale, dh = sourceImage.naturalHeight * scale;
     const dx = (w - dw) / 2, dy = (h - dh) / 2;

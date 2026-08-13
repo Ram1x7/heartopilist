@@ -433,5 +433,8 @@
   "art_convert_fit_label": "Placement",
   "art_fit_crop": "Crop",
   "art_fit_fit": "Fit",
-  "art_fit_fill": "Fill"
+  "art_fit_fill": "Fill",
+  "art_convert_fit_bg_label": "Margin color",
+  "art_fit_bg_transparent": "Transparent",
+  "art_fit_bg_custom": "Custom color"
 }
