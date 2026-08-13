@@ -368,7 +368,7 @@ body.dark .art-usage-empty{
   color:#b3a89a;
 }
 
-/* キャンバスサイズ選択モーダル */
+/* キャンバスサイズ選択（モーダル・変換パネル共通） */
 .art-gridsize-options{
   display:flex;
   flex-wrap:wrap;
@@ -376,6 +376,205 @@ body.dark .art-usage-empty{
   margin-top:14px;
 }
 
+.art-panel-section .art-gridsize-options{
+  margin-top:0;
+}
+
 .art-gridsize-options button{
   flex:1 1 40%;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 10px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.art-gridsize-options button.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .art-gridsize-options button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-gridsize-options button.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* ヘッダーアクション（画像から作る／エディターに戻る） */
+.art-header-actions{
+  margin:-6px 0 14px;
+}
+
+.art-header-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 16px;
+  border-radius:999px;
+  border:1px solid var(--indigo);
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+body.dark .art-header-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.art-back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-bottom:14px;
+  font-size:12px;
+  color:var(--text-sub);
+  text-decoration:none;
+}
+
+body.dark .art-back-link{
+  color:#b3a89a;
+}
+
+.art-back-icon{
+  transform:rotate(90deg);
+}
+
+/* 画像から作るページ */
+.art-convert-layout{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.art-convert-upload{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  padding:36px 16px;
+  background:var(--card);
+  border:1px dashed var(--border);
+  border-radius:16px;
+  text-align:center;
+}
+
+body.dark .art-convert-upload{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.art-upload-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:11px 20px;
+  border-radius:999px;
+  border:1px solid var(--indigo);
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-upload-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.art-upload-hint{
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+body.dark .art-upload-hint{
+  color:#b3a89a;
+}
+
+.art-preview-pair{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.art-preview-box{
+  flex:1 1 140px;
+  min-width:0;
+}
+
+.art-preview-label{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+body.dark .art-preview-label{
+  color:#b3a89a;
+}
+
+.art-preview-frame{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .art-preview-frame{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.art-preview-frame img{
+  max-width:100%;
+  max-height:220px;
+  border-radius:8px;
+  display:block;
+}
+
+.art-preview-frame canvas{
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+}
+
+.art-use-btn{
+  width:100%;
+  justify-content:center;
+  margin-top:4px;
+}
+
+.art-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--text);
+  cursor:pointer;
+}
+
+body.dark .art-toggle-row{
+  color:#ece4d4;
 }

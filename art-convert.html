@@ -9,27 +9,28 @@
 <link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#3c5a6e">
-<title data-i18n="page_title_art">アート｜はとぴ図鑑</title>
-<meta name="description" data-i18n-content="meta_description_art" content="Heartopia（ハートピアスローライフ）向けのドット絵デザインを、ブラウザ上で作成・保存できるお絵かきツールです。">
+<title data-i18n="page_title_art_convert">画像から作る｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_art_convert" content="Heartopia（ハートピアスローライフ）向けに、画像をブラウザ上でドット絵に変換できるツールです。">
 
 <!-- OGP -->
-<meta property="og:title" content="はとぴ図鑑 | アート">
-<meta property="og:description" content="Heartopia向けのドット絵デザインをブラウザ上で作成・保存できます。">
+<meta property="og:title" content="はとぴ図鑑 | 画像から作る">
+<meta property="og:description" content="画像をブラウザ上でドット絵に変換できます。">
 <meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
-<meta property="og:url" content="https://ram1x7.github.io/heartopilist/art-create.html">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/art-convert.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="はとぴ図鑑">
 
 <!-- X(Twitter) -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="はとぴ図鑑 | アート">
-<meta name="twitter:description" content="Heartopia向けのドット絵デザインをブラウザ上で作成・保存できます。">
+<meta name="twitter:title" content="はとぴ図鑑 | 画像から作る">
+<meta name="twitter:description" content="画像をブラウザ上でドット絵に変換できます。">
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
 <link rel="stylesheet" href="./css/art.css?v=3">
 
+<link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -72,43 +73,77 @@
 </nav>
 
 <div class="page-header">
-  <h2 data-i18n="art_page_title">アート</h2>
-  <p data-i18n="art_page_subtitle">ドット絵デザインをブラウザで作成・保存</p>
-</div>
-
-<div class="art-header-actions">
-  <a href="./art-convert.html" class="art-header-btn">
-    <span id="artConvertIcon"></span>
-    <span data-i18n="art_from_image">画像から作る</span>
-  </a>
+  <h2 data-i18n="art_convert_page_title">画像から作る</h2>
+  <p data-i18n="art_convert_page_subtitle">画像をアップロードしてドット絵に変換します</p>
 </div>
 
 <div class="art-notice" data-i18n="art_coming_soon">
   現在開発中の機能です。今後のアップデートで順次使えるようになります。
 </div>
 
-<div class="art-layout">
-  <div class="art-toolbar" id="artToolbar"></div>
-  <div class="art-canvas-area">
-    <canvas id="artCanvas" width="320" height="320"></canvas>
+<a href="./art-create.html" class="art-back-link">
+  <span id="artBackIcon"></span>
+  <span data-i18n="art_back_to_editor">エディターに戻る</span>
+</a>
+
+<div class="art-convert-layout">
+  <div class="art-convert-upload" id="artUploadArea">
+    <input type="file" id="artFileInput" accept="image/jpeg,image/png,image/webp" hidden>
+    <button class="art-upload-btn" id="artUploadBtn">
+      <span id="artUploadIcon"></span>
+      <span data-i18n="art_choose_image">画像を選ぶ</span>
+    </button>
+    <p class="art-upload-hint" data-i18n="art_upload_hint">JPG・PNG・WebPに対応</p>
   </div>
-  <div class="art-panel" id="artPanel">
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_zoom_label">拡大率</div>
-      <div class="art-zoom-controls" id="artZoomControls"></div>
-    </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_palette_label">カラー</div>
-      <div class="art-palette" id="artPalette"></div>
-      <div class="art-custom-color">
-        <input type="color" id="artColorPicker" value="#b1503b">
-        <input type="text" id="artHexInput" placeholder="#RRGGBB" maxlength="7">
-        <button id="artAddColorBtn" data-i18n="art_add_color">追加</button>
+
+  <div class="art-convert-preview" id="artConvertPreview" style="display:none;">
+    <div class="art-preview-pair">
+      <div class="art-preview-box">
+        <div class="art-preview-label" data-i18n="art_original_label">元画像</div>
+        <div class="art-preview-frame">
+          <img id="artOriginalImg" alt="">
+        </div>
+      </div>
+      <div class="art-preview-box">
+        <div class="art-preview-label" data-i18n="art_result_label">ドット絵</div>
+        <div class="art-preview-frame">
+          <canvas id="artResultCanvas"></canvas>
+        </div>
       </div>
     </div>
+    <button class="art-header-btn art-use-btn" id="artUseInEditorBtn" data-i18n="art_use_in_editor">エディターで編集する</button>
+  </div>
+
+  <div class="art-panel" id="artConvertPanel" style="display:none;">
     <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
-      <div class="art-color-usage" id="artColorUsage"></div>
+      <div class="art-panel-title" data-i18n="art_convert_size_label">キャンバスサイズ</div>
+      <div class="art-gridsize-options" id="artConvertSizeOptions"></div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_colors_label">色数</div>
+      <div class="art-gridsize-options" id="artConvertColorOptions"></div>
+    </div>
+    <div class="art-panel-section">
+      <label class="art-toggle-row">
+        <span data-i18n="art_convert_dither_label">ディザリング</span>
+        <input type="checkbox" id="artDitherToggle">
+      </label>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_edge_label">輪郭強調</div>
+      <div class="art-gridsize-options" id="artConvertEdgeOptions"></div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_brightness_label">明るさ</div>
+      <input type="range" id="artBrightnessRange" min="-100" max="100" value="0">
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_contrast_label">コントラスト</div>
+      <input type="range" id="artContrastRange" min="-100" max="100" value="0">
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_bg_label">背景</div>
+      <div class="art-gridsize-options" id="artConvertBgOptions"></div>
     </div>
   </div>
 </div>
@@ -117,18 +152,12 @@
   ※本サイトは非公式のファンツールです
 </div>
 
-<div id="gridSizeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
-  <div class="modal-box">
-    <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
-    <div class="art-gridsize-options" id="artGridSizeOptions"></div>
-  </div>
-</div>
-
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script>
 
-document.getElementById("artConvertIcon").innerHTML = icon("upload", { size: 15 });
+document.getElementById("artBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("artUploadIcon").innerHTML = icon("upload", { size: 18 });
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");
@@ -140,10 +169,7 @@ if(savedDark === "true"){
     document.body.classList.add("dark");
   }
 }
-// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
 document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
-
-// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
 if(document.body.classList.contains("dark")) forceRepaint();
 
 function updateDarkBtn(){
@@ -157,17 +183,15 @@ darkToggle.onclick = ()=>{
   localStorage.setItem("darkMode", document.body.classList.contains("dark"));
   updateDarkBtn();
   forceRepaint();
-  if(typeof renderCanvas === "function") renderCanvas();
+  if(typeof renderResultPreview === "function" && typeof sourceImage !== "undefined" && sourceImage) convert();
 };
 
 function forceRepaint(){
-  // Safari/iPad再描画バグ対策
   document.body.style.display = "none";
   document.body.offsetHeight;
   document.body.style.display = "";
 }
 
-// 多言語ヘルパー
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
     return window.i18n.t(key, vars);
@@ -176,7 +200,7 @@ function T(key, fallback, vars){
 }
 
 </script>
-<script src="js/art-editor.js"></script>
+<script src="js/art-converter.js"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
