@@ -394,5 +394,10 @@
   "art_size_frame_label": "设计框",
   "art_frame_mydesign": "我的设计（正方形）",
   "art_frame_clothing": "服装（上衣）",
-  "art_frame_unconfirmed": "确认实际游戏内尺寸后将支持"
+  "art_frame_unconfirmed": "确认实际游戏内尺寸后将支持",
+  "art_convert_preset_label": "转换方式",
+  "art_preset_standard": "标准",
+  "art_preset_smooth": "柔和",
+  "art_preset_crisp": "锐利",
+  "art_convert_noise_label": "降噪"
 }

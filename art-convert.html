@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=7">
+<link rel="stylesheet" href="./css/art.css?v=8">
 
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./index.html">
@@ -123,6 +123,10 @@
       <div class="art-gridsize-options" id="artConvertFramePresetOptions"></div>
     </div>
     <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_preset_label">変換方式</div>
+      <div class="art-preset-preview-row" id="artConvertPresetOptions"></div>
+    </div>
+    <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_convert_fit_label">配置方法</div>
       <div class="art-gridsize-options" id="artConvertFitOptions"></div>
     </div>
@@ -154,6 +158,10 @@
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_convert_contrast_label">コントラスト</div>
       <input type="range" id="artContrastRange" min="-100" max="100" value="0">
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_convert_noise_label">ノイズ除去</div>
+      <input type="range" id="artNoiseRange" min="0" max="100" value="0">
     </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_convert_bg_label">背景</div>

@@ -418,5 +418,10 @@
   "art_size_frame_label": "デザイン枠",
   "art_frame_mydesign": "マイデザイン（正方形）",
   "art_frame_clothing": "衣装（服）",
-  "art_frame_unconfirmed": "実際のゲーム内サイズを確認後に対応予定です"
+  "art_frame_unconfirmed": "実際のゲーム内サイズを確認後に対応予定です",
+  "art_convert_preset_label": "変換方式",
+  "art_preset_standard": "標準",
+  "art_preset_smooth": "なめらか",
+  "art_preset_crisp": "くっきり",
+  "art_convert_noise_label": "ノイズ除去"
 }

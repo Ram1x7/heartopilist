@@ -394,5 +394,10 @@
   "art_size_frame_label": "กรอบดีไซน์",
   "art_frame_mydesign": "ดีไซน์ของฉัน (สี่เหลี่ยมจัตุรัส)",
   "art_frame_clothing": "เสื้อผ้า (เสื้อ)",
-  "art_frame_unconfirmed": "จะรองรับหลังยืนยันขนาดจริงในเกม"
+  "art_frame_unconfirmed": "จะรองรับหลังยืนยันขนาดจริงในเกม",
+  "art_convert_preset_label": "รูปแบบการแปลง",
+  "art_preset_standard": "มาตรฐาน",
+  "art_preset_smooth": "นุ่มนวล",
+  "art_preset_crisp": "คมชัด",
+  "art_convert_noise_label": "ลดสัญญาณรบกวน"
 }

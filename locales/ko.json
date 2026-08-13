@@ -394,5 +394,10 @@
   "art_size_frame_label": "디자인 프레임",
   "art_frame_mydesign": "마이 디자인(정사각형)",
   "art_frame_clothing": "의상(상의)",
-  "art_frame_unconfirmed": "실제 게임 내 크기를 확인한 후 지원할 예정입니다"
+  "art_frame_unconfirmed": "실제 게임 내 크기를 확인한 후 지원할 예정입니다",
+  "art_convert_preset_label": "변환 방식",
+  "art_preset_standard": "표준",
+  "art_preset_smooth": "부드럽게",
+  "art_preset_crisp": "선명하게",
+  "art_convert_noise_label": "노이즈 제거"
 }

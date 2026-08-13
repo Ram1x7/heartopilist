@@ -25,6 +25,13 @@ const FIT_BG_MODES = [
   { id: "transparent", labelKey: "art_fit_bg_transparent", labelFallback: "透明" },
   { id: "custom", labelKey: "art_fit_bg_custom", labelFallback: "色を指定" },
 ];
+// 変換方式プリセット。それぞれディザリング・輪郭強調の初期値を切り替える早見表で、
+// 選択後も個別のスライダー・ボタンで微調整できる（手動で変えるとpresetはnullになる）
+const CONVERT_PRESETS = [
+  { id: "standard", labelKey: "art_preset_standard", labelFallback: "標準", overrides: { dither: false, edge: "off" } },
+  { id: "smooth", labelKey: "art_preset_smooth", labelFallback: "なめらか", overrides: { dither: true, edge: "off" } },
+  { id: "crisp", labelKey: "art_preset_crisp", labelFallback: "くっきり", overrides: { dither: false, edge: "mid" } },
+];
 
 let sourceImage = null;
 let settings = {
@@ -33,11 +40,13 @@ let settings = {
   fitMode: "fill",
   fitBgMode: "transparent",
   fitBgColor: "#ffffff",
+  preset: "standard",
   colors: 16,
   dither: false,
   edge: "off",
   brightness: 0,
   contrast: 0,
+  noiseReduction: 0,
   background: "keep",
 };
 let resultPixels = null;
@@ -61,6 +70,7 @@ function initArtConverter(){
 
   document.getElementById("artDitherToggle").addEventListener("change", (e) => {
     settings.dither = e.target.checked;
+    settings.preset = null;
     scheduleConvert();
   });
   document.getElementById("artBrightnessRange").addEventListener("input", (e) => {
@@ -69,6 +79,10 @@ function initArtConverter(){
   });
   document.getElementById("artContrastRange").addEventListener("input", (e) => {
     settings.contrast = Number(e.target.value);
+    scheduleConvert();
+  });
+  document.getElementById("artNoiseRange").addEventListener("input", (e) => {
+    settings.noiseReduction = Number(e.target.value);
     scheduleConvert();
   });
 
@@ -115,6 +129,7 @@ function renderConvertOptionLabels(){
   });
   renderOptionGroup("artConvertEdgeOptions", EDGE_LEVELS.map(e => ({ id: e.id, label: T(e.labelKey, e.labelFallback) })), settings.edge, (v) => {
     settings.edge = v;
+    settings.preset = null;
     scheduleConvert();
   });
   renderOptionGroup("artConvertBgOptions", BG_MODES.map(b => ({ id: b.id, label: T(b.labelKey, b.labelFallback) })), settings.background, (v) => {
@@ -171,19 +186,21 @@ function scheduleConvert(){
 }
 
 // ── 変換処理 ──
-function convert(){
-  if(!sourceImage) return;
-  const w = settings.width, h = settings.height;
+// 指定された設定値だけをもとにピクセル配列を計算する純粋関数（グローバル状態は変更しない）。
+// 変換方式プレビューのサムネイル生成でも同じ処理を使い回すためのもの。
+function computePixelsForSettings(s){
+  if(!sourceImage) return null;
+  const w = s.width, h = s.height;
 
   const off = document.createElement("canvas");
   off.width = w;
   off.height = h;
   const octx = off.getContext("2d");
 
-  if(settings.fitMode === "fit"){
+  if(s.fitMode === "fit"){
     // 画像全体を表示（コンテイン）。余白は透明のまま、または指定色で塗りつぶす
-    if(settings.fitBgMode === "custom"){
-      octx.fillStyle = settings.fitBgColor;
+    if(s.fitBgMode === "custom"){
+      octx.fillStyle = s.fitBgColor;
       octx.fillRect(0, 0, w, h);
     }
     const scale = Math.min(w / sourceImage.naturalWidth, h / sourceImage.naturalHeight);
@@ -197,22 +214,72 @@ function convert(){
   }
 
   const imgData = octx.getImageData(0, 0, w, h);
-  applyBrightnessContrast(imgData, settings.brightness, settings.contrast);
-  if(settings.edge !== "off") applyEdgeEnhance(imgData, settings.edge);
+  applyBrightnessContrast(imgData, s.brightness, s.contrast);
+  if(s.noiseReduction > 0) applyNoiseReduction(imgData, s.noiseReduction);
+  if(s.edge !== "off") applyEdgeEnhance(imgData, s.edge);
 
-  const bgMask = computeBackgroundMask(imgData, settings.background);
+  const bgMask = computeBackgroundMask(imgData, s.background);
   // Fitモードで生じる透明な余白は、背景設定に関わらず常に透明のまま扱う
   const d = imgData.data;
   for(let i = 0; i < bgMask.length; i++){
     if(d[i * 4 + 3] < 128) bgMask[i] = true;
   }
 
-  const palette = buildPalette(imgData, settings.colors, bgMask);
-  resultPixels = settings.dither
+  const palette = buildPalette(imgData, s.colors, bgMask);
+  return s.dither
     ? ditherToPalette(imgData, palette, bgMask)
     : mapToPalette(imgData, palette, bgMask);
+}
 
+function convert(){
+  if(!sourceImage) return;
+  resultPixels = computePixelsForSettings(settings);
   renderResultPreview();
+  renderPresetPreviews();
+}
+
+// 変換方式プレビュー（標準／なめらか／くっきり）のサムネイルを描画
+function renderPresetPreviews(){
+  const el = document.getElementById("artConvertPresetOptions");
+  if(!el || !sourceImage) return;
+  el.innerHTML = CONVERT_PRESETS.map(p => `
+    <button class="art-preset-preview-btn${settings.preset === p.id ? " active" : ""}" data-preset="${p.id}">
+      <canvas class="art-preset-preview-canvas" id="artPresetPreview_${p.id}"></canvas>
+      <span>${T(p.labelKey, p.labelFallback)}</span>
+    </button>
+  `).join("");
+  CONVERT_PRESETS.forEach(p => {
+    const pixels = computePixelsForSettings({ ...settings, ...p.overrides });
+    drawPixelsToCanvas(document.getElementById(`artPresetPreview_${p.id}`), pixels, settings.width, settings.height, 64);
+  });
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const preset = CONVERT_PRESETS.find(p => p.id === btn.dataset.preset);
+      Object.assign(settings, preset.overrides);
+      settings.preset = preset.id;
+      document.getElementById("artDitherToggle").checked = settings.dither;
+      renderConvertOptionLabels();
+      convert();
+    });
+  });
+}
+
+function drawPixelsToCanvas(canvas, pixels, w, h, maxBox){
+  if(!canvas) return;
+  const cell = Math.max(1, Math.floor(maxBox / Math.max(w, h)));
+  canvas.width = w * cell;
+  canvas.height = h * cell;
+  const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled = false;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const c = pixels[y * w + x];
+      if(c){
+        ctx.fillStyle = c;
+        ctx.fillRect(x * cell, y * cell, cell, cell);
+      }
+    }
+  }
 }
 
 // 中央基準でキャンバス比率(targetW:targetH)に合わせてクロップする範囲を求める（cover fit）
@@ -264,6 +331,33 @@ function applyEdgeEnhance(imgData, level){
         const idx = (y * w + x) * 4 + ch;
         const sharpened = sum < 0 ? 0 : sum > 255 ? 255 : sum;
         d[idx] = src[idx] * (1 - amount) + sharpened * amount;
+      }
+    }
+  }
+}
+
+// ノイズ除去（3×3メディアンフィルタをstrengthの割合だけ元画像とブレンド）
+function applyNoiseReduction(imgData, strength){
+  const amount = strength / 100;
+  if(amount <= 0) return;
+  const w = imgData.width, h = imgData.height;
+  const src = new Uint8ClampedArray(imgData.data);
+  const d = imgData.data;
+  const win = new Array(9);
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      for(let ch = 0; ch < 3; ch++){
+        let wi = 0;
+        for(let ky = -1; ky <= 1; ky++){
+          for(let kx = -1; kx <= 1; kx++){
+            const sx = Math.min(w - 1, Math.max(0, x + kx));
+            const sy = Math.min(h - 1, Math.max(0, y + ky));
+            win[wi++] = src[(sy * w + sx) * 4 + ch];
+          }
+        }
+        win.sort((a, b) => a - b);
+        const idx = (y * w + x) * 4 + ch;
+        d[idx] = src[idx] * (1 - amount) + win[4] * amount;
       }
     }
   }
@@ -427,23 +521,8 @@ function ditherToPalette(imgData, palette, bgMask){
 
 // ── 結果プレビュー ──
 function renderResultPreview(){
-  const w = settings.width, h = settings.height;
   const canvas = document.getElementById("artResultCanvas");
-  const cell = Math.max(2, Math.floor(320 / Math.max(w, h)));
-  canvas.width = w * cell;
-  canvas.height = h * cell;
-  const ctx = canvas.getContext("2d");
-  ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for(let y = 0; y < h; y++){
-    for(let x = 0; x < w; x++){
-      const c = resultPixels[y * w + x];
-      if(c){
-        ctx.fillStyle = c;
-        ctx.fillRect(x * cell, y * cell, cell, cell);
-      }
-    }
-  }
+  drawPixelsToCanvas(canvas, resultPixels, settings.width, settings.height, 320);
 }
 
 // ── エディターへ渡す ──
@@ -466,6 +545,7 @@ function useResultInEditor(){
 document.addEventListener("langchange", () => {
   renderConvertSizeOptions();
   renderConvertOptionLabels();
+  renderPresetPreviews();
 });
 
 initArtConverter();
