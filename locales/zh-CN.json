@@ -389,5 +389,9 @@
   "art_width_label": "宽度",
   "art_height_label": "高度",
   "art_ratio_label": "比例",
-  "art_create_canvas": "创建"
+  "art_create_canvas": "创建",
+  "art_display_label": "显示",
+  "art_show_color_numbers": "颜色编号",
+  "art_show_cell_numbers": "格子编号",
+  "art_block_mode": "10×10方块显示"
 }

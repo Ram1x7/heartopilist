@@ -389,5 +389,9 @@
   "art_width_label": "ความกว้าง",
   "art_height_label": "ความสูง",
   "art_ratio_label": "อัตราส่วน",
-  "art_create_canvas": "สร้าง"
+  "art_create_canvas": "สร้าง",
+  "art_display_label": "การแสดงผล",
+  "art_show_color_numbers": "หมายเลขสี",
+  "art_show_cell_numbers": "หมายเลขช่อง",
+  "art_block_mode": "มุมมองบล็อก 10×10"
 }

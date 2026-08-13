@@ -389,5 +389,9 @@
   "art_width_label": "너비",
   "art_height_label": "높이",
   "art_ratio_label": "비율",
-  "art_create_canvas": "만들기"
+  "art_create_canvas": "만들기",
+  "art_display_label": "표시",
+  "art_show_color_numbers": "색상 번호",
+  "art_show_cell_numbers": "칸 번호",
+  "art_block_mode": "10×10 블록 보기"
 }

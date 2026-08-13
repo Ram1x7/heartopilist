@@ -389,5 +389,9 @@
   "art_width_label": "寬度",
   "art_height_label": "高度",
   "art_ratio_label": "比例",
-  "art_create_canvas": "建立"
+  "art_create_canvas": "建立",
+  "art_display_label": "顯示",
+  "art_show_color_numbers": "顏色編號",
+  "art_show_cell_numbers": "格子編號",
+  "art_block_mode": "10×10方塊顯示"
 }

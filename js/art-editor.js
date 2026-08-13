@@ -27,6 +27,8 @@ const CANVAS_PRESETS = {
   heartopiaFurniture: { id: "heartopia-furniture", nameKey: "art_preset_furniture", nameFallback: "家具・装飾", width: null, height: null, blockSize: 10, confirmed: false },
 };
 
+const BLOCK_SIZE = 10;
+
 let gridWidth = 32;
 let gridHeight = 32;
 let pixels = [];
@@ -40,6 +42,11 @@ let lastCell = null;
 let saveTimer = null;
 let undoStack = [];
 let redoStack = [];
+let colorNumberMap = {};
+let showColorNumbers = false;
+let showCellNumbers = false;
+let blockMode = false;
+let blockStatus = {};
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -57,6 +64,7 @@ function initArtEditor(){
     gridWidth = draft.width;
     gridHeight = draft.height;
     pixels = draft.pixelData.slice();
+    blockStatus = draft.blockStatus || {};
   }else{
     renderHeartopiaPresets();
     bindNewCanvasControls();
@@ -69,7 +77,27 @@ function initArtEditor(){
   renderPalette();
   renderCanvas();
   updateColorUsage();
+  renderBlockList();
   bindCanvasEvents();
+  bindDisplayToggles();
+}
+
+// ── 表示切替（色番号・マス番号・ブロック表示） ──
+function bindDisplayToggles(){
+  document.getElementById("artColorNumberToggle").addEventListener("change", (e) => {
+    showColorNumbers = e.target.checked;
+    renderCanvas();
+  });
+  document.getElementById("artCellNumberToggle").addEventListener("change", (e) => {
+    showCellNumbers = e.target.checked;
+    renderCanvas();
+  });
+  document.getElementById("artBlockModeToggle").addEventListener("change", (e) => {
+    blockMode = e.target.checked;
+    renderToolbar();
+    renderCanvas();
+    renderBlockList();
+  });
 }
 
 // ── 比率計算（最大公約数で簡約） ──
@@ -129,12 +157,14 @@ function createCanvas(w, h){
   gridWidth = w;
   gridHeight = h;
   pixels = new Array(w * h).fill(null);
+  blockStatus = {};
   undoStack = [];
   redoStack = [];
   document.getElementById("gridSizeModal").style.display = "none";
   renderCanvas();
   updateColorUsage();
   updateUndoRedoButtons();
+  renderBlockList();
   saveDraft();
 }
 
@@ -148,6 +178,7 @@ const TOOLS = [
 
 function renderToolbar(){
   const el = document.getElementById("artToolbar");
+  el.classList.toggle("art-toolbar-disabled", blockMode);
   const toolButtons = TOOLS.map(t => `
     <button class="art-tool-btn${currentTool === t.id ? " active" : ""}" onclick="setTool('${t.id}')" aria-label="${T(t.labelKey, t.labelFallback)}" aria-pressed="${currentTool === t.id}">
       ${icon(t.icon, { size: 18 })}
@@ -302,10 +333,13 @@ function updateColorUsage(){
   const counts = {};
   pixels.forEach(c => { if(c) counts[c] = (counts[c] || 0) + 1; });
   const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  colorNumberMap = {};
+  entries.forEach(([c], i) => { colorNumberMap[c] = String(i + 1).padStart(2, "0"); });
   const el = document.getElementById("artColorUsage");
   el.innerHTML = entries.length
     ? entries.map(([c, n]) => `
         <div class="art-usage-row${highlightedColor === c ? " active" : ""}" onclick="toggleHighlight('${c}')">
+          <span class="art-usage-number">${colorNumberMap[c]}</span>
           <span class="art-usage-swatch" style="background:${c}"></span>
           <span class="art-usage-count">${n}${T("art_unit_cells", "マス")}</span>
         </div>
@@ -363,6 +397,104 @@ function renderCanvas(){
       ctx.stroke();
     }
   }
+
+  if((showColorNumbers || showCellNumbers) && cell >= 12){
+    drawCellLabels(cell);
+  }
+
+  if(blockMode){
+    drawBlockOverlay(cell);
+  }
+}
+
+// ── 色番号・マス番号ラベル ──
+function drawCellLabels(cell){
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const fontSize = Math.max(6, Math.floor(cell * 0.38));
+  ctx.font = `${fontSize}px sans-serif`;
+  ctx.lineWidth = Math.max(1, fontSize * 0.22);
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const idx = y * gridWidth + x;
+      let label = "";
+      if(showCellNumbers){
+        label = String(idx + 1).padStart(3, "0");
+      }else if(showColorNumbers && pixels[idx]){
+        label = colorNumberMap[pixels[idx]] || "";
+      }
+      if(!label) continue;
+      const px = x * cell + cell / 2, py = y * cell + cell / 2;
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.strokeText(label, px, py);
+      ctx.fillStyle = "#1a1814";
+      ctx.fillText(label, px, py);
+    }
+  }
+}
+
+// ── 10×10ブロック表示（境界線・進捗状態の色分け・番号） ──
+function blockKey(bx, by){
+  return bx + "_" + by;
+}
+
+function drawBlockOverlay(cell){
+  const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
+  const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
+  const dark = document.body.classList.contains("dark");
+  const statusFill = {
+    1: dark ? "rgba(232,201,60,0.22)" : "rgba(232,201,60,0.28)",
+    2: dark ? "rgba(90,158,74,0.28)" : "rgba(90,158,74,0.26)",
+  };
+
+  for(let by = 0; by < blocksY; by++){
+    for(let bx = 0; bx < blocksX; bx++){
+      const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
+      const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
+      const px = bx * BLOCK_SIZE * cell, py = by * BLOCK_SIZE * cell;
+      const status = blockStatus[blockKey(bx, by)] || 0;
+      if(statusFill[status]){
+        ctx.fillStyle = statusFill[status];
+        ctx.fillRect(px, py, bw * cell, bh * cell);
+      }
+    }
+  }
+
+  ctx.strokeStyle = dark ? "rgba(232,201,60,0.9)" : "rgba(177,80,59,0.85)";
+  ctx.lineWidth = 2.5;
+  for(let bx = 0; bx <= blocksX; bx++){
+    const x = Math.min(bx * BLOCK_SIZE, gridWidth) * cell;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+  for(let by = 0; by <= blocksY; by++){
+    const y = Math.min(by * BLOCK_SIZE, gridHeight) * cell;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+
+  if(cell >= 8){
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    const fontSize = Math.max(9, Math.floor(cell * 0.7));
+    ctx.font = `bold ${fontSize}px sans-serif`;
+    ctx.lineWidth = Math.max(1, fontSize * 0.22);
+    for(let by = 0; by < blocksY; by++){
+      for(let bx = 0; bx < blocksX; bx++){
+        const num = by * blocksX + bx + 1;
+        const px = bx * BLOCK_SIZE * cell, py = by * BLOCK_SIZE * cell;
+        const label = String(num).padStart(2, "0");
+        ctx.strokeStyle = "rgba(0,0,0,0.7)";
+        ctx.strokeText(label, px + 3, py + 2);
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.fillText(label, px + 3, py + 2);
+      }
+    }
+  }
 }
 
 // ── ポインター操作（マウス・タッチ・Apple Pencil共通） ──
@@ -413,20 +545,27 @@ function floodFill(cx, cy, color){
 function bindCanvasEvents(){
   canvas.addEventListener("pointerdown", (e) => {
     canvas.setPointerCapture(e.pointerId);
-    isDrawing = true;
     const c = cellFromEvent(e);
-    if(c){
-      if(currentTool !== "eyedropper") pushHistory();
-      applyToolAt(c.cx, c.cy);
-      lastCell = c;
-      renderCanvas();
+    updateCoordReadout(c);
+    if(!c) return;
+
+    if(blockMode){
+      cycleBlockStatus(Math.floor(c.cx / BLOCK_SIZE), Math.floor(c.cy / BLOCK_SIZE));
+      return;
     }
+
+    isDrawing = true;
+    if(currentTool !== "eyedropper") pushHistory();
+    applyToolAt(c.cx, c.cy);
+    lastCell = c;
+    renderCanvas();
   });
 
   canvas.addEventListener("pointermove", (e) => {
-    if(!isDrawing) return;
-    if(currentTool !== "pen" && currentTool !== "eraser") return;
     const c = cellFromEvent(e);
+    updateCoordReadout(c);
+    if(!isDrawing || blockMode) return;
+    if(currentTool !== "pen" && currentTool !== "eraser") return;
     if(c && (!lastCell || c.cx !== lastCell.cx || c.cy !== lastCell.cy)){
       applyToolAt(c.cx, c.cy);
       lastCell = c;
@@ -443,7 +582,80 @@ function bindCanvasEvents(){
   };
   canvas.addEventListener("pointerup", finishStroke);
   canvas.addEventListener("pointercancel", finishStroke);
-  canvas.addEventListener("pointerleave", finishStroke);
+  canvas.addEventListener("pointerleave", (e) => {
+    finishStroke();
+    updateCoordReadout(null);
+  });
+}
+
+function updateCoordReadout(c){
+  const el = document.getElementById("artCoordReadout");
+  if(!el) return;
+  if(c){
+    el.textContent = `X: ${String(c.cx).padStart(2, "0")}  Y: ${String(c.cy).padStart(2, "0")}`;
+    el.style.display = "block";
+  }else{
+    el.style.display = "none";
+  }
+}
+
+// ── ブロック進捗の切り替え・一覧・拡大表示 ──
+function cycleBlockStatus(bx, by){
+  const key = blockKey(bx, by);
+  const cur = blockStatus[key] || 0;
+  const next = (cur + 1) % 3;
+  if(next === 0) delete blockStatus[key];
+  else blockStatus[key] = next;
+  renderCanvas();
+  renderBlockList();
+  saveDraftDebounced();
+}
+
+function renderBlockList(){
+  const el = document.getElementById("artBlockList");
+  if(!el) return;
+  if(!blockMode){
+    el.innerHTML = "";
+    return;
+  }
+  const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
+  const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
+  const statusIcon = { 0: "□", 1: "◐", 2: "✓" };
+  let html = "";
+  for(let by = 0; by < blocksY; by++){
+    for(let bx = 0; bx < blocksX; bx++){
+      const num = by * blocksX + bx + 1;
+      const status = blockStatus[blockKey(bx, by)] || 0;
+      html += `<button class="art-block-btn art-block-status-${status}" onclick="zoomToBlock(${bx},${by})">${statusIcon[status]} ${String(num).padStart(2, "0")}</button>`;
+    }
+  }
+  el.innerHTML = html;
+}
+
+function zoomToBlock(bx, by){
+  blockMode = false;
+  const toggle = document.getElementById("artBlockModeToggle");
+  if(toggle) toggle.checked = false;
+
+  const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
+  const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
+  const area = document.querySelector(".art-canvas-area");
+  const availW = Math.max(area.clientWidth - 32, 40);
+  const availH = Math.max(area.clientHeight - 32, 40);
+  const fitCell = Math.min(availW / bw, availH / bh);
+  const fitZoomRaw = (fitCell / BASE_CELL) * 100;
+  let best = ZOOM_LEVELS[0];
+  ZOOM_LEVELS.forEach(z => { if(z <= fitZoomRaw) best = z; });
+  zoom = best;
+
+  renderToolbar();
+  renderCanvas();
+  updateZoomLabel();
+  renderBlockList();
+
+  const cell = BASE_CELL * zoom / 100;
+  area.scrollLeft = Math.max(0, (bx * BLOCK_SIZE + bw / 2) * cell - area.clientWidth / 2);
+  area.scrollTop = Math.max(0, (by * BLOCK_SIZE + bh / 2) * cell - area.clientHeight / 2);
 }
 
 // ── 全消去 ──
@@ -459,7 +671,7 @@ function clearAll(){
 
 // ── 下書きの自動保存（単一スロット。複数下書き管理は次フェーズで対応） ──
 function saveDraft(){
-  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridWidth, height: gridHeight, pixelData: pixels }));
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridWidth, height: gridHeight, pixelData: pixels, blockStatus }));
 }
 
 function saveDraftDebounced(){

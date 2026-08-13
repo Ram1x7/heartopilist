@@ -413,5 +413,9 @@
   "art_width_label": "幅",
   "art_height_label": "高さ",
   "art_ratio_label": "比率",
-  "art_create_canvas": "作成"
+  "art_create_canvas": "作成",
+  "art_display_label": "表示",
+  "art_show_color_numbers": "色番号",
+  "art_show_cell_numbers": "マス番号",
+  "art_block_mode": "10×10ブロック表示"
 }

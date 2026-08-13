@@ -413,5 +413,9 @@
   "art_width_label": "Width",
   "art_height_label": "Height",
   "art_ratio_label": "Ratio",
-  "art_create_canvas": "Create"
+  "art_create_canvas": "Create",
+  "art_display_label": "Display",
+  "art_show_color_numbers": "Color numbers",
+  "art_show_cell_numbers": "Cell numbers",
+  "art_block_mode": "10×10 block view"
 }

@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=4">
+<link rel="stylesheet" href="./css/art.css?v=5">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -90,6 +90,7 @@
 <div class="art-layout">
   <div class="art-toolbar" id="artToolbar"></div>
   <div class="art-canvas-area">
+    <div class="art-coord-readout" id="artCoordReadout"></div>
     <canvas id="artCanvas" width="320" height="320"></canvas>
   </div>
   <div class="art-panel" id="artPanel">
@@ -109,6 +110,22 @@
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
       <div class="art-color-usage" id="artColorUsage"></div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_display_label">表示</div>
+      <label class="art-toggle-row">
+        <span data-i18n="art_show_color_numbers">色番号</span>
+        <input type="checkbox" id="artColorNumberToggle">
+      </label>
+      <label class="art-toggle-row">
+        <span data-i18n="art_show_cell_numbers">マス番号</span>
+        <input type="checkbox" id="artCellNumberToggle">
+      </label>
+      <label class="art-toggle-row">
+        <span data-i18n="art_block_mode">10×10ブロック表示</span>
+        <input type="checkbox" id="artBlockModeToggle">
+      </label>
+      <div class="art-block-list" id="artBlockList"></div>
     </div>
   </div>
 </div>

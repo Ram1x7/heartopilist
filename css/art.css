@@ -47,6 +47,7 @@ body.dark .art-notice{
 }
 
 .art-canvas-area{
+  position:relative;
   grid-area:canvas;
   display:flex;
   align-items:center;
@@ -697,4 +698,85 @@ body.dark .art-newcanvas-preview-text{
   width:100%;
   justify-content:center;
   margin-top:14px;
+}
+
+/* 座標表示 */
+.art-coord-readout{
+  display:none;
+  position:absolute;
+  top:8px;
+  left:8px;
+  padding:4px 8px;
+  border-radius:8px;
+  background:rgba(52,48,43,0.72);
+  color:#fdf9ef;
+  font-size:10px;
+  font-family:monospace;
+  white-space:pre;
+  pointer-events:none;
+  z-index:2;
+}
+
+/* ブロック表示中はツールバーを無効化した見た目にする */
+.art-toolbar-disabled{
+  opacity:0.4;
+  pointer-events:none;
+}
+
+/* 使用色リストの色番号バッジ */
+.art-usage-number{
+  flex-shrink:0;
+  min-width:18px;
+  text-align:center;
+  font-size:10px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+body.dark .art-usage-number{
+  color:#b3a89a;
+}
+
+/* 表示切替トグルの間隔 */
+.art-toggle-row{
+  margin-bottom:10px;
+}
+
+.art-toggle-row:last-of-type{
+  margin-bottom:0;
+}
+
+/* ブロック一覧 */
+.art-block-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
+}
+
+.art-block-btn{
+  flex:1 1 30%;
+  padding:6px 4px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+}
+
+body.dark .art-block-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.art-block-status-1{
+  background:rgba(232,201,60,0.25);
+  border-color:#e8c93c;
+}
+
+.art-block-status-2{
+  background:rgba(90,158,74,0.22);
+  border-color:#5a9e4a;
 }
