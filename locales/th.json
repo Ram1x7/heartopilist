@@ -393,5 +393,21 @@
   "art_display_label": "การแสดงผล",
   "art_show_color_numbers": "หมายเลขสี",
   "art_show_cell_numbers": "หมายเลขช่อง",
-  "art_block_mode": "มุมมองบล็อก 10×10"
+  "art_block_mode": "มุมมองบล็อก 10×10",
+  "art_tool_select": "เลือก",
+  "art_selection_label": "พื้นที่ที่เลือก",
+  "art_copy": "คัดลอก",
+  "art_paste": "วาง",
+  "art_selected": "ที่เลือกอยู่",
+  "art_no_selection": "ยังไม่ได้เลือก",
+  "art_paste_armed": "แตะตำแหน่งที่ต้องการวาง",
+  "art_resize_label": "เปลี่ยนขนาดผืนผ้าใบ",
+  "art_resize_open": "เปลี่ยนขนาด",
+  "art_resize_title": "เปลี่ยนขนาดผืนผ้าใบ",
+  "art_resize_anchor_label": "ตำแหน่งยึด",
+  "art_resize_apply": "เปลี่ยนขนาด",
+  "art_convert_fit_label": "วิธีจัดวาง",
+  "art_fit_crop": "Crop",
+  "art_fit_fit": "Fit",
+  "art_fit_fill": "Fill"
 }

@@ -780,3 +780,100 @@ body.dark .art-block-btn{
   background:rgba(90,158,74,0.22);
   border-color:#5a9e4a;
 }
+
+/* 選択範囲・コピー＆ペースト */
+.art-selection-info{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-bottom:8px;
+}
+
+body.dark .art-selection-info{
+  color:#b3a89a;
+}
+
+.art-selection-actions{
+  display:flex;
+  gap:8px;
+}
+
+.art-selection-actions button{
+  flex:1;
+  padding:8px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:12px;
+  cursor:pointer;
+}
+
+.art-selection-actions button:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
+
+body.dark .art-selection-actions button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+/* キャンバスサイズ変更ボタン */
+.art-resize-open-btn{
+  display:flex;
+  width:100%;
+  justify-content:center;
+}
+
+/* アンカー位置グリッド */
+.art-anchor-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:6px;
+  margin-top:10px;
+}
+
+.art-anchor-btn{
+  aspect-ratio:1;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card-sub);
+  cursor:pointer;
+  position:relative;
+}
+
+.art-anchor-btn::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--text-sub);
+  transform:translate(-50%, -50%);
+}
+
+.art-anchor-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+}
+
+.art-anchor-btn.active::after{
+  background:#fdf9ef;
+}
+
+body.dark .art-anchor-btn{
+  background:#383329;
+  border-color:#46423b;
+}
+
+body.dark .art-anchor-btn::after{
+  background:#b3a89a;
+}
+
+body.dark .art-anchor-btn.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}

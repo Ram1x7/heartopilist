@@ -417,5 +417,21 @@
   "art_display_label": "表示",
   "art_show_color_numbers": "色番号",
   "art_show_cell_numbers": "マス番号",
-  "art_block_mode": "10×10ブロック表示"
+  "art_block_mode": "10×10ブロック表示",
+  "art_tool_select": "選択",
+  "art_selection_label": "選択範囲",
+  "art_copy": "コピー",
+  "art_paste": "ペースト",
+  "art_selected": "選択中",
+  "art_no_selection": "未選択",
+  "art_paste_armed": "貼り付け先をタップしてください",
+  "art_resize_label": "キャンバスサイズ変更",
+  "art_resize_open": "変更する",
+  "art_resize_title": "キャンバスサイズ変更",
+  "art_resize_anchor_label": "アンカー位置",
+  "art_resize_apply": "変更する",
+  "art_convert_fit_label": "配置方法",
+  "art_fit_crop": "Crop",
+  "art_fit_fit": "Fit",
+  "art_fit_fill": "Fill"
 }

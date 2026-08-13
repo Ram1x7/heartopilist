@@ -1,11 +1,11 @@
 // js/art-converter.js
-// 「画像から作る」ページ（art-convert.html）: 画像→ドット絵変換（Phase 4）
-// アップロード → リサイズ（正方形カバークロップ）→ 明るさ/コントラスト → 輪郭強調
-// → 背景処理 → 色数削減（メディアンカット）→ パレット変換（ディザリング対応）
+// 「画像から作る」ページ（art-convert.html）: 画像→ドット絵変換
+// アップロード → 配置（Crop/Fit/Fill、キャンバス比率に合わせる）→ 明るさ/コントラスト
+// → 輪郭強調 → 背景処理 → 色数削減（メディアンカット）→ パレット変換（ディザリング対応）
 // すべてブラウザ内で完結し、画像を外部に送信しない。
 
-const CONVERT_SIZES = [16, 24, 32, 48, 64];
 const COLOR_COUNTS = [4, 8, 12, 16, 24, 32];
+const MAX_CONVERT_DIM = 500;
 const EDGE_LEVELS = [
   { id: "off", labelKey: "art_edge_off", labelFallback: "OFF" },
   { id: "weak", labelKey: "art_edge_weak", labelFallback: "弱" },
@@ -17,10 +17,17 @@ const BG_MODES = [
   { id: "white", labelKey: "art_bg_white", labelFallback: "白を透明化" },
   { id: "auto", labelKey: "art_bg_auto", labelFallback: "自動背景削除" },
 ];
+const FIT_MODES = [
+  { id: "crop", labelKey: "art_fit_crop", labelFallback: "Crop" },
+  { id: "fit", labelKey: "art_fit_fit", labelFallback: "Fit" },
+  { id: "fill", labelKey: "art_fit_fill", labelFallback: "Fill" },
+];
 
 let sourceImage = null;
 let settings = {
-  size: 32,
+  width: 32,
+  height: 32,
+  fitMode: "fill",
   colors: 16,
   dither: false,
   edge: "off",
@@ -31,10 +38,27 @@ let settings = {
 let resultPixels = null;
 let convertTimer = null;
 
+function clampConvertDim(v){
+  let n = parseInt(v, 10);
+  if(isNaN(n)) n = 1;
+  return Math.min(MAX_CONVERT_DIM, Math.max(1, n));
+}
+
 // ── UI初期化 ──
 function initArtConverter(){
-  renderOptionGroup("artConvertSizeOptions", CONVERT_SIZES.map(s => ({ id: s, label: `${s}×${s}` })), settings.size, (v) => {
-    settings.size = Number(v);
+  const widthInput = document.getElementById("artConvertWidth");
+  const heightInput = document.getElementById("artConvertHeight");
+  widthInput.addEventListener("input", () => {
+    settings.width = clampConvertDim(widthInput.value);
+    scheduleConvert();
+  });
+  heightInput.addEventListener("input", () => {
+    settings.height = clampConvertDim(heightInput.value);
+    scheduleConvert();
+  });
+
+  renderOptionGroup("artConvertFitOptions", FIT_MODES.map(f => ({ id: f.id, label: T(f.labelKey, f.labelFallback) })), settings.fitMode, (v) => {
+    settings.fitMode = v;
     scheduleConvert();
   });
   renderOptionGroup("artConvertColorOptions", COLOR_COUNTS.map(c => ({ id: c, label: `${c}` })), settings.colors, (v) => {
@@ -116,20 +140,36 @@ function scheduleConvert(){
 // ── 変換処理 ──
 function convert(){
   if(!sourceImage) return;
-  const size = settings.size;
+  const w = settings.width, h = settings.height;
 
   const off = document.createElement("canvas");
-  off.width = size;
-  off.height = size;
+  off.width = w;
+  off.height = h;
   const octx = off.getContext("2d");
-  const rect = coverCropRect(sourceImage.naturalWidth, sourceImage.naturalHeight);
-  octx.drawImage(sourceImage, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, size, size);
 
-  const imgData = octx.getImageData(0, 0, size, size);
+  if(settings.fitMode === "fit"){
+    // 画像全体を表示（コンテイン）。はみ出す部分の余白は透明のまま残す
+    const scale = Math.min(w / sourceImage.naturalWidth, h / sourceImage.naturalHeight);
+    const dw = sourceImage.naturalWidth * scale, dh = sourceImage.naturalHeight * scale;
+    const dx = (w - dw) / 2, dy = (h - dh) / 2;
+    octx.drawImage(sourceImage, 0, 0, sourceImage.naturalWidth, sourceImage.naturalHeight, dx, dy, dw, dh);
+  }else{
+    // crop / fill: どちらもキャンバス比率に合わせて中央を基準にクロップする（cover）
+    const rect = coverCropRect(sourceImage.naturalWidth, sourceImage.naturalHeight, w, h);
+    octx.drawImage(sourceImage, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, w, h);
+  }
+
+  const imgData = octx.getImageData(0, 0, w, h);
   applyBrightnessContrast(imgData, settings.brightness, settings.contrast);
   if(settings.edge !== "off") applyEdgeEnhance(imgData, settings.edge);
 
   const bgMask = computeBackgroundMask(imgData, settings.background);
+  // Fitモードで生じる透明な余白は、背景設定に関わらず常に透明のまま扱う
+  const d = imgData.data;
+  for(let i = 0; i < bgMask.length; i++){
+    if(d[i * 4 + 3] < 128) bgMask[i] = true;
+  }
+
   const palette = buildPalette(imgData, settings.colors, bgMask);
   resultPixels = settings.dither
     ? ditherToPalette(imgData, palette, bgMask)
@@ -138,9 +178,19 @@ function convert(){
   renderResultPreview();
 }
 
-function coverCropRect(w, h){
-  const side = Math.min(w, h);
-  return { sx: (w - side) / 2, sy: (h - side) / 2, sw: side, sh: side };
+// 中央基準でキャンバス比率(targetW:targetH)に合わせてクロップする範囲を求める（cover fit）
+function coverCropRect(srcW, srcH, targetW, targetH){
+  const srcRatio = srcW / srcH;
+  const targetRatio = targetW / targetH;
+  let sw, sh;
+  if(srcRatio > targetRatio){
+    sh = srcH;
+    sw = srcH * targetRatio;
+  }else{
+    sw = srcW;
+    sh = srcW / targetRatio;
+  }
+  return { sx: (srcW - sw) / 2, sy: (srcH - sh) / 2, sw, sh };
 }
 
 function applyBrightnessContrast(imgData, brightness, contrast){
@@ -340,17 +390,17 @@ function ditherToPalette(imgData, palette, bgMask){
 
 // ── 結果プレビュー ──
 function renderResultPreview(){
-  const size = settings.size;
+  const w = settings.width, h = settings.height;
   const canvas = document.getElementById("artResultCanvas");
-  const cell = Math.max(4, Math.floor(320 / size));
-  canvas.width = size * cell;
-  canvas.height = size * cell;
+  const cell = Math.max(2, Math.floor(320 / Math.max(w, h)));
+  canvas.width = w * cell;
+  canvas.height = h * cell;
   const ctx = canvas.getContext("2d");
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for(let y = 0; y < size; y++){
-    for(let x = 0; x < size; x++){
-      const c = resultPixels[y * size + x];
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const c = resultPixels[y * w + x];
       if(c){
         ctx.fillStyle = c;
         ctx.fillRect(x * cell, y * cell, cell, cell);
@@ -368,8 +418,8 @@ function useResultInEditor(){
     if(!proceed) return;
   }
   localStorage.setItem("hatopiArt_currentDraft", JSON.stringify({
-    width: settings.size,
-    height: settings.size,
+    width: settings.width,
+    height: settings.height,
     pixelData: resultPixels,
   }));
   location.href = "art-create.html";

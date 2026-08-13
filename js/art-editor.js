@@ -47,6 +47,17 @@ let showColorNumbers = false;
 let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
+let selection = null; // {x0,y0,x1,y1}（セル座標、範囲は順不同）
+let selStart = null;
+let clipboard = null; // {w,h,data}
+let pasteArmed = false;
+
+const ANCHORS = {
+  "top-left": [0, 0], "top-center": [0.5, 0], "top-right": [1, 0],
+  "center-left": [0, 0.5], "center": [0.5, 0.5], "center-right": [1, 0.5],
+  "bottom-left": [0, 1], "bottom-center": [0.5, 1], "bottom-right": [1, 1],
+};
+let selectedAnchor = "center";
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -78,8 +89,11 @@ function initArtEditor(){
   renderCanvas();
   updateColorUsage();
   renderBlockList();
+  updateSelectionButtons();
   bindCanvasEvents();
   bindDisplayToggles();
+  bindSelectionControls();
+  bindResizeControls();
 }
 
 // ── 表示切替（色番号・マス番号・ブロック表示） ──
@@ -97,6 +111,22 @@ function bindDisplayToggles(){
     renderToolbar();
     renderCanvas();
     renderBlockList();
+  });
+}
+
+function bindSelectionControls(){
+  document.getElementById("artCopyBtn").addEventListener("click", copySelection);
+  document.getElementById("artPasteBtn").addEventListener("click", armPaste);
+}
+
+function bindResizeControls(){
+  document.getElementById("artResizeOpenBtn").addEventListener("click", openResizeModal);
+  document.getElementById("resizeApplyBtn").addEventListener("click", () => {
+    resizeCanvas(
+      document.getElementById("resizeWidth").value,
+      document.getElementById("resizeHeight").value,
+      selectedAnchor
+    );
   });
 }
 
@@ -174,6 +204,7 @@ const TOOLS = [
   { id: "eraser", icon: "eraser", labelKey: "art_tool_eraser", labelFallback: "消しゴム" },
   { id: "bucket", icon: "bucket", labelKey: "art_tool_bucket", labelFallback: "バケツ" },
   { id: "eyedropper", icon: "eyedropper", labelKey: "art_tool_eyedropper", labelFallback: "スポイト" },
+  { id: "select", icon: "select", labelKey: "art_tool_select", labelFallback: "選択" },
 ];
 
 function renderToolbar(){
@@ -208,36 +239,53 @@ function updateUndoRedoButtons(){
 }
 
 // ── Undo / Redo（スナップショット方式） ──
+// スナップショットはpixelsに加えgridWidth/gridHeightも保持する
+// （キャンバスサイズ変更もUndo/Redo対象にするため）
+function snapshotState(){
+  return { pixels: pixels.slice(), width: gridWidth, height: gridHeight };
+}
+
 function pushHistory(){
-  undoStack.push(pixels.slice());
+  undoStack.push(snapshotState());
   if(undoStack.length > MAX_HISTORY) undoStack.shift();
   redoStack = [];
   updateUndoRedoButtons();
 }
 
-function undo(){
-  if(undoStack.length === 0) return;
-  redoStack.push(pixels.slice());
-  pixels = undoStack.pop();
+function restoreSnapshot(snap){
+  pixels = snap.pixels;
+  gridWidth = snap.width;
+  gridHeight = snap.height;
   highlightedColor = null;
+  selection = null;
   renderCanvas();
   updateColorUsage();
-  updateUndoRedoButtons();
+  updateSelectionButtons();
+  renderBlockList();
   saveDraftDebounced();
+}
+
+function undo(){
+  if(undoStack.length === 0) return;
+  redoStack.push(snapshotState());
+  restoreSnapshot(undoStack.pop());
+  updateUndoRedoButtons();
 }
 
 function redo(){
   if(redoStack.length === 0) return;
-  undoStack.push(pixels.slice());
-  pixels = redoStack.pop();
-  highlightedColor = null;
-  renderCanvas();
-  updateColorUsage();
+  undoStack.push(snapshotState());
+  restoreSnapshot(redoStack.pop());
   updateUndoRedoButtons();
-  saveDraftDebounced();
 }
 
 function setTool(tool){
+  if(currentTool === "select" && tool !== "select"){
+    // 選択ツールから離れたら選択枠の表示は消す（コピー内容は保持する）
+    selection = null;
+    updateSelectionButtons();
+    renderCanvas();
+  }
   currentTool = tool;
   renderToolbar();
 }
@@ -405,6 +453,19 @@ function renderCanvas(){
   if(blockMode){
     drawBlockOverlay(cell);
   }
+
+  if(selection){
+    const x0 = Math.min(selection.x0, selection.x1);
+    const x1 = Math.max(selection.x0, selection.x1);
+    const y0 = Math.min(selection.y0, selection.y1);
+    const y1 = Math.max(selection.y0, selection.y1);
+    ctx.save();
+    ctx.strokeStyle = "#3c5a6e";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 3]);
+    ctx.strokeRect(x0 * cell + 1, y0 * cell + 1, (x1 - x0 + 1) * cell - 2, (y1 - y0 + 1) * cell - 2);
+    ctx.restore();
+  }
 }
 
 // ── 色番号・マス番号ラベル ──
@@ -554,6 +615,20 @@ function bindCanvasEvents(){
       return;
     }
 
+    if(pasteArmed){
+      pasteClipboardAt(c.cx, c.cy);
+      return;
+    }
+
+    if(currentTool === "select"){
+      isDrawing = true;
+      selStart = c;
+      selection = { x0: c.cx, y0: c.cy, x1: c.cx, y1: c.cy };
+      renderCanvas();
+      updateSelectionButtons();
+      return;
+    }
+
     isDrawing = true;
     if(currentTool !== "eyedropper") pushHistory();
     applyToolAt(c.cx, c.cy);
@@ -565,6 +640,15 @@ function bindCanvasEvents(){
     const c = cellFromEvent(e);
     updateCoordReadout(c);
     if(!isDrawing || blockMode) return;
+
+    if(currentTool === "select"){
+      if(c && selStart){
+        selection = { x0: selStart.cx, y0: selStart.cy, x1: c.cx, y1: c.cy };
+        renderCanvas();
+      }
+      return;
+    }
+
     if(currentTool !== "pen" && currentTool !== "eraser") return;
     if(c && (!lastCell || c.cx !== lastCell.cx || c.cy !== lastCell.cy)){
       applyToolAt(c.cx, c.cy);
@@ -577,7 +661,9 @@ function bindCanvasEvents(){
     if(!isDrawing) return;
     isDrawing = false;
     lastCell = null;
+    selStart = null;
     updateColorUsage();
+    updateSelectionButtons();
     saveDraftDebounced();
   };
   canvas.addEventListener("pointerup", finishStroke);
@@ -656,6 +742,124 @@ function zoomToBlock(bx, by){
   const cell = BASE_CELL * zoom / 100;
   area.scrollLeft = Math.max(0, (bx * BLOCK_SIZE + bw / 2) * cell - area.clientWidth / 2);
   area.scrollTop = Math.max(0, (by * BLOCK_SIZE + bh / 2) * cell - area.clientHeight / 2);
+}
+
+// ── 選択範囲・コピー＆ペースト ──
+function updateSelectionButtons(){
+  const copyBtn = document.getElementById("artCopyBtn");
+  const pasteBtn = document.getElementById("artPasteBtn");
+  const info = document.getElementById("artSelectionInfo");
+  if(copyBtn) copyBtn.disabled = !selection;
+  if(pasteBtn) pasteBtn.disabled = !clipboard;
+  if(info){
+    if(pasteArmed){
+      info.textContent = T("art_paste_armed", "貼り付け先をタップしてください");
+    }else if(selection){
+      const w = Math.abs(selection.x1 - selection.x0) + 1;
+      const h = Math.abs(selection.y1 - selection.y0) + 1;
+      info.textContent = `${w} × ${h} ${T("art_selected", "選択中")}`;
+    }else{
+      info.textContent = T("art_no_selection", "未選択");
+    }
+  }
+}
+
+function copySelection(){
+  if(!selection) return;
+  const x0 = Math.min(selection.x0, selection.x1);
+  const x1 = Math.max(selection.x0, selection.x1);
+  const y0 = Math.min(selection.y0, selection.y1);
+  const y1 = Math.max(selection.y0, selection.y1);
+  const w = x1 - x0 + 1, h = y1 - y0 + 1;
+  const data = [];
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      data.push(pixels[(y0 + y) * gridWidth + (x0 + x)]);
+    }
+  }
+  clipboard = { w, h, data };
+  updateSelectionButtons();
+}
+
+function armPaste(){
+  if(!clipboard) return;
+  pasteArmed = true;
+  updateSelectionButtons();
+}
+
+function pasteClipboardAt(cx, cy){
+  pushHistory();
+  for(let y = 0; y < clipboard.h; y++){
+    for(let x = 0; x < clipboard.w; x++){
+      const tx = cx + x, ty = cy + y;
+      if(tx < 0 || ty < 0 || tx >= gridWidth || ty >= gridHeight) continue;
+      const v = clipboard.data[y * clipboard.w + x];
+      if(v !== null && v !== undefined) pixels[ty * gridWidth + tx] = v;
+    }
+  }
+  pasteArmed = false;
+  renderCanvas();
+  updateColorUsage();
+  updateSelectionButtons();
+  saveDraftDebounced();
+}
+
+// ── キャンバスサイズ変更（アンカー位置指定） ──
+function openResizeModal(){
+  document.getElementById("resizeWidth").value = gridWidth;
+  document.getElementById("resizeHeight").value = gridHeight;
+  selectedAnchor = "center";
+  renderAnchorGrid();
+  document.getElementById("resizeModal").style.display = "block";
+}
+
+function closeResizeModal(){
+  document.getElementById("resizeModal").style.display = "none";
+}
+
+function renderAnchorGrid(){
+  const el = document.getElementById("artAnchorGrid");
+  if(!el) return;
+  el.innerHTML = Object.keys(ANCHORS).map(k => `
+    <button class="art-anchor-btn${k === selectedAnchor ? " active" : ""}" onclick="setAnchor('${k}')" aria-label="${k}"></button>
+  `).join("");
+}
+
+function setAnchor(k){
+  selectedAnchor = k;
+  renderAnchorGrid();
+}
+
+function resizeCanvas(newWRaw, newHRaw, anchorKey){
+  const newW = clampCanvasDim(newWRaw);
+  const newH = clampCanvasDim(newHRaw);
+  pushHistory();
+
+  const [ax, ay] = ANCHORS[anchorKey] || [0, 0];
+  const offsetX = Math.round((newW - gridWidth) * ax);
+  const offsetY = Math.round((newH - gridHeight) * ay);
+  const newPixels = new Array(newW * newH).fill(null);
+  for(let ny = 0; ny < newH; ny++){
+    for(let nx = 0; nx < newW; nx++){
+      const ox = nx - offsetX, oy = ny - offsetY;
+      if(ox >= 0 && oy >= 0 && ox < gridWidth && oy < gridHeight){
+        newPixels[ny * newW + nx] = pixels[oy * gridWidth + ox];
+      }
+    }
+  }
+
+  gridWidth = newW;
+  gridHeight = newH;
+  pixels = newPixels;
+  blockStatus = {}; // ブロック座標の意味が変わるためリセット
+  selection = null;
+  highlightedColor = null;
+  closeResizeModal();
+  renderCanvas();
+  updateColorUsage();
+  updateSelectionButtons();
+  renderBlockList();
+  saveDraft();
 }
 
 // ── 全消去 ──

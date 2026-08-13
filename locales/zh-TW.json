@@ -393,5 +393,21 @@
   "art_display_label": "顯示",
   "art_show_color_numbers": "顏色編號",
   "art_show_cell_numbers": "格子編號",
-  "art_block_mode": "10×10方塊顯示"
+  "art_block_mode": "10×10方塊顯示",
+  "art_tool_select": "選擇",
+  "art_selection_label": "選擇區域",
+  "art_copy": "複製",
+  "art_paste": "貼上",
+  "art_selected": "已選擇",
+  "art_no_selection": "未選擇",
+  "art_paste_armed": "請點擊要貼上的位置",
+  "art_resize_label": "變更畫布尺寸",
+  "art_resize_open": "變更",
+  "art_resize_title": "變更畫布尺寸",
+  "art_resize_anchor_label": "錨點位置",
+  "art_resize_apply": "變更",
+  "art_convert_fit_label": "放置方式",
+  "art_fit_crop": "Crop",
+  "art_fit_fit": "Fit",
+  "art_fit_fill": "Fill"
 }
