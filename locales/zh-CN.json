@@ -337,6 +337,8 @@
   "art_tool_bucket": "填充",
   "art_tool_eyedropper": "取色器",
   "art_tool_clear": "全部清除",
+  "art_undo": "撤销",
+  "art_redo": "重做",
   "art_zoom_label": "缩放",
   "art_zoom_out": "缩小",
   "art_zoom_in": "放大",
@@ -347,5 +349,5 @@
   "art_usage_empty": "还没有涂色",
   "art_unit_cells": "格",
   "art_invalid_hex": "颜色代码格式不正确（例：#FF0000）",
-  "art_confirm_clear": "确定要全部清除吗？此操作无法撤销（撤销功能将在后续更新中加入）。"
+  "art_confirm_clear": "确定要全部清除吗？（可以通过撤销恢复）"
 }

@@ -144,6 +144,11 @@ body.dark #artCanvas{
   color:#fdf9ef;
 }
 
+.art-tool-btn:disabled{
+  opacity:0.35;
+  cursor:not-allowed;
+}
+
 body.dark .art-tool-btn{
   background:#383329;
   border-color:#46423b;

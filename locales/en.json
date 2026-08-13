@@ -361,6 +361,8 @@
   "art_tool_bucket": "Fill",
   "art_tool_eyedropper": "Eyedropper",
   "art_tool_clear": "Clear all",
+  "art_undo": "Undo",
+  "art_redo": "Redo",
   "art_zoom_label": "Zoom",
   "art_zoom_out": "Zoom out",
   "art_zoom_in": "Zoom in",
@@ -371,5 +373,5 @@
   "art_usage_empty": "Nothing painted yet",
   "art_unit_cells": " cells",
   "art_invalid_hex": "That doesn't look like a valid color code (e.g. #FF0000)",
-  "art_confirm_clear": "Clear everything? This can't be undone (Undo support is coming in a future update)."
+  "art_confirm_clear": "Clear everything? (You can undo this.)"
 }

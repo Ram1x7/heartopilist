@@ -1,7 +1,7 @@
 // js/art-editor.js
-// 「アート」ページ（art-create.html）のCanvasエディター（Phase 2: 基本描画）
-// ペン・消しゴム・バケツ・スポイト、カラーパレット・カスタムカラー、
-// ズーム、使用色の集計・ハイライトを実装。Undo/Redoは次フェーズで対応。
+// 「アート」ページ（art-create.html）のCanvasエディター
+// Phase 2: ペン・消しゴム・バケツ・スポイト、カラーパレット・カスタムカラー、ズーム、使用色の集計・ハイライト
+// Phase 3: Undo/Redo（スナップショット方式、最大50段階）
 
 const BASE_CELL = 16; // 100%ズーム時の1マスのピクセルサイズ
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
@@ -12,6 +12,7 @@ const BASE_PALETTE = [
 ];
 const DRAFT_KEY = "hatopiArt_currentDraft";
 const CUSTOM_COLORS_KEY = "hatopiArt_customColors";
+const MAX_HISTORY = 50;
 
 let gridSize = 32;
 let pixels = [];
@@ -23,6 +24,8 @@ let highlightedColor = null;
 let isDrawing = false;
 let lastCell = null;
 let saveTimer = null;
+let undoStack = [];
+let redoStack = [];
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -62,9 +65,12 @@ function renderGridSizeOptions(){
 function chooseGridSize(size){
   gridSize = size;
   pixels = new Array(size * size).fill(null);
+  undoStack = [];
+  redoStack = [];
   document.getElementById("gridSizeModal").style.display = "none";
   renderCanvas();
   updateColorUsage();
+  updateUndoRedoButtons();
   saveDraft();
 }
 
@@ -83,12 +89,57 @@ function renderToolbar(){
       ${icon(t.icon, { size: 18 })}
     </button>
   `).join("");
+  const undoRedoButtons = `
+    <button class="art-tool-btn" id="artUndoBtn" onclick="undo()" aria-label="${T('art_undo', '元に戻す')}" ${undoStack.length === 0 ? "disabled" : ""}>
+      ${icon("undo", { size: 18 })}
+    </button>
+    <button class="art-tool-btn" id="artRedoBtn" onclick="redo()" aria-label="${T('art_redo', 'やり直す')}" ${redoStack.length === 0 ? "disabled" : ""}>
+      ${icon("redo", { size: 18 })}
+    </button>
+  `;
   const clearButton = `
     <button class="art-tool-btn" onclick="clearAll()" aria-label="${T('art_tool_clear', '全消去')}">
       ${icon("trash", { size: 18 })}
     </button>
   `;
-  el.innerHTML = toolButtons + clearButton;
+  el.innerHTML = toolButtons + undoRedoButtons + clearButton;
+}
+
+function updateUndoRedoButtons(){
+  const undoBtn = document.getElementById("artUndoBtn");
+  const redoBtn = document.getElementById("artRedoBtn");
+  if(undoBtn) undoBtn.disabled = undoStack.length === 0;
+  if(redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+// ── Undo / Redo（スナップショット方式） ──
+function pushHistory(){
+  undoStack.push(pixels.slice());
+  if(undoStack.length > MAX_HISTORY) undoStack.shift();
+  redoStack = [];
+  updateUndoRedoButtons();
+}
+
+function undo(){
+  if(undoStack.length === 0) return;
+  redoStack.push(pixels.slice());
+  pixels = undoStack.pop();
+  highlightedColor = null;
+  renderCanvas();
+  updateColorUsage();
+  updateUndoRedoButtons();
+  saveDraftDebounced();
+}
+
+function redo(){
+  if(redoStack.length === 0) return;
+  undoStack.push(pixels.slice());
+  pixels = redoStack.pop();
+  highlightedColor = null;
+  renderCanvas();
+  updateColorUsage();
+  updateUndoRedoButtons();
+  saveDraftDebounced();
 }
 
 function setTool(tool){
@@ -298,6 +349,7 @@ function bindCanvasEvents(){
     isDrawing = true;
     const c = cellFromEvent(e);
     if(c){
+      if(currentTool !== "eyedropper") pushHistory();
       applyToolAt(c.cx, c.cy);
       lastCell = c;
       renderCanvas();
@@ -329,7 +381,8 @@ function bindCanvasEvents(){
 
 // ── 全消去 ──
 function clearAll(){
-  if(!confirm(T("art_confirm_clear", "すべて消去しますか？この操作は取り消せません（Undo機能は今後のアップデートで追加予定です）"))) return;
+  if(!confirm(T("art_confirm_clear", "すべて消去しますか？（Undoで元に戻せます）"))) return;
+  pushHistory();
   pixels = new Array(gridSize * gridSize).fill(null);
   highlightedColor = null;
   renderCanvas();
@@ -355,5 +408,18 @@ function loadDraft(){
     return null;
   }
 }
+
+// ── キーボードショートカット（PC向け：Ctrl/Cmd+Z で元に戻す、Shift併用でやり直す） ──
+document.addEventListener("keydown", (e) => {
+  if(!(e.ctrlKey || e.metaKey)) return;
+  const key = e.key.toLowerCase();
+  if(key === "z" && !e.shiftKey){
+    e.preventDefault();
+    undo();
+  }else if((key === "z" && e.shiftKey) || key === "y"){
+    e.preventDefault();
+    redo();
+  }
+});
 
 initArtEditor();

@@ -361,6 +361,8 @@
   "art_tool_bucket": "バケツ",
   "art_tool_eyedropper": "スポイト",
   "art_tool_clear": "全消去",
+  "art_undo": "元に戻す",
+  "art_redo": "やり直す",
   "art_zoom_label": "拡大率",
   "art_zoom_out": "縮小",
   "art_zoom_in": "拡大",
@@ -371,5 +373,5 @@
   "art_usage_empty": "まだ何も塗られていません",
   "art_unit_cells": "マス",
   "art_invalid_hex": "カラーコードの形式が正しくありません（例：#FF0000）",
-  "art_confirm_clear": "すべて消去しますか？この操作は取り消せません（Undo機能は今後のアップデートで追加予定です）"
+  "art_confirm_clear": "すべて消去しますか？（Undoで元に戻せます）"
 }

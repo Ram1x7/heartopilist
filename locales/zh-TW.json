@@ -337,6 +337,8 @@
   "art_tool_bucket": "填色",
   "art_tool_eyedropper": "取色器",
   "art_tool_clear": "全部清除",
+  "art_undo": "復原",
+  "art_redo": "重做",
   "art_zoom_label": "縮放",
   "art_zoom_out": "縮小",
   "art_zoom_in": "放大",
@@ -347,5 +349,5 @@
   "art_usage_empty": "尚未上色",
   "art_unit_cells": "格",
   "art_invalid_hex": "色碼格式不正確（例：#FF0000）",
-  "art_confirm_clear": "確定要全部清除嗎？此操作無法復原（復原功能將於後續更新加入）。"
+  "art_confirm_clear": "確定要全部清除嗎？（可以透過復原還原）"
 }

@@ -337,6 +337,8 @@
   "art_tool_bucket": "채우기",
   "art_tool_eyedropper": "스포이드",
   "art_tool_clear": "전체 지우기",
+  "art_undo": "실행 취소",
+  "art_redo": "다시 실행",
   "art_zoom_label": "확대율",
   "art_zoom_out": "축소",
   "art_zoom_in": "확대",
@@ -347,5 +349,5 @@
   "art_usage_empty": "아직 칠한 부분이 없습니다",
   "art_unit_cells": "칸",
   "art_invalid_hex": "컬러 코드 형식이 올바르지 않습니다 (예: #FF0000)",
-  "art_confirm_clear": "모두 지우시겠습니까? 이 작업은 되돌릴 수 없습니다 (Undo 기능은 추후 업데이트 예정입니다)."
+  "art_confirm_clear": "모두 지우시겠습니까? (실행 취소로 되돌릴 수 있습니다)"
 }
