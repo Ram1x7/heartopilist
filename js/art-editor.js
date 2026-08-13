@@ -4,10 +4,10 @@
 // Phase 3: Undo/Redo（スナップショット方式、最大50段階）
 // Phase 4.5: キャンバスの「実データのマス数」と「画面上の表示サイズ」を分離し、
 //   正方形以外の比率にも対応（1マスは常に正方形として描画）
+// キャンバスサイズはjs/art-config.jsのFREE_CANVAS_SIZES（固定4サイズ）から選択する
 
 const BASE_CELL = 16; // 100%ズーム時の1マスのピクセルサイズ
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
-const MAX_CANVAS_DIM = 500;
 const BASE_PALETTE = [
   "#e0453c", "#e58a2e", "#e8c93c", "#5a9e4a",
   "#4fb0c6", "#3c5a6e", "#8a5ec7", "#e06fa0",
@@ -16,23 +16,10 @@ const BASE_PALETTE = [
 const DRAFT_KEY = "hatopiArt_currentDraft";
 const CUSTOM_COLORS_KEY = "hatopiArt_customColors";
 const MAX_HISTORY = 50;
-
-// キャンバスプリセット。Heartopia専用の実サイズは確認できるまでnullのまま
-// （推測値は絶対に入れない）。自由サイズのみユーザーが任意のwidth/heightを指定できる。
-// width/height/maxColorsがnullのプリセットは実際のゲーム内仕様が未確認のため、
-// 推測値を入れずプレースホルダーのまま残している（確認でき次第、値を登録するだけで対応可能な構造）
-const CANVAS_PRESETS = {
-  freeSize: { id: "free-size", nameKey: "art_preset_free_size", nameFallback: "自由サイズ", width: 32, height: 32, blockSize: 10, maxColors: null, confirmed: true },
-  heartopiaClothing: { id: "heartopia-clothing", nameKey: "art_preset_clothing", nameFallback: "服・衣類", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
-  heartopiaCanvas: { id: "heartopia-canvas", nameKey: "art_preset_canvas", nameFallback: "キャンバス", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
-  heartopiaSign: { id: "heartopia-sign", nameKey: "art_preset_sign", nameFallback: "看板", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
-  heartopiaFurniture: { id: "heartopia-furniture", nameKey: "art_preset_furniture", nameFallback: "家具・装飾", width: null, height: null, blockSize: 10, maxColors: null, confirmed: false },
-};
-
 const BLOCK_SIZE = 10;
 
-let gridWidth = 32;
-let gridHeight = 32;
+let gridWidth = 30;
+let gridHeight = 30;
 let pixels = [];
 let customColors = [];
 let currentColor = BASE_PALETTE[0];
@@ -49,17 +36,6 @@ let showColorNumbers = false;
 let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
-let selection = null; // {x0,y0,x1,y1}（セル座標、範囲は順不同）
-let selStart = null;
-let clipboard = null; // {w,h,data}
-let pasteArmed = false;
-
-const ANCHORS = {
-  "top-left": [0, 0], "top-center": [0.5, 0], "top-right": [1, 0],
-  "center-left": [0, 0.5], "center": [0.5, 0.5], "center-right": [1, 0.5],
-  "bottom-left": [0, 1], "bottom-center": [0.5, 1], "bottom-right": [1, 1],
-};
-let selectedAnchor = "center";
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -79,9 +55,7 @@ function initArtEditor(){
     pixels = draft.pixelData.slice();
     blockStatus = draft.blockStatus || {};
   }else{
-    renderHeartopiaPresets();
-    bindNewCanvasControls();
-    updateNewCanvasPreview();
+    renderFreeSizeOptions();
     document.getElementById("gridSizeModal").style.display = "block";
   }
 
@@ -91,11 +65,8 @@ function initArtEditor(){
   renderCanvas();
   updateColorUsage();
   renderBlockList();
-  updateSelectionButtons();
   bindCanvasEvents();
   bindDisplayToggles();
-  bindSelectionControls();
-  bindResizeControls();
 }
 
 // ── 表示切替（色番号・マス番号・ブロック表示） ──
@@ -116,73 +87,12 @@ function bindDisplayToggles(){
   });
 }
 
-function bindSelectionControls(){
-  document.getElementById("artCopyBtn").addEventListener("click", copySelection);
-  document.getElementById("artPasteBtn").addEventListener("click", armPaste);
-}
-
-function bindResizeControls(){
-  document.getElementById("artResizeOpenBtn").addEventListener("click", openResizeModal);
-  document.getElementById("resizeApplyBtn").addEventListener("click", () => {
-    resizeCanvas(
-      document.getElementById("resizeWidth").value,
-      document.getElementById("resizeHeight").value,
-      selectedAnchor
-    );
-  });
-}
-
-// ── 比率計算（最大公約数で簡約） ──
-function gcd(a, b){
-  return b === 0 ? a : gcd(b, a % b);
-}
-
-function ratioText(w, h){
-  const g = gcd(w, h) || 1;
-  return `${w / g}:${h / g}`;
-}
-
-function clampCanvasDim(v){
-  let n = parseInt(v, 10);
-  if(isNaN(n)) n = 1;
-  return Math.min(MAX_CANVAS_DIM, Math.max(1, n));
-}
-
-// ── 新規キャンバス作成モーダル ──
-function renderHeartopiaPresets(){
-  const el = document.getElementById("artHeartopiaPresets");
-  const presets = Object.values(CANVAS_PRESETS).filter(p => p.id !== "free-size");
-  el.innerHTML = presets.map(p => `
-    <button disabled title="${T("art_preset_unconfirmed", "実際のゲーム内サイズを確認後に対応予定です")}">
-      ${T(p.nameKey, p.nameFallback)}<br><span class="art-preset-badge">${T("art_preset_coming_soon", "準備中")}</span>
-    </button>
+// ── 新規キャンバス作成モーダル（固定4サイズから選択。すべて正方形） ──
+function renderFreeSizeOptions(){
+  const el = document.getElementById("artFreeSizeOptions");
+  el.innerHTML = FREE_CANVAS_SIZES.map(s => `
+    <button onclick="createCanvas(${s}, ${s})">${s} × ${s}</button>
   `).join("");
-}
-
-function bindNewCanvasControls(){
-  const wInput = document.getElementById("newCanvasWidth");
-  const hInput = document.getElementById("newCanvasHeight");
-  wInput.addEventListener("input", updateNewCanvasPreview);
-  hInput.addEventListener("input", updateNewCanvasPreview);
-  document.getElementById("newCanvasCreateBtn").addEventListener("click", () => {
-    createCanvas(clampCanvasDim(wInput.value), clampCanvasDim(hInput.value));
-  });
-}
-
-function updateNewCanvasPreview(){
-  const w = clampCanvasDim(document.getElementById("newCanvasWidth").value);
-  const h = clampCanvasDim(document.getElementById("newCanvasHeight").value);
-  // CSSのaspect-ratioは明示width指定と組み合わせるとmax-heightを無視するため、
-  // 表示px数はJS側で計算して両軸とも140pxの枠に収まるようにする
-  const maxBox = 140;
-  const scale = Math.min(maxBox / w, maxBox / h);
-  const boxW = Math.max(4, Math.round(w * scale));
-  const boxH = Math.max(4, Math.round(h * scale));
-  const box = document.getElementById("newCanvasPreviewBox");
-  box.style.width = boxW + "px";
-  box.style.height = boxH + "px";
-  document.getElementById("newCanvasPreviewText").textContent =
-    `${w} × ${h}　${T("art_ratio_label", "比率")} ${ratioText(w, h)}`;
 }
 
 function createCanvas(w, h){
@@ -206,7 +116,6 @@ const TOOLS = [
   { id: "eraser", icon: "eraser", labelKey: "art_tool_eraser", labelFallback: "消しゴム" },
   { id: "bucket", icon: "bucket", labelKey: "art_tool_bucket", labelFallback: "バケツ" },
   { id: "eyedropper", icon: "eyedropper", labelKey: "art_tool_eyedropper", labelFallback: "スポイト" },
-  { id: "select", icon: "select", labelKey: "art_tool_select", labelFallback: "選択" },
 ];
 
 function renderToolbar(){
@@ -259,10 +168,8 @@ function restoreSnapshot(snap){
   gridWidth = snap.width;
   gridHeight = snap.height;
   highlightedColor = null;
-  selection = null;
   renderCanvas();
   updateColorUsage();
-  updateSelectionButtons();
   renderBlockList();
   saveDraftDebounced();
 }
@@ -282,12 +189,6 @@ function redo(){
 }
 
 function setTool(tool){
-  if(currentTool === "select" && tool !== "select"){
-    // 選択ツールから離れたら選択枠の表示は消す（コピー内容は保持する）
-    selection = null;
-    updateSelectionButtons();
-    renderCanvas();
-  }
   currentTool = tool;
   renderToolbar();
 }
@@ -455,19 +356,6 @@ function renderCanvas(){
   if(blockMode){
     drawBlockOverlay(cell);
   }
-
-  if(selection){
-    const x0 = Math.min(selection.x0, selection.x1);
-    const x1 = Math.max(selection.x0, selection.x1);
-    const y0 = Math.min(selection.y0, selection.y1);
-    const y1 = Math.max(selection.y0, selection.y1);
-    ctx.save();
-    ctx.strokeStyle = "#3c5a6e";
-    ctx.lineWidth = 2;
-    ctx.setLineDash([4, 3]);
-    ctx.strokeRect(x0 * cell + 1, y0 * cell + 1, (x1 - x0 + 1) * cell - 2, (y1 - y0 + 1) * cell - 2);
-    ctx.restore();
-  }
 }
 
 // ── 色番号・マス番号ラベル ──
@@ -617,20 +505,6 @@ function bindCanvasEvents(){
       return;
     }
 
-    if(pasteArmed){
-      pasteClipboardAt(c.cx, c.cy);
-      return;
-    }
-
-    if(currentTool === "select"){
-      isDrawing = true;
-      selStart = c;
-      selection = { x0: c.cx, y0: c.cy, x1: c.cx, y1: c.cy };
-      renderCanvas();
-      updateSelectionButtons();
-      return;
-    }
-
     isDrawing = true;
     if(currentTool !== "eyedropper") pushHistory();
     applyToolAt(c.cx, c.cy);
@@ -642,14 +516,6 @@ function bindCanvasEvents(){
     const c = cellFromEvent(e);
     updateCoordReadout(c);
     if(!isDrawing || blockMode) return;
-
-    if(currentTool === "select"){
-      if(c && selStart){
-        selection = { x0: selStart.cx, y0: selStart.cy, x1: c.cx, y1: c.cy };
-        renderCanvas();
-      }
-      return;
-    }
 
     if(currentTool !== "pen" && currentTool !== "eraser") return;
     if(c && (!lastCell || c.cx !== lastCell.cx || c.cy !== lastCell.cy)){
@@ -663,9 +529,7 @@ function bindCanvasEvents(){
     if(!isDrawing) return;
     isDrawing = false;
     lastCell = null;
-    selStart = null;
     updateColorUsage();
-    updateSelectionButtons();
     saveDraftDebounced();
   };
   canvas.addEventListener("pointerup", finishStroke);
@@ -746,124 +610,6 @@ function zoomToBlock(bx, by){
   area.scrollTop = Math.max(0, (by * BLOCK_SIZE + bh / 2) * cell - area.clientHeight / 2);
 }
 
-// ── 選択範囲・コピー＆ペースト ──
-function updateSelectionButtons(){
-  const copyBtn = document.getElementById("artCopyBtn");
-  const pasteBtn = document.getElementById("artPasteBtn");
-  const info = document.getElementById("artSelectionInfo");
-  if(copyBtn) copyBtn.disabled = !selection;
-  if(pasteBtn) pasteBtn.disabled = !clipboard;
-  if(info){
-    if(pasteArmed){
-      info.textContent = T("art_paste_armed", "貼り付け先をタップしてください");
-    }else if(selection){
-      const w = Math.abs(selection.x1 - selection.x0) + 1;
-      const h = Math.abs(selection.y1 - selection.y0) + 1;
-      info.textContent = `${w} × ${h} ${T("art_selected", "選択中")}`;
-    }else{
-      info.textContent = T("art_no_selection", "未選択");
-    }
-  }
-}
-
-function copySelection(){
-  if(!selection) return;
-  const x0 = Math.min(selection.x0, selection.x1);
-  const x1 = Math.max(selection.x0, selection.x1);
-  const y0 = Math.min(selection.y0, selection.y1);
-  const y1 = Math.max(selection.y0, selection.y1);
-  const w = x1 - x0 + 1, h = y1 - y0 + 1;
-  const data = [];
-  for(let y = 0; y < h; y++){
-    for(let x = 0; x < w; x++){
-      data.push(pixels[(y0 + y) * gridWidth + (x0 + x)]);
-    }
-  }
-  clipboard = { w, h, data };
-  updateSelectionButtons();
-}
-
-function armPaste(){
-  if(!clipboard) return;
-  pasteArmed = true;
-  updateSelectionButtons();
-}
-
-function pasteClipboardAt(cx, cy){
-  pushHistory();
-  for(let y = 0; y < clipboard.h; y++){
-    for(let x = 0; x < clipboard.w; x++){
-      const tx = cx + x, ty = cy + y;
-      if(tx < 0 || ty < 0 || tx >= gridWidth || ty >= gridHeight) continue;
-      const v = clipboard.data[y * clipboard.w + x];
-      if(v !== null && v !== undefined) pixels[ty * gridWidth + tx] = v;
-    }
-  }
-  pasteArmed = false;
-  renderCanvas();
-  updateColorUsage();
-  updateSelectionButtons();
-  saveDraftDebounced();
-}
-
-// ── キャンバスサイズ変更（アンカー位置指定） ──
-function openResizeModal(){
-  document.getElementById("resizeWidth").value = gridWidth;
-  document.getElementById("resizeHeight").value = gridHeight;
-  selectedAnchor = "center";
-  renderAnchorGrid();
-  document.getElementById("resizeModal").style.display = "block";
-}
-
-function closeResizeModal(){
-  document.getElementById("resizeModal").style.display = "none";
-}
-
-function renderAnchorGrid(){
-  const el = document.getElementById("artAnchorGrid");
-  if(!el) return;
-  el.innerHTML = Object.keys(ANCHORS).map(k => `
-    <button class="art-anchor-btn${k === selectedAnchor ? " active" : ""}" onclick="setAnchor('${k}')" aria-label="${k}"></button>
-  `).join("");
-}
-
-function setAnchor(k){
-  selectedAnchor = k;
-  renderAnchorGrid();
-}
-
-function resizeCanvas(newWRaw, newHRaw, anchorKey){
-  const newW = clampCanvasDim(newWRaw);
-  const newH = clampCanvasDim(newHRaw);
-  pushHistory();
-
-  const [ax, ay] = ANCHORS[anchorKey] || [0, 0];
-  const offsetX = Math.round((newW - gridWidth) * ax);
-  const offsetY = Math.round((newH - gridHeight) * ay);
-  const newPixels = new Array(newW * newH).fill(null);
-  for(let ny = 0; ny < newH; ny++){
-    for(let nx = 0; nx < newW; nx++){
-      const ox = nx - offsetX, oy = ny - offsetY;
-      if(ox >= 0 && oy >= 0 && ox < gridWidth && oy < gridHeight){
-        newPixels[ny * newW + nx] = pixels[oy * gridWidth + ox];
-      }
-    }
-  }
-
-  gridWidth = newW;
-  gridHeight = newH;
-  pixels = newPixels;
-  blockStatus = {}; // ブロック座標の意味が変わるためリセット
-  selection = null;
-  highlightedColor = null;
-  closeResizeModal();
-  renderCanvas();
-  updateColorUsage();
-  updateSelectionButtons();
-  renderBlockList();
-  saveDraft();
-}
-
 // ── 全消去 ──
 function clearAll(){
   if(!confirm(T("art_confirm_clear", "すべて消去しますか？（Undoで元に戻せます）"))) return;
@@ -912,13 +658,8 @@ document.addEventListener("langchange", () => {
   renderToolbar();
   renderZoomControls();
   updateColorUsage();
-  updateSelectionButtons();
   if(document.getElementById("gridSizeModal").style.display !== "none"){
-    renderHeartopiaPresets();
-    updateNewCanvasPreview();
-  }
-  if(document.getElementById("resizeModal").style.display !== "none"){
-    renderAnchorGrid();
+    renderFreeSizeOptions();
   }
 });
 

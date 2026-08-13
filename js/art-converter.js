@@ -5,7 +5,6 @@
 // すべてブラウザ内で完結し、画像を外部に送信しない。
 
 const COLOR_COUNTS = [4, 8, 12, 16, 24, 32];
-const MAX_CONVERT_DIM = 500;
 const EDGE_LEVELS = [
   { id: "off", labelKey: "art_edge_off", labelFallback: "OFF" },
   { id: "weak", labelKey: "art_edge_weak", labelFallback: "弱" },
@@ -29,8 +28,8 @@ const FIT_BG_MODES = [
 
 let sourceImage = null;
 let settings = {
-  width: 32,
-  height: 32,
+  width: FREE_CANVAS_SIZES[0],
+  height: FREE_CANVAS_SIZES[0],
   fitMode: "fill",
   fitBgMode: "transparent",
   fitBgColor: "#ffffff",
@@ -44,24 +43,9 @@ let settings = {
 let resultPixels = null;
 let convertTimer = null;
 
-function clampConvertDim(v){
-  let n = parseInt(v, 10);
-  if(isNaN(n)) n = 1;
-  return Math.min(MAX_CONVERT_DIM, Math.max(1, n));
-}
-
 // ── UI初期化 ──
 function initArtConverter(){
-  const widthInput = document.getElementById("artConvertWidth");
-  const heightInput = document.getElementById("artConvertHeight");
-  widthInput.addEventListener("input", () => {
-    settings.width = clampConvertDim(widthInput.value);
-    scheduleConvert();
-  });
-  heightInput.addEventListener("input", () => {
-    settings.height = clampConvertDim(heightInput.value);
-    scheduleConvert();
-  });
+  renderConvertSizeOptions();
 
   renderOptionGroup("artConvertColorOptions", COLOR_COUNTS.map(c => ({ id: c, label: `${c}` })), settings.colors, (v) => {
     settings.colors = Number(v);
@@ -95,6 +79,26 @@ function initArtConverter(){
   });
 
   document.getElementById("artUseInEditorBtn").addEventListener("click", useResultInEditor);
+}
+
+// キャンバスサイズ選択（自由サイズ4種＋デザイン枠プリセット）
+function renderConvertSizeOptions(){
+  renderOptionGroup(
+    "artConvertFreeSizeOptions",
+    FREE_CANVAS_SIZES.map(s => ({ id: s, label: `${s} × ${s}` })),
+    settings.width === settings.height ? settings.width : null,
+    (v) => {
+      settings.width = Number(v);
+      settings.height = Number(v);
+      scheduleConvert();
+    }
+  );
+  const el = document.getElementById("artConvertFramePresetOptions");
+  el.innerHTML = DESIGN_FRAME_PRESETS.map(p => `
+    <button disabled title="${T("art_frame_unconfirmed", "実際のゲーム内サイズを確認後に対応予定です")}">
+      ${T(p.nameKey, p.nameFallback)}<br><span class="art-preset-badge">${T("art_preset_coming_soon", "準備中")}</span>
+    </button>
+  `).join("");
 }
 
 // T()に依存するラベルのみ再描画（言語切替時にも呼び直す）
@@ -460,6 +464,7 @@ function useResultInEditor(){
 
 // 言語切替時に動的コンテンツ（i18n読み込み前に描画されたUI）を再描画
 document.addEventListener("langchange", () => {
+  renderConvertSizeOptions();
   renderConvertOptionLabels();
 });
 
