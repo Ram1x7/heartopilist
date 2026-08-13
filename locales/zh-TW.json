@@ -377,5 +377,17 @@
   "art_bg_auto": "自動移除背景",
   "art_invalid_image": "不支援的檔案格式（僅支援JPG・PNG・WebP）",
   "art_image_load_failed": "圖片載入失敗",
-  "art_overwrite_draft_confirm": "有正在編輯的草稿。是否用此次轉換結果覆蓋？"
+  "art_overwrite_draft_confirm": "有正在編輯的草稿。是否用此次轉換結果覆蓋？",
+  "art_preset_heartopia_title": "Heartopia專用",
+  "art_preset_free_size": "自由尺寸",
+  "art_preset_clothing": "服裝・衣物",
+  "art_preset_canvas": "畫布",
+  "art_preset_sign": "招牌",
+  "art_preset_furniture": "傢俱・裝飾",
+  "art_preset_unconfirmed": "確認實際遊戲內尺寸後將會支援",
+  "art_preset_coming_soon": "敬請期待",
+  "art_width_label": "寬度",
+  "art_height_label": "高度",
+  "art_ratio_label": "比例",
+  "art_create_canvas": "建立"
 }

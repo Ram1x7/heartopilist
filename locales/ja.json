@@ -401,5 +401,17 @@
   "art_bg_auto": "自動背景削除",
   "art_invalid_image": "対応していないファイル形式です（JPG・PNG・WebPのみ）",
   "art_image_load_failed": "画像の読み込みに失敗しました",
-  "art_overwrite_draft_confirm": "編集中の下書きがあります。変換結果で上書きしますか？"
+  "art_overwrite_draft_confirm": "編集中の下書きがあります。変換結果で上書きしますか？",
+  "art_preset_heartopia_title": "Heartopia専用",
+  "art_preset_free_size": "自由サイズ",
+  "art_preset_clothing": "服・衣類",
+  "art_preset_canvas": "キャンバス",
+  "art_preset_sign": "看板",
+  "art_preset_furniture": "家具・装飾",
+  "art_preset_unconfirmed": "実際のゲーム内サイズを確認後に対応予定です",
+  "art_preset_coming_soon": "準備中",
+  "art_width_label": "幅",
+  "art_height_label": "高さ",
+  "art_ratio_label": "比率",
+  "art_create_canvas": "作成"
 }

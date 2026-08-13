@@ -2,9 +2,12 @@
 // 「アート」ページ（art-create.html）のCanvasエディター
 // Phase 2: ペン・消しゴム・バケツ・スポイト、カラーパレット・カスタムカラー、ズーム、使用色の集計・ハイライト
 // Phase 3: Undo/Redo（スナップショット方式、最大50段階）
+// Phase 4.5: キャンバスの「実データのマス数」と「画面上の表示サイズ」を分離し、
+//   正方形以外の比率にも対応（1マスは常に正方形として描画）
 
 const BASE_CELL = 16; // 100%ズーム時の1マスのピクセルサイズ
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
+const MAX_CANVAS_DIM = 500;
 const BASE_PALETTE = [
   "#e0453c", "#e58a2e", "#e8c93c", "#5a9e4a",
   "#4fb0c6", "#3c5a6e", "#8a5ec7", "#e06fa0",
@@ -14,7 +17,18 @@ const DRAFT_KEY = "hatopiArt_currentDraft";
 const CUSTOM_COLORS_KEY = "hatopiArt_customColors";
 const MAX_HISTORY = 50;
 
-let gridSize = 32;
+// キャンバスプリセット。Heartopia専用の実サイズは確認できるまでnullのまま
+// （推測値は絶対に入れない）。自由サイズのみユーザーが任意のwidth/heightを指定できる。
+const CANVAS_PRESETS = {
+  freeSize: { id: "free-size", nameKey: "art_preset_free_size", nameFallback: "自由サイズ", width: 32, height: 32, blockSize: 10, confirmed: true },
+  heartopiaClothing: { id: "heartopia-clothing", nameKey: "art_preset_clothing", nameFallback: "服・衣類", width: null, height: null, blockSize: 10, confirmed: false },
+  heartopiaCanvas: { id: "heartopia-canvas", nameKey: "art_preset_canvas", nameFallback: "キャンバス", width: null, height: null, blockSize: 10, confirmed: false },
+  heartopiaSign: { id: "heartopia-sign", nameKey: "art_preset_sign", nameFallback: "看板", width: null, height: null, blockSize: 10, confirmed: false },
+  heartopiaFurniture: { id: "heartopia-furniture", nameKey: "art_preset_furniture", nameFallback: "家具・装飾", width: null, height: null, blockSize: 10, confirmed: false },
+};
+
+let gridWidth = 32;
+let gridHeight = 32;
 let pixels = [];
 let customColors = [];
 let currentColor = BASE_PALETTE[0];
@@ -39,32 +53,82 @@ function initArtEditor(){
   }
 
   const draft = loadDraft();
-  if(draft && draft.width && Array.isArray(draft.pixelData)){
-    gridSize = draft.width;
+  if(draft && draft.width && draft.height && Array.isArray(draft.pixelData)){
+    gridWidth = draft.width;
+    gridHeight = draft.height;
     pixels = draft.pixelData.slice();
   }else{
+    renderHeartopiaPresets();
+    bindNewCanvasControls();
+    updateNewCanvasPreview();
     document.getElementById("gridSizeModal").style.display = "block";
   }
 
   renderToolbar();
   renderZoomControls();
   renderPalette();
-  renderGridSizeOptions();
   renderCanvas();
   updateColorUsage();
   bindCanvasEvents();
 }
 
-// ── キャンバスサイズ選択 ──
-function renderGridSizeOptions(){
-  const el = document.getElementById("artGridSizeOptions");
-  const sizes = [16, 24, 32, 48, 64];
-  el.innerHTML = sizes.map(s => `<button onclick="chooseGridSize(${s})">${s}×${s}</button>`).join("");
+// ── 比率計算（最大公約数で簡約） ──
+function gcd(a, b){
+  return b === 0 ? a : gcd(b, a % b);
 }
 
-function chooseGridSize(size){
-  gridSize = size;
-  pixels = new Array(size * size).fill(null);
+function ratioText(w, h){
+  const g = gcd(w, h) || 1;
+  return `${w / g}:${h / g}`;
+}
+
+function clampCanvasDim(v){
+  let n = parseInt(v, 10);
+  if(isNaN(n)) n = 1;
+  return Math.min(MAX_CANVAS_DIM, Math.max(1, n));
+}
+
+// ── 新規キャンバス作成モーダル ──
+function renderHeartopiaPresets(){
+  const el = document.getElementById("artHeartopiaPresets");
+  const presets = Object.values(CANVAS_PRESETS).filter(p => p.id !== "free-size");
+  el.innerHTML = presets.map(p => `
+    <button disabled title="${T("art_preset_unconfirmed", "実際のゲーム内サイズを確認後に対応予定です")}">
+      ${T(p.nameKey, p.nameFallback)}<br><span class="art-preset-badge">${T("art_preset_coming_soon", "準備中")}</span>
+    </button>
+  `).join("");
+}
+
+function bindNewCanvasControls(){
+  const wInput = document.getElementById("newCanvasWidth");
+  const hInput = document.getElementById("newCanvasHeight");
+  wInput.addEventListener("input", updateNewCanvasPreview);
+  hInput.addEventListener("input", updateNewCanvasPreview);
+  document.getElementById("newCanvasCreateBtn").addEventListener("click", () => {
+    createCanvas(clampCanvasDim(wInput.value), clampCanvasDim(hInput.value));
+  });
+}
+
+function updateNewCanvasPreview(){
+  const w = clampCanvasDim(document.getElementById("newCanvasWidth").value);
+  const h = clampCanvasDim(document.getElementById("newCanvasHeight").value);
+  // CSSのaspect-ratioは明示width指定と組み合わせるとmax-heightを無視するため、
+  // 表示px数はJS側で計算して両軸とも140pxの枠に収まるようにする
+  const maxBox = 140;
+  const scale = Math.min(maxBox / w, maxBox / h);
+  const boxW = Math.max(4, Math.round(w * scale));
+  const boxH = Math.max(4, Math.round(h * scale));
+  const box = document.getElementById("newCanvasPreviewBox");
+  box.style.width = boxW + "px";
+  box.style.height = boxH + "px";
+  document.getElementById("newCanvasPreviewText").textContent =
+    `${w} × ${h}　${T("art_ratio_label", "比率")} ${ratioText(w, h)}`;
+}
+
+function createCanvas(w, h){
+  gridWidth = w;
+  gridHeight = h;
+  pixels = new Array(w * h).fill(null);
   undoStack = [];
   redoStack = [];
   document.getElementById("gridSizeModal").style.display = "none";
@@ -187,7 +251,8 @@ function zoomReset(){
 function zoomFit(){
   const area = document.querySelector(".art-canvas-area");
   const availW = Math.max(area.clientWidth - 32, 40);
-  const fitCell = availW / gridSize;
+  const availH = Math.max(area.clientHeight - 32, 40);
+  const fitCell = Math.min(availW / gridWidth, availH / gridHeight);
   const fitZoomRaw = (fitCell / BASE_CELL) * 100;
   let best = ZOOM_LEVELS[0];
   ZOOM_LEVELS.forEach(z => { if(z <= fitZoomRaw) best = z; });
@@ -254,16 +319,16 @@ function toggleHighlight(c){
   renderCanvas();
 }
 
-// ── 描画 ──
+// ── 描画（1マスは常に正方形。gridWidth/gridHeightが異なっても比率を維持） ──
 function renderCanvas(){
   const cell = BASE_CELL * zoom / 100;
-  canvas.width = gridSize * cell;
-  canvas.height = gridSize * cell;
+  canvas.width = gridWidth * cell;
+  canvas.height = gridHeight * cell;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  for(let y = 0; y < gridSize; y++){
-    for(let x = 0; x < gridSize; x++){
-      const c = pixels[y * gridSize + x];
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const c = pixels[y * gridWidth + x];
       if(c){
         ctx.fillStyle = c;
         ctx.fillRect(x * cell, y * cell, cell, cell);
@@ -273,9 +338,9 @@ function renderCanvas(){
 
   if(highlightedColor){
     ctx.fillStyle = document.body.classList.contains("dark") ? "rgba(26,24,20,0.6)" : "rgba(255,255,255,0.65)";
-    for(let y = 0; y < gridSize; y++){
-      for(let x = 0; x < gridSize; x++){
-        if(pixels[y * gridSize + x] !== highlightedColor){
+    for(let y = 0; y < gridHeight; y++){
+      for(let x = 0; x < gridWidth; x++){
+        if(pixels[y * gridWidth + x] !== highlightedColor){
           ctx.fillRect(x * cell, y * cell, cell, cell);
         }
       }
@@ -285,11 +350,13 @@ function renderCanvas(){
   if(cell >= 6){
     ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
     ctx.lineWidth = 1;
-    for(let i = 0; i <= gridSize; i++){
+    for(let i = 0; i <= gridWidth; i++){
       ctx.beginPath();
       ctx.moveTo(i * cell + 0.5, 0);
       ctx.lineTo(i * cell + 0.5, canvas.height);
       ctx.stroke();
+    }
+    for(let i = 0; i <= gridHeight; i++){
       ctx.beginPath();
       ctx.moveTo(0, i * cell + 0.5);
       ctx.lineTo(canvas.width, i * cell + 0.5);
@@ -308,12 +375,12 @@ function cellFromEvent(e){
   const cell = BASE_CELL * zoom / 100;
   const cx = Math.floor(x / cell);
   const cy = Math.floor(y / cell);
-  if(cx < 0 || cy < 0 || cx >= gridSize || cy >= gridSize) return null;
+  if(cx < 0 || cy < 0 || cx >= gridWidth || cy >= gridHeight) return null;
   return { cx, cy };
 }
 
 function applyToolAt(cx, cy){
-  const idx = cy * gridSize + cx;
+  const idx = cy * gridWidth + cx;
   if(currentTool === "pen"){
     pixels[idx] = currentColor;
   }else if(currentTool === "eraser"){
@@ -329,14 +396,14 @@ function applyToolAt(cx, cy){
 }
 
 function floodFill(cx, cy, color){
-  const startIdx = cy * gridSize + cx;
+  const startIdx = cy * gridWidth + cx;
   const target = pixels[startIdx];
   if(target === color) return;
   const stack = [[cx, cy]];
   while(stack.length){
     const [x, y] = stack.pop();
-    if(x < 0 || y < 0 || x >= gridSize || y >= gridSize) continue;
-    const i = y * gridSize + x;
+    if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) continue;
+    const i = y * gridWidth + x;
     if(pixels[i] !== target) continue;
     pixels[i] = color;
     stack.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
@@ -383,7 +450,7 @@ function bindCanvasEvents(){
 function clearAll(){
   if(!confirm(T("art_confirm_clear", "すべて消去しますか？（Undoで元に戻せます）"))) return;
   pushHistory();
-  pixels = new Array(gridSize * gridSize).fill(null);
+  pixels = new Array(gridWidth * gridHeight).fill(null);
   highlightedColor = null;
   renderCanvas();
   updateColorUsage();
@@ -392,7 +459,7 @@ function clearAll(){
 
 // ── 下書きの自動保存（単一スロット。複数下書き管理は次フェーズで対応） ──
 function saveDraft(){
-  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridSize, height: gridSize, pixelData: pixels }));
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridWidth, height: gridHeight, pixelData: pixels }));
 }
 
 function saveDraftDebounced(){

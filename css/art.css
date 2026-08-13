@@ -52,6 +52,9 @@ body.dark .art-notice{
   align-items:center;
   justify-content:center;
   padding:16px;
+  min-height:280px;
+  max-height:60vh;
+  overflow:auto;
   background:var(--card);
   border:1px solid var(--border);
   border-radius:16px;
@@ -103,6 +106,7 @@ body.dark #artCanvas{
 @media (min-width:768px){
   .art-canvas-area{
     padding:28px;
+    min-height:380px;
   }
 }
 
@@ -577,4 +581,120 @@ body.dark .art-preview-frame{
 
 body.dark .art-toggle-row{
   color:#ece4d4;
+}
+
+/* 新規キャンバス作成モーダル */
+.art-newcanvas-box{
+  max-width:360px;
+  text-align:left;
+}
+
+.art-newcanvas-section-title{
+  margin-top:16px;
+}
+
+.art-newcanvas-box h3{
+  text-align:center;
+}
+
+.art-gridsize-options button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+.art-preset-badge{
+  display:inline-block;
+  margin-top:2px;
+  font-size:9px;
+  color:var(--vermillion);
+}
+
+body.dark .art-preset-badge{
+  color:#e07060;
+}
+
+.art-newcanvas-inputs{
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  margin-top:10px;
+}
+
+.art-newcanvas-inputs label{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+body.dark .art-newcanvas-inputs label{
+  color:#b3a89a;
+}
+
+.art-newcanvas-inputs input{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:14px;
+  box-sizing:border-box;
+}
+
+body.dark .art-newcanvas-inputs input{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-newcanvas-x{
+  padding-bottom:9px;
+  font-size:12px;
+  color:var(--text-sub);
+}
+
+.art-newcanvas-preview{
+  display:flex;
+  justify-content:center;
+  margin-top:16px;
+  padding:14px;
+  background:var(--card-sub);
+  border-radius:12px;
+}
+
+body.dark .art-newcanvas-preview{
+  background:#383329;
+}
+
+.art-newcanvas-preview-box{
+  flex-shrink:0;
+  border:2px solid var(--indigo);
+  border-radius:4px;
+  background:var(--card);
+}
+
+body.dark .art-newcanvas-preview-box{
+  border-color:var(--indigo-soft);
+  background:#2c2823;
+}
+
+.art-newcanvas-preview-text{
+  margin-top:8px;
+  text-align:center;
+  font-size:12px;
+  color:var(--text-sub);
+}
+
+body.dark .art-newcanvas-preview-text{
+  color:#b3a89a;
+}
+
+.art-newcanvas-create-btn{
+  display:flex;
+  width:100%;
+  justify-content:center;
+  margin-top:14px;
 }

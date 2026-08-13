@@ -401,5 +401,17 @@
   "art_bg_auto": "Auto-remove background",
   "art_invalid_image": "Unsupported file type (JPG, PNG, or WebP only)",
   "art_image_load_failed": "Couldn't load that image",
-  "art_overwrite_draft_confirm": "You have a draft in progress. Overwrite it with this conversion result?"
+  "art_overwrite_draft_confirm": "You have a draft in progress. Overwrite it with this conversion result?",
+  "art_preset_heartopia_title": "Heartopia canvases",
+  "art_preset_free_size": "Free size",
+  "art_preset_clothing": "Clothing",
+  "art_preset_canvas": "Canvas",
+  "art_preset_sign": "Sign",
+  "art_preset_furniture": "Furniture / decor",
+  "art_preset_unconfirmed": "Coming once the real in-game size is confirmed",
+  "art_preset_coming_soon": "Coming soon",
+  "art_width_label": "Width",
+  "art_height_label": "Height",
+  "art_ratio_label": "Ratio",
+  "art_create_canvas": "Create"
 }

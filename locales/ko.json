@@ -377,5 +377,17 @@
   "art_bg_auto": "배경 자동 제거",
   "art_invalid_image": "지원하지 않는 파일 형식입니다 (JPG・PNG・WebP만 가능)",
   "art_image_load_failed": "이미지를 불러오지 못했습니다",
-  "art_overwrite_draft_confirm": "편집 중인 하위 도안이 있습니다. 변환 결과로 덮어쓰시겠습니까?"
+  "art_overwrite_draft_confirm": "편집 중인 하위 도안이 있습니다. 변환 결과로 덮어쓰시겠습니까?",
+  "art_preset_heartopia_title": "Heartopia 전용",
+  "art_preset_free_size": "자유 크기",
+  "art_preset_clothing": "옷・의류",
+  "art_preset_canvas": "캔버스",
+  "art_preset_sign": "간판",
+  "art_preset_furniture": "가구・장식",
+  "art_preset_unconfirmed": "실제 게임 내 크기를 확인한 후 지원 예정입니다",
+  "art_preset_coming_soon": "준비 중",
+  "art_width_label": "너비",
+  "art_height_label": "높이",
+  "art_ratio_label": "비율",
+  "art_create_canvas": "만들기"
 }

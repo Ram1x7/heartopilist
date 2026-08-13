@@ -377,5 +377,17 @@
   "art_bg_auto": "ลบพื้นหลังอัตโนมัติ",
   "art_invalid_image": "ไม่รองรับไฟล์รูปแบบนี้ (รองรับเฉพาะ JPG・PNG・WebP)",
   "art_image_load_failed": "โหลดรูปภาพไม่สำเร็จ",
-  "art_overwrite_draft_confirm": "มีฉบับร่างที่กำลังแก้ไขอยู่ ต้องการเขียนทับด้วยผลลัพธ์การแปลงนี้หรือไม่?"
+  "art_overwrite_draft_confirm": "มีฉบับร่างที่กำลังแก้ไขอยู่ ต้องการเขียนทับด้วยผลลัพธ์การแปลงนี้หรือไม่?",
+  "art_preset_heartopia_title": "สำหรับ Heartopia โดยเฉพาะ",
+  "art_preset_free_size": "ขนาดอิสระ",
+  "art_preset_clothing": "เสื้อผ้า",
+  "art_preset_canvas": "ผืนผ้าใบ",
+  "art_preset_sign": "ป้าย",
+  "art_preset_furniture": "เฟอร์นิเจอร์・ของตกแต่ง",
+  "art_preset_unconfirmed": "จะเปิดให้ใช้เมื่อยืนยันขนาดจริงในเกมได้แล้ว",
+  "art_preset_coming_soon": "เร็วๆ นี้",
+  "art_width_label": "ความกว้าง",
+  "art_height_label": "ความสูง",
+  "art_ratio_label": "อัตราส่วน",
+  "art_create_canvas": "สร้าง"
 }
