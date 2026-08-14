@@ -100,8 +100,10 @@ body.dark .art-lock-btn.is-locked{
   position:relative;
   grid-area:canvas;
   display:flex;
-  align-items:center;
-  justify-content:center;
+  /* align-items/justify-content:centerは使わない。ズームでcanvasがコンテナより
+     大きくなった時、中央寄せのflexは overflow を左右/上下対称にクリップしてしまい、
+     一部の領域にスクロールで到達できなくなる（ブラウザの既知の挙動）。
+     代わりにcanvas側のmargin:autoで中央寄せする（overflow時も正しくスクロールできる） */
   padding:16px;
   min-height:280px;
   max-height:60vh;
@@ -130,8 +132,9 @@ body.dark .art-panel{
 }
 
 #artCanvas{
-  max-width:100%;
-  height:auto;
+  margin:auto;
+  /* max-width:100%は付けない。ズーム時にcanvasが実寸で親要素より大きくなることで
+     .art-canvas-areaのoverflow:autoによる横/縦スクロールが機能する（拡大の要） */
   border-radius:8px;
   touch-action:none;
   image-rendering:pixelated;
