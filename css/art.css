@@ -637,6 +637,8 @@ body.dark .art-toggle-row{
 /* 新規キャンバス作成モーダル */
 .art-newcanvas-box{
   max-width:360px;
+  max-height:85vh;
+  overflow-y:auto;
   text-align:left;
 }
 

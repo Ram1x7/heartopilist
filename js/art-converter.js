@@ -25,12 +25,6 @@ const FIT_BG_MODES = [
   { id: "transparent", labelKey: "art_fit_bg_transparent", labelFallback: "透明" },
   { id: "custom", labelKey: "art_fit_bg_custom", labelFallback: "色を指定" },
 ];
-const FRAME_CATEGORIES = [
-  { id: "all", labelKey: "art_frame_cat_all", labelFallback: "すべて" },
-  { id: "clothes", labelKey: "art_frame_cat_clothes", labelFallback: "衣装" },
-  { id: "furniture", labelKey: "art_frame_cat_furniture", labelFallback: "家具" },
-  { id: "other", labelKey: "art_frame_cat_other", labelFallback: "その他" },
-];
 // 変換方式プリセット。それぞれディザリング・輪郭強調の初期値を切り替える早見表で、
 // 選択後も個別のスライダー・ボタンで微調整できる（手動で変えるとpresetはnullになる）
 const CONVERT_PRESETS = [

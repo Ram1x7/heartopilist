@@ -39,6 +39,9 @@ let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
 let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
+let selectedFrameCategory = "all"; // 新規キャンバス作成モーダルの「デザイン枠」絞り込みカテゴリ
+let selectedFrameId = null; // 選択中のデザイン枠アイテム
+let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
 let savedDesigns = []; // 名前を付けて保存したデザインの一覧
 let currentDesignId = null; // 保存済みデザインを読み込んで編集中の場合、そのID（未保存ならnull）
 let newCanvasModalCancelable = false; // 新規キャンバス作成モーダルを「新規作成」ボタンから開いた場合のみキャンセル可能にする
@@ -119,7 +122,7 @@ function closeNewCanvasModal(){
   document.getElementById("gridSizeModal").style.display = "none";
 }
 
-// ── 新規キャンバス作成モーダル（比率を選んでから、その比率のサイズレベルを選ぶ2段階） ──
+// ── 新規キャンバス作成モーダル（自由サイズ：比率→サイズレベルの2段階／デザイン枠：カテゴリ→アイテム→パーツ） ──
 function renderFreeSizeOptions(){
   renderRatioOptions(
     "artRatioOptions",
@@ -127,6 +130,7 @@ function renderFreeSizeOptions(){
     (id) => { selectedRatioId = id; renderLevelOptions(); }
   );
   renderLevelOptions();
+  renderFrameOptions();
 }
 
 function renderRatioOptions(containerId, currentId, onSelect){
@@ -141,6 +145,83 @@ function renderRatioOptions(containerId, currentId, onSelect){
       onSelect(btn.dataset.ratio);
     });
   });
+}
+
+function currentLang(){
+  return window.i18n && typeof window.i18n.getCurrentLang === "function" ? window.i18n.getCurrentLang() : "ja";
+}
+
+function renderOptionGroup(containerId, options, currentValue, onSelect){
+  const el = document.getElementById(containerId);
+  el.innerHTML = options.map(o => `
+    <button class="${String(o.id) === String(currentValue) ? "active" : ""}" data-value="${o.id}">${o.label}</button>
+  `).join("");
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      el.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      onSelect(btn.dataset.value);
+    });
+  });
+}
+
+// レンダリングそのものではキャンバスを作成しない（モーダル再オープン時に古い選択状態が
+// 残っていても、クリックしていないのに勝手に新規作成されてしまうのを防ぐため）。
+// 作成は必ずクリックハンドラー内（アイテム選択 or パーツ選択）からのみ行う。
+function renderFrameOptions(){
+  renderOptionGroup(
+    "artFrameCategoryOptions",
+    FRAME_CATEGORIES.map(c => ({ id: c.id, label: T(c.labelKey, c.labelFallback) })),
+    selectedFrameCategory,
+    (v) => {
+      selectedFrameCategory = v;
+      selectedFrameId = null;
+      selectedFramePartId = null;
+      renderFrameOptions();
+    }
+  );
+
+  const lang = currentLang();
+  const items = DESIGN_FRAME_PRESETS.filter(f => selectedFrameCategory === "all" || f.category === selectedFrameCategory);
+  renderOptionGroup(
+    "artFrameItemOptions",
+    items.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    selectedFrameId,
+    (v) => {
+      selectedFrameId = v;
+      selectedFramePartId = null;
+      const frame = DESIGN_FRAME_PRESETS.find(f => f.id === v);
+      if(frame.parts.length === 1){
+        createFrameCanvas(frame.parts[0].id);
+      }else{
+        renderFrameOptions();
+      }
+    }
+  );
+
+  const partsEl = document.getElementById("artFramePartOptions");
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
+  if(frame && frame.parts.length > 1){
+    partsEl.style.display = "flex";
+    renderOptionGroup(
+      "artFramePartOptions",
+      frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
+      selectedFramePartId,
+      (v) => createFrameCanvas(v)
+    );
+  }else{
+    partsEl.style.display = "none";
+    partsEl.innerHTML = "";
+  }
+}
+
+function createFrameCanvas(partId){
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
+  if(!frame) return;
+  const part = frame.parts.find(p => p.id === partId);
+  if(!part) return;
+  selectedFramePartId = partId;
+  createCanvas(part.width, part.height);
 }
 
 function renderLevelOptions(){
