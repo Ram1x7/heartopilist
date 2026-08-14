@@ -151,14 +151,23 @@
 
 <div id="gridSizeModal" onclick="if(event.target.id==='gridSizeModal') closeNewCanvasModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-newcanvas-box">
-    <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
-    <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
-    <div class="art-gridsize-options" id="artRatioOptions"></div>
-    <div class="art-gridsize-options" id="artFrameCategoryOptions"></div>
-    <div class="art-gridsize-options art-scroll-options" id="artFrameItemOptions"></div>
-    <div class="art-gridsize-options" id="artFramePartOptions" style="display:none"></div>
-    <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
-    <div class="art-gridsize-options" id="artLevelOptions"></div>
+    <div id="gridSizeStep1">
+      <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
+      <div class="art-gridsize-options" id="artRatioOptions"></div>
+      <div class="art-gridsize-options" id="artFrameCategoryOptions"></div>
+      <div class="art-gridsize-options art-scroll-options" id="artFrameItemOptions"></div>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
+      <div class="art-gridsize-options" id="artLevelOptions"></div>
+    </div>
+    <div id="gridSizeStep2" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="showFrameStep1()">
+        <span id="artFrameBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <h3 data-i18n="art_gridsize_step2_title">キャンバスを選択</h3>
+      <div class="art-gridsize-options" id="artFramePartOptions"></div>
+    </div>
     <div id="gridSizeCancelWrap" style="display:none;">
       <button class="modal-close-btn" onclick="closeNewCanvasModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
     </div>
@@ -180,6 +189,7 @@
 <script>
 
 document.getElementById("artConvertIcon").innerHTML = icon("upload", { size: 15 });
+document.getElementById("artFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");

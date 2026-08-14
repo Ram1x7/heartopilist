@@ -442,5 +442,7 @@
   "art_confirm_delete_design": "Delete this design?",
   "art_share_title": "Hatopi Art",
   "art_new_canvas": "New",
-  "art_confirm_new_canvas": "Create a new canvas without saving the current one?"
+  "art_confirm_new_canvas": "Create a new canvas without saving the current one?",
+  "art_gridsize_back": "Back",
+  "art_gridsize_step2_title": "Choose a canvas"
 }

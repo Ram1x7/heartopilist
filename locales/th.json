@@ -418,5 +418,7 @@
   "art_confirm_delete_design": "ลบดีไซน์นี้หรือไม่?",
   "art_share_title": "Hatopi Art",
   "art_new_canvas": "สร้างใหม่",
-  "art_confirm_new_canvas": "สร้างผืนผ้าใบใหม่โดยไม่บันทึกผืนปัจจุบันหรือไม่?"
+  "art_confirm_new_canvas": "สร้างผืนผ้าใบใหม่โดยไม่บันทึกผืนปัจจุบันหรือไม่?",
+  "art_gridsize_back": "ย้อนกลับ",
+  "art_gridsize_step2_title": "เลือกผืนผ้าใบ"
 }

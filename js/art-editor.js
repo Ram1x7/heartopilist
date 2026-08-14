@@ -66,6 +66,7 @@ function initArtEditor(){
     blockStatus = draft.blockStatus || {};
     currentDesignId = draft.designId || null;
   }else{
+    showFrameStep1();
     renderFreeSizeOptions();
     document.getElementById("gridSizeModal").style.display = "block";
   }
@@ -113,8 +114,20 @@ function openNewCanvasModal(){
   if(!confirm(T("art_confirm_new_canvas", "現在のキャンバスを保存せずに新しいキャンバスを作成しますか？"))) return;
   newCanvasModalCancelable = true;
   document.getElementById("gridSizeCancelWrap").style.display = "block";
+  showFrameStep1();
   renderFreeSizeOptions();
   document.getElementById("gridSizeModal").style.display = "block";
+}
+
+// デザイン枠のパーツ選択は、元サイトと同様に「戻る」付きの別画面へ切り替える方式
+function showFrameStep1(){
+  document.getElementById("gridSizeStep1").style.display = "block";
+  document.getElementById("gridSizeStep2").style.display = "none";
+}
+
+function showFrameStep2(){
+  document.getElementById("gridSizeStep1").style.display = "none";
+  document.getElementById("gridSizeStep2").style.display = "block";
 }
 
 function closeNewCanvasModal(){
@@ -194,25 +207,23 @@ function renderFrameOptions(){
       if(frame.parts.length === 1){
         createFrameCanvas(frame.parts[0].id);
       }else{
-        renderFrameOptions();
+        renderFramePartOptions();
+        showFrameStep2();
       }
     }
   );
+}
 
-  const partsEl = document.getElementById("artFramePartOptions");
+function renderFramePartOptions(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
-  if(frame && frame.parts.length > 1){
-    partsEl.style.display = "flex";
-    renderOptionGroup(
-      "artFramePartOptions",
-      frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
-      selectedFramePartId,
-      (v) => createFrameCanvas(v)
-    );
-  }else{
-    partsEl.style.display = "none";
-    partsEl.innerHTML = "";
-  }
+  if(!frame) return;
+  const lang = currentLang();
+  renderOptionGroup(
+    "artFramePartOptions",
+    frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
+    selectedFramePartId,
+    (v) => createFrameCanvas(v)
+  );
 }
 
 function createFrameCanvas(partId){
@@ -990,6 +1001,9 @@ document.addEventListener("langchange", () => {
   updateColorUsage();
   if(document.getElementById("gridSizeModal").style.display !== "none"){
     renderFreeSizeOptions();
+    if(document.getElementById("gridSizeStep2").style.display !== "none"){
+      renderFramePartOptions();
+    }
   }
   if(document.getElementById("myDesignsModal").style.display !== "none"){
     renderMyDesignsList();

@@ -418,5 +418,7 @@
   "art_confirm_delete_design": "要刪除這個設計嗎？",
   "art_share_title": "哈托皮藝術",
   "art_new_canvas": "新建",
-  "art_confirm_new_canvas": "要在不儲存目前畫布的情況下新建畫布嗎？"
+  "art_confirm_new_canvas": "要在不儲存目前畫布的情況下新建畫布嗎？",
+  "art_gridsize_back": "返回",
+  "art_gridsize_step2_title": "選擇畫布"
 }

@@ -156,33 +156,41 @@ function renderConvertFrameOptions(){
     "artConvertFrameItemOptions",
     items.map(f => ({ id: f.id, label: frameName(f, lang) })),
     selectedFrameId,
-    (v) => {
-      selectFrameItem(v);
-    }
+    (v) => selectFrameItem(v)
   );
+}
 
-  const partsEl = document.getElementById("artConvertFramePartOptions");
+function renderConvertFramePartOptions(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
-  if(frame && frame.parts.length > 1){
-    partsEl.style.display = "flex";
-    renderOptionGroup(
-      "artConvertFramePartOptions",
-      frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
-      selectedFramePartId,
-      (v) => {
-        selectFramePart(v);
-      }
-    );
-  }else{
-    partsEl.style.display = "none";
-    partsEl.innerHTML = "";
-  }
+  if(!frame) return;
+  const lang = currentLang();
+  renderOptionGroup(
+    "artConvertFramePartOptions",
+    frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
+    selectedFramePartId,
+    (v) => selectFramePart(v)
+  );
+}
+
+// デザイン枠のパーツ選択は、元サイトと同様に「戻る」付きの別画面へ切り替える方式
+function showConvertFrameStep1(){
+  document.getElementById("artConvertSizeStep1").style.display = "block";
+  document.getElementById("artConvertSizeStep2").style.display = "none";
+}
+
+function showConvertFrameStep2(){
+  document.getElementById("artConvertSizeStep1").style.display = "none";
+  document.getElementById("artConvertSizeStep2").style.display = "block";
 }
 
 function selectFrameItem(frameId){
   selectedFrameId = frameId;
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
   selectFramePart(frame.parts[0].id);
+  if(frame.parts.length > 1){
+    renderConvertFramePartOptions();
+    showConvertFrameStep2();
+  }
 }
 
 function selectFramePart(partId){
@@ -191,7 +199,6 @@ function selectFramePart(partId){
   const part = frame.parts.find(p => p.id === partId);
   settings.width = part.width;
   settings.height = part.height;
-  renderConvertFrameOptions();
   renderConvertLevelOptions();
   scheduleConvert();
 }
@@ -625,6 +632,9 @@ function useResultInEditor(){
 // 言語切替時に動的コンテンツ（i18n読み込み前に描画されたUI）を再描画
 document.addEventListener("langchange", () => {
   renderConvertSizeOptions();
+  if(document.getElementById("artConvertSizeStep2").style.display !== "none"){
+    renderConvertFramePartOptions();
+  }
   renderConvertOptionLabels();
   renderPresetPreviews();
 });

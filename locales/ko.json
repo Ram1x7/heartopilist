@@ -418,5 +418,7 @@
   "art_confirm_delete_design": "이 디자인을 삭제하시겠습니까?",
   "art_share_title": "하토피 아트",
   "art_new_canvas": "새로 만들기",
-  "art_confirm_new_canvas": "현재 캔버스를 저장하지 않고 새 캔버스를 만드시겠습니까?"
+  "art_confirm_new_canvas": "현재 캔버스를 저장하지 않고 새 캔버스를 만드시겠습니까?",
+  "art_gridsize_back": "뒤로",
+  "art_gridsize_step2_title": "캔버스 선택"
 }
