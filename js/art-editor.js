@@ -43,6 +43,12 @@ let editMode = false; // 編集モード（ONの間だけキャンバスタッ�
 let isLocked = false; // キャンバスの固定（ロック）。ロック中は編集モードに関わらず描画系ツールを一切受け付けない
 let activeFrameId = null; // 現在のキャンバスが紐づくデザイン枠プリセットID（自由サイズならnull）。マスク表示・使用不可マス判定に使う
 let activePartId = null; // 現在のキャンバスが紐づくデザイン枠パーツID
+let activePointers = new Map(); // 現在キャンバスに触れているポインター（pointerId → {x, y, type}）。2本指ジェスチャー判定に使う
+let pinchState = null; // 2本指ジェスチャー中の基準値（{startDist, startZoom, startMidX, startMidY, startScrollLeft, startScrollTop}）
+let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイベントとして届くため、
+  // 片方の指だけ座標が更新された「途中の不整合な状態」でupdatePinch()が呼ばれるのを防ぐために、
+  // 同一フレーム内の複数回の呼び出しをrequestAnimationFrameで1回にまとめる
+let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeDisabledSet = null; // 現在のキャンバスの使用不可マス集合（Set<"x,y">）。マスクなしならnull
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 
@@ -385,6 +391,7 @@ function undo(){
   redoStack.push(snapshotState());
   restoreSnapshot(undoStack.pop());
   updateUndoRedoButtons();
+  showToast(T("art_undo", "元に戻す"));
 }
 
 function redo(){
@@ -392,11 +399,15 @@ function redo(){
   undoStack.push(snapshotState());
   restoreSnapshot(redoStack.pop());
   updateUndoRedoButtons();
+  showToast(T("art_redo", "やり直す"));
 }
 
+// ツールボタンをタップした際、何を選んだかが一瞬わかるようトーストで表示する
 function setTool(tool){
   currentTool = tool;
   renderToolbar();
+  const t = TOOLS.find(x => x.id === tool);
+  if(t) showToast(T(t.labelKey, t.labelFallback));
 }
 
 // ── ズーム ──
@@ -416,24 +427,74 @@ function updateZoomLabel(){
   if(el) el.textContent = zoom + "%";
 }
 
-function zoomIn(){
-  const i = ZOOM_LEVELS.indexOf(zoom);
-  zoom = ZOOM_LEVELS[Math.min(i + 1, ZOOM_LEVELS.length - 1)];
+const MIN_ZOOM = ZOOM_LEVELS[0];
+const MAX_ZOOM = ZOOM_LEVELS[ZOOM_LEVELS.length - 1];
+
+// 表示エリア（.art-canvas-area）の中心を、画面上の座標（clientX/Y）として返す。
+// ボタン操作など、特定の指の位置がないズーム操作の基準点に使う
+function containerCenterClientPoint(){
+  const area = document.querySelector(".art-canvas-area");
+  const rect = area.getBoundingClientRect();
+  return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+}
+
+// 画面上の座標（clientX/Y）が指すグリッド座標（マス単位、小数可）を、現在のズームで求める
+function gridPointFromClient(clientX, clientY){
+  const rect = canvas.getBoundingClientRect();
+  const cell = BASE_CELL * zoom / 100;
+  return {
+    gx: (clientX - rect.left) * (canvas.width / rect.width) / cell,
+    gy: (clientY - rect.top) * (canvas.height / rect.height) / cell,
+  };
+}
+
+// グリッド座標（マス単位）が、現在のズームで画面上のどこに来るかを返す
+function clientPointFromGrid(gx, gy){
+  const rect = canvas.getBoundingClientRect();
+  const cell = BASE_CELL * zoom / 100;
+  return {
+    clientX: rect.left + gx * cell * (rect.width / canvas.width),
+    clientY: rect.top + gy * cell * (rect.height / canvas.height),
+  };
+}
+
+// ズームを変更しつつ、画面上の指定位置（clientX/Y）が指していたグリッド座標が
+// ズーム後も同じ画面位置に留まるよう、.art-canvas-areaのスクロール位置を補正する。
+// これにより、ボタン操作でもピンチ操作でも「今見ている場所を中心に」拡大縮小され、
+// 見えている場所が急に変わる（ズームが機能していないように感じる）問題を防ぐ
+function zoomAt(newZoomRaw, clientX, clientY){
+  const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.round(newZoomRaw)));
+  if(newZoom === zoom) return;
+
+  const area = document.querySelector(".art-canvas-area");
+  const before = gridPointFromClient(clientX, clientY);
+
+  zoom = newZoom;
   renderCanvas();
   updateZoomLabel();
+
+  const after = clientPointFromGrid(before.gx, before.gy);
+  area.scrollLeft += after.clientX - clientX;
+  area.scrollTop += after.clientY - clientY;
+}
+
+function zoomIn(){
+  const next = ZOOM_LEVELS.find(z => z > zoom);
+  const target = next !== undefined ? next : MAX_ZOOM;
+  const c = containerCenterClientPoint();
+  zoomAt(target, c.x, c.y);
 }
 
 function zoomOut(){
-  const i = ZOOM_LEVELS.indexOf(zoom);
-  zoom = ZOOM_LEVELS[Math.max(i - 1, 0)];
-  renderCanvas();
-  updateZoomLabel();
+  const lower = ZOOM_LEVELS.filter(z => z < zoom);
+  const target = lower.length ? lower[lower.length - 1] : MIN_ZOOM;
+  const c = containerCenterClientPoint();
+  zoomAt(target, c.x, c.y);
 }
 
 function zoomReset(){
-  zoom = 100;
-  renderCanvas();
-  updateZoomLabel();
+  const c = containerCenterClientPoint();
+  zoomAt(100, c.x, c.y);
 }
 
 function zoomFit(){
@@ -447,6 +508,8 @@ function zoomFit(){
   zoom = best;
   renderCanvas();
   updateZoomLabel();
+  area.scrollLeft = 0;
+  area.scrollTop = 0;
 }
 
 // ── カラーパレット ──
@@ -787,9 +850,64 @@ function floodFill(cx, cy, color){
   }
 }
 
+const TOUCH_DRAW_DELAY = 90; // タッチでの単発描画を、2本目の指(ピンチ/パン開始)と区別するための待ち時間(ms)
+
+function cancelPendingTouchPaint(){
+  if(pendingTouchPaint){
+    clearTimeout(pendingTouchPaint.timer);
+    pendingTouchPaint = null;
+  }
+}
+
+// ── 2本指ジェスチャー（ピンチズーム・パン） ──
+// 1本指＝描画、2本指＝表示のズーム/移動という一般的な描画アプリの操作体系にする
+function startPinch(){
+  const pts = [...activePointers.values()];
+  if(pts.length < 2) return;
+  const [p1, p2] = pts;
+  const area = document.querySelector(".art-canvas-area");
+  pinchState = {
+    startDist: Math.hypot(p1.x - p2.x, p1.y - p2.y),
+    startZoom: zoom,
+    startMidX: (p1.x + p2.x) / 2,
+    startMidY: (p1.y + p2.y) / 2,
+    startScrollLeft: area.scrollLeft,
+    startScrollTop: area.scrollTop,
+  };
+}
+
+function updatePinch(){
+  const pts = [...activePointers.values()];
+  if(pts.length < 2 || !pinchState) return;
+  const [p1, p2] = pts;
+  const area = document.querySelector(".art-canvas-area");
+  const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+  const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
+
+  // 2本指の平行移動量をそのままパンとして反映する
+  area.scrollLeft = pinchState.startScrollLeft - (midX - pinchState.startMidX);
+  area.scrollTop = pinchState.startScrollTop - (midY - pinchState.startMidY);
+
+  // 指の間隔の変化に応じてズームし、中点の位置が画面上で動かないよう補正する
+  if(pinchState.startDist > 10){
+    const newZoom = pinchState.startZoom * (dist / pinchState.startDist);
+    zoomAt(newZoom, midX, midY);
+  }
+}
+
 function bindCanvasEvents(){
   canvas.addEventListener("pointerdown", (e) => {
     canvas.setPointerCapture(e.pointerId);
+    activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
+
+    if(activePointers.size >= 2){
+      // 2本目の指が触れた→ピンチ/パン開始。進行中だった単発描画の予約や描画は打ち切る
+      cancelPendingTouchPaint();
+      finishStroke();
+      startPinch();
+      return;
+    }
+
     const c = cellFromEvent(e);
     updateCoordReadout(c);
     if(!c) return;
@@ -803,6 +921,24 @@ function bindCanvasEvents(){
     // ペン/消しゴム/塗りつぶしは、誤タップ防止のため編集モードON時のみ発動する
     if(currentTool !== "eyedropper" && (!editMode || isLocked)) return;
 
+    if(e.pointerType === "touch" && currentTool !== "eyedropper"){
+      // タッチでの単発描画は、2本目の指（ピンチ/パン）と区別するため少し待って確定する
+      pendingTouchPaint = {
+        pointerId: e.pointerId,
+        cx: c.cx, cy: c.cy,
+        timer: setTimeout(() => {
+          pendingTouchPaint = null;
+          if(pinchState || !activePointers.has(e.pointerId)) return;
+          isDrawing = true;
+          pushHistory();
+          applyToolAt(c.cx, c.cy);
+          lastCell = c;
+          renderCanvas();
+        }, TOUCH_DRAW_DELAY),
+      };
+      return;
+    }
+
     isDrawing = true;
     if(currentTool !== "eyedropper") pushHistory();
     applyToolAt(c.cx, c.cy);
@@ -811,6 +947,24 @@ function bindCanvasEvents(){
   });
 
   canvas.addEventListener("pointermove", (e) => {
+    if(activePointers.has(e.pointerId)){
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
+    }
+
+    if(pinchState){
+      // 2本指それぞれのpointermoveは別々のイベントとして届くため、両方の座標が
+      // 更新された後の状態で1フレームに1回だけ計算する（片方だけ新しい座標の
+      // 「不整合な瞬間」で計算すると、指の間隔が一瞬だけ揺れてズームが暴れる）
+      if(activePointers.size >= 2 && !pinchRafPending){
+        pinchRafPending = true;
+        requestAnimationFrame(() => {
+          pinchRafPending = false;
+          if(pinchState && activePointers.size >= 2) updatePinch();
+        });
+      }
+      return;
+    }
+
     const c = cellFromEvent(e);
     updateCoordReadout(c);
     if(!isDrawing || blockMode) return;
@@ -831,12 +985,42 @@ function bindCanvasEvents(){
     updateColorUsage();
     saveDraftDebounced();
   };
-  canvas.addEventListener("pointerup", finishStroke);
-  canvas.addEventListener("pointercancel", finishStroke);
+
+  const releasePointer = (e) => {
+    activePointers.delete(e.pointerId);
+
+    if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
+      // 2本目の指が来る前に指を離した＝単発タップとして、保留していた描画を確定する
+      clearTimeout(pendingTouchPaint.timer);
+      const p = pendingTouchPaint;
+      pendingTouchPaint = null;
+      if(!pinchState && currentTool !== "eyedropper" && editMode && !isLocked){
+        pushHistory();
+        applyToolAt(p.cx, p.cy);
+        renderCanvas();
+        updateColorUsage();
+        saveDraftDebounced();
+      }
+    }
+
+    if(pinchState && activePointers.size < 2){
+      pinchState = null;
+    }
+    finishStroke();
+  };
+  canvas.addEventListener("pointerup", releasePointer);
+  canvas.addEventListener("pointercancel", releasePointer);
   canvas.addEventListener("pointerleave", (e) => {
     finishStroke();
     updateCoordReadout(null);
   });
+
+  // Ctrl+ホイール（トラックパッドの2本指ピンチはブラウザがこの形で発火する）でもズームできる
+  canvas.addEventListener("wheel", (e) => {
+    if(!e.ctrlKey) return;
+    e.preventDefault();
+    zoomAt(zoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+  }, { passive: false });
 }
 
 function updateCoordReadout(c){
