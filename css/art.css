@@ -105,8 +105,9 @@ body.dark .art-lock-btn.is-locked{
      一部の領域にスクロールで到達できなくなる（ブラウザの既知の挙動）。
      代わりにcanvas側のmargin:autoで中央寄せする（overflow時も正しくスクロールできる） */
   padding:16px;
-  min-height:280px;
-  max-height:60vh;
+  /* 高さはビューポートに応じて決まる固定値にする（min/maxの範囲で内容に合わせて
+     伸び縮みさせない）。ズームで中の見え方が変わっても、この「窓」自体は動かない */
+  height:clamp(280px, 60vh, 560px);
   overflow:auto;
   background:var(--card);
   border:1px solid var(--border);
@@ -160,7 +161,7 @@ body.dark #artCanvas{
 @media (min-width:768px){
   .art-canvas-area{
     padding:28px;
-    min-height:380px;
+    height:clamp(380px, 60vh, 640px);
   }
 }
 
