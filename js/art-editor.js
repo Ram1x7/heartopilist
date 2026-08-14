@@ -41,6 +41,7 @@ let blockStatus = {};
 let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
 let savedDesigns = []; // 名前を付けて保存したデザインの一覧
 let currentDesignId = null; // 保存済みデザインを読み込んで編集中の場合、そのID（未保存ならnull）
+let newCanvasModalCancelable = false; // 新規キャンバス作成モーダルを「新規作成」ボタンから開いた場合のみキャンセル可能にする
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -79,6 +80,7 @@ function initArtEditor(){
 
 // ── マイデザイン・エクスポート/共有ボタンの結線 ──
 function bindMyDesignsControls(){
+  document.getElementById("artNewCanvasBtn").addEventListener("click", openNewCanvasModal);
   document.getElementById("artSaveBtn").addEventListener("click", saveCurrentAsDesign);
   document.getElementById("artMyDesignsBtn").addEventListener("click", openMyDesignsModal);
   document.getElementById("artExportBtn").addEventListener("click", exportPNG);
@@ -101,6 +103,20 @@ function bindDisplayToggles(){
     renderCanvas();
     renderBlockList();
   });
+}
+
+// ── 新規キャンバス作成モーダルを「新規作成」ボタンから開く（既存キャンバスがある場合のみキャンセル可能） ──
+function openNewCanvasModal(){
+  if(!confirm(T("art_confirm_new_canvas", "現在のキャンバスを保存せずに新しいキャンバスを作成しますか？"))) return;
+  newCanvasModalCancelable = true;
+  document.getElementById("gridSizeCancelWrap").style.display = "block";
+  renderFreeSizeOptions();
+  document.getElementById("gridSizeModal").style.display = "block";
+}
+
+function closeNewCanvasModal(){
+  if(!newCanvasModalCancelable) return;
+  document.getElementById("gridSizeModal").style.display = "none";
 }
 
 // ── 新規キャンバス作成モーダル（比率を選んでから、その比率のサイズレベルを選ぶ2段階） ──
@@ -143,6 +159,8 @@ function createCanvas(w, h){
   undoStack = [];
   redoStack = [];
   currentDesignId = null;
+  newCanvasModalCancelable = false;
+  document.getElementById("gridSizeCancelWrap").style.display = "none";
   document.getElementById("gridSizeModal").style.display = "none";
   renderCanvas();
   updateColorUsage();

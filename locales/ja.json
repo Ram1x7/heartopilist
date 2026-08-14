@@ -442,5 +442,7 @@
   "art_open": "開く",
   "art_delete": "削除",
   "art_confirm_delete_design": "このデザインを削除しますか？",
-  "art_share_title": "はとぴアート"
+  "art_share_title": "はとぴアート",
+  "art_new_canvas": "新規作成",
+  "art_confirm_new_canvas": "現在のキャンバスを保存せずに新しいキャンバスを作成しますか？"
 }

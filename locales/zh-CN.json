@@ -418,5 +418,7 @@
   "art_open": "打开",
   "art_delete": "删除",
   "art_confirm_delete_design": "要删除这个设计吗？",
-  "art_share_title": "哈托皮艺术"
+  "art_share_title": "哈托皮艺术",
+  "art_new_canvas": "新建",
+  "art_confirm_new_canvas": "要在不保存当前画布的情况下新建画布吗？"
 }
