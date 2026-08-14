@@ -4,7 +4,8 @@
 // Phase 3: Undo/Redo（スナップショット方式、最大50段階）
 // Phase 4.5: キャンバスの「実データのマス数」と「画面上の表示サイズ」を分離し、
 //   正方形以外の比率にも対応（1マスは常に正方形として描画）
-// キャンバスサイズはjs/art-config.jsのFREE_CANVAS_SIZES（固定4サイズ）から選択する
+// キャンバスサイズはjs/art-config.jsのFREE_CANVAS_RATIOS（比率×サイズレベル、
+// art-pia.comのConsole出力から確認済みの実数値）から選択する
 
 const BASE_CELL = 16; // 100%ズーム時の1マスのピクセルサイズ
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
@@ -36,6 +37,7 @@ let showColorNumbers = false;
 let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
+let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -87,11 +89,35 @@ function bindDisplayToggles(){
   });
 }
 
-// ── 新規キャンバス作成モーダル（固定4サイズから選択。すべて正方形） ──
+// ── 新規キャンバス作成モーダル（比率を選んでから、その比率のサイズレベルを選ぶ2段階） ──
 function renderFreeSizeOptions(){
-  const el = document.getElementById("artFreeSizeOptions");
-  el.innerHTML = FREE_CANVAS_SIZES.map(s => `
-    <button onclick="createCanvas(${s}, ${s})">${s} × ${s}</button>
+  renderRatioOptions(
+    "artRatioOptions",
+    selectedRatioId,
+    (id) => { selectedRatioId = id; renderLevelOptions(); }
+  );
+  renderLevelOptions();
+}
+
+function renderRatioOptions(containerId, currentId, onSelect){
+  const el = document.getElementById(containerId);
+  el.innerHTML = FREE_CANVAS_RATIOS.map(r => `
+    <button class="${r.id === currentId ? "active" : ""}" data-ratio="${r.id}">${r.ratio}</button>
+  `).join("");
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      el.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      onSelect(btn.dataset.ratio);
+    });
+  });
+}
+
+function renderLevelOptions(){
+  const ratio = FREE_CANVAS_RATIOS.find(r => r.id === selectedRatioId);
+  const el = document.getElementById("artLevelOptions");
+  el.innerHTML = ratio.levels.map(lv => `
+    <button onclick="createCanvas(${lv.w}, ${lv.h})">${lv.w} × ${lv.h}</button>
   `).join("");
 }
 

@@ -25,6 +25,12 @@ const FIT_BG_MODES = [
   { id: "transparent", labelKey: "art_fit_bg_transparent", labelFallback: "透明" },
   { id: "custom", labelKey: "art_fit_bg_custom", labelFallback: "色を指定" },
 ];
+const FRAME_CATEGORIES = [
+  { id: "all", labelKey: "art_frame_cat_all", labelFallback: "すべて" },
+  { id: "clothes", labelKey: "art_frame_cat_clothes", labelFallback: "衣装" },
+  { id: "furniture", labelKey: "art_frame_cat_furniture", labelFallback: "家具" },
+  { id: "other", labelKey: "art_frame_cat_other", labelFallback: "その他" },
+];
 // 変換方式プリセット。それぞれディザリング・輪郭強調の初期値を切り替える早見表で、
 // 選択後も個別のスライダー・ボタンで微調整できる（手動で変えるとpresetはnullになる）
 const CONVERT_PRESETS = [
@@ -34,9 +40,13 @@ const CONVERT_PRESETS = [
 ];
 
 let sourceImage = null;
+let selectedRatioId = "1-1"; // 「自由サイズ」で選択中の比率
+let selectedFrameCategory = "all"; // 「デザイン枠」の絞り込みカテゴリ
+let selectedFrameId = null; // 選択中のデザイン枠アイテム
+let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
 let settings = {
-  width: FREE_CANVAS_SIZES[0],
-  height: FREE_CANVAS_SIZES[0],
+  width: 30,
+  height: 30,
   fitMode: "fill",
   fitBgMode: "transparent",
   fitBgColor: "#ffffff",
@@ -95,24 +105,101 @@ function initArtConverter(){
   document.getElementById("artUseInEditorBtn").addEventListener("click", useResultInEditor);
 }
 
-// キャンバスサイズ選択（自由サイズ4種＋デザイン枠プリセット）
+// キャンバスサイズ選択（自由サイズ：比率→サイズレベルの2段階／デザイン枠：カテゴリ→アイテム→パーツ）
+function currentLang(){
+  return window.i18n && typeof window.i18n.getCurrentLang === "function" ? window.i18n.getCurrentLang() : "ja";
+}
+
 function renderConvertSizeOptions(){
   renderOptionGroup(
-    "artConvertFreeSizeOptions",
-    FREE_CANVAS_SIZES.map(s => ({ id: s, label: `${s} × ${s}` })),
-    settings.width === settings.height ? settings.width : null,
+    "artConvertRatioOptions",
+    FREE_CANVAS_RATIOS.map(r => ({ id: r.id, label: r.ratio })),
+    selectedRatioId,
     (v) => {
-      settings.width = Number(v);
-      settings.height = Number(v);
+      selectedRatioId = v;
+      renderConvertLevelOptions();
+    }
+  );
+  renderConvertLevelOptions();
+  renderConvertFrameOptions();
+}
+
+function renderConvertLevelOptions(){
+  const ratio = FREE_CANVAS_RATIOS.find(r => r.id === selectedRatioId);
+  const currentLevelId = !selectedFrameId ? `${settings.width}x${settings.height}` : null;
+  renderOptionGroup(
+    "artConvertLevelOptions",
+    ratio.levels.map(lv => ({ id: `${lv.w}x${lv.h}`, label: `${lv.w} × ${lv.h}` })),
+    currentLevelId,
+    (v) => {
+      const [w, h] = v.split("x").map(Number);
+      settings.width = w;
+      settings.height = h;
+      selectedFrameId = null;
+      selectedFramePartId = null;
+      renderConvertFrameOptions();
       scheduleConvert();
     }
   );
-  const el = document.getElementById("artConvertFramePresetOptions");
-  el.innerHTML = DESIGN_FRAME_PRESETS.map(p => `
-    <button disabled title="${T("art_frame_unconfirmed", "実際のゲーム内サイズを確認後に対応予定です")}">
-      ${T(p.nameKey, p.nameFallback)}<br><span class="art-preset-badge">${T("art_preset_coming_soon", "準備中")}</span>
-    </button>
-  `).join("");
+}
+
+function renderConvertFrameOptions(){
+  renderOptionGroup(
+    "artConvertFrameCategoryOptions",
+    FRAME_CATEGORIES.map(c => ({ id: c.id, label: T(c.labelKey, c.labelFallback) })),
+    selectedFrameCategory,
+    (v) => {
+      selectedFrameCategory = v;
+      selectedFrameId = null;
+      selectedFramePartId = null;
+      renderConvertFrameOptions();
+    }
+  );
+
+  const lang = currentLang();
+  const items = DESIGN_FRAME_PRESETS.filter(f => selectedFrameCategory === "all" || f.category === selectedFrameCategory);
+  renderOptionGroup(
+    "artConvertFrameItemOptions",
+    items.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    selectedFrameId,
+    (v) => {
+      selectFrameItem(v);
+    }
+  );
+
+  const partsEl = document.getElementById("artConvertFramePartOptions");
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
+  if(frame && frame.parts.length > 1){
+    partsEl.style.display = "flex";
+    renderOptionGroup(
+      "artConvertFramePartOptions",
+      frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
+      selectedFramePartId,
+      (v) => {
+        selectFramePart(v);
+      }
+    );
+  }else{
+    partsEl.style.display = "none";
+    partsEl.innerHTML = "";
+  }
+}
+
+function selectFrameItem(frameId){
+  selectedFrameId = frameId;
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
+  selectFramePart(frame.parts[0].id);
+}
+
+function selectFramePart(partId){
+  selectedFramePartId = partId;
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
+  const part = frame.parts.find(p => p.id === partId);
+  settings.width = part.width;
+  settings.height = part.height;
+  renderConvertFrameOptions();
+  renderConvertLevelOptions();
+  scheduleConvert();
 }
 
 // T()に依存するラベルのみ再描画（言語切替時にも呼び直す）
