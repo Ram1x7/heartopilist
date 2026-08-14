@@ -389,8 +389,6 @@
   "art_convert_fit_bg_label": "여백 색상",
   "art_fit_bg_transparent": "투명",
   "art_fit_bg_custom": "색상 지정",
-  "art_size_free_label": "자유 사이즈",
-  "art_size_frame_label": "디자인 프레임",
   "art_convert_preset_label": "변환 방식",
   "art_preset_standard": "표준",
   "art_preset_smooth": "부드럽게",
@@ -398,10 +396,6 @@
   "art_convert_noise_label": "노이즈 제거",
   "art_ratio_select_label": "비율",
   "art_size_select_label": "사이즈",
-  "art_frame_cat_all": "전체",
-  "art_frame_cat_clothes": "의상",
-  "art_frame_cat_furniture": "가구",
-  "art_frame_cat_other": "기타",
   "art_mydesigns_label": "마이 디자인",
   "art_save_design": "저장",
   "art_open_mydesigns": "목록 보기",
@@ -420,5 +414,7 @@
   "art_confirm_delete_design": "이 디자인을 삭제하시겠습니까?",
   "art_share_title": "하토피 아트",
   "art_new_canvas": "새로 만들기",
-  "art_confirm_new_canvas": "현재 캔버스를 저장하지 않고 새 캔버스를 만드시겠습니까?"
+  "art_confirm_new_canvas": "현재 캔버스를 저장하지 않고 새 캔버스를 만드시겠습니까?",
+  "art_gridsize_back": "뒤로",
+  "art_gridsize_step2_title": "캔버스 선택"
 }

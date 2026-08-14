@@ -389,8 +389,6 @@
   "art_convert_fit_bg_label": "สีขอบว่าง",
   "art_fit_bg_transparent": "โปร่งใส",
   "art_fit_bg_custom": "กำหนดสีเอง",
-  "art_size_free_label": "ขนาดอิสระ",
-  "art_size_frame_label": "กรอบดีไซน์",
   "art_convert_preset_label": "รูปแบบการแปลง",
   "art_preset_standard": "มาตรฐาน",
   "art_preset_smooth": "นุ่มนวล",
@@ -398,10 +396,6 @@
   "art_convert_noise_label": "ลดสัญญาณรบกวน",
   "art_ratio_select_label": "อัตราส่วน",
   "art_size_select_label": "ขนาด",
-  "art_frame_cat_all": "ทั้งหมด",
-  "art_frame_cat_clothes": "เสื้อผ้า",
-  "art_frame_cat_furniture": "เฟอร์นิเจอร์",
-  "art_frame_cat_other": "อื่นๆ",
   "art_mydesigns_label": "ดีไซน์ของฉัน",
   "art_save_design": "บันทึก",
   "art_open_mydesigns": "ดูรายการ",
@@ -420,5 +414,7 @@
   "art_confirm_delete_design": "ลบดีไซน์นี้หรือไม่?",
   "art_share_title": "Hatopi Art",
   "art_new_canvas": "สร้างใหม่",
-  "art_confirm_new_canvas": "สร้างผืนผ้าใบใหม่โดยไม่บันทึกผืนปัจจุบันหรือไม่?"
+  "art_confirm_new_canvas": "สร้างผืนผ้าใบใหม่โดยไม่บันทึกผืนปัจจุบันหรือไม่?",
+  "art_gridsize_back": "ย้อนกลับ",
+  "art_gridsize_step2_title": "เลือกผืนผ้าใบ"
 }

@@ -9,13 +9,6 @@
 //   1アイテムが複数パーツ（前面・背面・袖など）を持つ場合は parts に列挙する。
 //   1アイテムしかないパーツは parts[0]（id:"default"）のみを持つ。
 
-const FRAME_CATEGORIES = [
-  { id: "all", labelKey: "art_frame_cat_all", labelFallback: "すべて" },
-  { id: "clothes", labelKey: "art_frame_cat_clothes", labelFallback: "衣装" },
-  { id: "furniture", labelKey: "art_frame_cat_furniture", labelFallback: "家具" },
-  { id: "other", labelKey: "art_frame_cat_other", labelFallback: "その他" },
-];
-
 const FREE_CANVAS_RATIOS = [
   { id: "16-9", ratio: "16:9", levels: [{ w: 30, h: 18 }, { w: 50, h: 28 }, { w: 100, h: 56 }, { w: 150, h: 84 }] },
   { id: "4-3", ratio: "4:3", levels: [{ w: 30, h: 24 }, { w: 50, h: 38 }, { w: 100, h: 76 }, { w: 150, h: 114 }] },

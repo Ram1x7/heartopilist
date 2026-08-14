@@ -39,7 +39,6 @@ let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
 let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
-let selectedFrameCategory = "all"; // 新規キャンバス作成モーダルの「デザイン枠」絞り込みカテゴリ
 let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
 let savedDesigns = []; // 名前を付けて保存したデザインの一覧
@@ -66,6 +65,7 @@ function initArtEditor(){
     blockStatus = draft.blockStatus || {};
     currentDesignId = draft.designId || null;
   }else{
+    showFrameStep1();
     renderFreeSizeOptions();
     document.getElementById("gridSizeModal").style.display = "block";
   }
@@ -113,8 +113,20 @@ function openNewCanvasModal(){
   if(!confirm(T("art_confirm_new_canvas", "現在のキャンバスを保存せずに新しいキャンバスを作成しますか？"))) return;
   newCanvasModalCancelable = true;
   document.getElementById("gridSizeCancelWrap").style.display = "block";
+  showFrameStep1();
   renderFreeSizeOptions();
   document.getElementById("gridSizeModal").style.display = "block";
+}
+
+// デザイン枠のパーツ選択は、元サイトと同様に「戻る」付きの別画面へ切り替える方式
+function showFrameStep1(){
+  document.getElementById("gridSizeStep1").style.display = "block";
+  document.getElementById("gridSizeStep2").style.display = "none";
+}
+
+function showFrameStep2(){
+  document.getElementById("gridSizeStep1").style.display = "none";
+  document.getElementById("gridSizeStep2").style.display = "block";
 }
 
 function closeNewCanvasModal(){
@@ -169,23 +181,10 @@ function renderOptionGroup(containerId, options, currentValue, onSelect){
 // 残っていても、クリックしていないのに勝手に新規作成されてしまうのを防ぐため）。
 // 作成は必ずクリックハンドラー内（アイテム選択 or パーツ選択）からのみ行う。
 function renderFrameOptions(){
-  renderOptionGroup(
-    "artFrameCategoryOptions",
-    FRAME_CATEGORIES.map(c => ({ id: c.id, label: T(c.labelKey, c.labelFallback) })),
-    selectedFrameCategory,
-    (v) => {
-      selectedFrameCategory = v;
-      selectedFrameId = null;
-      selectedFramePartId = null;
-      renderFrameOptions();
-    }
-  );
-
   const lang = currentLang();
-  const items = DESIGN_FRAME_PRESETS.filter(f => selectedFrameCategory === "all" || f.category === selectedFrameCategory);
   renderOptionGroup(
     "artFrameItemOptions",
-    items.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang) })),
     selectedFrameId,
     (v) => {
       selectedFrameId = v;
@@ -194,25 +193,23 @@ function renderFrameOptions(){
       if(frame.parts.length === 1){
         createFrameCanvas(frame.parts[0].id);
       }else{
-        renderFrameOptions();
+        renderFramePartOptions();
+        showFrameStep2();
       }
     }
   );
+}
 
-  const partsEl = document.getElementById("artFramePartOptions");
+function renderFramePartOptions(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
-  if(frame && frame.parts.length > 1){
-    partsEl.style.display = "flex";
-    renderOptionGroup(
-      "artFramePartOptions",
-      frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
-      selectedFramePartId,
-      (v) => createFrameCanvas(v)
-    );
-  }else{
-    partsEl.style.display = "none";
-    partsEl.innerHTML = "";
-  }
+  if(!frame) return;
+  const lang = currentLang();
+  renderOptionGroup(
+    "artFramePartOptions",
+    frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
+    selectedFramePartId,
+    (v) => createFrameCanvas(v)
+  );
 }
 
 function createFrameCanvas(partId){
@@ -990,6 +987,9 @@ document.addEventListener("langchange", () => {
   updateColorUsage();
   if(document.getElementById("gridSizeModal").style.display !== "none"){
     renderFreeSizeOptions();
+    if(document.getElementById("gridSizeStep2").style.display !== "none"){
+      renderFramePartOptions();
+    }
   }
   if(document.getElementById("myDesignsModal").style.display !== "none"){
     renderMyDesignsList();

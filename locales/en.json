@@ -413,8 +413,6 @@
   "art_convert_fit_bg_label": "Margin color",
   "art_fit_bg_transparent": "Transparent",
   "art_fit_bg_custom": "Custom color",
-  "art_size_free_label": "Free size",
-  "art_size_frame_label": "Design frames",
   "art_convert_preset_label": "Conversion style",
   "art_preset_standard": "Standard",
   "art_preset_smooth": "Smooth",
@@ -422,10 +420,6 @@
   "art_convert_noise_label": "Noise reduction",
   "art_ratio_select_label": "Ratio",
   "art_size_select_label": "Size",
-  "art_frame_cat_all": "All",
-  "art_frame_cat_clothes": "Clothing",
-  "art_frame_cat_furniture": "Furniture",
-  "art_frame_cat_other": "Other",
   "art_mydesigns_label": "My Designs",
   "art_save_design": "Save",
   "art_open_mydesigns": "View List",
@@ -444,5 +438,7 @@
   "art_confirm_delete_design": "Delete this design?",
   "art_share_title": "Hatopi Art",
   "art_new_canvas": "New",
-  "art_confirm_new_canvas": "Create a new canvas without saving the current one?"
+  "art_confirm_new_canvas": "Create a new canvas without saving the current one?",
+  "art_gridsize_back": "Back",
+  "art_gridsize_step2_title": "Choose a canvas"
 }

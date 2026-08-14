@@ -385,6 +385,14 @@ body.dark .art-usage-empty{
   margin-top:0;
 }
 
+/* デザイン枠アイテム一覧（数が多いので固定高さ+スクロール） */
+.art-scroll-options{
+  max-height:200px;
+  overflow-y:auto;
+  align-content:flex-start;
+  padding:2px;
+}
+
 .art-gridsize-options button{
   flex:1 1 40%;
   border:1px solid var(--border);
