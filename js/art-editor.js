@@ -409,7 +409,18 @@ function selectPaletteMain(no){
     setCurrentColor(entry.hex, no);
     return;
   }
-  expandedPaletteMain = expandedPaletteMain === no ? null : no;
+  if(expandedPaletteMain === no){
+    // 展開中の同じメインカラーを再タップ → 閉じるだけ（選択色はそのまま）
+    expandedPaletteMain = null;
+    renderPalette();
+    return;
+  }
+  // メインカラーをタップした時点で、選択中マークがすぐに追従するようそのメインの代表色
+  // （＝メインカラー自体のhex。サブカラーの1つと同じ値）を選択しつつサブカラー一覧を展開する。
+  // より具体的な色合いはサブカラーをタップして選び直せる。
+  currentColor = entry.hex;
+  selectedMainNo = no;
+  expandedPaletteMain = no;
   renderPalette();
 }
 
