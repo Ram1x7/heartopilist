@@ -7,7 +7,8 @@
 // キャンバスサイズはjs/art-config.jsのFREE_CANVAS_RATIOS（比率×サイズレベル、
 // art-pia.comのConsole出力から確認済みの実数値）から選択する
 
-const BASE_CELL = 16; // 100%ズーム時の1マスのピクセルサイズ
+// ズーム100%＝画面（.art-canvas-area、固定サイズの表示エリア）にキャンバス全体が
+// ちょうど収まる大きさ。1マスのピクセルサイズはfitCellSize()で動的に求める
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
 const DRAFT_KEY = "hatopiArt_currentDraft";
 const SAVED_DESIGNS_KEY = "hatopiArt_savedDesigns";
@@ -418,7 +419,6 @@ function renderZoomControls(){
     <span class="art-zoom-label" id="artZoomLabel">${zoom}%</span>
     <button onclick="zoomIn()" aria-label="${T('art_zoom_in', '拡大')}">${icon("plus", { size: 16 })}</button>
     <button class="art-zoom-text-btn" onclick="zoomReset()">100%</button>
-    <button class="art-zoom-text-btn" onclick="zoomFit()">${T('art_zoom_fit', '画面に合わせる')}</button>
   `;
 }
 
@@ -429,6 +429,21 @@ function updateZoomLabel(){
 
 const MIN_ZOOM = ZOOM_LEVELS[0];
 const MAX_ZOOM = ZOOM_LEVELS[ZOOM_LEVELS.length - 1];
+
+// w×hのグリッド全体が.art-canvas-area（固定サイズの表示エリア）にちょうど収まる
+// 1マスのピクセルサイズ。表示エリア自体はCSSで高さが固定されているため、
+// ズームや内容が変わってもこの基準値がぶれない（「背景の画面」が動かなくなる）
+function fitCellSize(w, h){
+  const area = document.querySelector(".art-canvas-area");
+  const availW = Math.max(area.clientWidth - 32, 40);
+  const availH = Math.max(area.clientHeight - 32, 40);
+  return Math.min(availW / w, availH / h);
+}
+
+// 現在のキャンバス・ズームでの1マスのピクセルサイズ（ズーム100%＝画面に合わせた表示）
+function currentCellSize(){
+  return fitCellSize(gridWidth, gridHeight) * zoom / 100;
+}
 
 // 表示エリア（.art-canvas-area）の中心を、画面上の座標（clientX/Y）として返す。
 // ボタン操作など、特定の指の位置がないズーム操作の基準点に使う
@@ -441,7 +456,7 @@ function containerCenterClientPoint(){
 // 画面上の座標（clientX/Y）が指すグリッド座標（マス単位、小数可）を、現在のズームで求める
 function gridPointFromClient(clientX, clientY){
   const rect = canvas.getBoundingClientRect();
-  const cell = BASE_CELL * zoom / 100;
+  const cell = currentCellSize();
   return {
     gx: (clientX - rect.left) * (canvas.width / rect.width) / cell,
     gy: (clientY - rect.top) * (canvas.height / rect.height) / cell,
@@ -451,7 +466,7 @@ function gridPointFromClient(clientX, clientY){
 // グリッド座標（マス単位）が、現在のズームで画面上のどこに来るかを返す
 function clientPointFromGrid(gx, gy){
   const rect = canvas.getBoundingClientRect();
-  const cell = BASE_CELL * zoom / 100;
+  const cell = currentCellSize();
   return {
     clientX: rect.left + gx * cell * (rect.width / canvas.width),
     clientY: rect.top + gy * cell * (rect.height / canvas.height),
@@ -492,20 +507,11 @@ function zoomOut(){
   zoomAt(target, c.x, c.y);
 }
 
+// ズーム100%＝画面に合わせた表示（fitCellSize）そのものなので、「100%に戻す」は
+// そのまま「画面に合わせる」を兼ねる
 function zoomReset(){
-  const c = containerCenterClientPoint();
-  zoomAt(100, c.x, c.y);
-}
-
-function zoomFit(){
   const area = document.querySelector(".art-canvas-area");
-  const availW = Math.max(area.clientWidth - 32, 40);
-  const availH = Math.max(area.clientHeight - 32, 40);
-  const fitCell = Math.min(availW / gridWidth, availH / gridHeight);
-  const fitZoomRaw = (fitCell / BASE_CELL) * 100;
-  let best = ZOOM_LEVELS[0];
-  ZOOM_LEVELS.forEach(z => { if(z <= fitZoomRaw) best = z; });
-  zoom = best;
+  zoom = 100;
   renderCanvas();
   updateZoomLabel();
   area.scrollLeft = 0;
@@ -626,7 +632,7 @@ function toggleHighlight(c){
 
 // ── 描画（1マスは常に正方形。gridWidth/gridHeightが異なっても比率を維持） ──
 function renderCanvas(){
-  const cell = BASE_CELL * zoom / 100;
+  const cell = currentCellSize();
   canvas.width = gridWidth * cell;
   canvas.height = gridHeight * cell;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -804,7 +810,7 @@ function cellFromEvent(e){
   const scaleY = canvas.height / rect.height;
   const x = (e.clientX - rect.left) * scaleX;
   const y = (e.clientY - rect.top) * scaleY;
-  const cell = BASE_CELL * zoom / 100;
+  const cell = currentCellSize();
   const cx = Math.floor(x / cell);
   const cy = Math.floor(y / cell);
   if(cx < 0 || cy < 0 || cx >= gridWidth || cy >= gridHeight) return null;
@@ -1075,20 +1081,20 @@ function zoomToBlock(bx, by){
   const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
   const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
   const area = document.querySelector(".art-canvas-area");
-  const availW = Math.max(area.clientWidth - 32, 40);
-  const availH = Math.max(area.clientHeight - 32, 40);
-  const fitCell = Math.min(availW / bw, availH / bh);
-  const fitZoomRaw = (fitCell / BASE_CELL) * 100;
+  // ズーム100%＝キャンバス全体を画面に合わせた大きさが基準になったため、
+  // 「このブロックを画面に合わせた大きさ」を、その基準に対する相対的なズーム%に変換する
+  const blockFitCell = fitCellSize(bw, bh);
+  const fitZoomRaw = (blockFitCell / fitCellSize(gridWidth, gridHeight)) * 100;
   let best = ZOOM_LEVELS[0];
   ZOOM_LEVELS.forEach(z => { if(z <= fitZoomRaw) best = z; });
-  zoom = best;
+  zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, best));
 
   renderToolbar();
   renderCanvas();
   updateZoomLabel();
   renderBlockList();
 
-  const cell = BASE_CELL * zoom / 100;
+  const cell = currentCellSize();
   area.scrollLeft = Math.max(0, (bx * BLOCK_SIZE + bw / 2) * cell - area.clientWidth / 2);
   area.scrollTop = Math.max(0, (by * BLOCK_SIZE + bh / 2) * cell - area.clientHeight / 2);
 }
