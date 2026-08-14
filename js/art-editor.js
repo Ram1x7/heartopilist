@@ -9,13 +9,7 @@
 
 const BASE_CELL = 16; // 100%ズーム時の1マスのピクセルサイズ
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
-const BASE_PALETTE = [
-  "#e0453c", "#e58a2e", "#e8c93c", "#5a9e4a",
-  "#4fb0c6", "#3c5a6e", "#8a5ec7", "#e06fa0",
-  "#8a5a3c", "#2b2620", "#fdf9ef", "#9a9488",
-];
 const DRAFT_KEY = "hatopiArt_currentDraft";
-const CUSTOM_COLORS_KEY = "hatopiArt_customColors";
 const SAVED_DESIGNS_KEY = "hatopiArt_savedDesigns";
 const MAX_HISTORY = 50;
 const BLOCK_SIZE = 10;
@@ -23,8 +17,8 @@ const BLOCK_SIZE = 10;
 let gridWidth = 30;
 let gridHeight = 30;
 let pixels = [];
-let customColors = [];
-let currentColor = BASE_PALETTE[0];
+let currentColor = "#EF6E72"; // 初期選択色（05 コーラル）
+let expandedPaletteMain = null; // カラーパレットで展開表示中のメインカラー番号
 let currentTool = "pen";
 let zoom = 100;
 let highlightedColor = null;
@@ -50,11 +44,6 @@ const ctx = canvas.getContext("2d");
 
 // ── 初期化 ──
 function initArtEditor(){
-  try{
-    customColors = JSON.parse(localStorage.getItem(CUSTOM_COLORS_KEY) || "[]");
-  }catch(e){
-    customColors = [];
-  }
   loadSavedDesigns();
 
   const draft = loadDraft();
@@ -381,40 +370,76 @@ function zoomFit(){
 }
 
 // ── カラーパレット ──
+// ゲーム内で実際に選択できる色（js/art-config.jsのGAME_PALETTE）に完全一致させた
+// 階層UI（メインカラー→サブカラー）のみを通じて色を選ぶ。任意の色を自由入力する手段は持たない。
 function renderPalette(){
-  const el = document.getElementById("artPalette");
-  const swatches = [...BASE_PALETTE, ...customColors];
-  el.innerHTML = swatches.map(c => `
-    <button class="art-swatch${c === currentColor ? " active" : ""}" style="background:${c}" onclick="setCurrentColor('${c}')" aria-label="${c}"></button>
+  const mainsEl = document.getElementById("artPaletteMains");
+  mainsEl.innerHTML = GAME_PALETTE.map(entry => {
+    const isNone = entry.no === "04";
+    const hasSubs = entry.subs.length > 0;
+    const isActive = isNone
+      ? currentColor === null
+      : hasSubs
+        ? entry.subs.some(h => h.toUpperCase() === String(currentColor).toUpperCase())
+        : entry.hex.toUpperCase() === String(currentColor).toUpperCase();
+    const cls = ["art-swatch", "art-swatch-main"];
+    // "active"は全体で*{background:var(--indigo)!important}という汎用クラスと衝突し
+    // スウォッチ本来の色を上書きしてしまうため、専用クラス名にする
+    if(isActive) cls.push("is-selected");
+    if(isNone) cls.push("art-swatch-none");
+    const style = isNone ? "" : ` style="background:${entry.hex}"`;
+    return `<button class="${cls.join(" ")}"${style} data-main="${entry.no}" aria-label="${entry.no} ${entry.name}"></button>`;
+  }).join("");
+  mainsEl.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => selectPaletteMain(btn.dataset.main));
+  });
+  renderPaletteSubs();
+}
+
+function selectPaletteMain(no){
+  const entry = GAME_PALETTE.find(e => e.no === no);
+  // 04（透明/なし）・02・03（サブカラーなし）はメインカラーのタップだけで選択が確定するため、
+  // 別のメインカラーのサブカラー一覧が開いたままにならないよう、常にサブカラー欄を閉じる
+  // （例：#FEFFFFは01のサブカラーにも含まれるが、02をタップして01のサブ一覧が開くのは避ける）
+  if(no === "04"){
+    currentColor = null;
+    expandedPaletteMain = null;
+    renderPalette();
+    return;
+  }
+  if(entry.subs.length === 0){
+    currentColor = entry.hex;
+    expandedPaletteMain = null;
+    renderPalette();
+    return;
+  }
+  expandedPaletteMain = expandedPaletteMain === no ? null : no;
+  renderPalette();
+}
+
+function renderPaletteSubs(){
+  const wrap = document.getElementById("artPaletteSubs");
+  const entry = GAME_PALETTE.find(e => e.no === expandedPaletteMain);
+  if(!entry || entry.subs.length === 0){
+    wrap.style.display = "none";
+    wrap.innerHTML = "";
+    return;
+  }
+  wrap.style.display = "flex";
+  wrap.innerHTML = entry.subs.map((hex, i) => `
+    <button class="art-swatch art-swatch-sub${hex.toUpperCase() === String(currentColor).toUpperCase() ? " is-selected" : ""}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>
   `).join("");
+  wrap.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex));
+  });
 }
 
 function setCurrentColor(c){
   currentColor = c;
+  const group = c === null ? null : gamePaletteGroupForHex(c);
+  expandedPaletteMain = group && group.subs.length > 0 ? group.no : null;
   renderPalette();
 }
-
-function addCustomColor(){
-  const input = document.getElementById("artHexInput");
-  let hex = input.value.trim();
-  if(!hex) return;
-  if(!hex.startsWith("#")) hex = "#" + hex;
-  if(!/^#[0-9a-fA-F]{6}$/.test(hex)){
-    alert(T("art_invalid_hex", "カラーコードの形式が正しくありません（例：#FF0000）"));
-    return;
-  }
-  if(!customColors.includes(hex)){
-    customColors.push(hex);
-    localStorage.setItem(CUSTOM_COLORS_KEY, JSON.stringify(customColors));
-  }
-  setCurrentColor(hex);
-  input.value = "";
-}
-
-document.getElementById("artAddColorBtn").addEventListener("click", addCustomColor);
-document.getElementById("artColorPicker").addEventListener("input", (e) => {
-  setCurrentColor(e.target.value);
-});
 
 // ── 使用色の集計・ハイライト ──
 function updateColorUsage(){
@@ -422,7 +447,7 @@ function updateColorUsage(){
   pixels.forEach(c => { if(c) counts[c] = (counts[c] || 0) + 1; });
   const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   colorNumberMap = {};
-  entries.forEach(([c], i) => { colorNumberMap[c] = String(i + 1).padStart(2, "0"); });
+  entries.forEach(([c]) => { colorNumberMap[c] = gamePaletteCode(c); });
   const el = document.getElementById("artColorUsage");
   el.innerHTML = entries.length
     ? entries.map(([c, n]) => `
@@ -609,7 +634,8 @@ function applyToolAt(cx, cy){
     floodFill(cx, cy, currentColor);
   }else if(currentTool === "eyedropper"){
     if(pixels[idx]){
-      setCurrentColor(pixels[idx]);
+      // 拾った色が固定パレット外（旧データ等）の場合は最も近いパレット色に丸める
+      setCurrentColor(nearestGamePaletteHex(hexToRgb(pixels[idx])));
     }
     setTool("pen");
   }

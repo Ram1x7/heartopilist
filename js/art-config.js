@@ -251,3 +251,78 @@ const DESIGN_FRAME_PRESETS = [
 function frameName(obj, lang){
   return (obj.nameI18n && obj.nameI18n[lang]) || obj.name;
 }
+
+// ── カラーパレット（ゲーム内で実際に選択できる色に完全一致させる固定パレット） ──
+// メインカラー16枠（01〜16）。04は「透明/なし」の予約枠で、現時点ではhex未定義のため
+// 色一覧・最近傍色マッチングの対象からは除外する（後日データが入り次第対応する）。
+// 01・05〜16はサブカラー（詳細色）を持ち、02・03はメインカラー単色のみ（サブカラーなし）。
+const GAME_PALETTE = [
+  { no: "01", name: "黒系", hex: "#051616", subs: ["#051616", "#414545", "#808282", "#BEBFBF", "#FEFFFF"] },
+  { no: "02", name: "白", hex: "#FEFFFF", subs: [] },
+  { no: "03", name: "グレー", hex: "#808282", subs: [] },
+  { no: "04", name: "透明", hex: null, subs: [] },
+  { no: "05", name: "コーラル", hex: "#EF6E72", subs: ["#D0344D", "#EF6E72", "#A6263D", "#F5ACA6", "#CA8483", "#A35D5E", "#69313B", "#E7D5D4", "#C0ACAB", "#755E5E"] },
+  { no: "06", name: "オレンジ", hex: "#F98358", subs: ["#E95E2B", "#F98358", "#AB4226", "#FEBA9F", "#DA937C", "#AF6B58", "#753B31", "#E9D5D0", "#C1ACA6", "#755E59"] },
+  { no: "07", name: "黄オレンジ", hex: "#FEAE3B", subs: ["#F49E16", "#FEAE3B", "#B16E16", "#FECF91", "#DBA76C", "#B3814B", "#795126", "#F5E3CF", "#CEBBA9", "#806E5E"] },
+  { no: "08", name: "黄色", hex: "#F9D837", subs: ["#EDCA16", "#F9D837", "#B39416", "#FAE690", "#D3BD6E", "#AB954B", "#756326", "#EFE6C7", "#C6BEA2", "#787259"] },
+  { no: "09", name: "黄緑", hex: "#B7C931", subs: ["#A8BB16", "#B7C931", "#758616", "#D8DF93", "#ADB76C", "#85904B", "#545E2B", "#E6E9C7", "#BCC2A3", "#6E745D"] },
+  { no: "10", name: "緑", hex: "#41B97B", subs: ["#05A25D", "#41B97B", "#057447", "#9CD9AD", "#76B28C", "#508968", "#245640", "#C4E0CC", "#9DB7A6", "#54685D"] },
+  { no: "11", name: "ティール", hex: "#05ABA0", subs: ["#058781", "#05ABA0", "#056865", "#7ECDC2", "#55A49C", "#2B7D78", "#054B4B", "#BEE0D9", "#98B7B2", "#4E6965"] },
+  { no: "12", name: "水色", hex: "#0599BA", subs: ["#05729C", "#0599BA", "#055878", "#79BACB", "#5293A5", "#246C7F", "#05495B", "#C6DDE2", "#9EB5BA", "#50676E"] },
+  { no: "13", name: "青", hex: "#2B83C1", subs: ["#055EA6", "#2B83C1", "#054782", "#83A8C9", "#5D80A1", "#365B7F", "#193B56", "#C2CDD5", "#9BA6B0", "#4C5967"] },
+  { no: "14", name: "青紫", hex: "#7577BC", subs: ["#544DA1", "#7577BC", "#3E377D", "#A2A0C8", "#787AA1", "#55567D", "#323454", "#C9CBD5", "#A2A3B0", "#565868"] },
+  { no: "15", name: "紫", hex: "#A167A9", subs: ["#813D8C", "#A167A9", "#602B6B", "#B79BB9", "#907395", "#6C4D73", "#402944", "#D0C9D1", "#ABA1AC", "#605665"] },
+  { no: "16", name: "ローズ", hex: "#D0698F", subs: ["#AD346E", "#D0698F", "#862658", "#DAA1B4", "#B47A8D", "#8B5367", "#60344B", "#E4D5D9", "#BCADB1", "#725E65"] },
+];
+
+// GAME_PALETTEを平坦化した「選択可能な全色」一覧と、hex→パレット番号（例:"05-3"、
+// サブカラーを持たない02・03は"02"のように番号のみ）の逆引きマップ。
+// 04（透明/なし）はhexデータがないため含めない。
+const GAME_PALETTE_FLAT = [];
+const GAME_PALETTE_CODE_BY_HEX = {};
+GAME_PALETTE.forEach(entry => {
+  if(!entry.hex) return;
+  if(entry.subs.length === 0){
+    GAME_PALETTE_FLAT.push({ code: entry.no, hex: entry.hex });
+    GAME_PALETTE_CODE_BY_HEX[entry.hex.toUpperCase()] = entry.no;
+  }else{
+    entry.subs.forEach((hex, i) => {
+      const code = `${entry.no}-${i + 1}`;
+      GAME_PALETTE_FLAT.push({ code, hex });
+      GAME_PALETTE_CODE_BY_HEX[hex.toUpperCase()] = code;
+    });
+  }
+});
+
+function hexToRgb(hex){
+  const h = hex.replace("#", "");
+  return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+}
+
+// 任意のRGBに対して、固定パレット内で最も近い色（最近傍色マッチング）のhexを返す
+function nearestGamePaletteHex(rgb){
+  let best = GAME_PALETTE_FLAT[0].hex, bestDist = Infinity;
+  GAME_PALETTE_FLAT.forEach(({ hex }) => {
+    const p = hexToRgb(hex);
+    const dist = (rgb[0] - p[0]) ** 2 + (rgb[1] - p[1]) ** 2 + (rgb[2] - p[2]) ** 2;
+    if(dist < bestDist){ bestDist = dist; best = hex; }
+  });
+  return best;
+}
+
+// hexに対応するパレット番号（例:"05-3"）。パレット外の色（旧データ等）は空文字を返す
+function gamePaletteCode(hex){
+  if(!hex) return "";
+  return GAME_PALETTE_CODE_BY_HEX[hex.toUpperCase()] || "";
+}
+
+// hexが属するメインカラーのGAME_PALETTEエントリを返す（サブカラー・メインカラーどちらの一致でも可）
+function gamePaletteGroupForHex(hex){
+  if(!hex) return null;
+  const upper = hex.toUpperCase();
+  return GAME_PALETTE.find(entry => {
+    if(!entry.hex) return false;
+    if(entry.subs.length === 0) return entry.hex.toUpperCase() === upper;
+    return entry.subs.some(s => s.toUpperCase() === upper);
+  }) || null;
+}

@@ -1,7 +1,9 @@
 // js/art-converter.js
 // 「画像から作る」ページ（art-convert.html）: 画像→ドット絵変換
 // アップロード → 配置（Crop/Fit/Fill、キャンバス比率に合わせる）→ 明るさ/コントラスト
-// → 輪郭強調 → 背景処理 → 色数削減（メディアンカット）→ パレット変換（ディザリング対応）
+// → 輪郭強調 → 背景処理 → 色数削減 → パレット変換（ディザリング対応）
+// 使用する色は、js/art-config.jsのGAME_PALETTE（ゲーム内で実際に選べる色に完全一致させた
+// 固定パレット、約125色）のみに制限する（最近傍色マッチング）。
 // すべてブラウザ内で完結し、画像を外部に送信しない。
 
 const COLOR_COUNTS = [4, 8, 12, 16, 24, 32];
@@ -476,59 +478,24 @@ function computeBackgroundMask(imgData, mode){
   return mask;
 }
 
-// ── パレット生成（メディアンカット法） ──
+// ── パレット生成 ──
+// ゲーム内で実際に選べる色（js/art-config.jsのGAME_PALETTE、約125色）のみを使う。
+// まず各ピクセルを最も近い固定パレット色に丸め、その出現頻度が多い上位n色を
+// 「この変換で使う色」として残し、残りのピクセルもその上位n色の中から最も近い色に丸め直す
+// （＝「125色の中から何色まで絞り込むか」を n で調整する）。
 function buildPalette(imgData, n, bgMask){
   const d = imgData.data;
-  const pts = [];
+  const counts = new Map();
   for(let i = 0; i < bgMask.length; i++){
     if(bgMask[i]) continue;
-    pts.push([d[i * 4], d[i * 4 + 1], d[i * 4 + 2]]);
+    const hex = nearestGamePaletteHex([d[i * 4], d[i * 4 + 1], d[i * 4 + 2]]);
+    counts.set(hex, (counts.get(hex) || 0) + 1);
   }
-  if(pts.length === 0) return [[0, 0, 0]];
-  return medianCut(pts, n);
-}
-
-function medianCut(points, n){
-  let buckets = [points];
-  while(buckets.length < n){
-    let idx = -1, maxRange = -1;
-    buckets.forEach((b, i) => {
-      const r = channelRange(b);
-      if(r.max > maxRange && b.length > 1){
-        maxRange = r.max;
-        idx = i;
-      }
-    });
-    if(idx === -1) break;
-    const bucket = buckets[idx];
-    const ch = channelRange(bucket).channel;
-    bucket.sort((a, b) => a[ch] - b[ch]);
-    const mid = Math.floor(bucket.length / 2);
-    buckets.splice(idx, 1, bucket.slice(0, mid), bucket.slice(mid));
-  }
-  return buckets.filter(b => b.length > 0).map(averageColor);
-}
-
-function channelRange(points){
-  const min = [255, 255, 255], max = [0, 0, 0];
-  points.forEach(p => {
-    for(let c = 0; c < 3; c++){
-      if(p[c] < min[c]) min[c] = p[c];
-      if(p[c] > max[c]) max[c] = p[c];
-    }
-  });
-  const ranges = [max[0] - min[0], max[1] - min[1], max[2] - min[2]];
-  let channel = 0, best = ranges[0];
-  for(let c = 1; c < 3; c++){
-    if(ranges[c] > best){ best = ranges[c]; channel = c; }
-  }
-  return { channel, max: best };
-}
-
-function averageColor(points){
-  const sum = [0, 0, 0];
-  points.forEach(p => { sum[0] += p[0]; sum[1] += p[1]; sum[2] += p[2]; });
-  return [Math.round(sum[0] / points.length), Math.round(sum[1] / points.length), Math.round(sum[2] / points.length)];
+  if(counts.size === 0) return [hexToRgb(GAME_PALETTE_FLAT[0].hex)];
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([hex]) => hexToRgb(hex));
 }
 
 function nearestPaletteIndex(rgb, palette){
@@ -541,10 +508,10 @@ function nearestPaletteIndex(rgb, palette){
 }
 
 function rgbToHex(rgb){
-  return "#" + rgb.map(v => {
+  return ("#" + rgb.map(v => {
     const n = Math.max(0, Math.min(255, Math.round(v)));
     return n.toString(16).padStart(2, "0");
-  }).join("");
+  }).join("")).toUpperCase();
 }
 
 function mapToPalette(imgData, palette, bgMask){

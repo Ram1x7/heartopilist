@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=12">
+<link rel="stylesheet" href="./css/art.css?v=13">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -100,12 +100,8 @@
     </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_palette_label">カラー</div>
-      <div class="art-palette" id="artPalette"></div>
-      <div class="art-custom-color">
-        <input type="color" id="artColorPicker" value="#b1503b">
-        <input type="text" id="artHexInput" placeholder="#RRGGBB" maxlength="7">
-        <button id="artAddColorBtn" data-i18n="art_add_color">追加</button>
-      </div>
+      <div class="art-palette" id="artPaletteMains"></div>
+      <div class="art-palette art-palette-subs" id="artPaletteSubs" style="display:none"></div>
     </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
