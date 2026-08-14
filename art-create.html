@@ -114,6 +114,7 @@
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_mydesigns_label">マイデザイン</div>
       <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artNewCanvasBtn" data-i18n="art_new_canvas">新規作成</button>
         <button class="art-header-btn" id="artSaveBtn" data-i18n="art_save_design">保存する</button>
         <button class="art-header-btn" id="artMyDesignsBtn" data-i18n="art_open_mydesigns">一覧を見る</button>
       </div>
@@ -148,13 +149,16 @@
   ※本サイトは非公式のファンツールです
 </div>
 
-<div id="gridSizeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+<div id="gridSizeModal" onclick="if(event.target.id==='gridSizeModal') closeNewCanvasModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-newcanvas-box">
     <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
     <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
     <div class="art-gridsize-options" id="artRatioOptions"></div>
     <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
     <div class="art-gridsize-options" id="artLevelOptions"></div>
+    <div id="gridSizeCancelWrap" style="display:none;">
+      <button class="modal-close-btn" onclick="closeNewCanvasModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
+    </div>
   </div>
 </div>
 
