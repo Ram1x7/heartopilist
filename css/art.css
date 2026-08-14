@@ -245,7 +245,9 @@ body.dark .art-zoom-label{
   padding:0;
 }
 
-.art-swatch.active{
+/* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
+   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現） */
+.art-swatch.is-selected{
   border-color:var(--indigo);
   box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo);
 }
@@ -254,60 +256,38 @@ body.dark .art-swatch{
   border-color:#46423b;
 }
 
-body.dark .art-swatch.active{
+body.dark .art-swatch.is-selected{
   border-color:var(--indigo-soft);
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
 }
 
-.art-custom-color{
-  display:flex;
-  align-items:center;
-  gap:6px;
+/* サブカラー展開エリア（メインカラーをタップすると下に表示される） */
+.art-palette-subs{
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px dashed var(--border);
 }
 
-.art-custom-color input[type="color"]{
-  width:32px;
-  height:32px;
-  padding:0;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:none;
-  cursor:pointer;
+body.dark .art-palette-subs{
+  border-top-color:#46423b;
 }
 
-.art-custom-color input[type="text"]{
-  flex:1;
-  min-width:0;
-  height:32px;
-  padding:0 10px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:var(--card-sub);
-  color:var(--text);
-  font-size:12px;
+.art-swatch-sub{
+  width:24px;
+  height:24px;
+  border-radius:6px;
 }
 
-.art-custom-color button{
-  flex-shrink:0;
-  height:32px;
-  padding:0 12px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:var(--indigo);
-  color:#fdf9ef;
-  font-size:12px;
-  cursor:pointer;
-}
-
-body.dark .art-custom-color input[type="text"]{
-  background:#383329;
-  border-color:#46423b;
-  color:#ece4d4;
-}
-
-body.dark .art-custom-color button{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
+/* 04：透明/なしスロット（市松模様で「色なし」を表す） */
+.art-swatch-none{
+  background-color:var(--card);
+  background-image:
+    linear-gradient(45deg, var(--card-sub) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--card-sub) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--card-sub) 75%);
+  background-size:8px 8px;
+  background-position:0 0, 0 4px, 4px -4px, -4px 0;
 }
 
 /* 使用色リスト */
@@ -697,10 +677,10 @@ body.dark .art-preset-badge{
   pointer-events:none;
 }
 
-/* 使用色リストの色番号バッジ */
+/* 使用色リストの色番号バッジ（例："05-3"） */
 .art-usage-number{
   flex-shrink:0;
-  min-width:18px;
+  min-width:30px;
   text-align:center;
   font-size:10px;
   font-weight:700;
