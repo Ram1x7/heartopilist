@@ -316,13 +316,14 @@ function gamePaletteCode(hex){
   return GAME_PALETTE_CODE_BY_HEX[hex.toUpperCase()] || "";
 }
 
-// hexが属するメインカラーのGAME_PALETTEエントリを返す（サブカラー・メインカラーどちらの一致でも可）
+// hexが属するメインカラーのGAME_PALETTEエントリを返す（サブカラー・メインカラーどちらの一致でも可）。
+// 01のサブカラー（黒〜白のグラデーション）は02（白）・03（グレー）と同じhexを含むため、
+// サブカラーを持たない単色スロット（02・03）との完全一致を先に優先する
+// （例：白を拾ったら「01のサブカラー」ではなく「02」に紐づける）
 function gamePaletteGroupForHex(hex){
   if(!hex) return null;
   const upper = hex.toUpperCase();
-  return GAME_PALETTE.find(entry => {
-    if(!entry.hex) return false;
-    if(entry.subs.length === 0) return entry.hex.toUpperCase() === upper;
-    return entry.subs.some(s => s.toUpperCase() === upper);
-  }) || null;
+  const direct = GAME_PALETTE.find(entry => entry.hex && entry.subs.length === 0 && entry.hex.toUpperCase() === upper);
+  if(direct) return direct;
+  return GAME_PALETTE.find(entry => entry.hex && entry.subs.some(s => s.toUpperCase() === upper)) || null;
 }
