@@ -401,5 +401,22 @@
   "art_frame_cat_all": "전체",
   "art_frame_cat_clothes": "의상",
   "art_frame_cat_furniture": "가구",
-  "art_frame_cat_other": "기타"
+  "art_frame_cat_other": "기타",
+  "art_mydesigns_label": "마이 디자인",
+  "art_save_design": "저장",
+  "art_open_mydesigns": "목록 보기",
+  "art_export_label": "내보내기・공유",
+  "art_export_png": "PNG로 저장",
+  "art_share_design": "공유하기",
+  "art_mydesigns_title": "마이 디자인",
+  "art_close": "닫기",
+  "art_toast_updated": "업데이트했습니다",
+  "art_save_prompt": "디자인 이름을 입력하세요",
+  "art_default_design_name": "디자인",
+  "art_toast_saved": "저장했습니다",
+  "art_mydesigns_empty": "저장된 디자인이 아직 없습니다",
+  "art_open": "열기",
+  "art_delete": "삭제",
+  "art_confirm_delete_design": "이 디자인을 삭제하시겠습니까?",
+  "art_share_title": "하토피 아트"
 }

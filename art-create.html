@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=9">
+<link rel="stylesheet" href="./css/art.css?v=10">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -112,6 +112,20 @@
       <div class="art-color-usage" id="artColorUsage"></div>
     </div>
     <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_mydesigns_label">マイデザイン</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSaveBtn" data-i18n="art_save_design">保存する</button>
+        <button class="art-header-btn" id="artMyDesignsBtn" data-i18n="art_open_mydesigns">一覧を見る</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_export_label">エクスポート・共有</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artExportBtn" data-i18n="art_export_png">PNGで保存</button>
+        <button class="art-header-btn" id="artShareBtn" data-i18n="art_share_design">共有する</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_display_label">表示</div>
       <label class="art-toggle-row">
         <span data-i18n="art_show_color_numbers">色番号</span>
@@ -143,6 +157,16 @@
     <div class="art-gridsize-options" id="artLevelOptions"></div>
   </div>
 </div>
+
+<div id="myDesignsModal" onclick="if(event.target.id==='myDesignsModal') closeMyDesignsModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-mydesigns-box">
+    <h3 data-i18n="art_mydesigns_title">マイデザイン</h3>
+    <div class="art-mydesigns-list" id="artMyDesignsList"></div>
+    <button class="modal-close-btn" onclick="closeMyDesignsModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div id="artToast"></div>
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>

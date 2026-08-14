@@ -425,5 +425,22 @@
   "art_frame_cat_all": "すべて",
   "art_frame_cat_clothes": "衣装",
   "art_frame_cat_furniture": "家具",
-  "art_frame_cat_other": "その他"
+  "art_frame_cat_other": "その他",
+  "art_mydesigns_label": "マイデザイン",
+  "art_save_design": "保存する",
+  "art_open_mydesigns": "一覧を見る",
+  "art_export_label": "エクスポート・共有",
+  "art_export_png": "PNGで保存",
+  "art_share_design": "共有する",
+  "art_mydesigns_title": "マイデザイン",
+  "art_close": "閉じる",
+  "art_toast_updated": "更新しました",
+  "art_save_prompt": "デザイン名を入力してください",
+  "art_default_design_name": "デザイン",
+  "art_toast_saved": "保存しました",
+  "art_mydesigns_empty": "保存したデザインはまだありません",
+  "art_open": "開く",
+  "art_delete": "削除",
+  "art_confirm_delete_design": "このデザインを削除しますか？",
+  "art_share_title": "はとぴアート"
 }

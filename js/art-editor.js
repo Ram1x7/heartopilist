@@ -16,6 +16,7 @@ const BASE_PALETTE = [
 ];
 const DRAFT_KEY = "hatopiArt_currentDraft";
 const CUSTOM_COLORS_KEY = "hatopiArt_customColors";
+const SAVED_DESIGNS_KEY = "hatopiArt_savedDesigns";
 const MAX_HISTORY = 50;
 const BLOCK_SIZE = 10;
 
@@ -38,6 +39,8 @@ let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
 let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
+let savedDesigns = []; // 名前を付けて保存したデザインの一覧
+let currentDesignId = null; // 保存済みデザインを読み込んで編集中の場合、そのID（未保存ならnull）
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -49,6 +52,7 @@ function initArtEditor(){
   }catch(e){
     customColors = [];
   }
+  loadSavedDesigns();
 
   const draft = loadDraft();
   if(draft && draft.width && draft.height && Array.isArray(draft.pixelData)){
@@ -56,6 +60,7 @@ function initArtEditor(){
     gridHeight = draft.height;
     pixels = draft.pixelData.slice();
     blockStatus = draft.blockStatus || {};
+    currentDesignId = draft.designId || null;
   }else{
     renderFreeSizeOptions();
     document.getElementById("gridSizeModal").style.display = "block";
@@ -69,6 +74,15 @@ function initArtEditor(){
   renderBlockList();
   bindCanvasEvents();
   bindDisplayToggles();
+  bindMyDesignsControls();
+}
+
+// ── マイデザイン・エクスポート/共有ボタンの結線 ──
+function bindMyDesignsControls(){
+  document.getElementById("artSaveBtn").addEventListener("click", saveCurrentAsDesign);
+  document.getElementById("artMyDesignsBtn").addEventListener("click", openMyDesignsModal);
+  document.getElementById("artExportBtn").addEventListener("click", exportPNG);
+  document.getElementById("artShareBtn").addEventListener("click", shareDesign);
 }
 
 // ── 表示切替（色番号・マス番号・ブロック表示） ──
@@ -128,6 +142,7 @@ function createCanvas(w, h){
   blockStatus = {};
   undoStack = [];
   redoStack = [];
+  currentDesignId = null;
   document.getElementById("gridSizeModal").style.display = "none";
   renderCanvas();
   updateColorUsage();
@@ -647,9 +662,9 @@ function clearAll(){
   saveDraft();
 }
 
-// ── 下書きの自動保存（単一スロット。複数下書き管理は次フェーズで対応） ──
+// ── 下書きの自動保存（作業中の状態のみ。名前を付けた保存はSAVED_DESIGNS_KEY側で管理） ──
 function saveDraft(){
-  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridWidth, height: gridHeight, pixelData: pixels, blockStatus }));
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridWidth, height: gridHeight, pixelData: pixels, blockStatus, designId: currentDesignId }));
 }
 
 function saveDraftDebounced(){
@@ -664,6 +679,196 @@ function loadDraft(){
   }catch(e){
     return null;
   }
+}
+
+// ── 名前を付けて保存したデザインの一覧管理 ──
+function loadSavedDesigns(){
+  try{
+    const raw = localStorage.getItem(SAVED_DESIGNS_KEY);
+    savedDesigns = raw ? JSON.parse(raw) : [];
+    if(!Array.isArray(savedDesigns)) savedDesigns = [];
+  }catch(e){
+    savedDesigns = [];
+  }
+}
+
+function persistSavedDesigns(){
+  localStorage.setItem(SAVED_DESIGNS_KEY, JSON.stringify(savedDesigns));
+}
+
+function saveCurrentAsDesign(){
+  const existing = savedDesigns.find(d => d.id === currentDesignId);
+  if(existing){
+    existing.width = gridWidth;
+    existing.height = gridHeight;
+    existing.pixelData = pixels.slice();
+    existing.blockStatus = { ...blockStatus };
+    existing.updatedAt = Date.now();
+    persistSavedDesigns();
+    showToast(T("art_toast_updated", "更新しました"));
+    return;
+  }
+
+  const name = prompt(T("art_save_prompt", "デザイン名を入力してください"), T("art_default_design_name", "デザイン"));
+  if(name === null) return; // キャンセル
+  const design = {
+    id: "design-" + Date.now(),
+    name: name.trim() || T("art_default_design_name", "デザイン"),
+    width: gridWidth,
+    height: gridHeight,
+    pixelData: pixels.slice(),
+    blockStatus: { ...blockStatus },
+    updatedAt: Date.now(),
+  };
+  savedDesigns.push(design);
+  persistSavedDesigns();
+  currentDesignId = design.id;
+  saveDraft();
+  showToast(T("art_toast_saved", "保存しました"));
+}
+
+function openMyDesignsModal(){
+  renderMyDesignsList();
+  document.getElementById("myDesignsModal").style.display = "block";
+}
+
+function closeMyDesignsModal(){
+  document.getElementById("myDesignsModal").style.display = "none";
+}
+
+function renderMyDesignsList(){
+  const el = document.getElementById("artMyDesignsList");
+  if(!savedDesigns.length){
+    el.innerHTML = `<div class="art-mydesigns-empty">${T("art_mydesigns_empty", "保存したデザインはまだありません")}</div>`;
+    return;
+  }
+  const sorted = savedDesigns.slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  el.innerHTML = sorted.map(d => `
+    <div class="art-mydesign-item${d.id === currentDesignId ? " current" : ""}">
+      <canvas class="art-mydesign-thumb" id="artMyDesignThumb_${d.id}"></canvas>
+      <div class="art-mydesign-info">
+        <div class="art-mydesign-name">${escapeHtml(d.name)}</div>
+        <div class="art-mydesign-meta">${d.width} × ${d.height}</div>
+      </div>
+      <div class="art-mydesign-actions">
+        <button onclick="loadDesign('${d.id}')">${T("art_open", "開く")}</button>
+        <button onclick="deleteDesign('${d.id}')">${T("art_delete", "削除")}</button>
+      </div>
+    </div>
+  `).join("");
+  sorted.forEach(d => {
+    drawPixelsToThumb(document.getElementById(`artMyDesignThumb_${d.id}`), d.pixelData, d.width, d.height, 48);
+  });
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function drawPixelsToThumb(canvasEl, pixelData, w, h, maxBox){
+  if(!canvasEl) return;
+  const cell = Math.max(1, Math.floor(maxBox / Math.max(w, h)));
+  canvasEl.width = w * cell;
+  canvasEl.height = h * cell;
+  const tctx = canvasEl.getContext("2d");
+  tctx.imageSmoothingEnabled = false;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const c = pixelData[y * w + x];
+      if(c){
+        tctx.fillStyle = c;
+        tctx.fillRect(x * cell, y * cell, cell, cell);
+      }
+    }
+  }
+}
+
+function loadDesign(id){
+  const design = savedDesigns.find(d => d.id === id);
+  if(!design) return;
+  gridWidth = design.width;
+  gridHeight = design.height;
+  pixels = design.pixelData.slice();
+  blockStatus = { ...(design.blockStatus || {}) };
+  currentDesignId = design.id;
+  undoStack = [];
+  redoStack = [];
+  highlightedColor = null;
+  closeMyDesignsModal();
+  renderCanvas();
+  updateColorUsage();
+  updateUndoRedoButtons();
+  renderBlockList();
+  saveDraft();
+}
+
+function deleteDesign(id){
+  if(!confirm(T("art_confirm_delete_design", "このデザインを削除しますか？"))) return;
+  savedDesigns = savedDesigns.filter(d => d.id !== id);
+  persistSavedDesigns();
+  if(currentDesignId === id){
+    currentDesignId = null;
+    saveDraft();
+  }
+  renderMyDesignsList();
+}
+
+// ── PNGエクスポート・共有（既存のシェア機能と同じnavigator.shareパターン） ──
+function buildExportCanvas(){
+  const cell = Math.max(2, Math.floor(640 / Math.max(gridWidth, gridHeight)));
+  const c = document.createElement("canvas");
+  c.width = gridWidth * cell;
+  c.height = gridHeight * cell;
+  const ectx = c.getContext("2d");
+  ectx.imageSmoothingEnabled = false;
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const col = pixels[y * gridWidth + x];
+      if(col){
+        ectx.fillStyle = col;
+        ectx.fillRect(x * cell, y * cell, cell, cell);
+      }
+    }
+  }
+  return c;
+}
+
+function exportPNG(){
+  const c = buildExportCanvas();
+  c.toBlob((blob) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "hatopi-art.png";
+    a.click();
+  });
+}
+
+function shareDesign(){
+  const c = buildExportCanvas();
+  c.toBlob(async (blob) => {
+    const file = new File([blob], "hatopi-art.png", { type: "image/png" });
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({ files: [file], title: T("art_share_title", "はとぴアート") });
+      }catch(e){}
+    }else{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "hatopi-art.png";
+      a.click();
+    }
+  });
+}
+
+// ── トースト通知 ──
+function showToast(msg){
+  const t = document.getElementById("artToast");
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2000);
 }
 
 // ── キーボードショートカット（PC向け：Ctrl/Cmd+Z で元に戻す、Shift併用でやり直す） ──
@@ -686,6 +891,9 @@ document.addEventListener("langchange", () => {
   updateColorUsage();
   if(document.getElementById("gridSizeModal").style.display !== "none"){
     renderFreeSizeOptions();
+  }
+  if(document.getElementById("myDesignsModal").style.display !== "none"){
+    renderMyDesignsList();
   }
 });
 

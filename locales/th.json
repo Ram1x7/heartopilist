@@ -401,5 +401,22 @@
   "art_frame_cat_all": "ทั้งหมด",
   "art_frame_cat_clothes": "เสื้อผ้า",
   "art_frame_cat_furniture": "เฟอร์นิเจอร์",
-  "art_frame_cat_other": "อื่นๆ"
+  "art_frame_cat_other": "อื่นๆ",
+  "art_mydesigns_label": "ดีไซน์ของฉัน",
+  "art_save_design": "บันทึก",
+  "art_open_mydesigns": "ดูรายการ",
+  "art_export_label": "ส่งออก・แชร์",
+  "art_export_png": "บันทึกเป็น PNG",
+  "art_share_design": "แชร์",
+  "art_mydesigns_title": "ดีไซน์ของฉัน",
+  "art_close": "ปิด",
+  "art_toast_updated": "อัปเดตแล้ว",
+  "art_save_prompt": "กรอกชื่อดีไซน์",
+  "art_default_design_name": "ดีไซน์",
+  "art_toast_saved": "บันทึกแล้ว",
+  "art_mydesigns_empty": "ยังไม่มีดีไซน์ที่บันทึกไว้",
+  "art_open": "เปิด",
+  "art_delete": "ลบ",
+  "art_confirm_delete_design": "ลบดีไซน์นี้หรือไม่?",
+  "art_share_title": "Hatopi Art"
 }

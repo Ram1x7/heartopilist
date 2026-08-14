@@ -745,3 +745,131 @@ body.dark .art-block-btn{
   border-color:#5a9e4a;
 }
 
+/* パネル内に並べるヘッダー風ボタン（保存・エクスポートなど） */
+.art-panel-btn-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.art-panel-btn-row .art-header-btn{
+  flex:1 1 auto;
+  justify-content:center;
+}
+
+/* トースト通知（保存完了などの短い確認表示） */
+#artToast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 22px;
+  border-radius:999px;
+  font-size:13px;
+  opacity:0;
+  transition:opacity 0.25s, transform 0.25s;
+  pointer-events:none;
+  z-index:2100;
+  white-space:nowrap;
+}
+
+#artToast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* マイデザイン一覧 */
+.art-mydesigns-box{
+  max-width:400px;
+  max-height:80vh;
+  display:flex;
+  flex-direction:column;
+}
+
+.art-mydesigns-list{
+  overflow-y:auto;
+  margin:12px 0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.art-mydesigns-empty{
+  text-align:center;
+  padding:24px 0;
+  color:var(--text-sub);
+  font-size:13px;
+}
+
+.art-mydesign-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  border-radius:12px;
+  background:var(--card-sub);
+}
+
+.art-mydesign-item.current{
+  outline:2px solid var(--indigo);
+}
+
+.art-mydesign-thumb{
+  flex-shrink:0;
+  width:48px;
+  height:48px;
+  border-radius:8px;
+  background-image:linear-gradient(45deg, #d8d0bf 25%, transparent 25%), linear-gradient(-45deg, #d8d0bf 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #d8d0bf 75%), linear-gradient(-45deg, transparent 75%, #d8d0bf 75%);
+  background-size:8px 8px;
+  background-position:0 0, 0 4px, 4px -4px, -4px 0;
+  image-rendering:pixelated;
+  object-fit:contain;
+}
+
+.art-mydesign-info{
+  flex:1;
+  min-width:0;
+}
+
+.art-mydesign-name{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.art-mydesign-meta{
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+.art-mydesign-actions{
+  flex-shrink:0;
+  display:flex;
+  gap:6px;
+}
+
+.art-mydesign-actions button{
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+}
+
+body.dark .art-mydesign-item{
+  background:#383329;
+}
+
+body.dark .art-mydesign-actions button{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+

@@ -401,5 +401,22 @@
   "art_frame_cat_all": "全部",
   "art_frame_cat_clothes": "服裝",
   "art_frame_cat_furniture": "傢俱",
-  "art_frame_cat_other": "其他"
+  "art_frame_cat_other": "其他",
+  "art_mydesigns_label": "我的設計",
+  "art_save_design": "儲存",
+  "art_open_mydesigns": "查看清單",
+  "art_export_label": "匯出・分享",
+  "art_export_png": "儲存為PNG",
+  "art_share_design": "分享",
+  "art_mydesigns_title": "我的設計",
+  "art_close": "關閉",
+  "art_toast_updated": "已更新",
+  "art_save_prompt": "請輸入設計名稱",
+  "art_default_design_name": "設計",
+  "art_toast_saved": "已儲存",
+  "art_mydesigns_empty": "還沒有已儲存的設計",
+  "art_open": "開啟",
+  "art_delete": "刪除",
+  "art_confirm_delete_design": "要刪除這個設計嗎？",
+  "art_share_title": "哈托皮藝術"
 }

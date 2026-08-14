@@ -425,5 +425,22 @@
   "art_frame_cat_all": "All",
   "art_frame_cat_clothes": "Clothing",
   "art_frame_cat_furniture": "Furniture",
-  "art_frame_cat_other": "Other"
+  "art_frame_cat_other": "Other",
+  "art_mydesigns_label": "My Designs",
+  "art_save_design": "Save",
+  "art_open_mydesigns": "View List",
+  "art_export_label": "Export & Share",
+  "art_export_png": "Save as PNG",
+  "art_share_design": "Share",
+  "art_mydesigns_title": "My Designs",
+  "art_close": "Close",
+  "art_toast_updated": "Updated",
+  "art_save_prompt": "Enter a name for this design",
+  "art_default_design_name": "Design",
+  "art_toast_saved": "Saved",
+  "art_mydesigns_empty": "No saved designs yet",
+  "art_open": "Open",
+  "art_delete": "Delete",
+  "art_confirm_delete_design": "Delete this design?",
+  "art_share_title": "Hatopi Art"
 }
