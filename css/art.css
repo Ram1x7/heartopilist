@@ -19,6 +19,56 @@ body.dark .art-notice{
   color:#b3a89a;
 }
 
+/* 編集モード・固定（ロック）バー（常時表示。誤タップ防止のための明確なON/OFF表示） */
+.art-canvas-status-bar{
+  display:flex;
+  gap:8px;
+  margin-top:4px;
+  flex-wrap:wrap;
+}
+
+.art-edit-mode-btn, .art-lock-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 16px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-edit-mode-btn, body.dark .art-lock-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-edit-mode-btn.is-active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .art-edit-mode-btn.is-active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.art-lock-btn.is-locked{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
+}
+
+body.dark .art-lock-btn.is-locked{
+  background:var(--vermillion-soft);
+  border-color:var(--vermillion-soft);
+}
+
 /* レイアウト（モバイル：縦積み） */
 .art-layout{
   display:grid;
