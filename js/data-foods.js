@@ -789,7 +789,7 @@ const foodsData = [
   time:20,
   rarity: [true,true,true,true,true],
   prices:[240],
-  materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
+  materials:["ちまきの葉(@50)","稲(種@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
   level:1,
   materials_image:[
     { image:"./images/materials/timaki.jpg" },
@@ -808,7 +808,7 @@ const foodsData = [
   time:20,
   rarity: [true,true,true,true,true],
   prices:[260],
-  materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
+  materials:["ちまきの葉(@50)","稲(種@12)","あずき(@50)","あずき(@50)"],
   level:1,
   materials_image:[
     { image:"./images/materials/timaki.jpg" },
@@ -827,7 +827,7 @@ const foodsData = [
   time:20,
   rarity: [true,true,true,true,true],
   prices:[460],
-  materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
+  materials:["ちまきの葉(@50)","稲(種@12)","卵(@100)","肉(@200)"],
   level:1,
   materials_image:[
     { image:"./images/materials/timaki.jpg" },
@@ -846,7 +846,7 @@ const foodsData = [
   time:20,
   rarity: [true,true,true,true,true],
   prices:[240],
-  materials:["ちまきの葉(@50)","稲(@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
+  materials:["ちまきの葉(@50)","稲(種@12)","ちまきの食材ならなんでもOK","ちまきの食材ならなんでもOK"],
   level:1,
   materials_image:[
     { image:"./images/materials/timaki.jpg" },
@@ -865,7 +865,7 @@ const foodsData = [
   time:20,
   rarity: [true,true,true,true,true],
   prices:[260],
-  materials:["ちまきの葉(@50)","稲(@12)","あずき(@50)","あずき(@50)"],
+  materials:["ちまきの葉(@50)","稲(種@12)","あずき(@50)","あずき(@50)"],
   level:1,
   materials_image:[
     { image:"./images/materials/timaki.jpg" },
@@ -884,13 +884,32 @@ const foodsData = [
   time:20,
   rarity: [true,true,true,true,true],
   prices:[460],
-  materials:["ちまきの葉(@50)","稲(@12)","卵(@100)","肉(@200)"],
+  materials:["ちまきの葉(@50)","稲(種@12)","卵(@100)","肉(@200)"],
   level:1,
   materials_image:[
     { image:"./images/materials/timaki.jpg" },
     { image:"./images/materials/ine.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/meat.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"巧果",
+  nameI18n:{"ja":"巧果","en":"Pillow-shaped Egg Yolk Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/107.PNG",
+  cost:390,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[830],
+  materials:["小麦(種@95)","小麦(種@95)","卵(@100)","料理油(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/oil.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:false
