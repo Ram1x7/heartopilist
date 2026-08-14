@@ -19,6 +19,7 @@ let gridHeight = 30;
 let pixels = [];
 let currentColor = "#EF6E72"; // 初期選択色（05 コーラル）
 let expandedPaletteMain = null; // カラーパレットで展開表示中のメインカラー番号
+let selectedMainNo = "05"; // 現在の選択色が属するメインカラー番号（マーク表示用。hexの一致では判定しない）
 let currentTool = "pen";
 let zoom = 100;
 let highlightedColor = null;
@@ -376,12 +377,11 @@ function renderPalette(){
   const mainsEl = document.getElementById("artPaletteMains");
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
-    const hasSubs = entry.subs.length > 0;
-    const isActive = isNone
-      ? currentColor === null
-      : hasSubs
-        ? entry.subs.some(h => h.toUpperCase() === String(currentColor).toUpperCase())
-        : entry.hex.toUpperCase() === String(currentColor).toUpperCase();
+    // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
+    // hexの一致だけで判定すると、01のサブカラーと02・03のメインカラーが同じ値を共有している
+    // （例：#FEFFFFは01の5番目のサブカラーであり、かつ02のメインカラーそのもの）ため、
+    // 本来1つだけのはずのマークが同時に2箇所へついてしまう不具合になる。
+    const isActive = entry.no === selectedMainNo;
     const cls = ["art-swatch", "art-swatch-main"];
     // "active"は全体で*{background:var(--indigo)!important}という汎用クラスと衝突し
     // スウォッチ本来の色を上書きしてしまうため、専用クラス名にする
@@ -402,15 +402,11 @@ function selectPaletteMain(no){
   // 別のメインカラーのサブカラー一覧が開いたままにならないよう、常にサブカラー欄を閉じる
   // （例：#FEFFFFは01のサブカラーにも含まれるが、02をタップして01のサブ一覧が開くのは避ける）
   if(no === "04"){
-    currentColor = null;
-    expandedPaletteMain = null;
-    renderPalette();
+    setCurrentColor(null, "04");
     return;
   }
   if(entry.subs.length === 0){
-    currentColor = entry.hex;
-    expandedPaletteMain = null;
-    renderPalette();
+    setCurrentColor(entry.hex, no);
     return;
   }
   expandedPaletteMain = expandedPaletteMain === no ? null : no;
@@ -430,13 +426,22 @@ function renderPaletteSubs(){
     <button class="art-swatch art-swatch-sub${hex.toUpperCase() === String(currentColor).toUpperCase() ? " is-selected" : ""}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>
   `).join("");
   wrap.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex));
+    btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex, entry.no));
   });
 }
 
-function setCurrentColor(c){
+// mainNoを渡すと、選択元のメインカラー番号が確定しているものとして扱う
+// （サブカラーのクリックなど）。渡さない場合（スポイト等）はhexから逆引きする。
+function setCurrentColor(c, mainNo){
   currentColor = c;
-  const group = c === null ? null : gamePaletteGroupForHex(c);
+  if(c === null){
+    selectedMainNo = mainNo || "04";
+    expandedPaletteMain = null;
+    renderPalette();
+    return;
+  }
+  const group = mainNo ? GAME_PALETTE.find(e => e.no === mainNo) : gamePaletteGroupForHex(c);
+  selectedMainNo = group ? group.no : null;
   expandedPaletteMain = group && group.subs.length > 0 ? group.no : null;
   renderPalette();
 }
