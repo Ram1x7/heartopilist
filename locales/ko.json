@@ -389,8 +389,6 @@
   "art_convert_fit_bg_label": "여백 색상",
   "art_fit_bg_transparent": "투명",
   "art_fit_bg_custom": "색상 지정",
-  "art_size_free_label": "자유 사이즈",
-  "art_size_frame_label": "디자인 프레임",
   "art_convert_preset_label": "변환 방식",
   "art_preset_standard": "표준",
   "art_preset_smooth": "부드럽게",

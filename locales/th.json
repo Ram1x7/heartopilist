@@ -389,8 +389,6 @@
   "art_convert_fit_bg_label": "สีขอบว่าง",
   "art_fit_bg_transparent": "โปร่งใส",
   "art_fit_bg_custom": "กำหนดสีเอง",
-  "art_size_free_label": "ขนาดอิสระ",
-  "art_size_frame_label": "กรอบดีไซน์",
   "art_convert_preset_label": "รูปแบบการแปลง",
   "art_preset_standard": "มาตรฐาน",
   "art_preset_smooth": "นุ่มนวล",

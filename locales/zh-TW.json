@@ -389,8 +389,6 @@
   "art_convert_fit_bg_label": "邊距顏色",
   "art_fit_bg_transparent": "透明",
   "art_fit_bg_custom": "自訂顏色",
-  "art_size_free_label": "自由尺寸",
-  "art_size_frame_label": "設計框",
   "art_convert_preset_label": "轉換方式",
   "art_preset_standard": "標準",
   "art_preset_smooth": "柔和",
