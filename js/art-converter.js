@@ -105,16 +105,27 @@ function currentLang(){
   return window.i18n && typeof window.i18n.getCurrentLang === "function" ? window.i18n.getCurrentLang() : "ja";
 }
 
-function renderConvertSizeOptions(){
+// 「比率」欄には自由サイズの比率とデザイン枠アイテムを同じ選択肢として並べているため、
+// 両者は排他的に選ぶ（比率を選んだらデザイン枠の選択は解除、逆も同様）
+function selectConvertRatio(v){
+  selectedRatioId = v;
+  selectedFrameId = null;
+  selectedFramePartId = null;
+  renderConvertSizeOptions();
+}
+
+function renderConvertRatioOptions(){
+  // デザイン枠アイテムが選択中の間は、比率側のマークを表示しない（両方同時に選択済みに見えるのを防ぐ）
   renderOptionGroup(
     "artConvertRatioOptions",
     FREE_CANVAS_RATIOS.map(r => ({ id: r.id, label: r.ratio })),
-    selectedRatioId,
-    (v) => {
-      selectedRatioId = v;
-      renderConvertLevelOptions();
-    }
+    selectedFrameId ? null : selectedRatioId,
+    selectConvertRatio
   );
+}
+
+function renderConvertSizeOptions(){
+  renderConvertRatioOptions();
   renderConvertLevelOptions();
   renderConvertFrameOptions();
 }
@@ -132,6 +143,7 @@ function renderConvertLevelOptions(){
       settings.height = h;
       selectedFrameId = null;
       selectedFramePartId = null;
+      renderConvertRatioOptions(); // 比率側のマークを再表示する
       renderConvertFrameOptions();
       scheduleConvert();
     }
@@ -173,6 +185,7 @@ function showConvertFrameStep2(){
 
 function selectFrameItem(frameId){
   selectedFrameId = frameId;
+  renderConvertRatioOptions(); // 比率側のマークを消す
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
   selectFramePart(frame.parts[0].id);
   if(frame.parts.length > 1){

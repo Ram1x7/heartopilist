@@ -169,27 +169,29 @@ function closeNewCanvasModal(){
 }
 
 // ── 新規キャンバス作成モーダル（自由サイズ：比率→サイズレベルの2段階／デザイン枠：カテゴリ→アイテム→パーツ） ──
+// 「比率」欄には自由サイズの比率とデザイン枠アイテムを同じ選択肢として並べているため、
+// 両者は排他的に選ぶ（比率を選んだらデザイン枠の選択は解除、逆も同様）
+function selectFreeRatio(id){
+  selectedRatioId = id;
+  selectedFrameId = null;
+  selectedFramePartId = null;
+  renderFreeSizeOptions();
+}
+
 function renderFreeSizeOptions(){
-  renderRatioOptions(
-    "artRatioOptions",
-    selectedRatioId,
-    (id) => { selectedRatioId = id; renderLevelOptions(); }
-  );
+  renderRatioOptions("artRatioOptions", selectedRatioId, selectFreeRatio);
   renderLevelOptions();
   renderFrameOptions();
 }
 
 function renderRatioOptions(containerId, currentId, onSelect){
   const el = document.getElementById(containerId);
+  // デザイン枠アイテムが選択中の間は、比率側のマークを表示しない（両方同時に選択済みに見えるのを防ぐ）
   el.innerHTML = FREE_CANVAS_RATIOS.map(r => `
-    <button class="${r.id === currentId ? "active" : ""}" data-ratio="${r.id}">${r.ratio}</button>
+    <button class="${r.id === currentId && !selectedFrameId ? "active" : ""}" data-ratio="${r.id}">${r.ratio}</button>
   `).join("");
   el.querySelectorAll("button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      el.querySelectorAll("button").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      onSelect(btn.dataset.ratio);
-    });
+    btn.addEventListener("click", () => onSelect(btn.dataset.ratio));
   });
 }
 
@@ -223,6 +225,7 @@ function renderFrameOptions(){
     (v) => {
       selectedFrameId = v;
       selectedFramePartId = null;
+      renderRatioOptions("artRatioOptions", selectedRatioId, selectFreeRatio); // 比率側のマークを消す
       const frame = DESIGN_FRAME_PRESETS.find(f => f.id === v);
       if(frame.parts.length === 1){
         createFrameCanvas(frame.parts[0].id);
@@ -272,6 +275,12 @@ function createCanvas(w, h, frameId, partId){
   blockStatus = {};
   activeFrameId = frameId || null;
   activePartId = partId || null;
+  // 自由サイズ（frameId未指定）で作成した場合は、モーダルの選択状態も
+  // デザイン枠の選択なしに揃えておく（次回モーダルを開いた時の表示を一致させるため）
+  if(!frameId){
+    selectedFrameId = null;
+    selectedFramePartId = null;
+  }
   rebuildActiveMask();
   isLocked = false;
   editMode = false;
