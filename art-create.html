@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=13">
+<link rel="stylesheet" href="./css/art.css?v=14">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -85,6 +85,11 @@
 
 <div class="art-notice" data-i18n="art_coming_soon">
   現在開発中の機能です。今後のアップデートで順次使えるようになります。
+</div>
+
+<div class="art-canvas-status-bar" id="artCanvasStatusBar">
+  <button class="art-edit-mode-btn" id="artEditModeBtn"></button>
+  <button class="art-lock-btn" id="artLockBtn"></button>
 </div>
 
 <div class="art-layout">
@@ -233,6 +238,7 @@ function T(key, fallback, vars){
 
 </script>
 <script src="js/art-config.js"></script>
+<script src="js/art-masks.js"></script>
 <script src="js/art-editor.js"></script>
 <script src="js/sw-register.js"></script>
 </body>

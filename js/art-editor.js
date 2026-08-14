@@ -39,6 +39,12 @@ let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパ
 let savedDesigns = []; // 名前を付けて保存したデザインの一覧
 let currentDesignId = null; // 保存済みデザインを読み込んで編集中の場合、そのID（未保存ならnull）
 let newCanvasModalCancelable = false; // 新規キャンバス作成モーダルを「新規作成」ボタンから開いた場合のみキャンセル可能にする
+let editMode = false; // 編集モード（ONの間だけキャンバスタップでペン/消しゴム/塗りつぶしが発動する。誤タップ防止）
+let isLocked = false; // キャンバスの固定（ロック）。ロック中は編集モードに関わらず描画系ツールを一切受け付けない
+let activeFrameId = null; // 現在のキャンバスが紐づくデザイン枠プリセットID（自由サイズならnull）。マスク表示・使用不可マス判定に使う
+let activePartId = null; // 現在のキャンバスが紐づくデザイン枠パーツID
+let activeDisabledSet = null; // 現在のキャンバスの使用不可マス集合（Set<"x,y">）。マスクなしならnull
+let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -54,6 +60,10 @@ function initArtEditor(){
     pixels = draft.pixelData.slice();
     blockStatus = draft.blockStatus || {};
     currentDesignId = draft.designId || null;
+    activeFrameId = draft.frameId || null;
+    activePartId = draft.partId || null;
+    isLocked = !!draft.locked;
+    rebuildActiveMask();
   }else{
     showFrameStep1();
     renderFreeSizeOptions();
@@ -66,9 +76,36 @@ function initArtEditor(){
   renderCanvas();
   updateColorUsage();
   renderBlockList();
+  renderLockUI();
   bindCanvasEvents();
   bindDisplayToggles();
   bindMyDesignsControls();
+  bindLockControls();
+}
+
+// ── 編集モード・固定（ロック）ボタンの結線 ──
+function bindLockControls(){
+  document.getElementById("artEditModeBtn").addEventListener("click", toggleEditMode);
+  document.getElementById("artLockBtn").addEventListener("click", toggleLock);
+}
+
+// ── デザイン枠のマスク（輪郭線・使用不可マス）キャッシュ ──
+// activeFrameId/activePartIdが変わるたびに呼び直し、描画・当たり判定用に
+// disabledRangesを展開したSetを作り直す（js/art-masks.jsのPRESET_MASKS参照）
+function rebuildActiveMask(){
+  const preset = activeFrameId && typeof PRESET_MASKS !== "undefined" ? PRESET_MASKS[activeFrameId] : null;
+  const part = preset && activePartId ? preset[activePartId] : null;
+  if(!part){
+    activeDisabledSet = null;
+    activeMaskLines = null;
+    return;
+  }
+  const set = new Set();
+  part.disabledRanges.forEach(([y, x1, x2]) => {
+    for(let x = x1; x <= x2; x++) set.add(x + "," + y);
+  });
+  activeDisabledSet = set;
+  activeMaskLines = part.maskLines;
 }
 
 // ── マイデザイン・エクスポート/共有ボタンの結線 ──
@@ -208,7 +245,7 @@ function createFrameCanvas(partId){
   const part = frame.parts.find(p => p.id === partId);
   if(!part) return;
   selectedFramePartId = partId;
-  createCanvas(part.width, part.height);
+  createCanvas(part.width, part.height, selectedFrameId, partId);
 }
 
 function renderLevelOptions(){
@@ -219,11 +256,18 @@ function renderLevelOptions(){
   `).join("");
 }
 
-function createCanvas(w, h){
+// frameId/partIdは、アイテム別プリセットから作成した場合のみ渡される
+// （自由サイズの場合はundefined→活動中のマスク関連付けなしとして扱う）
+function createCanvas(w, h, frameId, partId){
   gridWidth = w;
   gridHeight = h;
   pixels = new Array(w * h).fill(null);
   blockStatus = {};
+  activeFrameId = frameId || null;
+  activePartId = partId || null;
+  rebuildActiveMask();
+  isLocked = false;
+  editMode = false;
   undoStack = [];
   redoStack = [];
   currentDesignId = null;
@@ -234,6 +278,7 @@ function createCanvas(w, h){
   updateColorUsage();
   updateUndoRedoButtons();
   renderBlockList();
+  renderLockUI();
   saveDraft();
 }
 
@@ -247,7 +292,7 @@ const TOOLS = [
 
 function renderToolbar(){
   const el = document.getElementById("artToolbar");
-  el.classList.toggle("art-toolbar-disabled", blockMode);
+  el.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
   const toolButtons = TOOLS.map(t => `
     <button class="art-tool-btn${currentTool === t.id ? " active" : ""}" onclick="setTool('${t.id}')" aria-label="${T(t.labelKey, t.labelFallback)}" aria-pressed="${currentTool === t.id}">
       ${icon(t.icon, { size: 18 })}
@@ -274,6 +319,40 @@ function updateUndoRedoButtons(){
   const redoBtn = document.getElementById("artRedoBtn");
   if(undoBtn) undoBtn.disabled = undoStack.length === 0;
   if(redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+// ── 編集モード・固定（ロック） ──
+// 編集モードOFFの間はキャンバスタップでペン/消しゴム/塗りつぶしが発動しない（誤タップ防止、閲覧・確認専用）。
+// 固定（ロック）は編集モードより強く、ロック中は編集モードに関わらず描画系ツールを一切受け付けない。
+function toggleEditMode(){
+  if(isLocked) return; // ロック中は編集モードの切り替え自体を受け付けない
+  editMode = !editMode;
+  renderLockUI();
+}
+
+function toggleLock(){
+  if(isLocked){
+    if(!confirm(T("art_confirm_unlock", "固定を解除しますか？誤って上書きしないようご注意ください。"))) return;
+    isLocked = false;
+  }else{
+    isLocked = true;
+    editMode = false; // 固定したら編集モードも自動でOFFにする
+  }
+  renderLockUI();
+  renderToolbar();
+  renderCanvas();
+  saveDraft();
+}
+
+function renderLockUI(){
+  const editBtn = document.getElementById("artEditModeBtn");
+  const lockBtn = document.getElementById("artLockBtn");
+  if(!editBtn || !lockBtn) return;
+  editBtn.style.display = isLocked ? "none" : "";
+  editBtn.textContent = editMode ? T("art_edit_mode_off", "編集を終える") : T("art_edit_mode_on", "編集する");
+  editBtn.classList.toggle("is-active", editMode);
+  lockBtn.textContent = isLocked ? T("art_unlock", "固定を解除") : T("art_lock", "固定する");
+  lockBtn.classList.toggle("is-locked", isLocked);
 }
 
 // ── Undo / Redo（スナップショット方式） ──
@@ -510,6 +589,16 @@ function renderCanvas(){
     }
   }
 
+  // デザイン枠の使用不可マスをグレーアウト（実データにわずかに輪郭線と食い違うマスがあっても
+  // 実際に描画をブロックする判定=disabledRangesを常に優先して表示する）
+  if(activeDisabledSet){
+    ctx.fillStyle = document.body.classList.contains("dark") ? "rgba(0,0,0,0.4)" : "rgba(26,24,20,0.14)";
+    activeDisabledSet.forEach(key => {
+      const [dx, dy] = key.split(",").map(Number);
+      ctx.fillRect(dx * cell, dy * cell, cell, cell);
+    });
+  }
+
   if(cell >= 6){
     ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
     ctx.lineWidth = 1;
@@ -525,6 +614,25 @@ function renderCanvas(){
       ctx.lineTo(canvas.width, i * cell + 0.5);
       ctx.stroke();
     }
+  }
+
+  // デザイン枠の輪郭線（襟ぐりなどの曲線・本の3分割のような直線区切り、どちらも
+  // maskLinesの頂点座標をそのまま線として描くことで対応する。ズーム/パンにもcellの
+  // スケールを通じて自動的に追従する）
+  if(activeMaskLines && activeMaskLines.length){
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.9)" : "rgba(26,24,20,0.85)";
+    ctx.lineWidth = Math.max(1.5, cell * 0.09);
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    activeMaskLines.forEach(path => {
+      if(!path || path.length < 2) return;
+      ctx.beginPath();
+      ctx.moveTo(path[0].x * cell, path[0].y * cell);
+      for(let i = 1; i < path.length; i++){
+        ctx.lineTo(path[i].x * cell, path[i].y * cell);
+      }
+      ctx.stroke();
+    });
   }
 
   if((showColorNumbers || showCellNumbers) && cell >= 12){
@@ -640,13 +748,19 @@ function cellFromEvent(e){
   return { cx, cy };
 }
 
+function isCellDisabled(cx, cy){
+  return !!(activeDisabledSet && activeDisabledSet.has(cx + "," + cy));
+}
+
 function applyToolAt(cx, cy){
   const idx = cy * gridWidth + cx;
   if(currentTool === "pen"){
+    if(isCellDisabled(cx, cy)) return; // デザイン枠の使用不可マスには描けない
     pixels[idx] = currentColor;
   }else if(currentTool === "eraser"){
     pixels[idx] = null;
   }else if(currentTool === "bucket"){
+    if(isCellDisabled(cx, cy)) return;
     floodFill(cx, cy, currentColor);
   }else if(currentTool === "eyedropper"){
     if(pixels[idx]){
@@ -665,6 +779,7 @@ function floodFill(cx, cy, color){
   while(stack.length){
     const [x, y] = stack.pop();
     if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) continue;
+    if(isCellDisabled(x, y)) continue; // 使用不可マスへは塗りつぶしが広がらない
     const i = y * gridWidth + x;
     if(pixels[i] !== target) continue;
     pixels[i] = color;
@@ -684,6 +799,10 @@ function bindCanvasEvents(){
       return;
     }
 
+    // スポイトは閲覧・確認に近い非破壊操作のため、編集モードOFF・固定中でも発動できる。
+    // ペン/消しゴム/塗りつぶしは、誤タップ防止のため編集モードON時のみ発動する
+    if(currentTool !== "eyedropper" && (!editMode || isLocked)) return;
+
     isDrawing = true;
     if(currentTool !== "eyedropper") pushHistory();
     applyToolAt(c.cx, c.cy);
@@ -697,6 +816,7 @@ function bindCanvasEvents(){
     if(!isDrawing || blockMode) return;
 
     if(currentTool !== "pen" && currentTool !== "eraser") return;
+    if(!editMode || isLocked) return;
     if(c && (!lastCell || c.cx !== lastCell.cx || c.cy !== lastCell.cy)){
       applyToolAt(c.cx, c.cy);
       lastCell = c;
@@ -802,7 +922,10 @@ function clearAll(){
 
 // ── 下書きの自動保存（作業中の状態のみ。名前を付けた保存はSAVED_DESIGNS_KEY側で管理） ──
 function saveDraft(){
-  localStorage.setItem(DRAFT_KEY, JSON.stringify({ width: gridWidth, height: gridHeight, pixelData: pixels, blockStatus, designId: currentDesignId }));
+  localStorage.setItem(DRAFT_KEY, JSON.stringify({
+    width: gridWidth, height: gridHeight, pixelData: pixels, blockStatus, designId: currentDesignId,
+    frameId: activeFrameId, partId: activePartId, locked: isLocked,
+  }));
 }
 
 function saveDraftDebounced(){
@@ -841,6 +964,9 @@ function saveCurrentAsDesign(){
     existing.height = gridHeight;
     existing.pixelData = pixels.slice();
     existing.blockStatus = { ...blockStatus };
+    existing.frameId = activeFrameId;
+    existing.partId = activePartId;
+    existing.locked = isLocked;
     existing.updatedAt = Date.now();
     persistSavedDesigns();
     showToast(T("art_toast_updated", "更新しました"));
@@ -856,6 +982,9 @@ function saveCurrentAsDesign(){
     height: gridHeight,
     pixelData: pixels.slice(),
     blockStatus: { ...blockStatus },
+    frameId: activeFrameId,
+    partId: activePartId,
+    locked: isLocked,
     updatedAt: Date.now(),
   };
   savedDesigns.push(design);
@@ -929,14 +1058,21 @@ function loadDesign(id){
   pixels = design.pixelData.slice();
   blockStatus = { ...(design.blockStatus || {}) };
   currentDesignId = design.id;
+  activeFrameId = design.frameId || null;
+  activePartId = design.partId || null;
+  isLocked = !!design.locked;
+  editMode = false;
+  rebuildActiveMask();
   undoStack = [];
   redoStack = [];
   highlightedColor = null;
   closeMyDesignsModal();
+  renderToolbar();
   renderCanvas();
   updateColorUsage();
   updateUndoRedoButtons();
   renderBlockList();
+  renderLockUI();
   saveDraft();
 }
 
@@ -1026,6 +1162,7 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("langchange", () => {
   renderToolbar();
   renderZoomControls();
+  renderLockUI();
   updateColorUsage();
   if(document.getElementById("gridSizeModal").style.display !== "none"){
     renderFreeSizeOptions();
