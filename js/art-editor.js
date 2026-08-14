@@ -39,7 +39,6 @@ let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
 let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
-let selectedFrameCategory = "all"; // 新規キャンバス作成モーダルの「デザイン枠」絞り込みカテゴリ
 let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
 let savedDesigns = []; // 名前を付けて保存したデザインの一覧
@@ -182,23 +181,10 @@ function renderOptionGroup(containerId, options, currentValue, onSelect){
 // 残っていても、クリックしていないのに勝手に新規作成されてしまうのを防ぐため）。
 // 作成は必ずクリックハンドラー内（アイテム選択 or パーツ選択）からのみ行う。
 function renderFrameOptions(){
-  renderOptionGroup(
-    "artFrameCategoryOptions",
-    FRAME_CATEGORIES.map(c => ({ id: c.id, label: T(c.labelKey, c.labelFallback) })),
-    selectedFrameCategory,
-    (v) => {
-      selectedFrameCategory = v;
-      selectedFrameId = null;
-      selectedFramePartId = null;
-      renderFrameOptions();
-    }
-  );
-
   const lang = currentLang();
-  const items = DESIGN_FRAME_PRESETS.filter(f => selectedFrameCategory === "all" || f.category === selectedFrameCategory);
   renderOptionGroup(
     "artFrameItemOptions",
-    items.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang) })),
     selectedFrameId,
     (v) => {
       selectedFrameId = v;

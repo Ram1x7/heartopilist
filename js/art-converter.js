@@ -35,7 +35,6 @@ const CONVERT_PRESETS = [
 
 let sourceImage = null;
 let selectedRatioId = "1-1"; // 「自由サイズ」で選択中の比率
-let selectedFrameCategory = "all"; // 「デザイン枠」の絞り込みカテゴリ
 let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
 let settings = {
@@ -138,23 +137,10 @@ function renderConvertLevelOptions(){
 }
 
 function renderConvertFrameOptions(){
-  renderOptionGroup(
-    "artConvertFrameCategoryOptions",
-    FRAME_CATEGORIES.map(c => ({ id: c.id, label: T(c.labelKey, c.labelFallback) })),
-    selectedFrameCategory,
-    (v) => {
-      selectedFrameCategory = v;
-      selectedFrameId = null;
-      selectedFramePartId = null;
-      renderConvertFrameOptions();
-    }
-  );
-
   const lang = currentLang();
-  const items = DESIGN_FRAME_PRESETS.filter(f => selectedFrameCategory === "all" || f.category === selectedFrameCategory);
   renderOptionGroup(
     "artConvertFrameItemOptions",
-    items.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang) })),
     selectedFrameId,
     (v) => selectFrameItem(v)
   );
