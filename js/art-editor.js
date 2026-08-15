@@ -204,7 +204,7 @@ function renderOptionGroup(containerId, options, currentValue, onSelect){
   const el = document.getElementById(containerId);
   el.innerHTML = options.map(o => `
     <button class="${String(o.id) === String(currentValue) ? "active" : ""}${o.icon ? " art-frame-btn" : ""}" data-value="${o.id}">
-      ${o.icon ? `<img class="art-frame-icon" src="${o.icon}" alt="" width="36" height="36">` : ""}
+      ${o.icon ? `<img class="art-frame-icon" src="${o.icon}" alt="" width="29" height="29">` : ""}
       <span>${o.label}</span>
     </button>
   `).join("");

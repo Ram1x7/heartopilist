@@ -567,14 +567,21 @@ body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
   line-height:1.2;
 }
 
-.art-frame-icon{
-  width:24px;
-  height:24px;
+/* .modal-box img（他のモーダルの写真用）のpadding/background等を打ち消す必要があるため、
+   詳細度を上げるためあえて2クラスのセレクタにしている */
+.art-frame-btn .art-frame-icon{
+  width:29px;
+  height:29px;
   object-fit:contain;
+  padding:0;
+  margin-bottom:0;
+  background:none;
+  border-radius:0;
 }
 
-body.dark .art-frame-icon{
+body.dark .art-frame-btn .art-frame-icon{
   filter:brightness(0.72);
+  background:none;
 }
 
 .art-gridsize-options button{
