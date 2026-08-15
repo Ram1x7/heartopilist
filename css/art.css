@@ -807,9 +807,215 @@ body.dark .art-preview-frame{
 }
 
 .art-use-btn{
-  width:100%;
   justify-content:center;
-  margin-top:4px;
+}
+
+.art-preview-actions{
+  margin-top:12px;
+}
+
+/* 画像アップロード直後の位置・拡大縮小の調整ステップ */
+.art-crop-stage{
+  padding:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .art-crop-stage{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.art-crop-hint{
+  font-size:11px;
+  line-height:1.5;
+  color:var(--text-sub);
+  margin:4px 0 12px;
+}
+
+body.dark .art-crop-hint{
+  color:#b3a89a;
+}
+
+.art-crop-viewport{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  max-width:280px;
+  aspect-ratio:1/1;
+  margin:0 auto;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:
+    linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    linear-gradient(-45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    var(--card);
+  touch-action:none;
+  cursor:grab;
+}
+
+.art-crop-viewport:active{
+  cursor:grabbing;
+}
+
+body.dark .art-crop-viewport{
+  border-color:#46423b;
+}
+
+#artCropImg{
+  position:absolute;
+  top:0;
+  left:0;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+}
+
+.art-crop-zoom-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  max-width:280px;
+  margin:12px auto 0;
+}
+
+.art-crop-zoom-row input[type=range]{
+  flex:1;
+  accent-color:var(--indigo);
+}
+
+body.dark .art-crop-zoom-row input[type=range]{
+  accent-color:var(--indigo-soft);
+}
+
+.art-crop-zoom-icon{
+  font-size:14px;
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .art-crop-zoom-icon{
+  color:#b3a89a;
+}
+
+.art-crop-actions{
+  margin-top:14px;
+}
+
+.art-crop-reset-btn{
+  flex:1 1 auto;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-radius:999px;
+  padding:9px 16px;
+  font-size:12px;
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  cursor:pointer;
+}
+
+body.dark .art-crop-reset-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+/* 変換設定の主要3ステップ（変換方式・ノイズ除去・色数） */
+.art-convert-step{
+  padding:12px 14px;
+  background:var(--card-sub);
+  border-radius:14px;
+}
+
+body.dark .art-convert-step{
+  background:#383329;
+}
+
+.art-step-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+body.dark .art-step-title{
+  color:#ece4d4;
+}
+
+.art-step-num{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  width:19px;
+  height:19px;
+  border-radius:50%;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:10px;
+  font-weight:700;
+}
+
+body.dark .art-step-num{
+  background:var(--indigo-soft);
+}
+
+.art-step-hint{
+  font-size:11px;
+  line-height:1.5;
+  color:var(--text-sub);
+  margin:0 0 10px;
+}
+
+body.dark .art-step-hint{
+  color:#b3a89a;
+}
+
+/* 詳細設定（配置方法・輪郭強調・明るさ・コントラスト・背景など）のアコーディオン */
+.art-accordion-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  width:100%;
+  padding:11px 14px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  cursor:pointer;
+}
+
+body.dark .art-accordion-toggle{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-accordion-icon{
+  display:inline-flex;
+  transition:transform 0.2s;
+}
+
+.art-accordion-toggle[aria-expanded="true"] .art-accordion-icon{
+  transform:rotate(180deg);
+}
+
+.art-accordion-body{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
 .art-toggle-row{
