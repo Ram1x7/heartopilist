@@ -1,5 +1,22 @@
 /* art-*.html 専用CSS（共通の見た目はcss/style.cssを参照。既存ページのスタイルには一切影響しない） */
 
+/* フッター（他ページと同じ見た目に揃える） */
+.footer{
+  text-align:center;
+  padding:28px 16px 20px;
+  font-size:11px;
+  color:var(--text-sub);
+  border-top:1px solid var(--border);
+  margin-top:30px;
+}
+
+.footer a{ color:var(--vermillion); text-decoration:none; }
+
+body.dark .footer{
+  color:#b3a89a;
+  border-top-color:#46423b;
+}
+
 /* 開発中バナー */
 .art-notice{
   margin:10px 0 16px;
@@ -282,6 +299,59 @@ body.dark .art-zoom-label{
   color:#ece4d4;
 }
 
+/* ズームスライダー */
+.art-zoom-slider{
+  flex:1 1 100%;
+  width:100%;
+  accent-color:var(--indigo);
+}
+
+body.dark .art-zoom-slider{
+  accent-color:var(--indigo-soft);
+}
+
+/* ペン・消しゴムの太さ選択 */
+.art-brush-size-options{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.art-brush-size-options button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:30px;
+  padding:0 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.art-brush-size-options button.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .art-brush-size-options button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-brush-size-options button.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
 /* カラーパレット */
 .art-palette{
   display:flex;
@@ -419,12 +489,99 @@ body.dark .art-usage-empty{
   margin-top:0;
 }
 
+/* 比率選択（項目数が5種で固定のため、折り返さず均等な列幅で並べる。
+   最後の1個だけ幅が伸びて不自然に見えるのを防ぐ） */
+.art-ratio-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:6px;
+}
+
+.art-ratio-grid button.art-ratio-btn{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  height:66px;
+  padding:8px 2px;
+  border-radius:14px;
+}
+
+.art-ratio-shape{
+  display:block;
+  flex-shrink:0;
+  border:2px solid var(--text-sub);
+  border-radius:3px;
+  background:var(--card);
+}
+
+.art-ratio-label{
+  font-size:11px;
+}
+
+.art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
+  border-color:#fdf9ef;
+  background:rgba(253,249,239,0.3);
+}
+
+body.dark .art-ratio-shape{
+  border-color:#b3a89a;
+  background:#2c2823;
+}
+
+body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
+  border-color:#fdf9ef;
+  background:rgba(253,249,239,0.18);
+}
+
 /* デザイン枠アイテム一覧（数が多いので固定高さ+スクロール） */
 .art-scroll-options{
   max-height:200px;
   overflow-y:auto;
   align-content:flex-start;
   padding:2px;
+}
+
+/* デザイン枠アイテムのアイコン付き一覧（2列グリッド） */
+.art-frame-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:6px;
+  /* 比率グリッドの直後に続くため、大枠の上余白(14px)を打ち消して同じ6pxの間隔で連続させる */
+  margin-top:6px;
+}
+
+.art-frame-grid button.art-frame-btn{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  height:66px;
+  padding:6px 2px;
+  border-radius:12px;
+  font-size:9.5px;
+  line-height:1.2;
+}
+
+/* .modal-box img（他のモーダルの写真用）のpadding/background等を打ち消す必要があるため、
+   詳細度を上げるためあえて2クラスのセレクタにしている */
+.art-frame-btn .art-frame-icon{
+  width:29px;
+  height:29px;
+  object-fit:contain;
+  padding:0;
+  margin-bottom:0;
+  background:none;
+  border-radius:0;
+}
+
+body.dark .art-frame-btn .art-frame-icon{
+  filter:brightness(0.72);
+  background:none;
 }
 
 .art-gridsize-options button{
@@ -915,5 +1072,109 @@ body.dark .art-mydesign-actions button{
   background:#2c2823;
   border-color:#46423b;
   color:#b3a89a;
+}
+
+/* ヘルプモーダル */
+.art-help-box{
+  max-width:380px;
+  max-height:85vh;
+  overflow-y:auto;
+  text-align:left;
+}
+
+/* 初回チュートリアル（関連ボタンを順番に吹き出しで案内する） */
+.art-tutorial-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(26,24,20,0.55);
+  z-index:2200;
+}
+
+.art-tutorial-highlight{
+  position:fixed;
+  border-radius:14px;
+  box-shadow:0 0 0 4px var(--indigo);
+  z-index:2201;
+  pointer-events:none;
+  transition:top 0.25s, left 0.25s, width 0.25s, height 0.25s;
+}
+
+body.dark .art-tutorial-highlight{
+  box-shadow:0 0 0 4px var(--indigo-soft);
+}
+
+.art-tutorial-popup{
+  position:fixed;
+  width:240px;
+  max-width:calc(100vw - 24px);
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  z-index:2202;
+}
+
+body.dark .art-tutorial-popup{
+  background:#2c2823;
+  border:1px solid #46423b;
+}
+
+.art-tutorial-step{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:6px;
+}
+
+body.dark .art-tutorial-step{
+  color:#e8d2a8;
+}
+
+.art-tutorial-text{
+  font-size:12px;
+  line-height:1.6;
+  color:var(--text);
+  margin-bottom:12px;
+}
+
+body.dark .art-tutorial-text{
+  color:#ece4d4;
+}
+
+.art-tutorial-actions{
+  display:flex;
+  gap:8px;
+}
+
+.art-tutorial-actions button{
+  flex:1;
+  padding:8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-size:12px;
+  cursor:pointer;
+}
+
+.art-tutorial-skip{
+  background:var(--card-sub);
+  color:var(--text-sub);
+}
+
+.art-tutorial-next{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .art-tutorial-skip{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-tutorial-next{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
 }
 

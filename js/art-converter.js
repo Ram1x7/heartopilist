@@ -116,12 +116,20 @@ function selectConvertRatio(v){
 
 function renderConvertRatioOptions(){
   // デザイン枠アイテムが選択中の間は、比率側のマークを表示しない（両方同時に選択済みに見えるのを防ぐ）
-  renderOptionGroup(
-    "artConvertRatioOptions",
-    FREE_CANVAS_RATIOS.map(r => ({ id: r.id, label: r.ratio })),
-    selectedFrameId ? null : selectedRatioId,
-    selectConvertRatio
-  );
+  const el = document.getElementById("artConvertRatioOptions");
+  const currentId = selectedFrameId ? null : selectedRatioId;
+  el.innerHTML = FREE_CANVAS_RATIOS.map(r => {
+    const box = ratioShapeBox(r.id, 28);
+    return `
+    <button class="art-ratio-btn${r.id === currentId ? " active" : ""}" data-ratio="${r.id}">
+      <span class="art-ratio-shape" style="width:${box.width}px;height:${box.height}px;"></span>
+      <span class="art-ratio-label">${r.ratio}</span>
+    </button>
+  `;
+  }).join("");
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => selectConvertRatio(btn.dataset.ratio));
+  });
 }
 
 function renderConvertSizeOptions(){
@@ -154,7 +162,7 @@ function renderConvertFrameOptions(){
   const lang = currentLang();
   renderOptionGroup(
     "artConvertFrameItemOptions",
-    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang), icon: f.icon })),
     selectedFrameId,
     (v) => selectFrameItem(v)
   );
@@ -233,10 +241,14 @@ function updateFitBgRowVisibility(){
   document.getElementById("artConvertFitBgColorWrap").style.display = settings.fitBgMode === "custom" ? "flex" : "none";
 }
 
+// o.iconが指定されている場合（デザイン枠アイテムなど）は、アイコン画像をラベルの上に表示する
 function renderOptionGroup(containerId, options, currentValue, onSelect){
   const el = document.getElementById(containerId);
   el.innerHTML = options.map(o => `
-    <button class="${String(o.id) === String(currentValue) ? "active" : ""}" data-value="${o.id}">${o.label}</button>
+    <button class="${String(o.id) === String(currentValue) ? "active" : ""}${o.icon ? " art-frame-btn" : ""}" data-value="${o.id}">
+      ${o.icon ? `<img class="art-frame-icon" src="${o.icon}" alt="" width="29" height="29">` : ""}
+      <span>${o.label}</span>
+    </button>
   `).join("");
   el.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => {
