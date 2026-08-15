@@ -414,6 +414,22 @@ body.dark .music-score-display{
   border-radius:8px;
   background:var(--card);
   border:1px solid var(--border);
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+/* 和音（複数の音を同時に押した1つのまとまり）。音符を縦に並べて表示する */
+.music-chip.chord{
+  height:auto;
+  min-height:40px;
+  padding:4px 2px;
+  gap:1px;
+}
+
+.music-chip.chord .music-note-digit{
+  font-size:12px;
+  line-height:1.15;
 }
 
 .music-chip.current{
@@ -494,6 +510,17 @@ body.dark .music-note-kana{
   background:var(--card-sub);
   cursor:pointer;
   -webkit-tap-highlight-color:transparent;
+  /* 長押し（録音・練習モードでの押しっぱなし）でOS標準のテキスト選択や
+     コピー/調べるメニューが出てしまうのを防ぐ */
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.music-note-digit,
+.music-note-kana{
+  user-select:none;
+  -webkit-user-select:none;
 }
 
 /* 練習モード：画面幅に合わせて縮めず、実機に近いサイズで表示する。

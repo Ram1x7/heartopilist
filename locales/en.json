@@ -499,5 +499,5 @@
   "music_note_count_suffix": " notes",
   "music_timesig_label": "Time Sig.",
   "music_record_toggle": "Record",
-  "music_record_hint": "How long you hold the button becomes the note's length (chords are not supported)."
+  "music_record_hint": "How long you hold the button becomes the note's length. Press multiple buttons at once to record a chord."
 }

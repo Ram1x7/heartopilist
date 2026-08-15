@@ -9,7 +9,7 @@ const SAVED_SCORES_KEY = "hatopiMusic_savedScores";
 
 let pageMode = "edit"; // "edit" | "practice"
 let currentInstrumentId = "piano";
-let tokens = []; // {degree, accidental, octave, beats}
+let tokens = []; // {notes:[{degree, accidental, octave}, ...], beats}  ※1音だけでもnotesは配列
 let selectedDurationId = "quarter";
 let isRecording = false; // 編集モード：ONの間はボタンを押した長さがそのまま音の長さになる
 let bpm = DEFAULT_BPM;
@@ -20,15 +20,18 @@ let savedScores = [];
 
 let soundEnabled = true;
 let audioCtx = null;
-let sustainedOsc = null;
-let sustainedGain = null;
+let sustainedTones = new Map(); // pointerId -> {osc, gain}（和音対応：同時に複数鳴らせる）
 
 let isPlaying = false;
 let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
 let playTimer = null;
 
-let activeHold = null; // 演奏ボタンを押している間の情報 {note, btn, startTime}
+// 演奏ボタンの「押す・離す」（和音対応）。同時に押されている指をactiveHoldsで管理し、
+// 最初の1本目が押された時点から全ての指が離れるまでを「1つの和音グループ」とする
+let activeHolds = new Map(); // pointerId -> {note, btn, startTime}
+let currentGroupNotes = []; // 現在の和音グループに含まれる音（離しても消えない。確定時にクリア）
+let groupStartTime = 0;
 
 // ── 初期化 ──
 function initMusicEditor() {
@@ -36,7 +39,7 @@ function initMusicEditor() {
 
   const draft = loadDraft();
   if (draft && Array.isArray(draft.tokens)) {
-    tokens = draft.tokens;
+    tokens = normalizeTokens(draft.tokens);
     currentInstrumentId = draft.instrumentId || "piano";
     bpm = draft.bpm || DEFAULT_BPM;
     timeSignatureId = draft.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
@@ -108,58 +111,64 @@ function renderInstrumentGrid() {
   });
 }
 
-// 演奏ボタンの「押す・離す」を扱う。押している長さで練習モードの音の長さ・
-// 録音時の音の長さが決まる（和音は非対応：新しい音を押したら前の音は終わる）
+// 演奏ボタンの「押す・離す」を扱う（和音対応）。最初の1本目が押されてから
+// 全ての指が離れるまでを1つの和音グループとして扱う
 function bindNoteButtonHold(btn, note) {
   const start = (e) => {
     e.preventDefault();
-    if (activeHold) endHold();
     try {
       btn.setPointerCapture(e.pointerId);
     } catch (err) {}
     btn.classList.add("pressed");
-    activeHold = { note, btn, startTime: performance.now() };
-    handleNotePress(note);
+    if (activeHolds.size === 0) {
+      currentGroupNotes = [];
+      groupStartTime = performance.now();
+    }
+    activeHolds.set(e.pointerId, { note, btn, startTime: performance.now() });
+    currentGroupNotes.push(note);
+    startSustainedTone(e.pointerId, noteFrequency(note));
+    if (pageMode === "practice") tryAdvancePracticeChord();
   };
   const end = (e) => {
-    if (!activeHold || activeHold.btn !== btn) return;
-    endHold();
+    const held = activeHolds.get(e.pointerId);
+    if (!held) return;
+    held.btn.classList.remove("pressed");
+    activeHolds.delete(e.pointerId);
+    stopSustainedTone(e.pointerId);
+    if (activeHolds.size === 0) finalizeGroup();
   };
   btn.addEventListener("pointerdown", start);
   btn.addEventListener("pointerup", end);
   btn.addEventListener("pointercancel", end);
 }
 
-function endHold() {
-  if (!activeHold) return;
-  const { note, btn, startTime } = activeHold;
-  const heldMs = performance.now() - startTime;
-  btn.classList.remove("pressed");
-  activeHold = null;
-  stopSustainedTone();
-  handleNoteRelease(note, heldMs);
-}
-
-function handleNotePress(note) {
+// 和音グループの全ての指が離れた時点で確定する（編集モードのみ譜面に追加。
+// 練習モードは押した時点で既に先取り判定済みのため、ここでは何もしない）
+function finalizeGroup() {
+  if (!currentGroupNotes.length) return;
+  const notes = dedupeNotes(currentGroupNotes);
   if (pageMode === "edit") {
     if (isRecording) {
-      startSustainedTone(noteFrequency(note));
+      const rawBeats = (performance.now() - groupStartTime) / 1000 / (60 / bpm);
+      addChordToken(notes, snapBeatsToPreset(rawBeats));
     } else {
-      const beats = getDuration(selectedDurationId).beats;
-      playTone(noteFrequency(note), (60 / bpm) * beats);
-      addNoteToken(note, beats);
+      addChordToken(notes, getDuration(selectedDurationId).beats);
     }
-  } else {
-    startSustainedTone(noteFrequency(note));
-    tryAdvancePractice(note);
   }
+  currentGroupNotes = [];
 }
 
-function handleNoteRelease(note, heldMs) {
-  if (pageMode === "edit" && isRecording) {
-    const rawBeats = heldMs / 1000 / (60 / bpm);
-    addNoteToken(note, snapBeatsToPreset(rawBeats));
-  }
+function dedupeNotes(notes) {
+  const seen = new Set();
+  const result = [];
+  notes.forEach((n) => {
+    const k = noteKey(n);
+    if (!seen.has(k)) {
+      seen.add(k);
+      result.push(n);
+    }
+  });
+  return result;
 }
 
 function snapBeatsToPreset(rawBeats) {
@@ -209,8 +218,11 @@ function updateRecordingUI() {
 }
 
 // ── 譜面の編集 ──
-function addNoteToken(note, beats) {
-  tokens.push({ degree: note.degree, accidental: note.accidental || null, octave: note.octave, beats });
+function addChordToken(notes, beats) {
+  tokens.push({
+    notes: notes.map((n) => ({ degree: n.degree, accidental: n.accidental || null, octave: n.octave })),
+    beats,
+  });
   renderScoreDisplay();
   saveDraftDebounced();
 }
@@ -246,10 +258,10 @@ function renderScoreDisplay() {
       beatsSinceBar = 0;
     }
     const current = pageMode === "practice" && i === cursor;
-    html += `<span class="music-chip${current ? " current" : ""}" data-index="${i}">
-      <span class="music-note-digit">${noteDisplayDigit(tok)}</span>
-      <span class="music-note-kana">${DEGREE_LABELS[tok.degree]}</span>
-    </span>`;
+    const isChord = tok.notes.length > 1;
+    const digits = tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
+    const kana = isChord ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
+    html += `<span class="music-chip${isChord ? " chord" : ""}${current ? " current" : ""}" data-index="${i}">${digits}${kana}</span>`;
     beatsSinceBar += tok.beats;
   });
   el.innerHTML = html;
@@ -270,12 +282,20 @@ function renderScoreMeta() {
 // ── モード切り替え(編集/練習) ──
 function setPageMode(mode) {
   if (pageMode === mode) return;
-  if (activeHold) endHold();
+  releaseAllHolds();
   stopPlayback();
   pageMode = mode;
   cursor = -1;
   updateModeUI();
   renderScoreDisplay();
+}
+
+// 押しっぱなしの指を全て強制的に離した扱いにする（モード切り替え時などの後始末）
+function releaseAllHolds() {
+  activeHolds.forEach((held) => held.btn.classList.remove("pressed"));
+  activeHolds.clear();
+  currentGroupNotes = [];
+  stopAllSustainedTones();
 }
 
 function updateModeUI() {
@@ -294,10 +314,10 @@ function nextNoteIndex(fromIdx) {
   return fromIdx + 1 < tokens.length ? fromIdx + 1 : null;
 }
 
-function tryAdvancePractice(note) {
+function tryAdvancePracticeChord() {
   const idx = nextNoteIndex(cursor);
   if (idx === null) return;
-  if (!notesEqual(tokens[idx], note)) return;
+  if (!notesSetEqual(currentGroupNotes, tokens[idx].notes)) return;
   cursor = idx;
   renderScoreDisplay();
   if (isPlaying) {
@@ -305,6 +325,13 @@ function tryAdvancePractice(note) {
     scheduleNextTick();
   }
   if (nextNoteIndex(cursor) === null) stopPlayback();
+}
+
+function notesSetEqual(a, b) {
+  const aKeys = dedupeNotes(a).map(noteKey).sort();
+  const bKeys = dedupeNotes(b).map(noteKey).sort();
+  if (aKeys.length !== bKeys.length) return false;
+  return aKeys.every((k, i) => k === bKeys[i]);
 }
 
 function togglePlayback() {
@@ -340,9 +367,9 @@ function tick() {
   }
   cursor = idx;
   renderScoreDisplay();
-  const note = tokens[idx];
-  const durSec = (60 / bpm) * note.beats / playSpeed;
-  playTone(noteFrequency(note), durSec);
+  const tok = tokens[idx];
+  const durSec = (60 / bpm) * tok.beats / playSpeed;
+  tok.notes.forEach((n) => playTone(noteFrequency(n), durSec));
   playTimer = setTimeout(tick, durSec * 1000);
 }
 
@@ -352,8 +379,8 @@ function scheduleNextTick() {
     stopPlayback();
     return;
   }
-  const note = tokens[cursor];
-  const durSec = (60 / bpm) * note.beats / playSpeed;
+  const tok = tokens[cursor];
+  const durSec = (60 / bpm) * tok.beats / playSpeed;
   playTimer = setTimeout(tick, durSec * 1000);
 }
 
@@ -401,11 +428,12 @@ function playTone(freq, durationSec) {
   }
 }
 
-// 押している間だけ鳴らし続ける（練習モード・録音入力用）
-function startSustainedTone(freq) {
+// 押している間だけ鳴らし続ける（練習モード・録音入力用）。和音対応のため
+// 指(pointerId)ごとに個別の音源を持ち、複数同時に鳴らせるようにする
+function startSustainedTone(pointerId, freq) {
   if (!soundEnabled) return;
   try {
-    stopSustainedTone();
+    stopSustainedTone(pointerId);
     const ctx = ensureAudioCtx();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -413,28 +441,32 @@ function startSustainedTone(freq) {
     osc.frequency.value = freq;
     const now = ctx.currentTime;
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.22, now + 0.01);
+    // 和音で複数同時に鳴る想定のため、単音時より少し音量を抑える
+    gain.gain.linearRampToValueAtTime(0.18, now + 0.01);
     osc.connect(gain).connect(ctx.destination);
     osc.start(now);
-    sustainedOsc = osc;
-    sustainedGain = gain;
+    sustainedTones.set(pointerId, { osc, gain });
   } catch (e) {
     // Web Audio非対応環境では無音のまま無視する
   }
 }
 
-function stopSustainedTone() {
-  if (!sustainedOsc) return;
+function stopSustainedTone(pointerId) {
+  const t = sustainedTones.get(pointerId);
+  if (!t) return;
   try {
     const ctx = ensureAudioCtx();
     const now = ctx.currentTime;
-    sustainedGain.gain.cancelScheduledValues(now);
-    sustainedGain.gain.setValueAtTime(sustainedGain.gain.value, now);
-    sustainedGain.gain.linearRampToValueAtTime(0, now + 0.05);
-    sustainedOsc.stop(now + 0.08);
+    t.gain.gain.cancelScheduledValues(now);
+    t.gain.gain.setValueAtTime(t.gain.gain.value, now);
+    t.gain.gain.linearRampToValueAtTime(0, now + 0.05);
+    t.osc.stop(now + 0.08);
   } catch (e) {}
-  sustainedOsc = null;
-  sustainedGain = null;
+  sustainedTones.delete(pointerId);
+}
+
+function stopAllSustainedTones() {
+  [...sustainedTones.keys()].forEach(stopSustainedTone);
 }
 
 function toggleSound() {
@@ -567,7 +599,7 @@ function renderSavedList() {
 function loadScore(id) {
   const score = savedScores.find((s) => s.id === id);
   if (!score) return;
-  tokens = score.tokens.slice();
+  tokens = normalizeTokens(score.tokens);
   currentInstrumentId = score.instrumentId;
   bpm = score.bpm || DEFAULT_BPM;
   timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
@@ -600,6 +632,16 @@ function closeHelpModal() {
 }
 
 // ── ユーティリティ ──
+// 和音対応前（{degree,accidental,octave,beats}）に保存された譜面を
+// 現在の形式（{notes:[...], beats}）に変換する
+function normalizeTokens(rawTokens) {
+  if (!Array.isArray(rawTokens)) return [];
+  return rawTokens.map((t) => {
+    if (Array.isArray(t.notes)) return t;
+    return { notes: [{ degree: t.degree, accidental: t.accidental || null, octave: t.octave }], beats: t.beats };
+  });
+}
+
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }

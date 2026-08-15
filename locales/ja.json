@@ -499,5 +499,5 @@
   "music_note_count_suffix": "音",
   "music_timesig_label": "拍子",
   "music_record_toggle": "録音する",
-  "music_record_hint": "押している長さがそのまま音の長さになります（和音は非対応）"
+  "music_record_hint": "押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります"
 }

@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=3">
-<link rel="stylesheet" href="./css/music.css?v=1">
+<link rel="stylesheet" href="./css/music.css?v=2">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -135,7 +135,7 @@
         <span data-i18n="music_record_toggle">録音する</span>
         <input type="checkbox" id="musicRecordToggle">
       </label>
-      <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります（和音は非対応）</p>
+      <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります</p>
       <div class="music-duration-options" id="musicDurationOptions"></div>
       <div class="music-panel-btn-row">
         <button class="music-header-btn" id="musicDeleteLastBtn" data-i18n="music_delete_last">最後を削除</button>
@@ -173,7 +173,7 @@
     「音の長さ」を選んでから演奏ボタンを押すと、その音が譜面に追加されます。「最後を削除」で1つ前に戻せます。</p>
 
     <p style="margin-top:10px;"><strong>録音する</strong><br>
-    ONにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。和音（同時押し）には対応していません。</p>
+    ONにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。複数のボタンを同時に押すと和音として記録されます。</p>
 
     <p style="margin-top:10px;"><strong>テンポ・拍子</strong><br>
     BPM（1分間の拍数）と拍子（4/4・3/4など）を設定できます。練習モードの再生速度はテンポを基準にした倍率です。小節線は拍子をもとに自動で表示されます。</p>
