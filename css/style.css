@@ -53,6 +53,10 @@ body{
   overflow-x:hidden;
   position:relative;
   animation:fadeIn 0.2s ease;
+  /* PWA（ホーム画面追加）でピンチ操作すると画面全体が縮小され、周りに余白が
+     見えてしまうのを防ぐ（ページ全体のピンチズーム・ダブルタップズームを無効化。
+     縦横のスクロールは引き続き可能） */
+  touch-action:pan-x pan-y;
 }
 
 @keyframes fadeIn{
