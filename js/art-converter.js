@@ -162,7 +162,7 @@ function renderConvertFrameOptions(){
   const lang = currentLang();
   renderOptionGroup(
     "artConvertFrameItemOptions",
-    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang) })),
+    DESIGN_FRAME_PRESETS.map(f => ({ id: f.id, label: frameName(f, lang), icon: f.icon })),
     selectedFrameId,
     (v) => selectFrameItem(v)
   );
@@ -241,10 +241,14 @@ function updateFitBgRowVisibility(){
   document.getElementById("artConvertFitBgColorWrap").style.display = settings.fitBgMode === "custom" ? "flex" : "none";
 }
 
+// o.iconが指定されている場合（デザイン枠アイテムなど）は、アイコン画像をラベルの上に表示する
 function renderOptionGroup(containerId, options, currentValue, onSelect){
   const el = document.getElementById(containerId);
   el.innerHTML = options.map(o => `
-    <button class="${String(o.id) === String(currentValue) ? "active" : ""}" data-value="${o.id}">${o.label}</button>
+    <button class="${String(o.id) === String(currentValue) ? "active" : ""}${o.icon ? " art-frame-btn" : ""}" data-value="${o.id}">
+      ${o.icon ? `<img class="art-frame-icon" src="${o.icon}" alt="" width="36" height="36">` : ""}
+      <span>${o.label}</span>
+    </button>
   `).join("");
   el.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => {

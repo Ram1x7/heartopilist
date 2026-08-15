@@ -27,6 +27,7 @@ function ratioShapeBox(ratioId, maxSide){
 const DESIGN_FRAME_PRESETS = [
   {
     id: "book",
+    icon: "images/art-frames/book.webp",
     category: "other",
     name: "本", nameI18n: {"ja": "本", "en": "Book", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -37,6 +38,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "t_shirt",
+    icon: "images/art-frames/t_shirt.webp",
     category: "clothes",
     name: "Tシャツ", nameI18n: {"ja": "Tシャツ", "en": "T-Shirt", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -49,6 +51,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "tank_top",
+    icon: "images/art-frames/tank_top.webp",
     category: "clothes",
     name: "タンクトップ", nameI18n: {"ja": "タンクトップ", "en": "Tank Top", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -59,6 +62,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "mini_skirt",
+    icon: "images/art-frames/mini_skirt.webp",
     category: "clothes",
     name: "ミニスカート", nameI18n: {"ja": "ミニスカート", "en": "Mini Skirt", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -69,6 +73,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "shorts",
+    icon: "images/art-frames/shorts.webp",
     category: "clothes",
     name: "ハーフパンツ", nameI18n: {"ja": "ハーフパンツ", "en": "Shorts", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -79,6 +84,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "bucket_hat",
+    icon: "images/art-frames/bucket_hat.webp",
     category: "clothes",
     name: "バケットハット", nameI18n: {"ja": "バケットハット", "en": "Bucket Hat", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -90,6 +96,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "sweatshirt",
+    icon: "images/art-frames/sweatshirt.webp",
     category: "clothes",
     name: "スウェット", nameI18n: {"ja": "スウェット", "en": "Sweatshirt", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -101,6 +108,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "pants",
+    icon: "images/art-frames/pants.webp",
     category: "clothes",
     name: "パンツ", nameI18n: {"ja": "パンツ", "en": "Pants", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -111,6 +119,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "dress",
+    icon: "images/art-frames/dress.webp",
     category: "clothes",
     name: "ワンピース", nameI18n: {"ja": "ワンピース", "en": "Dress", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -122,6 +131,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "cap",
+    icon: "images/art-frames/cap.webp",
     category: "clothes",
     name: "キャップ", nameI18n: {"ja": "キャップ", "en": "Cap", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -133,6 +143,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "shoes",
+    icon: "images/art-frames/shoes.webp",
     category: "clothes",
     name: "靴", nameI18n: {"ja": "靴", "en": "Shoes", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -144,6 +155,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "mary_jane",
+    icon: "images/art-frames/mary_jane.webp",
     category: "clothes",
     name: "メリージェーン", nameI18n: {"ja": "メリージェーン", "en": "Mary Jane", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -154,6 +166,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "single_bed",
+    icon: "images/art-frames/single_bed.webp",
     category: "furniture",
     name: "シングルベッド", nameI18n: {"ja": "シングルベッド", "en": "Single Bed", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -164,6 +177,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "double_bed",
+    icon: "images/art-frames/double_bed.webp",
     category: "furniture",
     name: "ダブルベッド", nameI18n: {"ja": "ダブルベッド", "en": "Double Bed", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -174,6 +188,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "closet",
+    icon: "images/art-frames/closet.webp",
     category: "furniture",
     name: "クローゼット", nameI18n: {"ja": "クローゼット", "en": "Closet", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -183,6 +198,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "nightstand",
+    icon: "images/art-frames/nightstand.webp",
     category: "furniture",
     name: "ナイトテーブル", nameI18n: {"ja": "ナイトテーブル", "en": "Nightstand", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -192,6 +208,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "table_lamp",
+    icon: "images/art-frames/table_lamp.webp",
     category: "furniture",
     name: "テーブルランプ", nameI18n: {"ja": "テーブルランプ", "en": "Table Lamp", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -203,6 +220,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "chair",
+    icon: "images/art-frames/chair.webp",
     category: "furniture",
     name: "チェア", nameI18n: {"ja": "チェア", "en": "Chair", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -214,6 +232,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "low_table",
+    icon: "images/art-frames/low_table.webp",
     category: "furniture",
     name: "ローテーブル", nameI18n: {"ja": "ローテーブル", "en": "Low Table", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -223,6 +242,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "double_sofa",
+    icon: "images/art-frames/double_sofa.webp",
     category: "furniture",
     name: "ダブルソファ", nameI18n: {"ja": "ダブルソファ", "en": "Double Sofa", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -233,6 +253,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "single_sofa",
+    icon: "images/art-frames/single_sofa.webp",
     category: "furniture",
     name: "シングルソファ", nameI18n: {"ja": "シングルソファ", "en": "Single Sofa", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,
@@ -243,6 +264,7 @@ const DESIGN_FRAME_PRESETS = [
   },
   {
     id: "floor_lamp",
+    icon: "images/art-frames/floor_lamp.webp",
     category: "furniture",
     name: "フロアランプ", nameI18n: {"ja": "フロアランプ", "en": "Floor Lamp", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
     confirmed: true,

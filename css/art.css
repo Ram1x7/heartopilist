@@ -544,6 +544,33 @@ body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
   padding:2px;
 }
 
+/* デザイン枠アイテムのアイコン付き一覧（2列グリッド） */
+.art-frame-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:8px;
+}
+
+.art-frame-grid button.art-frame-btn{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  padding:10px 4px 8px;
+  border-radius:14px;
+}
+
+.art-frame-icon{
+  width:36px;
+  height:36px;
+  object-fit:contain;
+}
+
+body.dark .art-frame-icon{
+  filter:brightness(0.72);
+}
+
 .art-gridsize-options button{
   flex:1 1 40%;
   border:1px solid var(--border);
