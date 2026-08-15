@@ -201,6 +201,9 @@ function updateModeUI() {
   document.getElementById("musicEditControls").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicScoreEditRow").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicPracticeControls").style.display = pageMode === "practice" ? "" : "none";
+  // 練習モードでは、画面幅に合わせて縮めず実機に近い固定サイズで表示する
+  // （はみ出す分は横スクロール。編集モードは今まで通り画面幅に収める）
+  document.getElementById("musicInstrumentGrid").classList.toggle("practice-size", pageMode === "practice");
 }
 
 // ── 練習(なぞり)モード：再生 ──

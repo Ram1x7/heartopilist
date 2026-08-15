@@ -445,6 +445,25 @@ body.dark .music-note-kana{
   -webkit-tap-highlight-color:transparent;
 }
 
+/* 練習モード：画面幅に合わせて縮めず、実機に近い固定サイズで表示する。
+   はみ出す分はグリッド全体を横スクロール（各行が連動して動くので、縦に並ぶ
+   音の位置がずれない。端末を横向きにすれば1画面に収まりやすい） */
+.music-instrument-grid.practice-size{
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:4px;
+}
+
+.music-instrument-grid.practice-size .music-instrument-row{
+  width:max-content;
+}
+
+.music-instrument-grid.practice-size .music-note-btn{
+  flex:0 0 auto;
+  width:58px;
+  height:70px;
+}
+
 .music-note-btn:active{
   background:var(--indigo);
 }
