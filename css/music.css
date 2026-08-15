@@ -576,11 +576,12 @@ body.dark .music-note-kana{
   -webkit-user-select:none;
 }
 
-/* 練習モード：画面幅に合わせて縮めず、実機に近いサイズで表示する。
-   実機（iPad Pro 11インチ・横画面、表示幅は約1210pt）のボタンサイズを基準に、
-   画面幅に対する割合(vw)でスケールさせる。これにより、iPhone・Androidなど
-   画面が小さい端末でも「画面に対して大きすぎる/小さすぎる」ズレを防ぎ、
-   タップしやすい最小サイズ(44px)は下回らないようにする。
+/* 練習モード：実機の指の感覚に合わせるため、画面幅に対する一律の割合ではなく、
+   「今の配置(15鍵2列／3列／22キーなど)で一番ボタン数が多い行」が画面幅に
+   ちょうど収まるボタンサイズをJS側(applyPracticeGridSizing)で計算し、
+   --music-btn-w としてこの要素に設定する。実機も配置によってボタンの大きさが
+   変わる（ボタン数が少ない配置ほど1個が大きい）ため、これに合わせることで
+   どの配置で練習しても実機と同じ指の距離感になる。
    はみ出す分はグリッド全体を横スクロール（各行が連動して動くので、縦に並ぶ
    音の位置がずれない。端末を横向きにすれば1画面に収まりやすい） */
 .music-instrument-grid.practice-size{
@@ -595,7 +596,7 @@ body.dark .music-note-kana{
 
 .music-instrument-grid.practice-size .music-note-btn{
   flex:0 0 auto;
-  width:clamp(44px, 6.9vw, 92px);
+  width:var(--music-btn-w, 92px);
   aspect-ratio:5 / 6;
   height:auto;
 }
