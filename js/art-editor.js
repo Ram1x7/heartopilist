@@ -53,6 +53,7 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
   // 同一フレーム内の複数回の呼び出しをrequestAnimationFrameで1回にまとめる
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
+let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -277,6 +278,7 @@ function createCanvas(w, h, frameId, partId){
   gridHeight = h;
   pixels = new Array(w * h).fill(null);
   blockStatus = {};
+  inspectedCell = null;
   activeFrameId = frameId || null;
   activePartId = partId || null;
   // 自由サイズ（frameId未指定）で作成した場合は、モーダルの選択状態も
@@ -727,6 +729,15 @@ function renderCanvas(){
   if(blockMode){
     drawBlockOverlay(cell);
   }
+
+  // タップして調べたマスのハイライト（座標・使用色をはっきり分かるように、常に最前面に描く）
+  if(inspectedCell && inspectedCell.cx < gridWidth && inspectedCell.cy < gridHeight){
+    const ix = inspectedCell.cx, iy = inspectedCell.cy;
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "#8fbdc9" : "#3c5a6e";
+    ctx.lineWidth = Math.max(2, cell * 0.12);
+    const half = ctx.lineWidth / 2;
+    ctx.strokeRect(ix * cell + half, iy * cell + half, cell - ctx.lineWidth, cell - ctx.lineWidth);
+  }
 }
 
 // ── 色番号・マス番号ラベル ──
@@ -946,6 +957,11 @@ function bindCanvasEvents(){
       return;
     }
 
+    // タップしたマスをハイライト表示する（座標・使用色の確認用）。編集モードOFF・固定中でも、
+    // 非破壊の「調べる」操作として常に動作する
+    inspectedCell = c;
+    renderCanvas();
+
     // スポイトは閲覧・確認に近い非破壊操作のため、編集モードOFF・固定中でも発動できる。
     // ペン/消しゴム/塗りつぶしは、誤タップ防止のため編集モードON時のみ発動する
     if(currentTool !== "eyedropper" && (!editMode || isLocked)) return;
@@ -1056,7 +1072,9 @@ function updateCoordReadout(c){
   const el = document.getElementById("artCoordReadout");
   if(!el) return;
   if(c){
-    el.textContent = `X: ${String(c.cx).padStart(2, "0")}  Y: ${String(c.cy).padStart(2, "0")}`;
+    const color = pixels[c.cy * gridWidth + c.cx];
+    const code = color ? gamePaletteCode(color) : "";
+    el.textContent = `X: ${String(c.cx).padStart(2, "0")}  Y: ${String(c.cy).padStart(2, "0")}` + (code ? `   ${code}` : "");
     el.style.display = "block";
   }else{
     el.style.display = "none";
@@ -1270,6 +1288,7 @@ function loadDesign(id){
   gridHeight = design.height;
   pixels = design.pixelData.slice();
   blockStatus = { ...(design.blockStatus || {}) };
+  inspectedCell = null;
   currentDesignId = design.id;
   activeFrameId = design.frameId || null;
   activePartId = design.partId || null;

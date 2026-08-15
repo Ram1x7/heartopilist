@@ -30,12 +30,20 @@ const FIT_BG_MODES = [
 // 変換方式プリセット。それぞれディザリング・輪郭強調の初期値を切り替える早見表で、
 // 選択後も個別のスライダー・ボタンで微調整できる（手動で変えるとpresetはnullになる）
 const CONVERT_PRESETS = [
-  { id: "standard", labelKey: "art_preset_standard", labelFallback: "標準", overrides: { dither: false, edge: "off" } },
-  { id: "smooth", labelKey: "art_preset_smooth", labelFallback: "なめらか", overrides: { dither: true, edge: "off" } },
-  { id: "crisp", labelKey: "art_preset_crisp", labelFallback: "くっきり", overrides: { dither: false, edge: "mid" } },
+  { id: "standard", labelKey: "art_preset_standard", labelFallback: "標準（写真向け）", overrides: { dither: false, edge: "off" } },
+  { id: "smooth", labelKey: "art_preset_smooth", labelFallback: "なめらか（イラスト向け）", overrides: { dither: true, edge: "off" } },
+  { id: "crisp", labelKey: "art_preset_crisp", labelFallback: "くっきり（高コントラスト向け）", overrides: { dither: false, edge: "mid" } },
 ];
 
 let sourceImage = null;
+// 位置・拡大縮小の調整ステップ（アップロード直後、変換前に切り抜き範囲を目で見て決める）
+let cropZoom = 1; // 1 = ビューポートにちょうど収まる（cover）大きさ
+let cropLeft = 0; // ビューポート内での画像左端の位置（CSS px）
+let cropTop = 0;
+let cropCoverScale = 1; // 等倍(cropZoom=1)の時の「元画像px→表示px」の倍率
+let cropTargetKey = null; // 調整済みのキャンバスサイズ（幅x高さ）。変わったら自動でリセットする
+let manualCropRect = null; // 確定した切り抜き範囲（元画像のpx座標）。null = 中央基準の自動クロップ
+let cropDragState = null;
 let selectedRatioId = "1-1"; // 「自由サイズ」で選択中の比率
 let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
@@ -98,6 +106,7 @@ function initArtConverter(){
   });
 
   document.getElementById("artUseInEditorBtn").addEventListener("click", useResultInEditor);
+  document.getElementById("artAdjustCropBtn").addEventListener("click", () => openCropStage(false));
 }
 
 // キャンバスサイズ選択（自由サイズ：比率→サイズレベルの2段階／デザイン枠：カテゴリ→アイテム→パーツ）
@@ -149,6 +158,7 @@ function renderConvertLevelOptions(){
       const [w, h] = v.split("x").map(Number);
       settings.width = w;
       settings.height = h;
+      manualCropRect = null; // サイズが変わったら調整済みの切り抜き範囲を無効化する
       selectedFrameId = null;
       selectedFramePartId = null;
       renderConvertRatioOptions(); // 比率側のマークを再表示する
@@ -208,6 +218,7 @@ function selectFramePart(partId){
   const part = frame.parts.find(p => p.id === partId);
   settings.width = part.width;
   settings.height = part.height;
+  manualCropRect = null; // サイズが変わったら調整済みの切り抜き範囲を無効化する
   renderConvertLevelOptions();
   scheduleConvert();
 }
@@ -270,15 +281,117 @@ function handleFileSelect(file){
     const img = new Image();
     img.onload = () => {
       sourceImage = img;
+      manualCropRect = null;
+      cropTargetKey = null;
       document.getElementById("artOriginalImg").src = e.target.result;
-      document.getElementById("artConvertPreview").style.display = "block";
-      document.getElementById("artConvertPanel").style.display = "block";
-      convert();
+      openCropStage(true);
     };
     img.onerror = () => alert(T("art_image_load_failed", "画像の読み込みに失敗しました"));
     img.src = e.target.result;
   };
   reader.readAsDataURL(file);
+}
+
+// ── 位置・拡大縮小の調整ステップ（アップロード直後、または「位置を調整する」から再度開く） ──
+// reset=trueの場合、または前回調整した時とキャンバスサイズ(比率)が変わっている場合は、
+// 中央基準のcover（画面いっぱいに収める最小倍率）にリセットする
+function openCropStage(reset){
+  if(!sourceImage) return;
+  document.getElementById("artConvertPreview").style.display = "none";
+  document.getElementById("artConvertPanel").style.display = "none";
+  document.getElementById("artCropStage").style.display = "block";
+
+  const targetKey = `${settings.width}x${settings.height}`;
+  const viewport = document.getElementById("artCropViewport");
+  viewport.style.aspectRatio = `${settings.width} / ${settings.height}`;
+  document.getElementById("artCropImg").src = sourceImage.src;
+
+  requestAnimationFrame(() => {
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    cropCoverScale = Math.max(vw / sourceImage.naturalWidth, vh / sourceImage.naturalHeight);
+    if(reset || cropTargetKey !== targetKey){
+      cropZoom = 1;
+      cropLeft = (vw - sourceImage.naturalWidth * cropCoverScale) / 2;
+      cropTop = (vh - sourceImage.naturalHeight * cropCoverScale) / 2;
+      cropTargetKey = targetKey;
+    }
+    document.getElementById("artCropZoomSlider").value = Math.round(cropZoom * 100);
+    applyCropTransform();
+    bindCropInteractions();
+  });
+}
+
+// 画像が常にビューポート全体を覆うようclampしつつ、実際の位置・大きさをimg要素に反映する
+function applyCropTransform(){
+  const viewport = document.getElementById("artCropViewport");
+  const img = document.getElementById("artCropImg");
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const scale = cropCoverScale * cropZoom;
+  const dispW = sourceImage.naturalWidth * scale;
+  const dispH = sourceImage.naturalHeight * scale;
+  cropLeft = Math.min(0, Math.max(vw - dispW, cropLeft));
+  cropTop = Math.min(0, Math.max(vh - dispH, cropTop));
+  img.style.width = dispW + "px";
+  img.style.height = dispH + "px";
+  img.style.left = cropLeft + "px";
+  img.style.top = cropTop + "px";
+}
+
+// ドラッグ（パン）・スライダー（ズーム）・リセット・確定ボタンの結線（初回のみ）
+function bindCropInteractions(){
+  const viewport = document.getElementById("artCropViewport");
+  if(viewport.dataset.bound) return;
+  viewport.dataset.bound = "1";
+
+  viewport.addEventListener("pointerdown", (e) => {
+    viewport.setPointerCapture(e.pointerId);
+    cropDragState = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, startLeft: cropLeft, startTop: cropTop };
+  });
+  viewport.addEventListener("pointermove", (e) => {
+    if(!cropDragState || e.pointerId !== cropDragState.pointerId) return;
+    cropLeft = cropDragState.startLeft + (e.clientX - cropDragState.startX);
+    cropTop = cropDragState.startTop + (e.clientY - cropDragState.startY);
+    applyCropTransform();
+  });
+  const endDrag = (e) => {
+    if(cropDragState && e.pointerId === cropDragState.pointerId) cropDragState = null;
+  };
+  viewport.addEventListener("pointerup", endDrag);
+  viewport.addEventListener("pointercancel", endDrag);
+
+  document.getElementById("artCropZoomSlider").addEventListener("input", (e) => {
+    // ズーム中もビューポート中央が指す画像上の位置を変えない（中心を軸に拡大縮小する）
+    const newZoom = Number(e.target.value) / 100;
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
+    const oldScale = cropCoverScale * cropZoom;
+    const newScale = cropCoverScale * newZoom;
+    const cx = vw / 2, cy = vh / 2;
+    const ix = (cx - cropLeft) / oldScale;
+    const iy = (cy - cropTop) / oldScale;
+    cropZoom = newZoom;
+    cropLeft = cx - ix * newScale;
+    cropTop = cy - iy * newScale;
+    applyCropTransform();
+  });
+
+  document.getElementById("artCropResetBtn").addEventListener("click", () => openCropStage(true));
+  document.getElementById("artCropConfirmBtn").addEventListener("click", confirmCrop);
+}
+
+function confirmCrop(){
+  const viewport = document.getElementById("artCropViewport");
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const scale = cropCoverScale * cropZoom;
+  manualCropRect = {
+    sx: Math.max(0, -cropLeft / scale),
+    sy: Math.max(0, -cropTop / scale),
+    sw: Math.min(sourceImage.naturalWidth, vw / scale),
+    sh: Math.min(sourceImage.naturalHeight, vh / scale),
+  };
+  document.getElementById("artCropStage").style.display = "none";
+  document.getElementById("artConvertPreview").style.display = "block";
+  document.getElementById("artConvertPanel").style.display = "block";
+  convert();
 }
 
 function scheduleConvert(){
@@ -309,8 +422,9 @@ function computePixelsForSettings(s){
     const dx = (w - dw) / 2, dy = (h - dh) / 2;
     octx.drawImage(sourceImage, 0, 0, sourceImage.naturalWidth, sourceImage.naturalHeight, dx, dy, dw, dh);
   }else{
-    // crop / fill: どちらもキャンバス比率に合わせて中央を基準にクロップする（cover）
-    const rect = coverCropRect(sourceImage.naturalWidth, sourceImage.naturalHeight, w, h);
+    // crop / fill: 位置調整ステップで確定した範囲（manualCropRect）があればそれを使い、
+    // なければキャンバス比率に合わせて中央基準でクロップする（cover）
+    const rect = manualCropRect || coverCropRect(sourceImage.naturalWidth, sourceImage.naturalHeight, w, h);
     octx.drawImage(sourceImage, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, w, h);
   }
 

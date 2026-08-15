@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=24">
+<link rel="stylesheet" href="./css/art.css?v=25">
 
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./index.html">
@@ -97,6 +97,23 @@
     <p class="art-upload-hint" data-i18n="art_upload_hint">JPG・PNG・WebPに対応</p>
   </div>
 
+  <div class="art-crop-stage" id="artCropStage" style="display:none;">
+    <div class="art-panel-title" data-i18n="art_crop_title">位置とサイズを調整</div>
+    <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
+    <div class="art-crop-viewport" id="artCropViewport">
+      <img id="artCropImg" alt="" draggable="false">
+    </div>
+    <div class="art-crop-zoom-row">
+      <span class="art-crop-zoom-icon">－</span>
+      <input type="range" id="artCropZoomSlider" min="100" max="300" value="100">
+      <span class="art-crop-zoom-icon">＋</span>
+    </div>
+    <div class="art-panel-btn-row art-crop-actions">
+      <button class="art-crop-reset-btn" id="artCropResetBtn" data-i18n="art_crop_reset">位置をリセット</button>
+      <button class="art-header-btn" id="artCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定</button>
+    </div>
+  </div>
+
   <div class="art-convert-preview" id="artConvertPreview" style="display:none;">
     <div class="art-preview-pair">
       <div class="art-preview-box">
@@ -112,7 +129,10 @@
         </div>
       </div>
     </div>
-    <button class="art-header-btn art-use-btn" id="artUseInEditorBtn" data-i18n="art_use_in_editor">エディターで編集する</button>
+    <div class="art-panel-btn-row art-preview-actions">
+      <button class="art-crop-reset-btn" id="artAdjustCropBtn" data-i18n="art_adjust_crop">位置を調整する</button>
+      <button class="art-header-btn art-use-btn" id="artUseInEditorBtn" data-i18n="art_use_in_editor">エディターで編集する</button>
+    </div>
   </div>
 
   <div class="art-panel" id="artConvertPanel" style="display:none;">
@@ -132,50 +152,61 @@
       <div class="art-panel-title" data-i18n="art_gridsize_step2_title">キャンバスを選択</div>
       <div class="art-gridsize-options" id="artConvertFramePartOptions"></div>
     </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_preset_label">変換方式</div>
+    <div class="art-panel-section art-convert-step">
+      <div class="art-step-title"><span class="art-step-num">1</span><span data-i18n="art_convert_preset_label">変換方式</span></div>
+      <p class="art-step-hint" data-i18n="art_step_preset_hint">写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです</p>
       <div class="art-preset-preview-row" id="artConvertPresetOptions"></div>
     </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_fit_label">配置方法</div>
-      <div class="art-gridsize-options" id="artConvertFitOptions"></div>
+    <div class="art-panel-section art-convert-step">
+      <div class="art-step-title"><span class="art-step-num">2</span><span data-i18n="art_convert_noise_label">ノイズ除去</span></div>
+      <p class="art-step-hint" data-i18n="art_step_noise_hint">写真のザラつきが気になる場合に調整してください。色数を減らす前に整えるのがおすすめです</p>
+      <input type="range" id="artNoiseRange" min="0" max="100" value="0">
     </div>
-    <div class="art-panel-section" id="artConvertFitBgRow" style="display:none">
-      <div class="art-panel-title" data-i18n="art_convert_fit_bg_label">余白の色</div>
-      <div class="art-gridsize-options" id="artConvertFitBgOptions"></div>
-      <div class="art-custom-color" id="artConvertFitBgColorWrap" style="display:none; margin-top:8px;">
-        <input type="color" id="artConvertFitBgColor" value="#ffffff">
-      </div>
-    </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_colors_label">色数</div>
+    <div class="art-panel-section art-convert-step">
+      <div class="art-step-title"><span class="art-step-num">3</span><span data-i18n="art_convert_colors_label">色数</span></div>
+      <p class="art-step-hint" data-i18n="art_step_colors_hint">色数が多いほど元画像に近づきますが、ゲーム内で塗る手間も増えます。まずは16色前後がおすすめです</p>
       <div class="art-gridsize-options" id="artConvertColorOptions"></div>
-    </div>
-    <div class="art-panel-section">
-      <label class="art-toggle-row">
+      <label class="art-toggle-row" style="margin-top:10px;">
         <span data-i18n="art_convert_dither_label">ディザリング</span>
         <input type="checkbox" id="artDitherToggle">
       </label>
     </div>
+
     <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_edge_label">輪郭強調</div>
-      <div class="art-gridsize-options" id="artConvertEdgeOptions"></div>
-    </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_brightness_label">明るさ</div>
-      <input type="range" id="artBrightnessRange" min="-100" max="100" value="0">
-    </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_contrast_label">コントラスト</div>
-      <input type="range" id="artContrastRange" min="-100" max="100" value="0">
-    </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_noise_label">ノイズ除去</div>
-      <input type="range" id="artNoiseRange" min="0" max="100" value="0">
-    </div>
-    <div class="art-panel-section">
-      <div class="art-panel-title" data-i18n="art_convert_bg_label">背景</div>
-      <div class="art-gridsize-options" id="artConvertBgOptions"></div>
+      <button class="art-accordion-toggle" id="artAdvancedToggle" type="button" aria-expanded="false">
+        <span data-i18n="art_advanced_settings">詳細設定</span>
+        <span class="art-accordion-icon" id="artAdvancedIcon"></span>
+      </button>
+      <div class="art-accordion-body" id="artAdvancedBody" style="display:none;">
+        <div>
+          <div class="art-panel-title" data-i18n="art_convert_fit_label">配置方法</div>
+          <p class="art-step-hint" data-i18n="art_fit_hint">Crop/Fillは画面いっぱいに切り抜き、Fitは画像全体が見えるよう余白を付けて収めます</p>
+          <div class="art-gridsize-options" id="artConvertFitOptions"></div>
+        </div>
+        <div id="artConvertFitBgRow" style="display:none">
+          <div class="art-panel-title" data-i18n="art_convert_fit_bg_label">余白の色</div>
+          <div class="art-gridsize-options" id="artConvertFitBgOptions"></div>
+          <div class="art-custom-color" id="artConvertFitBgColorWrap" style="display:none; margin-top:8px;">
+            <input type="color" id="artConvertFitBgColor" value="#ffffff">
+          </div>
+        </div>
+        <div>
+          <div class="art-panel-title" data-i18n="art_convert_edge_label">輪郭強調</div>
+          <div class="art-gridsize-options" id="artConvertEdgeOptions"></div>
+        </div>
+        <div>
+          <div class="art-panel-title" data-i18n="art_convert_brightness_label">明るさ</div>
+          <input type="range" id="artBrightnessRange" min="-100" max="100" value="0">
+        </div>
+        <div>
+          <div class="art-panel-title" data-i18n="art_convert_contrast_label">コントラスト</div>
+          <input type="range" id="artContrastRange" min="-100" max="100" value="0">
+        </div>
+        <div>
+          <div class="art-panel-title" data-i18n="art_convert_bg_label">背景</div>
+          <div class="art-gridsize-options" id="artConvertBgOptions"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -189,19 +220,25 @@
     <h3 style="text-align:center;">使い方</h3>
 
     <p><strong>画像を選ぶ</strong><br>
-    JPG・PNG・WebP形式の画像をアップロードすると、ドット絵への変換プレビューが表示されます。</p>
+    JPG・PNG・WebP形式の画像をアップロードします。</p>
 
     <p style="margin-top:10px;"><strong>キャンバスサイズ</strong><br>
     「比率」からキャンバスの縦横比を、「サイズ」から実際のマス数を選びます。ゲーム内のデザイン枠（衣装・家具など）に合わせて変換したい場合は、比率の一覧からアイテムを選んでください。</p>
 
-    <p style="margin-top:10px;"><strong>変換方式・配置方法</strong><br>
-    変換方式で画像の質感（標準・なめらか・くっきり）を、配置方法で画像をキャンバスにどう収めるかを選べます。余白ができる場合は色も指定できます。</p>
+    <p style="margin-top:10px;"><strong>位置とサイズを調整</strong><br>
+    アップロード直後に表示される画面で、ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を目で見ながら決められます。あとから「位置を調整する」ボタンでいつでもやり直せます。</p>
 
-    <p style="margin-top:10px;"><strong>色数・ディザリング</strong><br>
-    使用する色数を制限したり、ディザリング（色の粒を混ぜてグラデーションを表現する処理）のON/OFFを切り替えられます。</p>
+    <p style="margin-top:10px;"><strong>① 変換方式</strong><br>
+    画像の質感を選びます。写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。</p>
 
-    <p style="margin-top:10px;"><strong>明るさ・コントラスト・ノイズ除去・輪郭強調</strong><br>
-    スライダーで画像を調整してから変換できます。輪郭強調は、線画をはっきりさせたい場合に使います。</p>
+    <p style="margin-top:10px;"><strong>② ノイズ除去</strong><br>
+    写真のザラつきが気になる場合に調整します。色数を減らす前に、まずこちらを整えるのがおすすめです。</p>
+
+    <p style="margin-top:10px;"><strong>③ 色数</strong><br>
+    使用する色数を制限します。多いほど元画像に近づきますが、ゲーム内で塗る手間も増えるため、まずは16色前後から試すのがおすすめです。ディザリング（色の粒を混ぜてグラデーションを表現する処理）も合わせて調整できます。</p>
+
+    <p style="margin-top:10px;"><strong>詳細設定</strong><br>
+    配置方法・余白の色・輪郭強調・明るさ・コントラスト・背景など、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。</p>
 
     <p style="margin-top:10px;"><strong>エディターで編集する</strong><br>
     変換結果に納得したら、このボタンでアートエディターに移動し、続きを手描きで仕上げられます。</p>
@@ -218,6 +255,15 @@ document.getElementById("artBackIcon").innerHTML = icon("chevronDown", { size: 1
 document.getElementById("artConvertFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("artUploadIcon").innerHTML = icon("upload", { size: 18 });
 document.getElementById("helpBtn").innerHTML = icon("help");
+document.getElementById("artAdvancedIcon").innerHTML = icon("chevronDown", { size: 14 });
+
+const artAdvancedToggle = document.getElementById("artAdvancedToggle");
+artAdvancedToggle.addEventListener("click", () => {
+  const body = document.getElementById("artAdvancedBody");
+  const expanded = artAdvancedToggle.getAttribute("aria-expanded") === "true";
+  artAdvancedToggle.setAttribute("aria-expanded", String(!expanded));
+  body.style.display = expanded ? "none" : "flex";
+});
 
 function openHelpModal(){
   document.getElementById("helpModal").style.display = "block";
