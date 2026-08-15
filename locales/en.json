@@ -485,6 +485,7 @@
   "music_playback_label": "Playback",
   "music_speed_suffix": "x",
   "music_practice_hint": "Notes sound only while you hold the button. Even while stopped, pressing the correct next note will advance the highlight.",
+  "music_rotate_hint": "Turn your device sideways to see the performance buttons at the same size as in-game",
   "music_saved_title": "Saved Scores",
   "music_saved_empty": "No saved scores yet",
   "music_open": "Open",

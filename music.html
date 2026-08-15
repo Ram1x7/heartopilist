@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=3">
-<link rel="stylesheet" href="./css/music.css?v=4">
+<link rel="stylesheet" href="./css/music.css?v=5">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -89,7 +89,7 @@
   <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="toggle sound"></button>
 </div>
 
-<div class="music-layout">
+<div class="music-layout" id="musicEditLayout">
   <div class="music-panel-section">
     <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
     <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
@@ -120,21 +120,11 @@
     </div>
   </div>
 
-  <div class="music-panel-section" id="musicPracticeControls" style="display:none">
-    <div class="music-panel-title" data-i18n="music_playback_label">再生</div>
-    <div class="music-playback-row">
-      <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="play/pause"></button>
-      <div class="music-speed-control">
-        <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1">
-        <span id="musicSpeedLabel">1.00倍</span>
-      </div>
-    </div>
-    <p class="music-practice-hint" data-i18n="music_practice_hint">ボタンを押している間だけ音が鳴ります。停止中でも、次に弾く音を正しく押すと先へ進みます。</p>
-  </div>
-
   <div class="music-panel-section">
     <div class="music-panel-title" data-i18n="music_score_label">譜面</div>
-    <div class="music-score-display" id="musicScoreDisplay"></div>
+    <div id="musicScoreDisplayAnchorEdit">
+      <div class="music-score-display" id="musicScoreDisplay"></div>
+    </div>
     <div class="music-panel-btn-row" id="musicScoreEditRow">
       <label class="music-record-toggle-row">
         <span data-i18n="music_record_toggle">録音する</span>
@@ -151,8 +141,36 @@
 
   <div class="music-panel-section">
     <div class="music-panel-title" data-i18n="music_perform_label">演奏</div>
-    <div class="music-instrument-grid" id="musicInstrumentGrid"></div>
+    <div id="musicInstrumentGridAnchorEdit">
+      <div class="music-instrument-grid" id="musicInstrumentGrid"></div>
+    </div>
   </div>
+</div>
+
+<!-- 練習モード：全画面の専用ステージ。端末が縦向きでもCSSで横画面表示にする -->
+<div class="music-practice-stage" id="musicPracticeStage">
+  <div class="music-practice-stage-topbar">
+    <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="close"></button>
+    <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
+    <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="toggle sound"></button>
+  </div>
+  <div id="musicScoreDisplayAnchorPractice"></div>
+  <div id="musicInstrumentGridAnchorPractice"></div>
+  <div class="music-playback-row">
+    <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="play/pause"></button>
+    <div class="music-speed-control">
+      <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1">
+      <span id="musicSpeedLabel">1.00倍</span>
+    </div>
+  </div>
+  <p class="music-practice-hint" data-i18n="music_practice_hint">ボタンを押している間だけ音が鳴ります。停止中でも、次に弾く音を正しく押すと先へ進みます。</p>
+</div>
+
+<!-- 端末が縦向きの間だけ表示する、横向きを促す案内（ステージ本体は回転済みのため、
+     こちらは回転させず、縦向きのまま読める状態で表示する） -->
+<div class="music-rotate-prompt" id="musicRotatePrompt">
+  <div class="music-rotate-prompt-icon" id="musicRotatePromptIcon"></div>
+  <p data-i18n="music_rotate_hint">端末を横向きにすると、実機と同じ大きさで演奏ボタンが表示されます</p>
 </div>
 
 <div class="footer">
@@ -184,7 +202,7 @@
     BPM（1分間の拍数）と拍子（4/4・3/4など）を設定できます。練習モードの再生速度はテンポを基準にした倍率です。小節線は拍子をもとに自動で表示されます。</p>
 
     <p style="margin-top:10px;"><strong>練習モード</strong><br>
-    譜面を0.1〜1.0倍速で自動再生できます。演奏ボタンは押している間だけ音が鳴ります。再生を止めていても、次に弾くべき音を正しく押すと譜面のハイライトが先へ進みます。採点はありません。</p>
+    「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列／22キーなど）がそのまま自動で使われます。ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。再生を止めていても、次に弾くべき音を正しく押すと譜面のハイライトが先へ進みます。採点はありません。左上の×で編集モードに戻れます。</p>
 
     <p style="margin-top:10px;"><strong>音</strong><br>
     簡易的な合成音が鳴ります（ゲーム内の実際の音とは異なります）。右上のボタンでON/OFFを切り替えられます。</p>

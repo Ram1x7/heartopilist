@@ -43,15 +43,23 @@ function initMusicEditor() {
   if (draft && Array.isArray(draft.tokens)) {
     tokens = normalizeTokens(draft.tokens);
     currentInstrumentId = draft.instrumentId || "piano";
+    // 配置(15鍵2列/22キーなど)・半音表示は「保存している譜面のスタイル」として引き継ぐ。
+    // 練習モードに切り替えた時、これに合わせて鍵盤を自動設定する
+    currentLayoutId = draft.layoutId || defaultLayoutIdFor(currentInstrumentId);
+    semitoneEnabled = !!draft.semitoneEnabled;
     bpm = draft.bpm || DEFAULT_BPM;
     timeSignatureId = draft.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
+  } else {
+    currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
   }
-  currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
 
   const savedSound = localStorage.getItem("hatopiMusic_soundEnabled");
   if (savedSound !== null) soundEnabled = savedSound === "1";
+
+  document.getElementById("musicPracticeExitBtn").innerHTML = icon("close", { size: 18 });
+  document.getElementById("musicRotatePromptIcon").innerHTML = icon("rotateDevice", { size: 32 });
 
   renderInstrumentSelector();
   renderDurationOptions();
@@ -176,10 +184,13 @@ function renderInstrumentGrid() {
 // 練習モードのボタンサイズ：実機は配置(何鍵配置か)ごとに、1番ボタン数が多い行が
 // 画面幅にちょうど収まるサイズで表示される（＝配置によってボタンの大きさが変わる）。
 // 画面幅に対する一律の割合(vw)で縮めると、実機よりボタンが小さくなり指の感覚が合わないため、
-// 「現在の配置の最大行のボタン数」から実機と同じ考え方でボタン1個分の幅を逆算する
+// 「現在の配置の最大行のボタン数」から実機と同じ考え方でボタン1個分の幅を逆算する。
+// 横幅だけでなく縦幅（行数）からも上限を計算し、両方に収まる大きさを採用する
+// （縦幅を考慮しないと、3段配置(22キーなど)が横画面の低い高さで縦にはみ出してしまう）
 const MUSIC_BTN_GAP = 6; // .music-instrument-row の gap と合わせる
 const MUSIC_BTN_MIN = 44; // タップ可能な最小サイズ
 const MUSIC_BTN_MAX = 100; // 疎な配置(オカリナ等)で際限なく大きくならないための上限
+const MUSIC_BTN_ASPECT = 6 / 5; // CSSの aspect-ratio:5/6 と合わせる（高さ = 幅 × この値）
 
 function applyPracticeGridSizing() {
   const el = document.getElementById("musicInstrumentGrid");
@@ -188,9 +199,14 @@ function applyPracticeGridSizing() {
   const layout = getLayout(inst, currentLayoutId);
   const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
   const maxRowLen = Math.max(...grid.map((row) => row.length));
-  const available = el.clientWidth;
-  if (!available || !maxRowLen) return;
-  const raw = (available - (maxRowLen - 1) * MUSIC_BTN_GAP) / maxRowLen;
+  const numRows = grid.length;
+  const anchor = el.parentElement;
+  const availWidth = anchor.clientWidth;
+  const availHeight = anchor.clientHeight;
+  if (!availWidth || !maxRowLen) return;
+  const widthBased = (availWidth - (maxRowLen - 1) * MUSIC_BTN_GAP) / maxRowLen;
+  const heightBased = availHeight ? (availHeight - (numRows - 1) * MUSIC_BTN_GAP) / numRows / MUSIC_BTN_ASPECT : Infinity;
+  const raw = Math.min(widthBased, heightBased);
   const size = Math.max(MUSIC_BTN_MIN, Math.min(MUSIC_BTN_MAX, raw));
   el.style.setProperty("--music-btn-w", `${size}px`);
 }
@@ -387,11 +403,34 @@ function updateModeUI() {
   document.getElementById("musicModePracticeBtn").classList.toggle("active", pageMode === "practice");
   document.getElementById("musicEditControls").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicScoreEditRow").style.display = pageMode === "edit" ? "" : "none";
-  document.getElementById("musicPracticeControls").style.display = pageMode === "practice" ? "" : "none";
+
+  // 練習モードは、譜面と演奏ボタンだけの全画面ステージに切り替える。編集用の楽器・配置選択は
+  // 「保存している譜面のスタイル」をそのまま自動で使うため、練習中は表示しない
+  const isPractice = pageMode === "practice";
+  document.getElementById("musicPracticeStage").classList.toggle("active", isPractice);
+  const scoreDisplay = document.getElementById("musicScoreDisplay");
+  const grid = document.getElementById("musicInstrumentGrid");
+  const scoreAnchor = document.getElementById(isPractice ? "musicScoreDisplayAnchorPractice" : "musicScoreDisplayAnchorEdit");
+  const gridAnchor = document.getElementById(isPractice ? "musicInstrumentGridAnchorPractice" : "musicInstrumentGridAnchorEdit");
+  scoreAnchor.appendChild(scoreDisplay);
+  gridAnchor.appendChild(grid);
+  if (isPractice) renderPracticeStageName();
+
   // 練習モードでは、画面幅に合わせて縮めず実機に近いサイズで表示する
   // （はみ出す分は横スクロール。編集モードは今まで通り画面幅に収める）
-  document.getElementById("musicInstrumentGrid").classList.toggle("practice-size", pageMode === "practice");
+  grid.classList.toggle("practice-size", isPractice);
   applyPracticeGridSizing();
+}
+
+// 練習ステージ上部に、今使っている楽器・配置と曲名を表示する
+// （楽器選択パネルを隠す代わりに、今どのスタイルで演奏しているか分かるようにする）
+function renderPracticeStageName() {
+  const inst = getInstrument(currentInstrumentId);
+  const layout = getLayout(inst, currentLayoutId);
+  const instLabel = T(inst.nameKey, inst.nameFallback);
+  const layoutLabel = inst.layouts.length > 1 ? `・${T(layout.labelKey, layout.labelFallback)}` : "";
+  const name = scoreName || T("music_default_score_name", "譜面");
+  document.getElementById("musicPracticeStageName").textContent = `${name} ・ ${instLabel}${layoutLabel}`;
 }
 
 // ── 練習(なぞり)モード：再生 ──
@@ -561,17 +600,28 @@ function toggleSound() {
 }
 
 function updateSoundToggleUI() {
-  const btn = document.getElementById("musicSoundToggleBtn");
-  if (!btn) return;
-  btn.innerHTML = icon(soundEnabled ? "volumeOn" : "volumeOff", { size: 18 });
-  btn.classList.toggle("muted", !soundEnabled);
+  ["musicSoundToggleBtn", "musicSoundToggleBtnStage"].forEach((id) => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.innerHTML = icon(soundEnabled ? "volumeOn" : "volumeOff", { size: 18 });
+    btn.classList.toggle("muted", !soundEnabled);
+  });
 }
 
 // ── 下書きの自動保存 ──
 function saveDraft() {
   localStorage.setItem(
     DRAFT_KEY,
-    JSON.stringify({ tokens, instrumentId: currentInstrumentId, bpm, timeSignatureId, name: scoreName, scoreId: currentScoreId })
+    JSON.stringify({
+      tokens,
+      instrumentId: currentInstrumentId,
+      layoutId: currentLayoutId,
+      semitoneEnabled,
+      bpm,
+      timeSignatureId,
+      name: scoreName,
+      scoreId: currentScoreId,
+    })
   );
 }
 
@@ -611,6 +661,8 @@ function saveCurrentAsScore() {
   if (existing) {
     existing.name = scoreName || T("music_default_score_name", "譜面");
     existing.instrumentId = currentInstrumentId;
+    existing.layoutId = currentLayoutId;
+    existing.semitoneEnabled = semitoneEnabled;
     existing.bpm = bpm;
     existing.timeSignatureId = timeSignatureId;
     existing.tokens = tokens.slice();
@@ -623,6 +675,8 @@ function saveCurrentAsScore() {
     id: "score-" + Date.now(),
     name: scoreName || T("music_default_score_name", "譜面"),
     instrumentId: currentInstrumentId,
+    layoutId: currentLayoutId,
+    semitoneEnabled,
     bpm,
     timeSignatureId,
     tokens: tokens.slice(),
@@ -686,8 +740,9 @@ function loadScore(id) {
   if (!score) return;
   tokens = normalizeTokens(score.tokens);
   currentInstrumentId = score.instrumentId;
-  currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
-  semitoneEnabled = false;
+  // 保存時の配置(15鍵2列/22キーなど)・半音表示をそのまま復元する
+  currentLayoutId = score.layoutId || defaultLayoutIdFor(currentInstrumentId);
+  semitoneEnabled = !!score.semitoneEnabled;
   bpm = score.bpm || DEFAULT_BPM;
   timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
   scoreName = score.name;
@@ -746,6 +801,8 @@ function showToast(msg) {
 function bindControls() {
   document.getElementById("musicModeEditBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicModePracticeBtn").addEventListener("click", () => setPageMode("practice"));
+  document.getElementById("musicPracticeExitBtn").addEventListener("click", () => setPageMode("edit"));
+  document.getElementById("musicSoundToggleBtnStage").addEventListener("click", toggleSound);
 
   document.getElementById("musicNewBtn").addEventListener("click", newScore);
   document.getElementById("musicSaveBtn").addEventListener("click", saveCurrentAsScore);
@@ -779,10 +836,12 @@ function bindControls() {
 
   // 画面回転・リサイズ時にも練習モードのボタンサイズを再計算する
   let resizeTimer = null;
-  window.addEventListener("resize", () => {
+  const scheduleGridResize = () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(applyPracticeGridSizing, 150);
-  });
+  };
+  window.addEventListener("resize", scheduleGridResize);
+  window.addEventListener("orientationchange", scheduleGridResize);
 }
 
 document.addEventListener("langchange", () => {

@@ -627,6 +627,175 @@ body.dark .music-note-btn.accidental{
   background:#2c2823;
 }
 
+/* 練習モード：全画面の専用ステージ。実機の指の感覚に合わせて練習できるよう、
+   通常のページ（ナビ・楽器選択などの編集用パネル）を覆い隠し、譜面と演奏ボタンだけの
+   画面にする。端末が縦向きの場合はCSSで画面全体を90度回転させ、実機同様の横画面表示を
+   自動的に行う（iOS Safariは画面回転ロックAPIに対応していないため、回転操作自体を
+   要求するのではなく見た目を横画面化する方式を採る） */
+.music-practice-stage{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1900;
+  flex-direction:column;
+  gap:6px;
+  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+  box-sizing:border-box;
+  background:var(--card);
+  overflow:hidden;
+}
+
+.music-practice-stage.active{
+  display:flex;
+}
+
+body.dark .music-practice-stage{
+  background:#211e19;
+}
+
+@media (orientation:portrait){
+  .music-practice-stage.active{
+    width:100vh;
+    height:100vw;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%) rotate(90deg);
+  }
+}
+
+.music-practice-stage-topbar{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.music-practice-exit-btn{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+}
+
+.music-practice-stage .music-sound-btn{
+  width:28px;
+  height:28px;
+}
+
+body.dark .music-practice-exit-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.music-practice-stage-name{
+  flex:1;
+  min-width:0;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-sub);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+body.dark .music-practice-stage-name{
+  color:#b3a89a;
+}
+
+.music-practice-stage #musicScoreDisplayAnchorPractice{
+  flex-shrink:0;
+}
+
+.music-practice-stage #musicInstrumentGridAnchorPractice{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  overflow-y:auto;
+}
+
+/* 表示スペースが低い画面（横画面のスマホ、または縦画面のままCSSで横画面表示にした
+   場合はvw側が低さに相当する）では、必須ではない案内文を隠してボタンの表示を優先する */
+@media (orientation:landscape) and (max-height:480px),
+       (orientation:portrait) and (max-width:480px){
+  .music-practice-stage .music-practice-hint{
+    display:none;
+  }
+}
+
+.music-practice-stage .music-score-display{
+  margin:0;
+  min-height:32px;
+  padding:6px;
+}
+
+.music-practice-stage .music-playback-row{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.music-practice-stage .music-playpause-btn{
+  width:34px;
+  height:34px;
+}
+
+.music-practice-stage .music-practice-hint{
+  flex-shrink:0;
+  margin:0;
+  font-size:10px;
+}
+
+/* 端末が縦向きのまま練習モードに入ったとき、画面全体はCSSで横画面に見えるよう
+   回転させているが、それだけでは「なぜ斜めに表示されているか」が伝わりにくいため、
+   回転させていない案内を上に重ねて、実際に端末を横向きにするよう促す */
+.music-rotate-prompt{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1950;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 40px;
+  text-align:center;
+  background:rgba(52,48,43,0.55);
+  color:#fdf9ef;
+  pointer-events:none;
+}
+
+@media (orientation:portrait){
+  .music-practice-stage.active + .music-rotate-prompt{
+    display:flex;
+  }
+}
+
+.music-rotate-prompt-icon{
+  animation:musicRotateHint 1.6s ease-in-out infinite;
+}
+
+@keyframes musicRotateHint{
+  0%, 100%{ transform:rotate(0deg); }
+  50%{ transform:rotate(-90deg); }
+}
+
+.music-rotate-prompt p{
+  margin:0;
+  font-size:13px;
+  line-height:1.6;
+}
+
 /* 保存済み譜面一覧 */
 .music-saved-box{
   max-width:400px;

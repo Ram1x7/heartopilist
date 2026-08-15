@@ -485,6 +485,7 @@
   "music_playback_label": "再生",
   "music_speed_suffix": "倍",
   "music_practice_hint": "ボタンを押している間だけ音が鳴ります。停止中でも、次に弾く音を正しく押すと先へ進みます。",
+  "music_rotate_hint": "端末を横向きにすると、実機と同じ大きさで演奏ボタンが表示されます",
   "music_saved_title": "保存した譜面",
   "music_saved_empty": "保存した譜面はまだありません",
   "music_open": "開く",
