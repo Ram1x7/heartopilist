@@ -64,6 +64,25 @@ function highRowWithExtra(octave) {
   return [...plainRow(octave, 7), { degree: 1, accidental: null, octave: octave + 1 }];
 }
 
+// 連続する音階をcols列ずつのグリッドに割り振る（実機の「15鍵(3列)」と同じ並び。
+// 22キーとは独立した直線グリッドで、千鳥配置ではない）
+function continuousGrid(startOctave, totalNotes, cols) {
+  const flat = [];
+  let deg = 1;
+  let oct = startOctave;
+  for (let i = 0; i < totalNotes; i++) {
+    flat.push({ degree: deg, accidental: null, octave: oct });
+    deg++;
+    if (deg > 7) {
+      deg = 1;
+      oct++;
+    }
+  }
+  const grid = [];
+  for (let i = 0; i < flat.length; i += cols) grid.push(flat.slice(i, i + cols));
+  return grid;
+}
+
 // ── 練習モードの演奏ボタン絶対座標 ──
 // 実機の演奏画面スクリーンショット（1600×1118px、横画面）を基準解像度とし、
 // ボタン座標はこの解像度に対する%で保持する。画面サイズ・アスペクト比が違う
@@ -124,6 +143,16 @@ function build15Key2RowPositions() {
   ];
 }
 
+// 15鍵(3列)：22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）。
+// x座標は3段とも共通(444,622,799,977,1155px)
+const POS_3ROW_X = [444, 622, 799, 977, 1155];
+const POS_3ROW_Y = [781, 911, 1041];
+
+function build15Key3RowPositions() {
+  const rows = continuousGrid(1, 15, 5);
+  return rows.flatMap((row, i) => withPositions(row, POS_3ROW_X, POS_3ROW_Y[i], "main"));
+}
+
 // 8鍵(2列)：オカリナ/ほら貝。千鳥配置ではない4列×2行の直線グリッド
 const POS_8KEY_TOP_X = [534, 712, 890, 1068];
 const POS_8KEY_BOT_X = [534, 712, 890, 1068];
@@ -175,9 +204,9 @@ const INSTRUMENTS = [
         id: "3row",
         labelKey: "music_layout_3row",
         labelFallback: "15鍵（3列）",
-        // 実機確認の結果、物理ボタン配置は22キー(半音OFF)と完全に同一
-        grid: [highRowWithExtra(1), plainRow(0, 7), plainRow(-1, 7)],
-        positions: build22KeyMainPositions(),
+        // 22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）
+        grid: continuousGrid(1, 15, 5),
+        positions: build15Key3RowPositions(),
       },
     ],
   },
@@ -197,9 +226,9 @@ const INSTRUMENTS = [
         id: "3row",
         labelKey: "music_layout_3row",
         labelFallback: "15鍵（3列）",
-        // 実機確認の結果、物理ボタン配置は22キー(半音OFF)と完全に同一
-        grid: [highRowWithExtra(1), plainRow(0, 7), plainRow(-1, 7)],
-        positions: build22KeyMainPositions(),
+        // 22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）
+        grid: continuousGrid(1, 15, 5),
+        positions: build15Key3RowPositions(),
       },
       {
         id: "22key",
