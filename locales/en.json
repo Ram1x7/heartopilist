@@ -499,5 +499,10 @@
   "music_note_count_suffix": " notes",
   "music_timesig_label": "Time Sig.",
   "music_record_toggle": "Record",
-  "music_record_hint": "How long you hold the button becomes the note's length. Press multiple buttons at once to record a chord."
+  "music_record_hint": "How long you hold the button becomes the note's length. Press multiple buttons at once to record a chord.",
+  "music_layout_default": "Default",
+  "music_layout_2row": "15 Keys (2 Rows)",
+  "music_layout_3row": "15 Keys (3 Rows)",
+  "music_layout_22key": "22 Keys",
+  "music_semitone_toggle": "Show sharps while playing"
 }

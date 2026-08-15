@@ -9,6 +9,8 @@ const SAVED_SCORES_KEY = "hatopiMusic_savedScores";
 
 let pageMode = "edit"; // "edit" | "practice"
 let currentInstrumentId = "piano";
+let currentLayoutId = "22key"; // 楽器ごとの配置（15鍵2列／15鍵3列／22キーなど）
+let semitoneEnabled = false; // ピアノの「22キー」配置のみ、半音(♯)ボタンの表示有無を切り替える
 let tokens = []; // {notes:[{degree, accidental, octave}, ...], beats}  ※1音だけでもnotesは配列
 let selectedDurationId = "quarter";
 let isRecording = false; // 編集モード：ONの間はボタンを押した長さがそのまま音の長さになる
@@ -46,6 +48,7 @@ function initMusicEditor() {
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
   }
+  currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
 
   const savedSound = localStorage.getItem("hatopiMusic_soundEnabled");
   if (savedSound !== null) soundEnabled = savedSound === "1";
@@ -53,6 +56,7 @@ function initMusicEditor() {
   renderInstrumentSelector();
   renderDurationOptions();
   renderTimeSignatureOptions();
+  renderLayoutSelector();
   renderInstrumentGrid();
   renderScoreDisplay();
   renderScoreMeta();
@@ -79,16 +83,73 @@ function renderInstrumentSelector() {
 
 function selectInstrument(id) {
   currentInstrumentId = id;
+  currentLayoutId = defaultLayoutIdFor(id);
+  semitoneEnabled = false;
   renderInstrumentSelector();
+  renderLayoutSelector();
   renderInstrumentGrid();
   saveDraftDebounced();
+}
+
+// 楽器ごとの初期配置（ピアノは実機の初期選択に合わせ「22キー」、それ以外は先頭の配置）
+function defaultLayoutIdFor(instrumentId) {
+  const inst = getInstrument(instrumentId);
+  if (instrumentId === "piano") return "22key";
+  return inst.layouts[0].id;
+}
+
+// ── 配置(15鍵2列／15鍵3列／22キーなど)の切り替え ──
+function renderLayoutSelector() {
+  const el = document.getElementById("musicLayoutButtons");
+  const inst = getInstrument(currentInstrumentId);
+  if (inst.layouts.length <= 1) {
+    el.innerHTML = "";
+    el.style.display = "none";
+    updateSemitoneToggleVisibility();
+    return;
+  }
+  el.style.display = "";
+  el.innerHTML = inst.layouts
+    .map(
+      (l) => `<button class="music-layout-btn${l.id === currentLayoutId ? " active" : ""}" data-layout="${l.id}">${T(l.labelKey, l.labelFallback)}</button>`
+    )
+    .join("");
+  el.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => selectLayout(btn.dataset.layout));
+  });
+  updateSemitoneToggleVisibility();
+}
+
+function selectLayout(id) {
+  currentLayoutId = id;
+  renderLayoutSelector();
+  renderInstrumentGrid();
+  saveDraftDebounced();
+}
+
+// ピアノの「22キー」配置の時だけ、半音(♯)表示のON/OFFトグルを見せる
+function updateSemitoneToggleVisibility() {
+  const row = document.getElementById("musicSemitoneRow");
+  if (!row) return;
+  const layout = getLayout(getInstrument(currentInstrumentId), currentLayoutId);
+  const show = !!layout.chromaticGrid;
+  row.style.display = show ? "" : "none";
+  const toggle = document.getElementById("musicSemitoneToggle");
+  if (toggle) toggle.checked = semitoneEnabled;
+}
+
+function toggleSemitone() {
+  semitoneEnabled = !semitoneEnabled;
+  renderInstrumentGrid();
 }
 
 // ── 楽器の演奏ボタン（実機の配置を再現。押している間だけ音が鳴る） ──
 function renderInstrumentGrid() {
   const el = document.getElementById("musicInstrumentGrid");
   const inst = getInstrument(currentInstrumentId);
-  el.innerHTML = inst.grid
+  const layout = getLayout(inst, currentLayoutId);
+  const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
+  el.innerHTML = grid
     .map(
       (row) => `
       <div class="music-instrument-row">
@@ -601,6 +662,8 @@ function loadScore(id) {
   if (!score) return;
   tokens = normalizeTokens(score.tokens);
   currentInstrumentId = score.instrumentId;
+  currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
+  semitoneEnabled = false;
   bpm = score.bpm || DEFAULT_BPM;
   timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
   scoreName = score.name;
@@ -608,6 +671,7 @@ function loadScore(id) {
   cursor = -1;
   stopPlayback();
   renderInstrumentSelector();
+  renderLayoutSelector();
   renderInstrumentGrid();
   renderScoreMeta();
   renderScoreDisplay();
@@ -679,6 +743,7 @@ function bindControls() {
   });
 
   document.getElementById("musicRecordToggle").addEventListener("change", toggleRecording);
+  document.getElementById("musicSemitoneToggle").addEventListener("change", toggleSemitone);
 
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);
   document.getElementById("musicClearBtn").addEventListener("click", clearScore);
@@ -692,6 +757,7 @@ function bindControls() {
 document.addEventListener("langchange", () => {
   renderInstrumentSelector();
   renderDurationOptions();
+  renderLayoutSelector();
   renderInstrumentGrid();
   renderScoreDisplay();
   if (document.getElementById("musicSavedListModal").style.display !== "none") renderSavedList();

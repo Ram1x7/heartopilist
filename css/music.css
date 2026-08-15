@@ -155,6 +155,59 @@ body.dark .music-instrument-btn.active{
   border-color:var(--indigo-soft);
 }
 
+/* 配置（15鍵2列／15鍵3列／22キーなど）の切り替え */
+.music-layout-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.music-layout-btn{
+  flex:1 1 auto;
+  padding:7px 12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text-sub);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.music-layout-btn.active{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
+}
+
+body.dark .music-layout-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .music-layout-btn.active{
+  background:var(--vermillion-soft);
+  border-color:var(--vermillion-soft);
+}
+
+/* ピアノ「22キー」限定の半音表示トグル */
+.music-semitone-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:10px;
+  font-size:12px;
+  color:var(--text);
+  cursor:pointer;
+}
+
+body.dark .music-semitone-row{
+  color:#ece4d4;
+}
+
 /* 曲名・テンポ */
 .music-score-meta-row{
   display:flex;

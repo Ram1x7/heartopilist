@@ -499,5 +499,10 @@
   "music_note_count_suffix": "音",
   "music_timesig_label": "拍子",
   "music_record_toggle": "録音する",
-  "music_record_hint": "押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります"
+  "music_record_hint": "押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります",
+  "music_layout_default": "標準",
+  "music_layout_2row": "15鍵（2列）",
+  "music_layout_3row": "15鍵（3列）",
+  "music_layout_22key": "22キー",
+  "music_semitone_toggle": "演奏時に半音を表示する"
 }
