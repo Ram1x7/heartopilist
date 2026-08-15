@@ -475,5 +475,10 @@
   "music_note_count_suffix": "음",
   "music_timesig_label": "박자",
   "music_record_toggle": "녹음",
-  "music_record_hint": "버튼을 누르고 있는 길이가 그대로 음의 길이가 됩니다. 여러 버튼을 동시에 누르면 화음이 됩니다"
+  "music_record_hint": "버튼을 누르고 있는 길이가 그대로 음의 길이가 됩니다. 여러 버튼을 동시에 누르면 화음이 됩니다",
+  "music_layout_default": "기본",
+  "music_layout_2row": "15건반（2줄）",
+  "music_layout_3row": "15건반（3줄）",
+  "music_layout_22key": "22키",
+  "music_semitone_toggle": "연주 시 반음 표시"
 }

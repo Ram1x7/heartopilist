@@ -52,40 +52,109 @@ function buildPianoOctaveRow(octave) {
   return row;
 }
 
-// 楽器プロファイル（実機の演奏画面と同じボタン配置）
+// 度数1〜countのプレーンな1行を作る（半音なし）
+function plainRow(octave, count) {
+  const row = [];
+  for (let d = 1; d <= count; d++) row.push({ degree: d, accidental: null, octave });
+  return row;
+}
+
+// 度数1〜7 ＋ 次オクターブの1（実機の「15鍵(2列)」「22キー」の上段と同じ、8個の行）
+function highRowWithExtra(octave) {
+  return [...plainRow(octave, 7), { degree: 1, accidental: null, octave: octave + 1 }];
+}
+
+// 連続する音階をcols列ずつのグリッドに割り振る（実機の「15鍵(3列)」と同じ並び）
+function continuousGrid(startOctave, totalNotes, cols) {
+  const flat = [];
+  let deg = 1;
+  let oct = startOctave;
+  for (let i = 0; i < totalNotes; i++) {
+    flat.push({ degree: deg, accidental: null, octave: oct });
+    deg++;
+    if (deg > 7) {
+      deg = 1;
+      oct++;
+    }
+  }
+  const grid = [];
+  for (let i = 0; i < flat.length; i += cols) grid.push(flat.slice(i, i + cols));
+  return grid;
+}
+
+// 楽器プロファイル（実機の演奏画面・設定画面で確認したボタン配置を再現）。
+// ピアノ／ギター・ベースは複数の配置(layouts)を切り替えられる。
+// ピアノの「22キー」のみ、半音(♯)あり/なしを切り替えるchromaticGridを持つ
 const INSTRUMENTS = [
   {
     id: "ocarina",
     nameKey: "music_instr_ocarina",
     nameFallback: "オカリナ/ほら貝",
-    chromatic: false,
-    grid: [
-      [{ degree: 1, accidental: null, octave: 0 }, { degree: 2, accidental: null, octave: 0 }, { degree: 3, accidental: null, octave: 0 }, { degree: 4, accidental: null, octave: 0 }],
-      [{ degree: 5, accidental: null, octave: 0 }, { degree: 6, accidental: null, octave: 0 }, { degree: 7, accidental: null, octave: 0 }, { degree: 1, accidental: null, octave: 1 }],
+    layouts: [
+      {
+        id: "default",
+        labelKey: "music_layout_default",
+        labelFallback: "標準",
+        grid: [
+          [{ degree: 1, accidental: null, octave: 0 }, { degree: 2, accidental: null, octave: 0 }, { degree: 3, accidental: null, octave: 0 }, { degree: 4, accidental: null, octave: 0 }],
+          [{ degree: 5, accidental: null, octave: 0 }, { degree: 6, accidental: null, octave: 0 }, { degree: 7, accidental: null, octave: 0 }, { degree: 1, accidental: null, octave: 1 }],
+        ],
+      },
     ],
   },
   {
     id: "guitar",
     nameKey: "music_instr_guitar",
     nameFallback: "ギター/ベース",
-    chromatic: false,
-    grid: [
-      [{ degree: 1, accidental: null, octave: 0 }, { degree: 2, accidental: null, octave: 0 }, { degree: 3, accidental: null, octave: 0 }, { degree: 4, accidental: null, octave: 0 }, { degree: 5, accidental: null, octave: 0 }],
-      [{ degree: 6, accidental: null, octave: 0 }, { degree: 7, accidental: null, octave: 0 }, { degree: 1, accidental: null, octave: 1 }, { degree: 2, accidental: null, octave: 1 }, { degree: 3, accidental: null, octave: 1 }],
-      [{ degree: 4, accidental: null, octave: 1 }, { degree: 5, accidental: null, octave: 1 }, { degree: 6, accidental: null, octave: 1 }, { degree: 7, accidental: null, octave: 1 }, { degree: 1, accidental: null, octave: 2 }],
+    layouts: [
+      {
+        id: "2row",
+        labelKey: "music_layout_2row",
+        labelFallback: "15鍵（2列）",
+        grid: [highRowWithExtra(1), plainRow(0, 7)],
+      },
+      {
+        id: "3row",
+        labelKey: "music_layout_3row",
+        labelFallback: "15鍵（3列）",
+        grid: continuousGrid(0, 15, 5),
+      },
     ],
   },
   {
     id: "piano",
     nameKey: "music_instr_piano",
     nameFallback: "ピアノ",
-    chromatic: true,
-    grid: [buildPianoOctaveRow(1), buildPianoOctaveRow(0), buildPianoOctaveRow(-1)],
+    layouts: [
+      {
+        id: "2row",
+        labelKey: "music_layout_2row",
+        labelFallback: "15鍵（2列）",
+        grid: [highRowWithExtra(1), plainRow(0, 7)],
+      },
+      {
+        id: "3row",
+        labelKey: "music_layout_3row",
+        labelFallback: "15鍵（3列）",
+        grid: continuousGrid(0, 15, 5),
+      },
+      {
+        id: "22key",
+        labelKey: "music_layout_22key",
+        labelFallback: "22キー",
+        grid: [highRowWithExtra(1), plainRow(0, 7), plainRow(-1, 7)],
+        chromaticGrid: [buildPianoOctaveRow(1), buildPianoOctaveRow(0), buildPianoOctaveRow(-1)],
+      },
+    ],
   },
 ];
 
 function getInstrument(id) {
   return INSTRUMENTS.find((i) => i.id === id) || INSTRUMENTS[0];
+}
+
+function getLayout(instrument, layoutId) {
+  return instrument.layouts.find((l) => l.id === layoutId) || instrument.layouts[0];
 }
 
 // 音の長さプリセット（4分音符=1拍として計算する）

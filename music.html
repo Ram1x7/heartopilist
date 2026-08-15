@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=3">
-<link rel="stylesheet" href="./css/music.css?v=2">
+<link rel="stylesheet" href="./css/music.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -93,6 +93,11 @@
   <div class="music-panel-section">
     <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
     <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
+    <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
+    <label class="music-semitone-row" id="musicSemitoneRow" style="display:none">
+      <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+      <input type="checkbox" id="musicSemitoneToggle">
+    </label>
   </div>
 
   <div class="music-panel-section" id="musicEditControls">
@@ -167,7 +172,7 @@
     <h3 style="text-align:center;">使い方</h3>
 
     <p><strong>楽器</strong><br>
-    ピアノ・ギター/ベース・オカリナ/ほら貝の3種類から選べます。ゲーム内の実際の演奏画面と同じボタン配置です。楽器によって音域や半音（♯）の有無が異なります。</p>
+    ピアノ・ギター/ベース・オカリナ/ほら貝の3種類から選べます。ゲーム内の実際の演奏画面と同じボタン配置です。ピアノとギター/ベースは「15鍵（2列）」「15鍵（3列）」などの配置を切り替えられます。ピアノの「22キー」配置では、半音（♯）を表示するかも選べます。</p>
 
     <p style="margin-top:10px;"><strong>編集モード</strong><br>
     「音の長さ」を選んでから演奏ボタンを押すと、その音が譜面に追加されます。「最後を削除」で1つ前に戻せます。</p>

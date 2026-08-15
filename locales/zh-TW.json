@@ -475,5 +475,10 @@
   "music_note_count_suffix": "音",
   "music_timesig_label": "拍號",
   "music_record_toggle": "錄製",
-  "music_record_hint": "按住的時長將直接成為該音的長度。同時按住多個按鈕即可錄製和弦"
+  "music_record_hint": "按住的時長將直接成為該音的長度。同時按住多個按鈕即可錄製和弦",
+  "music_layout_default": "標準",
+  "music_layout_2row": "15鍵（2列）",
+  "music_layout_3row": "15鍵（3列）",
+  "music_layout_22key": "22鍵",
+  "music_semitone_toggle": "演奏時顯示半音"
 }
