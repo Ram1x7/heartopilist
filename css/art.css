@@ -549,6 +549,8 @@ body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
   display:grid;
   grid-template-columns:repeat(5, 1fr);
   gap:6px;
+  /* 比率グリッドの直後に続くため、大枠の上余白(14px)を打ち消して同じ6pxの間隔で連続させる */
+  margin-top:6px;
 }
 
 .art-frame-grid button.art-frame-btn{
