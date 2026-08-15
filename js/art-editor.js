@@ -957,10 +957,22 @@ function bindCanvasEvents(){
       return;
     }
 
-    // タップしたマスをハイライト表示する（座標・使用色の確認用）。編集モードOFF・固定中でも、
-    // 非破壊の「調べる」操作として常に動作する
-    inspectedCell = c;
-    renderCanvas();
+    // 実際に描画・消去・塗りつぶしを行うタップかどうか（下の誤タップ防止の条件と同じ）
+    const willPaint = currentTool !== "eyedropper" && editMode && !isLocked;
+
+    if(willPaint){
+      // 描画中はハイライトが操作の邪魔になるため、表示中なら消しておく（描画のたびに
+      // 再描画が増えるのを避けるため、消す必要がある時だけrenderCanvas()を呼ぶ）
+      if(inspectedCell){
+        inspectedCell = null;
+        renderCanvas();
+      }
+    }else{
+      // タップしたマスをハイライト表示する（座標・使用色の確認用）。編集モードOFF・固定中や
+      // スポイト使用時など、実際に描画しないタップの時だけ動作する（描画時の操作感を妨げないため）
+      inspectedCell = c;
+      renderCanvas();
+    }
 
     // スポイトは閲覧・確認に近い非破壊操作のため、編集モードOFF・固定中でも発動できる。
     // ペン/消しゴム/塗りつぶしは、誤タップ防止のため編集モードON時のみ発動する
@@ -1423,8 +1435,10 @@ function renderTutorialStep(){
   document.getElementById("artTutorialStepLabel").textContent = `${tutorialStep + 1} / ${TUTORIAL_STEPS.length}`;
   document.getElementById("artTutorialText").innerHTML = `<strong>${step.title}</strong><br>${step.text}`;
   document.getElementById("artTutorialNextBtn").textContent = tutorialStep === TUTORIAL_STEPS.length - 1 ? "はじめる" : "次へ";
-  target.scrollIntoView({ block: "center", behavior: "smooth" });
-  setTimeout(() => positionTutorialElements(target), 280);
+  // スムーススクロールだとアニメーション完了前に位置を確定してしまい枠がズレるため、
+  // 即座にジャンプさせてからレイアウト確定後（次の描画フレーム）に位置を合わせる
+  target.scrollIntoView({ block: "center", behavior: "auto" });
+  requestAnimationFrame(() => requestAnimationFrame(() => positionTutorialElements(target)));
 }
 
 function positionTutorialElements(target){
@@ -1475,12 +1489,16 @@ function replayTutorial(){
 function bindTutorialControls(){
   document.getElementById("artTutorialSkipBtn").addEventListener("click", endTutorial);
   document.getElementById("artTutorialNextBtn").addEventListener("click", nextTutorialStep);
-  window.addEventListener("resize", () => {
+  const repositionIfActive = () => {
     if(document.getElementById("artTutorialPopup").style.display === "none") return;
     const step = TUTORIAL_STEPS[tutorialStep];
     const target = step ? document.querySelector(step.selector) : null;
     if(target) positionTutorialElements(target);
-  });
+  };
+  window.addEventListener("resize", repositionIfActive);
+  // ページ側のレイアウトが原因でわずかにスクロール位置がずれるケースの保険として、
+  // スクロール中も枠がターゲットに追従するようにする
+  window.addEventListener("scroll", repositionIfActive, { passive: true });
 }
 
 // ── トースト通知 ──
