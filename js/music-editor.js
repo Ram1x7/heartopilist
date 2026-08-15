@@ -7,7 +7,7 @@
 const DRAFT_KEY = "hatopiMusic_currentDraft";
 const SAVED_SCORES_KEY = "hatopiMusic_savedScores";
 
-let pageMode = "edit"; // "edit" | "practice"
+let pageMode = "edit"; // "edit" | "practice" | "follow"
 let currentInstrumentId = "piano";
 let currentLayoutId = "22key"; // 楽器ごとの配置（15鍵2列／15鍵3列／22キーなど）
 let semitoneEnabled = false; // ピアノの「22キー」配置のみ、半音(♯)ボタンの表示有無を切り替える
@@ -59,6 +59,7 @@ function initMusicEditor() {
   if (savedSound !== null) soundEnabled = savedSound === "1";
 
   document.getElementById("musicPracticeExitBtn").innerHTML = icon("close", { size: 18 });
+  document.getElementById("musicFollowExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicRotatePromptIcon").innerHTML = icon("rotateDevice", { size: 32 });
 
   renderInstrumentSelector();
@@ -347,6 +348,7 @@ function renderScoreDisplay() {
   const el = document.getElementById("musicScoreDisplay");
   if (!tokens.length) {
     el.innerHTML = `<div class="music-score-empty">${T("music_score_empty", "まだ音が入力されていません")}</div>`;
+    if (pageMode === "follow") renderFollowDisplay();
     return;
   }
   const beatsPerBar = getTimeSignature(timeSignatureId).beatsPerBar;
@@ -370,6 +372,7 @@ function renderScoreDisplay() {
     const cur = el.querySelector(".music-chip.current");
     if (cur) cur.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }
+  if (pageMode === "follow") renderFollowDisplay();
 }
 
 function renderScoreMeta() {
@@ -401,20 +404,35 @@ function releaseAllHolds() {
 function updateModeUI() {
   document.getElementById("musicModeEditBtn").classList.toggle("active", pageMode === "edit");
   document.getElementById("musicModePracticeBtn").classList.toggle("active", pageMode === "practice");
+  document.getElementById("musicModeFollowBtn").classList.toggle("active", pageMode === "follow");
   document.getElementById("musicEditControls").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicScoreEditRow").style.display = pageMode === "edit" ? "" : "none";
 
   // 練習モードは、譜面と演奏ボタンだけの全画面ステージに切り替える。編集用の楽器・配置選択は
-  // 「保存している譜面のスタイル」をそのまま自動で使うため、練習中は表示しない
+  // 「保存している譜面のスタイル」をそのまま自動で使うため、練習中は表示しない。
+  // 追従モードは、ボタンを出さず大きな数字譜だけの全画面ステージに切り替える
+  // （実機の画面と分割画面で並べて使う想定のため、横画面には固定しない）
   const isPractice = pageMode === "practice";
+  const isFollow = pageMode === "follow";
   document.getElementById("musicPracticeStage").classList.toggle("active", isPractice);
+  document.getElementById("musicFollowStage").classList.toggle("active", isFollow);
+
   const scoreDisplay = document.getElementById("musicScoreDisplay");
   const grid = document.getElementById("musicInstrumentGrid");
+  const playbackRow = document.getElementById("musicPlaybackRow");
   const scoreAnchor = document.getElementById(isPractice ? "musicScoreDisplayAnchorPractice" : "musicScoreDisplayAnchorEdit");
   const gridAnchor = document.getElementById(isPractice ? "musicInstrumentGridAnchorPractice" : "musicInstrumentGridAnchorEdit");
   scoreAnchor.appendChild(scoreDisplay);
   gridAnchor.appendChild(grid);
-  if (isPractice) renderPracticeStageName();
+
+  if (isPractice) {
+    document.getElementById("musicPlaybackAnchorPractice").appendChild(playbackRow);
+    renderPracticeStageName();
+  } else if (isFollow) {
+    document.getElementById("musicPlaybackAnchorFollow").appendChild(playbackRow);
+    renderFollowStageName();
+    renderFollowDisplay();
+  }
 
   // 練習モードでは、画面幅に合わせて縮めず実機に近いサイズで表示する
   // （はみ出す分は横スクロール。編集モードは今まで通り画面幅に収める）
@@ -431,6 +449,44 @@ function renderPracticeStageName() {
   const layoutLabel = inst.layouts.length > 1 ? `・${T(layout.labelKey, layout.labelFallback)}` : "";
   const name = scoreName || T("music_default_score_name", "譜面");
   document.getElementById("musicPracticeStageName").textContent = `${name} ・ ${instLabel}${layoutLabel}`;
+}
+
+// 追従ステージ上部に曲名だけを表示する（ボタンが無いので楽器・配置は不要）
+function renderFollowStageName() {
+  const name = scoreName || T("music_default_score_name", "譜面");
+  document.getElementById("musicFollowStageName").textContent = name;
+}
+
+// 追従モード：ボタンを出さず、今の音（と次の音のプレビュー）だけを大きく表示する。
+// 実機の画面と並べて使う想定で、離れた位置からでも見やすいことを優先する
+function renderFollowDisplay() {
+  const el = document.getElementById("musicFollowDisplay");
+  if (!el) return;
+  if (!tokens.length) {
+    el.innerHTML = `<div class="music-follow-empty">${T("music_score_empty", "まだ音が入力されていません")}</div>`;
+    return;
+  }
+  const idx = cursor >= 0 ? cursor : 0;
+  const cur = tokens[idx];
+  const nextIdx = nextNoteIndex(idx);
+  const next = nextIdx !== null ? tokens[nextIdx] : null;
+  const renderDigits = (tok) => tok.notes.map((n) => `<span>${noteDisplayDigit(n)}</span>`).join("");
+  const curKana = cur.notes.length === 1 ? DEGREE_LABELS[cur.notes[0].degree] : "";
+
+  el.innerHTML = `
+    <div class="music-follow-current">
+      <div class="music-follow-current-notes">${renderDigits(cur)}</div>
+      ${curKana ? `<div class="music-follow-current-kana">${curKana}</div>` : ""}
+    </div>
+    ${
+      next
+        ? `<div class="music-follow-next">
+        <span class="music-follow-next-label">${T("music_follow_next", "つぎ")}</span>
+        <div class="music-follow-next-notes">${renderDigits(next)}</div>
+      </div>`
+        : ""
+    }
+  `;
 }
 
 // ── 練習(なぞり)モード：再生 ──
@@ -600,7 +656,7 @@ function toggleSound() {
 }
 
 function updateSoundToggleUI() {
-  ["musicSoundToggleBtn", "musicSoundToggleBtnStage"].forEach((id) => {
+  ["musicSoundToggleBtn", "musicSoundToggleBtnStage", "musicSoundToggleBtnFollow"].forEach((id) => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.innerHTML = icon(soundEnabled ? "volumeOn" : "volumeOff", { size: 18 });
@@ -801,8 +857,11 @@ function showToast(msg) {
 function bindControls() {
   document.getElementById("musicModeEditBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicModePracticeBtn").addEventListener("click", () => setPageMode("practice"));
+  document.getElementById("musicModeFollowBtn").addEventListener("click", () => setPageMode("follow"));
   document.getElementById("musicPracticeExitBtn").addEventListener("click", () => setPageMode("edit"));
+  document.getElementById("musicFollowExitBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicSoundToggleBtnStage").addEventListener("click", toggleSound);
+  document.getElementById("musicSoundToggleBtnFollow").addEventListener("click", toggleSound);
 
   document.getElementById("musicNewBtn").addEventListener("click", newScore);
   document.getElementById("musicSaveBtn").addEventListener("click", saveCurrentAsScore);
