@@ -29,6 +29,12 @@ let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
 let playTimer = null;
 
+// 区間リピート：苦手な部分だけを選んで繰り返し練習・再生できる（練習モード・追従モード共通）
+let loopStart = null; // ループ区間の開始インデックス（tokens内）
+let loopEnd = null; // ループ区間の終了インデックス
+let loopEnabled = false; // ループ再生のON/OFF（区間は選んだままON/OFFだけ切り替えられる）
+let loopSelecting = false; // 譜面をタップして区間を選んでいる最中かどうか
+
 // 演奏ボタンの「押す・離す」（和音対応）。同時に押されている指をactiveHoldsで管理し、
 // 最初の1本目が押された時点から全ての指が離れるまでを「1つの和音グループ」とする
 let activeHolds = new Map(); // pointerId -> {note, btn, startTime}
@@ -69,6 +75,7 @@ function initMusicEditor() {
   renderInstrumentGrid();
   renderScoreDisplay();
   renderScoreMeta();
+  updateLoopUI();
   updateSoundToggleUI();
   updateModeUI();
   updateRecordingUI();
@@ -330,6 +337,7 @@ function addChordToken(notes, beats) {
 
 function deleteLastToken() {
   tokens.pop();
+  if (loopEnd !== null && loopEnd >= tokens.length) resetLoop();
   renderScoreDisplay();
   saveDraftDebounced();
 }
@@ -338,6 +346,7 @@ function clearScore() {
   if (!tokens.length) return;
   if (!confirm(T("music_confirm_clear", "譜面をすべて消去しますか？"))) return;
   tokens = [];
+  resetLoop();
   renderScoreDisplay();
   saveDraftDebounced();
 }
@@ -361,9 +370,12 @@ function renderScoreDisplay() {
     }
     const current = pageMode === "practice" && i === cursor;
     const isChord = tok.notes.length > 1;
+    const inLoop = loopStart !== null && loopEnd !== null && i >= loopStart && i <= loopEnd;
+    const outOfLoop = loopEnabled && loopStart !== null && !inLoop;
     const digits = tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
     const kana = isChord ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
-    html += `<span class="music-chip${isChord ? " chord" : ""}${current ? " current" : ""}" data-index="${i}">${digits}${kana}</span>`;
+    const cls = ["music-chip", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop"].filter(Boolean).join(" ");
+    html += `<span class="${cls}" data-index="${i}">${digits}${kana}</span>`;
     beatsSinceBar += tok.beats;
   });
   el.innerHTML = html;
@@ -380,6 +392,82 @@ function renderScoreMeta() {
   document.getElementById("musicBpmInput").value = bpm;
   const timeSigSelect = document.getElementById("musicTimeSigSelect");
   if (timeSigSelect) timeSigSelect.value = timeSignatureId;
+}
+
+// ── 区間リピート ──
+// 「区間を選ぶ」ボタン：譜面の音を2つタップして開始・終了を選ぶモードに入る/出る
+function toggleLoopSelect() {
+  if (loopSelecting) {
+    loopSelecting = false;
+  } else {
+    loopStart = null;
+    loopEnd = null;
+    loopEnabled = false;
+    loopSelecting = true;
+  }
+  updateLoopUI();
+  renderScoreDisplay();
+}
+
+// 譜面の音がタップされたとき（区間選択中のみ反応する）
+function handleScoreChipTap(index) {
+  if (!loopSelecting) return;
+  if (loopStart === null) {
+    loopStart = index;
+  } else {
+    loopEnd = index;
+    if (loopEnd < loopStart) [loopStart, loopEnd] = [loopEnd, loopStart];
+    loopSelecting = false;
+    loopEnabled = true;
+  }
+  updateLoopUI();
+  renderScoreDisplay();
+}
+
+function toggleLoopEnabled() {
+  loopEnabled = !loopEnabled;
+  updateLoopUI();
+  renderScoreDisplay();
+}
+
+function clearLoop() {
+  loopStart = null;
+  loopEnd = null;
+  loopEnabled = false;
+  loopSelecting = false;
+  updateLoopUI();
+  renderScoreDisplay();
+}
+
+function updateLoopUI() {
+  const selectBtn = document.getElementById("musicLoopSelectBtn");
+  selectBtn.classList.toggle("active", loopSelecting);
+  selectBtn.textContent = loopSelecting ? T("music_loop_selecting", "選択をやめる") : T("music_loop_select", "区間を選ぶ");
+
+  const hint = document.getElementById("musicLoopHint");
+  hint.style.display = loopSelecting ? "" : "none";
+  hint.textContent =
+    loopSelecting && loopStart === null
+      ? T("music_loop_select_hint", "譜面の音をタップして、開始の音を選んでください")
+      : T("music_loop_select_hint_end", "譜面の音をタップして、終了の音を選んでください");
+
+  const hasRange = loopStart !== null && loopEnd !== null;
+  document.getElementById("musicLoopRangeLabel").style.display = hasRange ? "" : "none";
+  document.getElementById("musicLoopToggleRow").style.display = hasRange ? "" : "none";
+  document.getElementById("musicLoopClearBtn").style.display = hasRange ? "" : "none";
+  if (hasRange) {
+    document.getElementById("musicLoopRangeLabel").textContent = `${loopStart + 1} - ${loopEnd + 1}`;
+    document.getElementById("musicLoopToggle").checked = loopEnabled;
+  }
+}
+
+// 新しい譜面を開いたとき、前の譜面のインデックスに紐づいたループ区間を持ち越さない
+function resetLoop() {
+  loopStart = null;
+  loopEnd = null;
+  loopEnabled = false;
+  loopSelecting = false;
+  updateLoopUI();
 }
 
 // ── モード切り替え(編集/練習) ──
@@ -448,13 +536,19 @@ function renderPracticeStageName() {
   const instLabel = T(inst.nameKey, inst.nameFallback);
   const layoutLabel = inst.layouts.length > 1 ? `・${T(layout.labelKey, layout.labelFallback)}` : "";
   const name = scoreName || T("music_default_score_name", "譜面");
-  document.getElementById("musicPracticeStageName").textContent = `${name} ・ ${instLabel}${layoutLabel}`;
+  document.getElementById("musicPracticeStageName").textContent = `${name} ・ ${instLabel}${layoutLabel}${loopBadgeText()}`;
 }
 
 // 追従ステージ上部に曲名だけを表示する（ボタンが無いので楽器・配置は不要）
 function renderFollowStageName() {
   const name = scoreName || T("music_default_score_name", "譜面");
-  document.getElementById("musicFollowStageName").textContent = name;
+  document.getElementById("musicFollowStageName").textContent = `${name}${loopBadgeText()}`;
+}
+
+// 練習・追従ステージの見出しに付け足す、ループ再生中であることを示す短い表示
+function loopBadgeText() {
+  if (!loopEnabled || loopStart === null || loopEnd === null) return "";
+  return ` ・ ${T("music_loop_badge", "ループ")} ${loopStart + 1}-${loopEnd + 1}`;
 }
 
 // 追従モード：ボタンを出さず、今の音（と次の音のプレビュー）だけを大きく表示する。
@@ -490,7 +584,11 @@ function renderFollowDisplay() {
 }
 
 // ── 練習(なぞり)モード：再生 ──
+// ループ再生ON時は、区間の終わりに達したら区間の始まりに戻る（tapモード・自動再生共通）
 function nextNoteIndex(fromIdx) {
+  if (loopEnabled && loopStart !== null && loopEnd !== null && fromIdx >= loopEnd) {
+    return loopStart;
+  }
   return fromIdx + 1 < tokens.length ? fromIdx + 1 : null;
 }
 
@@ -521,7 +619,12 @@ function togglePlayback() {
 
 function startPlayback() {
   if (isPlaying) return;
-  if (nextNoteIndex(cursor) === null) cursor = -1; // 最後まで行っていたら最初から
+  if (loopEnabled && loopStart !== null && loopEnd !== null) {
+    // ループ区間の外から再生を始めたら、区間の頭から始める
+    if (cursor < loopStart - 1 || cursor > loopEnd) cursor = loopStart - 1;
+  } else if (nextNoteIndex(cursor) === null) {
+    cursor = -1; // 最後まで行っていたら最初から
+  }
   isPlaying = true;
   updatePlaybackUI();
   tick();
@@ -752,6 +855,7 @@ function newScore() {
   currentScoreId = null;
   bpm = DEFAULT_BPM;
   timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
+  resetLoop();
   renderScoreMeta();
   renderScoreDisplay();
   saveDraft();
@@ -805,6 +909,7 @@ function loadScore(id) {
   currentScoreId = score.id;
   cursor = -1;
   stopPlayback();
+  resetLoop();
   renderInstrumentSelector();
   renderLayoutSelector();
   renderInstrumentGrid();
@@ -888,6 +993,14 @@ function bindControls() {
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);
   document.getElementById("musicClearBtn").addEventListener("click", clearScore);
 
+  document.getElementById("musicLoopSelectBtn").addEventListener("click", toggleLoopSelect);
+  document.getElementById("musicLoopToggle").addEventListener("change", toggleLoopEnabled);
+  document.getElementById("musicLoopClearBtn").addEventListener("click", clearLoop);
+  document.getElementById("musicScoreDisplay").addEventListener("click", (e) => {
+    const chip = e.target.closest(".music-chip[data-index]");
+    if (chip) handleScoreChipTap(Number(chip.dataset.index));
+  });
+
   document.getElementById("musicPlayPauseBtn").addEventListener("click", togglePlayback);
   document.getElementById("musicSpeedSlider").addEventListener("input", (e) => setPlaySpeed(e.target.value));
 
@@ -909,6 +1022,9 @@ document.addEventListener("langchange", () => {
   renderLayoutSelector();
   renderInstrumentGrid();
   renderScoreDisplay();
+  updateLoopUI();
+  if (pageMode === "practice") renderPracticeStageName();
+  if (pageMode === "follow") renderFollowStageName();
   if (document.getElementById("musicSavedListModal").style.display !== "none") renderSavedList();
 });
 

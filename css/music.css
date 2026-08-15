@@ -299,6 +299,68 @@ body.dark .music-record-hint{
   color:var(--vermillion-soft);
 }
 
+/* 区間リピート：譜面の一部分だけ選んで繰り返し練習できる */
+.music-loop-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin:8px 0;
+}
+
+.music-loop-row .music-header-btn{
+  flex:0 0 auto;
+  padding:7px 12px;
+  font-size:11px;
+}
+
+.music-loop-row .music-header-btn.active{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+}
+
+body.dark .music-loop-row .music-header-btn.active{
+  background:var(--vermillion-soft);
+  border-color:var(--vermillion-soft);
+}
+
+.music-loop-range{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+body.dark .music-loop-range{
+  color:#b3a89a;
+}
+
+.music-loop-toggle{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:11px;
+  color:var(--text);
+  cursor:pointer;
+}
+
+body.dark .music-loop-toggle{
+  color:#ece4d4;
+}
+
+/* 選択中の区間に含まれる音を強調表示する */
+.music-chip.in-loop{
+  border-color:var(--vermillion);
+}
+
+body.dark .music-chip.in-loop{
+  border-color:var(--vermillion-soft);
+}
+
+/* ループ再生ON中、区間の外の音は控えめにして今どこを繰り返しているか分かりやすくする */
+.music-chip.out-of-loop{
+  opacity:0.4;
+}
+
 /* パネル内に並べるヘッダー風ボタン */
 .music-panel-btn-row{
   display:flex;
