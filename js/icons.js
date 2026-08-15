@@ -91,6 +91,11 @@ const ICONS = {
   eyedropper: `<path d="m7.5 16.5 8-8"/><path d="M14 5.5 18.5 10"/><path d="M15.8 3.7a2.3 2.3 0 0 1 3.2 0l1.3 1.3a2.3 2.3 0 0 1 0 3.2l-1.8 1.8-4.5-4.5Z"/><path d="M7.5 16.5 5 20l3.5-2.5"/>`,
   undo: `<path d="M4 11h9a5.5 5.5 0 0 1 0 11h-3"/><path d="m8 6-4 5 4 5"/>`,
   redo: `<path d="M20 11h-9a5.5 5.5 0 0 0 0 11h3"/><path d="m16 6 4 5-4 5"/>`,
+
+  // 楽譜エディター
+  pause: `<rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/>`,
+  volumeOn: `<path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z"/><path d="M16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>`,
+  volumeOff: `<path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5"/>`,
 };
 
 /**
