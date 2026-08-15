@@ -17,6 +17,13 @@ const FREE_CANVAS_RATIOS = [
   { id: "9-16", ratio: "9:16", levels: [{ w: 18, h: 30 }, { w: 28, h: 50 }, { w: 56, h: 100 }, { w: 84, h: 150 }] },
 ];
 
+// 比率選択ボタンに表示する、縦横比を視覚的に示す矩形のサイズ（長辺をmaxSide pxに収める）
+function ratioShapeBox(ratioId, maxSide){
+  const [w, h] = ratioId.split("-").map(Number);
+  if(w >= h) return { width: maxSide, height: Math.round(maxSide * h / w) };
+  return { width: Math.round(maxSide * w / h), height: maxSide };
+}
+
 const DESIGN_FRAME_PRESETS = [
   {
     id: "book",

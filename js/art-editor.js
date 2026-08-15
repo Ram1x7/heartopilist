@@ -181,9 +181,15 @@ function renderFreeSizeOptions(){
 function renderRatioOptions(containerId, currentId, onSelect){
   const el = document.getElementById(containerId);
   // デザイン枠アイテムが選択中の間は、比率側のマークを表示しない（両方同時に選択済みに見えるのを防ぐ）
-  el.innerHTML = FREE_CANVAS_RATIOS.map(r => `
-    <button class="${r.id === currentId && !selectedFrameId ? "active" : ""}" data-ratio="${r.id}">${r.ratio}</button>
-  `).join("");
+  el.innerHTML = FREE_CANVAS_RATIOS.map(r => {
+    const box = ratioShapeBox(r.id, 28);
+    return `
+    <button class="art-ratio-btn${r.id === currentId && !selectedFrameId ? " active" : ""}" data-ratio="${r.id}">
+      <span class="art-ratio-shape" style="width:${box.width}px;height:${box.height}px;"></span>
+      <span class="art-ratio-label">${r.ratio}</span>
+    </button>
+  `;
+  }).join("");
   el.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => onSelect(btn.dataset.ratio));
   });

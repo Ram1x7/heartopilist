@@ -497,9 +497,43 @@ body.dark .art-usage-empty{
   gap:6px;
 }
 
-.art-ratio-grid button{
+.art-ratio-grid button.art-ratio-btn{
   flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  height:66px;
   padding:8px 2px;
+  border-radius:14px;
+}
+
+.art-ratio-shape{
+  display:block;
+  flex-shrink:0;
+  border:2px solid var(--text-sub);
+  border-radius:3px;
+  background:var(--card);
+}
+
+.art-ratio-label{
+  font-size:11px;
+}
+
+.art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
+  border-color:#fdf9ef;
+  background:rgba(253,249,239,0.3);
+}
+
+body.dark .art-ratio-shape{
+  border-color:#b3a89a;
+  background:#2c2823;
+}
+
+body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
+  border-color:#fdf9ef;
+  background:rgba(253,249,239,0.18);
 }
 
 /* デザイン枠アイテム一覧（数が多いので固定高さ+スクロール） */
