@@ -646,8 +646,8 @@ body.dark .music-note-kana{
    コンテナクエリ(cqh)を使うことで、JSでのリサイズ計算なしに常に画面へ
    ぴったり収まるサイズを算出できる */
 .music-instrument-grid.practice-size{
-  flex:1;
-  min-height:0;
+  width:100%;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -743,16 +743,12 @@ body.dark .music-note-btn.accidental{
   position:fixed;
   inset:0;
   z-index:1900;
-  flex-direction:column;
-  gap:6px;
-  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
-  box-sizing:border-box;
   background:var(--card);
   overflow:hidden;
 }
 
 .music-practice-stage.active{
-  display:flex;
+  display:block;
 }
 
 body.dark .music-practice-stage{
@@ -767,6 +763,27 @@ body.dark .music-practice-stage{
     left:50%;
     transform:translate(-50%, -50%) rotate(90deg);
   }
+}
+
+/* 上部バー・譜面プレビューは演奏ボタン領域の上に重ねて表示する固定オーバーレイ。
+   実際に使っている高さぶんだけ pointer-events を戻し、それ以外(下の余白)は
+   クリックをすり抜けさせてボタンを押せるようにする */
+.music-practice-stage-overlay-top{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:6px 10px 0;
+  box-sizing:border-box;
+  pointer-events:none;
+}
+
+.music-practice-stage-overlay-top > *{
+  pointer-events:auto;
 }
 
 .music-practice-stage-topbar{
@@ -838,17 +855,22 @@ body.dark .music-practice-stage-name{
   color:#b3a89a;
 }
 
-.music-practice-stage #musicScoreDisplayAnchorPractice{
+.music-practice-stage-overlay-top #musicScoreDisplayAnchorPractice{
   flex-shrink:0;
 }
 
+/* 演奏ボタン領域はステージ全体(position:fixed;inset:0の.music-practice-stage)を
+   基準に中央寄せする。上部バー・譜面プレビューはその上に重ねる別要素のため、
+   ここでの中央寄せ計算には影響しない（実機と同じく画面全体を基準にできる） */
 .music-practice-stage #musicInstrumentGridAnchorPractice{
-  flex:1;
-  min-height:0;
+  position:absolute;
+  inset:0;
+  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+  box-sizing:border-box;
   display:flex;
-  flex-direction:column;
+  align-items:center;
   justify-content:center;
-  overflow-y:auto;
+  overflow:hidden;
 }
 
 .music-practice-stage .music-score-display{
