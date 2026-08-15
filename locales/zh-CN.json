@@ -460,7 +460,7 @@
   "music_dur_whole": "全音符",
   "music_playback_label": "播放",
   "music_speed_suffix": "倍",
-  "music_practice_hint": "即使在停止状态下，正确点击下一个音也会使高亮前进。",
+  "music_practice_hint": "仅在按住按钮时发声。即使在停止状态下，正确按下下一个音也会使高亮前进。",
   "music_saved_title": "已保存的乐谱",
   "music_saved_empty": "还没有已保存的乐谱",
   "music_open": "打开",
@@ -472,5 +472,8 @@
   "music_default_score_name": "乐谱",
   "music_toast_saved": "已保存",
   "music_toast_updated": "已更新",
-  "music_note_count_suffix": "音"
+  "music_note_count_suffix": "音",
+  "music_timesig_label": "拍号",
+  "music_record_toggle": "录制",
+  "music_record_hint": "按住的时长将直接成为该音的长度（不支持和弦）"
 }

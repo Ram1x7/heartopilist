@@ -193,11 +193,57 @@ body.dark .music-instrument-btn.active{
   text-align:center;
 }
 
+.music-timesig-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  color:var(--text-sub);
+}
+
+.music-timesig-select{
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:13px;
+  font-family:inherit;
+}
+
 body.dark .music-score-name-input,
-body.dark .music-bpm-input{
+body.dark .music-bpm-input,
+body.dark .music-timesig-select{
   background:#383329;
   border-color:#46423b;
   color:#ece4d4;
+}
+
+/* 録音トグル */
+.music-record-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  cursor:pointer;
+  margin-bottom:4px;
+}
+
+body.dark .music-record-toggle-row{
+  color:#ece4d4;
+}
+
+.music-record-hint{
+  margin:0 0 10px;
+  font-size:11px;
+  color:var(--vermillion);
+  line-height:1.6;
+}
+
+body.dark .music-record-hint{
+  color:var(--vermillion-soft);
 }
 
 /* パネル内に並べるヘッダー風ボタン */
@@ -292,12 +338,17 @@ body.dark .music-practice-hint{
   color:#b3a89a;
 }
 
-/* 音の長さ選択 */
+/* 音の長さ選択（録音中は押した長さで決まるため無効化する） */
 .music-duration-options{
   display:flex;
   flex-wrap:wrap;
   gap:6px;
   margin-bottom:10px;
+}
+
+.music-duration-options.disabled{
+  opacity:0.4;
+  pointer-events:none;
 }
 
 .music-duration-btn{
@@ -469,12 +520,15 @@ body.dark .music-note-kana{
   height:auto;
 }
 
-.music-note-btn:active{
+.music-note-btn:active,
+.music-note-btn.pressed{
   background:var(--indigo);
 }
 
 .music-note-btn:active .music-note-digit,
-.music-note-btn:active .music-note-kana{
+.music-note-btn:active .music-note-kana,
+.music-note-btn.pressed .music-note-digit,
+.music-note-btn.pressed .music-note-kana{
   color:#fdf9ef;
 }
 

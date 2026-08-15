@@ -460,7 +460,7 @@
   "music_dur_whole": "온음표",
   "music_playback_label": "재생",
   "music_speed_suffix": "배",
-  "music_practice_hint": "정지 중이라도 다음에 연주할 음을 올바르게 탭하면 앞으로 진행됩니다.",
+  "music_practice_hint": "버튼을 누르고 있는 동안만 소리가 납니다. 정지 중이라도 다음에 연주할 음을 올바르게 누르면 앞으로 진행됩니다.",
   "music_saved_title": "저장한 악보",
   "music_saved_empty": "저장된 악보가 아직 없습니다",
   "music_open": "열기",
@@ -472,5 +472,8 @@
   "music_default_score_name": "악보",
   "music_toast_saved": "저장했습니다",
   "music_toast_updated": "업데이트했습니다",
-  "music_note_count_suffix": "음"
+  "music_note_count_suffix": "음",
+  "music_timesig_label": "박자",
+  "music_record_toggle": "녹음",
+  "music_record_hint": "버튼을 누르고 있는 길이가 그대로 음의 길이가 됩니다（화음은 지원하지 않습니다）"
 }
