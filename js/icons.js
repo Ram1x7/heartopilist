@@ -19,6 +19,7 @@ const ICONS = {
   pin: `<path d="M12 21s6.5-6.1 6.5-11A6.5 6.5 0 0 0 5.5 10c0 4.9 6.5 11 6.5 11z"/><circle cx="12" cy="10" r="2.3"/>`,
   chevronDown: `<path d="m6 9 6 6 6-6"/>`,
   minus: `<path d="M5 12h14"/>`,
+  rotateDevice: `<rect x="7" y="3.5" width="10" height="17" rx="2"/><path d="M9.5 20.5h5"/><path d="M19 9.5a6 6 0 0 0-9.8-4.6M5 14.5a6 6 0 0 0 9.8 4.6"/><path d="M18.5 6.5 19 9.5l3-1M5.5 17.5 5 14.5l-3 1"/>`,
 
   // 種類フィルター
   all: `<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="1.6"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="1.6"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="1.6"/><rect x="13" y="13" width="7.5" height="7.5" rx="1.6"/>`,

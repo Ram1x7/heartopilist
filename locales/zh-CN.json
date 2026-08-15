@@ -461,6 +461,7 @@
   "music_playback_label": "播放",
   "music_speed_suffix": "倍",
   "music_practice_hint": "仅在按住按钮时发声。即使在停止状态下，正确按下下一个音也会使高亮前进。",
+  "music_rotate_hint": "将设备横向放置后，演奏按钮会以与游戏内相同的大小显示",
   "music_saved_title": "已保存的乐谱",
   "music_saved_empty": "还没有已保存的乐谱",
   "music_open": "打开",
