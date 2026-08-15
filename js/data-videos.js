@@ -39,7 +39,7 @@ const videoData = [
   { category:"pink_bubble", date:"2026-07-25", videoId:"Jggxo4G4Dao", note:"7/25~7/31" },
   { category:"pink_bubble", date:"2026-08-01", videoId:"sLCTKmF_o8Q", note:"8/1~8/7" },
   { category:"pink_bubble", date:"2026-08-08", videoId:"HQLpix261-c", note:"8/8~8/14" },
-  { category:"pink_bubble", date:"2026-08-15", videoId:"PVrRBid4g_X-feYD", note:"8/15~8/21" },
+  { category:"pink_bubble", date:"2026-08-15", videoId:"Z-xgSBDP8m4", note:"8/15~8/21" },
   { category:"meteor_shower", date:"2026-02-07", videoId:"gCBvEQ_Anzc", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-02-14", videoId:"eIPZGHHw0kQ", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-02-23", videoId:"Wz2QN5VXyAA", note:"18:00~24:00" },
