@@ -160,11 +160,23 @@ function toggleSemitone() {
 }
 
 // ── 楽器の演奏ボタン（実機の配置を再現。押している間だけ音が鳴る） ──
+// 編集モードは画面幅に合わせて伸縮するボタン行、練習モードは実機の座標を
+// そのまま絶対配置で再現する（指の感覚を実機と揃えるため）。表示方法が
+// 大きく異なるため、現在のページモードに応じてどちらかを描画する
 function renderInstrumentGrid() {
+  if (pageMode === "practice") {
+    renderPracticeStageGrid();
+  } else {
+    renderEditGrid();
+  }
+}
+
+function renderEditGrid() {
   const el = document.getElementById("musicInstrumentGrid");
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
   const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
+  el.className = "music-instrument-grid";
   el.innerHTML = grid
     .map(
       (row) => `
@@ -186,37 +198,35 @@ function renderInstrumentGrid() {
     const note = JSON.parse(btn.dataset.note);
     bindNoteButtonHold(btn, note);
   });
-  applyPracticeGridSizing();
 }
 
-// 練習モードのボタンサイズ：実機は配置(何鍵配置か)ごとに、1番ボタン数が多い行が
-// 画面幅にちょうど収まるサイズで表示される（＝配置によってボタンの大きさが変わる）。
-// 画面幅に対する一律の割合(vw)で縮めると、実機よりボタンが小さくなり指の感覚が合わないため、
-// 「現在の配置の最大行のボタン数」から実機と同じ考え方でボタン1個分の幅を逆算する。
-// 横幅だけでなく縦幅（行数）からも上限を計算し、両方に収まる大きさを採用する
-// （縦幅を考慮しないと、3段配置(22キーなど)が横画面の低い高さで縦にはみ出してしまう）
-const MUSIC_BTN_GAP = 6; // .music-instrument-row の gap と合わせる
-const MUSIC_BTN_MIN = 44; // タップ可能な最小サイズ
-const MUSIC_BTN_MAX = 100; // 疎な配置(オカリナ等)で際限なく大きくならないための上限
-const MUSIC_BTN_ASPECT = 6 / 5; // CSSの aspect-ratio:5/6 と合わせる（高さ = 幅 × この値）
-
-function applyPracticeGridSizing() {
+// 実機の演奏画面スクリーンショット(1600×1118px)を基準にした絶対座標で、
+// ボタンの位置・大きさを実機と同じ相対比になるよう再現する。
+// アスペクト比を保ったまま画面に収める(レターボックス)ため、
+// CSS側で aspect-ratio + コンテナクエリ(cqh)を使って自動的にフィットさせている
+function renderPracticeStageGrid() {
   const el = document.getElementById("musicInstrumentGrid");
-  if (!el || pageMode !== "practice") return;
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
-  const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
-  const maxRowLen = Math.max(...grid.map((row) => row.length));
-  const numRows = grid.length;
-  const anchor = el.parentElement;
-  const availWidth = anchor.clientWidth;
-  const availHeight = anchor.clientHeight;
-  if (!availWidth || !maxRowLen) return;
-  const widthBased = (availWidth - (maxRowLen - 1) * MUSIC_BTN_GAP) / maxRowLen;
-  const heightBased = availHeight ? (availHeight - (numRows - 1) * MUSIC_BTN_GAP) / numRows / MUSIC_BTN_ASPECT : Infinity;
-  const raw = Math.min(widthBased, heightBased);
-  const size = Math.max(MUSIC_BTN_MIN, Math.min(MUSIC_BTN_MAX, raw));
-  el.style.setProperty("--music-btn-w", `${size}px`);
+  const mainPositions = layout.positions || [];
+  const accidentalPositions = (semitoneEnabled && layout.accidentalPositions) || [];
+  const allPositions = [...mainPositions, ...accidentalPositions];
+  el.className = "music-instrument-grid practice-size";
+  el.innerHTML = `<div class="music-stage-frame" id="musicStageFrame">${allPositions
+    .map((p) => {
+      const note = { degree: p.degree, accidental: p.accidental, octave: p.octave };
+      const label = noteDisplayDigit(note);
+      const accidentalClass = p.size === "accidental" ? " accidental" : "";
+      return `<button class="music-note-btn music-stage-btn${accidentalClass}" style="left:${p.xPct}%; top:${p.yPct}%;" data-note='${JSON.stringify(note)}'>
+        <span class="music-note-digit">${label}</span>
+        <span class="music-note-kana">${DEGREE_LABELS[note.degree]}</span>
+      </button>`;
+    })
+    .join("")}</div>`;
+  el.querySelectorAll(".music-stage-btn").forEach((btn) => {
+    const note = JSON.parse(btn.dataset.note);
+    bindNoteButtonHold(btn, note);
+  });
 }
 
 // 演奏ボタンの「押す・離す」を扱う（和音対応）。最初の1本目が押されてから
@@ -522,10 +532,9 @@ function updateModeUI() {
     renderFollowDisplay();
   }
 
-  // 練習モードでは、画面幅に合わせて縮めず実機に近いサイズで表示する
-  // （はみ出す分は横スクロール。編集モードは今まで通り画面幅に収める）
-  grid.classList.toggle("practice-size", isPractice);
-  applyPracticeGridSizing();
+  // モードによって演奏ボタンの描画方法が異なる（編集＝伸縮するボタン行、
+  // 練習＝実機座標の絶対配置）ため、モード切り替え時に描画し直す
+  renderInstrumentGrid();
 }
 
 // 練習ステージ上部に、今使っている楽器・配置と曲名を表示する
@@ -1005,15 +1014,6 @@ function bindControls() {
   document.getElementById("musicSpeedSlider").addEventListener("input", (e) => setPlaySpeed(e.target.value));
 
   document.getElementById("musicSoundToggleBtn").addEventListener("click", toggleSound);
-
-  // 画面回転・リサイズ時にも練習モードのボタンサイズを再計算する
-  let resizeTimer = null;
-  const scheduleGridResize = () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(applyPracticeGridSizing, 150);
-  };
-  window.addEventListener("resize", scheduleGridResize);
-  window.addEventListener("orientationchange", scheduleGridResize);
 }
 
 document.addEventListener("langchange", () => {
