@@ -773,7 +773,29 @@ body.dark .music-practice-stage{
   flex-shrink:0;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
+}
+
+/* 練習ステージでは、演奏ボタンの表示面積を実機に近づけるため、再生操作を
+   上部バーに集約する（別の行として縦幅を消費させない） */
+.music-practice-stage #musicPlaybackAnchorPractice .music-playback-row{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.music-practice-stage #musicPlaybackAnchorPractice .music-playpause-btn{
+  width:24px;
+  height:24px;
+}
+
+.music-practice-stage #musicPlaybackAnchorPractice .music-speed-control{
+  width:70px;
+}
+
+.music-practice-stage #musicPlaybackAnchorPractice .music-speed-control span{
+  display:none;
 }
 
 .music-practice-exit-btn{
@@ -829,37 +851,30 @@ body.dark .music-practice-stage-name{
   overflow-y:auto;
 }
 
-/* 表示スペースが低い画面（横画面のスマホ、または縦画面のままCSSで横画面表示にした
-   場合はvw側が低さに相当する）では、必須ではない案内文を隠してボタンの表示を優先する */
-@media (orientation:landscape) and (max-height:480px),
-       (orientation:portrait) and (max-width:480px){
-  .music-practice-stage .music-practice-hint{
-    display:none;
-  }
-}
-
 .music-practice-stage .music-score-display{
   margin:0;
-  min-height:32px;
-  padding:6px;
+  min-height:0;
+  padding:4px 6px;
 }
 
-.music-practice-stage .music-playback-row{
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  gap:10px;
+/* 演奏ボタンの表示面積を優先するため、練習ステージの譜面プレビューは
+   通常より小さいチップで表示する */
+.music-practice-stage .music-chip{
+  width:22px;
+  height:26px;
+  border-radius:6px;
 }
 
-.music-practice-stage .music-playpause-btn{
-  width:34px;
-  height:34px;
+.music-practice-stage .music-chip .music-note-digit{
+  font-size:11px;
 }
 
-.music-practice-stage .music-practice-hint{
-  flex-shrink:0;
-  margin:0;
-  font-size:10px;
+.music-practice-stage .music-chip .music-note-kana{
+  font-size:7px;
+}
+
+.music-practice-stage .music-chip-bar{
+  height:20px;
 }
 
 /* 端末が縦向きのまま練習モードに入ったとき、画面全体はCSSで横画面に見えるよう
