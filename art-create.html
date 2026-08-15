@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=16">
+<link rel="stylesheet" href="./css/art.css?v=17">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -54,6 +54,7 @@
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -72,8 +73,8 @@
 </nav>
 
 <div class="page-header">
-  <h2 data-i18n="art_page_title">アート</h2>
-  <p data-i18n="art_page_subtitle">ドット絵デザインをブラウザで作成・保存</p>
+  <h1 data-i18n="art_page_title">アート</h1>
+  <p class="page-subtitle" data-i18n="art_page_subtitle">ドット絵デザインをブラウザで作成・保存</p>
 </div>
 
 <div class="art-header-actions">
@@ -99,6 +100,10 @@
     <canvas id="artCanvas" width="320" height="320"></canvas>
   </div>
   <div class="art-panel" id="artPanel">
+    <div class="art-panel-section" id="artBrushSizeSection">
+      <div class="art-panel-title" data-i18n="art_brush_size_label">太さ</div>
+      <div class="art-brush-size-options" id="artBrushSizeOptions"></div>
+    </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_zoom_label">拡大率</div>
       <div class="art-zoom-controls" id="artZoomControls"></div>
@@ -155,7 +160,7 @@
     <div id="gridSizeStep1">
       <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
       <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
-      <div class="art-gridsize-options" id="artRatioOptions"></div>
+      <div class="art-gridsize-options art-ratio-grid" id="artRatioOptions"></div>
       <div class="art-gridsize-options art-scroll-options" id="artFrameItemOptions"></div>
       <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
       <div class="art-gridsize-options" id="artLevelOptions"></div>
@@ -182,6 +187,50 @@
   </div>
 </div>
 
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-help-box">
+    <h3 style="text-align:center;">使い方</h3>
+
+    <p><strong>編集する・固定する</strong><br>
+    「編集する」をONにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をONにすると、編集モードに関わらず一切の描画を受け付けなくなります。</p>
+
+    <p style="margin-top:10px;"><strong>ツール</strong><br>
+    ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）が使えます。ペン・消しゴムは「太さ」欄で1〜4マスの太さに変更できます。</p>
+
+    <p style="margin-top:10px;"><strong>カラー</strong><br>
+    ゲーム内で実際に選べる色と完全に一致したパレットから選びます。メインカラーをタップすると、さらに詳しいサブカラーが表示されます。</p>
+
+    <p style="margin-top:10px;"><strong>拡大率</strong><br>
+    スライダーで自由に拡大・縮小できます。タッチ操作の場合は2本指のピンチでも拡大縮小できます。</p>
+
+    <p style="margin-top:10px;"><strong>デザイン枠の輪郭線</strong><br>
+    デザイン枠（衣装・家具など）で作成すると、実際に使われる部分を示す輪郭線が表示されます。輪郭線の外側もゲーム内の仕様どおり塗ることができます。</p>
+
+    <p style="margin-top:10px;"><strong>マイデザイン</strong><br>
+    「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。「新規作成」から別サイズのキャンバスも作成できます。</p>
+
+    <p style="margin-top:10px;"><strong>エクスポート・共有</strong><br>
+    完成したデザインをPNG画像として保存したり、共有したりできます。</p>
+
+    <p style="margin-top:10px;"><strong>10×10ブロック表示</strong><br>
+    ONにすると、キャンバスが10×10マスごとのブロックに区切られます。各ブロックをタップすると未着手・作業中・完了の3段階で進捗を記録できます。</p>
+
+    <button class="modal-close-btn" onclick="replayTutorial()" style="margin-top:14px; background:var(--card-sub);">チュートリアルをもう一度見る</button>
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div class="art-tutorial-backdrop" id="artTutorialBackdrop" style="display:none;"></div>
+<div class="art-tutorial-highlight" id="artTutorialHighlight" style="display:none;"></div>
+<div class="art-tutorial-popup" id="artTutorialPopup" style="display:none;">
+  <div class="art-tutorial-step" id="artTutorialStepLabel"></div>
+  <div class="art-tutorial-text" id="artTutorialText"></div>
+  <div class="art-tutorial-actions">
+    <button class="art-tutorial-skip" id="artTutorialSkipBtn">スキップ</button>
+    <button class="art-tutorial-next" id="artTutorialNextBtn">次へ</button>
+  </div>
+</div>
+
 <div id="artToast"></div>
 
 <script src="js/i18n.js"></script>
@@ -190,6 +239,7 @@
 
 document.getElementById("artConvertIcon").innerHTML = icon("upload", { size: 15 });
 document.getElementById("artFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("helpBtn").innerHTML = icon("help");
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");

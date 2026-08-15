@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=2">
-<link rel="stylesheet" href="./css/art.css?v=16">
+<link rel="stylesheet" href="./css/art.css?v=17">
 
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./index.html">
@@ -55,6 +55,7 @@
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -73,8 +74,8 @@
 </nav>
 
 <div class="page-header">
-  <h2 data-i18n="art_convert_page_title">画像から作る</h2>
-  <p data-i18n="art_convert_page_subtitle">画像をアップロードしてドット絵に変換します</p>
+  <h1 data-i18n="art_convert_page_title">画像から作る</h1>
+  <p class="page-subtitle" data-i18n="art_convert_page_subtitle">画像をアップロードしてドット絵に変換します</p>
 </div>
 
 <div class="art-notice" data-i18n="art_coming_soon">
@@ -118,7 +119,7 @@
     <div class="art-panel-section" id="artConvertSizeStep1">
       <div class="art-panel-title" data-i18n="art_convert_size_label">キャンバスサイズ</div>
       <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
-      <div class="art-gridsize-options" id="artConvertRatioOptions"></div>
+      <div class="art-gridsize-options art-ratio-grid" id="artConvertRatioOptions"></div>
       <div class="art-gridsize-options art-scroll-options" id="artConvertFrameItemOptions"></div>
       <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
       <div class="art-gridsize-options" id="artConvertLevelOptions"></div>
@@ -183,6 +184,32 @@
   ※本サイトは非公式のファンツールです
 </div>
 
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-help-box">
+    <h3 style="text-align:center;">使い方</h3>
+
+    <p><strong>画像を選ぶ</strong><br>
+    JPG・PNG・WebP形式の画像をアップロードすると、ドット絵への変換プレビューが表示されます。</p>
+
+    <p style="margin-top:10px;"><strong>キャンバスサイズ</strong><br>
+    「比率」からキャンバスの縦横比を、「サイズ」から実際のマス数を選びます。ゲーム内のデザイン枠（衣装・家具など）に合わせて変換したい場合は、比率の一覧からアイテムを選んでください。</p>
+
+    <p style="margin-top:10px;"><strong>変換方式・配置方法</strong><br>
+    変換方式で画像の質感（標準・なめらか・くっきり）を、配置方法で画像をキャンバスにどう収めるかを選べます。余白ができる場合は色も指定できます。</p>
+
+    <p style="margin-top:10px;"><strong>色数・ディザリング</strong><br>
+    使用する色数を制限したり、ディザリング（色の粒を混ぜてグラデーションを表現する処理）のON/OFFを切り替えられます。</p>
+
+    <p style="margin-top:10px;"><strong>明るさ・コントラスト・ノイズ除去・輪郭強調</strong><br>
+    スライダーで画像を調整してから変換できます。輪郭強調は、線画をはっきりさせたい場合に使います。</p>
+
+    <p style="margin-top:10px;"><strong>エディターで編集する</strong><br>
+    変換結果に納得したら、このボタンでアートエディターに移動し、続きを手描きで仕上げられます。</p>
+
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script>
@@ -190,6 +217,15 @@
 document.getElementById("artBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("artConvertFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("artUploadIcon").innerHTML = icon("upload", { size: 18 });
+document.getElementById("helpBtn").innerHTML = icon("help");
+
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");

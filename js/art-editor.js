@@ -10,6 +10,7 @@
 // ズーム100%＝画面（.art-canvas-area、固定サイズの表示エリア）にキャンバス全体が
 // ちょうど収まる大きさ。1マスのピクセルサイズはfitCellSize()で動的に求める
 const ZOOM_LEVELS = [25, 50, 100, 200, 400, 800, 1600];
+const BRUSH_SIZES = [1, 2, 3, 4];
 const DRAFT_KEY = "hatopiArt_currentDraft";
 const SAVED_DESIGNS_KEY = "hatopiArt_savedDesigns";
 const MAX_HISTORY = 50;
@@ -22,6 +23,7 @@ let currentColor = "#EF6E72"; // 初期選択色（05 コーラル）
 let expandedPaletteMain = null; // カラーパレットで展開表示中のメインカラー番号
 let selectedMainNo = "05"; // 現在の選択色が属するメインカラー番号（マーク表示用。hexの一致では判定しない）
 let currentTool = "pen";
+let brushSize = 1; // ペン・消しゴムの太さ（1マス～。太いほど中心のマスを基準にN×Nマスへ反映する）
 let zoom = 100;
 let highlightedColor = null;
 let isDrawing = false;
@@ -50,7 +52,6 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
   // 片方の指だけ座標が更新された「途中の不整合な状態」でupdatePinch()が呼ばれるのを防ぐために、
   // 同一フレーム内の複数回の呼び出しをrequestAnimationFrameで1回にまとめる
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
-let activeDisabledSet = null; // 現在のキャンバスの使用不可マス集合（Set<"x,y">）。マスクなしならnull
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 
 const canvas = document.getElementById("artCanvas");
@@ -79,6 +80,7 @@ function initArtEditor(){
 
   renderToolbar();
   renderZoomControls();
+  renderBrushSizeControls();
   renderPalette();
   renderCanvas();
   updateColorUsage();
@@ -88,6 +90,8 @@ function initArtEditor(){
   bindDisplayToggles();
   bindMyDesignsControls();
   bindLockControls();
+  bindTutorialControls();
+  maybeStartTutorial();
 }
 
 // ── 編集モード・固定（ロック）ボタンの結線 ──
@@ -96,23 +100,13 @@ function bindLockControls(){
   document.getElementById("artLockBtn").addEventListener("click", toggleLock);
 }
 
-// ── デザイン枠のマスク（輪郭線・使用不可マス）キャッシュ ──
-// activeFrameId/activePartIdが変わるたびに呼び直し、描画・当たり判定用に
-// disabledRangesを展開したSetを作り直す（js/art-masks.jsのPRESET_MASKS参照）
+// ── デザイン枠のマスク（輪郭線）キャッシュ ──
+// activeFrameId/activePartIdが変わるたびに呼び直す（js/art-masks.jsのPRESET_MASKS参照）。
+// 輪郭線より外のマスも、ゲーム内の実際の仕様に合わせて描画できる（使用不可扱いにはしない）。
 function rebuildActiveMask(){
   const preset = activeFrameId && typeof PRESET_MASKS !== "undefined" ? PRESET_MASKS[activeFrameId] : null;
   const part = preset && activePartId ? preset[activePartId] : null;
-  if(!part){
-    activeDisabledSet = null;
-    activeMaskLines = null;
-    return;
-  }
-  const set = new Set();
-  part.disabledRanges.forEach(([y, x1, x2]) => {
-    for(let x = x1; x <= x2; x++) set.add(x + "," + y);
-  });
-  activeDisabledSet = set;
-  activeMaskLines = part.maskLines;
+  activeMaskLines = part ? part.maskLines : null;
 }
 
 // ── マイデザイン・エクスポート/共有ボタンの結線 ──
@@ -296,6 +290,7 @@ function createCanvas(w, h, frameId, partId){
   renderBlockList();
   renderLockUI();
   saveDraft();
+  maybeStartTutorial();
 }
 
 // ── ツールバー ──
@@ -416,24 +411,50 @@ function redo(){
 function setTool(tool){
   currentTool = tool;
   renderToolbar();
+  renderBrushSizeControls();
   const t = TOOLS.find(x => x.id === tool);
   if(t) showToast(T(t.labelKey, t.labelFallback));
 }
 
-// ── ズーム ──
+// ── 太さ（ペン・消しゴム共通） ──
+// ペン/消しゴムを選んでいる時だけ表示する（バケツ・スポイトには無関係のため）
+function renderBrushSizeControls(){
+  const section = document.getElementById("artBrushSizeSection");
+  const el = document.getElementById("artBrushSizeOptions");
+  if(!section || !el) return;
+  const show = currentTool === "pen" || currentTool === "eraser";
+  section.style.display = show ? "" : "none";
+  if(!show) return;
+  el.innerHTML = BRUSH_SIZES.map(s => `
+    <button class="${s === brushSize ? "active" : ""}" onclick="setBrushSize(${s})" aria-label="${s}">${s}</button>
+  `).join("");
+}
+
+function setBrushSize(s){
+  brushSize = s;
+  renderBrushSizeControls();
+}
+
+// ── ズーム（スライダーで連続的に拡大率を変更する） ──
 function renderZoomControls(){
   const el = document.getElementById("artZoomControls");
   el.innerHTML = `
-    <button onclick="zoomOut()" aria-label="${T('art_zoom_out', '縮小')}">${icon("minus", { size: 16 })}</button>
+    <input type="range" class="art-zoom-slider" id="artZoomSlider" min="${MIN_ZOOM}" max="${MAX_ZOOM}" step="1" value="${zoom}" aria-label="${T('art_zoom_label', '拡大率')}">
     <span class="art-zoom-label" id="artZoomLabel">${zoom}%</span>
-    <button onclick="zoomIn()" aria-label="${T('art_zoom_in', '拡大')}">${icon("plus", { size: 16 })}</button>
     <button class="art-zoom-text-btn" onclick="zoomReset()">100%</button>
   `;
+  const slider = document.getElementById("artZoomSlider");
+  slider.addEventListener("input", () => {
+    const c = containerCenterClientPoint();
+    zoomAt(Number(slider.value), c.x, c.y);
+  });
 }
 
 function updateZoomLabel(){
   const el = document.getElementById("artZoomLabel");
   if(el) el.textContent = zoom + "%";
+  const slider = document.getElementById("artZoomSlider");
+  if(slider) slider.value = zoom;
 }
 
 const MIN_ZOOM = ZOOM_LEVELS[0];
@@ -500,20 +521,6 @@ function zoomAt(newZoomRaw, clientX, clientY){
   const after = clientPointFromGrid(before.gx, before.gy);
   area.scrollLeft += after.clientX - clientX;
   area.scrollTop += after.clientY - clientY;
-}
-
-function zoomIn(){
-  const next = ZOOM_LEVELS.find(z => z > zoom);
-  const target = next !== undefined ? next : MAX_ZOOM;
-  const c = containerCenterClientPoint();
-  zoomAt(target, c.x, c.y);
-}
-
-function zoomOut(){
-  const lower = ZOOM_LEVELS.filter(z => z < zoom);
-  const target = lower.length ? lower[lower.length - 1] : MIN_ZOOM;
-  const c = containerCenterClientPoint();
-  zoomAt(target, c.x, c.y);
 }
 
 // ズーム100%＝画面に合わせた表示（fitCellSize）そのものなので、「100%に戻す」は
@@ -667,16 +674,6 @@ function renderCanvas(){
     }
   }
 
-  // デザイン枠の使用不可マスをグレーアウト（実データにわずかに輪郭線と食い違うマスがあっても
-  // 実際に描画をブロックする判定=disabledRangesを常に優先して表示する）
-  if(activeDisabledSet){
-    ctx.fillStyle = document.body.classList.contains("dark") ? "rgba(0,0,0,0.4)" : "rgba(26,24,20,0.14)";
-    activeDisabledSet.forEach(key => {
-      const [dx, dy] = key.split(",").map(Number);
-      ctx.fillRect(dx * cell, dy * cell, cell, cell);
-    });
-  }
-
   if(cell >= 6){
     ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
     ctx.lineWidth = 1;
@@ -826,19 +823,13 @@ function cellFromEvent(e){
   return { cx, cy };
 }
 
-function isCellDisabled(cx, cy){
-  return !!(activeDisabledSet && activeDisabledSet.has(cx + "," + cy));
-}
-
 function applyToolAt(cx, cy){
   const idx = cy * gridWidth + cx;
   if(currentTool === "pen"){
-    if(isCellDisabled(cx, cy)) return; // デザイン枠の使用不可マスには描けない
-    pixels[idx] = currentColor;
+    paintBrush(cx, cy, currentColor);
   }else if(currentTool === "eraser"){
-    pixels[idx] = null;
+    paintBrush(cx, cy, null);
   }else if(currentTool === "bucket"){
-    if(isCellDisabled(cx, cy)) return;
     floodFill(cx, cy, currentColor);
   }else if(currentTool === "eyedropper"){
     if(pixels[idx]){
@@ -846,6 +837,20 @@ function applyToolAt(cx, cy){
       setCurrentColor(nearestGamePaletteHex(hexToRgb(pixels[idx])));
     }
     setTool("pen");
+  }
+}
+
+// brushSize×brushSizeのマスへ一括反映する（1なら従来通り1マスのみ）。
+// 基準マス(cx,cy)を左上寄りの中心として、はみ出た部分はキャンバス外として無視する。
+function paintBrush(cx, cy, color){
+  const half = Math.floor((brushSize - 1) / 2);
+  for(let dy = 0; dy < brushSize; dy++){
+    for(let dx = 0; dx < brushSize; dx++){
+      const x = cx - half + dx;
+      const y = cy - half + dy;
+      if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) continue;
+      pixels[y * gridWidth + x] = color;
+    }
   }
 }
 
@@ -857,7 +862,6 @@ function floodFill(cx, cy, color){
   while(stack.length){
     const [x, y] = stack.pop();
     if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) continue;
-    if(isCellDisabled(x, y)) continue; // 使用不可マスへは塗りつぶしが広がらない
     const i = y * gridWidth + x;
     if(pixels[i] !== target) continue;
     pixels[i] = color;
@@ -1335,6 +1339,121 @@ function shareDesign(){
   });
 }
 
+// ── ヘルプモーダル ──
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
+
+// ── 初回チュートリアル（ゲームのチュートリアルのように、関連ボタンを順番に吹き出しで案内する） ──
+// 一度最後まで見る／スキップすると再表示しない（ヘルプモーダルの「もう一度見る」からはいつでも再生できる）
+const TUTORIAL_DONE_KEY = "hatopiArt_tutorialDone";
+const TUTORIAL_STEPS = [
+  { selector: "#artEditModeBtn", title: "① 編集する", text: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
+  { selector: "#artToolbar", title: "② ツール", text: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから。" },
+  { selector: "#artBrushSizeSection", title: "③ 太さ", text: "ペン・消しゴムの太さを1〜4マスから選べます。" },
+  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。タップするとサブカラー（詳細な色合い）が展開します。" },
+  { selector: "#artZoomControls", title: "⑤ 拡大率", text: "スライダーで自由に拡大・縮小できます。スマホなら2本指のピンチ操作でも変更できます。" },
+  { selector: "#artLockBtn", title: "⑥ 固定する", text: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
+  { selector: "#artSaveBtn", title: "⑦ 保存する", text: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG保存・共有もできます。" },
+];
+let tutorialStep = 0;
+
+// gridSizeModal表示中（＝まだキャンバスを作成していない）はチュートリアルを開始しない。
+// キャンバス作成完了（createCanvas）のタイミングで呼び直される
+function maybeStartTutorial(){
+  if(document.getElementById("gridSizeModal").style.display === "block") return;
+  if(localStorage.getItem(TUTORIAL_DONE_KEY) === "true") return;
+  setTimeout(startTutorial, 400);
+}
+
+function startTutorial(){
+  tutorialStep = 0;
+  document.getElementById("artTutorialBackdrop").style.display = "block";
+  document.getElementById("artTutorialHighlight").style.display = "block";
+  document.getElementById("artTutorialPopup").style.display = "block";
+  renderTutorialStep();
+}
+
+function renderTutorialStep(){
+  const step = TUTORIAL_STEPS[tutorialStep];
+  const target = step ? document.querySelector(step.selector) : null;
+  if(!step || !target || target.offsetParent === null){
+    // 対象ボタンが非表示（別ツール選択中など）の場合はスキップして次へ
+    if(tutorialStep < TUTORIAL_STEPS.length - 1){
+      tutorialStep++;
+      renderTutorialStep();
+    }else{
+      endTutorial();
+    }
+    return;
+  }
+  document.getElementById("artTutorialStepLabel").textContent = `${tutorialStep + 1} / ${TUTORIAL_STEPS.length}`;
+  document.getElementById("artTutorialText").innerHTML = `<strong>${step.title}</strong><br>${step.text}`;
+  document.getElementById("artTutorialNextBtn").textContent = tutorialStep === TUTORIAL_STEPS.length - 1 ? "はじめる" : "次へ";
+  target.scrollIntoView({ block: "center", behavior: "smooth" });
+  setTimeout(() => positionTutorialElements(target), 280);
+}
+
+function positionTutorialElements(target){
+  const rect = target.getBoundingClientRect();
+  const pad = 6;
+  const highlight = document.getElementById("artTutorialHighlight");
+  highlight.style.left = (rect.left - pad) + "px";
+  highlight.style.top = (rect.top - pad) + "px";
+  highlight.style.width = (rect.width + pad * 2) + "px";
+  highlight.style.height = (rect.height + pad * 2) + "px";
+
+  const popup = document.getElementById("artTutorialPopup");
+  const margin = 12;
+  const popupRect = popup.getBoundingClientRect();
+  let top = rect.bottom + margin;
+  if(top + popupRect.height > window.innerHeight - 12){
+    top = rect.top - popupRect.height - margin;
+  }
+  top = Math.max(12, Math.min(top, window.innerHeight - popupRect.height - 12));
+  let left = rect.left + rect.width / 2 - popupRect.width / 2;
+  left = Math.max(12, Math.min(left, window.innerWidth - popupRect.width - 12));
+  popup.style.top = top + "px";
+  popup.style.left = left + "px";
+}
+
+function nextTutorialStep(){
+  if(tutorialStep >= TUTORIAL_STEPS.length - 1){
+    endTutorial();
+    return;
+  }
+  tutorialStep++;
+  renderTutorialStep();
+}
+
+function endTutorial(){
+  localStorage.setItem(TUTORIAL_DONE_KEY, "true");
+  document.getElementById("artTutorialBackdrop").style.display = "none";
+  document.getElementById("artTutorialHighlight").style.display = "none";
+  document.getElementById("artTutorialPopup").style.display = "none";
+}
+
+function replayTutorial(){
+  closeHelpModal();
+  localStorage.removeItem(TUTORIAL_DONE_KEY);
+  setTimeout(startTutorial, 250);
+}
+
+function bindTutorialControls(){
+  document.getElementById("artTutorialSkipBtn").addEventListener("click", endTutorial);
+  document.getElementById("artTutorialNextBtn").addEventListener("click", nextTutorialStep);
+  window.addEventListener("resize", () => {
+    if(document.getElementById("artTutorialPopup").style.display === "none") return;
+    const step = TUTORIAL_STEPS[tutorialStep];
+    const target = step ? document.querySelector(step.selector) : null;
+    if(target) positionTutorialElements(target);
+  });
+}
+
 // ── トースト通知 ──
 function showToast(msg){
   const t = document.getElementById("artToast");
@@ -1361,6 +1480,7 @@ document.addEventListener("keydown", (e) => {
 document.addEventListener("langchange", () => {
   renderToolbar();
   renderZoomControls();
+  renderBrushSizeControls();
   renderLockUI();
   updateColorUsage();
   if(document.getElementById("gridSizeModal").style.display !== "none"){
