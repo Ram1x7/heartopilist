@@ -64,27 +64,86 @@ function highRowWithExtra(octave) {
   return [...plainRow(octave, 7), { degree: 1, accidental: null, octave: octave + 1 }];
 }
 
-// 連続する音階をcols列ずつのグリッドに割り振る（実機の「15鍵(3列)」と同じ並び）
-function continuousGrid(startOctave, totalNotes, cols) {
-  const flat = [];
-  let deg = 1;
-  let oct = startOctave;
-  for (let i = 0; i < totalNotes; i++) {
-    flat.push({ degree: deg, accidental: null, octave: oct });
-    deg++;
-    if (deg > 7) {
-      deg = 1;
-      oct++;
-    }
-  }
-  const grid = [];
-  for (let i = 0; i < flat.length; i += cols) grid.push(flat.slice(i, i + cols));
-  return grid;
+// ── 練習モードの演奏ボタン絶対座標 ──
+// 実機の演奏画面スクリーンショット（1600×1118px、横画面）を基準解像度とし、
+// ボタン座標はこの解像度に対する%で保持する。画面サイズ・アスペクト比が違う
+// 端末でも、実機と同じ相対位置・大きさ（指の感覚）で表示できるようにするため。
+const STAGE_REF_W = 1600;
+const STAGE_REF_H = 1118;
+const MAIN_BTN_SIZE_PCT = 5.56; // 画面幅に対するメインボタンの直径
+const ACCIDENTAL_BTN_SIZE_PCT = MAIN_BTN_SIZE_PCT * 0.72; // 半音ボタンは実測でメインボタンの約72%
+
+function toStagePct(xPx, yPx) {
+  return { xPct: (xPx / STAGE_REF_W) * 100, yPct: (yPx / STAGE_REF_H) * 100 };
+}
+
+// notes配列（度数・臨時記号・オクターブ）と、対応するx座標(px)配列・共通y座標(px)から
+// 座標つきの音配列を組み立てる
+function withPositions(notes, xsPx, yPx, size) {
+  return notes.map((note, i) => ({ ...note, ...toStagePct(xsPx[i], yPx), size }));
+}
+
+// 実機確認の結果、「22キー」と「15鍵(3列)」は物理ボタン配置が完全に同一（座標も一致）。
+// 半音ON時のみ、隙間に半音ボタンが追加表示される
+const POS_22KEY_TOP_X = [178, 355, 532, 710, 889, 1067, 1244, 1416];
+const POS_22KEY_MID_X = [267, 446, 623, 800, 978, 1155, 1333];
+const POS_22KEY_BOT_X = [267, 446, 623, 800, 978, 1155, 1333];
+
+function build22KeyMainPositions() {
+  return [
+    ...withPositions(highRowWithExtra(1), POS_22KEY_TOP_X, 778, "main"),
+    ...withPositions(plainRow(0, 7), POS_22KEY_MID_X, 907, "main"),
+    ...withPositions(plainRow(-1, 7), POS_22KEY_BOT_X, 1035, "main"),
+  ];
+}
+
+// 半音ボタン（度数1,2,4,5,6の♯のみ。ミ-ファ間・シ-ド間には黒鍵＝半音が無い）
+function sharpsOfOctave(octave) {
+  return [1, 2, 4, 5, 6].map((d) => ({ degree: d, accidental: "#", octave }));
+}
+const POS_SEMI_TOP_X = [266, 444, 800, 977, 1155];
+const POS_SEMI_MID_X = [355, 535, 889, 1066, 1244];
+const POS_SEMI_BOT_X = [355, 535, 889, 1066, 1244];
+
+function build22KeySemitonePositions() {
+  return [
+    ...withPositions(sharpsOfOctave(1), POS_SEMI_TOP_X, 755, "accidental"),
+    ...withPositions(sharpsOfOctave(0), POS_SEMI_MID_X, 890, "accidental"),
+    ...withPositions(sharpsOfOctave(-1), POS_SEMI_BOT_X, 1015, "accidental"),
+  ];
+}
+
+// 15鍵(2列)：上段8個・下段7個のみ（3段目なし）。y位置が22キーよりやや下寄り
+const POS_2ROW_TOP_X = [179, 356, 533, 710, 888, 1065, 1243, 1423];
+const POS_2ROW_BOT_X = [268, 446, 625, 798, 979, 1155, 1333];
+
+function build15Key2RowPositions() {
+  return [
+    ...withPositions(highRowWithExtra(1), POS_2ROW_TOP_X, 899, "main"),
+    ...withPositions(plainRow(0, 7), POS_2ROW_BOT_X, 1028, "main"),
+  ];
+}
+
+// 8鍵(2列)：オカリナ/ほら貝。千鳥配置ではない4列×2行の直線グリッド
+const POS_8KEY_TOP_X = [534, 712, 890, 1068];
+const POS_8KEY_BOT_X = [534, 712, 890, 1068];
+const OCARINA_TOP_NOTES = [1, 2, 3, 4].map((d) => ({ degree: d, accidental: null, octave: 0 }));
+const OCARINA_BOT_NOTES = [
+  { degree: 5, accidental: null, octave: 0 },
+  { degree: 6, accidental: null, octave: 0 },
+  { degree: 7, accidental: null, octave: 0 },
+  { degree: 1, accidental: null, octave: 1 },
+];
+
+function build8Key2RowPositions() {
+  return [...withPositions(OCARINA_TOP_NOTES, POS_8KEY_TOP_X, 896, "main"), ...withPositions(OCARINA_BOT_NOTES, POS_8KEY_BOT_X, 1027, "main")];
 }
 
 // 楽器プロファイル（実機の演奏画面・設定画面で確認したボタン配置を再現）。
 // ピアノ／ギター・ベースは複数の配置(layouts)を切り替えられる。
-// ピアノの「22キー」のみ、半音(♯)あり/なしを切り替えるchromaticGridを持つ
+// ピアノの「22キー」のみ、半音(♯)あり/なしを切り替えるchromaticGridを持つ。
+// gridは編集モードの数字譜入力用（画面幅に合わせて伸縮するボタン行）、
+// positions/accidentalPositionsは練習モード用の実機座標（絶対配置）
 const INSTRUMENTS = [
   {
     id: "ocarina",
@@ -95,10 +154,8 @@ const INSTRUMENTS = [
         id: "default",
         labelKey: "music_layout_default",
         labelFallback: "標準",
-        grid: [
-          [{ degree: 1, accidental: null, octave: 0 }, { degree: 2, accidental: null, octave: 0 }, { degree: 3, accidental: null, octave: 0 }, { degree: 4, accidental: null, octave: 0 }],
-          [{ degree: 5, accidental: null, octave: 0 }, { degree: 6, accidental: null, octave: 0 }, { degree: 7, accidental: null, octave: 0 }, { degree: 1, accidental: null, octave: 1 }],
-        ],
+        grid: [OCARINA_TOP_NOTES, OCARINA_BOT_NOTES],
+        positions: build8Key2RowPositions(),
       },
     ],
   },
@@ -112,12 +169,15 @@ const INSTRUMENTS = [
         labelKey: "music_layout_2row",
         labelFallback: "15鍵（2列）",
         grid: [highRowWithExtra(1), plainRow(0, 7)],
+        positions: build15Key2RowPositions(),
       },
       {
         id: "3row",
         labelKey: "music_layout_3row",
         labelFallback: "15鍵（3列）",
-        grid: continuousGrid(0, 15, 5),
+        // 実機確認の結果、物理ボタン配置は22キー(半音OFF)と完全に同一
+        grid: [highRowWithExtra(1), plainRow(0, 7), plainRow(-1, 7)],
+        positions: build22KeyMainPositions(),
       },
     ],
   },
@@ -131,12 +191,15 @@ const INSTRUMENTS = [
         labelKey: "music_layout_2row",
         labelFallback: "15鍵（2列）",
         grid: [highRowWithExtra(1), plainRow(0, 7)],
+        positions: build15Key2RowPositions(),
       },
       {
         id: "3row",
         labelKey: "music_layout_3row",
         labelFallback: "15鍵（3列）",
-        grid: continuousGrid(0, 15, 5),
+        // 実機確認の結果、物理ボタン配置は22キー(半音OFF)と完全に同一
+        grid: [highRowWithExtra(1), plainRow(0, 7), plainRow(-1, 7)],
+        positions: build22KeyMainPositions(),
       },
       {
         id: "22key",
@@ -144,6 +207,8 @@ const INSTRUMENTS = [
         labelFallback: "22キー",
         grid: [highRowWithExtra(1), plainRow(0, 7), plainRow(-1, 7)],
         chromaticGrid: [buildPianoOctaveRow(1), buildPianoOctaveRow(0), buildPianoOctaveRow(-1)],
+        positions: build22KeyMainPositions(),
+        accidentalPositions: build22KeySemitonePositions(),
       },
     ],
   },

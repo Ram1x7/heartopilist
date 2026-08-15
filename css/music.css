@@ -638,29 +638,73 @@ body.dark .music-note-kana{
   -webkit-user-select:none;
 }
 
-/* 練習モード：実機の指の感覚に合わせるため、画面幅に対する一律の割合ではなく、
-   「今の配置(15鍵2列／3列／22キーなど)で一番ボタン数が多い行」が画面幅に
-   ちょうど収まるボタンサイズをJS側(applyPracticeGridSizing)で計算し、
-   --music-btn-w としてこの要素に設定する。実機も配置によってボタンの大きさが
-   変わる（ボタン数が少ない配置ほど1個が大きい）ため、これに合わせることで
-   どの配置で練習しても実機と同じ指の距離感になる。
-   はみ出す分はグリッド全体を横スクロール（各行が連動して動くので、縦に並ぶ
-   音の位置がずれない。端末を横向きにすれば1画面に収まりやすい） */
+/* 練習モード：実機の演奏画面スクリーンショット(1600×1118px)を基準にした
+   絶対座標で、ボタンの位置・大きさを実機と同じ相対比になるよう再現する
+   （js/music-config.js の positions/accidentalPositions を参照）。
+   実機の画面アスペクト比(1600:1118)を保ったまま、画面サイズが違う端末でも
+   レターボックス/ピラーボックス状に収める（実機の演奏画面と同じ挙動）。
+   コンテナクエリ(cqh)を使うことで、JSでのリサイズ計算なしに常に画面へ
+   ぴったり収まるサイズを算出できる */
 .music-instrument-grid.practice-size{
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  padding-bottom:4px;
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  container-type:size;
 }
 
-.music-instrument-grid.practice-size .music-instrument-row{
-  width:max-content;
+.music-stage-frame{
+  position:relative;
+  aspect-ratio:1600 / 1118;
+  width:min(100%, 143.113cqh); /* 1600/1118 ≒ 1.43113。高さいっぱいに収まる幅の上限 */
+  max-width:100%;
+  max-height:100%;
+  container-type:size;
 }
 
-.music-instrument-grid.practice-size .music-note-btn{
-  flex:0 0 auto;
-  width:var(--music-btn-w, 92px);
-  aspect-ratio:5 / 6;
-  height:auto;
+/* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
+   高さも%で明示して真円を保つ（フレームの縦横比は1600:1118で固定なので、
+   幅%×(1600/1118)が同じ見た目の大きさになる高さ%になる）。
+   半音ボタンの当たり判定(::before)を円の外側まで広げるため、overflowはvisibleのままにする
+   （内容がわずかに円をはみ出す場合があるが、タップ判定の正しさを優先する） */
+.music-stage-btn{
+  position:absolute;
+  width:5.56%;
+  height:calc(5.56% * 1600 / 1118);
+  padding:0;
+  border-radius:50%;
+  transform:translate(-50%, -50%);
+}
+
+.music-stage-btn .music-note-digit{
+  font-size:clamp(9px, 2.6cqw, 32px);
+}
+
+.music-stage-btn .music-note-kana{
+  font-size:clamp(6px, 1.3cqw, 16px);
+}
+
+/* 半音ボタンは実機の見た目通りメインボタンの約72%サイズ。円が小さくなるぶん
+   文字サイズも比例して縮小し、2行のテキストが円の中に収まりやすくする */
+.music-stage-btn.accidental{
+  width:calc(5.56% * 0.72);
+  height:calc(5.56% * 0.72 * 1600 / 1118);
+}
+
+.music-stage-btn.accidental .music-note-digit{
+  font-size:clamp(7px, calc(2.6cqw * 0.72), 23px);
+}
+
+.music-stage-btn.accidental .music-note-kana{
+  font-size:clamp(5px, calc(1.3cqw * 0.72), 12px);
+}
+
+/* 視覚サイズのままだと実機よりタップしづらいため、当たり判定だけ少し広げる */
+.music-stage-btn.accidental::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
 }
 
 .music-note-btn:active,
