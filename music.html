@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=3">
-<link rel="stylesheet" href="./css/music.css?v=5">
+<link rel="stylesheet" href="./css/music.css?v=6">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -86,6 +86,7 @@
 <div class="music-mode-tabs">
   <button class="music-mode-btn active" id="musicModeEditBtn" data-i18n="music_mode_edit">編集</button>
   <button class="music-mode-btn" id="musicModePracticeBtn" data-i18n="music_mode_practice">練習</button>
+  <button class="music-mode-btn" id="musicModeFollowBtn" data-i18n="music_mode_follow">追従</button>
   <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="toggle sound"></button>
 </div>
 
@@ -156,11 +157,13 @@
   </div>
   <div id="musicScoreDisplayAnchorPractice"></div>
   <div id="musicInstrumentGridAnchorPractice"></div>
-  <div class="music-playback-row">
-    <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="play/pause"></button>
-    <div class="music-speed-control">
-      <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1">
-      <span id="musicSpeedLabel">1.00倍</span>
+  <div id="musicPlaybackAnchorPractice">
+    <div class="music-playback-row" id="musicPlaybackRow">
+      <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="play/pause"></button>
+      <div class="music-speed-control">
+        <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1">
+        <span id="musicSpeedLabel">1.00倍</span>
+      </div>
     </div>
   </div>
   <p class="music-practice-hint" data-i18n="music_practice_hint">ボタンを押している間だけ音が鳴ります。停止中でも、次に弾く音を正しく押すと先へ進みます。</p>
@@ -171,6 +174,20 @@
 <div class="music-rotate-prompt" id="musicRotatePrompt">
   <div class="music-rotate-prompt-icon" id="musicRotatePromptIcon"></div>
   <p data-i18n="music_rotate_hint">端末を横向きにすると、実機と同じ大きさで演奏ボタンが表示されます</p>
+</div>
+
+<!-- 追従モード：ボタンは出さず、大きな数字譜だけを自動スクロール表示する軽量画面。
+     実機の画面と分割画面(iPadのSplit Viewなど)で並べて使う想定なので、
+     練習モードと違って横画面には固定しない -->
+<div class="music-follow-stage" id="musicFollowStage">
+  <div class="music-practice-stage-topbar">
+    <button class="music-practice-exit-btn" id="musicFollowExitBtn" aria-label="close"></button>
+    <div class="music-practice-stage-name" id="musicFollowStageName"></div>
+    <button class="music-sound-btn" id="musicSoundToggleBtnFollow" aria-label="toggle sound"></button>
+  </div>
+  <div class="music-follow-display" id="musicFollowDisplay"></div>
+  <div id="musicPlaybackAnchorFollow"></div>
+  <p class="music-practice-hint" data-i18n="music_follow_hint">実機の画面と並べて表示し、実際に演奏しながら次の音を確認できます。効果音はミュートすることをおすすめします。</p>
 </div>
 
 <div class="footer">
@@ -203,6 +220,9 @@
 
     <p style="margin-top:10px;"><strong>練習モード</strong><br>
     「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列／22キーなど）がそのまま自動で使われます。ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。再生を止めていても、次に弾くべき音を正しく押すと譜面のハイライトが先へ進みます。採点はありません。左上の×で編集モードに戻れます。</p>
+
+    <p style="margin-top:10px;"><strong>追従モード</strong><br>
+    「追従」をタップすると、演奏ボタンを出さず、今弾く音と次の音だけを大きく表示する全画面表示に切り替わります。実際のゲーム画面と、iPadの「Split View」などの分割画面で並べて表示し、実機で演奏しながら次の音を確認する使い方を想定しています。練習モードと違って横画面には固定されません。譜面を0.1〜1.0倍速で自動再生し、テンポに合わせて表示が進みます。効果音が実機の音と重ならないよう、ミュートしての利用をおすすめします。</p>
 
     <p style="margin-top:10px;"><strong>音</strong><br>
     簡易的な合成音が鳴ります（ゲーム内の実際の音とは異なります）。右上のボタンでON/OFFを切り替えられます。</p>

@@ -796,6 +796,109 @@ body.dark .music-practice-stage-name{
   line-height:1.6;
 }
 
+/* 追従モード：ボタンは出さず、大きな数字譜だけを表示する全画面ステージ。
+   実機の画面とiPadのSplit Viewなどで並べて使う想定なので、練習モードと違って
+   横画面には固定しない（縦長の狭い分割画面でもそのまま使えるようにする） */
+.music-follow-stage{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1900;
+  flex-direction:column;
+  gap:8px;
+  padding:6px 14px calc(6px + env(safe-area-inset-bottom));
+  box-sizing:border-box;
+  background:var(--card);
+}
+
+.music-follow-stage.active{
+  display:flex;
+}
+
+body.dark .music-follow-stage{
+  background:#211e19;
+}
+
+.music-follow-display{
+  flex:1;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  text-align:center;
+  overflow:hidden;
+}
+
+.music-follow-current{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+
+.music-follow-current-notes{
+  display:flex;
+  gap:14px;
+  font-size:clamp(48px, 18vw, 130px);
+  font-weight:700;
+  color:var(--indigo);
+  line-height:1;
+}
+
+body.dark .music-follow-current-notes{
+  color:var(--indigo-soft);
+}
+
+.music-follow-current-kana{
+  font-size:16px;
+  color:var(--text-sub);
+}
+
+body.dark .music-follow-current-kana{
+  color:#b3a89a;
+}
+
+.music-follow-next{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  opacity:0.55;
+}
+
+.music-follow-next-label{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+.music-follow-next-notes{
+  display:flex;
+  gap:6px;
+  font-size:clamp(20px, 6vw, 42px);
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .music-follow-next-notes{
+  color:#ece4d4;
+}
+
+.music-follow-empty{
+  color:var(--text-sub);
+  font-size:14px;
+}
+
+body.dark .music-follow-empty{
+  color:#b3a89a;
+}
+
+.music-follow-stage .music-practice-hint{
+  flex-shrink:0;
+  margin:0;
+}
+
 /* 保存済み譜面一覧 */
 .music-saved-box{
   max-width:400px;
