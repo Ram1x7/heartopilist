@@ -536,15 +536,7 @@ body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
   background:rgba(253,249,239,0.18);
 }
 
-/* デザイン枠アイテム一覧（数が多いので固定高さ+スクロール） */
-.art-scroll-options{
-  max-height:200px;
-  overflow-y:auto;
-  align-content:flex-start;
-  padding:2px;
-}
-
-/* デザイン枠アイテムのアイコン付き一覧（2列グリッド） */
+/* デザイン枠アイテムのアイコン付き一覧（5列グリッド。比率選択と合わせてモーダル全体で一緒にスクロールする） */
 .art-frame-grid{
   display:grid;
   grid-template-columns:repeat(5, 1fr);
