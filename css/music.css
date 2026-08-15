@@ -445,7 +445,11 @@ body.dark .music-note-kana{
   -webkit-tap-highlight-color:transparent;
 }
 
-/* 練習モード：画面幅に合わせて縮めず、実機に近い固定サイズで表示する。
+/* 練習モード：画面幅に合わせて縮めず、実機に近いサイズで表示する。
+   実機（iPad Pro 11インチ・横画面、表示幅は約1210pt）のボタンサイズを基準に、
+   画面幅に対する割合(vw)でスケールさせる。これにより、iPhone・Androidなど
+   画面が小さい端末でも「画面に対して大きすぎる/小さすぎる」ズレを防ぎ、
+   タップしやすい最小サイズ(44px)は下回らないようにする。
    はみ出す分はグリッド全体を横スクロール（各行が連動して動くので、縦に並ぶ
    音の位置がずれない。端末を横向きにすれば1画面に収まりやすい） */
 .music-instrument-grid.practice-size{
@@ -460,8 +464,9 @@ body.dark .music-note-kana{
 
 .music-instrument-grid.practice-size .music-note-btn{
   flex:0 0 auto;
-  width:58px;
-  height:70px;
+  width:clamp(44px, 6.9vw, 92px);
+  aspect-ratio:5 / 6;
+  height:auto;
 }
 
 .music-note-btn:active{
@@ -606,8 +611,9 @@ body.dark .music-saved-actions button{
   }
 }
 
-/* PC（1200px〜） */
-@media (min-width:1200px){
+/* PC（1400px〜。iPad Pro 11/12.9インチの横画面（最大1366px程度）はここに含めない。
+   タブレット横画面でも練習モードのボタンが画面幅いっぱいに使えるようにするため） */
+@media (min-width:1400px){
   .music-layout{
     max-width:640px;
     margin:0 auto;
