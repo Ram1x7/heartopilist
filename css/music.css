@@ -865,7 +865,10 @@ body.dark .music-practice-stage-name{
 .music-practice-stage #musicInstrumentGridAnchorPractice{
   position:absolute;
   inset:0;
-  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+  /* 実機のスクショから座標検出したところ、中央寄せがわずかに理論値より下に
+     ズレていた（横方向は理論値と一致）。下側のpaddingを少し多めに取ることで
+     フレームをその分だけ上に寄せて補正する */
+  padding:6px 10px calc(6px + 3.7vh + env(safe-area-inset-bottom));
   box-sizing:border-box;
   display:flex;
   align-items:center;
