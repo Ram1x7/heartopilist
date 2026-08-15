@@ -1109,22 +1109,24 @@ body.dark .art-usage-number{
   margin-bottom:0;
 }
 
-/* ブロック一覧 */
+/* ブロック一覧（実際のキャンバス配置=横blocksX×縦blocksYと同じ並びのグリッド。
+   grid-template-columnsはJS側でブロック数に応じて設定する） */
 .art-block-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:6px;
+  display:grid;
+  gap:4px;
   margin-top:10px;
 }
 
 .art-block-btn{
-  flex:1 1 30%;
-  padding:6px 4px;
+  aspect-ratio:1;
+  min-width:0;
+  padding:2px;
   border:1px solid var(--border);
-  border-radius:8px;
+  border-radius:6px;
   background:var(--card-sub);
   color:var(--text-sub);
-  font-size:11px;
+  font-size:10px;
+  line-height:1;
   cursor:pointer;
 }
 

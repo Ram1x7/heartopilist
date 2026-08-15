@@ -36,6 +36,7 @@ let showColorNumbers = false;
 let showCellNumbers = false;
 let blockMode = false;
 let blockStatus = {};
+let focusedBlock = null; // 一覧からブロックへジャンプした直後、そのブロックの範囲だけを示す（{bx,by}）
 let selectedRatioId = "1-1"; // 新規キャンバス作成モーダルで選択中の比率
 let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
@@ -131,6 +132,7 @@ function bindDisplayToggles(){
   });
   document.getElementById("artBlockModeToggle").addEventListener("change", (e) => {
     blockMode = e.target.checked;
+    focusedBlock = null; // 手動での切り替えは常に、ジャンプ後の枠線表示より優先する
     renderToolbar();
     renderCanvas();
     renderBlockList();
@@ -279,6 +281,7 @@ function createCanvas(w, h, frameId, partId){
   pixels = new Array(w * h).fill(null);
   blockStatus = {};
   inspectedCell = null;
+  focusedBlock = null;
   activeFrameId = frameId || null;
   activePartId = partId || null;
   // 自由サイズ（frameId未指定）で作成した場合は、モーダルの選択状態も
@@ -540,6 +543,7 @@ function zoomAt(newZoomRaw, clientX, clientY){
 function zoomReset(){
   const area = document.querySelector(".art-canvas-area");
   zoom = 100;
+  focusedBlock = null;
   renderCanvas();
   updateZoomLabel();
   area.scrollLeft = 0;
@@ -728,6 +732,10 @@ function renderCanvas(){
 
   if(blockMode){
     drawBlockOverlay(cell);
+  }else if(focusedBlock){
+    // 一覧からブロックへジャンプした直後は、進捗タップこそ無効化するが
+    // 「今どのブロックの範囲内にいるか」を見失わないよう、そのブロックの枠と番号だけ残す
+    drawFocusedBlockOutline(cell);
   }
 
   // タップして調べたマスのハイライト（座標・使用色をはっきり分かるように、常に最前面に描く）
@@ -828,6 +836,37 @@ function drawBlockOverlay(cell){
       }
     }
   }
+}
+
+// 一覧から特定ブロックへジャンプした直後専用の、軽量な枠線表示
+// (drawBlockOverlayと違い全体を覆わない。境界線と番号だけをそのブロックの範囲に描く)
+function drawFocusedBlockOutline(cell){
+  const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
+  const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
+  const { bx, by } = focusedBlock;
+  if(bx >= blocksX || by >= blocksY){ focusedBlock = null; return; }
+
+  const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
+  const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
+  const px = bx * BLOCK_SIZE * cell, py = by * BLOCK_SIZE * cell;
+  const dark = document.body.classList.contains("dark");
+
+  ctx.strokeStyle = dark ? "rgba(232,201,60,0.9)" : "rgba(177,80,59,0.85)";
+  ctx.lineWidth = 2.5;
+  const half = ctx.lineWidth / 2;
+  ctx.strokeRect(px + half, py + half, bw * cell - ctx.lineWidth, bh * cell - ctx.lineWidth);
+
+  const num = by * blocksX + bx + 1;
+  const label = String(num).padStart(2, "0");
+  const fontSize = Math.max(9, Math.floor(cell * 0.14));
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  ctx.font = `bold ${fontSize}px sans-serif`;
+  ctx.lineWidth = Math.max(1, fontSize * 0.22);
+  ctx.strokeStyle = "rgba(0,0,0,0.7)";
+  ctx.strokeText(label, px + 3, py + 2);
+  ctx.fillStyle = "rgba(255,255,255,0.95)";
+  ctx.fillText(label, px + 3, py + 2);
 }
 
 // ── ポインター操作（マウス・タッチ・Apple Pencil共通） ──
@@ -1110,17 +1149,22 @@ function renderBlockList(){
   if(!el) return;
   if(!blockMode){
     el.innerHTML = "";
+    el.style.gridTemplateColumns = "";
     return;
   }
   const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
   const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
-  const statusIcon = { 0: "□", 1: "◐", 2: "✓" };
+  // 実際のキャンバス配置（横blocksX×縦blocksY）と同じ並びのグリッドにする。
+  // 単純な固定3列の数字リストだと、目的のブロックがキャンバス上のどこに
+  // あるか一覧内で見た目から判断できず探しにくいため、見たままの位置で選べるようにする
+  el.style.gridTemplateColumns = `repeat(${blocksX}, 1fr)`;
+  const statusIcon = { 0: "", 1: "◐", 2: "✓" };
   let html = "";
   for(let by = 0; by < blocksY; by++){
     for(let bx = 0; bx < blocksX; bx++){
       const num = by * blocksX + bx + 1;
       const status = blockStatus[blockKey(bx, by)] || 0;
-      html += `<button class="art-block-btn art-block-status-${status}" onclick="zoomToBlock(${bx},${by})">${statusIcon[status]} ${String(num).padStart(2, "0")}</button>`;
+      html += `<button class="art-block-btn art-block-status-${status}" onclick="zoomToBlock(${bx},${by})" aria-label="${num}">${statusIcon[status]}${num}</button>`;
     }
   }
   el.innerHTML = html;
@@ -1128,6 +1172,7 @@ function renderBlockList(){
 
 function zoomToBlock(bx, by){
   blockMode = false;
+  focusedBlock = { bx, by };
   const toggle = document.getElementById("artBlockModeToggle");
   if(toggle) toggle.checked = false;
 
@@ -1301,6 +1346,7 @@ function loadDesign(id){
   pixels = design.pixelData.slice();
   blockStatus = { ...(design.blockStatus || {}) };
   inspectedCell = null;
+  focusedBlock = null;
   currentDesignId = design.id;
   activeFrameId = design.frameId || null;
   activePartId = design.partId || null;
