@@ -1,27 +1,34 @@
 // js/music-editor.js
 // 「楽譜」ページ（music.html）のエディター
-// 譜面の手入力（音程・臨時記号・オクターブ・音の長さ・小節区切り）、LocalStorageへの保存、
-// 練習（なぞり）モード（可変速自動再生／停止中のタップ先取り／簡易合成音）を扱う
+// 譜面の手入力（音程・臨時記号・オクターブ・音の長さ・拍子）、演奏をそのまま録音する入力、
+// LocalStorageへの保存、練習（なぞり）モード（可変速自動再生／停止中のタップ先取り／
+// 押した長さで音が鳴る簡易合成音）を扱う
 
 const DRAFT_KEY = "hatopiMusic_currentDraft";
 const SAVED_SCORES_KEY = "hatopiMusic_savedScores";
 
 let pageMode = "edit"; // "edit" | "practice"
 let currentInstrumentId = "piano";
-let tokens = []; // {type:"note", degree, accidental, octave, beats} | {type:"bar"}
+let tokens = []; // {degree, accidental, octave, beats}
 let selectedDurationId = "quarter";
+let isRecording = false; // 編集モード：ONの間はボタンを押した長さがそのまま音の長さになる
 let bpm = DEFAULT_BPM;
+let timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
 let scoreName = "";
 let currentScoreId = null;
 let savedScores = [];
 
 let soundEnabled = true;
 let audioCtx = null;
+let sustainedOsc = null;
+let sustainedGain = null;
 
 let isPlaying = false;
 let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
 let playTimer = null;
+
+let activeHold = null; // 演奏ボタンを押している間の情報 {note, btn, startTime}
 
 // ── 初期化 ──
 function initMusicEditor() {
@@ -32,6 +39,7 @@ function initMusicEditor() {
     tokens = draft.tokens;
     currentInstrumentId = draft.instrumentId || "piano";
     bpm = draft.bpm || DEFAULT_BPM;
+    timeSignatureId = draft.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
   }
@@ -41,11 +49,13 @@ function initMusicEditor() {
 
   renderInstrumentSelector();
   renderDurationOptions();
+  renderTimeSignatureOptions();
   renderInstrumentGrid();
   renderScoreDisplay();
   renderScoreMeta();
   updateSoundToggleUI();
   updateModeUI();
+  updateRecordingUI();
   bindControls();
 }
 
@@ -71,7 +81,7 @@ function selectInstrument(id) {
   saveDraftDebounced();
 }
 
-// ── 楽器の演奏ボタン（実機の配置を再現） ──
+// ── 楽器の演奏ボタン（実機の配置を再現。押している間だけ音が鳴る） ──
 function renderInstrumentGrid() {
   const el = document.getElementById("musicInstrumentGrid");
   const inst = getInstrument(currentInstrumentId);
@@ -94,27 +104,78 @@ function renderInstrumentGrid() {
     .join("");
   el.querySelectorAll(".music-note-btn").forEach((btn) => {
     const note = JSON.parse(btn.dataset.note);
-    btn.addEventListener("click", () => handleInstrumentTap(note));
+    bindNoteButtonHold(btn, note);
   });
 }
 
-function handleInstrumentTap(note) {
-  const beats = pageMode === "edit" ? getDuration(selectedDurationId).beats : cursorTapBeats(note);
-  playTone(noteFrequency(note), (60 / bpm) * beats);
+// 演奏ボタンの「押す・離す」を扱う。押している長さで練習モードの音の長さ・
+// 録音時の音の長さが決まる（和音は非対応：新しい音を押したら前の音は終わる）
+function bindNoteButtonHold(btn, note) {
+  const start = (e) => {
+    e.preventDefault();
+    if (activeHold) endHold();
+    try {
+      btn.setPointerCapture(e.pointerId);
+    } catch (err) {}
+    btn.classList.add("pressed");
+    activeHold = { note, btn, startTime: performance.now() };
+    handleNotePress(note);
+  };
+  const end = (e) => {
+    if (!activeHold || activeHold.btn !== btn) return;
+    endHold();
+  };
+  btn.addEventListener("pointerdown", start);
+  btn.addEventListener("pointerup", end);
+  btn.addEventListener("pointercancel", end);
+}
+
+function endHold() {
+  if (!activeHold) return;
+  const { note, btn, startTime } = activeHold;
+  const heldMs = performance.now() - startTime;
+  btn.classList.remove("pressed");
+  activeHold = null;
+  stopSustainedTone();
+  handleNoteRelease(note, heldMs);
+}
+
+function handleNotePress(note) {
   if (pageMode === "edit") {
-    addNoteToken(note);
+    if (isRecording) {
+      startSustainedTone(noteFrequency(note));
+    } else {
+      const beats = getDuration(selectedDurationId).beats;
+      playTone(noteFrequency(note), (60 / bpm) * beats);
+      addNoteToken(note, beats);
+    }
   } else {
+    startSustainedTone(noteFrequency(note));
     tryAdvancePractice(note);
   }
 }
 
-function cursorTapBeats(note) {
-  const idx = nextNoteIndex(cursor);
-  if (idx !== null && notesEqual(tokens[idx], note)) return tokens[idx].beats;
-  return 1; // 期待している音と違う場合も、タップの手応え用に4分音符ぶんだけ鳴らす
+function handleNoteRelease(note, heldMs) {
+  if (pageMode === "edit" && isRecording) {
+    const rawBeats = heldMs / 1000 / (60 / bpm);
+    addNoteToken(note, snapBeatsToPreset(rawBeats));
+  }
 }
 
-// ── 音の長さ選択（編集モード用） ──
+function snapBeatsToPreset(rawBeats) {
+  let best = DURATION_PRESETS[0].beats;
+  let bestDiff = Infinity;
+  DURATION_PRESETS.forEach((d) => {
+    const diff = Math.abs(d.beats - rawBeats);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = d.beats;
+    }
+  });
+  return best;
+}
+
+// ── 音の長さ選択（編集モード・非録音時用） ──
 function renderDurationOptions() {
   const el = document.getElementById("musicDurationOptions");
   el.innerHTML = DURATION_PRESETS.map(
@@ -128,16 +189,28 @@ function renderDurationOptions() {
   });
 }
 
-// ── 譜面の編集 ──
-function addNoteToken(note) {
-  tokens.push({ type: "note", degree: note.degree, accidental: note.accidental || null, octave: note.octave, beats: getDuration(selectedDurationId).beats });
-  renderScoreDisplay();
-  saveDraftDebounced();
+// ── 拍子選択 ──
+function renderTimeSignatureOptions() {
+  const el = document.getElementById("musicTimeSigSelect");
+  el.innerHTML = TIME_SIGNATURES.map((t) => `<option value="${t.id}"${t.id === timeSignatureId ? " selected" : ""}>${t.label}</option>`).join("");
 }
 
-function addBarToken() {
-  if (!tokens.length || tokens[tokens.length - 1].type === "bar") return;
-  tokens.push({ type: "bar" });
+// ── 録音トグル ──
+function toggleRecording() {
+  isRecording = !isRecording;
+  updateRecordingUI();
+}
+
+function updateRecordingUI() {
+  const toggle = document.getElementById("musicRecordToggle");
+  if (toggle) toggle.checked = isRecording;
+  document.getElementById("musicDurationOptions").classList.toggle("disabled", isRecording);
+  document.getElementById("musicRecordHint").style.display = isRecording ? "" : "none";
+}
+
+// ── 譜面の編集 ──
+function addNoteToken(note, beats) {
+  tokens.push({ degree: note.degree, accidental: note.accidental || null, octave: note.octave, beats });
   renderScoreDisplay();
   saveDraftDebounced();
 }
@@ -156,23 +229,30 @@ function clearScore() {
   saveDraftDebounced();
 }
 
-// ── 譜面の表示（編集中のプレビュー／練習モードのハイライト共通） ──
+// ── 譜面の表示（編集中のプレビュー／練習モードのハイライト共通）。
+// 小節線は保存せず、拍子(timeSignature)をもとに毎回その場で計算して表示する ──
 function renderScoreDisplay() {
   const el = document.getElementById("musicScoreDisplay");
   if (!tokens.length) {
     el.innerHTML = `<div class="music-score-empty">${T("music_score_empty", "まだ音が入力されていません")}</div>`;
     return;
   }
-  el.innerHTML = tokens
-    .map((tok, i) => {
-      if (tok.type === "bar") return `<span class="music-chip music-chip-bar"></span>`;
-      const current = pageMode === "practice" && i === cursor;
-      return `<span class="music-chip${current ? " current" : ""}" data-index="${i}">
-        <span class="music-note-digit">${noteDisplayDigit(tok)}</span>
-        <span class="music-note-kana">${DEGREE_LABELS[tok.degree]}</span>
-      </span>`;
-    })
-    .join("");
+  const beatsPerBar = getTimeSignature(timeSignatureId).beatsPerBar;
+  let html = "";
+  let beatsSinceBar = 0;
+  tokens.forEach((tok, i) => {
+    if (i > 0 && beatsSinceBar >= beatsPerBar) {
+      html += `<span class="music-chip music-chip-bar"></span>`;
+      beatsSinceBar = 0;
+    }
+    const current = pageMode === "practice" && i === cursor;
+    html += `<span class="music-chip${current ? " current" : ""}" data-index="${i}">
+      <span class="music-note-digit">${noteDisplayDigit(tok)}</span>
+      <span class="music-note-kana">${DEGREE_LABELS[tok.degree]}</span>
+    </span>`;
+    beatsSinceBar += tok.beats;
+  });
+  el.innerHTML = html;
 
   if (pageMode === "practice" && cursor >= 0) {
     const cur = el.querySelector(".music-chip.current");
@@ -183,11 +263,14 @@ function renderScoreDisplay() {
 function renderScoreMeta() {
   document.getElementById("musicScoreNameInput").value = scoreName;
   document.getElementById("musicBpmInput").value = bpm;
+  const timeSigSelect = document.getElementById("musicTimeSigSelect");
+  if (timeSigSelect) timeSigSelect.value = timeSignatureId;
 }
 
 // ── モード切り替え(編集/練習) ──
 function setPageMode(mode) {
   if (pageMode === mode) return;
+  if (activeHold) endHold();
   stopPlayback();
   pageMode = mode;
   cursor = -1;
@@ -201,17 +284,14 @@ function updateModeUI() {
   document.getElementById("musicEditControls").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicScoreEditRow").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicPracticeControls").style.display = pageMode === "practice" ? "" : "none";
-  // 練習モードでは、画面幅に合わせて縮めず実機に近い固定サイズで表示する
+  // 練習モードでは、画面幅に合わせて縮めず実機に近いサイズで表示する
   // （はみ出す分は横スクロール。編集モードは今まで通り画面幅に収める）
   document.getElementById("musicInstrumentGrid").classList.toggle("practice-size", pageMode === "practice");
 }
 
 // ── 練習(なぞり)モード：再生 ──
 function nextNoteIndex(fromIdx) {
-  for (let i = fromIdx + 1; i < tokens.length; i++) {
-    if (tokens[i].type === "note") return i;
-  }
-  return null;
+  return fromIdx + 1 < tokens.length ? fromIdx + 1 : null;
 }
 
 function tryAdvancePractice(note) {
@@ -297,6 +377,7 @@ function ensureAudioCtx() {
   return audioCtx;
 }
 
+// 一定の長さだけ自動で鳴らす（自動再生用）
 function playTone(freq, durationSec) {
   if (!soundEnabled) return;
   try {
@@ -320,6 +401,42 @@ function playTone(freq, durationSec) {
   }
 }
 
+// 押している間だけ鳴らし続ける（練習モード・録音入力用）
+function startSustainedTone(freq) {
+  if (!soundEnabled) return;
+  try {
+    stopSustainedTone();
+    const ctx = ensureAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = freq;
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(0.22, now + 0.01);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(now);
+    sustainedOsc = osc;
+    sustainedGain = gain;
+  } catch (e) {
+    // Web Audio非対応環境では無音のまま無視する
+  }
+}
+
+function stopSustainedTone() {
+  if (!sustainedOsc) return;
+  try {
+    const ctx = ensureAudioCtx();
+    const now = ctx.currentTime;
+    sustainedGain.gain.cancelScheduledValues(now);
+    sustainedGain.gain.setValueAtTime(sustainedGain.gain.value, now);
+    sustainedGain.gain.linearRampToValueAtTime(0, now + 0.05);
+    sustainedOsc.stop(now + 0.08);
+  } catch (e) {}
+  sustainedOsc = null;
+  sustainedGain = null;
+}
+
 function toggleSound() {
   soundEnabled = !soundEnabled;
   updateSoundToggleUI();
@@ -337,7 +454,7 @@ function updateSoundToggleUI() {
 function saveDraft() {
   localStorage.setItem(
     DRAFT_KEY,
-    JSON.stringify({ tokens, instrumentId: currentInstrumentId, bpm, name: scoreName, scoreId: currentScoreId })
+    JSON.stringify({ tokens, instrumentId: currentInstrumentId, bpm, timeSignatureId, name: scoreName, scoreId: currentScoreId })
   );
 }
 
@@ -378,6 +495,7 @@ function saveCurrentAsScore() {
     existing.name = scoreName || T("music_default_score_name", "譜面");
     existing.instrumentId = currentInstrumentId;
     existing.bpm = bpm;
+    existing.timeSignatureId = timeSignatureId;
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
     persistSavedScores();
@@ -389,6 +507,7 @@ function saveCurrentAsScore() {
     name: scoreName || T("music_default_score_name", "譜面"),
     instrumentId: currentInstrumentId,
     bpm,
+    timeSignatureId,
     tokens: tokens.slice(),
     updatedAt: Date.now(),
   };
@@ -405,6 +524,7 @@ function newScore() {
   scoreName = "";
   currentScoreId = null;
   bpm = DEFAULT_BPM;
+  timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
   renderScoreMeta();
   renderScoreDisplay();
   saveDraft();
@@ -432,7 +552,7 @@ function renderSavedList() {
     <div class="music-saved-item${s.id === currentScoreId ? " current" : ""}">
       <div class="music-saved-info">
         <div class="music-saved-name">${escapeHtml(s.name)}</div>
-        <div class="music-saved-meta">${T(getInstrument(s.instrumentId).nameKey, getInstrument(s.instrumentId).nameFallback)} ・ ${s.tokens.filter((t) => t.type === "note").length}${T("music_note_count_suffix", "音")}</div>
+        <div class="music-saved-meta">${T(getInstrument(s.instrumentId).nameKey, getInstrument(s.instrumentId).nameFallback)} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")}</div>
       </div>
       <div class="music-saved-actions">
         <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
@@ -450,6 +570,7 @@ function loadScore(id) {
   tokens = score.tokens.slice();
   currentInstrumentId = score.instrumentId;
   bpm = score.bpm || DEFAULT_BPM;
+  timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
   scoreName = score.name;
   currentScoreId = score.id;
   cursor = -1;
@@ -509,8 +630,14 @@ function bindControls() {
     e.target.value = bpm;
     saveDraftDebounced();
   });
+  document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {
+    timeSignatureId = e.target.value;
+    renderScoreDisplay();
+    saveDraftDebounced();
+  });
 
-  document.getElementById("musicAddBarBtn").addEventListener("click", addBarToken);
+  document.getElementById("musicRecordToggle").addEventListener("change", toggleRecording);
+
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);
   document.getElementById("musicClearBtn").addEventListener("click", clearScore);
 

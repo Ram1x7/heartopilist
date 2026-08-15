@@ -484,7 +484,7 @@
   "music_dur_whole": "全音符",
   "music_playback_label": "再生",
   "music_speed_suffix": "倍",
-  "music_practice_hint": "停止中でも、次に弾く音を正しくタップすると先へ進みます。",
+  "music_practice_hint": "ボタンを押している間だけ音が鳴ります。停止中でも、次に弾く音を正しく押すと先へ進みます。",
   "music_saved_title": "保存した譜面",
   "music_saved_empty": "保存した譜面はまだありません",
   "music_open": "開く",
@@ -496,5 +496,8 @@
   "music_default_score_name": "譜面",
   "music_toast_saved": "保存しました",
   "music_toast_updated": "更新しました",
-  "music_note_count_suffix": "音"
+  "music_note_count_suffix": "音",
+  "music_timesig_label": "拍子",
+  "music_record_toggle": "録音する",
+  "music_record_hint": "押している長さがそのまま音の長さになります（和音は非対応）"
 }

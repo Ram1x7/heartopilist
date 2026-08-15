@@ -105,3 +105,19 @@ function getDuration(id) {
 const DEFAULT_BPM = 100;
 const MIN_BPM = 40;
 const MAX_BPM = 220;
+
+// 拍子プリセット（beatsPerBarは4分音符=1拍換算での1小節あたりの拍数。
+// 例えば6/8は8分音符6つ=4分音符換算で3拍として小節線の位置を計算する）
+const TIME_SIGNATURES = [
+  { id: "4/4", label: "4/4", beatsPerBar: 4 },
+  { id: "3/4", label: "3/4", beatsPerBar: 3 },
+  { id: "2/4", label: "2/4", beatsPerBar: 2 },
+  { id: "2/2", label: "2/2", beatsPerBar: 4 },
+  { id: "6/8", label: "6/8", beatsPerBar: 3 },
+  { id: "3/8", label: "3/8", beatsPerBar: 1.5 },
+];
+const DEFAULT_TIME_SIGNATURE_ID = "4/4";
+
+function getTimeSignature(id) {
+  return TIME_SIGNATURES.find((t) => t.id === id) || TIME_SIGNATURES[0];
+}

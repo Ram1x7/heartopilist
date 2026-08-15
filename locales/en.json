@@ -484,7 +484,7 @@
   "music_dur_whole": "Whole",
   "music_playback_label": "Playback",
   "music_speed_suffix": "x",
-  "music_practice_hint": "Even while stopped, tapping the correct next note will advance the highlight.",
+  "music_practice_hint": "Notes sound only while you hold the button. Even while stopped, pressing the correct next note will advance the highlight.",
   "music_saved_title": "Saved Scores",
   "music_saved_empty": "No saved scores yet",
   "music_open": "Open",
@@ -496,5 +496,8 @@
   "music_default_score_name": "Score",
   "music_toast_saved": "Saved",
   "music_toast_updated": "Updated",
-  "music_note_count_suffix": " notes"
+  "music_note_count_suffix": " notes",
+  "music_timesig_label": "Time Sig.",
+  "music_record_toggle": "Record",
+  "music_record_hint": "How long you hold the button becomes the note's length (chords are not supported)."
 }

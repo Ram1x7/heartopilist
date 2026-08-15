@@ -460,7 +460,7 @@
   "music_dur_whole": "เต็มตัว",
   "music_playback_label": "เล่น",
   "music_speed_suffix": "เท่า",
-  "music_practice_hint": "แม้ขณะหยุดเล่น หากแตะโน้ตถัดไปได้ถูกต้อง ไฮไลต์จะเลื่อนไปข้างหน้า",
+  "music_practice_hint": "เสียงจะดังเฉพาะขณะที่กดปุ่มค้างไว้เท่านั้น แม้ขณะหยุดเล่น หากกดโน้ตถัดไปได้ถูกต้อง ไฮไลต์จะเลื่อนไปข้างหน้า",
   "music_saved_title": "โน้ตที่บันทึกไว้",
   "music_saved_empty": "ยังไม่มีโน้ตที่บันทึกไว้",
   "music_open": "เปิด",
@@ -472,5 +472,8 @@
   "music_default_score_name": "โน้ตเพลง",
   "music_toast_saved": "บันทึกแล้ว",
   "music_toast_updated": "อัปเดตแล้ว",
-  "music_note_count_suffix": " โน้ต"
+  "music_note_count_suffix": " โน้ต",
+  "music_timesig_label": "จังหวะเพลง",
+  "music_record_toggle": "บันทึกเสียง",
+  "music_record_hint": "ระยะเวลาที่กดค้างจะกลายเป็นความยาวของโน้ตนั้น（ไม่รองรับคอร์ด）"
 }
