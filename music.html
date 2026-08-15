@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title data-i18n="page_title_music">楽譜｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_music" content="Heartopia（ハートピアスローライフ）の楽器演奏用に、数字譜（簡譜）をブラウザ上で作成・保存し、練習できるツールです。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | 楽譜">
+<meta property="og:description" content="Heartopia向けの数字譜をブラウザ上で作成・保存・練習できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/music.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | 楽譜">
+<meta name="twitter:description" content="Heartopia向けの数字譜をブラウザ上で作成・保存・練習できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=3">
+<link rel="stylesheet" href="./css/music.css?v=1">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./faq.html">
+<link rel="prefetch" href="./art-create.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./music.html" class="site-nav-item active" data-i18n="nav_music">楽譜</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+</nav>
+
+<div class="page-header">
+  <h1 data-i18n="music_page_title">楽譜</h1>
+  <p class="page-subtitle" data-i18n="music_page_subtitle">数字譜を作成・保存し、演奏を練習できます</p>
+</div>
+
+<div class="music-notice" data-i18n="music_coming_soon">
+  現在開発中の機能です。今後のアップデートで順次使えるようになります。
+</div>
+
+<div class="music-mode-tabs">
+  <button class="music-mode-btn active" id="musicModeEditBtn" data-i18n="music_mode_edit">編集</button>
+  <button class="music-mode-btn" id="musicModePracticeBtn" data-i18n="music_mode_practice">練習</button>
+  <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="toggle sound"></button>
+</div>
+
+<div class="music-layout">
+  <div class="music-panel-section">
+    <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
+    <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
+  </div>
+
+  <div class="music-panel-section" id="musicEditControls">
+    <div class="music-score-meta-row">
+      <input type="text" id="musicScoreNameInput" class="music-score-name-input" placeholder="曲名" data-i18n-placeholder="music_score_name_placeholder">
+      <div class="music-bpm-row">
+        <span data-i18n="music_bpm_label">テンポ</span>
+        <input type="number" id="musicBpmInput" class="music-bpm-input" min="40" max="220" value="100">
+        <span data-i18n="music_bpm_unit">BPM</span>
+      </div>
+    </div>
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicNewBtn" data-i18n="music_new">新規作成</button>
+      <button class="music-header-btn" id="musicSaveBtn" data-i18n="music_save">保存する</button>
+      <button class="music-header-btn" id="musicOpenListBtn" data-i18n="music_open_list">一覧を見る</button>
+    </div>
+  </div>
+
+  <div class="music-panel-section" id="musicPracticeControls" style="display:none">
+    <div class="music-panel-title" data-i18n="music_playback_label">再生</div>
+    <div class="music-playback-row">
+      <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="play/pause"></button>
+      <div class="music-speed-control">
+        <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1">
+        <span id="musicSpeedLabel">1.00倍</span>
+      </div>
+    </div>
+    <p class="music-practice-hint" data-i18n="music_practice_hint">停止中でも、次に弾く音を正しくタップすると先へ進みます。</p>
+  </div>
+
+  <div class="music-panel-section">
+    <div class="music-panel-title" data-i18n="music_score_label">譜面</div>
+    <div class="music-score-display" id="musicScoreDisplay"></div>
+    <div class="music-panel-btn-row" id="musicScoreEditRow">
+      <div class="music-duration-options" id="musicDurationOptions"></div>
+      <div class="music-panel-btn-row">
+        <button class="music-header-btn" id="musicAddBarBtn" data-i18n="music_add_bar">小節線</button>
+        <button class="music-header-btn" id="musicDeleteLastBtn" data-i18n="music_delete_last">最後を削除</button>
+        <button class="music-header-btn" id="musicClearBtn" data-i18n="music_clear_all">全消去</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="music-panel-section">
+    <div class="music-panel-title" data-i18n="music_perform_label">演奏</div>
+    <div class="music-instrument-grid" id="musicInstrumentGrid"></div>
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<div id="musicSavedListModal" onclick="if(event.target.id==='musicSavedListModal') closeSavedListModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box music-saved-box">
+    <h3 data-i18n="music_saved_title">保存した譜面</h3>
+    <div class="music-saved-list" id="musicSavedList"></div>
+    <button class="modal-close-btn" onclick="closeSavedListModal()" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box music-help-box">
+    <h3 style="text-align:center;">使い方</h3>
+
+    <p><strong>楽器</strong><br>
+    ピアノ・ギター/ベース・オカリナ/ほら貝の3種類から選べます。ゲーム内の実際の演奏画面と同じボタン配置です。楽器によって音域や半音（♯）の有無が異なります。</p>
+
+    <p style="margin-top:10px;"><strong>編集モード</strong><br>
+    「音の長さ」を選んでから演奏ボタンをタップすると、その音が譜面に追加されます。「小節線」で区切りを入れられます。「最後を削除」で1つ前に戻せます。</p>
+
+    <p style="margin-top:10px;"><strong>テンポ</strong><br>
+    BPM（1分間の拍数）を設定できます。練習モードの再生速度はこのテンポを基準にした倍率です。</p>
+
+    <p style="margin-top:10px;"><strong>練習モード</strong><br>
+    譜面を0.1〜1.0倍速で自動再生できます。再生を止めていても、次に弾くべき音を正しくタップすると譜面のハイライトが先へ進みます。採点はありません。</p>
+
+    <p style="margin-top:10px;"><strong>音</strong><br>
+    タップすると簡易的な合成音が鳴ります（ゲーム内の実際の音とは異なります）。右上のボタンでON/OFFを切り替えられます。</p>
+
+    <p style="margin-top:10px;"><strong>保存</strong><br>
+    「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。ログイン不要で、ブラウザ内にのみ保存されます。</p>
+
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="musicToast"></div>
+
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script>
+
+document.getElementById("helpBtn").innerHTML = icon("help");
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// 多言語ヘルパー
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars);
+  }
+  return fallback;
+}
+
+</script>
+<script src="js/music-config.js"></script>
+<script src="js/music-editor.js"></script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>
