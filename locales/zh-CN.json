@@ -475,5 +475,5 @@
   "music_note_count_suffix": "音",
   "music_timesig_label": "拍号",
   "music_record_toggle": "录制",
-  "music_record_hint": "按住的时长将直接成为该音的长度（不支持和弦）"
+  "music_record_hint": "按住的时长将直接成为该音的长度。同时按住多个按钮即可录制和弦"
 }
