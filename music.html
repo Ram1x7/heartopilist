@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=3">
-<link rel="stylesheet" href="./css/music.css?v=6">
+<link rel="stylesheet" href="./css/music.css?v=7">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -126,6 +126,16 @@
     <div id="musicScoreDisplayAnchorEdit">
       <div class="music-score-display" id="musicScoreDisplay"></div>
     </div>
+    <div class="music-loop-row" id="musicLoopRow">
+      <button class="music-header-btn" id="musicLoopSelectBtn">区間を選ぶ</button>
+      <span class="music-loop-range" id="musicLoopRangeLabel" style="display:none"></span>
+      <label class="music-loop-toggle" id="musicLoopToggleRow" style="display:none">
+        <input type="checkbox" id="musicLoopToggle">
+        <span data-i18n="music_loop_enabled">この区間をループ</span>
+      </label>
+      <button class="music-header-btn" id="musicLoopClearBtn" style="display:none" data-i18n="music_loop_clear">解除</button>
+    </div>
+    <p class="music-record-hint" id="musicLoopHint" style="display:none">譜面の音をタップして、開始の音を選んでください</p>
     <div class="music-panel-btn-row" id="musicScoreEditRow">
       <label class="music-record-toggle-row">
         <span data-i18n="music_record_toggle">録音する</span>
@@ -217,6 +227,9 @@
 
     <p style="margin-top:10px;"><strong>テンポ・拍子</strong><br>
     BPM（1分間の拍数）と拍子（4/4・3/4など）を設定できます。練習モードの再生速度はテンポを基準にした倍率です。小節線は拍子をもとに自動で表示されます。</p>
+
+    <p style="margin-top:10px;"><strong>区間リピート</strong><br>
+    「区間を選ぶ」を押してから譜面の音を2つタップすると、その間を区間として選べます。「この区間をループ」をONにすると、練習モード・追従モードの再生（タップでの先取りも含む）が、区間の終わりに来ると自動で区間の始めに戻ります。苦手な部分だけを集中して繰り返し練習できます。「解除」でいつでも区間を消せます。</p>
 
     <p style="margin-top:10px;"><strong>練習モード</strong><br>
     「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列／22キーなど）がそのまま自動で使われます。ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。再生を止めていても、次に弾くべき音を正しく押すと譜面のハイライトが先へ進みます。採点はありません。左上の×で編集モードに戻れます。</p>
