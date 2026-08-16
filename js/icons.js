@@ -78,6 +78,7 @@ const ICONS = {
   tent: `<path d="M12 4 4 20h16Z"/><path d="M12 4v16M8 20l4-9 4 9"/>`,
   idea: `<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/>`,
   wrench: `<path d="M14.5 6.5a3.5 3.5 0 0 1-4.6 4.6L5 16l3 3 4.9-4.9a3.5 3.5 0 0 1 4.6-4.6l-2.7 2.7-2-2Z"/>`,
+  lock: `<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/>`,
   checklist: `<rect x="4" y="3.5" width="16" height="17" rx="2.2"/><path d="M8 8.5h8M8 12h8M8 15.5h5"/><path d="m7 8.2.6.6L9 7.4" opacity="0"/>`,
   clock: `<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>`,
   shirt: `<path d="M8 4 5 6.5 6.5 9l1.7-1V20h7.6V8l1.7 1 1.5-2.5L16 4c-1 1.4-2.5 2.2-4 2.2S9 5.4 8 4Z"/>`,

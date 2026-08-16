@@ -646,6 +646,8 @@ body.dark .music-note-kana{
    コンテナクエリ(cqh)を使うことで、JSでのリサイズ計算なしに常に画面へ
    ぴったり収まるサイズを算出できる */
 .music-instrument-grid.practice-size{
+  position:relative;
+  z-index:1; /* 背景に重ねる実機画像(#musicCalibBgImage, z-index:0)より上に表示する */
   width:100%;
   height:100%;
   display:flex;
@@ -663,14 +665,136 @@ body.dark .music-note-kana{
   container-type:size;
 }
 
-/* 実機と見比べると、ぴったりフィットさせるより少し拡大した方が実機の見た目に
-   近い。レイアウト計算（コンテナクエリのサイズ）には影響しないtransform:scale
-   で見た目だけ拡大し、その後translateYで上下位置を微調整する。
-   env(safe-area-inset-top)は使わない：iPadの横向きではほぼ0で補正が効かず、
-   さらに縦持ち端末をCSSで横画面に回転させる仕組み（下記@media (orientation:portrait)）
-   の中では、回転後の見た目の向きと物理的な安全領域の向きがズレてしまうため */
-.music-practice-stage .music-stage-frame{
-  transform:translateY(-0.6vh) scale(1.05);
+/* ボタンの大きさ・位置は端末によって「ちょうど良い」感覚に個人差・機種差があるため、
+   固定値ではなくユーザーが調整モードで拡大縮小・移動でき、その値をlocalStorageに
+   保存して端末ごとに記憶する（js/music-editor.jsのapplyCalibTransform）。
+   調整していない場合のデフォルト値もJS側(MUSIC_CALIB_DEFAULT)で管理する */
+
+/* 調整モード中、位置合わせの目安として実機のスクリーンショットを薄く背景表示できる。
+   画像は保存せずその場限り（js/music-editor.jsでURL.createObjectURLを都度発行） */
+#musicCalibBgImage{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0.55;
+  pointer-events:none;
+  z-index:0;
+  display:none;
+}
+
+/* 調整モード中だけ表示する、ドラッグ・ピンチ操作を受け止める透明レイヤー。
+   演奏ボタンより上、上部バー(z-index:2)より下に置き、誤って音が鳴るのを防ぎつつ
+   上部バーの操作（ロック・終了など）はそのまま行える */
+.music-calib-catcher{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:1;
+  touch-action:none;
+  cursor:move;
+}
+
+.music-practice-stage.calibrating .music-calib-catcher{
+  display:block;
+}
+
+.music-calib-toggle-btn{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+}
+
+.music-calib-toggle-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .music-calib-toggle-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .music-calib-toggle-btn.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* 調整モード中に画面下部へ出す操作パネル（背景画像を選ぶ／リセット／ロック） */
+.music-calib-overlay{
+  display:none;
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:3;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  box-sizing:border-box;
+  background:linear-gradient(rgba(52,48,43,0), rgba(52,48,43,0.55) 40%);
+}
+
+.music-practice-stage.calibrating .music-calib-overlay{
+  display:flex;
+}
+
+.music-calib-hint{
+  margin:0;
+  font-size:11px;
+  color:#fdf9ef;
+  text-align:center;
+}
+
+.music-calib-btn-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+}
+
+.music-calib-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px 14px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.music-calib-btn.music-calib-lock-btn{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .music-calib-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .music-calib-btn.music-calib-lock-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
 }
 
 /* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
