@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/art.css?v=28">
+<link rel="stylesheet" href="./css/art.css?v=29">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -219,7 +219,7 @@
     デザイン枠（衣装・家具など）で作成すると、実際に使われる部分を示す輪郭線が表示されます。輪郭線の外側もゲーム内の仕様どおり塗ることができます。</p>
 
     <p style="margin-top:10px;"><strong>ぬり方ガイド</strong><br>
-    「効率のいい順番を見る」を押すと、ゲーム内のバケツ（塗りつぶし）ツールを使う前提で、移動距離と色の切り替え回数が少なくなるように塗る順番を自動で計算し、1手ずつ案内します。同じ色でつながった範囲はまとめてバケツで塗ることを、離れた1マスだけの色は個別にタップして塗ることを提案します。</p>
+    「効率のいい順番を見る」を押すと、色ごとに手順をまとめて案内します。ゲーム内のバケツ（塗りつぶし）ツールは、隣の色との境目を先に塗って壁を作らないと、意図した範囲を越えて塗り広がってしまいます。そのため、隣に違う色がある「境目のマス」は丸印で個別にタップする場所として、周りを同じ色で囲まれた「内側のマス」は境目を塗ったあとバケツでまとめて塗れる場所として、色ごとにオレンジの枠と丸印で示します。マスが探しにくいときは右上の「拡大表示」で該当箇所に寄って確認できます。</p>
 
     <p style="margin-top:10px;"><strong>マイデザイン</strong><br>
     「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。「新規作成」から別サイズのキャンバスも作成できます。</p>
@@ -252,6 +252,7 @@
       <div class="art-guide-progress-label" id="artGuideProgressLabel"></div>
       <div class="art-guide-progress-bar"><div class="art-guide-progress-fill" id="artGuideProgressFill"></div></div>
     </div>
+    <button class="art-guide-zoom-btn" id="artGuideZoomBtn"></button>
     <button class="art-guide-close-btn" id="artGuideCloseBtn" aria-label="close"></button>
   </div>
   <div class="art-guide-canvas-wrap">
@@ -260,7 +261,7 @@
   <div class="art-guide-instruction">
     <div class="art-guide-color-chip" id="artGuideColorChip"></div>
     <div class="art-guide-info">
-      <div class="art-guide-method-badge" id="artGuideMethodBadge"></div>
+      <div class="art-guide-method-badges" id="artGuideMethodBadges"></div>
       <div class="art-guide-detail" id="artGuideDetail"></div>
     </div>
   </div>

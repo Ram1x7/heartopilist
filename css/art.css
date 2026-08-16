@@ -1437,6 +1437,25 @@ body.dark .art-guide-progress-fill{
   background:var(--indigo-soft);
 }
 
+.art-guide-zoom-btn{
+  flex-shrink:0;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text-sub);
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+body.dark .art-guide-zoom-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
 .art-guide-close-btn{
   flex-shrink:0;
   width:34px;
@@ -1497,13 +1516,19 @@ body.dark .art-guide-color-chip{
   min-width:0;
 }
 
+.art-guide-method-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:4px;
+}
+
 .art-guide-method-badge{
   display:inline-block;
   font-size:12px;
   font-weight:700;
   padding:3px 10px;
   border-radius:999px;
-  margin-bottom:4px;
 }
 
 .art-guide-method-badge.is-bucket{
