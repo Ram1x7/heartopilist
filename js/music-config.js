@@ -253,7 +253,9 @@ function getLayout(instrument, layoutId) {
 
 // 音の長さプリセット（4分音符=1拍として計算する）
 const DURATION_PRESETS = [
+  { id: "sixteenth", beats: 0.25, labelKey: "music_dur_sixteenth", labelFallback: "16分" },
   { id: "eighth", beats: 0.5, labelKey: "music_dur_eighth", labelFallback: "8分" },
+  { id: "dotted-eighth", beats: 0.75, labelKey: "music_dur_dotted_eighth", labelFallback: "付点8分" },
   { id: "quarter", beats: 1, labelKey: "music_dur_quarter", labelFallback: "4分" },
   { id: "dotted-quarter", beats: 1.5, labelKey: "music_dur_dotted_quarter", labelFallback: "付点4分" },
   { id: "half", beats: 2, labelKey: "music_dur_half", labelFallback: "2分" },

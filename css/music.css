@@ -390,6 +390,11 @@ body.dark .music-header-btn{
   border-color:var(--indigo-soft);
 }
 
+.music-header-btn:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
+
 #musicScoreEditRow{
   flex-direction:column;
   align-items:stretch;
@@ -555,6 +560,23 @@ body.dark .music-score-display{
 .music-chip.current .music-note-digit,
 .music-chip.current .music-note-kana{
   color:#fdf9ef;
+}
+
+/* 休符：他の音符と見分けやすいよう、枠を破線にして少し控えめな色にする */
+.music-chip.rest{
+  border-style:dashed;
+}
+
+.music-chip.rest .music-note-digit{
+  color:var(--text-sub);
+}
+
+.music-chip.rest.current .music-note-digit{
+  color:#fdf9ef;
+}
+
+body.dark .music-chip.rest .music-note-digit{
+  color:#b3a89a;
 }
 
 .music-chip-bar{
