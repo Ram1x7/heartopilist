@@ -699,7 +699,8 @@ body.dark .music-note-kana{
   inset:0;
   width:100%;
   height:100%;
-  object-fit:contain;
+  object-fit:cover; /* containだと画面より横長の端末で左右が余白になり画像が届かないため、
+                        cover で常に左右いっぱいに表示する（はみ出た上下は自動的に隠れる） */
   opacity:0.55;
   pointer-events:none;
   z-index:0;
