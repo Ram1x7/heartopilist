@@ -667,7 +667,7 @@ body.dark .music-note-kana{
    近い。レイアウト計算（コンテナクエリのサイズ）には影響しないtransform:scale
    で見た目だけ拡大し、その後translateYで上下位置を微調整する */
 .music-practice-stage .music-stage-frame{
-  transform:translateY(1vh) scale(1.05);
+  transform:translateY(0.3vh) scale(1.05);
 }
 
 /* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
