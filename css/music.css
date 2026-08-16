@@ -663,15 +663,6 @@ body.dark .music-note-kana{
   container-type:size;
 }
 
-/* 実機のスクショ座標検出により、中央寄せが理論値よりわずかにズレることが
-   判明したための補正。paddingで補正すると拡大率まで縮んでしまうため、
-   レイアウト計算に影響しないtransformでフレームだけを上下に寄せる。
-   実機スクショの自動座標解析(37ボタンの最小二乗フィット、残差0.4px以下)に
-   基づき算出した値 */
-.music-practice-stage .music-stage-frame{
-  transform:translateY(-1.95vh);
-}
-
 /* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
    高さも%で明示して真円を保つ（フレームの縦横比は1600:1118で固定なので、
    幅%×(1600/1118)が同じ見た目の大きさになる高さ%になる）。
@@ -871,13 +862,13 @@ body.dark .music-practice-stage-name{
 /* 演奏ボタン領域はステージ全体(position:fixed;inset:0の.music-practice-stage)を
    基準に中央寄せする。上部バー・譜面プレビューはその上に重ねる別要素のため、
    ここでの中央寄せ計算には影響しない（実機と同じく画面全体を基準にできる）。
-   paddingは高さの取り分（＝フレームの拡大率）にも影響するため、上下対称の
-   最小限の値に留める。実機とのわずかな縦ズレはフレーム自体のtransformで
-   補正する（下記.music-stage-frame）ことで、拡大率を犠牲にしない */
+   実機の演奏画面にはセーフエリア分の余白は存在しないため、paddingは上下左右
+   対称の最小値に留め、コンテナの実効サイズ（＝フレームの拡大率）を削らない。
+   上下左右が対称なので、中央寄せもtransformなしで自然に成立する */
 .music-practice-stage #musicInstrumentGridAnchorPractice{
   position:absolute;
   inset:0;
-  padding:6px 10px calc(6px + env(safe-area-inset-bottom));
+  padding:6px 10px;
   box-sizing:border-box;
   display:flex;
   align-items:center;
