@@ -1551,6 +1551,16 @@ body.dark .art-guide-method-badge.is-tap{
   color:#9ad0f0;
 }
 
+.art-guide-method-badge.is-note{
+  background:rgba(200,168,107,0.22);
+  color:#8a6d2f;
+}
+
+body.dark .art-guide-method-badge.is-note{
+  background:rgba(200,168,107,0.3);
+  color:#e8d2a8;
+}
+
 .art-guide-detail{
   font-size:13px;
   font-weight:700;
