@@ -450,6 +450,7 @@
   "music_score_label": "乐谱",
   "music_add_bar": "小节线",
   "music_add_rest": "添加休止符",
+  "music_duration_hint": "上方选择的时值，会同时用于用演奏按钮输入的音符，以及「添加休止符」添加的休止符",
   "music_delete_last": "删除最后一个",
   "music_loop_select": "选择区间",
   "music_loop_selecting": "取消选择",

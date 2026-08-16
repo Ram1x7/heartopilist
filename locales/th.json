@@ -450,6 +450,7 @@
   "music_score_label": "โน้ตเพลง",
   "music_add_bar": "เส้นห้อง",
   "music_add_rest": "เพิ่มตัวหยุด",
+  "music_duration_hint": "ความยาวที่เลือกไว้ด้านบนจะใช้ทั้งกับโน้ตที่ป้อนด้วยปุ่มเล่นและตัวหยุดที่เพิ่มด้วย \"เพิ่มตัวหยุด\"",
   "music_delete_last": "ลบตัวสุดท้าย",
   "music_loop_select": "เลือกช่วง",
   "music_loop_selecting": "ยกเลิกการเลือก",

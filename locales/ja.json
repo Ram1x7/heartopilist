@@ -474,6 +474,7 @@
   "music_score_label": "譜面",
   "music_add_bar": "小節線",
   "music_add_rest": "休符を追加",
+  "music_duration_hint": "上で選んでいる長さが、演奏ボタンで入力する音符にも「休符を追加」の休符にも使われます",
   "music_delete_last": "最後を削除",
   "music_loop_select": "区間を選ぶ",
   "music_loop_selecting": "選択をやめる",

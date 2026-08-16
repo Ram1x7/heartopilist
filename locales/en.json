@@ -474,6 +474,7 @@
   "music_score_label": "Score",
   "music_add_bar": "Bar Line",
   "music_add_rest": "Add rest",
+  "music_duration_hint": "The length selected above is used both for notes entered with the play buttons and for rests added with \"Add rest\"",
   "music_delete_last": "Delete Last",
   "music_loop_select": "Select section",
   "music_loop_selecting": "Cancel selection",
