@@ -663,6 +663,13 @@ body.dark .music-note-kana{
   container-type:size;
 }
 
+/* 実機と見比べると、ぴったりフィットさせるより少し拡大して下寄りにした方が
+   実機の見た目に近い。レイアウト計算（コンテナクエリのサイズ）には影響しない
+   transform:scaleで見た目だけ拡大し、その後translateYで下に寄せる */
+.music-practice-stage .music-stage-frame{
+  transform:translateY(1.5vh) scale(1.03);
+}
+
 /* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
    高さも%で明示して真円を保つ（フレームの縦横比は1600:1118で固定なので、
    幅%×(1600/1118)が同じ見た目の大きさになる高さ%になる）。
