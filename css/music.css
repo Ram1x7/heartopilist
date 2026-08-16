@@ -915,9 +915,15 @@ body.dark .music-calib-btn.music-calib-lock-btn{
   color:#fdf9ef;
 }
 
+/* ピアノの黒鍵（半音ボタン）は実機同様、ダークモードに関わらず常に黒で固定する */
 .music-note-btn.accidental{
-  background:var(--card);
-  border-color:var(--border);
+  background:#1a1a1a;
+  border-color:#000;
+}
+
+.music-note-btn.accidental .music-note-digit,
+.music-note-btn.accidental .music-note-kana{
+  color:#fdf9ef;
 }
 
 body.dark .music-note-btn{
@@ -926,7 +932,8 @@ body.dark .music-note-btn{
 }
 
 body.dark .music-note-btn.accidental{
-  background:#2c2823;
+  background:#1a1a1a;
+  border-color:#000;
 }
 
 /* 練習モード：全画面の専用ステージ。実機の指の感覚に合わせて練習できるよう、
@@ -976,6 +983,11 @@ body.dark .music-practice-stage{
   padding:6px 10px 0;
   box-sizing:border-box;
   pointer-events:none;
+  /* 演奏ボタンの長押し中に、この上に重なっているテキストがiOSの選択候補と
+     みなされコピー/調べるメニューが出てしまうのを防ぐ（子要素にも継承される） */
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
 }
 
 .music-practice-stage-overlay-top > *{
@@ -1004,6 +1016,8 @@ body.dark .music-practice-stage{
 }
 
 .music-practice-stage #musicPlaybackAnchorPractice .music-speed-control{
+  flex:none; /* 基本ルールのflex:1(flex-basis:0%)がwidthより優先されてしまい、
+                スライダーが伸びて右隣の調整・音量ボタンと重なっていたのを防ぐ */
   width:70px;
 }
 
@@ -1045,6 +1059,11 @@ body.dark .music-practice-exit-btn{
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
+  /* 演奏ボタンの長押し中にiOSがこのテキストを選択候補とみなし、
+     コピー/調べるメニューが出てしまうのを防ぐ */
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
 }
 
 body.dark .music-practice-stage-name{
