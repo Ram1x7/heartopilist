@@ -107,6 +107,9 @@ function initArtConverter(){
 
   document.getElementById("artUseInEditorBtn").addEventListener("click", useResultInEditor);
   document.getElementById("artAdjustCropBtn").addEventListener("click", () => openCropStage(false));
+
+  bindConvertTutorialControls();
+  maybeStartConvertTutorialPhase("upload");
 }
 
 // キャンバスサイズ選択（自由サイズ：比率→サイズレベルの2段階／デザイン枠：カテゴリ→アイテム→パーツ）
@@ -318,6 +321,7 @@ function openCropStage(reset){
     document.getElementById("artCropZoomSlider").value = Math.round(cropZoom * 100);
     applyCropTransform();
     bindCropInteractions();
+    maybeStartConvertTutorialPhase("crop");
   });
 }
 
@@ -392,6 +396,7 @@ function confirmCrop(){
   document.getElementById("artConvertPreview").style.display = "block";
   document.getElementById("artConvertPanel").style.display = "block";
   convert();
+  maybeStartConvertTutorialPhase("panel");
 }
 
 function scheduleConvert(){
@@ -724,6 +729,127 @@ function useResultInEditor(){
     partId: selectedFramePartId || null,
   }));
   location.href = "art-create.html";
+}
+
+// ── チュートリアル（アップロード→位置調整→設定パネルと、画面が段階的に切り替わる
+// フローに合わせて、各段階が実際に表示されたタイミングで続きを案内する。
+// 一度最後まで見る／スキップすると再表示しない（ヘルプモーダルの「もう一度見る」から
+// はいつでも再生できる） ──
+const CONVERT_TUTORIAL_DONE_KEY = "hatopiArt_convertTutorialDone";
+const CONVERT_TUTORIAL_STEPS = [
+  { phase: "upload", selector: "#artUploadBtn", title: "① 画像を選ぶ", text: "変換したい画像をアップロードします。JPG・PNG・WebPに対応しています。" },
+  { phase: "crop", selector: "#artCropViewport", title: "② 位置を調整", text: "ドラッグで位置を、下のスライダーで拡大縮小して、切り抜く範囲を決めます。" },
+  { phase: "crop", selector: "#artCropConfirmBtn", title: "③ 決定する", text: "位置が決まったらこのボタンで確定し、変換結果のプレビューに進みます。" },
+  { phase: "panel", selector: "#artConvertSizeStep1", title: "④ キャンバスサイズ", text: "比率、またはゲーム内のデザイン枠（衣装・家具など）に合わせてサイズを選べます。サイズを変えたら「位置を調整する」でやり直すのがおすすめです。" },
+  { phase: "panel", selector: "#artConvertPresetOptions", title: "⑤ 変換方式", text: "写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。" },
+  { phase: "panel", selector: "#artConvertColorOptions", title: "⑥ 色数", text: "少ないほどゲーム内で塗りやすくなります。まずは16色前後から試してみてください。" },
+  { phase: "panel", selector: "#artAdvancedToggle", title: "⑦ 詳細設定", text: "配置方法・明るさ・コントラストなど、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。" },
+  { phase: "panel", selector: "#artUseInEditorBtn", title: "⑧ エディターで編集する", text: "納得のいく結果になったら、このボタンでアートエディターに移動して、続きを手描きで仕上げられます。" },
+];
+let convertTutorialStep = 0;
+let convertTutorialActive = false;
+
+// phase（upload/crop/panel）の最初のステップから開始する。既にそのフェーズ以降まで
+// 進んでいる場合は巻き戻さない（「位置を調整する」で後からcrop画面に戻った場合など）
+function maybeStartConvertTutorialPhase(phase){
+  if(localStorage.getItem(CONVERT_TUTORIAL_DONE_KEY) === "true") return;
+  const firstIdx = CONVERT_TUTORIAL_STEPS.findIndex((s) => s.phase === phase);
+  if(firstIdx === -1) return;
+  if(convertTutorialActive && convertTutorialStep >= firstIdx) return;
+  convertTutorialStep = firstIdx;
+  convertTutorialActive = true;
+  document.getElementById("artTutorialBackdrop").style.display = "block";
+  document.getElementById("artTutorialHighlight").style.display = "block";
+  document.getElementById("artTutorialPopup").style.display = "block";
+  renderConvertTutorialStep();
+}
+
+function renderConvertTutorialStep(){
+  const step = CONVERT_TUTORIAL_STEPS[convertTutorialStep];
+  const target = step ? document.querySelector(step.selector) : null;
+  if(!step || !target || target.offsetParent === null){
+    // 対象要素がまだ表示されていない段階なら、そこで一旦チュートリアルを止めて待つ
+    // （次のフェーズの画面が表示された時点でmaybeStartConvertTutorialPhaseが続きを開始する）
+    endConvertTutorial(false);
+    return;
+  }
+  document.getElementById("artTutorialStepLabel").textContent = `${convertTutorialStep + 1} / ${CONVERT_TUTORIAL_STEPS.length}`;
+  document.getElementById("artTutorialText").innerHTML = `<strong>${step.title}</strong><br>${step.text}`;
+  document.getElementById("artTutorialNextBtn").textContent = convertTutorialStep === CONVERT_TUTORIAL_STEPS.length - 1 ? "はじめる" : "次へ";
+  target.scrollIntoView({ block: "center", behavior: "auto" });
+  requestAnimationFrame(() => requestAnimationFrame(() => positionConvertTutorialElements(target)));
+}
+
+function positionConvertTutorialElements(target){
+  const rect = target.getBoundingClientRect();
+  const pad = 6;
+  const highlight = document.getElementById("artTutorialHighlight");
+  highlight.style.left = (rect.left - pad) + "px";
+  highlight.style.top = (rect.top - pad) + "px";
+  highlight.style.width = (rect.width + pad * 2) + "px";
+  highlight.style.height = (rect.height + pad * 2) + "px";
+
+  const popup = document.getElementById("artTutorialPopup");
+  const margin = 12;
+  const popupRect = popup.getBoundingClientRect();
+  let top = rect.bottom + margin;
+  if(top + popupRect.height > window.innerHeight - 12){
+    top = rect.top - popupRect.height - margin;
+  }
+  top = Math.max(12, Math.min(top, window.innerHeight - popupRect.height - 12));
+  let left = rect.left + rect.width / 2 - popupRect.width / 2;
+  left = Math.max(12, Math.min(left, window.innerWidth - popupRect.width - 12));
+  popup.style.top = top + "px";
+  popup.style.left = left + "px";
+}
+
+function nextConvertTutorialStep(){
+  if(convertTutorialStep >= CONVERT_TUTORIAL_STEPS.length - 1){
+    endConvertTutorial(true);
+    return;
+  }
+  convertTutorialStep++;
+  renderConvertTutorialStep();
+}
+
+// done=true: 最後まで見終えた（次に見せるべきフェーズがまだ来ていないだけの場合はfalseで、
+// 「完了扱い」にはせず、後続フェーズの画面が表示された時に続きから再開できるようにする）
+function endConvertTutorial(done){
+  convertTutorialActive = false;
+  if(done) localStorage.setItem(CONVERT_TUTORIAL_DONE_KEY, "true");
+  document.getElementById("artTutorialBackdrop").style.display = "none";
+  document.getElementById("artTutorialHighlight").style.display = "none";
+  document.getElementById("artTutorialPopup").style.display = "none";
+}
+
+function skipConvertTutorial(){
+  endConvertTutorial(true);
+}
+
+function replayConvertTutorial(){
+  closeHelpModal();
+  localStorage.removeItem(CONVERT_TUTORIAL_DONE_KEY);
+  convertTutorialActive = false;
+  // 現在表示されている画面に応じて、該当フェーズから再生し直す
+  const phase = document.getElementById("artConvertPanel").style.display !== "none"
+    ? "panel"
+    : document.getElementById("artCropStage").style.display !== "none"
+      ? "crop"
+      : "upload";
+  setTimeout(() => maybeStartConvertTutorialPhase(phase), 250);
+}
+
+function bindConvertTutorialControls(){
+  document.getElementById("artTutorialSkipBtn").addEventListener("click", skipConvertTutorial);
+  document.getElementById("artTutorialNextBtn").addEventListener("click", nextConvertTutorialStep);
+  const repositionIfActive = () => {
+    if(document.getElementById("artTutorialPopup").style.display === "none") return;
+    const step = CONVERT_TUTORIAL_STEPS[convertTutorialStep];
+    const target = step ? document.querySelector(step.selector) : null;
+    if(target) positionConvertTutorialElements(target);
+  };
+  window.addEventListener("resize", repositionIfActive);
+  window.addEventListener("scroll", repositionIfActive, { passive: true });
 }
 
 // 言語切替時に動的コンテンツ（i18n読み込み前に描画されたUI）を再描画
