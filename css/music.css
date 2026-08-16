@@ -700,6 +700,41 @@ body.dark .music-note-kana{
   display:block;
 }
 
+/* 調整モード中、左右中央に近づくと磁石のように吸着し、その間だけ縦の補助線を
+   表示する（js/music-editor.jsのMUSIC_CALIB_SNAP_THRESHOLD／.snappedクラスの
+   切り替え）。縦位置(offsetY)は端末や好みによって中央からずらすのが正しい
+   場合が多いためスナップ対象にしない。上部バー・下部の操作パネルの下に
+   隠れるようz-indexは低めにしておく */
+.music-calib-guide{
+  display:none;
+  position:absolute;
+  z-index:1;
+  background:var(--vermillion);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.12s ease;
+}
+
+.music-practice-stage.calibrating .music-calib-guide{
+  display:block;
+}
+
+.music-calib-guide.snapped{
+  opacity:0.85;
+}
+
+.music-calib-guide-v{
+  top:0;
+  bottom:0;
+  left:50%;
+  width:1.5px;
+  transform:translateX(-50%);
+}
+
+body.dark .music-calib-guide{
+  background:var(--vermillion-soft);
+}
+
 .music-calib-toggle-btn{
   flex-shrink:0;
   display:flex;
