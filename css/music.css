@@ -701,6 +701,10 @@ body.dark .music-note-kana{
   height:100%;
   object-fit:cover; /* containだと画面より横長の端末で左右が余白になり画像が届かないため、
                         cover で常に左右いっぱいに表示する（はみ出た上下は自動的に隠れる） */
+  /* Safariのツールバー分だけ表示領域の縦幅が実際の画面より少し小さくなり、cover側で
+     上下を少しトリミングすることになる。上端はどのみち上部バーで隠れる部分なので、
+     下側を基準に揃えて削れる分を上だけに寄せる */
+  object-position:center bottom;
   opacity:0.55;
   pointer-events:none;
   z-index:0;
