@@ -748,7 +748,10 @@ body.dark .music-note-btn.accidental{
 .music-practice-stage{
   display:none;
   position:fixed;
-  inset:0;
+  top:env(safe-area-inset-top);
+  right:env(safe-area-inset-right);
+  bottom:env(safe-area-inset-bottom);
+  left:env(safe-area-inset-left);
   z-index:1900;
   background:var(--card);
   overflow:hidden;
