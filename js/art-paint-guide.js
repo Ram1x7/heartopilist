@@ -285,6 +285,22 @@ function renderPaintGuideCanvas(){
   }
   gctx.globalAlpha = 1;
 
+  // マス目の境界線（1マスずつはっきり分かるように、セルがある程度の大きさの時だけ表示）
+  if(cell >= 6){
+    gctx.strokeStyle = dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
+    gctx.lineWidth = 1;
+    gctx.beginPath();
+    for(let vx = 0; vx <= viewport.w; vx++){
+      gctx.moveTo(vx * cell, 0);
+      gctx.lineTo(vx * cell, cvs.height);
+    }
+    for(let vy = 0; vy <= viewport.h; vy++){
+      gctx.moveTo(0, vy * cell);
+      gctx.lineTo(cvs.width, vy * cell);
+    }
+    gctx.stroke();
+  }
+
   // 今のブロックの範囲を枠で示す（全体表示に切り替えたときに特に役立つ）
   if(!zoomed){
     const bx0 = step.bx * BLOCK_SIZE, by0 = step.by * BLOCK_SIZE;
