@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=3">
-<link rel="stylesheet" href="./css/music.css?v=18">
+<link rel="stylesheet" href="./css/music.css?v=19">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -163,7 +163,10 @@
      その上に重ねて表示する（どの配置でもボタンは画面上部約2/3には現れないため、
      重ねても実際のボタンとは重ならない） -->
 <div class="music-practice-stage" id="musicPracticeStage">
-  <div id="musicInstrumentGridAnchorPractice"></div>
+  <div id="musicInstrumentGridAnchorPractice">
+    <img id="musicCalibBgImage" alt="">
+  </div>
+  <div class="music-calib-catcher" id="musicCalibCatcher"></div>
   <div class="music-practice-stage-overlay-top">
     <div class="music-practice-stage-topbar">
       <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="close"></button>
@@ -177,9 +180,21 @@
           </div>
         </div>
       </div>
+      <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="adjust position"></button>
       <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="toggle sound"></button>
     </div>
     <div id="musicScoreDisplayAnchorPractice"></div>
+  </div>
+  <div class="music-calib-overlay" id="musicCalibOverlay">
+    <p class="music-calib-hint" data-i18n="music_calib_hint">ドラッグで移動、2本指ピンチで拡大縮小できます</p>
+    <div class="music-calib-btn-row">
+      <label class="music-calib-btn" id="musicCalibBgLabel">
+        <input type="file" accept="image/*" id="musicCalibBgInput" style="display:none">
+        <span data-i18n="music_calib_bg_btn">実機画像を重ねる</span>
+      </label>
+      <button class="music-calib-btn" id="musicCalibResetBtn" data-i18n="music_calib_reset">リセット</button>
+      <button class="music-calib-btn music-calib-lock-btn" id="musicCalibLockBtn" data-i18n="music_calib_lock">ロックする</button>
+    </div>
   </div>
 </div>
 
@@ -237,6 +252,9 @@
 
     <p style="margin-top:10px;"><strong>練習モード</strong><br>
     「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列／22キーなど）がそのまま自動で使われます。ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。再生を止めていても、次に弾くべき音を正しく押すと譜面のハイライトが先へ進みます。採点はありません。左上の×で編集モードに戻れます。</p>
+
+    <p style="margin-top:10px;"><strong>位置調整</strong><br>
+    練習モード右上のレンチのアイコンで、演奏ボタンの大きさ・位置を自分の端末に合わせて微調整できます。1本指ドラッグで移動、2本指ピンチで拡大縮小でき、「実機画像を重ねる」で実際のゲーム画面のスクリーンショットを背景に薄く表示しながら位置合わせすることもできます（画像は保存されず、その場限りの参考表示です）。「ロックする」で調整を確定すると、この端末・ブラウザに記憶され、次回から自動で適用されます。「リセット」でいつでも初期値に戻せます。</p>
 
     <p style="margin-top:10px;"><strong>追従モード</strong><br>
     「追従」をタップすると、演奏ボタンを出さず、今弾く音と次の音だけを大きく表示する全画面表示に切り替わります。実際のゲーム画面と、iPadの「Split View」などの分割画面で並べて表示し、実機で演奏しながら次の音を確認する使い方を想定しています。練習モードと違って横画面には固定されません。譜面を0.1〜1.0倍速で自動再生し、テンポに合わせて表示が進みます。効果音が実機の音と重ならないよう、ミュートしての利用をおすすめします。</p>

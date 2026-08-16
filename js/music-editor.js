@@ -41,6 +41,20 @@ let activeHolds = new Map(); // pointerId -> {note, btn, startTime}
 let currentGroupNotes = []; // 現在の和音グループに含まれる音（離しても消えない。確定時にクリア）
 let groupStartTime = 0;
 
+// 演奏ボタンの拡大率・位置は端末や個人の感覚差が大きいため、ユーザー自身が調整モードで
+// 拡大縮小・移動でき、その結果をlocalStorageに保存して端末ごとに記憶する
+const MUSIC_CALIB_KEY = "hatopiMusic_stageCalib";
+const MUSIC_CALIB_DEFAULT = { scale: 1.05, offsetX: 0, offsetY: -0.6 }; // offsetは vh 単位
+const MUSIC_CALIB_SCALE_MIN = 0.5;
+const MUSIC_CALIB_SCALE_MAX = 2.5;
+let calib = { ...MUSIC_CALIB_DEFAULT };
+let calibActive = false;
+let calibBackup = null; // 調整モードに入った時点の値。ロックせずに終了した場合はこれに戻す
+let calibPointers = new Map(); // pointerId -> {x, y}（画面座標px）
+let calibPanStart = null; // {x, y, offsetX, offsetY}（1本指ドラッグ用）
+let calibPinchStart = null; // {dist, scale}（2本指ピンチ用）
+let calibBgObjectUrl = null;
+
 // ── 初期化 ──
 function initMusicEditor() {
   loadSavedScores();
@@ -64,9 +78,12 @@ function initMusicEditor() {
   const savedSound = localStorage.getItem("hatopiMusic_soundEnabled");
   if (savedSound !== null) soundEnabled = savedSound === "1";
 
+  calib = loadCalibration();
+
   document.getElementById("musicPracticeExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicFollowExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicRotatePromptIcon").innerHTML = icon("rotateDevice", { size: 32 });
+  document.getElementById("musicCalibToggleBtn").innerHTML = icon("wrench", { size: 15 });
 
   renderInstrumentSelector();
   renderDurationOptions();
@@ -227,6 +244,168 @@ function renderPracticeStageGrid() {
     const note = JSON.parse(btn.dataset.note);
     bindNoteButtonHold(btn, note);
   });
+  applyCalibTransform();
+}
+
+// ── 演奏ボタンの拡大率・位置調整（端末ごとにlocalStorageへ記憶） ──
+function loadCalibration() {
+  try {
+    const raw = localStorage.getItem(MUSIC_CALIB_KEY);
+    if (!raw) return { ...MUSIC_CALIB_DEFAULT };
+    const parsed = JSON.parse(raw);
+    if (
+      typeof parsed.scale === "number" &&
+      typeof parsed.offsetX === "number" &&
+      typeof parsed.offsetY === "number"
+    ) {
+      return parsed;
+    }
+  } catch (e) {
+    // 壊れた値が入っていた場合はデフォルトにフォールバック
+  }
+  return { ...MUSIC_CALIB_DEFAULT };
+}
+
+function saveCalibration() {
+  localStorage.setItem(MUSIC_CALIB_KEY, JSON.stringify(calib));
+}
+
+function applyCalibTransform() {
+  const frame = document.getElementById("musicStageFrame");
+  if (!frame) return;
+  frame.style.transform = `translate(${calib.offsetX}vh, ${calib.offsetY}vh) scale(${calib.scale})`;
+}
+
+function toggleCalibMode() {
+  if (calibActive) {
+    cancelCalibMode();
+  } else {
+    enterCalibMode();
+  }
+}
+
+function enterCalibMode() {
+  calibActive = true;
+  calibBackup = { ...calib };
+  document.getElementById("musicPracticeStage").classList.add("calibrating");
+  document.getElementById("musicCalibToggleBtn").classList.add("active");
+  const catcher = document.getElementById("musicCalibCatcher");
+  catcher.addEventListener("pointerdown", onCalibPointerDown);
+  catcher.addEventListener("pointermove", onCalibPointerMove);
+  catcher.addEventListener("pointerup", onCalibPointerUpOrCancel);
+  catcher.addEventListener("pointercancel", onCalibPointerUpOrCancel);
+}
+
+function exitCalibModeUI() {
+  calibActive = false;
+  calibPointers.clear();
+  calibPanStart = null;
+  calibPinchStart = null;
+  document.getElementById("musicPracticeStage").classList.remove("calibrating");
+  document.getElementById("musicCalibToggleBtn").classList.remove("active");
+  const catcher = document.getElementById("musicCalibCatcher");
+  catcher.removeEventListener("pointerdown", onCalibPointerDown);
+  catcher.removeEventListener("pointermove", onCalibPointerMove);
+  catcher.removeEventListener("pointerup", onCalibPointerUpOrCancel);
+  catcher.removeEventListener("pointercancel", onCalibPointerUpOrCancel);
+  clearCalibBgImage();
+}
+
+// ロックせずに調整モードを終える場合は、入る前の状態に戻す
+function cancelCalibMode() {
+  if (calibBackup) {
+    calib = { ...calibBackup };
+    applyCalibTransform();
+  }
+  calibBackup = null;
+  exitCalibModeUI();
+}
+
+function lockCalibration() {
+  saveCalibration();
+  calibBackup = null;
+  exitCalibModeUI();
+}
+
+function resetCalibration() {
+  calib = { ...MUSIC_CALIB_DEFAULT };
+  applyCalibTransform();
+}
+
+function calibDistance(a, b) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function onCalibPointerDown(e) {
+  e.preventDefault();
+  calibPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (calibPointers.size === 1) {
+    calibPanStart = { x: e.clientX, y: e.clientY, offsetX: calib.offsetX, offsetY: calib.offsetY };
+    calibPinchStart = null;
+  } else if (calibPointers.size === 2) {
+    const pts = [...calibPointers.values()];
+    calibPinchStart = { dist: calibDistance(pts[0], pts[1]), scale: calib.scale };
+    calibPanStart = null;
+  }
+}
+
+function onCalibPointerMove(e) {
+  if (!calibPointers.has(e.pointerId)) return;
+  e.preventDefault();
+  calibPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  const stage = document.getElementById("musicPracticeStage");
+  const stageH = stage.getBoundingClientRect().height || 1;
+
+  if (calibPointers.size === 2 && calibPinchStart) {
+    const pts = [...calibPointers.values()];
+    const dist = calibDistance(pts[0], pts[1]);
+    const nextScale = calibPinchStart.scale * (dist / calibPinchStart.dist);
+    calib.scale = Math.min(MUSIC_CALIB_SCALE_MAX, Math.max(MUSIC_CALIB_SCALE_MIN, nextScale));
+    applyCalibTransform();
+  } else if (calibPointers.size === 1 && calibPanStart) {
+    const dxPct = ((e.clientX - calibPanStart.x) / stageH) * 100;
+    const dyPct = ((e.clientY - calibPanStart.y) / stageH) * 100;
+    calib.offsetX = calibPanStart.offsetX + dxPct;
+    calib.offsetY = calibPanStart.offsetY + dyPct;
+    applyCalibTransform();
+  }
+}
+
+function onCalibPointerUpOrCancel(e) {
+  calibPointers.delete(e.pointerId);
+  if (calibPointers.size === 1) {
+    // ピンチから1本指ドラッグに戻った場合、その時点の指位置を新しい起点にする
+    const [, pt] = [...calibPointers.entries()][0];
+    calibPanStart = { x: pt.x, y: pt.y, offsetX: calib.offsetX, offsetY: calib.offsetY };
+    calibPinchStart = null;
+  } else if (calibPointers.size === 0) {
+    calibPanStart = null;
+    calibPinchStart = null;
+  }
+}
+
+// 実機のスクリーンショットを調整の目安として背景に薄く表示する（保存はせず、その場限り）
+function onCalibBgFileChosen(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  clearCalibBgImage();
+  calibBgObjectUrl = URL.createObjectURL(file);
+  const img = document.getElementById("musicCalibBgImage");
+  img.src = calibBgObjectUrl;
+  img.style.display = "block";
+  e.target.value = "";
+}
+
+function clearCalibBgImage() {
+  const img = document.getElementById("musicCalibBgImage");
+  if (img) {
+    img.style.display = "none";
+    img.removeAttribute("src");
+  }
+  if (calibBgObjectUrl) {
+    URL.revokeObjectURL(calibBgObjectUrl);
+    calibBgObjectUrl = null;
+  }
 }
 
 // 演奏ボタンの「押す・離す」を扱う（和音対応）。最初の1本目が押されてから
@@ -483,6 +662,7 @@ function resetLoop() {
 // ── モード切り替え(編集/練習) ──
 function setPageMode(mode) {
   if (pageMode === mode) return;
+  if (calibActive) cancelCalibMode();
   releaseAllHolds();
   stopPlayback();
   pageMode = mode;
@@ -976,6 +1156,11 @@ function bindControls() {
   document.getElementById("musicFollowExitBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicSoundToggleBtnStage").addEventListener("click", toggleSound);
   document.getElementById("musicSoundToggleBtnFollow").addEventListener("click", toggleSound);
+
+  document.getElementById("musicCalibToggleBtn").addEventListener("click", toggleCalibMode);
+  document.getElementById("musicCalibResetBtn").addEventListener("click", resetCalibration);
+  document.getElementById("musicCalibLockBtn").addEventListener("click", lockCalibration);
+  document.getElementById("musicCalibBgInput").addEventListener("change", onCalibBgFileChosen);
 
   document.getElementById("musicNewBtn").addEventListener("click", newScore);
   document.getElementById("musicSaveBtn").addEventListener("click", saveCurrentAsScore);
