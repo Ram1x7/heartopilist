@@ -667,7 +667,7 @@ body.dark .music-note-kana{
    近い。レイアウト計算（コンテナクエリのサイズ）には影響しないtransform:scale
    で見た目だけ拡大し、その後translateYで上下位置を微調整する */
 .music-practice-stage .music-stage-frame{
-  transform:translateY(0.3vh) scale(1.05);
+  transform:translateY(calc(-1 * env(safe-area-inset-top))) scale(1.05);
 }
 
 /* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
@@ -748,10 +748,7 @@ body.dark .music-note-btn.accidental{
 .music-practice-stage{
   display:none;
   position:fixed;
-  top:env(safe-area-inset-top);
-  right:env(safe-area-inset-right);
-  bottom:env(safe-area-inset-bottom);
-  left:env(safe-area-inset-left);
+  inset:0;
   z-index:1900;
   background:var(--card);
   overflow:hidden;
