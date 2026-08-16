@@ -47,6 +47,7 @@ const MUSIC_CALIB_KEY = "hatopiMusic_stageCalib";
 const MUSIC_CALIB_DEFAULT = { scale: 1.05, offsetX: 0, offsetY: -0.6 }; // offsetは vh 単位
 const MUSIC_CALIB_SCALE_MIN = 0.5;
 const MUSIC_CALIB_SCALE_MAX = 2.5;
+const MUSIC_CALIB_SNAP_THRESHOLD = 1.2; // 中央からこの範囲内（%）に入ると吸着する
 let calib = { ...MUSIC_CALIB_DEFAULT };
 let calibActive = false;
 let calibBackup = null; // 調整モードに入った時点の値。ロックせずに終了した場合はこれに戻す
@@ -301,6 +302,7 @@ function exitCalibModeUI() {
   calibPointers.clear();
   calibPanStart = null;
   calibPinchStart = null;
+  clearCalibGuides();
   document.getElementById("musicPracticeStage").classList.remove("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.remove("active");
   const catcher = document.getElementById("musicCalibCatcher");
@@ -336,6 +338,11 @@ function calibDistance(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
+function clearCalibGuides() {
+  document.getElementById("musicCalibGuideV").classList.remove("snapped");
+  document.getElementById("musicCalibGuideH").classList.remove("snapped");
+}
+
 function onCalibPointerDown(e) {
   e.preventDefault();
   calibPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -346,6 +353,7 @@ function onCalibPointerDown(e) {
     const pts = [...calibPointers.values()];
     calibPinchStart = { dist: calibDistance(pts[0], pts[1]), scale: calib.scale };
     calibPanStart = null;
+    clearCalibGuides();
   }
 }
 
@@ -365,8 +373,14 @@ function onCalibPointerMove(e) {
   } else if (calibPointers.size === 1 && calibPanStart) {
     const dxPct = ((e.clientX - calibPanStart.x) / stageH) * 100;
     const dyPct = ((e.clientY - calibPanStart.y) / stageH) * 100;
-    calib.offsetX = calibPanStart.offsetX + dxPct;
-    calib.offsetY = calibPanStart.offsetY + dyPct;
+    const rawX = calibPanStart.offsetX + dxPct;
+    const rawY = calibPanStart.offsetY + dyPct;
+    const snapX = Math.abs(rawX) < MUSIC_CALIB_SNAP_THRESHOLD;
+    const snapY = Math.abs(rawY) < MUSIC_CALIB_SNAP_THRESHOLD;
+    calib.offsetX = snapX ? 0 : rawX;
+    calib.offsetY = snapY ? 0 : rawY;
+    document.getElementById("musicCalibGuideV").classList.toggle("snapped", snapX);
+    document.getElementById("musicCalibGuideH").classList.toggle("snapped", snapY);
     applyCalibTransform();
   }
 }
@@ -381,6 +395,7 @@ function onCalibPointerUpOrCancel(e) {
   } else if (calibPointers.size === 0) {
     calibPanStart = null;
     calibPinchStart = null;
+    clearCalibGuides();
   }
 }
 

@@ -700,6 +700,47 @@ body.dark .music-note-kana{
   display:block;
 }
 
+/* 調整モード中、中央に近づくと磁石のように吸着し、その間だけ補助線を表示する
+   （js/music-editor.jsのMUSIC_CALIB_SNAP_THRESHOLD／.snappedクラスの切り替え）。
+   上部バー・下部の操作パネルの下に隠れるようz-indexは低めにしておく */
+.music-calib-guide{
+  display:none;
+  position:absolute;
+  z-index:1;
+  background:var(--vermillion);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.12s ease;
+}
+
+.music-practice-stage.calibrating .music-calib-guide{
+  display:block;
+}
+
+.music-calib-guide.snapped{
+  opacity:0.85;
+}
+
+.music-calib-guide-v{
+  top:0;
+  bottom:0;
+  left:50%;
+  width:1.5px;
+  transform:translateX(-50%);
+}
+
+.music-calib-guide-h{
+  left:0;
+  right:0;
+  top:50%;
+  height:1.5px;
+  transform:translateY(-50%);
+}
+
+body.dark .music-calib-guide{
+  background:var(--vermillion-soft);
+}
+
 .music-calib-toggle-btn{
   flex-shrink:0;
   display:flex;
