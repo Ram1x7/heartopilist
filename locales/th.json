@@ -413,7 +413,6 @@
   "art_paint_guide_step_of": "{current} / {total} (บล็อก {block})",
   "art_paint_guide_method_bucket": "ใช้ถังสีลง {count} จุด",
   "art_paint_guide_method_tap": "แตะทีละช่อง {count} ช่อง",
-  "art_paint_guide_spans_note": "พื้นที่นี้ขยายออกไปนอกส่วนที่แสดง",
   "art_paint_guide_zoom_fit": "กลับไปที่บล็อกนี้",
   "art_paint_guide_zoom_full": "แสดงทั้งหมด",
   "art_paint_guide_prev": "ย้อนกลับ",

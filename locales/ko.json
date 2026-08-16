@@ -413,7 +413,6 @@
   "art_paint_guide_step_of": "{current} / {total} (블록 {block})",
   "art_paint_guide_method_bucket": "페인트통으로 {count}곳 칠하기",
   "art_paint_guide_method_tap": "{count}칸을 하나씩 탭",
-  "art_paint_guide_spans_note": "이 범위는 화면 밖까지 이어져 있습니다",
   "art_paint_guide_zoom_fit": "이 블록으로 돌아가기",
   "art_paint_guide_zoom_full": "전체 보기",
   "art_paint_guide_prev": "이전",
