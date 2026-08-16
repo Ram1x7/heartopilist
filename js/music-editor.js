@@ -340,7 +340,6 @@ function calibDistance(a, b) {
 
 function clearCalibGuides() {
   document.getElementById("musicCalibGuideV").classList.remove("snapped");
-  document.getElementById("musicCalibGuideH").classList.remove("snapped");
 }
 
 function onCalibPointerDown(e) {
@@ -374,13 +373,12 @@ function onCalibPointerMove(e) {
     const dxPct = ((e.clientX - calibPanStart.x) / stageH) * 100;
     const dyPct = ((e.clientY - calibPanStart.y) / stageH) * 100;
     const rawX = calibPanStart.offsetX + dxPct;
-    const rawY = calibPanStart.offsetY + dyPct;
+    // 縦位置（offsetY）は端末や好みによって中央からずらすのが正しい場合が多いため、
+    // スナップ対象は左右中央（offsetX）のみとする
     const snapX = Math.abs(rawX) < MUSIC_CALIB_SNAP_THRESHOLD;
-    const snapY = Math.abs(rawY) < MUSIC_CALIB_SNAP_THRESHOLD;
     calib.offsetX = snapX ? 0 : rawX;
-    calib.offsetY = snapY ? 0 : rawY;
+    calib.offsetY = calibPanStart.offsetY + dyPct;
     document.getElementById("musicCalibGuideV").classList.toggle("snapped", snapX);
-    document.getElementById("musicCalibGuideH").classList.toggle("snapped", snapY);
     applyCalibTransform();
   }
 }
