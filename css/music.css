@@ -665,9 +665,12 @@ body.dark .music-note-kana{
 
 /* 実機と見比べると、ぴったりフィットさせるより少し拡大した方が実機の見た目に
    近い。レイアウト計算（コンテナクエリのサイズ）には影響しないtransform:scale
-   で見た目だけ拡大し、その後translateYで上下位置を微調整する */
+   で見た目だけ拡大し、その後translateYで上下位置を微調整する。
+   env(safe-area-inset-top)は使わない：iPadの横向きではほぼ0で補正が効かず、
+   さらに縦持ち端末をCSSで横画面に回転させる仕組み（下記@media (orientation:portrait)）
+   の中では、回転後の見た目の向きと物理的な安全領域の向きがズレてしまうため */
 .music-practice-stage .music-stage-frame{
-  transform:translateY(calc(-1 * env(safe-area-inset-top))) scale(1.05);
+  transform:translateY(-0.6vh) scale(1.05);
 }
 
 /* 円形ボタン：aspect-ratioだけだと数字+かなの2行分のテキストで縦に伸びてしまうため、
