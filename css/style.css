@@ -306,6 +306,19 @@ body.dark .page-header h1{
   color:var(--text-sub);
 }
 
+/* チュートリアルを再生できるページの見出し下に添える、ヘルプボタンへの案内 */
+.page-tutorial-hint{
+  margin:4px 0 0;
+  font-size:11px;
+  text-align:center;
+  color:var(--text-sub);
+  opacity:0.8;
+}
+
+body.dark .page-tutorial-hint{
+  color:#b3a89a;
+}
+
 /* カード */
 .card{
   background:var(--card);

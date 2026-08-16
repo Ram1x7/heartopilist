@@ -27,7 +27,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=3">
+<link rel="stylesheet" href="./css/style.css?v=4">
 <link rel="stylesheet" href="./css/art.css?v=27">
 
 <link rel="prefetch" href="./art-create.html">
@@ -78,6 +78,7 @@
 <div class="page-header">
   <h1 data-i18n="art_convert_page_title">画像から作る</h1>
   <p class="page-subtitle" data-i18n="art_convert_page_subtitle">画像をアップロードしてドット絵に変換します</p>
+  <p class="page-tutorial-hint" data-i18n="art_tutorial_hint">使い方やチュートリアルは、画面右上の「？」からいつでも確認できます</p>
 </div>
 
 <div class="art-notice" data-i18n="art_coming_soon">
@@ -217,6 +218,17 @@
   ※本サイトは非公式のファンツールです
 </div>
 
+<div class="art-tutorial-backdrop" id="artTutorialBackdrop" style="display:none;"></div>
+<div class="art-tutorial-highlight" id="artTutorialHighlight" style="display:none;"></div>
+<div class="art-tutorial-popup" id="artTutorialPopup" style="display:none;">
+  <div class="art-tutorial-step" id="artTutorialStepLabel"></div>
+  <div class="art-tutorial-text" id="artTutorialText"></div>
+  <div class="art-tutorial-actions">
+    <button class="art-tutorial-skip" id="artTutorialSkipBtn">スキップ</button>
+    <button class="art-tutorial-next" id="artTutorialNextBtn">次へ</button>
+  </div>
+</div>
+
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-help-box">
     <h3 style="text-align:center;">使い方</h3>
@@ -245,6 +257,7 @@
     <p style="margin-top:10px;"><strong>エディターで編集する</strong><br>
     変換結果に納得したら、このボタンでアートエディターに移動し、続きを手描きで仕上げられます。</p>
 
+    <button class="modal-close-btn" onclick="replayConvertTutorial()" style="margin-top:14px;">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
   </div>
 </div>
