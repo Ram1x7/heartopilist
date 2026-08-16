@@ -717,6 +717,11 @@ function useResultInEditor(){
     width: settings.width,
     height: settings.height,
     pixelData: resultPixels,
+    // デザイン枠（衣装など）のキャンバスで変換した場合、frameId/partIdをそのまま
+    // 引き継がないとエディタ側で枠のマスク（輪郭線・使用不可マス）を判定できず、
+    // 補助線が表示されなくなる
+    frameId: selectedFrameId || null,
+    partId: selectedFramePartId || null,
   }));
   location.href = "art-create.html";
 }
