@@ -437,7 +437,6 @@
   "art_paint_guide_step_of": "{current} / {total} (Block {block})",
   "art_paint_guide_method_bucket": "Bucket-fill {count} spot(s)",
   "art_paint_guide_method_tap": "Tap {count} cell(s) individually",
-  "art_paint_guide_spans_note": "This area extends beyond what's shown",
   "art_paint_guide_zoom_fit": "Back to this block",
   "art_paint_guide_zoom_full": "Show full canvas",
   "art_paint_guide_prev": "Back",

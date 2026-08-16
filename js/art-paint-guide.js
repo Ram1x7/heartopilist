@@ -77,20 +77,21 @@ function clusterInteriorCells(cells){
 }
 
 // ── ブロック×色ごとの手順データを組み立てる ──
-// 境目マスはそのマス自身が属するブロックに、内側マスのかたまり（バケツひと押し分）は
-// その左上のマスが属するブロックに割り当てる（かたまりがブロックをまたぐこともある。
-// その場合はバケツ操作1回で表示範囲の外まで一気に塗られる旨を案内に添える）
+// 境目マスも内側マスも、まずそのマス自身が属するブロックに振り分けてから、
+// 内側マスのかたまり（バケツひと押し分）はブロックの中だけで連結成分を作る。
+// こうすることで、1回のバケツ操作が今表示しているブロックの外まで広がることはなく、
+// 常に「今見えている範囲の中だけ」で完結する
 function computePaintSteps(){
   const colorMap = classifyPaintCells();
   const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
   const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
-  const blockMap = new Map(); // "bx_by" -> { bx, by, colors: Map(color -> {borderCells, interiorClusters}) }
+  const blockMap = new Map(); // "bx_by" -> { bx, by, colors: Map(color -> {borderCells, interiorCandidates}) }
 
   function colorEntryFor(bx, by, color){
     const bk = `${bx}_${by}`;
     if(!blockMap.has(bk)) blockMap.set(bk, { bx, by, colors: new Map() });
     const block = blockMap.get(bk);
-    if(!block.colors.has(color)) block.colors.set(color, { borderCells: [], interiorClusters: [] });
+    if(!block.colors.has(color)) block.colors.set(color, { borderCells: [], interiorCandidates: [] });
     return block.colors.get(color);
   }
 
@@ -99,20 +100,9 @@ function computePaintSteps(){
       const bx = Math.floor(x / BLOCK_SIZE), by = Math.floor(y / BLOCK_SIZE);
       colorEntryFor(bx, by, color).borderCells.push([x, y]);
     });
-
-    clusterInteriorCells(entry.interiorCandidates).forEach(cells => {
-      // 連結成分の中で一番上・その中で一番左のマスを代表点とし、そのマスが属する
-      // ブロックへこのかたまりをまとめて割り当てる
-      let anchor = cells[0];
-      cells.forEach(c => {
-        if(c[1] < anchor[1] || (c[1] === anchor[1] && c[0] < anchor[0])) anchor = c;
-      });
-      const bx = Math.floor(anchor[0] / BLOCK_SIZE), by = Math.floor(anchor[1] / BLOCK_SIZE);
-      const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
-      const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
-      const spansBeyondBlock = cells.some(([x, y]) =>
-        x < bx * BLOCK_SIZE || x >= bx * BLOCK_SIZE + bw || y < by * BLOCK_SIZE || y >= by * BLOCK_SIZE + bh);
-      colorEntryFor(bx, by, color).interiorClusters.push({ cells, spansBeyondBlock });
+    entry.interiorCandidates.forEach(([x, y]) => {
+      const bx = Math.floor(x / BLOCK_SIZE), by = Math.floor(y / BLOCK_SIZE);
+      colorEntryFor(bx, by, color).interiorCandidates.push([x, y]);
     });
   });
 
@@ -126,12 +116,16 @@ function computePaintSteps(){
       const blockNum = by * blocksX + bx + 1;
       const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
       const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
-      const colorEntries = Array.from(block.colors.entries()).map(([color, data]) => ({
-        color,
-        borderCells: data.borderCells,
-        interiorClusters: data.interiorClusters,
-        cellCount: data.borderCells.length + data.interiorClusters.reduce((s, c) => s + c.cells.length, 0),
-      }));
+      const colorEntries = Array.from(block.colors.entries()).map(([color, data]) => {
+        // 連結成分はこのブロックの候補マスだけを対象にするため、自然とブロックの外へは広がらない
+        const interiorClusters = clusterInteriorCells(data.interiorCandidates).map(cells => ({ cells }));
+        return {
+          color,
+          borderCells: data.borderCells,
+          interiorClusters,
+          cellCount: data.borderCells.length + data.interiorCandidates.length,
+        };
+      });
       colorEntries.sort((a, b) => b.cellCount - a.cellCount);
       colorEntries.forEach(entry => {
         steps.push({
@@ -229,13 +223,6 @@ function renderPaintGuideStep(){
     b.textContent = T("art_paint_guide_method_tap", `${step.borderCells.length}マスを個別にタップ`, { count: step.borderCells.length });
     badges.appendChild(b);
   }
-  if(step.interiorClusters.some(c => c.spansBeyondBlock)){
-    const b = document.createElement("span");
-    b.className = "art-guide-method-badge is-note";
-    b.textContent = T("art_paint_guide_spans_note", "この範囲は表示エリアの外まで広がっています");
-    badges.appendChild(b);
-  }
-
   document.getElementById("artGuidePrevBtn").disabled = paintGuideStepIndex === 0;
   document.getElementById("artGuideNextBtn").textContent =
     stepNum === total ? T("art_paint_guide_finish", "完了") : T("art_paint_guide_next", "次へ");
@@ -284,6 +271,22 @@ function renderPaintGuideCanvas(){
     }
   }
   gctx.globalAlpha = 1;
+
+  // マス目の境界線（1マスずつはっきり分かるように、セルがある程度の大きさの時だけ表示）
+  if(cell >= 6){
+    gctx.strokeStyle = dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
+    gctx.lineWidth = 1;
+    gctx.beginPath();
+    for(let vx = 0; vx <= viewport.w; vx++){
+      gctx.moveTo(vx * cell, 0);
+      gctx.lineTo(vx * cell, cvs.height);
+    }
+    for(let vy = 0; vy <= viewport.h; vy++){
+      gctx.moveTo(0, vy * cell);
+      gctx.lineTo(cvs.width, vy * cell);
+    }
+    gctx.stroke();
+  }
 
   // 今のブロックの範囲を枠で示す（全体表示に切り替えたときに特に役立つ）
   if(!zoomed){

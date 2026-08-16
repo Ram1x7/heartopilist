@@ -413,7 +413,6 @@
   "art_paint_guide_step_of": "{current} / {total}（区块{block}）",
   "art_paint_guide_method_bucket": "用油漆桶涂{count}处",
   "art_paint_guide_method_tap": "逐格点涂{count}格",
-  "art_paint_guide_spans_note": "此区域延伸到显示范围之外",
   "art_paint_guide_zoom_fit": "返回此区块",
   "art_paint_guide_zoom_full": "显示全图",
   "art_paint_guide_prev": "上一步",

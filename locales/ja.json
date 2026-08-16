@@ -437,7 +437,6 @@
   "art_paint_guide_step_of": "{current} / {total}（ブロック{block}）",
   "art_paint_guide_method_bucket": "バケツで{count}箇所を塗る",
   "art_paint_guide_method_tap": "{count}マスを個別にタップ",
-  "art_paint_guide_spans_note": "この範囲は表示エリアの外まで広がっています",
   "art_paint_guide_zoom_fit": "このブロックへ戻る",
   "art_paint_guide_zoom_full": "全体を表示",
   "art_paint_guide_prev": "戻る",
