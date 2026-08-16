@@ -284,8 +284,8 @@ function renderPaintGuideCanvas(){
 
   // マス目の境界線（1マスずつはっきり分かるように、セルがある程度の大きさの時だけ表示）
   if(cell >= 6){
-    gctx.strokeStyle = dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
-    gctx.lineWidth = 1;
+    gctx.strokeStyle = dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.25)";
+    gctx.lineWidth = Math.max(1.5, cell * 0.06);
     gctx.beginPath();
     for(let vx = 0; vx <= viewport.w; vx++){
       gctx.moveTo(vx * cell, 0);
