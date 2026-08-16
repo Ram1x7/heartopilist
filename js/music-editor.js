@@ -525,6 +525,7 @@ function updateRecordingUI() {
   if (toggle) toggle.checked = isRecording;
   document.getElementById("musicDurationOptions").classList.toggle("disabled", isRecording);
   document.getElementById("musicRecordHint").style.display = isRecording ? "" : "none";
+  document.getElementById("musicDurationHint").style.display = isRecording ? "none" : "";
   // 録音中は長さの選択ができないのと同じ理由で、休符も追加できないようにする
   document.getElementById("musicAddRestBtn").disabled = isRecording;
 }

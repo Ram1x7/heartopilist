@@ -450,6 +450,7 @@
   "music_score_label": "악보",
   "music_add_bar": "마디선",
   "music_add_rest": "쉼표 추가",
+  "music_duration_hint": "위에서 선택한 길이가 연주 버튼으로 입력하는 음표와 \"쉼표 추가\"의 쉼표 모두에 사용됩니다",
   "music_delete_last": "마지막 삭제",
   "music_loop_select": "구간 선택",
   "music_loop_selecting": "선택 취소",
