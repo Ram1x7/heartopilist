@@ -8,16 +8,19 @@
 // 逆に、周りをすべて同じ色のマスだけで囲まれている内側のマスは、境目さえ塗ってあれば
 // バケツでまとめて塗っても安全に収まる。
 //
-// これを踏まえて、
 //   ・完成図で隣に違う色（または未着色）のマスがある＝「境目マス」→ 1マスずつタップ
 //   ・周りが全部同じ色＝「内側マス」→ 境目を塗った後ならバケツでまとめて塗れる
-// に分類し、さらに手順は「色ごと」にまとめる（同じ色のマスが盤面のあちこちに
-// 散らばっていても、1色選んだらまとめて片付けられるようにし、手順数を色の種類数まで
-// 抑える）。色ごとの手順は、現在地から近い色を優先する貪欲法で並べる。
+//
+// 手順を「色ごと」だけでまとめると、同じ色が盤面のあちこちに散らばっている場合に
+// 全体図の中の遠く離れた位置を指すだけになり、実際にゲーム内のどこを見ればいいか
+// 分かりにくい。実際に操作するのは人間なので、まずは「10×10ブロック表示」機能と
+// 同じ番号のブロック単位で場所をまとめ、ブロックの中では色ごとにまとめる2段階の
+// 構成にした。ブロックは既存の進捗トラッカー（未着手/作業中/完了）と同じ番号・
+// 並び順にしてあるので、ガイドを見ながら実際のブロック一覧で進捗も追いやすい。
 
 let paintGuideOrder = [];
 let paintGuideStepIndex = 0;
-let paintGuideForceView = null; // null=自動判定 / "zoom"=拡大 / "full"=全体表示（ステップが変わるたびリセット）
+let paintGuideForceView = null; // null=現在のブロックへズーム / "full"=全体表示（ステップが変わるたびリセット）
 
 // ── マスの分類 ──
 // 完成図の各マスについて、上下左右のいずれかが違う色（または未着色）なら「境目マス」、
@@ -73,65 +76,84 @@ function clusterInteriorCells(cells){
   return clusters;
 }
 
-// ── 色ごとの手順データを組み立てる ──
-function computePaintColorSteps(){
+// ── ブロック×色ごとの手順データを組み立てる ──
+// 境目マスはそのマス自身が属するブロックに、内側マスのかたまり（バケツひと押し分）は
+// その左上のマスが属するブロックに割り当てる（かたまりがブロックをまたぐこともある。
+// その場合はバケツ操作1回で表示範囲の外まで一気に塗られる旨を案内に添える）
+function computePaintSteps(){
   const colorMap = classifyPaintCells();
-  const steps = [];
+  const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
+  const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
+  const blockMap = new Map(); // "bx_by" -> { bx, by, colors: Map(color -> {borderCells, interiorClusters}) }
+
+  function colorEntryFor(bx, by, color){
+    const bk = `${bx}_${by}`;
+    if(!blockMap.has(bk)) blockMap.set(bk, { bx, by, colors: new Map() });
+    const block = blockMap.get(bk);
+    if(!block.colors.has(color)) block.colors.set(color, { borderCells: [], interiorClusters: [] });
+    return block.colors.get(color);
+  }
+
   colorMap.forEach((entry, color) => {
-    const allCells = entry.borderCells.concat(entry.interiorCandidates);
-    if(allCells.length === 0) return;
-    const interiorClusters = clusterInteriorCells(entry.interiorCandidates).map(cells => ({ cells }));
-    const xs = allCells.map(c => c[0]);
-    const ys = allCells.map(c => c[1]);
-    const sumX = xs.reduce((s, v) => s + v, 0);
-    const sumY = ys.reduce((s, v) => s + v, 0);
-    steps.push({
-      color,
-      borderCells: entry.borderCells,
-      interiorClusters,
-      totalCells: allCells.length,
-      centerX: sumX / allCells.length,
-      centerY: sumY / allCells.length,
-      bbox: {
-        minX: Math.min(...xs), maxX: Math.max(...xs),
-        minY: Math.min(...ys), maxY: Math.max(...ys),
-      },
+    entry.borderCells.forEach(([x, y]) => {
+      const bx = Math.floor(x / BLOCK_SIZE), by = Math.floor(y / BLOCK_SIZE);
+      colorEntryFor(bx, by, color).borderCells.push([x, y]);
+    });
+
+    clusterInteriorCells(entry.interiorCandidates).forEach(cells => {
+      // 連結成分の中で一番上・その中で一番左のマスを代表点とし、そのマスが属する
+      // ブロックへこのかたまりをまとめて割り当てる
+      let anchor = cells[0];
+      cells.forEach(c => {
+        if(c[1] < anchor[1] || (c[1] === anchor[1] && c[0] < anchor[0])) anchor = c;
+      });
+      const bx = Math.floor(anchor[0] / BLOCK_SIZE), by = Math.floor(anchor[1] / BLOCK_SIZE);
+      const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
+      const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
+      const spansBeyondBlock = cells.some(([x, y]) =>
+        x < bx * BLOCK_SIZE || x >= bx * BLOCK_SIZE + bw || y < by * BLOCK_SIZE || y >= by * BLOCK_SIZE + bh);
+      colorEntryFor(bx, by, color).interiorClusters.push({ cells, spansBeyondBlock });
     });
   });
-  return steps;
-}
 
-// ── 色の並び順の最適化 ──
-// 貪欲法：現在地（直前の色の重心）から近い色を優先することで、移動距離を抑える
-function orderColorSteps(steps){
-  const remaining = steps.slice();
-  const ordered = [];
-  let current = { centerX: 0, centerY: 0 };
-  while(remaining.length){
-    let bestIdx = 0;
-    let bestDist = Infinity;
-    remaining.forEach((s, idx) => {
-      const dist = Math.hypot(s.centerX - current.centerX, s.centerY - current.centerY);
-      if(dist < bestDist){
-        bestDist = dist;
-        bestIdx = idx;
-      }
-    });
-    const [chosen] = remaining.splice(bestIdx, 1);
-    ordered.push(chosen);
-    current = chosen;
+  // ブロック番号順（既存の10×10ブロック表示・ブロック一覧と同じ並び）に、
+  // ブロック内はマス数が多い色から手順化する
+  const steps = [];
+  for(let by = 0; by < blocksY; by++){
+    for(let bx = 0; bx < blocksX; bx++){
+      const block = blockMap.get(`${bx}_${by}`);
+      if(!block) continue;
+      const blockNum = by * blocksX + bx + 1;
+      const bw = Math.min(BLOCK_SIZE, gridWidth - bx * BLOCK_SIZE);
+      const bh = Math.min(BLOCK_SIZE, gridHeight - by * BLOCK_SIZE);
+      const colorEntries = Array.from(block.colors.entries()).map(([color, data]) => ({
+        color,
+        borderCells: data.borderCells,
+        interiorClusters: data.interiorClusters,
+        cellCount: data.borderCells.length + data.interiorClusters.reduce((s, c) => s + c.cells.length, 0),
+      }));
+      colorEntries.sort((a, b) => b.cellCount - a.cellCount);
+      colorEntries.forEach(entry => {
+        steps.push({
+          blockNum, bx, by, bw, bh,
+          color: entry.color,
+          borderCells: entry.borderCells,
+          interiorClusters: entry.interiorClusters,
+        });
+      });
+    }
   }
-  return ordered;
+  return steps;
 }
 
 // ── ガイド画面の開閉 ──
 function openPaintGuide(){
-  const steps = computePaintColorSteps();
+  const steps = computePaintSteps();
   if(steps.length === 0){
     showToast(T("art_paint_guide_empty", "まだ何も塗られていません"));
     return;
   }
-  paintGuideOrder = orderColorSteps(steps);
+  paintGuideOrder = steps;
   paintGuideStepIndex = 0;
   paintGuideForceView = null;
   document.getElementById("artGuideOverlay").style.display = "flex";
@@ -162,29 +184,21 @@ function paintGuidePrev(){
 }
 
 function paintGuideToggleZoom(){
-  const step = paintGuideOrder[paintGuideStepIndex];
-  const zoomedNow = shouldZoomForStep(step);
-  paintGuideForceView = zoomedNow ? "full" : "zoom";
+  paintGuideForceView = shouldZoomForStep() ? "full" : null;
   renderPaintGuideCanvas();
   updateZoomBtnLabel();
 }
 
-// バウンディングボックスがキャンバス全体よりだいぶ小さければ、自動でそこへ寄せて表示する
-function shouldZoomForStep(step){
-  if(paintGuideForceView === "zoom") return true;
-  if(paintGuideForceView === "full") return false;
-  const bboxW = step.bbox.maxX - step.bbox.minX + 1;
-  const bboxH = step.bbox.maxY - step.bbox.minY + 1;
-  const bboxArea = bboxW * bboxH;
-  const canvasArea = gridWidth * gridHeight;
-  return bboxArea <= canvasArea * 0.55;
+// デフォルトは常に「今のブロック」へズームする（全体図だけではどこを塗ればいいか
+// 分からない、という声を受けて、場所を毎回はっきり示すようにした）。
+// 手動で切り替えたときだけ全体表示にする
+function shouldZoomForStep(){
+  return paintGuideForceView !== "full";
 }
 
 function updateZoomBtnLabel(){
-  const step = paintGuideOrder[paintGuideStepIndex];
-  const zoomed = shouldZoomForStep(step);
   document.getElementById("artGuideZoomBtn").textContent =
-    zoomed ? T("art_paint_guide_zoom_full", "全体を表示") : T("art_paint_guide_zoom_fit", "拡大表示");
+    shouldZoomForStep() ? T("art_paint_guide_zoom_full", "全体を表示") : T("art_paint_guide_zoom_fit", "このブロックへ戻る");
 }
 
 function renderPaintGuideStep(){
@@ -193,7 +207,7 @@ function renderPaintGuideStep(){
   const stepNum = paintGuideStepIndex + 1;
 
   document.getElementById("artGuideProgressLabel").textContent =
-    T("art_paint_guide_step_of", `${stepNum} / ${total}`, { current: stepNum, total });
+    T("art_paint_guide_step_of", `${stepNum} / ${total}（ブロック${step.blockNum}）`, { current: stepNum, total, block: step.blockNum });
   document.getElementById("artGuideProgressFill").style.width = `${(stepNum / total) * 100}%`;
 
   document.getElementById("artGuideColorChip").style.background = step.color;
@@ -215,6 +229,12 @@ function renderPaintGuideStep(){
     b.textContent = T("art_paint_guide_method_tap", `${step.borderCells.length}マスを個別にタップ`, { count: step.borderCells.length });
     badges.appendChild(b);
   }
+  if(step.interiorClusters.some(c => c.spansBeyondBlock)){
+    const b = document.createElement("span");
+    b.className = "art-guide-method-badge is-note";
+    b.textContent = T("art_paint_guide_spans_note", "この範囲は表示エリアの外まで広がっています");
+    badges.appendChild(b);
+  }
 
   document.getElementById("artGuidePrevBtn").disabled = paintGuideStepIndex === 0;
   document.getElementById("artGuideNextBtn").textContent =
@@ -230,8 +250,8 @@ function renderPaintGuideCanvas(){
   if(!cvs || overlay.style.display === "none" || !paintGuideOrder.length) return;
 
   const step = paintGuideOrder[paintGuideStepIndex];
-  const zoomed = shouldZoomForStep(step);
-  const viewport = zoomed ? computeStepViewport(step) : { ox: 0, oy: 0, w: gridWidth, h: gridHeight };
+  const zoomed = shouldZoomForStep();
+  const viewport = zoomed ? computeBlockViewport(step) : { ox: 0, oy: 0, w: gridWidth, h: gridHeight };
 
   const gctx = cvs.getContext("2d");
   const wrap = cvs.parentElement;
@@ -265,6 +285,14 @@ function renderPaintGuideCanvas(){
   }
   gctx.globalAlpha = 1;
 
+  // 今のブロックの範囲を枠で示す（全体表示に切り替えたときに特に役立つ）
+  if(!zoomed){
+    const bx0 = step.bx * BLOCK_SIZE, by0 = step.by * BLOCK_SIZE;
+    gctx.strokeStyle = dark ? "#ffe680" : "#ff7a1a";
+    gctx.lineWidth = Math.max(2, cell * 0.15);
+    gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
+  }
+
   // 内側マス（バケツ範囲）のかたまりごとに外周を強調表示
   gctx.strokeStyle = dark ? "#ffe680" : "#ff7a1a";
   gctx.lineWidth = Math.max(2, cell * 0.22);
@@ -296,13 +324,14 @@ function renderPaintGuideCanvas(){
   });
 }
 
-// 表示範囲を、現在の色のマス全体のバウンディングボックス＋余白に絞り込む
-function computeStepViewport(step){
-  const pad = 2;
-  const minX = Math.max(0, step.bbox.minX - pad);
-  const minY = Math.max(0, step.bbox.minY - pad);
-  const maxX = Math.min(gridWidth - 1, step.bbox.maxX + pad);
-  const maxY = Math.min(gridHeight - 1, step.bbox.maxY + pad);
+// 表示範囲を「今のブロック」の実マス範囲＋少し余白に固定する
+// （既存の10×10ブロック表示と同じ区切りなので、実機の画面でも同じ単位で作業しやすい）
+function computeBlockViewport(step){
+  const pad = 1;
+  const minX = Math.max(0, step.bx * BLOCK_SIZE - pad);
+  const minY = Math.max(0, step.by * BLOCK_SIZE - pad);
+  const maxX = Math.min(gridWidth - 1, step.bx * BLOCK_SIZE + step.bw - 1 + pad);
+  const maxY = Math.min(gridHeight - 1, step.by * BLOCK_SIZE + step.bh - 1 + pad);
   return { ox: minX, oy: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
 }
 
