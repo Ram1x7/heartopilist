@@ -525,6 +525,8 @@ function updateRecordingUI() {
   if (toggle) toggle.checked = isRecording;
   document.getElementById("musicDurationOptions").classList.toggle("disabled", isRecording);
   document.getElementById("musicRecordHint").style.display = isRecording ? "" : "none";
+  // 録音中は長さの選択ができないのと同じ理由で、休符も追加できないようにする
+  document.getElementById("musicAddRestBtn").disabled = isRecording;
 }
 
 // ── 譜面の編集 ──
@@ -535,6 +537,11 @@ function addChordToken(notes, beats) {
   });
   renderScoreDisplay();
   saveDraftDebounced();
+}
+
+// 休符（notes:[]の音）を、選んでいる長さで譜面の最後に追加する
+function addRestToken() {
+  addChordToken([], getDuration(selectedDurationId).beats);
 }
 
 function deleteLastToken() {
@@ -571,12 +578,15 @@ function renderScoreDisplay() {
       beatsSinceBar = 0;
     }
     const current = pageMode === "practice" && i === cursor;
+    const isRest = tok.notes.length === 0;
     const isChord = tok.notes.length > 1;
     const inLoop = loopStart !== null && loopEnd !== null && i >= loopStart && i <= loopEnd;
     const outOfLoop = loopEnabled && loopStart !== null && !inLoop;
-    const digits = tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
-    const kana = isChord ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
-    const cls = ["music-chip", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop"].filter(Boolean).join(" ");
+    const digits = isRest
+      ? `<span class="music-note-digit">0</span>`
+      : tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
+    const kana = isChord || isRest ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
+    const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop"].filter(Boolean).join(" ");
     html += `<span class="${cls}" data-index="${i}">${digits}${kana}</span>`;
     beatsSinceBar += tok.beats;
   });
@@ -680,6 +690,8 @@ function setPageMode(mode) {
   stopPlayback();
   pageMode = mode;
   cursor = -1;
+  // 練習モードの冒頭が休符の場合、対応するボタン操作が存在しないため自動で読み飛ばす
+  if (pageMode === "practice") skipLeadingRests();
   updateModeUI();
   renderScoreDisplay();
 }
@@ -766,7 +778,7 @@ function renderFollowDisplay() {
   const cur = tokens[idx];
   const nextIdx = nextNoteIndex(idx);
   const next = nextIdx !== null ? tokens[nextIdx] : null;
-  const renderDigits = (tok) => tok.notes.map((n) => `<span>${noteDisplayDigit(n)}</span>`).join("");
+  const renderDigits = (tok) => (tok.notes.length ? tok.notes.map((n) => `<span>${noteDisplayDigit(n)}</span>`).join("") : `<span>0</span>`);
   const curKana = cur.notes.length === 1 ? DEGREE_LABELS[cur.notes[0].degree] : "";
 
   el.innerHTML = `
@@ -794,11 +806,28 @@ function nextNoteIndex(fromIdx) {
   return fromIdx + 1 < tokens.length ? fromIdx + 1 : null;
 }
 
+// 休符（notes:[]の音）は対応するボタン操作が存在しないため、タップでの先取り
+// （停止中／再生中を問わず）では自動的に読み飛ばす。実際の間の長さは自動再生の
+// tick()側でtok.beatsぶん待つことで表現される（休符は何も鳴らさないだけで、
+// 進行自体はここでは早めない）
+function isRestToken(tok) {
+  return !tok || tok.notes.length === 0;
+}
+
+function skipLeadingRests() {
+  let idx = nextNoteIndex(cursor);
+  while (idx !== null && isRestToken(tokens[idx])) {
+    cursor = idx;
+    idx = nextNoteIndex(cursor);
+  }
+}
+
 function tryAdvancePracticeChord() {
   const idx = nextNoteIndex(cursor);
   if (idx === null) return;
   if (!notesSetEqual(currentGroupNotes, tokens[idx].notes)) return;
   cursor = idx;
+  skipLeadingRests();
   renderScoreDisplay();
   if (isPlaying) {
     clearTimeout(playTimer);
@@ -1197,6 +1226,7 @@ function bindControls() {
   document.getElementById("musicRecordToggle").addEventListener("change", toggleRecording);
   document.getElementById("musicSemitoneToggle").addEventListener("change", toggleSemitone);
 
+  document.getElementById("musicAddRestBtn").addEventListener("click", addRestToken);
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);
   document.getElementById("musicClearBtn").addEventListener("click", clearScore);
 
