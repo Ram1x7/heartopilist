@@ -282,28 +282,39 @@ function renderPaintGuideCanvas(){
   }
   gctx.globalAlpha = 1;
 
-  // マス目の境界線（1マスずつはっきり分かるように、セルがある程度の大きさの時だけ表示）
+  // マス目の境界線（1マスずつはっきり分かるように、セルがある程度の大きさの時だけ表示）。
+  // 単色の半透明線だと、マスの色と同系統の色（暗い線が黒系のマス、明るい線が
+  // 白系のマスなど）に重なったときに見えなくなるため、明るい縁取り＋暗い本線を
+  // 重ねて描く「縁取り線」にし、周りの色に関係なく常にはっきり見えるようにする
   if(cell >= 6){
-    gctx.strokeStyle = dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
-    gctx.lineWidth = 1;
-    gctx.beginPath();
+    const gridPath = new Path2D();
     for(let vx = 0; vx <= viewport.w; vx++){
-      gctx.moveTo(vx * cell, 0);
-      gctx.lineTo(vx * cell, cvs.height);
+      gridPath.moveTo(vx * cell, 0);
+      gridPath.lineTo(vx * cell, cvs.height);
     }
     for(let vy = 0; vy <= viewport.h; vy++){
-      gctx.moveTo(0, vy * cell);
-      gctx.lineTo(cvs.width, vy * cell);
+      gridPath.moveTo(0, vy * cell);
+      gridPath.lineTo(cvs.width, vy * cell);
     }
-    gctx.stroke();
+    gctx.strokeStyle = "rgba(255,255,255,0.9)";
+    gctx.lineWidth = 2.4;
+    gctx.stroke(gridPath);
+    gctx.strokeStyle = "rgba(0,0,0,0.55)";
+    gctx.lineWidth = 1;
+    gctx.stroke(gridPath);
   }
 
   // 今のブロック（10×10）の一番外側の枠だけ太く表示する（ズーム時はブロックの
-  // 実際の境目を、全体表示のときは今どこを見ているかを分かりやすくする）
+  // 実際の境目を、全体表示のときは今どこを見ているかを分かりやすくする）。
+  // こちらも縁取り線にして、周りのマスの色に関係なく見えるようにする
   {
     const bx0 = step.bx * BLOCK_SIZE - viewport.ox, by0 = step.by * BLOCK_SIZE - viewport.oy;
-    gctx.strokeStyle = dark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.7)";
-    gctx.lineWidth = Math.max(3, cell * 0.12);
+    const frameWidth = Math.max(3, cell * 0.12);
+    gctx.strokeStyle = "rgba(255,255,255,0.95)";
+    gctx.lineWidth = frameWidth + 2.5;
+    gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
+    gctx.strokeStyle = "rgba(0,0,0,0.85)";
+    gctx.lineWidth = frameWidth;
     gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
   }
 
