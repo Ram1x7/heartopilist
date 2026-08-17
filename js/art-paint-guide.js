@@ -284,8 +284,8 @@ function renderPaintGuideCanvas(){
 
   // マス目の境界線（1マスずつはっきり分かるように、セルがある程度の大きさの時だけ表示）
   if(cell >= 6){
-    gctx.strokeStyle = dark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.25)";
-    gctx.lineWidth = Math.max(1.5, cell * 0.06);
+    gctx.strokeStyle = dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
+    gctx.lineWidth = 1;
     gctx.beginPath();
     for(let vx = 0; vx <= viewport.w; vx++){
       gctx.moveTo(vx * cell, 0);
@@ -298,11 +298,12 @@ function renderPaintGuideCanvas(){
     gctx.stroke();
   }
 
-  // 今のブロックの範囲を枠で示す（全体表示に切り替えたときに特に役立つ）
-  if(!zoomed){
-    const bx0 = step.bx * BLOCK_SIZE, by0 = step.by * BLOCK_SIZE;
-    gctx.strokeStyle = dark ? "#ffe680" : "#ff7a1a";
-    gctx.lineWidth = Math.max(2, cell * 0.15);
+  // 今のブロック（10×10）の一番外側の枠だけ太く表示する（ズーム時はブロックの
+  // 実際の境目を、全体表示のときは今どこを見ているかを分かりやすくする）
+  {
+    const bx0 = step.bx * BLOCK_SIZE - viewport.ox, by0 = step.by * BLOCK_SIZE - viewport.oy;
+    gctx.strokeStyle = dark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.7)";
+    gctx.lineWidth = Math.max(3, cell * 0.12);
     gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
   }
 
