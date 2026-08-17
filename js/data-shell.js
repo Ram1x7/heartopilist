@@ -302,7 +302,7 @@ const shellData = [
  level:8,
  price:85,
  weather:["虹"],
- time:["0-6","6-12","18-0"],
+ time:["0-6","12-18","18-0"],
  location:"海洋清掃クエスト",
  locationI18n:{"ja":"海洋清掃クエスト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/shells/025.PNG",
