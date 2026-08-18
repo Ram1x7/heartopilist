@@ -253,6 +253,13 @@ const codesData = [
     expiry: "2026-09-01 00:59",
     active: true,
   },
+  {
+    code: "THXHEART26",
+    reward: "願い星×3，コイン×8000",
+    rewardI18n:{"ja":"願い星×3，コイン×8000","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-10-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
