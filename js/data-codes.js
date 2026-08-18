@@ -254,6 +254,15 @@ const codesData = [
     active: true,
   },
   {
+    code: "a7m4q9r3k6n2",
+    reward: "願い星×3，染色剤×2，無垢な蛍石×1",
+    rewardI18n:{"ja":"願い星×3，染色剤×2，無垢な蛍石×1","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"願い星×3，染色剤×2，無垢な蛍石×1","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"願い星×3，染色剤×2，無垢な蛍石×1","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-10-01 00:59",
+    active: true,
+  },
+  {
     code: "THXHEART26",
     reward: "願い星×3，コイン×8000",
     rewardI18n:{"ja":"願い星×3，コイン×8000","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
