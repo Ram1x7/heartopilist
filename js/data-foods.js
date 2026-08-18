@@ -1757,7 +1757,7 @@ const foodsData = [
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
-  prices:[2980],
+  prices:[400],
   materials:["牛乳(@50)","牛乳(@50)","ブルーベリー","ブルーベリー"],
   level:11,
   materials_image:[
