@@ -41,6 +41,7 @@ let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
 let savedDesigns = []; // 名前を付けて保存したデザインの一覧
 let currentDesignId = null; // 保存済みデザインを読み込んで編集中の場合、そのID（未保存ならnull）
+let myDesignsFilter = "all"; // マイデザイン一覧の絞り込み（all/notStarted/inProgress/done）
 let newCanvasModalCancelable = false; // 新規キャンバス作成モーダルを「新規作成」ボタンから開いた場合のみキャンセル可能にする
 let editMode = false; // 編集モード（ONの間だけキャンバスタップでペン/消しゴム/塗りつぶしが発動する。誤タップ防止）
 let isLocked = false; // キャンバスの固定（ロック）。ロック中は編集モードに関わらず描画系ツールを一切受け付けない
@@ -1374,7 +1375,24 @@ function saveCurrentAsDesign(){
   showToast(T("art_toast_saved", "保存しました"));
 }
 
+// ── 進捗（未着手/作業中/完了）の判定 ──
+// ぬり方ガイドの完了時と、10×10ブロック表示のタップ（未着手/作業中/完了の3段階）で
+// 更新される既存のblockStatusをそのまま進捗の元データとして使う。新しいデータを
+// 持たせず、既存の仕組みと完全に連動させるため
+function computeDesignProgress(design){
+  const blocksX = Math.ceil(design.width / BLOCK_SIZE);
+  const blocksY = Math.ceil(design.height / BLOCK_SIZE);
+  const totalBlocks = blocksX * blocksY;
+  const statuses = Object.values(design.blockStatus || {});
+  const doneBlocks = statuses.filter(s => s === 2).length;
+  const anyProgress = statuses.length > 0;
+  const percent = totalBlocks > 0 ? Math.round((doneBlocks / totalBlocks) * 100) : 0;
+  const status = doneBlocks >= totalBlocks && totalBlocks > 0 ? "done" : anyProgress ? "inProgress" : "notStarted";
+  return { status, percent };
+}
+
 function openMyDesignsModal(){
+  renderMyDesignsFilters();
   renderMyDesignsList();
   document.getElementById("myDesignsModal").style.display = "block";
 }
@@ -1383,19 +1401,68 @@ function closeMyDesignsModal(){
   document.getElementById("myDesignsModal").style.display = "none";
 }
 
+function renderMyDesignsFilters(){
+  const el = document.getElementById("artMyDesignsFilters");
+  if(!el) return;
+  if(!savedDesigns.length){
+    el.innerHTML = "";
+    return;
+  }
+  const progressById = new Map(savedDesigns.map(d => [d.id, computeDesignProgress(d)]));
+  const counts = { all: savedDesigns.length, notStarted: 0, inProgress: 0, done: 0 };
+  progressById.forEach(p => { counts[p.status]++; });
+  const filters = [
+    ["all", T("art_mydesigns_filter_all", "すべて")],
+    ["notStarted", T("art_mydesigns_filter_not_started", "未着手")],
+    ["inProgress", T("art_mydesigns_filter_in_progress", "作業中")],
+    ["done", T("art_mydesigns_filter_done", "完了")],
+  ];
+  el.innerHTML = filters.map(([key, label]) => `
+    <button class="art-mydesigns-filter-chip${myDesignsFilter === key ? " is-active" : ""}" data-filter="${key}">${label}（${counts[key]}）</button>
+  `).join("");
+  el.querySelectorAll("[data-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      myDesignsFilter = btn.dataset.filter;
+      renderMyDesignsFilters();
+      renderMyDesignsList();
+    });
+  });
+}
+
 function renderMyDesignsList(){
   const el = document.getElementById("artMyDesignsList");
   if(!savedDesigns.length){
     el.innerHTML = `<div class="art-mydesigns-empty">${T("art_mydesigns_empty", "保存したデザインはまだありません")}</div>`;
     return;
   }
-  const sorted = savedDesigns.slice().sort((a, b) => b.updatedAt - a.updatedAt);
-  el.innerHTML = sorted.map(d => `
+  const withProgress = savedDesigns.map(d => ({ design: d, progress: computeDesignProgress(d) }));
+  const filtered = myDesignsFilter === "all" ? withProgress : withProgress.filter(x => x.progress.status === myDesignsFilter);
+  if(!filtered.length){
+    el.innerHTML = `<div class="art-mydesigns-empty">${T("art_mydesigns_filter_empty", "該当するデザインはありません")}</div>`;
+    return;
+  }
+  // 作業中のデザインを常に上に固定し、それ以外は更新日時の新しい順にする
+  const sorted = filtered.slice().sort((a, b) => {
+    const aPinned = a.progress.status === "inProgress" ? 1 : 0;
+    const bPinned = b.progress.status === "inProgress" ? 1 : 0;
+    if(aPinned !== bPinned) return bPinned - aPinned;
+    return b.design.updatedAt - a.design.updatedAt;
+  });
+  const statusLabel = {
+    notStarted: T("art_mydesigns_filter_not_started", "未着手"),
+    inProgress: T("art_mydesigns_filter_in_progress", "作業中"),
+    done: T("art_mydesigns_filter_done", "完了"),
+  };
+  el.innerHTML = sorted.map(({ design: d, progress }) => `
     <div class="art-mydesign-item${d.id === currentDesignId ? " current" : ""}">
       <canvas class="art-mydesign-thumb" id="artMyDesignThumb_${d.id}"></canvas>
       <div class="art-mydesign-info">
         <div class="art-mydesign-name">${escapeHtml(d.name)}</div>
         <div class="art-mydesign-meta">${d.width} × ${d.height}</div>
+        <div class="art-mydesign-progress-row">
+          <div class="art-mydesign-progress-bar"><div class="art-mydesign-progress-fill is-${progress.status}" style="width:${progress.percent}%"></div></div>
+          <span class="art-mydesign-progress-label is-${progress.status}">${statusLabel[progress.status]} ${progress.percent}%</span>
+        </div>
       </div>
       <div class="art-mydesign-actions">
         <button onclick="loadDesign('${d.id}')">${T("art_open", "開く")}</button>
@@ -1403,7 +1470,7 @@ function renderMyDesignsList(){
       </div>
     </div>
   `).join("");
-  sorted.forEach(d => {
+  sorted.forEach(({ design: d }) => {
     drawPixelsToThumb(document.getElementById(`artMyDesignThumb_${d.id}`), d.pixelData, d.width, d.height, 48);
   });
 }
@@ -1465,6 +1532,7 @@ function deleteDesign(id){
     currentDesignId = null;
     saveDraft();
   }
+  renderMyDesignsFilters();
   renderMyDesignsList();
 }
 
