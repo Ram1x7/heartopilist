@@ -106,6 +106,7 @@ function initMusicEditor() {
   updateRecordingUI();
   bindControls();
   bindOnboardingControls();
+  bindHumControls();
   maybeShowOnboarding();
 }
 

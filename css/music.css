@@ -1387,6 +1387,140 @@ body.dark .music-saved-actions button{
   color:#b3a89a;
 }
 
+.music-step-hint{
+  font-size:11px;
+  line-height:1.5;
+  color:var(--text-sub);
+  margin:0 0 10px;
+}
+
+body.dark .music-step-hint{
+  color:#b3a89a;
+}
+
+/* ハミングから作る（β機能） */
+.music-hum-box{
+  max-width:380px;
+  max-height:85vh;
+  overflow-y:auto;
+  text-align:left;
+}
+
+.music-hum-caution{
+  margin:0 0 14px;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--text-sub);
+}
+
+body.dark .music-hum-caution{
+  color:#b3a89a;
+}
+
+.music-hum-source-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.music-hum-upload-label{
+  cursor:pointer;
+}
+
+.music-hum-recording-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:10px;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .music-hum-recording-row{
+  color:#ece4d4;
+}
+
+.music-hum-rec-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--vermillion);
+  animation:music-hum-rec-blink 1s ease-in-out infinite;
+}
+
+body.dark .music-hum-rec-dot{
+  background:var(--vermillion-soft);
+}
+
+@keyframes music-hum-rec-blink{
+  0%, 100%{ opacity:1; }
+  50%{ opacity:0.25; }
+}
+
+.music-hum-file-row{
+  margin-bottom:10px;
+  font-size:12px;
+  color:var(--text-sub);
+}
+
+body.dark .music-hum-file-row{
+  color:#b3a89a;
+}
+
+.music-hum-progress-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.music-hum-progress-bar{
+  flex:1;
+  height:6px;
+  border-radius:999px;
+  background:var(--card-sub);
+  overflow:hidden;
+}
+
+body.dark .music-hum-progress-bar{
+  background:#383329;
+}
+
+.music-hum-progress-fill{
+  height:100%;
+  background:var(--indigo);
+  border-radius:999px;
+  transition:width 0.2s;
+}
+
+body.dark .music-hum-progress-fill{
+  background:var(--indigo-soft);
+}
+
+.music-hum-progress-label{
+  flex-shrink:0;
+  font-size:11px;
+  color:var(--text-sub);
+  white-space:nowrap;
+}
+
+body.dark .music-hum-progress-label{
+  color:#b3a89a;
+}
+
+.music-hum-error{
+  min-height:1.4em;
+  margin:0 0 8px;
+  font-size:12px;
+  color:var(--vermillion);
+}
+
+body.dark .music-hum-error{
+  color:var(--vermillion-soft);
+}
+
 /* はじめての案内（①楽器→②テンポ→③録音か手入力か） */
 .music-onboarding-box{
   max-width:360px;
