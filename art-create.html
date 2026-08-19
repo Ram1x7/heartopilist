@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/art.css?v=34">
+<link rel="stylesheet" href="./css/art.css?v=35">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -89,6 +89,12 @@
 
 <div class="art-notice" data-i18n="art_coming_soon">
   現在開発中の機能です。今後のアップデートで順次使えるようになります。
+</div>
+
+<div class="art-offline-banner" id="artOfflineBanner" style="display:none;">
+  <span class="art-offline-banner-icon" id="artOfflineBannerIcon"></span>
+  <p data-i18n="art_offline_banner_text">ログイン不要・データはこの端末だけに保存されます。電波が悪くても引き続き使えます。</p>
+  <button class="art-offline-banner-close" id="artOfflineBannerCloseBtn" aria-label="close"></button>
 </div>
 
 <div class="art-canvas-status-bar" id="artCanvasStatusBar">
@@ -203,6 +209,7 @@
 <div id="myDesignsModal" onclick="if(event.target.id==='myDesignsModal') closeMyDesignsModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-mydesigns-box">
     <h3 data-i18n="art_mydesigns_title">マイデザイン</h3>
+    <p class="art-mydesigns-storage-note" data-i18n="art_mydesigns_storage_note">保存したデザインはこの端末のブラウザだけに残ります（アカウント登録不要）。機種変更・買い替えの前には「共有コード」でバックアップしておきましょう。</p>
     <div class="art-mydesigns-filters" id="artMyDesignsFilters"></div>
     <div class="art-mydesigns-list" id="artMyDesignsList"></div>
     <button class="modal-close-btn" onclick="closeMyDesignsModal()" data-i18n="art_close">閉じる</button>
@@ -275,6 +282,9 @@
 
     <p style="margin-top:10px;"><strong>マイデザイン</strong><br>
     「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。一覧では未着手・作業中・完了で絞り込め、進捗（%）も表示されます。作業中のデザインは常に一覧の上に固定されるので、続きから再開しやすくなっています。「新規作成」から別サイズのキャンバスも作成できます。</p>
+
+    <p style="margin-top:10px;"><strong>オフライン・データの保存について</strong><br>
+    「アート」機能はアカウント登録・ログインが一切不要です。作成したデザインはサーバーには送信されず、この端末のブラウザ内だけに保存されます。一度開いたページはオフラインでも引き続き使えるので、電波の弱い場所でも安心して作業を続けられます。ただし、ブラウザのデータを消去したり機種変更をしたりすると、保存したデザインも一緒に失われてしまいます。大事なデザインは「共有コード」を使ってバックアップしておくことをおすすめします。</p>
 
     <p style="margin-top:10px;"><strong>エクスポート・共有</strong><br>
     完成したデザインをPNG画像として保存したり、共有したりできます。</p>
@@ -364,6 +374,18 @@ document.getElementById("artFrameBackIcon").innerHTML = icon("chevronDown", { si
 document.getElementById("helpBtn").innerHTML = icon("help");
 document.getElementById("artGuideBlockFlashIcon").innerHTML = icon("check", { size: 20 });
 document.getElementById("artGuideCompleteIcon").innerHTML = icon("trophy", { size: 40 });
+document.getElementById("artOfflineBannerIcon").innerHTML = icon("globe", { size: 18 });
+document.getElementById("artOfflineBannerCloseBtn").innerHTML = icon("close", { size: 14 });
+
+// 「ログイン不要・オフラインでも使える」バナー（初回のみ表示。閉じたら二度と出さない）
+const OFFLINE_BANNER_SEEN_KEY = "hatopiArt_offlineBannerSeen";
+if(!localStorage.getItem(OFFLINE_BANNER_SEEN_KEY)){
+  document.getElementById("artOfflineBanner").style.display = "flex";
+}
+document.getElementById("artOfflineBannerCloseBtn").addEventListener("click", () => {
+  localStorage.setItem(OFFLINE_BANNER_SEEN_KEY, "1");
+  document.getElementById("artOfflineBanner").style.display = "none";
+});
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");

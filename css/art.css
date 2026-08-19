@@ -36,6 +36,63 @@ body.dark .art-notice{
   color:#b3a89a;
 }
 
+/* 「ログイン不要・オフラインでも使える」バナー（初回のみ、閉じるまで表示） */
+.art-offline-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 16px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(60,90,110,0.1);
+  border:1px solid var(--indigo);
+}
+
+.art-offline-banner-icon{
+  flex-shrink:0;
+  color:var(--indigo);
+  display:flex;
+}
+
+.art-offline-banner p{
+  flex:1;
+  margin:0;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--text);
+}
+
+.art-offline-banner-close{
+  flex-shrink:0;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+body.dark .art-offline-banner{
+  background:rgba(90,125,146,0.14);
+  border-color:var(--indigo-soft);
+}
+
+body.dark .art-offline-banner-icon{
+  color:var(--indigo-soft);
+}
+
+body.dark .art-offline-banner p{
+  color:#ece4d4;
+}
+
+body.dark .art-offline-banner-close{
+  color:#b3a89a;
+}
+
 /* 編集モード・固定（ロック）バー（常時表示。誤タップ防止のための明確なON/OFF表示） */
 .art-canvas-status-bar{
   display:flex;
@@ -1791,6 +1848,17 @@ body.dark .art-guide-complete-stat-label{
 }
 
 /* マイデザイン一覧の絞り込みチップ・進捗表示 */
+.art-mydesigns-storage-note{
+  margin:0 0 10px;
+  font-size:11px;
+  line-height:1.6;
+  color:var(--text-sub);
+}
+
+body.dark .art-mydesigns-storage-note{
+  color:#b3a89a;
+}
+
 .art-mydesigns-filters{
   display:flex;
   flex-wrap:wrap;
