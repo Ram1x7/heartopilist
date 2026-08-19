@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/music.css?v=25">
+<link rel="stylesheet" href="./css/music.css?v=26">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -94,11 +94,14 @@
   <div class="music-panel-section">
     <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
     <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
-    <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
-    <label class="music-semitone-row" id="musicSemitoneRow" style="display:none">
-      <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
-      <input type="checkbox" id="musicSemitoneToggle">
-    </label>
+    <details class="music-advanced-settings" id="musicAdvancedSettings">
+      <summary data-i18n="music_advanced_settings_label">詳細設定（配置・半音表示）</summary>
+      <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
+      <label class="music-semitone-row" id="musicSemitoneRow" style="display:none">
+        <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+        <input type="checkbox" id="musicSemitoneToggle">
+      </label>
+    </details>
   </div>
 
   <div class="music-panel-section" id="musicEditControls">
@@ -234,24 +237,77 @@
   </div>
 </div>
 
+<div id="musicOnboardingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+  <div class="modal-box music-onboarding-box">
+    <div class="music-onboarding-progress">
+      <span class="music-onboarding-dot" data-step="1"></span>
+      <span class="music-onboarding-dot" data-step="2"></span>
+      <span class="music-onboarding-dot" data-step="3"></span>
+    </div>
+
+    <div id="musicOnboardStep1">
+      <h3 data-i18n="music_onboard_step1_title">① 楽器を選ぶ</h3>
+      <p class="music-onboard-hint" data-i18n="music_onboard_step1_hint">練習したい楽器を選んでください。あとからいつでも変更できます</p>
+      <div class="music-onboard-instrument-buttons" id="musicOnboardInstrumentButtons"></div>
+    </div>
+
+    <div id="musicOnboardStep2" style="display:none">
+      <h3 data-i18n="music_onboard_step2_title">② テンポを決める</h3>
+      <p class="music-onboard-hint" data-i18n="music_onboard_step2_hint">目安のテンポと拍子を選んでください。わからなければそのままで大丈夫です</p>
+      <div class="music-onboard-tempo-row">
+        <span data-i18n="music_bpm_label">テンポ</span>
+        <input type="number" id="musicOnboardBpmInput" class="music-bpm-input" min="40" max="220" value="100">
+        <span data-i18n="music_bpm_unit">BPM</span>
+      </div>
+      <div class="music-onboard-tempo-row">
+        <span data-i18n="music_timesig_label">拍子</span>
+        <select id="musicOnboardTimeSigSelect" class="music-timesig-select"></select>
+      </div>
+    </div>
+
+    <div id="musicOnboardStep3" style="display:none">
+      <h3 data-i18n="music_onboard_step3_title">③ 録音か手入力かを選ぶ</h3>
+      <p class="music-onboard-hint" data-i18n="music_onboard_step3_hint">どちらもあとからいつでも切り替えられます</p>
+      <button class="music-onboard-choice-btn" id="musicOnboardChoiceRecord">
+        <strong data-i18n="music_onboard_choice_record_title">演奏しながら録音する</strong>
+        <span data-i18n="music_onboard_choice_record_body">演奏ボタンを押した長さがそのまま音の長さになります</span>
+      </button>
+      <button class="music-onboard-choice-btn" id="musicOnboardChoiceManual">
+        <strong data-i18n="music_onboard_choice_manual_title">音符を1つずつ入力する</strong>
+        <span data-i18n="music_onboard_choice_manual_body">長さを選んでから演奏ボタンを押すと、その音が譜面に追加されます</span>
+      </button>
+    </div>
+
+    <div class="music-onboard-nav">
+      <button class="music-header-btn music-onboard-nav-secondary" id="musicOnboardSkipBtn" data-i18n="music_onboard_skip">スキップ</button>
+      <button class="music-header-btn music-onboard-nav-secondary" id="musicOnboardBackBtn" data-i18n="music_onboard_back" style="display:none">戻る</button>
+      <button class="music-header-btn" id="musicOnboardNextBtn" data-i18n="music_onboard_next">次へ</button>
+    </div>
+  </div>
+</div>
+
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box music-help-box">
     <h3 style="text-align:center;">使い方</h3>
 
-    <p><strong>楽器</strong><br>
-    ピアノ・ギター/ベース・オカリナ/ほら貝の3種類から選べます。ゲーム内の実際の演奏画面と同じボタン配置です。ピアノとギター/ベースは「15鍵（2列）」「15鍵（3列）」などの配置を切り替えられます。ピアノの「22キー」配置では、半音（♯）を表示するかも選べます。</p>
+    <p><strong>はじめての案内</strong><br>
+    初めてこのページを開いたときは、①楽器を選ぶ→②テンポを決める→③録音か手入力かを選ぶ、という3ステップの案内が表示されます。あとから見直したいときは、下のボタンからいつでも呼び出せます。</p>
+    <button class="modal-close-btn" id="musicOnboardReplayBtn" onclick="closeHelpModal(); openOnboarding();" style="margin-top:8px;" data-i18n="music_onboard_replay">案内をもう一度見る</button>
+
+    <p style="margin-top:10px;"><strong>楽器</strong><br>
+    ピアノ・ギター/ベース・オカリナ/ほら貝の3種類から選べます。ゲーム内の実際の演奏画面と同じボタン配置です。ピアノとギター/ベースは「詳細設定」を開くと「15鍵（2列）」「15鍵（3列）」などの配置を切り替えられます。ピアノの「22キー」配置では、半音（♯）を表示するかも選べます。</p>
 
     <p style="margin-top:10px;"><strong>編集モード</strong><br>
     「音の長さ」を選んでから演奏ボタンを押すと、その音が譜面に追加されます。音を出さない「休符」を入れたいときは「休符を追加」を押すと、選んでいる長さの休符が譜面の最後に追加されます（数字譜では「0」で表示されます）。「最後を削除」で1つ前に戻せます。</p>
 
     <p style="margin-top:10px;"><strong>録音する</strong><br>
-    ONにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。複数のボタンを同時に押すと和音として記録されます。</p>
+    ONにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。複数のボタンを同時に押すと和音として記録されます。テンポ・拍子が初期値のまま一度も変更されていない状態で録音を始めようとすると、先に確認するかどうかの案内が出ます（音の長さの自動判定に影響するため）。</p>
 
     <p style="margin-top:10px;"><strong>テンポ・拍子</strong><br>
     BPM（1分間の拍数）と拍子（4/4・3/4など）を設定できます。練習モードの再生速度はテンポを基準にした倍率です。小節線は拍子をもとに自動で表示されます。</p>
 
     <p style="margin-top:10px;"><strong>区間リピート</strong><br>
-    「区間を選ぶ」を押してから譜面の音を2つタップすると、その間を区間として選べます。「この区間をループ」をONにすると、練習モード・追従モードの再生（タップでの先取りも含む）が、区間の終わりに来ると自動で区間の始めに戻ります。苦手な部分だけを集中して繰り返し練習できます。「解除」でいつでも区間を消せます。</p>
+    「区間を選ぶ」を押してから譜面の音を2つタップすると、その間を区間として選べます。開始の音を選んだ直後は、その音が点線の枠で点滅表示され、次にどこをタップすればよいか分かりやすくなっています。「この区間をループ」をONにすると、練習モード・追従モードの再生（タップでの先取りも含む）が、区間の終わりに来ると自動で区間の始めに戻ります。苦手な部分だけを集中して繰り返し練習できます。「解除」でいつでも区間を消せます。</p>
 
     <p style="margin-top:10px;"><strong>練習モード</strong><br>
     「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列／22キーなど）がそのまま自動で使われます。ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。再生を止めていても、次に弾くべき音を正しく押すと譜面のハイライトが先へ進みます。休符（押すボタンが無い音）は自動的に読み飛ばされます。採点はありません。左上の×で編集モードに戻れます。</p>
