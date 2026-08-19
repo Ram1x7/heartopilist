@@ -564,9 +564,9 @@ function zoomReset(){
 // ── カラーパレット ──
 // ゲーム内で実際に選択できる色（js/art-config.jsのGAME_PALETTE）に完全一致させた
 // 階層UI（メインカラー→サブカラー）のみを通じて色を選ぶ。任意の色を自由入力する手段は持たない。
-// メインカラーは単なる色見本のグリッドではなく、和名（GAME_PALETTE.name）を
-// 添えた「紙のチップ」として並べる。ゲーム内ピッカーの色名とそのまま一致する
-// 実用的な名前なので、RGB値だけでは分かりにくい色の見分けに役立つ
+// メインカラーは、ゲーム内に存在しない色名などを付け足さず、色番号だけで識別できる
+// 見本として並べる。角丸・薄い影の「紙のチップ」風の見た目にはしつつも、
+// 一覧性と選択speedを最優先にするため、サイズは名前ラベル追加前の密度に近い形を保つ
 function renderPalette(){
   const mainsEl = document.getElementById("artPaletteMains");
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
@@ -581,9 +581,8 @@ function renderPalette(){
     const swatchCls = ["art-paper-chip-swatch"];
     if(isNone) swatchCls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
-    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no} ${entry.name}">
+    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}">
       <span class="${swatchCls.join(" ")}"${style}></span>
-      <span class="art-paper-chip-name">${entry.name}</span>
     </button>`;
   }).join("");
   mainsEl.querySelectorAll("button").forEach(btn => {

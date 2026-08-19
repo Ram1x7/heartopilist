@@ -461,24 +461,26 @@ body.dark .art-swatch.is-selected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
 }
 
-/* メインカラーパレット：RGBグリッドではなく、和名を添えた「紙のチップ」として並べる */
+/* メインカラーパレット：ゲーム内に存在しない色名などは付け足さず、色番号だけで識別する。
+   角丸・薄い影の「紙のチップ」風の見た目は保ちつつ、名前ラベルを持たないぶん
+   スウォッチにぴったり寄せたサイズにして、一覧性・選択speedを優先する */
 .art-paper-chip{
   display:flex;
-  flex-direction:column;
   align-items:center;
-  gap:4px;
-  width:54px;
-  padding:6px 4px 5px;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  padding:0;
   border:1px solid var(--border);
-  border-radius:14px;
+  border-radius:10px;
   background:var(--card);
-  box-shadow:0 2px 5px rgba(60,40,20,0.1);
+  box-shadow:0 1px 3px rgba(60,40,20,0.1);
   cursor:pointer;
 }
 
 .art-paper-chip.is-selected{
   border-color:var(--indigo);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo), 0 2px 5px rgba(60,40,20,0.1);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo), 0 1px 3px rgba(60,40,20,0.1);
 }
 
 .art-paper-chip-swatch{
@@ -488,35 +490,19 @@ body.dark .art-swatch.is-selected{
   border:1px solid rgba(0,0,0,0.1);
 }
 
-.art-paper-chip-name{
-  max-width:48px;
-  font-size:9px;
-  font-weight:700;
-  line-height:1.2;
-  color:var(--text-sub);
-  text-align:center;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
 body.dark .art-paper-chip{
   background:#2c2823;
   border-color:#46423b;
-  box-shadow:0 2px 5px rgba(0,0,0,0.3);
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
 }
 
 body.dark .art-paper-chip.is-selected{
   border-color:var(--indigo-soft);
-  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 2px 5px rgba(0,0,0,0.3);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 1px 3px rgba(0,0,0,0.3);
 }
 
 body.dark .art-paper-chip-swatch{
   border-color:rgba(255,255,255,0.12);
-}
-
-body.dark .art-paper-chip-name{
-  color:#b3a89a;
 }
 
 /* サブカラー展開エリア（メインカラーをタップすると下に表示される） */
