@@ -1,5 +1,19 @@
 /* music.html 専用CSS（共通の見た目はcss/style.cssを参照。既存ページのスタイルには一切影響しない） */
 
+/* フッター（codes.html・faq.html・videos.htmlと同じ見た目に揃える） */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+body.dark .footer{
+  color:#b3a89a;
+}
+
 .music-notice{
   margin:10px 0 16px;
   padding:10px 14px;
