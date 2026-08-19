@@ -190,7 +190,12 @@ body.dark .art-lock-btn.is-locked{
      伸び縮みさせない）。ズームで中の見え方が変わっても、この「窓」自体は動かない */
   height:clamp(280px, 60vh, 560px);
   overflow:auto;
-  background:var(--card);
+  background-color:var(--card);
+  /* 和紙のような繊維の質感を、極薄い藍色・朱色の細かいクロスハッチで表現する
+     （実際の描画マス目やキャンバスの視認性を妨げない濃度に抑える） */
+  background-image:
+    repeating-linear-gradient(23deg, rgba(60,90,110,0.035) 0px, rgba(60,90,110,0.035) 1px, transparent 1px, transparent 7px),
+    repeating-linear-gradient(-64deg, rgba(177,80,59,0.025) 0px, rgba(177,80,59,0.025) 1px, transparent 1px, transparent 9px);
   border:1px solid var(--border);
   border-radius:16px;
   box-shadow:0 4px 12px rgba(52,48,43,0.06);
@@ -207,9 +212,16 @@ body.dark .art-lock-btn.is-locked{
 }
 
 body.dark .art-toolbar,
-body.dark .art-canvas-area,
 body.dark .art-panel{
   background:#2c2823;
+  border-color:#46423b;
+}
+
+body.dark .art-canvas-area{
+  background-color:#2c2823;
+  background-image:
+    repeating-linear-gradient(23deg, rgba(139,169,201,0.045) 0px, rgba(139,169,201,0.045) 1px, transparent 1px, transparent 7px),
+    repeating-linear-gradient(-64deg, rgba(226,140,110,0.03) 0px, rgba(226,140,110,0.03) 1px, transparent 1px, transparent 9px);
   border-color:#46423b;
 }
 
@@ -447,6 +459,64 @@ body.dark .art-swatch{
 body.dark .art-swatch.is-selected{
   border-color:var(--indigo-soft);
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
+}
+
+/* メインカラーパレット：RGBグリッドではなく、和名を添えた「紙のチップ」として並べる */
+.art-paper-chip{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  width:54px;
+  padding:6px 4px 5px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--card);
+  box-shadow:0 2px 5px rgba(60,40,20,0.1);
+  cursor:pointer;
+}
+
+.art-paper-chip.is-selected{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo), 0 2px 5px rgba(60,40,20,0.1);
+}
+
+.art-paper-chip-swatch{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:1px solid rgba(0,0,0,0.1);
+}
+
+.art-paper-chip-name{
+  max-width:48px;
+  font-size:9px;
+  font-weight:700;
+  line-height:1.2;
+  color:var(--text-sub);
+  text-align:center;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+body.dark .art-paper-chip{
+  background:#2c2823;
+  border-color:#46423b;
+  box-shadow:0 2px 5px rgba(0,0,0,0.3);
+}
+
+body.dark .art-paper-chip.is-selected{
+  border-color:var(--indigo-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 2px 5px rgba(0,0,0,0.3);
+}
+
+body.dark .art-paper-chip-swatch{
+  border-color:rgba(255,255,255,0.12);
+}
+
+body.dark .art-paper-chip-name{
+  color:#b3a89a;
 }
 
 /* サブカラー展開エリア（メインカラーをタップすると下に表示される） */
@@ -1209,9 +1279,19 @@ body.dark .art-block-btn{
   border-color:#e8c93c;
 }
 
+/* 完了ブロックは、ただの緑塗りではなく「朱印（判子）」を押したような丸い印にする */
 .art-block-status-2{
-  background:rgba(90,158,74,0.22);
-  border-color:#5a9e4a;
+  background:rgba(90,158,74,0.16);
+  border:1.6px solid var(--vermillion);
+  border-radius:50%;
+  color:var(--vermillion);
+  font-weight:700;
+}
+
+body.dark .art-block-status-2{
+  background:rgba(90,158,74,0.2);
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
 }
 
 /* パネル内に並べるヘッダー風ボタン（保存・エクスポートなど） */
