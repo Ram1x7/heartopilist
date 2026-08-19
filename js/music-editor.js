@@ -20,6 +20,13 @@ let scoreName = "";
 let currentScoreId = null;
 let savedScores = [];
 
+// はじめての案内（①楽器→②テンポ→③録音か手入力か）。録音前のテンポ確認案内は、
+// この案内を1回でも見た後、あるいは実際にテンポ・拍子を変更した後は出さない
+const ONBOARDING_SEEN_KEY = "hatopiMusic_onboardingSeen";
+let onboardStep = 1;
+let onboardInstrumentId = "piano";
+let tempoWarningDismissed = false;
+
 let soundEnabled = true;
 let audioCtx = null;
 let sustainedTones = new Map(); // pointerId -> {osc, gain}（和音対応：同時に複数鳴らせる）
@@ -98,6 +105,107 @@ function initMusicEditor() {
   updateModeUI();
   updateRecordingUI();
   bindControls();
+  bindOnboardingControls();
+  maybeShowOnboarding();
+}
+
+// ── はじめての案内（①楽器を選ぶ→②テンポを決める→③録音か手入力かを選ぶ） ──
+// 初期状態のまま何も作られていない、本当にはじめての訪問時にだけ出す。
+// 一度でも見た（またはスキップした）らlocalStorageに記録し、二度と自動表示しない
+function maybeShowOnboarding() {
+  if (localStorage.getItem(ONBOARDING_SEEN_KEY)) return;
+  if (tokens.length > 0) {
+    // 既に何か作られている（下書きが残っている）状態は「はじめて」ではないので、
+    // 案内は出さずそのまま既読扱いにする
+    localStorage.setItem(ONBOARDING_SEEN_KEY, "1");
+    return;
+  }
+  openOnboarding();
+}
+
+function openOnboarding() {
+  onboardStep = 1;
+  onboardInstrumentId = currentInstrumentId;
+  renderOnboardStep();
+  document.getElementById("musicOnboardingModal").style.display = "block";
+}
+
+function closeOnboarding(markSeen) {
+  document.getElementById("musicOnboardingModal").style.display = "none";
+  if (markSeen) localStorage.setItem(ONBOARDING_SEEN_KEY, "1");
+}
+
+function renderOnboardStep() {
+  document.getElementById("musicOnboardStep1").style.display = onboardStep === 1 ? "" : "none";
+  document.getElementById("musicOnboardStep2").style.display = onboardStep === 2 ? "" : "none";
+  document.getElementById("musicOnboardStep3").style.display = onboardStep === 3 ? "" : "none";
+  document.querySelectorAll(".music-onboarding-dot").forEach((dot) => {
+    dot.classList.toggle("active", Number(dot.dataset.step) === onboardStep);
+  });
+  document.getElementById("musicOnboardNextBtn").style.display = onboardStep === 3 ? "none" : "";
+  document.getElementById("musicOnboardBackBtn").style.display = onboardStep === 1 ? "none" : "";
+
+  if (onboardStep === 1) renderOnboardInstrumentButtons();
+  if (onboardStep === 2) {
+    document.getElementById("musicOnboardBpmInput").value = bpm;
+    const sel = document.getElementById("musicOnboardTimeSigSelect");
+    sel.innerHTML = TIME_SIGNATURES.map((t) => `<option value="${t.id}"${t.id === timeSignatureId ? " selected" : ""}>${t.label}</option>`).join("");
+  }
+}
+
+function renderOnboardInstrumentButtons() {
+  const el = document.getElementById("musicOnboardInstrumentButtons");
+  el.innerHTML = INSTRUMENTS.map(
+    (inst) => `<button class="music-onboard-instrument-btn${inst.id === onboardInstrumentId ? " active" : ""}" data-instrument="${inst.id}">${T(inst.nameKey, inst.nameFallback)}</button>`
+  ).join("");
+  el.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      onboardInstrumentId = btn.dataset.instrument;
+      renderOnboardInstrumentButtons();
+    });
+  });
+}
+
+function onboardNext() {
+  if (onboardStep === 1) {
+    currentInstrumentId = onboardInstrumentId;
+    currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
+    renderInstrumentSelector();
+    renderLayoutSelector();
+    renderInstrumentGrid();
+  } else if (onboardStep === 2) {
+    const bpmInput = document.getElementById("musicOnboardBpmInput");
+    const bpmVal = Math.max(MIN_BPM, Math.min(MAX_BPM, Number(bpmInput.value) || DEFAULT_BPM));
+    bpm = bpmVal;
+    timeSignatureId = document.getElementById("musicOnboardTimeSigSelect").value;
+    renderScoreMeta();
+    renderScoreDisplay();
+  }
+  onboardStep++;
+  renderOnboardStep();
+}
+
+function onboardBack() {
+  onboardStep--;
+  renderOnboardStep();
+}
+
+// ③のどちらを選んでも案内自体はそこで完了する（続けて確認するステップは無い）
+function finishOnboarding(startRecording) {
+  isRecording = startRecording;
+  updateRecordingUI();
+  // テンポのステップを実際に通過済みなので、直後に録音を始めても改めて確認しない
+  tempoWarningDismissed = true;
+  saveDraftDebounced();
+  closeOnboarding(true);
+}
+
+function bindOnboardingControls() {
+  document.getElementById("musicOnboardNextBtn").addEventListener("click", onboardNext);
+  document.getElementById("musicOnboardBackBtn").addEventListener("click", onboardBack);
+  document.getElementById("musicOnboardSkipBtn").addEventListener("click", () => closeOnboarding(true));
+  document.getElementById("musicOnboardChoiceRecord").addEventListener("click", () => finishOnboarding(true));
+  document.getElementById("musicOnboardChoiceManual").addEventListener("click", () => finishOnboarding(false));
 }
 
 // ── 楽器の切り替え ──
@@ -135,13 +243,18 @@ function defaultLayoutIdFor(instrumentId) {
 // ── 配置(15鍵2列／15鍵3列／22キーなど)の切り替え ──
 function renderLayoutSelector() {
   const el = document.getElementById("musicLayoutButtons");
+  const wrapper = document.getElementById("musicAdvancedSettings");
   const inst = getInstrument(currentInstrumentId);
   if (inst.layouts.length <= 1) {
     el.innerHTML = "";
     el.style.display = "none";
+    // 配置が1つしかない楽器（オカリナ等）は「詳細設定」の中身が空になるため、
+    // 折りたたみ自体を隠す（開いても何も出ない空欄を見せないため）
+    if (wrapper) wrapper.style.display = "none";
     updateSemitoneToggleVisibility();
     return;
   }
+  if (wrapper) wrapper.style.display = "";
   el.style.display = "";
   el.innerHTML = inst.layouts
     .map(
@@ -515,8 +628,23 @@ function renderTimeSignatureOptions() {
 }
 
 // ── 録音トグル ──
+// テンポ・拍子が初期値のまま一度も変更されていない状態で録音を始めようとすると、
+// 音の長さの自動判定に影響するため先に確認する（セッション中1回だけ）
 function toggleRecording() {
-  isRecording = !isRecording;
+  const toggle = document.getElementById("musicRecordToggle");
+  const turningOn = toggle.checked;
+  const tempoStillDefault = bpm === DEFAULT_BPM && timeSignatureId === DEFAULT_TIME_SIGNATURE_ID;
+  if (turningOn && tempoStillDefault && !tempoWarningDismissed) {
+    const ok = confirm(
+      T("music_confirm_tempo_before_record", "テンポと拍子がまだ初期値のままです。録音した音の長さはテンポをもとに自動調整されるため、先にテンポ・拍子を確認することをおすすめします。このまま録音を始めますか？")
+    );
+    if (!ok) {
+      toggle.checked = false;
+      return;
+    }
+    tempoWarningDismissed = true;
+  }
+  isRecording = turningOn;
   updateRecordingUI();
 }
 
@@ -583,11 +711,14 @@ function renderScoreDisplay() {
     const isChord = tok.notes.length > 1;
     const inLoop = loopStart !== null && loopEnd !== null && i >= loopStart && i <= loopEnd;
     const outOfLoop = loopEnabled && loopStart !== null && !inLoop;
+    // 区間の開始だけ選んだ直後（終了はまだタップしていない）は、その音を点滅表示して
+    // 「今ここが開始として選ばれている」ことを分かりやすくする
+    const pendingLoopStart = loopSelecting && loopStart !== null && loopEnd === null && i === loopStart;
     const digits = isRest
       ? `<span class="music-note-digit">0</span>`
       : tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
     const kana = isChord || isRest ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
-    const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop"].filter(Boolean).join(" ");
+    const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending"].filter(Boolean).join(" ");
     html += `<span class="${cls}" data-index="${i}">${digits}${kana}</span>`;
     beatsSinceBar += tok.beats;
   });
@@ -1216,10 +1347,12 @@ function bindControls() {
   document.getElementById("musicBpmInput").addEventListener("change", (e) => {
     bpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Number(e.target.value) || DEFAULT_BPM));
     e.target.value = bpm;
+    tempoWarningDismissed = true; // テンポを自分で確認・変更したので、録音前の確認案内はもう不要
     saveDraftDebounced();
   });
   document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {
     timeSignatureId = e.target.value;
+    tempoWarningDismissed = true;
     renderScoreDisplay();
     saveDraftDebounced();
   });
