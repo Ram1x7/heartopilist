@@ -955,13 +955,15 @@ body.dark .art-step-title{
   align-items:center;
   justify-content:center;
   flex-shrink:0;
-  width:19px;
+  min-width:19px;
   height:19px;
-  border-radius:50%;
+  padding:0 6px;
+  border-radius:999px;
   background:var(--indigo);
   color:#fdf9ef;
   font-size:10px;
   font-weight:700;
+  white-space:nowrap;
 }
 
 body.dark .art-step-num{

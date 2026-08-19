@@ -1,7 +1,9 @@
 // js/art-converter.js
 // 「画像から作る」ページ（art-convert.html）: 画像→ドット絵変換
-// アップロード → 配置（Crop/Fit/Fill、キャンバス比率に合わせる）→ 明るさ/コントラスト
-// → 輪郭強調 → 背景処理 → 色数削減 → パレット変換（ディザリング対応）
+// 画面の流れ: ①画像を選ぶ → ②キャンバスサイズ → ③位置とサイズを調整 → ④変換方式 →
+// ⑤ノイズ除去 → ⑥色数 → ⑦詳細設定（Crop/Fit/Fill・明るさ・コントラスト・輪郭強調・
+// 背景処理）。キャンバスサイズ（目標の縦横比）を切り抜き位置の調整より先に決めることで、
+// 後からサイズを変えて切り抜きをやり直す手戻りを減らしている。
 // 使用する色は、js/art-config.jsのGAME_PALETTE（ゲーム内で実際に選べる色に完全一致させた
 // 固定パレット、約125色）のみに制限する（最近傍色マッチング）。
 // すべてブラウザ内で完結し、画像を外部に送信しない。
@@ -107,6 +109,8 @@ function initArtConverter(){
 
   document.getElementById("artUseInEditorBtn").addEventListener("click", useResultInEditor);
   document.getElementById("artAdjustCropBtn").addEventListener("click", () => openCropStage(false));
+  document.getElementById("artChangeSizeBtn").addEventListener("click", showSizeStage);
+  document.getElementById("artSizeConfirmBtn").addEventListener("click", confirmSizeStage);
 
   bindConvertTutorialControls();
   maybeStartConvertTutorialPhase("upload");
@@ -287,7 +291,7 @@ function handleFileSelect(file){
       manualCropRect = null;
       cropTargetKey = null;
       document.getElementById("artOriginalImg").src = e.target.result;
-      openCropStage(true);
+      showSizeStage();
     };
     img.onerror = () => alert(T("art_image_load_failed", "画像の読み込みに失敗しました"));
     img.src = e.target.result;
@@ -295,11 +299,30 @@ function handleFileSelect(file){
   reader.readAsDataURL(file);
 }
 
-// ── 位置・拡大縮小の調整ステップ（アップロード直後、または「位置を調整する」から再度開く） ──
+// ── キャンバスサイズ選択ステップ（アップロード直後、または「サイズを変更する」
+// 「キャンバスサイズを変更する」から再度開く） ──
+function showSizeStage(){
+  if(!sourceImage) return;
+  document.getElementById("artCropStage").style.display = "none";
+  document.getElementById("artConvertPreview").style.display = "none";
+  document.getElementById("artConvertPanel").style.display = "none";
+  document.getElementById("artConvertSizeStage").style.display = "block";
+  maybeStartConvertTutorialPhase("size");
+}
+
+// サイズ確定 → 位置調整ステップへ。openCropStage内でキャンバスサイズが前回から
+// 変わっていれば自動でリセットされ、変わっていなければ調整済みの位置を引き継ぐ
+function confirmSizeStage(){
+  document.getElementById("artConvertSizeStage").style.display = "none";
+  openCropStage(false);
+}
+
+// ── 位置・拡大縮小の調整ステップ（サイズ確定後、または「位置を調整する」から再度開く） ──
 // reset=trueの場合、または前回調整した時とキャンバスサイズ(比率)が変わっている場合は、
 // 中央基準のcover（画面いっぱいに収める最小倍率）にリセットする
 function openCropStage(reset){
   if(!sourceImage) return;
+  document.getElementById("artConvertSizeStage").style.display = "none";
   document.getElementById("artConvertPreview").style.display = "none";
   document.getElementById("artConvertPanel").style.display = "none";
   document.getElementById("artCropStage").style.display = "block";
@@ -738,10 +761,10 @@ function useResultInEditor(){
 const CONVERT_TUTORIAL_DONE_KEY = "hatopiArt_convertTutorialDone";
 const CONVERT_TUTORIAL_STEPS = [
   { phase: "upload", selector: "#artUploadBtn", title: "① 画像を選ぶ", text: "変換したい画像をアップロードします。JPG・PNG・WebPに対応しています。" },
-  { phase: "crop", selector: "#artCropViewport", title: "② 位置を調整", text: "ドラッグで位置を、下のスライダーで拡大縮小して、切り抜く範囲を決めます。" },
-  { phase: "crop", selector: "#artCropConfirmBtn", title: "③ 決定する", text: "位置が決まったらこのボタンで確定し、変換結果のプレビューに進みます。" },
-  { phase: "panel", selector: "#artConvertSizeStep1", title: "④ キャンバスサイズ", text: "比率、またはゲーム内のデザイン枠（衣装・家具など）に合わせてサイズを選べます。サイズを変えたら「位置を調整する」でやり直すのがおすすめです。" },
-  { phase: "panel", selector: "#artConvertPresetOptions", title: "⑤ 変換方式", text: "写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。" },
+  { phase: "size", selector: "#artConvertSizeStep1", title: "② キャンバスサイズ", text: "比率、またはゲーム内のデザイン枠（衣装・家具など）に合わせてサイズを選びます。先にサイズを決めておくと、次の位置調整をやり直さずに済みます。" },
+  { phase: "crop", selector: "#artCropViewport", title: "③ 位置とサイズを調整", text: "ドラッグで位置を、下のスライダーで拡大縮小して、切り抜く範囲を決めます。決まったら「この位置で決定」で次に進みます。" },
+  { phase: "panel", selector: "#artConvertPresetOptions", title: "④ 変換方式", text: "写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。" },
+  { phase: "panel", selector: "#artNoiseRange", title: "⑤ ノイズ除去", text: "写真のザラつきが気になる場合に調整します。色数を減らす前に整えるのがおすすめです。" },
   { phase: "panel", selector: "#artConvertColorOptions", title: "⑥ 色数", text: "少ないほどゲーム内で塗りやすくなります。まずは16色前後から試してみてください。" },
   { phase: "panel", selector: "#artAdvancedToggle", title: "⑦ 詳細設定", text: "配置方法・明るさ・コントラストなど、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。" },
   { phase: "panel", selector: "#artUseInEditorBtn", title: "⑧ エディターで編集する", text: "納得のいく結果になったら、このボタンでアートエディターに移動して、続きを手描きで仕上げられます。" },
@@ -835,7 +858,9 @@ function replayConvertTutorial(){
     ? "panel"
     : document.getElementById("artCropStage").style.display !== "none"
       ? "crop"
-      : "upload";
+      : document.getElementById("artConvertSizeStage").style.display !== "none"
+        ? "size"
+        : "upload";
   setTimeout(() => maybeStartConvertTutorialPhase(phase), 250);
 }
 
