@@ -193,6 +193,23 @@ body.dark .section-label{ color:#e8d2a8; }
 .garden-item:active{ transform:scale(0.96); }
 body.dark .garden-item{ background:#2c2823; border-color:#46423b; }
 
+/* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのまま */
+body[data-icon-size="small"] .garden-grid{
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+body[data-icon-size="small"] .garden-item{
+  padding:6px;
+  font-size:10px;
+}
+body[data-icon-size="large"] .garden-grid{
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+body[data-icon-size="large"] .garden-item{
+  padding:13px;
+}
+
 .garden-item .img-wrap img{
   width:100%;
   aspect-ratio:1/1;
@@ -561,6 +578,12 @@ body.dark .garden-footer{
   <button class="g-tab" id="tab-flower" onclick="setTab('flower')"><span class="btn-icon" data-icon="flower"></span><span data-i18n="garden_tab_flower">花</span></button>
 </div>
 
+<div class="tab-row">
+  <button class="g-tab" id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+  <button class="g-tab" id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+  <button class="g-tab" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+</div>
+
 <div id="gardenContent"></div>
 
 <div class="garden-footer" data-i18n="garden_footer">※本サイトは非公式のファンツールです</div>  
@@ -573,6 +596,7 @@ body.dark .garden-footer{
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/icon-size.js"></script>
 <script src="js/price-calc.js"></script>
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>

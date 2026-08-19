@@ -883,6 +883,12 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
   <button class="f-sort-btn" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
 </div>
 
+<div class="f-sort">
+  <button class="f-sort-btn" id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+  <button class="f-sort-btn" id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+  <button class="f-sort-btn" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+</div>
+
 <div id="list"></div>
 
 <div class="foods-footer">※本サイトは非公式のファンツールです</div>
@@ -905,6 +911,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/icon-size.js"></script>
 <script src="js/price-calc.js"></script>
 <script src="js/data-foods.js"></script>
 <script src="js/food-auth-calc.js"></script>
