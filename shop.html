@@ -27,7 +27,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=4">
+<link rel="stylesheet" href="./css/style.css?v=5">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -132,6 +132,16 @@ body.dark .shop-category-title{ color:#e8d2a8; }
   grid-template-columns:repeat(2,1fr);
   gap:10px;
   margin-top:10px;
+}
+
+/* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのまま */
+body[data-icon-size="small"] .shop-grid{
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+body[data-icon-size="large"] .shop-grid{
+  grid-template-columns:repeat(1,1fr);
+  gap:12px;
 }
 
 .shop-item-name{
@@ -247,12 +257,19 @@ body.dark #shopClearBtn{
     <button id="shopSort_book" class="active" onclick="setShopSort('book')" data-i18n="shop_sort_book">並び順</button>
     <button id="shopSort_unchecked" onclick="setShopSort('unchecked')" data-i18n="shop_sort_unchecked">未所持順</button>
   </div>
+
+  <div class="filter">
+    <button id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+    <button id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+    <button id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+  </div>
 </div>
 
 <div id="shopContent"></div>
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/icon-size.js"></script>
 <script src="js/data-shop.js"></script>
 <script src="js/shop.js?v=1"></script>
 </body>

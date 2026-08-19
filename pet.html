@@ -29,7 +29,7 @@
 <title data-i18n="page_title_pet">ペットエサ管理｜はとぴ図鑑</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=4">
+<link rel="stylesheet" href="./css/style.css?v=5">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -305,6 +305,22 @@ body.dark .progress-label {
 }
 @media (max-width: 360px) {
   .food-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのまま */
+body[data-icon-size="small"] .food-grid{
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+body[data-icon-size="small"] .food-card{
+  padding: 5px;
+}
+body[data-icon-size="large"] .food-grid{
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+body[data-icon-size="large"] .food-card{
+  padding: 11px;
 }
 
 .food-card {
@@ -606,6 +622,11 @@ body.dark .footer {
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
     </div>
+    <div class="filter">
+      <button id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+      <button id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+      <button id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+    </div>
   </div>
 </div>
 
@@ -682,6 +703,7 @@ body.dark .footer {
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/icon-size.js"></script>
 <script src="js/data-dogs.js"></script>
 <script src="js/data-cats.js"></script>
 

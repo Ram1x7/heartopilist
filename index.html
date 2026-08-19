@@ -51,7 +51,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=4">
+<link rel="stylesheet" href="css/style.css?v=5">
 
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -236,6 +236,15 @@
         </div>
         <input type="range" id="levelMin" min="1" max="14" value="1" class="level-slider">
         <input type="range" id="levelMax" min="1" max="14" value="13" class="level-slider">
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label" data-i18n="group_icon_size">表示サイズ</div>
+        <div class="filter">
+          <button onclick="setIconSize('small')" id="sz_small" data-i18n="icon_size_small">小</button>
+          <button onclick="setIconSize('medium')" id="sz_medium" data-i18n="icon_size_medium">中</button>
+          <button onclick="setIconSize('large')" id="sz_large" data-i18n="icon_size_large">大</button>
+        </div>
       </div>
 
     </div>
@@ -574,6 +583,7 @@ text-align:left;
 <script src="js/data-shell.js"></script>
 <script src="js/data-daily-spots.js"></script>
 <script src="js/data-sync.js"></script>
+<script src="js/icon-size.js"></script>
 <script src="js/main.js?v=12"></script>
 
 <script src="js/sw-register.js"></script>

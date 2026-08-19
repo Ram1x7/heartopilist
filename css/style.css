@@ -998,6 +998,17 @@ body.dark .daily-spot-calendar-row.today{
   margin-top:14px;
 }
 
+/* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのままなので専用CSSを持たない */
+body[data-icon-size="small"] .grid{
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+body[data-icon-size="large"] .grid{
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
 /* 終了フェス・シーズン セクション(図鑑「今は出現しない」用) */
 .section-label{
   font-family:'Shippori Mincho', serif;
@@ -1063,6 +1074,22 @@ body.dark .section-label{ color:#e8d2a8; }
   box-sizing:border-box;
   margin-bottom:6px;
   display:block;
+}
+
+/* 表示サイズ「小」：5列になる分、カード内の余白・文字サイズを詰める */
+body[data-icon-size="small"] .item{
+  padding:6px;
+  font-size:10px;
+}
+
+body[data-icon-size="small"] .item-name{
+  height:28px;
+  font-size:10px;
+}
+
+/* 表示サイズ「大」：3列になる分、カード内の余白にゆとりを持たせる */
+body[data-icon-size="large"] .item{
+  padding:13px;
 }
 
 /* モーダル */
