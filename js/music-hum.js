@@ -109,49 +109,62 @@ function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
 }
 
 // ── ここから下はブラウザAPI（マイク・CDN読み込み・TensorFlow.js）に依存する部分 ──
-
-// 実際のCDN URL・basic-pitch側の関数名はドキュメントを参照して実装しているが、
-// この開発環境からはCDNへ到達できず実機での動作確認ができていない。
-// マージ後、実際のブラウザで一度動作確認することを強く推奨する
-const BASIC_PITCH_TFJS_URL = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js";
-const BASIC_PITCH_LIB_URL = "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/dist/basic-pitch.js";
+//
+// @spotify/basic-pitch（npm実パッケージを取得して仕様を確認済み）は<script>タグで
+// そのまま読み込めるUMD版を配布しておらず、CommonJS/ESM形式でのみ配布されている。
+// そのためscriptタグでの読み込みではなく、jsdelivrの動的ESM変換（+esm）を使って
+// import()で読み込む。これにより依存の@tensorflow/tfjs（basic-pitch側のpackage.json
+// が要求するバージョン）もjsdelivr側で自動的に解決されるため、tfjs本体を別途
+// 読み込む必要はない
+const BASIC_PITCH_ESM_URL = "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm";
+// モデル本体はbasic-pitchのnpmパッケージに同梱されており（model/model.json +
+// model/group1-shard1of1.bin）、jsdelivrはnpmパッケージ内の任意のファイルパスを
+// そのまま配信できるため、このURLでモデルの重みファイルまで正しく取得できる
 const BASIC_PITCH_MODEL_URL = "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json";
+// basic-pitchのevaluateModelは、この値と異なるサンプルレートの音声を渡すと
+// 例外を投げて解析全体が失敗する（「解析に失敗しました」の主な原因だった）
+const BASIC_PITCH_SAMPLE_RATE = 22050;
 
 let basicPitchLoaded = false;
 let basicPitchModel = null;
+let basicPitchLib = null; // { BasicPitch, outputToNotesPoly, addPitchBendsToNoteEvents, noteFramesToTime }
 let humRecorder = null;
 let humRecordedChunks = [];
 let humRecordingStartTime = 0;
 let humRecordingTimer = null;
 let humSourceBlob = null;
 
-function humLoadScript(src) {
-  return new Promise((resolve, reject) => {
-    const s = document.createElement("script");
-    s.src = src;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("failed to load " + src));
-    document.head.appendChild(s);
-  });
-}
-
 async function ensureBasicPitchLoaded(onStatus) {
   if (basicPitchLoaded) return;
   if (onStatus) onStatus(T("music_hum_progress_loading_model", "モデルを読み込み中…"));
-  if (!window.tf) await humLoadScript(BASIC_PITCH_TFJS_URL);
-  if (!window.BasicPitch) await humLoadScript(BASIC_PITCH_LIB_URL);
-  basicPitchModel = new window.BasicPitch(BASIC_PITCH_MODEL_URL);
+  basicPitchLib = await import(/* webpackIgnore: true */ BASIC_PITCH_ESM_URL);
+  basicPitchModel = new basicPitchLib.BasicPitch(BASIC_PITCH_MODEL_URL);
   basicPitchLoaded = true;
 }
 
+// basic-pitchはモノラル・22050Hzの音声しか受け付けない（それ以外だと例外を投げる）。
+// 録音・アップロードされる音声は端末やファイルによってサンプルレート・チャンネル数が
+// バラバラなため、デコード後にOfflineAudioContextで必ずこの形式へリサンプルし直す
 async function humDecodeAudioToBuffer(blob) {
   const arrayBuffer = await blob.arrayBuffer();
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  let decoded;
   try {
-    return await ctx.decodeAudioData(arrayBuffer);
+    decoded = await ctx.decodeAudioData(arrayBuffer);
   } finally {
     ctx.close();
   }
+  if (decoded.sampleRate === BASIC_PITCH_SAMPLE_RATE && decoded.numberOfChannels === 1) {
+    return decoded;
+  }
+  const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * BASIC_PITCH_SAMPLE_RATE), BASIC_PITCH_SAMPLE_RATE);
+  const source = offlineCtx.createBufferSource();
+  source.buffer = decoded;
+  // ステレオ→モノラルへのダウンミックスは、宛先のチャンネル数がソースより少ない場合の
+  // Web Audio API標準の自動ミックス（左右chを合成）でそのまま行われる
+  source.connect(offlineCtx.destination);
+  source.start(0);
+  return await offlineCtx.startRendering();
 }
 
 // basic-pitchの標準的な使い方：evaluateModelにAudioBufferを渡し、フレーム単位の
@@ -173,8 +186,8 @@ async function runBasicPitchAnalysis(audioBuffer, onProgress) {
       if (onProgress) onProgress(percent);
     }
   );
-  const rawNotes = window.noteFramesToTime(
-    window.addPitchBendsToNoteEvents(contours, window.outputToNotesPoly(frames, onsets, 0.25, 0.25, 5))
+  const rawNotes = basicPitchLib.noteFramesToTime(
+    basicPitchLib.addPitchBendsToNoteEvents(contours, basicPitchLib.outputToNotesPoly(frames, onsets, 0.25, 0.25, 5))
   );
   return rawNotes.map((n) => ({
     pitchMidi: n.pitchMidi,
