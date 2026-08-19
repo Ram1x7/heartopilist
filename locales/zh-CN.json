@@ -342,6 +342,7 @@
   "art_redo": "重做",
   "art_brush_size_label": "粗细",
   "art_zoom_label": "缩放",
+  "art_recent_colors_label": "最近使用的颜色",
   "art_palette_label": "颜色",
   "art_usage_label": "已使用的颜色",
   "art_usage_empty": "还没有涂色",
@@ -351,6 +352,7 @@
   "art_edit_mode_off": "结束编辑",
   "art_lock": "锁定",
   "art_unlock": "解除锁定",
+  "art_edit_disabled_by_lock": "解除固定后即可编辑",
   "art_confirm_unlock": "要解除锁定吗？请注意不要误覆盖内容。",
   "art_from_image": "用图片制作",
   "page_title_art_convert": "用图片制作｜哈托皮图鉴",
@@ -515,5 +517,6 @@
   "music_layout_2row": "15键（2行）",
   "music_layout_3row": "15键（3行）",
   "music_layout_22key": "22键",
-  "music_semitone_toggle": "演奏时显示半音"
+  "music_semitone_toggle": "演奏时显示半音",
+  "art_select_this_color": "选择此颜色"
 }

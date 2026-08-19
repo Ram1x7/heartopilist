@@ -342,6 +342,7 @@
   "art_redo": "ทำซ้ำ",
   "art_brush_size_label": "ขนาดพู่กัน",
   "art_zoom_label": "ระดับซูม",
+  "art_recent_colors_label": "สีที่ใช้ล่าสุด",
   "art_palette_label": "สี",
   "art_usage_label": "สีที่ใช้",
   "art_usage_empty": "ยังไม่มีการระบายสี",
@@ -351,6 +352,7 @@
   "art_edit_mode_off": "จบการแก้ไข",
   "art_lock": "ล็อก",
   "art_unlock": "ปลดล็อก",
+  "art_edit_disabled_by_lock": "ปลดล็อกเพื่อแก้ไขได้อีกครั้ง",
   "art_confirm_unlock": "ปลดล็อกงานนี้หรือไม่? โปรดระวังอย่าเผลอเขียนทับ",
   "art_from_image": "สร้างจากรูปภาพ",
   "page_title_art_convert": "สร้างจากรูปภาพ｜Hatopi Dex",
@@ -515,5 +517,6 @@
   "music_layout_2row": "15 คีย์ (2 แถว)",
   "music_layout_3row": "15 คีย์ (3 แถว)",
   "music_layout_22key": "22 คีย์",
-  "music_semitone_toggle": "แสดงเสียงครึ่งเสียงขณะเล่น"
+  "music_semitone_toggle": "แสดงเสียงครึ่งเสียงขณะเล่น",
+  "art_select_this_color": "เลือกสีนี้"
 }

@@ -366,6 +366,7 @@
   "art_redo": "やり直す",
   "art_brush_size_label": "太さ",
   "art_zoom_label": "拡大率",
+  "art_recent_colors_label": "最近使った色",
   "art_palette_label": "カラー",
   "art_usage_label": "使用色",
   "art_usage_empty": "まだ何も塗られていません",
@@ -375,6 +376,7 @@
   "art_edit_mode_off": "編集を終える",
   "art_lock": "固定する",
   "art_unlock": "固定を解除",
+  "art_edit_disabled_by_lock": "固定を解除すると編集できます",
   "art_confirm_unlock": "固定を解除しますか？誤って上書きしないようご注意ください。",
   "art_from_image": "画像から作る",
   "page_title_art_convert": "画像から作る｜はとぴ図鑑",
@@ -539,5 +541,6 @@
   "music_layout_2row": "15鍵（2列）",
   "music_layout_3row": "15鍵（3列）",
   "music_layout_22key": "22キー",
-  "music_semitone_toggle": "演奏時に半音を表示する"
+  "music_semitone_toggle": "演奏時に半音を表示する",
+  "art_select_this_color": "この色を選ぶ"
 }

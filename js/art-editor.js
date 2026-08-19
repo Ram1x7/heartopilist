@@ -54,6 +54,9 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
+let recentColors = []; // 直近使用した色（新しい順、最大RECENT_COLORS_MAX件）。ワンタップで選び直せるようにする
+const RECENT_COLORS_KEY = "hatopiArt_recentColors";
+const RECENT_COLORS_MAX = 8;
 
 const canvas = document.getElementById("artCanvas");
 const ctx = canvas.getContext("2d");
@@ -61,6 +64,7 @@ const ctx = canvas.getContext("2d");
 // ── 初期化 ──
 function initArtEditor(){
   loadSavedDesigns();
+  recentColors = loadRecentColors();
 
   const draft = loadDraft();
   if(draft && draft.width && draft.height && Array.isArray(draft.pixelData)){
@@ -83,6 +87,7 @@ function initArtEditor(){
   renderZoomControls();
   renderBrushSizeControls();
   renderPalette();
+  renderRecentColors();
   renderCanvas();
   updateColorUsage();
   renderBlockList();
@@ -371,7 +376,10 @@ function renderLockUI(){
   const editBtn = document.getElementById("artEditModeBtn");
   const lockBtn = document.getElementById("artLockBtn");
   if(!editBtn || !lockBtn) return;
-  editBtn.style.display = isLocked ? "none" : "";
+  // 固定中も非表示にはせず、無効化(グレーアウト)して「固定中は編集できない」という
+  // 上書き関係が見た目で分かるようにする
+  editBtn.disabled = isLocked;
+  editBtn.title = isLocked ? T("art_edit_disabled_by_lock", "固定を解除すると編集できます") : "";
   editBtn.textContent = editMode ? T("art_edit_mode_off", "編集を終える") : T("art_edit_mode_on", "編集する");
   editBtn.classList.toggle("is-active", editMode);
   lockBtn.textContent = isLocked ? T("art_unlock", "固定を解除") : T("art_lock", "固定する");
@@ -598,6 +606,7 @@ function selectPaletteMain(no){
   selectedMainNo = no;
   expandedPaletteMain = no;
   renderPalette();
+  pushRecentColor(entry.hex);
 }
 
 function renderPaletteSubs(){
@@ -631,6 +640,42 @@ function setCurrentColor(c, mainNo){
   selectedMainNo = group ? group.no : null;
   expandedPaletteMain = group && group.subs.length > 0 ? group.no : null;
   renderPalette();
+  pushRecentColor(c);
+}
+
+// ── 最近使った色（メイン→サブの2段階を踏まなくても、直近の色へワンタップで戻れるようにする） ──
+function loadRecentColors(){
+  try{
+    const arr = JSON.parse(localStorage.getItem(RECENT_COLORS_KEY));
+    return Array.isArray(arr) ? arr.filter(c => typeof c === "string") : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function pushRecentColor(c){
+  recentColors = [c, ...recentColors.filter(x => x !== c)].slice(0, RECENT_COLORS_MAX);
+  localStorage.setItem(RECENT_COLORS_KEY, JSON.stringify(recentColors));
+  renderRecentColors();
+}
+
+function renderRecentColors(){
+  const section = document.getElementById("artRecentColorsSection");
+  const el = document.getElementById("artRecentColors");
+  if(!section || !el) return;
+  if(recentColors.length === 0){
+    section.style.display = "none";
+    return;
+  }
+  section.style.display = "";
+  el.innerHTML = recentColors.map(c => {
+    const code = gamePaletteCode(c);
+    const isSelected = String(c).toUpperCase() === String(currentColor).toUpperCase();
+    return `<button class="art-swatch${isSelected ? " is-selected" : ""}" style="background:${c}" data-hex="${c}" aria-label="${code || c}"></button>`;
+  }).join("");
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex));
+  });
 }
 
 // ── 使用色の集計・ハイライト ──
@@ -643,13 +688,23 @@ function updateColorUsage(){
   const el = document.getElementById("artColorUsage");
   el.innerHTML = entries.length
     ? entries.map(([c, n]) => `
-        <div class="art-usage-row${highlightedColor === c ? " active" : ""}" onclick="toggleHighlight('${c}')">
+        <div class="art-usage-row${highlightedColor === c ? " active" : ""}" data-hex="${c}">
           <span class="art-usage-number">${colorNumberMap[c]}</span>
-          <span class="art-usage-swatch" style="background:${c}"></span>
+          <button class="art-usage-swatch" style="background:${c}" data-select-hex="${c}" aria-label="${T("art_select_this_color", "この色を選ぶ")}"></button>
           <span class="art-usage-count">${n}${T("art_unit_cells", "マス")}</span>
         </div>
       `).join("")
     : `<div class="art-usage-empty">${T("art_usage_empty", "まだ何も塗られていません")}</div>`;
+  // 行全体のタップ＝ハイライト切り替え、スウォッチ自体のタップ＝色をワンタップ選択（別動作）
+  el.querySelectorAll(".art-usage-row").forEach(row => {
+    row.addEventListener("click", () => toggleHighlight(row.dataset.hex));
+  });
+  el.querySelectorAll("[data-select-hex]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setCurrentColor(btn.dataset.selectHex);
+    });
+  });
 }
 
 function toggleHighlight(c){
@@ -939,11 +994,16 @@ function floodFill(cx, cy, color){
   }
 }
 
-const TOUCH_DRAW_DELAY = 90; // タッチでの単発描画を、2本目の指(ピンチ/パン開始)と区別するための待ち時間(ms)
+// タッチでの単発描画は、①2本目の指（ピンチ/パン開始）、②長押し（マス確認への切り替え）と
+// 区別するため、指を離した時（クイックタップ）か、閾値を超えて動かした時（ドラッグ開始）に
+// 確定する。動かさずに長押しし続けた場合は、編集モードのままでも描画せずマス確認（座標・
+// 使用色表示）に切り替える（作業中に別の場所の色を確認したい、という要望への対応）
+const TOUCH_LONG_PRESS_DELAY = 450; // これ以上動かさずに押し続けたら、描画の代わりにマス確認へ切り替える待ち時間(ms)
+const TOUCH_MOVE_CANCEL_THRESHOLD = 8; // これ以上動いたら長押し確認をキャンセルし、通常の描画（ドラッグ）として扱う距離(px)
 
 function cancelPendingTouchPaint(){
   if(pendingTouchPaint){
-    clearTimeout(pendingTouchPaint.timer);
+    clearTimeout(pendingTouchPaint.longPressTimer);
     pendingTouchPaint = null;
   }
 }
@@ -1028,19 +1088,20 @@ function bindCanvasEvents(){
     if(currentTool !== "eyedropper" && (!editMode || isLocked)) return;
 
     if(e.pointerType === "touch" && currentTool !== "eyedropper"){
-      // タッチでの単発描画は、2本目の指（ピンチ/パン）と区別するため少し待って確定する
+      // 指を離す（クイックタップ）か動かす（ドラッグ開始）まで確定を待つ。動かさずに
+      // TOUCH_LONG_PRESS_DELAYを超えて押し続けたら、描画せずマス確認に切り替える
       pendingTouchPaint = {
         pointerId: e.pointerId,
         cx: c.cx, cy: c.cy,
-        timer: setTimeout(() => {
+        startX: e.clientX, startY: e.clientY,
+        longPressTimer: setTimeout(() => {
+          if(!pendingTouchPaint || pendingTouchPaint.pointerId !== e.pointerId) return;
           pendingTouchPaint = null;
           if(pinchState || !activePointers.has(e.pointerId)) return;
-          isDrawing = true;
-          pushHistory();
-          applyToolAt(c.cx, c.cy);
-          lastCell = c;
+          inspectedCell = { cx: c.cx, cy: c.cy };
+          updateCoordReadout(c);
           renderCanvas();
-        }, TOUCH_DRAW_DELAY),
+        }, TOUCH_LONG_PRESS_DELAY),
       };
       return;
     }
@@ -1071,6 +1132,24 @@ function bindCanvasEvents(){
       return;
     }
 
+    // 長押し確認待ち中のタップが、閾値を超えて動いたらドラッグ開始とみなし、
+    // マス確認をキャンセルして通常の描画（ストローク）に切り替える
+    if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
+      const moved = Math.hypot(e.clientX - pendingTouchPaint.startX, e.clientY - pendingTouchPaint.startY);
+      if(moved > TOUCH_MOVE_CANCEL_THRESHOLD){
+        clearTimeout(pendingTouchPaint.longPressTimer);
+        const p = pendingTouchPaint;
+        pendingTouchPaint = null;
+        if(!pinchState && currentTool !== "eyedropper" && editMode && !isLocked){
+          isDrawing = true;
+          pushHistory();
+          applyToolAt(p.cx, p.cy);
+          lastCell = { cx: p.cx, cy: p.cy };
+          renderCanvas();
+        }
+      }
+    }
+
     const c = cellFromEvent(e);
     updateCoordReadout(c);
     if(!isDrawing || blockMode) return;
@@ -1096,8 +1175,8 @@ function bindCanvasEvents(){
     activePointers.delete(e.pointerId);
 
     if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
-      // 2本目の指が来る前に指を離した＝単発タップとして、保留していた描画を確定する
-      clearTimeout(pendingTouchPaint.timer);
+      // 長押し確認・ドラッグのどちらにもならず指を離した＝単発タップとして、保留していた描画を確定する
+      clearTimeout(pendingTouchPaint.longPressTimer);
       const p = pendingTouchPaint;
       pendingTouchPaint = null;
       if(!pinchState && currentTool !== "eyedropper" && editMode && !isLocked){
