@@ -388,11 +388,15 @@ async function onHumAnalyzeClick() {
 
     tokens = newTokens;
     resetLoop();
+    // 認識精度が完璧ではないため、変換直後の音は全て「未確認」としてマークし、
+    // 編集モードでタップして手直しした音から順にマークが消えるようにする
+    humReviewIndexes = new Set(newTokens.map((_, i) => i));
+    selectedTokenIndex = null;
     setPageMode("edit");
     renderScoreDisplay();
     saveDraftDebounced();
     closeHumModal();
-    showToast(T("music_hum_done_toast", "譜面に変換しました。聴きながら手直ししてください"));
+    showToast(T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
   } catch (e) {
     console.error(e);
     errorEl.textContent = T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください");

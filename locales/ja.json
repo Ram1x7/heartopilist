@@ -612,7 +612,13 @@
   "music_hum_progress_detecting": "音の高さを検出中…",
   "music_hum_progress_converting": "譜面に変換中…",
   "music_hum_no_notes": "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください",
-  "music_hum_done_toast": "譜面に変換しました。聴きながら手直ししてください",
+  "music_hum_done_toast": "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます",
   "music_hum_analyze_error": "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください",
+  "music_hum_review_banner": "自動検出した音が{n}件残っています。タップして確認・修正できます",
+  "music_review_clear": "すべて確認済みにする",
+  "music_note_selected_label": "{n}番目の音を選択中",
+  "music_note_delete": "この音を削除",
+  "music_note_deselect": "選択解除",
+  "music_note_toolbar_hint": "そのまま音を弾くと、選んだ音がその音に置き換わります",
   "art_select_this_color": "この色を選ぶ"
 }

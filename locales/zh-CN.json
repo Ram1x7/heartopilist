@@ -588,7 +588,13 @@
   "music_hum_progress_detecting": "正在检测音高…",
   "music_hum_progress_converting": "正在转换为乐谱…",
   "music_hum_no_notes": "未检测到音符，请再哼唱得清晰、缓慢一些",
-  "music_hum_done_toast": "已转换为乐谱，请边听边进行调整",
+  "music_hum_done_toast": "已转换为乐谱。金色边框的音符是自动检测的，点击即可修改",
   "music_hum_analyze_error": "分析失败，请尝试其他音频，或稍后再试",
+  "music_hum_review_banner": "还有{n}个自动检测的音符待确认，点击即可查看或修改",
+  "music_review_clear": "全部标记为已确认",
+  "music_note_selected_label": "已选中第{n}个音符",
+  "music_note_delete": "删除此音符",
+  "music_note_deselect": "取消选择",
+  "music_note_toolbar_hint": "直接弹奏音符即可替换所选的音符",
   "art_select_this_color": "选择此颜色"
 }

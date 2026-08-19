@@ -42,6 +42,15 @@ let loopEnd = null; // ループ区間の終了インデックス
 let loopEnabled = false; // ループ再生のON/OFF（区間は選んだままON/OFFだけ切り替えられる）
 let loopSelecting = false; // 譜面をタップして区間を選んでいる最中かどうか
 
+// 個別の音の手直し：編集モードで譜面の音を1つタップすると選択状態になり、
+// 次に演奏ボタンを弾くとその音が置き換わる（末尾からの「最後を削除」しかなかった
+// 操作を、途中の音1つだけの修正でも使えるようにする）
+let selectedTokenIndex = null; // 選択中の音のtokensインデックス（null=未選択）
+// ハミングから自動変換された直後の音のうち、まだ確認・修正していないもの。
+// 認識精度が完璧ではないため、どれが自動検出かひと目で分かるようにし、
+// 手直しした音から順にマークが消えていく
+let humReviewIndexes = new Set();
+
 // 演奏ボタンの「押す・離す」（和音対応）。同時に押されている指をactiveHoldsで管理し、
 // 最初の1本目が押された時点から全ての指が離れるまでを「1つの和音グループ」とする
 let activeHolds = new Map(); // pointerId -> {note, btn, startTime}
@@ -572,11 +581,12 @@ function finalizeGroup() {
   if (!currentGroupNotes.length) return;
   const notes = dedupeNotes(currentGroupNotes);
   if (pageMode === "edit") {
-    if (isRecording) {
-      const rawBeats = (performance.now() - groupStartTime) / 1000 / (60 / bpm);
-      addChordToken(notes, snapBeatsToPreset(rawBeats));
+    const beats = isRecording ? snapBeatsToPreset((performance.now() - groupStartTime) / 1000 / (60 / bpm)) : getDuration(selectedDurationId).beats;
+    // 譜面の音を選択中なら、末尾に追加するのではなくその音をまるごと置き換える
+    if (selectedTokenIndex !== null) {
+      replaceTokenAt(selectedTokenIndex, notes, beats);
     } else {
-      addChordToken(notes, getDuration(selectedDurationId).beats);
+      addChordToken(notes, beats);
     }
   }
   currentGroupNotes = [];
@@ -677,6 +687,7 @@ function addRestToken() {
 function deleteLastToken() {
   tokens.pop();
   if (loopEnd !== null && loopEnd >= tokens.length) resetLoop();
+  forgetTokenIndexesFrom(tokens.length);
   renderScoreDisplay();
   saveDraftDebounced();
 }
@@ -686,14 +697,71 @@ function clearScore() {
   if (!confirm(T("music_confirm_clear", "譜面をすべて消去しますか？"))) return;
   tokens = [];
   resetLoop();
+  selectedTokenIndex = null;
+  humReviewIndexes = new Set();
   renderScoreDisplay();
   saveDraftDebounced();
+}
+
+// 譜面の途中の音を1つだけタップして選び、置き換え・削除できるようにする
+// （ハミングからの自動変換など、末尾からの「最後を削除」だけでは直しづらい
+// 手直しのために追加）
+function selectTokenForEdit(index) {
+  selectedTokenIndex = selectedTokenIndex === index ? null : index;
+  renderScoreDisplay();
+}
+
+function deselectToken() {
+  if (selectedTokenIndex === null) return;
+  selectedTokenIndex = null;
+  renderScoreDisplay();
+}
+
+// 選択中の音を、次に弾いた音(notes)・長さ(beats)でそのまま置き換える
+function replaceTokenAt(index, notes, beats) {
+  if (index < 0 || index >= tokens.length) return;
+  tokens[index] = {
+    notes: notes.map((n) => ({ degree: n.degree, accidental: n.accidental || null, octave: n.octave })),
+    beats,
+  };
+  humReviewIndexes.delete(index); // 手直し済みなので自動検出マークを消す
+  selectedTokenIndex = null;
+  renderScoreDisplay();
+  saveDraftDebounced();
+}
+
+function deleteSelectedToken() {
+  if (selectedTokenIndex === null) return;
+  const index = selectedTokenIndex;
+  tokens.splice(index, 1);
+  // 削除した音より後ろのインデックスは1つずつ前へずれるため、
+  // 区間ループ・自動検出マークもズレないよう作り直す
+  resetLoop();
+  const shifted = new Set();
+  humReviewIndexes.forEach((i) => {
+    if (i === index) return;
+    shifted.add(i > index ? i - 1 : i);
+  });
+  humReviewIndexes = shifted;
+  selectedTokenIndex = null;
+  renderScoreDisplay();
+  saveDraftDebounced();
+}
+
+// index以降を指すインデックスの記録(自動検出マークなど)を取り除く。
+// 「最後を削除」で末尾の音が消えたときに、その音を指していた印を残さないため
+function forgetTokenIndexesFrom(index) {
+  humReviewIndexes.forEach((i) => {
+    if (i >= index) humReviewIndexes.delete(i);
+  });
 }
 
 // ── 譜面の表示（編集中のプレビュー／練習モードのハイライト共通）。
 // 小節線は保存せず、拍子(timeSignature)をもとに毎回その場で計算して表示する ──
 function renderScoreDisplay() {
   const el = document.getElementById("musicScoreDisplay");
+  updateNoteToolbarUI();
+  updateReviewBannerUI();
   if (!tokens.length) {
     el.innerHTML = `<div class="music-score-empty">${T("music_score_empty", "まだ音が入力されていません")}</div>`;
     if (pageMode === "follow") renderFollowDisplay();
@@ -715,11 +783,13 @@ function renderScoreDisplay() {
     // 区間の開始だけ選んだ直後（終了はまだタップしていない）は、その音を点滅表示して
     // 「今ここが開始として選ばれている」ことを分かりやすくする
     const pendingLoopStart = loopSelecting && loopStart !== null && loopEnd === null && i === loopStart;
+    const isSelected = pageMode === "edit" && i === selectedTokenIndex;
+    const needsReview = humReviewIndexes.has(i);
     const digits = isRest
       ? `<span class="music-note-digit">0</span>`
       : tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
     const kana = isChord || isRest ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
-    const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending"].filter(Boolean).join(" ");
+    const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending", isSelected && "selected", needsReview && "hum-review"].filter(Boolean).join(" ");
     html += `<span class="${cls}" data-index="${i}">${digits}${kana}</span>`;
     beatsSinceBar += tok.beats;
   });
@@ -730,6 +800,39 @@ function renderScoreDisplay() {
     if (cur) cur.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }
   if (pageMode === "follow") renderFollowDisplay();
+}
+
+// 譜面の音を1つ選んでいる間、置き換え・削除の操作パネルを出す
+function updateNoteToolbarUI() {
+  const toolbar = document.getElementById("musicNoteToolbar");
+  const hint = document.getElementById("musicNoteToolbarHint");
+  if (!toolbar || !hint) return;
+  const show = pageMode === "edit" && selectedTokenIndex !== null && selectedTokenIndex < tokens.length;
+  toolbar.style.display = show ? "" : "none";
+  hint.style.display = show ? "" : "none";
+  if (show) {
+    document.getElementById("musicNoteToolbarLabel").textContent = T(
+      "music_note_selected_label",
+      `${selectedTokenIndex + 1}番目の音を選択中`,
+      { n: selectedTokenIndex + 1 }
+    );
+  }
+}
+
+// ハミングからの自動変換直後、まだ確認していない音が残っていることを知らせる
+function updateReviewBannerUI() {
+  const banner = document.getElementById("musicReviewBanner");
+  if (!banner) return;
+  const count = humReviewIndexes.size;
+  const show = pageMode === "edit" && count > 0;
+  banner.style.display = show ? "" : "none";
+  if (show) {
+    document.getElementById("musicReviewBannerText").textContent = T(
+      "music_hum_review_banner",
+      `自動検出した音が${count}件残っています。タップして確認・修正できます`,
+      { n: count }
+    );
+  }
 }
 
 function renderScoreMeta() {
@@ -749,24 +852,29 @@ function toggleLoopSelect() {
     loopEnd = null;
     loopEnabled = false;
     loopSelecting = true;
+    selectedTokenIndex = null; // 区間選択と音の手直し選択が同時に表示されて紛らわしくならないようにする
   }
   updateLoopUI();
   renderScoreDisplay();
 }
 
-// 譜面の音がタップされたとき（区間選択中のみ反応する）
+// 譜面の音がタップされたとき（区間選択中は開始・終了の指定、それ以外の編集モードでは
+// 手直し対象としての選択・選択解除として扱う）
 function handleScoreChipTap(index) {
-  if (!loopSelecting) return;
-  if (loopStart === null) {
-    loopStart = index;
-  } else {
-    loopEnd = index;
-    if (loopEnd < loopStart) [loopStart, loopEnd] = [loopEnd, loopStart];
-    loopSelecting = false;
-    loopEnabled = true;
+  if (loopSelecting) {
+    if (loopStart === null) {
+      loopStart = index;
+    } else {
+      loopEnd = index;
+      if (loopEnd < loopStart) [loopStart, loopEnd] = [loopEnd, loopStart];
+      loopSelecting = false;
+      loopEnabled = true;
+    }
+    updateLoopUI();
+    renderScoreDisplay();
+    return;
   }
-  updateLoopUI();
-  renderScoreDisplay();
+  if (pageMode === "edit") selectTokenForEdit(index);
 }
 
 function toggleLoopEnabled() {
@@ -1220,6 +1328,8 @@ function newScore() {
   bpm = DEFAULT_BPM;
   timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
   resetLoop();
+  selectedTokenIndex = null;
+  humReviewIndexes = new Set();
   renderScoreMeta();
   renderScoreDisplay();
   saveDraft();
@@ -1274,6 +1384,8 @@ function loadScore(id) {
   cursor = -1;
   stopPlayback();
   resetLoop();
+  selectedTokenIndex = null;
+  humReviewIndexes = new Set();
   renderInstrumentSelector();
   renderLayoutSelector();
   renderInstrumentGrid();
@@ -1364,6 +1476,13 @@ function bindControls() {
   document.getElementById("musicAddRestBtn").addEventListener("click", addRestToken);
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);
   document.getElementById("musicClearBtn").addEventListener("click", clearScore);
+
+  document.getElementById("musicNoteDeleteBtn").addEventListener("click", deleteSelectedToken);
+  document.getElementById("musicNoteDeselectBtn").addEventListener("click", deselectToken);
+  document.getElementById("musicReviewClearBtn").addEventListener("click", () => {
+    humReviewIndexes = new Set();
+    renderScoreDisplay();
+  });
 
   document.getElementById("musicLoopSelectBtn").addEventListener("click", toggleLoopSelect);
   document.getElementById("musicLoopToggle").addEventListener("change", toggleLoopEnabled);
