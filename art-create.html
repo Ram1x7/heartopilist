@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/art.css?v=30">
+<link rel="stylesheet" href="./css/art.css?v=32">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -110,6 +110,10 @@
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_zoom_label">拡大率</div>
       <div class="art-zoom-controls" id="artZoomControls"></div>
+    </div>
+    <div class="art-panel-section" id="artRecentColorsSection" style="display:none;">
+      <div class="art-panel-title" data-i18n="art_recent_colors_label">最近使った色</div>
+      <div class="art-palette" id="artRecentColors"></div>
     </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_palette_label">カラー</div>
@@ -201,16 +205,19 @@
     <h3 style="text-align:center;">使い方</h3>
 
     <p><strong>編集する・固定する</strong><br>
-    「編集する」をONにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をONにすると、編集モードに関わらず一切の描画を受け付けなくなります。</p>
+    「編集する」をONにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をONにすると、編集モードに関わらず一切の描画を受け付けなくなり、「編集する」ボタンもグレーアウトして押せなくなります。固定を解除すればまた編集できます。</p>
 
     <p style="margin-top:10px;"><strong>ツール</strong><br>
     ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）が使えます。ペン・消しゴムは「太さ」欄で1〜4マスの太さに変更できます。</p>
 
     <p style="margin-top:10px;"><strong>カラー</strong><br>
-    ゲーム内で実際に選べる色と完全に一致したパレットから選びます。メインカラーをタップすると、さらに詳しいサブカラーが表示されます。現在選んでいる色は、パレット上に枠付きでマークされます。</p>
+    ゲーム内で実際に選べる色と完全に一致したパレットから選びます。メインカラーをタップすると、さらに詳しいサブカラーが表示されます。現在選んでいる色は、パレット上に枠付きでマークされます。直近に選んだ色は「最近使った色」にも並ぶので、切り替えたい時はそこからワンタップで選べます。</p>
+
+    <p style="margin-top:10px;"><strong>使用色</strong><br>
+    今のキャンバスで使われている色の一覧です。行をタップするとその色のマスがキャンバス上でハイライトされます。色の四角い部分だけをタップすると、ハイライトではなくその色をすぐに選択できます。</p>
 
     <p style="margin-top:10px;"><strong>マスを調べる</strong><br>
-    キャンバス上のマスをタップすると、そのマスがハイライト表示され、左上に座標と使用色（色番号）が表示されます。編集モードがOFFでも確認だけならいつでもできます。</p>
+    キャンバス上のマスをタップすると、そのマスがハイライト表示され、左上に座標と使用色（色番号）が表示されます。編集モードがOFFでも確認だけならいつでもできます。編集モードONのままでも、マスを動かさずに長押しすると、塗らずにそのマスだけ確認できます。</p>
 
     <p style="margin-top:10px;"><strong>拡大率</strong><br>
     スライダーで自由に拡大・縮小できます。タッチ操作の場合は2本指のピンチでも拡大縮小できます。</p>

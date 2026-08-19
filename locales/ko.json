@@ -342,6 +342,7 @@
   "art_redo": "다시 실행",
   "art_brush_size_label": "굵기",
   "art_zoom_label": "확대율",
+  "art_recent_colors_label": "최근 사용한 색",
   "art_palette_label": "색상",
   "art_usage_label": "사용한 색상",
   "art_usage_empty": "아직 칠한 부분이 없습니다",
@@ -351,6 +352,7 @@
   "art_edit_mode_off": "편집 종료",
   "art_lock": "고정하기",
   "art_unlock": "고정 해제",
+  "art_edit_disabled_by_lock": "고정을 해제하면 편집할 수 있습니다",
   "art_confirm_unlock": "고정을 해제하시겠습니까? 실수로 덮어쓰지 않도록 주의하세요.",
   "art_from_image": "이미지로 만들기",
   "page_title_art_convert": "이미지로 만들기｜하토피 도감",
@@ -366,6 +368,10 @@
   "art_crop_hint": "드래그하여 위치를 조정하고, 슬라이더로 잘라낼 범위를 확대/축소하세요",
   "art_crop_reset": "위치 초기화",
   "art_crop_confirm": "이 위치로 결정",
+  "art_crop_back_to_size": "캔버스 크기 변경하기",
+  "art_change_size": "크기 변경하기",
+  "art_step_size_hint": "크기를 먼저 정해두면 나중에 위치 조정을 다시 할 필요가 없습니다",
+  "art_size_confirm": "다음으로",
   "art_adjust_crop": "위치 조정하기",
   "art_use_in_editor": "에디터에서 편집하기",
   "art_convert_size_label": "캔버스 크기",
@@ -511,5 +517,6 @@
   "music_layout_2row": "15건반（2줄）",
   "music_layout_3row": "15건반（3줄）",
   "music_layout_22key": "22키",
-  "music_semitone_toggle": "연주 시 반음 표시"
+  "music_semitone_toggle": "연주 시 반음 표시",
+  "art_select_this_color": "이 색 선택하기"
 }

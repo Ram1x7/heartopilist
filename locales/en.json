@@ -366,6 +366,7 @@
   "art_redo": "Redo",
   "art_brush_size_label": "Brush Size",
   "art_zoom_label": "Zoom",
+  "art_recent_colors_label": "Recently used",
   "art_palette_label": "Color",
   "art_usage_label": "Colors used",
   "art_usage_empty": "Nothing painted yet",
@@ -375,6 +376,7 @@
   "art_edit_mode_off": "Stop editing",
   "art_lock": "Lock",
   "art_unlock": "Unlock",
+  "art_edit_disabled_by_lock": "Unlock to edit again",
   "art_confirm_unlock": "Unlock this design? Be careful not to overwrite it by accident.",
   "art_from_image": "From an image",
   "page_title_art_convert": "From an Image | Hatopi Dex",
@@ -390,6 +392,10 @@
   "art_crop_hint": "Drag to reposition, use the slider to zoom in or out of the crop area",
   "art_crop_reset": "Reset Position",
   "art_crop_confirm": "Confirm This Position",
+  "art_crop_back_to_size": "Change canvas size",
+  "art_change_size": "Change size",
+  "art_step_size_hint": "Choosing the size first means you won't need to redo the position adjustment later",
+  "art_size_confirm": "Next",
   "art_adjust_crop": "Adjust Position",
   "art_use_in_editor": "Edit in the editor",
   "art_convert_size_label": "Canvas size",
@@ -535,5 +541,6 @@
   "music_layout_2row": "15 Keys (2 Rows)",
   "music_layout_3row": "15 Keys (3 Rows)",
   "music_layout_22key": "22 Keys",
-  "music_semitone_toggle": "Show sharps while playing"
+  "music_semitone_toggle": "Show sharps while playing",
+  "art_select_this_color": "Select this color"
 }

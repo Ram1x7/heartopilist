@@ -342,6 +342,7 @@
   "art_redo": "重做",
   "art_brush_size_label": "粗細",
   "art_zoom_label": "縮放",
+  "art_recent_colors_label": "最近使用的顏色",
   "art_palette_label": "顏色",
   "art_usage_label": "已使用的顏色",
   "art_usage_empty": "尚未上色",
@@ -351,6 +352,7 @@
   "art_edit_mode_off": "結束編輯",
   "art_lock": "鎖定",
   "art_unlock": "解除鎖定",
+  "art_edit_disabled_by_lock": "解除固定後即可編輯",
   "art_confirm_unlock": "要解除鎖定嗎？請注意不要誤覆蓋內容。",
   "art_from_image": "用圖片製作",
   "page_title_art_convert": "用圖片製作｜哈托皮圖鑑",
@@ -366,6 +368,10 @@
   "art_crop_hint": "拖曳可調整位置，使用滑桿縮放裁切範圍",
   "art_crop_reset": "重設位置",
   "art_crop_confirm": "確定此位置",
+  "art_crop_back_to_size": "更改畫布尺寸",
+  "art_change_size": "更改尺寸",
+  "art_step_size_hint": "先確定尺寸可以避免之後重新調整裁切位置",
+  "art_size_confirm": "下一步",
   "art_adjust_crop": "調整位置",
   "art_use_in_editor": "在編輯器中編輯",
   "art_convert_size_label": "畫布尺寸",
@@ -511,5 +517,6 @@
   "music_layout_2row": "15鍵（2列）",
   "music_layout_3row": "15鍵（3列）",
   "music_layout_22key": "22鍵",
-  "music_semitone_toggle": "演奏時顯示半音"
+  "music_semitone_toggle": "演奏時顯示半音",
+  "art_select_this_color": "選擇此顏色"
 }

@@ -86,6 +86,13 @@ body.dark .art-lock-btn.is-locked{
   border-color:var(--vermillion-soft);
 }
 
+/* 固定中は「編集する」を非表示にせずグレーアウトし、上書き関係（固定中は編集不可）
+   が視覚的に分かるようにする */
+.art-edit-mode-btn:disabled{
+  opacity:0.45;
+  cursor:not-allowed;
+}
+
 /* レイアウト（モバイル：縦積み） */
 .art-layout{
   display:grid;
@@ -446,11 +453,13 @@ body.dark .art-usage-row.active{
 }
 
 .art-usage-swatch{
-  width:16px;
-  height:16px;
-  border-radius:4px;
+  width:22px;
+  height:22px;
+  border-radius:6px;
   border:1px solid var(--border);
   flex-shrink:0;
+  padding:0;
+  cursor:pointer;
 }
 
 body.dark .art-usage-swatch{
@@ -955,13 +964,15 @@ body.dark .art-step-title{
   align-items:center;
   justify-content:center;
   flex-shrink:0;
-  width:19px;
+  min-width:19px;
   height:19px;
-  border-radius:50%;
+  padding:0 6px;
+  border-radius:999px;
   background:var(--indigo);
   color:#fdf9ef;
   font-size:10px;
   font-weight:700;
+  white-space:nowrap;
 }
 
 body.dark .art-step-num{

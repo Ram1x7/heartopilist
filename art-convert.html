@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/art.css?v=27">
+<link rel="stylesheet" href="./css/art.css?v=32">
 
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./music.html">
@@ -92,6 +92,7 @@
 
 <div class="art-convert-layout">
   <div class="art-convert-upload" id="artUploadArea">
+    <div class="art-step-title"><span class="art-step-num">1/7</span><span data-i18n="art_choose_image">画像を選ぶ</span></div>
     <input type="file" id="artFileInput" accept="image/jpeg,image/png,image/webp" hidden>
     <button class="art-upload-btn" id="artUploadBtn">
       <span id="artUploadIcon"></span>
@@ -100,8 +101,31 @@
     <p class="art-upload-hint" data-i18n="art_upload_hint">JPG・PNG・WebPに対応</p>
   </div>
 
+  <div class="art-panel" id="artConvertSizeStage" style="display:none;">
+    <div class="art-panel-section" id="artConvertSizeStep1">
+      <div class="art-step-title"><span class="art-step-num">2/7</span><span data-i18n="art_convert_size_label">キャンバスサイズ</span></div>
+      <p class="art-step-hint" data-i18n="art_step_size_hint">先にサイズを決めておくと、次の位置調整をやり直さずに済みます</p>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
+      <div class="art-gridsize-options art-ratio-grid" id="artConvertRatioOptions"></div>
+      <div class="art-gridsize-options art-frame-grid" id="artConvertFrameItemOptions"></div>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
+      <div class="art-gridsize-options" id="artConvertLevelOptions"></div>
+    </div>
+    <div class="art-panel-section" id="artConvertSizeStep2" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="showConvertFrameStep1()">
+        <span id="artConvertFrameBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <div class="art-panel-title" data-i18n="art_gridsize_step2_title">キャンバスを選択</div>
+      <div class="art-gridsize-options" id="artConvertFramePartOptions"></div>
+    </div>
+    <div class="art-panel-btn-row">
+      <button class="art-header-btn" id="artSizeConfirmBtn" data-i18n="art_size_confirm">この内容で次へ</button>
+    </div>
+  </div>
+
   <div class="art-crop-stage" id="artCropStage" style="display:none;">
-    <div class="art-panel-title" data-i18n="art_crop_title">位置とサイズを調整</div>
+    <div class="art-step-title"><span class="art-step-num">3/7</span><span data-i18n="art_crop_title">位置とサイズを調整</span></div>
     <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
     <div class="art-crop-viewport" id="artCropViewport">
       <img id="artCropImg" alt="" draggable="false">
@@ -111,6 +135,10 @@
       <input type="range" id="artCropZoomSlider" min="100" max="300" value="100">
       <span class="art-crop-zoom-icon">＋</span>
     </div>
+    <a class="art-back-link" href="javascript:void(0)" onclick="showSizeStage()">
+      <span id="artCropBackIcon"></span>
+      <span data-i18n="art_crop_back_to_size">キャンバスサイズを変更する</span>
+    </a>
     <div class="art-panel-btn-row art-crop-actions">
       <button class="art-crop-reset-btn" id="artCropResetBtn" data-i18n="art_crop_reset">位置をリセット</button>
       <button class="art-header-btn" id="artCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定</button>
@@ -133,40 +161,25 @@
       </div>
     </div>
     <div class="art-panel-btn-row art-preview-actions">
+      <button class="art-crop-reset-btn" id="artChangeSizeBtn" data-i18n="art_change_size">サイズを変更する</button>
       <button class="art-crop-reset-btn" id="artAdjustCropBtn" data-i18n="art_adjust_crop">位置を調整する</button>
       <button class="art-header-btn art-use-btn" id="artUseInEditorBtn" data-i18n="art_use_in_editor">エディターで編集する</button>
     </div>
   </div>
 
   <div class="art-panel" id="artConvertPanel" style="display:none;">
-    <div class="art-panel-section" id="artConvertSizeStep1">
-      <div class="art-panel-title" data-i18n="art_convert_size_label">キャンバスサイズ</div>
-      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
-      <div class="art-gridsize-options art-ratio-grid" id="artConvertRatioOptions"></div>
-      <div class="art-gridsize-options art-frame-grid" id="artConvertFrameItemOptions"></div>
-      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
-      <div class="art-gridsize-options" id="artConvertLevelOptions"></div>
-    </div>
-    <div class="art-panel-section" id="artConvertSizeStep2" style="display:none">
-      <a class="art-back-link" href="javascript:void(0)" onclick="showConvertFrameStep1()">
-        <span id="artConvertFrameBackIcon"></span>
-        <span data-i18n="art_gridsize_back">戻る</span>
-      </a>
-      <div class="art-panel-title" data-i18n="art_gridsize_step2_title">キャンバスを選択</div>
-      <div class="art-gridsize-options" id="artConvertFramePartOptions"></div>
-    </div>
     <div class="art-panel-section art-convert-step">
-      <div class="art-step-title"><span class="art-step-num">1</span><span data-i18n="art_convert_preset_label">変換方式</span></div>
+      <div class="art-step-title"><span class="art-step-num">4/7</span><span data-i18n="art_convert_preset_label">変換方式</span></div>
       <p class="art-step-hint" data-i18n="art_step_preset_hint">写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです</p>
       <div class="art-preset-preview-row" id="artConvertPresetOptions"></div>
     </div>
     <div class="art-panel-section art-convert-step">
-      <div class="art-step-title"><span class="art-step-num">2</span><span data-i18n="art_convert_noise_label">ノイズ除去</span></div>
+      <div class="art-step-title"><span class="art-step-num">5/7</span><span data-i18n="art_convert_noise_label">ノイズ除去</span></div>
       <p class="art-step-hint" data-i18n="art_step_noise_hint">写真のザラつきが気になる場合に調整してください。色数を減らす前に整えるのがおすすめです</p>
       <input type="range" id="artNoiseRange" min="0" max="100" value="0">
     </div>
     <div class="art-panel-section art-convert-step">
-      <div class="art-step-title"><span class="art-step-num">3</span><span data-i18n="art_convert_colors_label">色数</span></div>
+      <div class="art-step-title"><span class="art-step-num">6/7</span><span data-i18n="art_convert_colors_label">色数</span></div>
       <p class="art-step-hint" data-i18n="art_step_colors_hint">色数が多いほど元画像に近づきますが、ゲーム内で塗る手間も増えます。まずは16色前後がおすすめです</p>
       <div class="art-gridsize-options" id="artConvertColorOptions"></div>
       <label class="art-toggle-row" style="margin-top:10px;">
@@ -177,7 +190,7 @@
 
     <div class="art-panel-section">
       <button class="art-accordion-toggle" id="artAdvancedToggle" type="button" aria-expanded="false">
-        <span data-i18n="art_advanced_settings">詳細設定</span>
+        <span class="art-step-title" style="margin-bottom:0;"><span class="art-step-num">7/7</span><span data-i18n="art_advanced_settings">詳細設定</span></span>
         <span class="art-accordion-icon" id="artAdvancedIcon"></span>
       </button>
       <div class="art-accordion-body" id="artAdvancedBody" style="display:none;">
@@ -233,25 +246,25 @@
   <div class="modal-box art-help-box">
     <h3 style="text-align:center;">使い方</h3>
 
-    <p><strong>画像を選ぶ</strong><br>
+    <p><strong>① 画像を選ぶ</strong><br>
     JPG・PNG・WebP形式の画像をアップロードします。</p>
 
-    <p style="margin-top:10px;"><strong>キャンバスサイズ</strong><br>
-    「比率」からキャンバスの縦横比を、「サイズ」から実際のマス数を選びます。ゲーム内のデザイン枠（衣装・家具など）に合わせて変換したい場合は、比率の一覧からアイテムを選んでください。</p>
+    <p style="margin-top:10px;"><strong>② キャンバスサイズ</strong><br>
+    「比率」からキャンバスの縦横比を、「サイズ」から実際のマス数を選びます。ゲーム内のデザイン枠（衣装・家具など）に合わせて変換したい場合は、比率の一覧からアイテムを選んでください。先にサイズを決めておくことで、次の位置調整をやり直さずに済みます。</p>
 
-    <p style="margin-top:10px;"><strong>位置とサイズを調整</strong><br>
-    アップロード直後に表示される画面で、ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を目で見ながら決められます。あとから「位置を調整する」ボタンでいつでもやり直せます。</p>
+    <p style="margin-top:10px;"><strong>③ 位置とサイズを調整</strong><br>
+    ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を目で見ながら決められます。あとから「位置を調整する」「サイズを変更する」ボタンでいつでもやり直せます。</p>
 
-    <p style="margin-top:10px;"><strong>① 変換方式</strong><br>
+    <p style="margin-top:10px;"><strong>④ 変換方式</strong><br>
     画像の質感を選びます。写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。</p>
 
-    <p style="margin-top:10px;"><strong>② ノイズ除去</strong><br>
+    <p style="margin-top:10px;"><strong>⑤ ノイズ除去</strong><br>
     写真のザラつきが気になる場合に調整します。色数を減らす前に、まずこちらを整えるのがおすすめです。</p>
 
-    <p style="margin-top:10px;"><strong>③ 色数</strong><br>
+    <p style="margin-top:10px;"><strong>⑥ 色数</strong><br>
     使用する色数を制限します。多いほど元画像に近づきますが、ゲーム内で塗る手間も増えるため、まずは16色前後から試すのがおすすめです。ディザリング（色の粒を混ぜてグラデーションを表現する処理）も合わせて調整できます。</p>
 
-    <p style="margin-top:10px;"><strong>詳細設定</strong><br>
+    <p style="margin-top:10px;"><strong>⑦ 詳細設定</strong><br>
     配置方法・余白の色・輪郭強調・明るさ・コントラスト・背景など、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。</p>
 
     <p style="margin-top:10px;"><strong>エディターで編集する</strong><br>
@@ -268,6 +281,7 @@
 
 document.getElementById("artBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("artConvertFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("artCropBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("artUploadIcon").innerHTML = icon("upload", { size: 18 });
 document.getElementById("helpBtn").innerHTML = icon("help");
 document.getElementById("artAdvancedIcon").innerHTML = icon("chevronDown", { size: 14 });
