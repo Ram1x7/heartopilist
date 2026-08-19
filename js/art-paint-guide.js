@@ -25,6 +25,56 @@
 let paintGuideOrder = [];
 let paintGuideStepIndex = 0;
 let paintGuideForceView = null; // null=現在のブロックへズーム / "full"=全体表示（ステップが変わるたびリセット）
+let paintGuideStartedAt = null; // ガイドを開始した時刻（実測ペースからの残り時間再計算に使う）
+
+// ── 所要時間の見積もり ──
+// 開始直後はまだ実測ペースがないため、1マスずつのタップとバケツひと押しに
+// それぞれ固定の目安秒数を割り当てて計算する。実際に「次へ」を押して手順を
+// 進めるたびに、経過時間÷完了したアクション数から実測ペースを求め、以降は
+// そちらを優先することで、人によって差が出る実際の作業速度に近づけていく
+const PAINT_GUIDE_TAP_SECONDS = 1.4; // マスを探して正確にタップするまでの目安秒数
+const PAINT_GUIDE_BUCKET_SECONDS = 2.2; // バケツで塗る範囲を確認して1回タップするまでの目安秒数
+
+function stepActionCount(step){
+  return step.borderCells.length + step.interiorClusters.length;
+}
+
+function estimateSecondsForStep(step){
+  return step.borderCells.length * PAINT_GUIDE_TAP_SECONDS + step.interiorClusters.length * PAINT_GUIDE_BUCKET_SECONDS;
+}
+
+function completedPaintGuideActionCount(){
+  let n = 0;
+  for(let i = 0; i < paintGuideStepIndex; i++) n += stepActionCount(paintGuideOrder[i]);
+  return n;
+}
+
+function estimateRemainingSeconds(){
+  const done = completedPaintGuideActionCount();
+  if(paintGuideStartedAt && done > 0){
+    const elapsedSec = (Date.now() - paintGuideStartedAt) / 1000;
+    const paceSecPerAction = elapsedSec / done;
+    let remainingActions = 0;
+    for(let i = paintGuideStepIndex; i < paintGuideOrder.length; i++) remainingActions += stepActionCount(paintGuideOrder[i]);
+    return Math.max(0, Math.round(paceSecPerAction * remainingActions));
+  }
+  let sec = 0;
+  for(let i = paintGuideStepIndex; i < paintGuideOrder.length; i++) sec += estimateSecondsForStep(paintGuideOrder[i]);
+  return Math.round(sec);
+}
+
+function formatEstimateSeconds(sec){
+  if(sec < 60) return T("art_paint_guide_estimate_lt1min", "1分未満");
+  const min = Math.max(1, Math.round(sec / 60));
+  return T("art_paint_guide_estimate_min", `約${min}分`, { min });
+}
+
+function formatElapsedSeconds(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if(m === 0) return T("art_guide_complete_time_sec", `${s}秒`, { sec });
+  return T("art_guide_complete_time_min_sec", `${m}分${s}秒`, { min: m, sec });
+}
 
 // ── マスの分類 ──
 // 完成図の各マスについて、周囲8マス（斜め含む）のいずれかが違う色・未着色・
@@ -160,6 +210,7 @@ function openPaintGuide(){
   paintGuideOrder = steps;
   paintGuideStepIndex = 0;
   paintGuideForceView = null;
+  paintGuideStartedAt = Date.now();
   document.getElementById("artGuideOverlay").style.display = "flex";
   document.body.style.overflow = "hidden";
   renderPaintGuideStep();
@@ -172,12 +223,60 @@ function closePaintGuide(){
 
 function paintGuideNext(){
   if(paintGuideStepIndex >= paintGuideOrder.length - 1){
-    closePaintGuide();
+    finishPaintGuide();
     return;
   }
+  const prevBlockNum = paintGuideOrder[paintGuideStepIndex].blockNum;
   paintGuideStepIndex++;
   paintGuideForceView = null;
   renderPaintGuideStep();
+  const newBlockNum = paintGuideOrder[paintGuideStepIndex].blockNum;
+  if(newBlockNum !== prevBlockNum) showBlockCompleteFlash(prevBlockNum);
+}
+
+// ── ブロック完了の軽い通知（振動含む） ──
+function showBlockCompleteFlash(blockNum){
+  const el = document.getElementById("artGuideBlockFlash");
+  const textEl = document.getElementById("artGuideBlockFlashText");
+  textEl.textContent = T("art_guide_block_complete", `ブロック${blockNum} 完了！`, { block: blockNum });
+  el.classList.add("is-visible");
+  if(navigator.vibrate) navigator.vibrate(120);
+  clearTimeout(showBlockCompleteFlash._timer);
+  showBlockCompleteFlash._timer = setTimeout(() => el.classList.remove("is-visible"), 1100);
+}
+
+// ── 完了（全ブロック完走）：まとめ画面を表示する ──
+function finishPaintGuide(){
+  const elapsedSec = paintGuideStartedAt ? Math.max(0, Math.round((Date.now() - paintGuideStartedAt) / 1000)) : 0;
+  const totalCells = pixels.filter(c => c).length;
+  markAllBlocksCompleteForGuide();
+  closePaintGuide();
+  showPaintGuideCompleteScreen(elapsedSec, totalCells);
+}
+
+// ぬり方ガイドを最後まで進めたら、既存の10×10ブロック進捗（未着手/作業中/完了）も
+// 完了扱いにする。マイデザイン一覧の進捗％・絞り込みと連動させるため
+function markAllBlocksCompleteForGuide(){
+  const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
+  const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
+  for(let by = 0; by < blocksY; by++){
+    for(let bx = 0; bx < blocksX; bx++){
+      blockStatus[blockKey(bx, by)] = 2;
+    }
+  }
+  renderCanvas();
+  renderBlockList();
+  saveDraft();
+}
+
+function showPaintGuideCompleteScreen(elapsedSec, totalCells){
+  document.getElementById("artGuideCompleteTime").textContent = formatElapsedSeconds(elapsedSec);
+  document.getElementById("artGuideCompleteCells").textContent = T("art_guide_complete_cells_value", `${totalCells}マス`, { count: totalCells });
+  document.getElementById("artGuideCompleteOverlay").style.display = "flex";
+}
+
+function closePaintGuideCompleteScreen(){
+  document.getElementById("artGuideCompleteOverlay").style.display = "none";
 }
 
 function paintGuidePrev(){
@@ -213,6 +312,10 @@ function renderPaintGuideStep(){
   document.getElementById("artGuideProgressLabel").textContent =
     T("art_paint_guide_step_of", `${stepNum} / ${total}（ブロック${step.blockNum}）`, { current: stepNum, total, block: step.blockNum });
   document.getElementById("artGuideProgressFill").style.width = `${(stepNum / total) * 100}%`;
+
+  const estText = formatEstimateSeconds(estimateRemainingSeconds());
+  document.getElementById("artGuideEstimate").textContent =
+    T("art_guide_estimate_remaining", `残り目安 ${estText}`, { time: estText });
 
   document.getElementById("artGuideColorChip").style.background = step.color;
 
@@ -368,6 +471,13 @@ function bindPaintGuideControls(){
   document.getElementById("artGuidePrevBtn").addEventListener("click", paintGuidePrev);
   document.getElementById("artGuideZoomBtn").addEventListener("click", paintGuideToggleZoom);
   window.addEventListener("resize", renderPaintGuideCanvas);
+
+  document.getElementById("artGuideCompleteExportBtn").addEventListener("click", exportPNG);
+  document.getElementById("artGuideCompleteShareBtn").addEventListener("click", () => {
+    closePaintGuideCompleteScreen();
+    openShareCodeModal();
+  });
+  document.getElementById("artGuideCompleteCloseBtn").addEventListener("click", closePaintGuideCompleteScreen);
 }
 
 bindPaintGuideControls();

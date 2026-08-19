@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/art.css?v=33">
+<link rel="stylesheet" href="./css/art.css?v=34">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -203,6 +203,7 @@
 <div id="myDesignsModal" onclick="if(event.target.id==='myDesignsModal') closeMyDesignsModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-mydesigns-box">
     <h3 data-i18n="art_mydesigns_title">マイデザイン</h3>
+    <div class="art-mydesigns-filters" id="artMyDesignsFilters"></div>
     <div class="art-mydesigns-list" id="artMyDesignsList"></div>
     <button class="modal-close-btn" onclick="closeMyDesignsModal()" data-i18n="art_close">閉じる</button>
   </div>
@@ -248,7 +249,10 @@
   <div class="modal-box art-help-box">
     <h3 style="text-align:center;">使い方</h3>
 
-    <p><strong>編集する・固定する</strong><br>
+    <p><strong>ぬり方ガイド（おすすめ）</strong><br>
+    「効率のいい順番を見る」を押すと、「10×10ブロック表示」と同じ番号のブロックを1つずつ順番にめぐりながら、そのブロックの中で色ごとに手順をまとめて案内します。画面は常にその時案内しているブロックへ自動でズームするので、全体図の中の遠い場所を探す必要はありません（右上のボタンでいつでも全体表示にも切り替えられます）。ゲーム内のバケツ（塗りつぶし）ツールは隙間なく囲まれた範囲を全部塗るため、斜めも含めた周囲8マスのどこかに違う色・未着色・キャンバスの外があるマスは先に塗って壁を作らないと、その隙間から意図した範囲を越えて塗り広がってしまいます（キャンバスの一番外側も特別扱いせず、同じように壁が必要な場所として扱います）。そのため、境目のマスは丸印で個別にタップする場所として、周囲8マス全てが同じ色のマスで埋まっている「内側のマス」は境目を塗ったあとバケツでまとめて塗れる場所として示します。画面上部には残り時間の目安が表示され、実際に進めるペースに合わせて自動で更新されます。ブロックを塗り終えるたびに軽い通知（振動含む）でお知らせし、最後まで塗り終えると、かかった時間と塗ったマス数のまとめ画面が表示され、そのままPNGでの保存や共有コードの発行に進めます。</p>
+
+    <p style="margin-top:10px;"><strong>編集する・固定する</strong><br>
     「編集する」をONにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をONにすると、編集モードに関わらず一切の描画を受け付けなくなり、「編集する」ボタンもグレーアウトして押せなくなります。固定を解除すればまた編集できます。</p>
 
     <p style="margin-top:10px;"><strong>ツール</strong><br>
@@ -269,11 +273,8 @@
     <p style="margin-top:10px;"><strong>デザイン枠の輪郭線</strong><br>
     デザイン枠（衣装・家具など）で作成すると、実際に使われる部分を示す輪郭線が表示されます。輪郭線の外側もゲーム内の仕様どおり塗ることができます。</p>
 
-    <p style="margin-top:10px;"><strong>ぬり方ガイド</strong><br>
-    「効率のいい順番を見る」を押すと、「10×10ブロック表示」と同じ番号のブロックを1つずつ順番にめぐりながら、そのブロックの中で色ごとに手順をまとめて案内します。画面は常にその時案内しているブロックへ自動でズームするので、全体図の中の遠い場所を探す必要はありません（右上のボタンでいつでも全体表示にも切り替えられます）。ゲーム内のバケツ（塗りつぶし）ツールは隙間なく囲まれた範囲を全部塗るため、斜めも含めた周囲8マスのどこかに違う色・未着色・キャンバスの外があるマスは先に塗って壁を作らないと、その隙間から意図した範囲を越えて塗り広がってしまいます（キャンバスの一番外側も特別扱いせず、同じように壁が必要な場所として扱います）。そのため、境目のマスは丸印で個別にタップする場所として、周囲8マス全てが同じ色のマスで埋まっている「内側のマス」は境目を塗ったあとバケツでまとめて塗れる場所として示します。</p>
-
     <p style="margin-top:10px;"><strong>マイデザイン</strong><br>
-    「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。「新規作成」から別サイズのキャンバスも作成できます。</p>
+    「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。一覧では未着手・作業中・完了で絞り込め、進捗（%）も表示されます。作業中のデザインは常に一覧の上に固定されるので、続きから再開しやすくなっています。「新規作成」から別サイズのキャンバスも作成できます。</p>
 
     <p style="margin-top:10px;"><strong>エクスポート・共有</strong><br>
     完成したデザインをPNG画像として保存したり、共有したりできます。</p>
@@ -301,10 +302,15 @@
 </div>
 
 <div class="art-guide-overlay" id="artGuideOverlay" style="display:none;">
+  <div class="art-guide-block-flash" id="artGuideBlockFlash">
+    <span id="artGuideBlockFlashIcon"></span>
+    <span id="artGuideBlockFlashText"></span>
+  </div>
   <div class="art-guide-topbar">
     <div class="art-guide-progress-wrap">
       <div class="art-guide-progress-label" id="artGuideProgressLabel"></div>
       <div class="art-guide-progress-bar"><div class="art-guide-progress-fill" id="artGuideProgressFill"></div></div>
+      <div class="art-guide-estimate" id="artGuideEstimate"></div>
     </div>
     <button class="art-guide-zoom-btn" id="artGuideZoomBtn"></button>
     <button class="art-guide-close-btn" id="artGuideCloseBtn" aria-label="close"></button>
@@ -325,6 +331,28 @@
   </div>
 </div>
 
+<div class="art-guide-complete-overlay" id="artGuideCompleteOverlay" style="display:none;">
+  <div class="art-guide-complete-box">
+    <div class="art-guide-complete-icon" id="artGuideCompleteIcon"></div>
+    <h3 data-i18n="art_guide_complete_title">ぬり終わりました！</h3>
+    <div class="art-guide-complete-stats">
+      <div class="art-guide-complete-stat">
+        <div class="art-guide-complete-stat-value" id="artGuideCompleteTime"></div>
+        <div class="art-guide-complete-stat-label" data-i18n="art_guide_complete_time_label">かかった時間</div>
+      </div>
+      <div class="art-guide-complete-stat">
+        <div class="art-guide-complete-stat-value" id="artGuideCompleteCells"></div>
+        <div class="art-guide-complete-stat-label" data-i18n="art_guide_complete_cells_label">塗ったマス数</div>
+      </div>
+    </div>
+    <div class="art-panel-btn-row">
+      <button class="art-header-btn" id="artGuideCompleteExportBtn" data-i18n="art_export_png">PNGで保存</button>
+      <button class="art-header-btn" id="artGuideCompleteShareBtn" data-i18n="art_share_code_generate">コードを発行する</button>
+    </div>
+    <button class="modal-close-btn" id="artGuideCompleteCloseBtn" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
 <div id="artToast"></div>
 
 <script src="js/i18n.js"></script>
@@ -334,6 +362,8 @@
 document.getElementById("artConvertIcon").innerHTML = icon("upload", { size: 15 });
 document.getElementById("artFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("helpBtn").innerHTML = icon("help");
+document.getElementById("artGuideBlockFlashIcon").innerHTML = icon("check", { size: 20 });
+document.getElementById("artGuideCompleteIcon").innerHTML = icon("trophy", { size: 40 });
 
 // ダークモード
 const darkToggle = document.getElementById("darkToggle");
