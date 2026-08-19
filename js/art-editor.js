@@ -316,9 +316,11 @@ function createCanvas(w, h, frameId, partId){
 }
 
 // ── ツールバー ──
+// アイコンは和モダンな見た目にするため筆（fude）・字消し（sumiKeshi）を使うが、
+// ツールのid（"pen"/"eraser"）自体はロジック側の分岐に使われているため変更しない
 const TOOLS = [
-  { id: "pen", icon: "pen", labelKey: "art_tool_pen", labelFallback: "ペン" },
-  { id: "eraser", icon: "eraser", labelKey: "art_tool_eraser", labelFallback: "消しゴム" },
+  { id: "pen", icon: "fude", labelKey: "art_tool_pen", labelFallback: "ペン" },
+  { id: "eraser", icon: "sumiKeshi", labelKey: "art_tool_eraser", labelFallback: "消しゴム" },
   { id: "bucket", icon: "bucket", labelKey: "art_tool_bucket", labelFallback: "バケツ" },
   { id: "eyedropper", icon: "eyedropper", labelKey: "art_tool_eyedropper", labelFallback: "スポイト" },
 ];
@@ -562,6 +564,9 @@ function zoomReset(){
 // ── カラーパレット ──
 // ゲーム内で実際に選択できる色（js/art-config.jsのGAME_PALETTE）に完全一致させた
 // 階層UI（メインカラー→サブカラー）のみを通じて色を選ぶ。任意の色を自由入力する手段は持たない。
+// メインカラーは単なる色見本のグリッドではなく、和名（GAME_PALETTE.name）を
+// 添えた「紙のチップ」として並べる。ゲーム内ピッカーの色名とそのまま一致する
+// 実用的な名前なので、RGB値だけでは分かりにくい色の見分けに役立つ
 function renderPalette(){
   const mainsEl = document.getElementById("artPaletteMains");
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
@@ -571,13 +576,15 @@ function renderPalette(){
     // （例：#FEFFFFは01の5番目のサブカラーであり、かつ02のメインカラーそのもの）ため、
     // 本来1つだけのはずのマークが同時に2箇所へついてしまう不具合になる。
     const isActive = entry.no === selectedMainNo;
-    const cls = ["art-swatch", "art-swatch-main"];
-    // "active"は全体で*{background:var(--indigo)!important}という汎用クラスと衝突し
-    // スウォッチ本来の色を上書きしてしまうため、専用クラス名にする
+    const cls = ["art-paper-chip"];
     if(isActive) cls.push("is-selected");
-    if(isNone) cls.push("art-swatch-none");
+    const swatchCls = ["art-paper-chip-swatch"];
+    if(isNone) swatchCls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
-    return `<button class="${cls.join(" ")}"${style} data-main="${entry.no}" aria-label="${entry.no} ${entry.name}"></button>`;
+    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no} ${entry.name}">
+      <span class="${swatchCls.join(" ")}"${style}></span>
+      <span class="art-paper-chip-name">${entry.name}</span>
+    </button>`;
   }).join("");
   mainsEl.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => selectPaletteMain(btn.dataset.main));
@@ -747,7 +754,8 @@ function renderCanvas(){
   }
 
   if(cell >= 6){
-    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)";
+    // 灰色・黒ではなく、サイト全体のテーマカラーである藍色をごく薄く使う
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(139,169,201,0.14)" : "rgba(60,90,110,0.16)";
     ctx.lineWidth = 1;
     for(let i = 0; i <= gridWidth; i++){
       ctx.beginPath();
@@ -1252,7 +1260,9 @@ function renderBlockList(){
   // 単純な固定3列の数字リストだと、目的のブロックがキャンバス上のどこに
   // あるか一覧内で見た目から判断できず探しにくいため、見たままの位置で選べるようにする
   el.style.gridTemplateColumns = `repeat(${blocksX}, 1fr)`;
-  const statusIcon = { 0: "", 1: "◐", 2: "✓" };
+  // 完了（2）はチェック文字ではなく、.art-block-status-2 側のCSSで丸い朱印（判子）風の
+  // 見た目にするため、ここでは文字を出さない
+  const statusIcon = { 0: "", 1: "◐", 2: "" };
   let html = "";
   for(let by = 0; by < blocksY; by++){
     for(let bx = 0; bx < blocksX; bx++){
