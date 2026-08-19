@@ -66,7 +66,9 @@ function initArtEditor(){
   loadSavedDesigns();
   recentColors = loadRecentColors();
 
-  const draft = loadDraft();
+  const originalDraft = loadDraft();
+  const draft = applyShareCodeFromUrlIfPresent(originalDraft);
+  const loadedFromShareUrl = draft !== originalDraft;
   if(draft && draft.width && draft.height && Array.isArray(draft.pixelData)){
     gridWidth = draft.width;
     gridHeight = draft.height;
@@ -77,6 +79,7 @@ function initArtEditor(){
     activePartId = draft.partId || null;
     isLocked = !!draft.locked;
     rebuildActiveMask();
+    if(loadedFromShareUrl) saveDraft(); // URLのコードから読み込んだ内容を下書きとして永続化する
   }else{
     showFrameStep1();
     renderFreeSizeOptions();
@@ -97,6 +100,7 @@ function initArtEditor(){
   bindMyDesignsControls();
   bindLockControls();
   bindTutorialControls();
+  bindShareCodeControls();
   maybeStartTutorial();
 }
 
@@ -1511,6 +1515,174 @@ function shareDesign(){
       a.click();
     }
   });
+}
+
+// ── 共有コード（アカウント不要で、文字列だけでデザインを共有・バックアップする） ──
+function bindShareCodeControls(){
+  document.getElementById("artShareCodeBtn").addEventListener("click", openShareCodeModal);
+  document.getElementById("artShareCodeCloseBtn").addEventListener("click", closeShareCodeModal);
+  document.getElementById("artShareCodeCopyBtn").addEventListener("click", () =>
+    copyTextToClipboard(document.getElementById("artShareCodeText").value, "artShareCodeCopyBtn"));
+  document.getElementById("artShareUrlCopyBtn").addEventListener("click", () =>
+    copyTextToClipboard(document.getElementById("artShareUrlText").value, "artShareUrlCopyBtn"));
+
+  document.getElementById("artImportCodeBtn").addEventListener("click", openImportCodeModal);
+  document.getElementById("artImportCodeCloseBtn").addEventListener("click", closeImportCodeModal);
+  document.getElementById("artImportCodeSubmitBtn").addEventListener("click", importFromPastedCode);
+}
+
+function currentDesignName(){
+  const design = currentDesignId ? savedDesigns.find(d => d.id === currentDesignId) : null;
+  return design ? design.name : "";
+}
+
+function openShareCodeModal(){
+  const code = encodeDesignToShareCode({
+    width: gridWidth, height: gridHeight, pixelData: pixels,
+    frameId: activeFrameId, partId: activePartId, name: currentDesignName(),
+  });
+  const url = buildShareUrl(code);
+  document.getElementById("artShareCodeText").value = code;
+  document.getElementById("artShareUrlText").value = url;
+  renderShareQrCode(url);
+  document.getElementById("artShareCodeModal").style.display = "block";
+}
+
+function closeShareCodeModal(){
+  document.getElementById("artShareCodeModal").style.display = "none";
+}
+
+function renderShareQrCode(url){
+  const el = document.getElementById("artShareQr");
+  el.innerHTML = "";
+  // QRコードに収まらないほど長いURLになった場合（巨大なキャンバス等）は、コード/URLの
+  // コピーは引き続き使えるようにしつつ、QR表示だけ静かに諦める
+  try{
+    const qr = qrcode(0, "M");
+    qr.addData(url);
+    qr.make();
+    const img = document.createElement("img");
+    img.src = qr.createDataURL(4, 4);
+    img.alt = "";
+    img.className = "art-share-qr-img";
+    el.appendChild(img);
+  }catch(e){
+    el.innerHTML = `<p class="art-share-qr-fallback">${T("art_share_qr_too_long", "QRコードにするには長すぎるため、コードかURLをコピーしてください")}</p>`;
+  }
+}
+
+// navigator.clipboardが使えない環境（iOSの一部条件など）向けに、textareaのselect+execCommandへ
+// フォールバックする汎用のクリップボードコピー
+function copyTextToClipboard(text, btnId){
+  const showCopied = () => {
+    const btn = document.getElementById(btnId);
+    if(!btn) return;
+    const original = btn.dataset.label || btn.textContent;
+    btn.dataset.label = original;
+    btn.textContent = T("art_copied", "コピーしました");
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopyToClipboard(text, showCopied));
+  }else{
+    fallbackCopyToClipboard(text, showCopied);
+  }
+}
+
+function fallbackCopyToClipboard(text, onDone){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try{
+    document.execCommand("copy");
+    onDone();
+  }catch(e){
+    // コピーに失敗しても、テキストは画面上に表示されたままなので手動選択で対応できる
+  }
+  document.body.removeChild(ta);
+}
+
+function openImportCodeModal(){
+  document.getElementById("artImportCodeInput").value = "";
+  document.getElementById("artImportCodeError").textContent = "";
+  document.getElementById("artImportCodeModal").style.display = "block";
+}
+
+function closeImportCodeModal(){
+  document.getElementById("artImportCodeModal").style.display = "none";
+}
+
+function importFromPastedCode(){
+  const raw = document.getElementById("artImportCodeInput").value;
+  const result = decodeShareCode(raw);
+  if(result.error){
+    document.getElementById("artImportCodeError").textContent = T(result.error, "共有コードの読み込みに失敗しました");
+    return;
+  }
+  const hasExistingContent = pixels.some(c => c);
+  if(hasExistingContent && !confirm(T("art_share_import_confirm_overwrite", "現在編集中のデザインを、共有されたデザインに置き換えます。よろしいですか？"))){
+    return;
+  }
+  applyImportedDesign(result);
+  closeImportCodeModal();
+  showToast(T("art_import_success", "デザインを読み込みました"));
+}
+
+// 編集中に共有コードを読み込んだ場合：ライブの状態を直接置き換えて再描画する
+function applyImportedDesign(design){
+  gridWidth = design.width;
+  gridHeight = design.height;
+  pixels = design.pixelData.slice();
+  blockStatus = {};
+  currentDesignId = null;
+  activeFrameId = design.frameId;
+  activePartId = design.partId;
+  isLocked = false;
+  editMode = false;
+  inspectedCell = null;
+  highlightedColor = null;
+  undoStack = [];
+  redoStack = [];
+  rebuildActiveMask();
+  renderToolbar();
+  renderCanvas();
+  updateColorUsage();
+  renderBlockList();
+  renderLockUI();
+  saveDraft();
+}
+
+// 起動時：URLの?d=を検知して読み込む（上書き確認付き）。initArtEditor()内、通常の下書き
+// 読み込みより前に呼ばれ、下書き代わりのオブジェクトを返すことで以降の初期化処理に合流する
+function applyShareCodeFromUrlIfPresent(existingDraft){
+  const params = new URLSearchParams(location.search);
+  const code = params.get("d");
+  if(!code) return existingDraft;
+
+  // 一度読み込んだらURLから消す（リロード・戻る操作での再適用を防ぐ）
+  params.delete("d");
+  const newSearch = params.toString();
+  history.replaceState(null, "", location.pathname + (newSearch ? `?${newSearch}` : "") + location.hash);
+
+  const result = decodeShareCode(code);
+  if(result.error){
+    alert(T(result.error, "共有コードの読み込みに失敗しました"));
+    return existingDraft;
+  }
+
+  const hasExistingContent = existingDraft && Array.isArray(existingDraft.pixelData) && existingDraft.pixelData.some(c => c);
+  if(hasExistingContent && !confirm(T("art_share_import_confirm_overwrite", "現在編集中のデザインを、共有されたデザインに置き換えます。よろしいですか？"))){
+    return existingDraft;
+  }
+
+  return {
+    width: result.width, height: result.height, pixelData: result.pixelData,
+    frameId: result.frameId, partId: result.partId, blockStatus: {}, designId: null, locked: false,
+  };
 }
 
 // ── ヘルプモーダル ──

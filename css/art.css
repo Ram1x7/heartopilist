@@ -1285,6 +1285,79 @@ body.dark .art-mydesign-actions button{
   color:#b3a89a;
 }
 
+/* 共有コード（発行・読み込み）モーダル */
+.art-share-code-box{
+  max-width:400px;
+  max-height:85vh;
+  overflow-y:auto;
+  text-align:left;
+}
+
+.art-share-code-field{
+  margin-top:12px;
+}
+
+.art-share-code-field .art-panel-title{
+  margin-bottom:6px;
+}
+
+.art-share-code-textarea{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-family:monospace;
+  font-size:12px;
+  line-height:1.5;
+  resize:vertical;
+  margin-bottom:8px;
+}
+
+body.dark .art-share-code-textarea{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-share-qr{
+  display:flex;
+  justify-content:center;
+  margin-top:14px;
+}
+
+.art-share-qr-img{
+  width:180px;
+  height:180px;
+  border-radius:12px;
+  background:#fff;
+  padding:8px;
+  box-sizing:border-box;
+}
+
+.art-share-qr-fallback{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+}
+
+body.dark .art-share-qr-fallback{
+  color:#b3a89a;
+}
+
+.art-share-code-error{
+  min-height:1.4em;
+  margin:6px 0 0;
+  font-size:12px;
+  color:var(--vermillion);
+}
+
+body.dark .art-share-code-error{
+  color:var(--vermillion-soft);
+}
+
 /* ヘルプモーダル */
 .art-help-box{
   max-width:380px;
