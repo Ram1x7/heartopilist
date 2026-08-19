@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/music.css?v=27">
+<link rel="stylesheet" href="./css/music.css?v=28">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -137,6 +137,16 @@
     <div id="musicScoreDisplayAnchorEdit">
       <div class="music-score-display" id="musicScoreDisplay"></div>
     </div>
+    <div class="music-review-banner" id="musicReviewBanner" style="display:none">
+      <span id="musicReviewBannerText"></span>
+      <button class="music-review-clear-btn" id="musicReviewClearBtn" data-i18n="music_review_clear">すべて確認済みにする</button>
+    </div>
+    <div class="music-note-toolbar" id="musicNoteToolbar" style="display:none">
+      <span class="music-note-toolbar-label" id="musicNoteToolbarLabel"></span>
+      <button class="music-header-btn music-onboard-nav-secondary" id="musicNoteDeleteBtn" data-i18n="music_note_delete">この音を削除</button>
+      <button class="music-header-btn music-onboard-nav-secondary" id="musicNoteDeselectBtn" data-i18n="music_note_deselect">選択解除</button>
+    </div>
+    <p class="music-record-hint" id="musicNoteToolbarHint" data-i18n="music_note_toolbar_hint" style="display:none">そのまま音を弾くと、選んだ音がその音に置き換わります</p>
     <div class="music-loop-row" id="musicLoopRow">
       <button class="music-header-btn" id="musicLoopSelectBtn">区間を選ぶ</button>
       <span class="music-loop-range" id="musicLoopRangeLabel" style="display:none"></span>
@@ -302,7 +312,7 @@
     <div class="music-hum-source-row">
       <button class="music-header-btn" id="musicHumRecordBtn" data-i18n="music_hum_record_start">録音する</button>
       <label class="music-header-btn music-hum-upload-label" id="musicHumUploadLabel">
-        <input type="file" accept="audio/*" id="musicHumFileInput" style="display:none">
+        <input type="file" accept="audio/*,video/*" id="musicHumFileInput" style="display:none">
         <span data-i18n="music_hum_upload">音声ファイルを選ぶ</span>
       </label>
     </div>

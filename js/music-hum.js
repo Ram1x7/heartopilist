@@ -142,15 +142,73 @@ async function ensureBasicPitchLoaded(onStatus) {
   basicPitchLoaded = true;
 }
 
+// decodeAudioDataは音声コンテナ（wav/mp3/m4a等）専用で、.mov等の動画コンテナを
+// 直接デコードできず例外を投げることがある。その場合のフォールバックとして、
+// <video>要素に実際に読み込ませてcaptureStream()で音声トラックだけを取り出し、
+// MediaRecorderで録音し直すことで、ブラウザが再生さえできればコンテナ形式を
+// 問わず音声データを取得できる（動画ファイルからの譜面生成に対応するため）
+async function humExtractAudioFromVideoBlob(blob) {
+  const url = URL.createObjectURL(blob);
+  const video = document.createElement("video");
+  try {
+    video.src = url;
+    video.muted = true; // ミュートしておけばユーザー操作なしの自動再生がブラウザに許可され、
+    video.volume = 0; // captureStream()で取れる音声トラック自体には影響しない
+    video.playsInline = true;
+    video.preload = "auto";
+
+    await new Promise((resolve, reject) => {
+      video.addEventListener("loadedmetadata", resolve, { once: true });
+      video.addEventListener("error", () => reject(new Error("video load failed")), { once: true });
+    });
+
+    const captureFn = video.captureStream || video.mozCaptureStream || video.webkitCaptureStream;
+    if (!captureFn) throw new Error("captureStream not supported");
+    const audioTracks = captureFn.call(video).getAudioTracks();
+    if (!audioTracks.length) throw new Error("no audio track in video");
+
+    const audioStream = new MediaStream(audioTracks);
+    const recorder = new MediaRecorder(audioStream);
+    const chunks = [];
+    recorder.addEventListener("dataavailable", (e) => {
+      if (e.data && e.data.size > 0) chunks.push(e.data);
+    });
+    const stopped = new Promise((resolve) => recorder.addEventListener("stop", resolve, { once: true }));
+
+    recorder.start();
+    await video.play();
+    await new Promise((resolve) => {
+      video.addEventListener("ended", resolve, { once: true });
+      // "ended"が発火しない環境向けの保険（動画の長さ+数秒で強制的に打ち切る）
+      const durationMs = isFinite(video.duration) && video.duration > 0 ? video.duration * 1000 : 60000;
+      setTimeout(resolve, durationMs + 3000);
+    });
+    recorder.stop();
+    await stopped;
+
+    return new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+  } finally {
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+    URL.revokeObjectURL(url);
+  }
+}
+
 // basic-pitchはモノラル・22050Hzの音声しか受け付けない（それ以外だと例外を投げる）。
 // 録音・アップロードされる音声は端末やファイルによってサンプルレート・チャンネル数が
 // バラバラなため、デコード後にOfflineAudioContextで必ずこの形式へリサンプルし直す
-async function humDecodeAudioToBuffer(blob) {
-  const arrayBuffer = await blob.arrayBuffer();
+async function humDecodeAudioToBuffer(blob, onStatus) {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   let decoded;
   try {
-    decoded = await ctx.decodeAudioData(arrayBuffer);
+    try {
+      decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
+    } catch (directErr) {
+      if (onStatus) onStatus(T("music_hum_progress_extracting_video", "動画から音声を取り出し中…"));
+      const audioBlob = await humExtractAudioFromVideoBlob(blob);
+      decoded = await ctx.decodeAudioData(await audioBlob.arrayBuffer());
+    }
   } finally {
     ctx.close();
   }
@@ -310,7 +368,7 @@ async function onHumAnalyzeClick() {
   try {
     await ensureBasicPitchLoaded((label) => setProgress(0, label));
     setProgress(0.1, T("music_hum_progress_decoding", "音声を解析用に変換中…"));
-    const audioBuffer = await humDecodeAudioToBuffer(humSourceBlob);
+    const audioBuffer = await humDecodeAudioToBuffer(humSourceBlob, (label) => setProgress(0.1, label));
     setProgress(0.2, T("music_hum_progress_detecting", "音の高さを検出中…"));
     const noteEvents = await runBasicPitchAnalysis(audioBuffer, (p) =>
       setProgress(0.2 + p * 0.7, T("music_hum_progress_detecting", "音の高さを検出中…"))
@@ -330,11 +388,15 @@ async function onHumAnalyzeClick() {
 
     tokens = newTokens;
     resetLoop();
+    // 認識精度が完璧ではないため、変換直後の音は全て「未確認」としてマークし、
+    // 編集モードでタップして手直しした音から順にマークが消えるようにする
+    humReviewIndexes = new Set(newTokens.map((_, i) => i));
+    selectedTokenIndex = null;
     setPageMode("edit");
     renderScoreDisplay();
     saveDraftDebounced();
     closeHumModal();
-    showToast(T("music_hum_done_toast", "譜面に変換しました。聴きながら手直ししてください"));
+    showToast(T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
   } catch (e) {
     console.error(e);
     errorEl.textContent = T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください");

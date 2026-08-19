@@ -647,6 +647,100 @@ body.dark .music-chip-bar{
   background:var(--vermillion-soft);
 }
 
+/* 手直し対象として選択中の音（編集モードでタップして選ぶ） */
+.music-chip.selected{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  box-shadow:0 0 0 2px rgba(60,90,110,0.25);
+}
+
+.music-chip.selected .music-note-digit,
+.music-chip.selected .music-note-kana{
+  color:#fdf9ef;
+}
+
+body.dark .music-chip.selected{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* ハミングから自動変換され、まだ確認・修正していない音 */
+.music-chip.hum-review{
+  border-style:dashed;
+  border-color:var(--gold);
+  box-shadow:0 0 0 1px rgba(200,168,107,0.45);
+}
+
+/* 選んだ音を手直しする操作パネル */
+.music-note-toolbar{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:8px 0 0;
+}
+
+.music-note-toolbar .music-header-btn{
+  flex:0 0 auto;
+  padding:7px 12px;
+  font-size:11px;
+}
+
+.music-note-toolbar-label{
+  flex:1 1 auto;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .music-note-toolbar-label{
+  color:#ece4d4;
+}
+
+/* ハミングからの自動変換直後、未確認の音が残っていることを知らせるバナー */
+.music-review-banner{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:8px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px dashed var(--gold);
+  background:rgba(200,168,107,0.14);
+}
+
+.music-review-banner span{
+  font-size:11px;
+  color:var(--text);
+  line-height:1.5;
+}
+
+body.dark .music-review-banner{
+  background:rgba(200,168,107,0.1);
+}
+
+body.dark .music-review-banner span{
+  color:#ece4d4;
+}
+
+.music-review-clear-btn{
+  flex-shrink:0;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid var(--gold);
+  background:transparent;
+  color:var(--text);
+  font-size:11px;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+body.dark .music-review-clear-btn{
+  color:#ece4d4;
+}
+
 .music-note-digit{
   font-size:15px;
   font-weight:700;
