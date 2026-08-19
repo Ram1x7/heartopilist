@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=4">
-<link rel="stylesheet" href="./css/art.css?v=32">
+<link rel="stylesheet" href="./css/art.css?v=33">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -146,6 +146,14 @@
       </div>
     </div>
     <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_share_code_label">共有コード</div>
+      <p class="art-step-hint" data-i18n="art_share_code_hint">アカウント登録なしで、デザインを文字列としてやり取りできます。機種変更前のバックアップにも使えます</p>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artShareCodeBtn" data-i18n="art_share_code_generate">コードを発行する</button>
+        <button class="art-header-btn" id="artImportCodeBtn" data-i18n="art_share_code_import">コードを読み込む</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_display_label">表示</div>
       <label class="art-toggle-row">
         <span data-i18n="art_show_color_numbers">色番号</span>
@@ -200,6 +208,42 @@
   </div>
 </div>
 
+<div id="artShareCodeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-share-code-box">
+    <h3 data-i18n="art_share_code_modal_title">共有コード</h3>
+    <p class="art-step-hint" data-i18n="art_share_code_modal_hint">下のコードかURLを、Discordやメモアプリなどに貼って共有できます。「コードを読み込む」から貼り付ければ、いつでも復元できます。</p>
+
+    <div class="art-share-code-field">
+      <label class="art-panel-title" data-i18n="art_share_code_field_label">コード</label>
+      <textarea id="artShareCodeText" class="art-share-code-textarea" readonly rows="3"></textarea>
+      <button class="art-header-btn" id="artShareCodeCopyBtn" data-i18n="art_copy">コピー</button>
+    </div>
+
+    <div class="art-share-code-field">
+      <label class="art-panel-title" data-i18n="art_share_url_field_label">共有URL</label>
+      <textarea id="artShareUrlText" class="art-share-code-textarea" readonly rows="2"></textarea>
+      <button class="art-header-btn" id="artShareUrlCopyBtn" data-i18n="art_copy">コピー</button>
+    </div>
+
+    <div class="art-share-qr" id="artShareQr"></div>
+
+    <button class="modal-close-btn" id="artShareCodeCloseBtn" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div id="artImportCodeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-share-code-box">
+    <h3 data-i18n="art_share_code_import_title">コードを読み込む</h3>
+    <p class="art-step-hint" data-i18n="art_share_code_import_hint">共有されたコードを貼り付けてください。今のデザインは上書きされるため、必要なら先に保存してください。</p>
+    <textarea id="artImportCodeInput" class="art-share-code-textarea" rows="4" placeholder=""></textarea>
+    <p class="art-share-code-error" id="artImportCodeError"></p>
+    <div class="art-panel-btn-row">
+      <button class="art-header-btn" id="artImportCodeSubmitBtn" data-i18n="art_share_code_import_submit">読み込む</button>
+    </div>
+    <button class="modal-close-btn" id="artImportCodeCloseBtn" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-help-box">
     <h3 style="text-align:center;">使い方</h3>
@@ -233,6 +277,9 @@
 
     <p style="margin-top:10px;"><strong>エクスポート・共有</strong><br>
     完成したデザインをPNG画像として保存したり、共有したりできます。</p>
+
+    <p style="margin-top:10px;"><strong>共有コード</strong><br>
+    アカウント登録なしで、デザインを短い文字列（コード）やURL、QRコードとしてやり取りできます。「コードを発行する」で作った文字列は、Discordやメモアプリなどにそのまま貼り付けられます。「コードを読み込む」から貼り付ければ、いつでも同じデザインを復元できます。機種変更前のバックアップとしてもお使いください（この機能はサーバーに一切データを送信せず、ブラウザの中だけで完結します）。</p>
 
     <p style="margin-top:10px;"><strong>10×10ブロック表示</strong><br>
     10×10マスごとの区切り線は、このOFF/ONに関わらず常に薄く表示されます。ONにすると各ブロックに色分けと番号が付き、タップすると未着手・作業中・完了の3段階で進捗を記録できます。</p>
@@ -336,6 +383,9 @@ function T(key, fallback, vars){
 </script>
 <script src="js/art-config.js"></script>
 <script src="js/art-masks.js"></script>
+<script src="js/lz-string.min.js"></script>
+<script src="js/qrcode.js"></script>
+<script src="js/art-share-code.js"></script>
 <script src="js/art-editor.js"></script>
 <script src="js/art-paint-guide.js"></script>
 <script src="js/sw-register.js"></script>
