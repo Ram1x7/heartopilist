@@ -620,6 +620,7 @@
   "music_hum_progress_extracting_video": "動画から音声を取り出し中…",
   "music_hum_progress_detecting": "音の高さを検出中…",
   "music_hum_progress_converting": "譜面に変換中…",
+  "music_hum_live_pitch_silent": "（無音）",
   "music_hum_no_notes": "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください",
   "music_hum_done_toast": "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます",
   "music_hum_analyze_error": "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください",

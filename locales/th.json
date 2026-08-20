@@ -596,6 +596,7 @@
   "music_hum_progress_extracting_video": "กำลังแยกเสียงจากวิดีโอ…",
   "music_hum_progress_detecting": "กำลังตรวจจับระดับเสียง…",
   "music_hum_progress_converting": "กำลังแปลงเป็นโน้ตเพลง…",
+  "music_hum_live_pitch_silent": "(เงียบ)",
   "music_hum_no_notes": "ตรวจไม่พบเสียง ลองฮัมให้ชัดเจนและช้าลงอีกนิด",
   "music_hum_done_toast": "แปลงเป็นโน้ตเพลงแล้ว โน้ตที่มีขอบสีทองคือเสียงที่ตรวจจับอัตโนมัติ แตะเพื่อแก้ไขได้",
   "music_hum_analyze_error": "การวิเคราะห์ล้มเหลว ลองใช้เสียงอื่นหรือลองใหม่อีกครั้งภายหลัง",

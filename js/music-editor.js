@@ -976,6 +976,9 @@ function updateModeUI() {
     document.getElementById("musicPlaybackAnchorFollow").appendChild(playbackRow);
     renderFollowStageName();
     renderFollowDisplay();
+  } else {
+    // 編集モードでも、入力した譜面をその場で再生して確認・微調整できるようにする
+    document.getElementById("musicPlaybackAnchorEdit").appendChild(playbackRow);
   }
 
   // モードによって演奏ボタンの描画方法が異なる（編集＝伸縮するボタン行、

@@ -596,6 +596,7 @@
   "music_hum_progress_extracting_video": "동영상에서 음성을 추출하는 중…",
   "music_hum_progress_detecting": "음높이를 감지하는 중…",
   "music_hum_progress_converting": "악보로 변환하는 중…",
+  "music_hum_live_pitch_silent": "(무음)",
   "music_hum_no_notes": "음을 감지하지 못했습니다. 조금 더 또렷하고 천천히 불러 보세요",
   "music_hum_done_toast": "악보로 변환했습니다. 금색 테두리의 음은 자동 감지된 것이니 탭해서 손질해 주세요",
   "music_hum_analyze_error": "분석에 실패했습니다. 다른 음성으로 시도하거나 잠시 후 다시 시도해 주세요",
