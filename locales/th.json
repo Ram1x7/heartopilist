@@ -622,5 +622,14 @@
   "art_nudge_down": "เลื่อนลง",
   "art_nudge_left": "เลื่อนซ้าย",
   "art_nudge_right": "เลื่อนขวา",
-  "art_crop_mask_hint": "เส้นสีขาวคือแนวรูปทรงจริง โปรดจัดตำแหน่งภาพให้พอดีกับบริเวณนี้"
+  "art_crop_mask_hint": "เส้นสีขาวคือแนวรูปทรงจริง โปรดจัดตำแหน่งภาพให้พอดีกับบริเวณนี้",
+  "art_mode_wizard_title": "เลือกวิธีการทำงาน",
+  "art_mode_wizard_hint": "สามารถเปลี่ยนได้ทุกเมื่อในภายหลัง",
+  "art_mode_wizard_recommended": "แนะนำสำหรับมือใหม่",
+  "art_mode_wizard_block_title": "โหมดทำงานทีละบล็อก",
+  "art_mode_wizard_block_desc": "แบ่งเป็นบล็อกละ 10×10 ช่อง ระบายทีละบล็อกอย่างตั้งใจ",
+  "art_mode_wizard_normal_title": "โหมดทำงานปกติ",
+  "art_mode_wizard_normal_desc": "มองเห็นทั้งผืนผ้าใบและระบายสีตามลำดับที่ต้องการได้อย่างอิสระ",
+  "art_confirm_switch_block_mode": "เปลี่ยนเป็นโหมดทำงานทีละบล็อกหรือไม่?",
+  "art_confirm_switch_normal_mode": "เปลี่ยนเป็นโหมดทำงานปกติหรือไม่?"
 }

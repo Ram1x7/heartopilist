@@ -622,5 +622,14 @@
   "art_nudge_down": "向下移动",
   "art_nudge_left": "向左移动",
   "art_nudge_right": "向右移动",
-  "art_crop_mask_hint": "白线是实际形状的参考。请以此范围为准调整位置"
+  "art_crop_mask_hint": "白线是实际形状的参考。请以此范围为准调整位置",
+  "art_mode_wizard_title": "请选择作业方式",
+  "art_mode_wizard_hint": "之后可以随时切换",
+  "art_mode_wizard_recommended": "推荐新手使用",
+  "art_mode_wizard_block_title": "分块作业模式",
+  "art_mode_wizard_block_desc": "按10×10格分块，一块一块专注涂色",
+  "art_mode_wizard_normal_title": "普通作业模式",
+  "art_mode_wizard_normal_desc": "查看整个画布，按喜欢的顺序自由涂色",
+  "art_confirm_switch_block_mode": "要切换到分块作业模式吗？",
+  "art_confirm_switch_normal_mode": "要切换到普通作业模式吗？"
 }

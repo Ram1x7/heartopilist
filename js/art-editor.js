@@ -74,6 +74,7 @@ function initArtEditor(){
   const originalDraft = loadDraft();
   const draft = applyShareCodeFromUrlIfPresent(originalDraft);
   const loadedFromShareUrl = draft !== originalDraft;
+  let showModeWizardOnInit = false;
   if(draft && draft.width && draft.height && Array.isArray(draft.pixelData)){
     gridWidth = draft.width;
     gridHeight = draft.height;
@@ -85,6 +86,13 @@ function initArtEditor(){
     isLocked = !!draft.locked;
     rebuildActiveMask();
     if(loadedFromShareUrl) saveDraft(); // URLのコードから読み込んだ内容を下書きとして永続化する
+    // 画像変換（「画像から作る」）を確定した直後の下書きにだけ立つ目印。作業モード選択の
+    // 導線を出したら、この目印自体は次の保存で自然に消えるようここで即座に保存し直す
+    // （目印が残ったままリロードすると、再度ウィザードが出てしまうのを防ぐため）
+    if(draft.justCreated){
+      showModeWizardOnInit = true;
+      saveDraft();
+    }
   }else{
     showFrameStep1();
     renderFreeSizeOptions();
@@ -107,6 +115,8 @@ function initArtEditor(){
   bindLockControls();
   bindTutorialControls();
   bindShareCodeControls();
+  bindModeWizardControls();
+  if(showModeWizardOnInit) showModeWizard();
   maybeStartTutorial();
 }
 
@@ -145,11 +155,43 @@ function bindDisplayToggles(){
     renderCanvas();
   });
   document.getElementById("artBlockModeToggle").addEventListener("change", (e) => {
-    blockMode = e.target.checked;
+    // 制作開始時のウィザードで最初に選んだ後の変更は、誤操作防止のため確認を挟む
+    const next = e.target.checked;
+    const msg = next
+      ? T("art_confirm_switch_block_mode", "ブロック作業モードに切り替えますか？")
+      : T("art_confirm_switch_normal_mode", "通常作業モードに切り替えますか？");
+    if(!confirm(msg)){
+      e.target.checked = !next; // キャンセル時は表示上のチェック状態も元に戻す
+      return;
+    }
+    blockMode = next;
     renderToolbar();
     renderCanvas();
     renderBlockList();
   });
+}
+
+// ── 作業モード選択ウィザード（制作開始時の一度きりの導線。既存の10×10ブロック表示
+// トグル自体は変更しない。ここではその初期値を、案内つきで最初に選ばせるだけ） ──
+function showModeWizard(){
+  document.getElementById("artModeWizardModal").style.display = "block";
+}
+
+function chooseModeWizard(useBlockMode){
+  blockMode = useBlockMode;
+  const toggle = document.getElementById("artBlockModeToggle");
+  if(toggle) toggle.checked = useBlockMode;
+  document.getElementById("artModeWizardModal").style.display = "none";
+  renderToolbar();
+  renderCanvas();
+  renderBlockList();
+  saveDraft();
+  maybeStartTutorial(); // ウィザード表示中は抑止していたチュートリアルを、閉じた後に改めて判定する
+}
+
+function bindModeWizardControls(){
+  document.getElementById("artModeWizardBlockBtn").addEventListener("click", () => chooseModeWizard(true));
+  document.getElementById("artModeWizardNormalBtn").addEventListener("click", () => chooseModeWizard(false));
 }
 
 // ── 新規キャンバス作成モーダルを「新規作成」ボタンから開く（既存キャンバスがある場合のみキャンセル可能） ──
@@ -317,6 +359,7 @@ function createCanvas(w, h, frameId, partId){
   renderBlockList();
   renderLockUI();
   saveDraft();
+  showModeWizard();
   maybeStartTutorial();
 }
 
@@ -2060,6 +2103,10 @@ let tutorialStep = 0;
 // キャンバス作成完了（createCanvas）のタイミングで呼び直される
 function maybeStartTutorial(){
   if(document.getElementById("gridSizeModal").style.display === "block") return;
+  // 作業モード選択ウィザードが出ている間はチュートリアルを重ねて出さない。
+  // ウィザードを閉じた側（chooseModeWizard）からこの関数を呼び直すことで、
+  // 「ウィザード→（初回のみ）チュートリアル」の順に必ず1つずつ表示する
+  if(document.getElementById("artModeWizardModal").style.display === "block") return;
   if(localStorage.getItem(TUTORIAL_DONE_KEY) === "true") return;
   setTimeout(startTutorial, 400);
 }

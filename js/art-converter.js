@@ -797,6 +797,9 @@ function useResultInEditor(){
     // 補助線が表示されなくなる
     frameId: selectedFrameId || null,
     partId: selectedFramePartId || null,
+    // エディタ側で「制作開始時の作業モード選択ウィザード」を出すための目印。
+    // エディタ側で読み込んだ直後に消費され、以後の下書きには残らない
+    justCreated: true,
   }));
   location.href = "art-create.html";
 }

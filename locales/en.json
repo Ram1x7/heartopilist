@@ -646,5 +646,14 @@
   "art_nudge_down": "Move down",
   "art_nudge_left": "Move left",
   "art_nudge_right": "Move right",
-  "art_crop_mask_hint": "The white lines show the actual shape. Line up your image with this area"
+  "art_crop_mask_hint": "The white lines show the actual shape. Line up your image with this area",
+  "art_mode_wizard_title": "Choose how you'd like to work",
+  "art_mode_wizard_hint": "You can switch anytime later",
+  "art_mode_wizard_recommended": "Recommended for beginners",
+  "art_mode_wizard_block_title": "Block mode",
+  "art_mode_wizard_block_desc": "Work through 10x10 blocks one at a time, focused and step by step",
+  "art_mode_wizard_normal_title": "Normal mode",
+  "art_mode_wizard_normal_desc": "See the whole canvas and paint in any order you like",
+  "art_confirm_switch_block_mode": "Switch to block mode?",
+  "art_confirm_switch_normal_mode": "Switch to normal mode?"
 }

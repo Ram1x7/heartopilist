@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=40">
+<link rel="stylesheet" href="./css/art.css?v=41">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -220,6 +220,24 @@
     </div>
     <div id="gridSizeCancelWrap" style="display:none;">
       <button class="modal-close-btn" onclick="closeNewCanvasModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="artModeWizardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-mode-wizard-box">
+    <h3 data-i18n="art_mode_wizard_title">作業の進め方を選んでください</h3>
+    <p class="art-step-hint" data-i18n="art_mode_wizard_hint">あとからいつでも切り替えられます</p>
+    <div class="art-mode-wizard-options">
+      <button class="art-mode-wizard-option is-recommended" id="artModeWizardBlockBtn">
+        <span class="art-mode-wizard-badge" data-i18n="art_mode_wizard_recommended">初心者におすすめ</span>
+        <span class="art-mode-wizard-option-title" data-i18n="art_mode_wizard_block_title">ブロック作業モード</span>
+        <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_block_desc">10×10マスずつ区切って、1ブロックずつ集中して塗り進められます</span>
+      </button>
+      <button class="art-mode-wizard-option" id="artModeWizardNormalBtn">
+        <span class="art-mode-wizard-option-title" data-i18n="art_mode_wizard_normal_title">通常作業モード</span>
+        <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_normal_desc">キャンバス全体を見ながら、自由な順番で塗り進められます</span>
+      </button>
     </div>
   </div>
 </div>
