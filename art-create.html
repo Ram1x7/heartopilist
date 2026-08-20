@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=44">
+<link rel="stylesheet" href="./css/art.css?v=45">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -154,6 +154,13 @@
         <button class="art-header-btn" id="artPaintGuideBtn" data-i18n="art_paint_guide_btn">効率のいい順番を見る</button>
       </div>
     </div>
+    <div class="art-panel-section" id="art3DSection" style="display:none;">
+      <div class="art-panel-title" data-i18n="art_3d_preview_label">3Dプレビュー（試験公開）</div>
+      <p class="art-step-hint" data-i18n="art_3d_preview_hint">保存済みの他のパーツも合わせて、立体的な見た目を確認できます</p>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="art3DPreviewBtn" data-i18n="art_3d_preview_btn">3Dプレビューを見る</button>
+      </div>
+    </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_mydesigns_label">マイデザイン</div>
       <div class="art-panel-btn-row">
@@ -239,6 +246,18 @@
         <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_normal_desc">キャンバス全体を見ながら、自由な順番で塗り進められます</span>
       </button>
     </div>
+  </div>
+</div>
+
+<div id="art3DModal" onclick="if(event.target.id==='art3DModal') close3DPreview()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-3d-box">
+    <h3 data-i18n="art_3d_preview_title">3Dプレビュー</h3>
+    <p class="art-step-hint" data-i18n="art_3d_preview_drag_hint">ドラッグして回転できます</p>
+    <div class="art-3d-host" id="art3DHost">
+      <p class="art-3d-loading" id="art3DLoading" data-i18n="art_3d_preview_loading">読み込み中…</p>
+    </div>
+    <p class="art-3d-note" data-i18n="art_3d_preview_note">試験的な機能です。実際のゲーム内の見た目と多少異なる場合があります</p>
+    <button class="modal-close-btn" onclick="close3DPreview()" data-i18n="art_close">閉じる</button>
   </div>
 </div>
 
@@ -476,6 +495,7 @@ function T(key, fallback, vars){
 <script src="js/art-share-code.js"></script>
 <script src="js/art-editor.js"></script>
 <script src="js/art-paint-guide.js"></script>
+<script src="js/art-3d.js"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
