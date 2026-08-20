@@ -620,6 +620,7 @@
   "music_hum_progress_extracting_video": "Extracting audio from video…",
   "music_hum_progress_detecting": "Detecting pitches…",
   "music_hum_progress_converting": "Converting to a score…",
+  "music_hum_live_pitch_silent": "(Silent)",
   "music_hum_no_notes": "No notes were detected. Try humming a bit more clearly and slowly",
   "music_hum_done_toast": "Converted to a score. Notes with a gold outline were auto-detected — tap one to fix it",
   "music_hum_analyze_error": "Analysis failed. Try a different recording, or try again later",

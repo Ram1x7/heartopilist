@@ -1567,6 +1567,41 @@ body.dark .music-hum-rec-dot{
   50%{ opacity:0.25; }
 }
 
+.music-hum-pitch-row{
+  display:flex;
+  justify-content:center;
+  margin-bottom:10px;
+  padding:10px;
+  border-radius:12px;
+  background:var(--card-sub);
+}
+
+body.dark .music-hum-pitch-row{
+  background:#383329;
+}
+
+.music-hum-pitch-value{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.04em;
+}
+
+body.dark .music-hum-pitch-value{
+  color:#e8d2a8;
+}
+
+.music-hum-pitch-value.is-silent{
+  font-size:14px;
+  font-weight:400;
+  color:var(--text-sub);
+}
+
+body.dark .music-hum-pitch-value.is-silent{
+  color:#b3a89a;
+}
+
 .music-hum-file-row{
   margin-bottom:10px;
   font-size:12px;

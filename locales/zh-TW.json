@@ -596,6 +596,7 @@
   "music_hum_progress_extracting_video": "正在從影片中擷取音訊…",
   "music_hum_progress_detecting": "正在偵測音高…",
   "music_hum_progress_converting": "正在轉換為樂譜…",
+  "music_hum_live_pitch_silent": "（無聲）",
   "music_hum_no_notes": "未偵測到音符，請再哼唱得清楚、緩慢一些",
   "music_hum_done_toast": "已轉換為樂譜。金色邊框的音符是自動偵測的，點一下即可修改",
   "music_hum_analyze_error": "分析失敗，請嘗試其他音訊，或稍後再試",

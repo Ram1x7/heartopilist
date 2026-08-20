@@ -254,6 +254,131 @@ async function runBasicPitchAnalysis(audioBuffer, onProgress) {
   }));
 }
 
+// ── リアルタイム音程表示（録音中に今どの音を歌っているか確認できるようにする） ──
+// Basic Pitchは録音全体をまとめて解析する重いモデルのため、録音中フレームごとの
+// リアルタイムフィードバックには使えない。そのため録音中だけは別途AnalyserNodeで
+// 波形を取り出し、自己相関法（autocorrelation）で基本周波数を推定する軽量な方式を
+// 使う（Web上のチューナー実装で広く使われている定番の手法）。この結果は表示のみに
+// 使い、実際の譜面変換は引き続きBasic Pitchの解析結果を使う
+let humPitchAudioCtx = null;
+let humPitchAnalyser = null;
+let humPitchDataArray = null;
+let humPitchRafId = null;
+
+const HUM_PITCH_CHROMATIC_NAMES = ["ド", "ド♯", "レ", "レ♯", "ミ", "ファ", "ファ♯", "ソ", "ソ♯", "ラ", "ラ♯", "シ"];
+
+// 時間波形データ(-1〜1)から自己相関により基本周波数(Hz)を推定する。
+// 無音・ノイズと判断した場合は-1を返す
+function detectPitchAutocorrelate(buf, sampleRate) {
+  const SIZE = buf.length;
+  let rms = 0;
+  for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.01) return -1; // 音量が小さすぎる（無音・環境ノイズ）
+
+  // 波形の前後にある無音に近い部分を切り詰めてから相関を取る
+  const threshold = 0.2;
+  let r1 = 0, r2 = SIZE - 1;
+  for (let i = 0; i < SIZE / 2; i++) {
+    if (Math.abs(buf[i]) >= threshold) { r1 = i; break; }
+  }
+  for (let i = 1; i < SIZE / 2; i++) {
+    if (Math.abs(buf[SIZE - i]) >= threshold) { r2 = SIZE - i; break; }
+  }
+  const trimmed = buf.slice(r1, r2);
+  const n = trimmed.length;
+  if (n < 8) return -1;
+
+  const c = new Array(n).fill(0);
+  for (let lag = 0; lag < n; lag++) {
+    for (let i = 0; i < n - lag; i++) c[lag] += trimmed[i] * trimmed[i + lag];
+  }
+
+  // 最初の下り坂を飛ばして、そのあとの最大値（＝周期のずれ幅）を探す
+  let d = 0;
+  while (d < n - 1 && c[d] > c[d + 1]) d++;
+  let maxVal = -1, maxPos = -1;
+  for (let i = d; i < n; i++) {
+    if (c[i] > maxVal) { maxVal = c[i]; maxPos = i; }
+  }
+  if (maxPos <= 0) return -1;
+
+  // 前後の値との放物線補間で、サンプル単位より細かい精度を出す
+  let period = maxPos;
+  const x1 = c[maxPos - 1] ?? c[maxPos];
+  const x2 = c[maxPos];
+  const x3 = c[maxPos + 1] ?? c[maxPos];
+  const a = (x1 + x3 - 2 * x2) / 2;
+  const b = (x3 - x1) / 2;
+  if (a) period -= b / (2 * a);
+
+  return period > 0 ? sampleRate / period : -1;
+}
+
+// 周波数(Hz)を「音名＋オクターブ＋セント（半音の何%ずれているか）」に変換する。
+// 譜面の度数（1=ド 2=レ…）は録音全体の音域が分かってから決まる（オクターブを
+// まるごとシフトして楽器に合わせるため）ので、録音中はまだ度数化できない。
+// そのため録音中の表示だけは絶対音名（A4=440Hz基準）で示す
+function hzToJaNoteLabel(freq) {
+  if (!freq || freq <= 0) return null;
+  const midi = 69 + 12 * Math.log2(freq / 440);
+  const rounded = Math.round(midi);
+  const cents = Math.round((midi - rounded) * 100);
+  return {
+    name: HUM_PITCH_CHROMATIC_NAMES[((rounded % 12) + 12) % 12],
+    octave: Math.floor(rounded / 12) - 1,
+    cents,
+    freq,
+  };
+}
+
+function startHumPitchMonitor(stream) {
+  try {
+    humPitchAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = humPitchAudioCtx.createMediaStreamSource(stream);
+    humPitchAnalyser = humPitchAudioCtx.createAnalyser();
+    humPitchAnalyser.fftSize = 2048;
+    humPitchDataArray = new Float32Array(humPitchAnalyser.fftSize);
+    source.connect(humPitchAnalyser);
+    document.getElementById("musicHumPitchRow").style.display = "";
+    updateHumPitchDisplay();
+  } catch (e) {
+    // リアルタイム表示だけ諦めて、録音自体はそのまま続行する
+    console.warn("hum pitch monitor init failed", e);
+  }
+}
+
+function updateHumPitchDisplay() {
+  if (!humPitchAnalyser) return;
+  humPitchAnalyser.getFloatTimeDomainData(humPitchDataArray);
+  const freq = detectPitchAutocorrelate(humPitchDataArray, humPitchAudioCtx.sampleRate);
+  const el = document.getElementById("musicHumLivePitch");
+  if (el) {
+    if (freq > 0) {
+      const info = hzToJaNoteLabel(freq);
+      const centsLabel = info.cents >= 0 ? `+${info.cents}` : `${info.cents}`;
+      el.textContent = `${info.name}${info.octave}（${Math.round(freq)}Hz ${centsLabel}¢）`;
+      el.classList.remove("is-silent");
+    } else {
+      el.textContent = T("music_hum_live_pitch_silent", "（無音）");
+      el.classList.add("is-silent");
+    }
+  }
+  humPitchRafId = requestAnimationFrame(updateHumPitchDisplay);
+}
+
+function stopHumPitchMonitor() {
+  if (humPitchRafId) cancelAnimationFrame(humPitchRafId);
+  humPitchRafId = null;
+  humPitchAnalyser = null;
+  humPitchDataArray = null;
+  if (humPitchAudioCtx) {
+    humPitchAudioCtx.close();
+    humPitchAudioCtx = null;
+  }
+  document.getElementById("musicHumPitchRow").style.display = "none";
+}
+
 // ── 録音（マイク） ──
 async function startHumRecording() {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -266,6 +391,7 @@ async function startHumRecording() {
   humRecordingStartTime = performance.now();
   updateHumRecordingUI(true);
   humRecordingTimer = setInterval(updateHumRecordingClock, 200);
+  startHumPitchMonitor(stream);
 }
 
 function stopHumRecording() {
@@ -277,6 +403,7 @@ function stopHumRecording() {
     const recorder = humRecorder;
     recorder.addEventListener("stop", () => {
       clearInterval(humRecordingTimer);
+      stopHumPitchMonitor();
       const blob = new Blob(humRecordedChunks, { type: recorder.mimeType || "audio/webm" });
       resolve(blob);
     });
