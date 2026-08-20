@@ -953,56 +953,6 @@ body.dark .art-mode-wizard-option-desc{
   color:#b3a89a;
 }
 
-/* 3Dプレビュー（検証段階。maskLinesを押し出したペーパークラフト風の立体をthree.jsで表示） */
-.art-3d-box{
-  max-width:380px;
-  text-align:center;
-}
-
-.art-3d-host{
-  position:relative;
-  width:100%;
-  height:320px;
-  margin-top:10px;
-  border-radius:14px;
-  overflow:hidden;
-  background:linear-gradient(180deg, var(--card-sub) 0%, var(--card) 100%);
-  border:1px solid var(--border);
-  touch-action:none;
-}
-
-.art-3d-host canvas{
-  display:block;
-  width:100%;
-  height:100%;
-}
-
-.art-3d-loading{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  margin:0;
-  font-size:12px;
-  color:var(--text-sub);
-}
-
-.art-3d-note{
-  margin-top:10px;
-  font-size:10.5px;
-  line-height:1.6;
-  color:var(--text-sub);
-}
-
-body.dark .art-3d-host{
-  border-color:#46423b;
-}
-
-body.dark .art-3d-loading,
-body.dark .art-3d-note{
-  color:#b3a89a;
-}
-
 /* 変換方式プレビュー（標準／なめらか／くっきり） */
 .art-preset-preview-row{
   display:flex;
