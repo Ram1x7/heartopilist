@@ -765,6 +765,29 @@ body.dark .daily-spot-item-location{
   margin-bottom:12px;
 }
 
+.weekly-shop-hint{
+  font-size:11px;
+  color:var(--text-sub);
+  line-height:1.6;
+  margin:0 0 8px;
+}
+
+body.dark .weekly-shop-hint{
+  color:#b3a89a;
+}
+
+.weekly-shop-countdown{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:10px;
+}
+
+body.dark .weekly-shop-countdown{
+  color:#e8d2a8;
+}
+
 .daily-task-section{
   margin-bottom:14px;
 }

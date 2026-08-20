@@ -117,6 +117,17 @@ function displayLocation(c){
   return c.locationI18n[lang] || c.location || "";
 }
 
+// 残り分数を「◯日◯時間◯分」形式の文字列に整形
+function formatMinutesUntil(minutes){
+  if(minutes == null || isNaN(minutes) || minutes < 0) return "";
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  const mins = Math.floor(minutes % 60);
+  if(days > 0) return `${days}日${hours}時間`;
+  if(hours > 0) return `${hours}時間${mins}分`;
+  return `${mins}分`;
+}
+
 // フォーマット
 function formatTime(arr){
 
@@ -1792,6 +1803,10 @@ function renderDailySpots(){
   if(tasksIconEl) tasksIconEl.innerHTML = icon("checklist", {size:13});
   const tasksTitleIconEl = document.getElementById("dailyTasksTitleIcon");
   if(tasksTitleIconEl) tasksTitleIconEl.innerHTML = icon("checklist", {size:16});
+  const weeklyShopIconEl = document.getElementById("weeklyShopIcon");
+  if(weeklyShopIconEl) weeklyShopIconEl.innerHTML = icon("gift", {size:13});
+  const weeklyShopTitleIconEl = document.getElementById("weeklyShopTitleIcon");
+  if(weeklyShopTitleIconEl) weeklyShopTitleIconEl.innerHTML = icon("gift", {size:16});
 
   grid.innerHTML = Object.keys(dailySpots).map(key => {
     const today = getDailySpotFor(key, 0);
@@ -1892,6 +1907,106 @@ if(dailyTasksBtn){
 
 function closeDailyTasksModal(){
   if(dailyTasksModal) dailyTasksModal.style.display = "none";
+}
+
+// ══════════════════════════════════════
+// 週替わり商店リスト（毎週土曜AM6:00(JST)リセット）
+// ══════════════════════════════════════
+const weeklyShopModal = document.getElementById("weeklyShopModal");
+const weeklyShopBtn   = document.getElementById("weeklyShopBtn");
+
+if(weeklyShopBtn){
+  weeklyShopBtn.onclick = async () => {
+    await loadScriptOnce("js/data-weekly-tasks.js");
+    renderWeeklyShopList();
+    weeklyShopModal.style.display = "block";
+  };
+}
+
+function closeWeeklyShopModal(){
+  if(weeklyShopModal) weeklyShopModal.style.display = "none";
+}
+
+// 直近の「今週の更新（毎週土曜6:00 JST）」の開始時刻をYYYY-MM-DD文字列で返す。
+// この文字列をチェック状態のキーにすることで、次のリセットを跨ぐと自動的に未チェック扱いに戻る
+function getWeeklyCycleKey(){
+  const jstNow = getJstDate();
+  for(let offset = 0; offset <= 7; offset++){
+    const candidate = new Date(jstNow);
+    candidate.setUTCDate(candidate.getUTCDate() - offset);
+    candidate.setUTCHours(6, 0, 0, 0);
+    if(candidate.getUTCDay() === 6 && candidate.getTime() <= jstNow.getTime()){
+      return candidate.toISOString().slice(0,10);
+    }
+  }
+  return jstNow.toISOString().slice(0,10); // 理論上は到達しない保険
+}
+
+// 次回の土曜6:00(JST)までの残り時間
+function getNextWeeklyResetMinutes(){
+  const jstNow = getJstDate();
+  for(let offset = 0; offset <= 7; offset++){
+    const candidate = new Date(jstNow);
+    candidate.setUTCDate(candidate.getUTCDate() + offset);
+    candidate.setUTCHours(6, 0, 0, 0);
+    if(candidate.getUTCDay() === 6 && candidate.getTime() > jstNow.getTime()){
+      return Math.round((candidate.getTime() - jstNow.getTime()) / 60000);
+    }
+  }
+  return null;
+}
+
+function renderWeeklyShopList(){
+  const body = document.getElementById("weeklyShopBody");
+  const countdownEl = document.getElementById("weeklyShopCountdown");
+  if(!body) return;
+
+  const nextMinutes = getNextWeeklyResetMinutes();
+  if(countdownEl){
+    countdownEl.textContent = nextMinutes != null
+      ? T("weekly_shop_countdown", `次のリセットまで：${formatMinutesUntil(nextMinutes)}`, { time: formatMinutesUntil(nextMinutes) })
+      : "";
+  }
+
+  if(typeof weeklyShops === "undefined" || weeklyShops.length === 0){
+    body.innerHTML = `<div class="daily-task-empty">${T("daily_tasks_no_data","データ未登録")}</div>`;
+    return;
+  }
+
+  const cycleKey = getWeeklyCycleKey();
+  const checks = JSON.parse(localStorage.getItem("weeklyShopChecks") || "{}");
+
+  const sections = weeklyShops.map(shop => {
+    const shopLabel = shop.shopI18n && shop.shopI18n[currentLang()] ? shop.shopI18n[currentLang()] : shop.shop;
+    const rows = shop.items.map((item, i) => {
+      const key = `${shop.id}_${i}`;
+      const isChecked = checks[key] === cycleKey;
+      const label = item.nameI18n && item.nameI18n[currentLang()] ? item.nameI18n[currentLang()] : item.name;
+      const detail = item.detailI18n && item.detailI18n[currentLang()] ? item.detailI18n[currentLang()] : item.detail;
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${label}<span class="daily-task-sub">${detail}</span></span>
+          <label class="daily-task-checkbox">
+            <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleWeeklyShopCheck(this, '${key}')">
+          </label>
+        </div>
+      `;
+    }).join("");
+    return sectionHTML("gift", shopLabel, rows);
+  });
+
+  body.innerHTML = sections.join("");
+}
+
+function toggleWeeklyShopCheck(checkboxEl, key){
+  const checks = JSON.parse(localStorage.getItem("weeklyShopChecks") || "{}");
+  const cycleKey = getWeeklyCycleKey();
+  if(checkboxEl.checked){
+    checks[key] = cycleKey;
+  } else {
+    delete checks[key];
+  }
+  localStorage.setItem("weeklyShopChecks", JSON.stringify(checks));
 }
 
 function renderDailyTasks(){
