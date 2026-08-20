@@ -140,11 +140,27 @@ function clusterInteriorCells(cells){
 // 境目マスも内側マスも、まずそのマス自身が属するブロックに振り分けてから、
 // 内側マスのかたまり（バケツひと押し分）はブロックの中だけで連結成分を作る。
 // こうすることで、1回のバケツ操作が今表示しているブロックの外まで広がることはなく、
-// 常に「今見えている範囲の中だけ」で完結する
+// 常に「今見えている範囲の中だけ」で完結する……はずだが、「内側マス」の判定
+// （classifyPaintCellsが完成図上で周囲8マスが同じ色かどうかで判定）はブロック
+// 分けを考慮していない。そのため、同じ色の内側マスがブロックの境目をまたいで
+// 隣り合うケースがあり、この場合は両方とも「内側マス」判定になってしまう。
+//
+// ゲーム内のバケツは完成図の色ではなく「今キャンバス上にある色」で塗り範囲を
+// 判定するため、後のブロックがまだ手つかず（未着色）の間は、先のブロックの
+// バケツ操作がその境目を素通りして後のブロックの未着色マスへ漏れ、そこから
+// さらに繋がっている未着色マス全部（他の色になる予定の場所も含む）を塗って
+// しまう。この「後のブロックがまだ未着色」という点では、後のブロック側のマスが
+// （そのマス単体では）「境目マス」判定だったとしても関係ない。境目マスも
+// 内側マスも、自分の手番が来るまでは同じくただの未着色マスでしかないため。
+// そのため、同じ色のマス同士でもブロックをまたいで隣接する場合は、手順が
+// 先に来る側の内側マスを「境目マス」（個別タップ）に格下げし、そちら側で
+// 先に壁を作ってから後のブロックの番が来るようにする
 function computePaintSteps(){
   const colorMap = classifyPaintCells();
   const blocksX = Math.ceil(gridWidth / BLOCK_SIZE);
   const blocksY = Math.ceil(gridHeight / BLOCK_SIZE);
+  const blockOrderAt = (x, y) => Math.floor(y / BLOCK_SIZE) * blocksX + Math.floor(x / BLOCK_SIZE);
+
   const blockMap = new Map(); // "bx_by" -> { bx, by, colors: Map(color -> {borderCells, interiorCandidates}) }
 
   function colorEntryFor(bx, by, color){
@@ -160,9 +176,29 @@ function computePaintSteps(){
       const bx = Math.floor(x / BLOCK_SIZE), by = Math.floor(y / BLOCK_SIZE);
       colorEntryFor(bx, by, color).borderCells.push([x, y]);
     });
+
+    // 境目マス・内側マスの区別なく、この色のマス全部の集合を持っておく
+    // （後述の判定は「同じ色かどうか」だけが問題で、そのマス自身が境目か
+    // 内側かは無関係なため）
+    const sameColorSet = new Set(
+      [...entry.borderCells, ...entry.interiorCandidates].map(([x, y]) => y * gridWidth + x)
+    );
     entry.interiorCandidates.forEach(([x, y]) => {
       const bx = Math.floor(x / BLOCK_SIZE), by = Math.floor(y / BLOCK_SIZE);
-      colorEntryFor(bx, by, color).interiorCandidates.push([x, y]);
+      const myOrder = blockOrderAt(x, y);
+
+      // 直交4方向に、同じ色のマス（境目・内側どちらでもよい）でありながら
+      // 手順が後に来るブロックのマスがあれば、このマスは先に個別タップで
+      // 壁を作っておく必要がある
+      const neighbors4 = [[x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]];
+      const leaksIntoLaterBlock = neighbors4.some(([nx, ny]) => {
+        if(nx < 0 || ny < 0 || nx >= gridWidth || ny >= gridHeight) return false;
+        if(!sameColorSet.has(ny * gridWidth + nx)) return false;
+        return blockOrderAt(nx, ny) > myOrder;
+      });
+
+      const target = colorEntryFor(bx, by, color);
+      (leaksIntoLaterBlock ? target.borderCells : target.interiorCandidates).push([x, y]);
     });
   });
 
