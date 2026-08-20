@@ -51,7 +51,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -120,6 +120,9 @@
       <button id="dailySpotCalendarBtn" class="daily-spot-calendar-btn">
         <span id="dailySpotCalIcon"></span><span data-i18n="daily_spot_calendar_btn">カレンダー</span>
       </button>
+      <button id="weeklyShopBtn" class="daily-spot-calendar-btn">
+        <span id="weeklyShopIcon"></span><span data-i18n="weekly_shop_btn">週替わり商店リスト</span>
+      </button>
     </div>
   </div>
   <div class="daily-spot-grid" id="dailySpotGrid">
@@ -133,6 +136,17 @@
     <h3><span id="dailyTasksTitleIcon"></span><span data-i18n="daily_tasks_title">今日やることリスト</span></h3>
     <div class="daily-tasks-body" id="dailyTasksBody"></div>
     <button class="modal-close-btn" onclick="closeDailyTasksModal()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<!-- 週替わり商店リスト モーダル -->
+<div id="weeklyShopModal" onclick="if(event.target.id==='weeklyShopModal')closeWeeklyShopModal()">
+  <div class="modal-box daily-tasks-modal">
+    <h3><span id="weeklyShopTitleIcon"></span><span data-i18n="weekly_shop_title">週替わり商店リスト</span></h3>
+    <p class="weekly-shop-hint" data-i18n="weekly_shop_hint">毎週土曜AM6:00（日本時間）に購入回数がリセットされます。買い忘れがないかチェックしてください</p>
+    <div class="weekly-shop-countdown" id="weeklyShopCountdown"></div>
+    <div class="daily-tasks-body" id="weeklyShopBody"></div>
+    <button class="modal-close-btn" onclick="closeWeeklyShopModal()" data-i18n="modal_close">閉じる</button>
   </div>
 </div>
 
@@ -585,7 +599,8 @@ text-align:left;
 <script src="js/data-daily-spots.js"></script>
 <script src="js/data-sync.js"></script>
 <script src="js/icon-size.js"></script>
-<script src="js/main.js?v=13"></script>
+<script src="js/currency-icons.js"></script>
+<script src="js/main.js?v=14"></script>
 
 <script src="js/sw-register.js"></script>
 </body>
