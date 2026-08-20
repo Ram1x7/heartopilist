@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=37">
+<link rel="stylesheet" href="./css/art.css?v=38">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -122,6 +122,11 @@
       <div class="art-palette" id="artRecentColors"></div>
     </div>
     <div class="art-panel-section">
+      <div class="art-color-replace-banner" id="artColorReplaceBanner" style="display:none;">
+        <span class="art-color-replace-banner-swatch" id="artColorReplaceBannerSwatch"></span>
+        <span class="art-color-replace-banner-text" data-i18n="art_color_replace_banner">この色をパレットから選んで置き換え先にしてください</span>
+        <button class="art-color-replace-banner-cancel" onclick="cancelColorReplace()" data-i18n="art_color_replace_cancel">やめる</button>
+      </div>
       <div class="art-panel-title" data-i18n="art_palette_label">カラー</div>
       <div class="art-palette" id="artPaletteMains"></div>
       <div class="art-palette art-palette-subs" id="artPaletteSubs" style="display:none"></div>

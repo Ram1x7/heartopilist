@@ -599,6 +599,94 @@ body.dark .art-usage-empty{
   color:#b3a89a;
 }
 
+/* 使用色一覧の「置き換え」ボタン（行の右端。色そのものではなく、置き換え操作を始める用） */
+.art-usage-replace-btn{
+  flex-shrink:0;
+  margin-left:auto;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.art-usage-replace-btn:hover{
+  background:rgba(60,90,110,0.12);
+  color:var(--indigo);
+}
+
+body.dark .art-usage-replace-btn{
+  color:#b3a89a;
+}
+
+body.dark .art-usage-replace-btn:hover{
+  background:rgba(90,125,146,0.18);
+  color:var(--indigo-soft);
+}
+
+/* 色の置き換えバナー：パレットの直前に表示し、次のパレットタップが置き換え先の指定に
+   なることを示す。朱色を使い、確認待ちの通常状態（藍色）と見分けやすくする */
+.art-color-replace-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+  padding:9px 10px;
+  border-radius:12px;
+  background:rgba(177,80,59,0.1);
+  border:1px solid var(--vermillion);
+}
+
+.art-color-replace-banner-swatch{
+  flex-shrink:0;
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  border:1px solid var(--border);
+}
+
+.art-color-replace-banner-text{
+  flex:1;
+  font-size:11.5px;
+  line-height:1.5;
+  color:var(--text);
+}
+
+.art-color-replace-banner-cancel{
+  flex-shrink:0;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--vermillion);
+  background:transparent;
+  color:var(--vermillion);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-color-replace-banner{
+  background:rgba(201,112,88,0.14);
+  border-color:var(--vermillion-soft);
+}
+
+body.dark .art-color-replace-banner-swatch{
+  border-color:#46423b;
+}
+
+body.dark .art-color-replace-banner-text{
+  color:#ece4d4;
+}
+
+body.dark .art-color-replace-banner-cancel{
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
+}
+
 /* キャンバスサイズ選択（モーダル・変換パネル共通） */
 .art-gridsize-options{
   display:flex;

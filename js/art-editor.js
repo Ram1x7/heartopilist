@@ -57,6 +57,8 @@ let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列�
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
 let shapeStartCell = null; // 図形ツール（直線・四角・円）のドラッグ開始マス。ドラッグ中でなければnull
 let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するプレビュー用のマス配列（[[x,y], ...]）。確定前のため未確定の色
+let colorReplaceSourceHex = null; // 色の置き換え：置き換え元の色（この値がnullでない間は、パレットのタップが
+  // 色の選択ではなく「置き換え先の指定」として扱われる。スポイトのツール切替と同じ、一時的なモード切り替え方式）
 let recentColors = []; // 直近使用した色（新しい順、最大RECENT_COLORS_MAX件）。ワンタップで選び直せるようにする
 const RECENT_COLORS_KEY = "hatopiArt_recentColors";
 const RECENT_COLORS_MAX = 8;
@@ -649,6 +651,13 @@ function renderPaletteSubs(){
 // mainNoを渡すと、選択元のメインカラー番号が確定しているものとして扱う
 // （サブカラーのクリックなど）。渡さない場合（スポイト等）はhexから逆引きする。
 function setCurrentColor(c, mainNo){
+  // 色の置き換えモード中は、パレット（使用色一覧・最近使った色も含む）での色選択を
+  // 「置き換え先の指定」として扱う。選択肢を絞り込むための展開タップ（サブカラーなしの
+  // メインを開く等）はこの関数を経由しないため、ここでの分岐だけで正しく完結する
+  if(colorReplaceSourceHex !== null){
+    applyColorReplace(colorReplaceSourceHex, c);
+    return;
+  }
   currentColor = c;
   if(c === null){
     selectedMainNo = mainNo || "04";
@@ -712,10 +721,14 @@ function updateColorUsage(){
           <span class="art-usage-number">${colorNumberMap[c]}</span>
           <button class="art-usage-swatch" style="background:${c}" data-select-hex="${c}" aria-label="${T("art_select_this_color", "この色を選ぶ")}"></button>
           <span class="art-usage-count">${n}${T("art_unit_cells", "マス")}</span>
+          <button class="art-usage-replace-btn" data-replace-hex="${c}" aria-label="${T("art_color_replace_btn", "置き換え")}">
+            ${icon("swap", { size: 15 })}
+          </button>
         </div>
       `).join("")
     : `<div class="art-usage-empty">${T("art_usage_empty", "まだ何も塗られていません")}</div>`;
-  // 行全体のタップ＝ハイライト切り替え、スウォッチ自体のタップ＝色をワンタップ選択（別動作）
+  // 行全体のタップ＝ハイライト切り替え、スウォッチ自体のタップ＝色をワンタップ選択、
+  // 置き換えボタンのタップ＝色の置き換え開始（それぞれ別動作）
   el.querySelectorAll(".art-usage-row").forEach(row => {
     row.addEventListener("click", () => toggleHighlight(row.dataset.hex));
   });
@@ -725,6 +738,48 @@ function updateColorUsage(){
       setCurrentColor(btn.dataset.selectHex);
     });
   });
+  el.querySelectorAll("[data-replace-hex]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      startColorReplace(btn.dataset.replaceHex);
+    });
+  });
+}
+
+// ── 色の置き換え：パレットを選び直す手間なく、使われている色を一括で別の色へ変える ──
+// スポイトツールと同じ「一時的なモード切り替え」方式。開始後は次にパレットで選んだ色が
+// 置き換え先になる（キャンバスの直接タップではなく、パレット側の操作で完結させることで、
+// 誤って1マスだけ塗ってしまう事故を防ぐ）
+function startColorReplace(sourceHex){
+  colorReplaceSourceHex = sourceHex;
+  const banner = document.getElementById("artColorReplaceBanner");
+  const swatch = document.getElementById("artColorReplaceBannerSwatch");
+  if(banner) banner.style.display = "flex";
+  if(swatch) swatch.style.background = sourceHex;
+  showToast(T("art_color_replace_start_toast", "置き換え先の色をパレットから選んでください"));
+}
+
+function cancelColorReplace(){
+  colorReplaceSourceHex = null;
+  const banner = document.getElementById("artColorReplaceBanner");
+  if(banner) banner.style.display = "none";
+}
+
+function applyColorReplace(sourceHex, targetHex){
+  cancelColorReplace();
+  if(sourceHex === targetHex) return;
+  pushHistory();
+  let changed = 0;
+  for(let i = 0; i < pixels.length; i++){
+    if(pixels[i] === sourceHex){
+      pixels[i] = targetHex;
+      changed++;
+    }
+  }
+  renderCanvas();
+  updateColorUsage();
+  saveDraftDebounced();
+  showToast(T("art_color_replace_done_toast", `${changed}マスを置き換えました`, { count: changed }));
 }
 
 function toggleHighlight(c){

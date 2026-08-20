@@ -633,5 +633,10 @@
   "music_note_delete": "この音を削除",
   "music_note_deselect": "選択解除",
   "music_note_toolbar_hint": "そのまま音を弾くと、選んだ音がその音に置き換わります",
-  "art_select_this_color": "この色を選ぶ"
+  "art_select_this_color": "この色を選ぶ",
+  "art_color_replace_btn": "置き換え",
+  "art_color_replace_banner": "この色をパレットから選んで置き換え先にしてください",
+  "art_color_replace_cancel": "やめる",
+  "art_color_replace_start_toast": "置き換え先の色をパレットから選んでください",
+  "art_color_replace_done_toast": "{count}マスを置き換えました"
 }

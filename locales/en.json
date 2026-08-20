@@ -633,5 +633,10 @@
   "music_note_delete": "Delete this note",
   "music_note_deselect": "Deselect",
   "music_note_toolbar_hint": "Play a note to replace the selected one with it",
-  "art_select_this_color": "Select this color"
+  "art_select_this_color": "Select this color",
+  "art_color_replace_btn": "Replace",
+  "art_color_replace_banner": "Pick a color from the palette to replace it with",
+  "art_color_replace_cancel": "Cancel",
+  "art_color_replace_start_toast": "Pick the replacement color from the palette",
+  "art_color_replace_done_toast": "{count} cells replaced"
 }

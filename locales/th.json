@@ -609,5 +609,10 @@
   "music_note_delete": "ลบโน้ตนี้",
   "music_note_deselect": "ยกเลิกการเลือก",
   "music_note_toolbar_hint": "เล่นโน้ตตัวใหม่เพื่อแทนที่โน้ตที่เลือกไว้",
-  "art_select_this_color": "เลือกสีนี้"
+  "art_select_this_color": "เลือกสีนี้",
+  "art_color_replace_btn": "แทนที่",
+  "art_color_replace_banner": "เลือกสีจากจานสีเพื่อใช้แทนที่",
+  "art_color_replace_cancel": "ยกเลิก",
+  "art_color_replace_start_toast": "เลือกสีที่จะใช้แทนที่จากจานสี",
+  "art_color_replace_done_toast": "แทนที่แล้ว {count} ช่อง"
 }

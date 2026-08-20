@@ -609,5 +609,10 @@
   "music_note_delete": "이 음 삭제",
   "music_note_deselect": "선택 해제",
   "music_note_toolbar_hint": "그대로 음을 연주하면 선택한 음이 그 음으로 바뀝니다",
-  "art_select_this_color": "이 색 선택하기"
+  "art_select_this_color": "이 색 선택하기",
+  "art_color_replace_btn": "바꾸기",
+  "art_color_replace_banner": "팔레트에서 바꿀 색을 선택해주세요",
+  "art_color_replace_cancel": "취소",
+  "art_color_replace_start_toast": "팔레트에서 바꿀 색을 선택해주세요",
+  "art_color_replace_done_toast": "{count}칸을 바꿨습니다"
 }

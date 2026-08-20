@@ -100,6 +100,7 @@ const ICONS = {
   shapeLine: `<path d="M6 18 18 6"/><circle cx="6" cy="18" r="1.7" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.7" fill="currentColor" stroke="none"/>`,
   shapeRect: `<rect x="4.5" y="6.5" width="15" height="11" rx="1.4"/>`,
   shapeCircle: `<circle cx="12" cy="12" r="7.5"/>`,
+  swap: `<path d="M4 8h13"/><path d="M14 4.5 17.5 8 14 11.5"/><path d="M20 16H7"/><path d="M10 12.5 6.5 16 10 19.5"/>`,
 
   // 楽譜エディター
   pause: `<rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/>`,

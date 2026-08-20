@@ -609,5 +609,10 @@
   "music_note_delete": "刪除此音符",
   "music_note_deselect": "取消選取",
   "music_note_toolbar_hint": "直接彈奏音符即可取代所選的音符",
-  "art_select_this_color": "選擇此顏色"
+  "art_select_this_color": "選擇此顏色",
+  "art_color_replace_btn": "取代",
+  "art_color_replace_banner": "請從調色盤選擇要取代成的顏色",
+  "art_color_replace_cancel": "取消",
+  "art_color_replace_start_toast": "請從調色盤選擇取代後的顏色",
+  "art_color_replace_done_toast": "已取代{count}格"
 }
