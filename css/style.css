@@ -748,6 +748,18 @@ body.dark .daily-spot-item-location{
   box-sizing:border-box;
 }
 
+/* 週替わり商店リスト モーダル */
+#weeklyShopModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:2500;
+  overflow-y:auto;
+  padding:20px 0;
+  box-sizing:border-box;
+}
+
 .daily-tasks-modal{
   max-width:360px;
   margin:0 auto;
