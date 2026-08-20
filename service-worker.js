@@ -57,6 +57,7 @@ const CACHE_FILES = [
   "./js/i18n.js",
   "./js/icons.js",
   "./js/icon-size.js",
+  "./js/currency-icons.js",
   "./js/sw-register.js",
   "./locales/ja.json?v=3",
   "./locales/en.json?v=3",

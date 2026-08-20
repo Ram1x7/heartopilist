@@ -883,6 +883,27 @@ body.dark .daily-task-label{
   margin-top:1px;
 }
 
+.daily-task-main{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:1;
+}
+
+.daily-task-thumb{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  object-fit:contain;
+  background:var(--card);
+  flex-shrink:0;
+}
+
+body.dark .daily-task-thumb{
+  background:#2a2620;
+}
+
 .daily-task-value{
   flex-shrink:0;
   font-weight:700;
@@ -1481,6 +1502,13 @@ body.dark .site-nav-item.active{
   display:inline-block;
   vertical-align:middle;
   flex-shrink:0;
+}
+
+/* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン */
+.currency-icon{
+  display:inline-block;
+  vertical-align:-2px;
+  margin:0 1px;
 }
 
 /* ヘッダーアイコンボタン（ヘルプ・シェア・データ同期・ダーク切替） */

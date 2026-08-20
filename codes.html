@@ -390,6 +390,7 @@ body.dark .receive-btn.received{
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/currency-icons.js"></script>
 <script src="js/data-codes.js"></script>
 <script>
 // ダークモード
@@ -458,9 +459,9 @@ function T(key, fallback, vars){
   return fallback;
 }
 function displayReward(c){
-  if(!c.rewardI18n) return c.reward;
   const lang = currentLang();
-  return c.rewardI18n[lang] || c.reward;
+  const text = (c.rewardI18n && c.rewardI18n[lang]) || c.reward;
+  return injectCurrencyIcons(text);
 }
 
 

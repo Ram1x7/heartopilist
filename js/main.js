@@ -1983,9 +1983,14 @@ function renderWeeklyShopList(){
       const isChecked = checks[key] === cycleKey;
       const label = item.nameI18n && item.nameI18n[currentLang()] ? item.nameI18n[currentLang()] : item.name;
       const detail = item.detailI18n && item.detailI18n[currentLang()] ? item.detailI18n[currentLang()] : item.detail;
+      const detailWithIcons = injectCurrencyIcons(detail);
+      const thumb = item.img ? `<img class="daily-task-thumb" src="${item.img}" alt="" loading="lazy">` : "";
       return `
         <div class="daily-task-row">
-          <span class="daily-task-label">${label}<span class="daily-task-sub">${detail}</span></span>
+          <div class="daily-task-main">
+            ${thumb}
+            <span class="daily-task-label">${label}<span class="daily-task-sub">${detailWithIcons}</span></span>
+          </div>
           <label class="daily-task-checkbox">
             <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleWeeklyShopCheck(this, '${key}')">
           </label>

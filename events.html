@@ -427,6 +427,7 @@ body.dark .footer{
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/currency-icons.js"></script>
 <script src="js/data-events.js"></script>
 <script>
 
@@ -640,7 +641,7 @@ function renderEvents(){
         </div>
         <div class="event-name">${ev.name}</div>
         <div class="event-period">${icon("calendar",{size:12})} ${periodHTML}</div>
-        ${ev.detail ? `<div class="event-detail">${ev.detail}</div>` : ""}
+        ${ev.detail ? `<div class="event-detail">${injectCurrencyIcons(ev.detail)}</div>` : ""}
         ${linkHTML}
       </div>
     `;
