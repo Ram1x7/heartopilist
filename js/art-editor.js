@@ -304,16 +304,27 @@ function renderFrameOptions(){
   );
 }
 
+// アイテム選択（renderFrameOptions）と同じ「アイコン付きボタン」の見た目にしつつ、
+// アイコンには実物の写真ではなくそのパーツの輪郭線（背景無地）を使う。パーツごとに
+// 形が大きく異なるため、選ぶ前にどの範囲を描くパーツなのか一目で分かるようにするため
 function renderFramePartOptions(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
   if(!frame) return;
   const lang = currentLang();
-  renderOptionGroup(
-    "artFramePartOptions",
-    frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
-    selectedFramePartId,
-    (v) => createFrameCanvas(v)
-  );
+  const el = document.getElementById("artFramePartOptions");
+  el.innerHTML = frame.parts.map(p => `
+    <button class="art-frame-btn${p.id === selectedFramePartId ? " active" : ""}" data-value="${p.id}">
+      ${partOutlineThumbSvg(frame.id, p.id, 29)}
+      <span>${frameName(p, lang)}</span>
+    </button>
+  `).join("");
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      el.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      createFrameCanvas(btn.dataset.value);
+    });
+  });
 }
 
 function createFrameCanvas(partId){

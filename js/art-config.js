@@ -24,6 +24,25 @@ function ratioShapeBox(ratioId, maxSide){
   return { width: Math.round(maxSide * w / h), height: maxSide };
 }
 
+// パーツ選択画面用：実物の写真の代わりに、そのパーツの輪郭線（maskLines）だけを
+// 背景無地の小さなSVGとして描く（js/art-masks.jsのPRESET_MASKS＝art-pia.comの実データが
+// 元になっており、キャンバス編集画面・切り抜き画面の輪郭線表示と完全に同じデータを使う）
+function partOutlineThumbSvg(frameId, partId, maxSide){
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
+  const part = frame && frame.parts.find(p => p.id === partId);
+  if(!part) return "";
+  const box = ratioShapeBox(`${part.width}-${part.height}`, maxSide);
+  const maskEntry = typeof PRESET_MASKS !== "undefined" && PRESET_MASKS[frameId] ? PRESET_MASKS[frameId][partId] : null;
+  const lines = (maskEntry && maskEntry.maskLines) || [];
+  const strokeWidth = Math.max(part.width, part.height) * 0.018;
+  const paths = lines.map(path => {
+    if(!path || path.length < 2) return "";
+    const d = path.map((p, i) => `${i === 0 ? "M" : "L"}${p.x} ${p.y}`).join(" ");
+    return `<path d="${d}" fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linejoin="round" stroke-linecap="round"/>`;
+  }).join("");
+  return `<svg class="art-part-thumb" width="${box.width}" height="${box.height}" viewBox="0 0 ${part.width} ${part.height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${paths}</svg>`;
+}
+
 const DESIGN_FRAME_PRESETS = [
   {
     id: "book",

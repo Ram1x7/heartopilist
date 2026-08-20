@@ -808,6 +808,20 @@ body.dark .art-frame-btn .art-frame-icon{
   background:none;
 }
 
+/* パーツ選択ボタンの輪郭線サムネイル（実物写真の代わりに背景無地で形だけを見せる） */
+.art-frame-btn .art-part-thumb{
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .art-frame-btn .art-part-thumb{
+  color:#b3a89a;
+}
+
+.art-frame-btn.active .art-part-thumb{
+  color:#fdf9ef;
+}
+
 .art-gridsize-options button{
   flex:1 1 40%;
   border:1px solid var(--border);
