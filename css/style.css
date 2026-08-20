@@ -1504,11 +1504,20 @@ body.dark .site-nav-item.active{
   flex-shrink:0;
 }
 
-/* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン */
-.currency-icon{
+/* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン
+   フォントサイズに連動させ、テキストの行の中に馴染むようベースラインを調整
+   （.modal-box img のpadding/背景/角丸がモーダル内で誤って効いてしまうため、
+   img.currency-iconで明示的に打ち消している） */
+img.currency-icon{
   display:inline-block;
-  vertical-align:-2px;
+  width:1.15em;
+  height:1.15em;
+  vertical-align:-0.25em;
   margin:0 1px;
+  padding:0;
+  background:none;
+  border-radius:0;
+  box-shadow:none;
 }
 
 /* ヘッダーアイコンボタン（ヘルプ・シェア・データ同期・ダーク切替） */

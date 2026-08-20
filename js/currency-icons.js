@@ -7,11 +7,10 @@ const CURRENCY_ICON_SRC = {
   negaiboshi: "images/currency/negaiboshi.png",
 };
 
-function currencyIcon(type, opts = {}) {
+function currencyIcon(type) {
   const src = CURRENCY_ICON_SRC[type];
   if (!src) return "";
-  const size = opts.size || 14;
-  return `<img src="${src}" class="currency-icon" width="${size}" height="${size}" alt="" loading="lazy">`;
+  return `<img src="${src}" class="currency-icon" alt="" loading="lazy">`;
 }
 
 function injectCurrencyIcons(text) {
