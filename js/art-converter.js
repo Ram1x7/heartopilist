@@ -185,16 +185,26 @@ function renderConvertFrameOptions(){
   );
 }
 
+// キャンバス編集画面（js/art-editor.jsのrenderFramePartOptions）と同じ見た目・データにする。
+// 実物の写真ではなく、そのパーツの輪郭線（背景無地）をアイコン代わりに表示する
 function renderConvertFramePartOptions(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === selectedFrameId);
   if(!frame) return;
   const lang = currentLang();
-  renderOptionGroup(
-    "artConvertFramePartOptions",
-    frame.parts.map(p => ({ id: p.id, label: frameName(p, lang) })),
-    selectedFramePartId,
-    (v) => selectFramePart(v)
-  );
+  const el = document.getElementById("artConvertFramePartOptions");
+  el.innerHTML = frame.parts.map(p => `
+    <button class="art-frame-btn${p.id === selectedFramePartId ? " active" : ""}" data-value="${p.id}">
+      ${partOutlineThumbSvg(frame.id, p.id, 29)}
+      <span>${frameName(p, lang)}</span>
+    </button>
+  `).join("");
+  el.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      el.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectFramePart(btn.dataset.value);
+    });
+  });
 }
 
 // デザイン枠のパーツ選択は、元サイトと同様に「戻る」付きの別画面へ切り替える方式
