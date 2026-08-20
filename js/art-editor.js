@@ -55,6 +55,8 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
+let shapeStartCell = null; // 図形ツール（直線・四角・円）のドラッグ開始マス。ドラッグ中でなければnull
+let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するプレビュー用のマス配列（[[x,y], ...]）。確定前のため未確定の色
 let recentColors = []; // 直近使用した色（新しい順、最大RECENT_COLORS_MAX件）。ワンタップで選び直せるようにする
 const RECENT_COLORS_KEY = "hatopiArt_recentColors";
 const RECENT_COLORS_MAX = 8;
@@ -323,7 +325,14 @@ const TOOLS = [
   { id: "eraser", icon: "sumiKeshi", labelKey: "art_tool_eraser", labelFallback: "消しゴム" },
   { id: "bucket", icon: "bucket", labelKey: "art_tool_bucket", labelFallback: "バケツ" },
   { id: "eyedropper", icon: "eyedropper", labelKey: "art_tool_eyedropper", labelFallback: "スポイト" },
+  { id: "line", icon: "shapeLine", labelKey: "art_tool_line", labelFallback: "直線" },
+  { id: "rect", icon: "shapeRect", labelKey: "art_tool_rect", labelFallback: "四角" },
+  { id: "circle", icon: "shapeCircle", labelKey: "art_tool_circle", labelFallback: "円" },
 ];
+// 図形ツール：ドラッグ開始点から終点までの直線・四角形の輪郭・円の輪郭を描く。
+// 塗りつぶした図形が欲しい場合は、輪郭を描いた後にバケツツールと組み合わせて使う想定
+// （塗り/線引きの操作を分けることで、既存のペン・バケツの操作感をそのまま活かす）
+const SHAPE_TOOLS = new Set(["line", "rect", "circle"]);
 
 function renderToolbar(){
   const el = document.getElementById("artToolbar");
@@ -801,6 +810,21 @@ function renderCanvas(){
     drawBlockBoundaryLines(cell);
   }
 
+  // 図形ツール（直線・四角・円）のドラッグ中プレビュー。確定前と分かるよう、
+  // 実際の色より薄く塗った上に、はとぴ図鑑のテーマ色（藍色）で1マスずつ縁取る
+  if(shapePreviewCells && shapePreviewCells.length){
+    const rgb = hexToRgb(currentColor);
+    ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.55)`;
+    shapePreviewCells.forEach(([x, y]) => {
+      ctx.fillRect(x * cell, y * cell, cell, cell);
+    });
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.85)" : "rgba(26,24,20,0.75)";
+    ctx.lineWidth = Math.max(1, cell * 0.07);
+    shapePreviewCells.forEach(([x, y]) => {
+      ctx.strokeRect(x * cell + ctx.lineWidth / 2, y * cell + ctx.lineWidth / 2, cell - ctx.lineWidth, cell - ctx.lineWidth);
+    });
+  }
+
   // タップして調べたマスのハイライト（座標・使用色をはっきり分かるように、常に最前面に描く）
   if(inspectedCell && inspectedCell.cx < gridWidth && inspectedCell.cy < gridHeight){
     const ix = inspectedCell.cx, iy = inspectedCell.cy;
@@ -960,6 +984,86 @@ function cellFromEvent(e){
   return { cx, cy };
 }
 
+// cellFromEvent()と異なり、キャンバス外にドラッグしてもnullを返さずキャンバス端のマスに
+// 丸める。図形ツールは端まで引ききりたいことが多いドラッグ操作のため、こちらを使う
+function cellFromEventClamped(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const cell = currentCellSize();
+  const cx = Math.min(gridWidth - 1, Math.max(0, Math.floor(x / cell)));
+  const cy = Math.min(gridHeight - 1, Math.max(0, Math.floor(y / cell)));
+  return { cx, cy };
+}
+
+// ── 図形ツールのジオメトリ（マス単位の座標配列を返す純粋関数） ──
+function bresenhamLineCells(x0, y0, x1, y1){
+  const cells = [];
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy;
+  let x = x0, y = y0;
+  while(true){
+    cells.push([x, y]);
+    if(x === x1 && y === y1) break;
+    const e2 = 2 * err;
+    if(e2 >= dy){ err += dy; x += sx; }
+    if(e2 <= dx){ err += dx; y += sy; }
+  }
+  return cells;
+}
+
+// 塗りつぶした四角ではなく輪郭のみ（塗りつぶしたい場合はバケツを併用する想定のため）
+function rectOutlineCells(x0, y0, x1, y1){
+  const left = Math.min(x0, x1), right = Math.max(x0, x1);
+  const top = Math.min(y0, y1), bottom = Math.max(y0, y1);
+  const cells = [];
+  for(let x = left; x <= right; x++){
+    cells.push([x, top], [x, bottom]);
+  }
+  for(let y = top; y <= bottom; y++){
+    cells.push([left, y], [right, y]);
+  }
+  return cells;
+}
+
+// ミッドポイント円アルゴリズム。中心=ドラッグ開始マス、半径=開始点から現在点までの距離
+function circleOutlineCells(cx0, cy0, cx1, cy1){
+  const r = Math.round(Math.hypot(cx1 - cx0, cy1 - cy0));
+  if(r === 0) return [[cx0, cy0]];
+  const cells = [];
+  let x = r, y = 0, err = 0;
+  while(x >= y){
+    cells.push(
+      [cx0 + x, cy0 + y], [cx0 + y, cy0 + x], [cx0 - y, cy0 + x], [cx0 - x, cy0 + y],
+      [cx0 - x, cy0 - y], [cx0 - y, cy0 - x], [cx0 + y, cy0 - x], [cx0 + x, cy0 - y]
+    );
+    y++;
+    if(err <= 0) err += 2 * y + 1;
+    if(err > 0){ x--; err -= 2 * x + 1; }
+  }
+  return cells;
+}
+
+// 開始マス(x0,y0)〜現在マス(x1,y1)から、ツールに応じたマス配列を求める（キャンバス範囲外は除く）
+function shapeCellsFor(tool, x0, y0, x1, y1){
+  let raw;
+  if(tool === "line") raw = bresenhamLineCells(x0, y0, x1, y1);
+  else if(tool === "rect") raw = rectOutlineCells(x0, y0, x1, y1);
+  else raw = circleOutlineCells(x0, y0, x1, y1);
+  return raw.filter(([x, y]) => x >= 0 && y >= 0 && x < gridWidth && y < gridHeight);
+}
+
+function commitShapeCells(cells, color){
+  if(!cells) return;
+  cells.forEach(([x, y]) => {
+    if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
+    pixels[y * gridWidth + x] = color;
+  });
+}
+
 function applyToolAt(cx, cy){
   const idx = cy * gridWidth + cx;
   if(currentTool === "pen"){
@@ -1078,6 +1182,20 @@ function bindCanvasEvents(){
       return;
     }
 
+    // 図形ツール（直線・四角・円）は、ドラッグ開始点から現在点までのプレビューを
+    // 描きながら、指/マウスを離した時点で確定する。誤タップ防止のため編集モードON時のみ
+    if(SHAPE_TOOLS.has(currentTool)){
+      if(!editMode || isLocked) return;
+      if(inspectedCell){
+        inspectedCell = null;
+      }
+      isDrawing = true;
+      shapeStartCell = c;
+      shapePreviewCells = shapeCellsFor(currentTool, c.cx, c.cy, c.cx, c.cy);
+      renderCanvas();
+      return;
+    }
+
     // 実際に描画・消去・塗りつぶしを行うタップかどうか（下の誤タップ防止の条件と同じ）
     const willPaint = currentTool !== "eyedropper" && editMode && !isLocked;
 
@@ -1144,6 +1262,16 @@ function bindCanvasEvents(){
       return;
     }
 
+    // 図形ツールのドラッグ中：現在点までのプレビューを再計算して表示するだけで、
+    // ピクセルの確定は指/マウスを離した時点（releasePointer）まで行わない
+    if(isDrawing && shapeStartCell && SHAPE_TOOLS.has(currentTool)){
+      const c2 = cellFromEventClamped(e);
+      shapePreviewCells = shapeCellsFor(currentTool, shapeStartCell.cx, shapeStartCell.cy, c2.cx, c2.cy);
+      updateCoordReadout(c2);
+      renderCanvas();
+      return;
+    }
+
     // 長押し確認待ち中のタップが、閾値を超えて動いたらドラッグ開始とみなし、
     // マス確認をキャンセルして通常の描画（ストローク）に切り替える
     if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
@@ -1176,6 +1304,15 @@ function bindCanvasEvents(){
   });
 
   const finishStroke = () => {
+    // 図形ツールのドラッグ中に打ち切られた場合（2本目の指が触れた等）は、確定せず
+    // プレビューだけ取り消す。誤った位置での確定を防ぐため、ここでは書き込まない
+    if(shapeStartCell){
+      shapeStartCell = null;
+      shapePreviewCells = null;
+      isDrawing = false;
+      renderCanvas();
+      return;
+    }
     if(!isDrawing) return;
     isDrawing = false;
     lastCell = null;
@@ -1183,8 +1320,25 @@ function bindCanvasEvents(){
     saveDraftDebounced();
   };
 
-  const releasePointer = (e) => {
+  // isCancel: pointercancelからの呼び出しならtrue（描画途中でシステム側に奪われた等）。
+  // その場合は図形の確定を行わずプレビューのみ取り消す
+  const releasePointer = (e, isCancel) => {
     activePointers.delete(e.pointerId);
+
+    if(shapeStartCell && SHAPE_TOOLS.has(currentTool)){
+      if(!isCancel && shapePreviewCells && shapePreviewCells.length){
+        pushHistory();
+        commitShapeCells(shapePreviewCells, currentColor);
+        updateColorUsage();
+        saveDraftDebounced();
+      }
+      shapeStartCell = null;
+      shapePreviewCells = null;
+      isDrawing = false;
+      if(pinchState && activePointers.size < 2) pinchState = null;
+      renderCanvas();
+      return;
+    }
 
     if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
       // 長押し確認・ドラッグのどちらにもならず指を離した＝単発タップとして、保留していた描画を確定する
@@ -1205,8 +1359,8 @@ function bindCanvasEvents(){
     }
     finishStroke();
   };
-  canvas.addEventListener("pointerup", releasePointer);
-  canvas.addEventListener("pointercancel", releasePointer);
+  canvas.addEventListener("pointerup", (e) => releasePointer(e, false));
+  canvas.addEventListener("pointercancel", (e) => releasePointer(e, true));
   canvas.addEventListener("pointerleave", (e) => {
     finishStroke();
     updateCoordReadout(null);

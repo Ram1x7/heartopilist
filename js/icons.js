@@ -97,6 +97,9 @@ const ICONS = {
   eyedropper: `<path d="m7.5 16.5 8-8"/><path d="M14 5.5 18.5 10"/><path d="M15.8 3.7a2.3 2.3 0 0 1 3.2 0l1.3 1.3a2.3 2.3 0 0 1 0 3.2l-1.8 1.8-4.5-4.5Z"/><path d="M7.5 16.5 5 20l3.5-2.5"/>`,
   undo: `<path d="M4 11h9a5.5 5.5 0 0 1 0 11h-3"/><path d="m8 6-4 5 4 5"/>`,
   redo: `<path d="M20 11h-9a5.5 5.5 0 0 0 0 11h3"/><path d="m16 6 4 5-4 5"/>`,
+  shapeLine: `<path d="M6 18 18 6"/><circle cx="6" cy="18" r="1.7" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.7" fill="currentColor" stroke="none"/>`,
+  shapeRect: `<rect x="4.5" y="6.5" width="15" height="11" rx="1.4"/>`,
+  shapeCircle: `<circle cx="12" cy="12" r="7.5"/>`,
 
   // 楽譜エディター
   pause: `<rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/>`,
