@@ -178,6 +178,7 @@
   "modal_time": "Time: ",
   "modal_close": "Close",
   "modal_star5_label": "★5 condition: ",
+  "modal_auth_count_label": "Required for certification: {n}",
   "modal_all_weather": "All weather",
   "modal_all_time": "All hours",
   "share_title": "Share completion status",

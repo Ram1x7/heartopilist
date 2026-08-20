@@ -38,6 +38,7 @@
   "modal_time": "시간：",
   "modal_close": "닫기",
   "modal_star5_label": "★5 조건：",
+  "modal_auth_count_label": "인증에 필요한 수：{n}",
   "modal_all_weather": "모든 날씨",
   "modal_all_time": "전 시간대",
   "share_title": "완성도 공유",
