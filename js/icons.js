@@ -107,6 +107,7 @@ const ICONS = {
   arrowDown: `<path d="M12 5v14"/><path d="M6.5 13.5 12 19l5.5-5.5"/>`,
   arrowLeft: `<path d="M19 12H5"/><path d="M10.5 6.5 5 12l5.5 5.5"/>`,
   arrowRight: `<path d="M5 12h14"/><path d="M13.5 6.5 19 12l-5.5 5.5"/>`,
+  guideLine: `<path d="M4 17c4-9 12-9 16 0" stroke-dasharray="3 2.5"/>`,
 
   // 楽譜エディター
   pause: `<rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/>`,

@@ -631,5 +631,7 @@
   "art_mode_wizard_normal_title": "일반 작업 모드",
   "art_mode_wizard_normal_desc": "캔버스 전체를 보면서 원하는 순서로 칠할 수 있습니다",
   "art_confirm_switch_block_mode": "블록 작업 모드로 전환하시겠습니까?",
-  "art_confirm_switch_normal_mode": "일반 작업 모드로 전환하시겠습니까?"
+  "art_confirm_switch_normal_mode": "일반 작업 모드로 전환하시겠습니까?",
+  "art_tool_guide": "가이드선",
+  "art_guide_clear": "가이드선 지우기"
 }

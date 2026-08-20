@@ -56,7 +56,11 @@ let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来る�
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
 let shapeStartCell = null; // 図形ツール（直線・四角・円）のドラッグ開始マス。ドラッグ中でなければnull
-let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するプレビュー用のマス配列（[[x,y], ...]）。確定前のため未確定の色
+let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するマス配列（[[x,y], ...]）。確定前のため未確定の色
+let guideLines = []; // 確定済みのガイド線（下描き用の一時的な表示専用オーバーレイ。ピクセルデータには一切影響しない）。
+  // 各要素は{x,y}（マス単位、小数可）の点列。ページを離れると消える想定のためdraftには保存しない
+let currentGuidePath = null; // 描画中のガイド線の点列（確定前）。ドラッグ中でなければnull
+const GUIDE_MOVE_MIN_DIST = 0.15; // ガイド線の点を追加する最小移動量（マス単位）。点が増えすぎるのを防ぐ
 let colorReplaceSourceHex = null; // 色の置き換え：置き換え元の色（この値がnullでない間は、パレットのタップが
   // 色の選択ではなく「置き換え先の指定」として扱われる。スポイトのツール切替と同じ、一時的なモード切り替え方式）
 let inspectedPaletteHex = null; // タップして調べたマスの色（パレット側のハイライト同期用。undefined区別のため初期値はnull）
@@ -375,6 +379,7 @@ const TOOLS = [
   { id: "line", icon: "shapeLine", labelKey: "art_tool_line", labelFallback: "直線" },
   { id: "rect", icon: "shapeRect", labelKey: "art_tool_rect", labelFallback: "四角" },
   { id: "circle", icon: "shapeCircle", labelKey: "art_tool_circle", labelFallback: "円" },
+  { id: "guide", icon: "guideLine", labelKey: "art_tool_guide", labelFallback: "ガイド線" },
 ];
 // 図形ツール：ドラッグ開始点から終点までの直線・四角形の輪郭・円の輪郭を描く。
 // 塗りつぶした図形が欲しい場合は、輪郭を描いた後にバケツツールと組み合わせて使う想定
@@ -399,12 +404,17 @@ function renderToolbar(){
       ${icon("redo", { size: 18 })}
     </button>
   `;
+  const guideClearButton = `
+    <button class="art-tool-btn" id="artGuideClearBtn" onclick="clearGuideLines()" aria-label="${T('art_guide_clear', 'ガイド線を消す')}" ${guideLines.length === 0 ? "disabled" : ""}>
+      ${icon("close", { size: 18 })}
+    </button>
+  `;
   const clearButton = `
     <button class="art-tool-btn" onclick="clearAll()" aria-label="${T('art_tool_clear', '全消去')}">
       ${icon("trash", { size: 18 })}
     </button>
   `;
-  el.innerHTML = toolButtons + undoRedoButtons + clearButton;
+  el.innerHTML = toolButtons + undoRedoButtons + guideClearButton + clearButton;
 }
 
 function updateUndoRedoButtons(){
@@ -921,6 +931,20 @@ function renderCanvas(){
     drawBlockBoundaryLines(cell);
   }
 
+  // ガイド線（下描き）。ピクセルデータには一切影響しない表示専用のオーバーレイのため、
+  // マス目にスナップさせず、なめらかな二次ベジェ曲線として描く
+  if(guideLines.length || currentGuidePath){
+    ctx.save();
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(226,140,110,0.9)" : "rgba(177,80,59,0.85)";
+    ctx.lineWidth = Math.max(1.5, cell * 0.05);
+    ctx.setLineDash([cell * 0.35, cell * 0.25]);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    guideLines.forEach(path => drawSmoothGuidePath(path, cell));
+    if(currentGuidePath) drawSmoothGuidePath(currentGuidePath, cell);
+    ctx.restore();
+  }
+
   // 図形ツール（直線・四角・円）のドラッグ中プレビュー。確定前と分かるよう、
   // 実際の色より薄く塗った上に、はとぴ図鑑のテーマ色（藍色）で1マスずつ縁取る
   if(shapePreviewCells && shapePreviewCells.length){
@@ -1128,6 +1152,37 @@ function cellFromEventClamped(e){
   return { cx, cy };
 }
 
+// ガイド線（下描き）用。マス目には一切スナップさせず、マス単位の小数座標をそのまま返す
+// （なめらかな曲線・斜めの直線を、ピクセルの階段状にせず引けるようにするため）
+function gridFloatFromEvent(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const cell = currentCellSize();
+  return { x: x / cell, y: y / cell };
+}
+
+// 点列を、隣接2点の中点を通過点にした二次ベジェ曲線でなめらかに描く（一般的なフリーハンド
+// スムージング手法）。点が2つだけ（≒ほぼ直線でドラッグした場合）は素直な直線として描く
+function drawSmoothGuidePath(points, cell){
+  if(!points || points.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x * cell, points[0].y * cell);
+  if(points.length === 2){
+    ctx.lineTo(points[1].x * cell, points[1].y * cell);
+  }else{
+    for(let i = 1; i < points.length - 1; i++){
+      const midX = (points[i].x + points[i + 1].x) / 2 * cell;
+      const midY = (points[i].y + points[i + 1].y) / 2 * cell;
+      ctx.quadraticCurveTo(points[i].x * cell, points[i].y * cell, midX, midY);
+    }
+    ctx.lineTo(points[points.length - 1].x * cell, points[points.length - 1].y * cell);
+  }
+  ctx.stroke();
+}
+
 // ── 図形ツールのジオメトリ（マス単位の座標配列を返す純粋関数） ──
 function bresenhamLineCells(x0, y0, x1, y1){
   const cells = [];
@@ -1326,6 +1381,19 @@ function bindCanvasEvents(){
       return;
     }
 
+    // ガイド線（下描き）：マス目にスナップさせず、指/マウスの軌跡をそのまま点列として
+    // 記録する。ピクセルデータには一切書き込まない、表示専用の一時的なオーバーレイ
+    if(currentTool === "guide"){
+      if(!editMode || isLocked) return;
+      if(inspectedCell){
+        inspectedCell = null;
+      }
+      isDrawing = true;
+      currentGuidePath = [gridFloatFromEvent(e)];
+      renderCanvas();
+      return;
+    }
+
     // 実際に描画・消去・塗りつぶしを行うタップかどうか（下の誤タップ防止の条件と同じ）
     const willPaint = currentTool !== "eyedropper" && editMode && !isLocked;
 
@@ -1402,6 +1470,18 @@ function bindCanvasEvents(){
       return;
     }
 
+    // ガイド線のドラッグ中：一定距離動くたびに点を追加する（毎フレーム記録すると
+    // 点が増えすぎるため、GUIDE_MOVE_MIN_DIST未満の細かい移動は間引く）
+    if(isDrawing && currentGuidePath && currentTool === "guide"){
+      const p = gridFloatFromEvent(e);
+      const last = currentGuidePath[currentGuidePath.length - 1];
+      if(Math.hypot(p.x - last.x, p.y - last.y) >= GUIDE_MOVE_MIN_DIST){
+        currentGuidePath.push(p);
+        renderCanvas();
+      }
+      return;
+    }
+
     // 長押し確認待ち中のタップが、閾値を超えて動いたらドラッグ開始とみなし、
     // マス確認をキャンセルして通常の描画（ストローク）に切り替える
     if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
@@ -1443,6 +1523,14 @@ function bindCanvasEvents(){
       renderCanvas();
       return;
     }
+    // ガイド線も同様に、打ち切られた場合は確定せず取り消す（非破壊オーバーレイのため、
+    // 中途半端な線を確定登録するより取り消した方が安全という判断）
+    if(currentGuidePath){
+      currentGuidePath = null;
+      isDrawing = false;
+      renderCanvas();
+      return;
+    }
     if(!isDrawing) return;
     isDrawing = false;
     lastCell = null;
@@ -1464,6 +1552,18 @@ function bindCanvasEvents(){
       }
       shapeStartCell = null;
       shapePreviewCells = null;
+      isDrawing = false;
+      if(pinchState && activePointers.size < 2) pinchState = null;
+      renderCanvas();
+      return;
+    }
+
+    if(currentGuidePath && currentTool === "guide"){
+      if(!isCancel && currentGuidePath.length >= 2){
+        guideLines.push(currentGuidePath);
+        renderToolbar(); // 「ガイド線を消す」ボタンの有効化を反映する
+      }
+      currentGuidePath = null;
       isDrawing = false;
       if(pinchState && activePointers.size < 2) pinchState = null;
       renderCanvas();
@@ -1581,6 +1681,14 @@ function zoomToBlock(bx, by){
   const cell = currentCellSize();
   area.scrollLeft = Math.max(0, (bx * BLOCK_SIZE + bw / 2) * cell - area.clientWidth / 2);
   area.scrollTop = Math.max(0, (by * BLOCK_SIZE + bh / 2) * cell - area.clientHeight / 2);
+}
+
+// ── ガイド線（下描き）を消す。ピクセルデータには影響しないため確認ダイアログは不要 ──
+function clearGuideLines(){
+  guideLines = [];
+  currentGuidePath = null;
+  renderCanvas();
+  renderToolbar();
 }
 
 // ── 全消去 ──

@@ -655,5 +655,7 @@
   "art_mode_wizard_normal_title": "通常作業モード",
   "art_mode_wizard_normal_desc": "キャンバス全体を見ながら、自由な順番で塗り進められます",
   "art_confirm_switch_block_mode": "ブロック作業モードに切り替えますか？",
-  "art_confirm_switch_normal_mode": "通常作業モードに切り替えますか？"
+  "art_confirm_switch_normal_mode": "通常作業モードに切り替えますか？",
+  "art_tool_guide": "ガイド線",
+  "art_guide_clear": "ガイド線を消す"
 }

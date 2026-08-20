@@ -631,5 +631,7 @@
   "art_mode_wizard_normal_title": "โหมดทำงานปกติ",
   "art_mode_wizard_normal_desc": "มองเห็นทั้งผืนผ้าใบและระบายสีตามลำดับที่ต้องการได้อย่างอิสระ",
   "art_confirm_switch_block_mode": "เปลี่ยนเป็นโหมดทำงานทีละบล็อกหรือไม่?",
-  "art_confirm_switch_normal_mode": "เปลี่ยนเป็นโหมดทำงานปกติหรือไม่?"
+  "art_confirm_switch_normal_mode": "เปลี่ยนเป็นโหมดทำงานปกติหรือไม่?",
+  "art_tool_guide": "เส้นไกด์",
+  "art_guide_clear": "ลบเส้นไกด์"
 }

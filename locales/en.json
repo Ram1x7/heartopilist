@@ -655,5 +655,7 @@
   "art_mode_wizard_normal_title": "Normal mode",
   "art_mode_wizard_normal_desc": "See the whole canvas and paint in any order you like",
   "art_confirm_switch_block_mode": "Switch to block mode?",
-  "art_confirm_switch_normal_mode": "Switch to normal mode?"
+  "art_confirm_switch_normal_mode": "Switch to normal mode?",
+  "art_tool_guide": "Guide line",
+  "art_guide_clear": "Clear guide lines"
 }

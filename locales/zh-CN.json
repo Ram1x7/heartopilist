@@ -631,5 +631,7 @@
   "art_mode_wizard_normal_title": "普通作业模式",
   "art_mode_wizard_normal_desc": "查看整个画布，按喜欢的顺序自由涂色",
   "art_confirm_switch_block_mode": "要切换到分块作业模式吗？",
-  "art_confirm_switch_normal_mode": "要切换到普通作业模式吗？"
+  "art_confirm_switch_normal_mode": "要切换到普通作业模式吗？",
+  "art_tool_guide": "参考线",
+  "art_guide_clear": "清除参考线"
 }
