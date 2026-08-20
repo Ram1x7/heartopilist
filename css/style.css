@@ -1168,6 +1168,7 @@ body[data-icon-size="large"] .item{
   text-align:center;
   border:1px solid var(--gold);
   box-shadow:0 20px 40px rgba(52,48,43,0.15);
+  box-sizing:border-box;
 }
 
 /* モーダル画像 */
