@@ -314,7 +314,7 @@ function renderFramePartOptions(){
   const el = document.getElementById("artFramePartOptions");
   el.innerHTML = frame.parts.map(p => `
     <button class="art-frame-btn${p.id === selectedFramePartId ? " active" : ""}" data-value="${p.id}">
-      ${partOutlineThumbSvg(frame.id, p.id, 29)}
+      ${partOutlineThumbSvg(frame.id, p.id, 54)}
       <span>${frameName(p, lang)}</span>
     </button>
   `).join("");

@@ -822,6 +822,20 @@ body.dark .art-frame-btn .art-part-thumb{
   color:#fdf9ef;
 }
 
+/* パーツ選択画面（フロント/バック/袖など）専用の大きめレイアウト。アイテム選択より
+   個数が少ないことが多いため、列数を減らして1つあたりの輪郭線サムネイルを大きくし、
+   選ぶ前にどんな形のパーツか把握しやすくする */
+.art-part-grid{
+  grid-template-columns:repeat(3, 1fr);
+}
+
+.art-part-grid button.art-frame-btn{
+  height:108px;
+  gap:6px;
+  padding:8px 4px;
+  font-size:10.5px;
+}
+
 .art-gridsize-options button{
   flex:1 1 40%;
   border:1px solid var(--border);
