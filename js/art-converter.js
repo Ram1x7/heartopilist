@@ -343,8 +343,55 @@ function openCropStage(reset){
     }
     document.getElementById("artCropZoomSlider").value = Math.round(cropZoom * 100);
     applyCropTransform();
+    renderCropMaskOverlay();
     bindCropInteractions();
     maybeStartConvertTutorialPhase("crop");
+  });
+}
+
+// ── 輪郭線オーバーレイ（アイテム別プリセットのみ）。切り抜き位置を決める段階から、
+// 画像のどの部分が襟ぐりや家具のどのパーツに対応するかを視覚的に把握できるよう、
+// キャンバス編集画面（js/art-editor.jsのrebuildActiveMask）と同じmaskLinesデータを
+// そのまま再利用する。線の位置はビューポート（＝確定する切り抜き範囲）に対して固定で、
+// 画像側をドラッグ・ズームしても動かない（「窓枠」の役割のため、画像の位置調整とは独立） ──
+function renderCropMaskOverlay(){
+  const canvas = document.getElementById("artCropOverlay");
+  const hint = document.getElementById("artCropMaskHint");
+  const viewport = document.getElementById("artCropViewport");
+  if(!canvas || !viewport) return;
+  const ctx = canvas.getContext("2d");
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  canvas.width = vw;
+  canvas.height = vh;
+  ctx.clearRect(0, 0, vw, vh);
+
+  const preset = selectedFrameId && typeof PRESET_MASKS !== "undefined" ? PRESET_MASKS[selectedFrameId] : null;
+  const part = preset && selectedFramePartId ? preset[selectedFramePartId] : null;
+  const maskLines = part ? part.maskLines : null;
+  if(!maskLines || !maskLines.length){
+    if(hint) hint.style.display = "none";
+    return;
+  }
+  if(hint) hint.style.display = "";
+
+  // 背景は任意の写真のため、キャンバス編集画面のようなテーマ別の黒/白ではなく、
+  // どんな写真の上でも視認できるよう白線＋影の組み合わせで固定する
+  const cellW = vw / settings.width;
+  const cellH = vh / settings.height;
+  ctx.strokeStyle = "rgba(255,255,255,0.95)";
+  ctx.lineWidth = Math.max(1.5, Math.min(cellW, cellH) * 0.09);
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.shadowColor = "rgba(0,0,0,0.55)";
+  ctx.shadowBlur = 2.5;
+  maskLines.forEach(path => {
+    if(!path || path.length < 2) return;
+    ctx.beginPath();
+    ctx.moveTo(path[0].x * cellW, path[0].y * cellH);
+    for(let i = 1; i < path.length; i++){
+      ctx.lineTo(path[i].x * cellW, path[i].y * cellH);
+    }
+    ctx.stroke();
   });
 }
 
@@ -750,6 +797,9 @@ function useResultInEditor(){
     // 補助線が表示されなくなる
     frameId: selectedFrameId || null,
     partId: selectedFramePartId || null,
+    // エディタ側で「制作開始時の作業モード選択ウィザード」を出すための目印。
+    // エディタ側で読み込んだ直後に消費され、以後の下書きには残らない
+    justCreated: true,
   }));
   location.href = "art-create.html";
 }

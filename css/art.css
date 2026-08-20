@@ -461,6 +461,18 @@ body.dark .art-swatch.is-selected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
 }
 
+/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
+   「今の描画色」を示すis-selected（藍色）と混同しないよう朱色にする */
+.art-swatch.is-inspected{
+  border-color:var(--vermillion);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion);
+}
+
+body.dark .art-swatch.is-inspected{
+  border-color:var(--vermillion-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
+}
+
 /* メインカラーパレット：ゲーム内に存在しない色名などは付け足さず、色番号だけで識別する。
    角丸・薄い影の「紙のチップ」風の見た目は保ちつつ、名前ラベルを持たないぶん
    スウォッチにぴったり寄せたサイズにして、一覧性・選択speedを優先する */
@@ -499,6 +511,16 @@ body.dark .art-paper-chip{
 body.dark .art-paper-chip.is-selected{
   border-color:var(--indigo-soft);
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.art-paper-chip.is-inspected{
+  border-color:var(--vermillion);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion), 0 1px 3px rgba(60,40,20,0.1);
+}
+
+body.dark .art-paper-chip.is-inspected{
+  border-color:var(--vermillion-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft), 0 1px 3px rgba(0,0,0,0.3);
 }
 
 body.dark .art-paper-chip-swatch{
@@ -597,6 +619,94 @@ body.dark .art-usage-count{
 
 body.dark .art-usage-empty{
   color:#b3a89a;
+}
+
+/* 使用色一覧の「置き換え」ボタン（行の右端。色そのものではなく、置き換え操作を始める用） */
+.art-usage-replace-btn{
+  flex-shrink:0;
+  margin-left:auto;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.art-usage-replace-btn:hover{
+  background:rgba(60,90,110,0.12);
+  color:var(--indigo);
+}
+
+body.dark .art-usage-replace-btn{
+  color:#b3a89a;
+}
+
+body.dark .art-usage-replace-btn:hover{
+  background:rgba(90,125,146,0.18);
+  color:var(--indigo-soft);
+}
+
+/* 色の置き換えバナー：パレットの直前に表示し、次のパレットタップが置き換え先の指定に
+   なることを示す。朱色を使い、確認待ちの通常状態（藍色）と見分けやすくする */
+.art-color-replace-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+  padding:9px 10px;
+  border-radius:12px;
+  background:rgba(177,80,59,0.1);
+  border:1px solid var(--vermillion);
+}
+
+.art-color-replace-banner-swatch{
+  flex-shrink:0;
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  border:1px solid var(--border);
+}
+
+.art-color-replace-banner-text{
+  flex:1;
+  font-size:11.5px;
+  line-height:1.5;
+  color:var(--text);
+}
+
+.art-color-replace-banner-cancel{
+  flex-shrink:0;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--vermillion);
+  background:transparent;
+  color:var(--vermillion);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-color-replace-banner{
+  background:rgba(201,112,88,0.14);
+  border-color:var(--vermillion-soft);
+}
+
+body.dark .art-color-replace-banner-swatch{
+  border-color:#46423b;
+}
+
+body.dark .art-color-replace-banner-text{
+  color:#ece4d4;
+}
+
+body.dark .art-color-replace-banner-cancel{
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
 }
 
 /* キャンバスサイズ選択（モーダル・変換パネル共通） */
@@ -728,6 +838,91 @@ body.dark .art-gridsize-options button.active{
   background:var(--indigo-soft);
   border-color:var(--indigo-soft);
   color:#fdf9ef;
+}
+
+/* 作業モード選択ウィザード（制作開始時の一度きりの導線） */
+.art-mode-wizard-box{
+  max-width:360px;
+  text-align:center;
+}
+
+.art-mode-wizard-options{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:16px;
+}
+
+button.art-mode-wizard-option{
+  position:relative;
+  flex:none;
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:16px 14px;
+  border-radius:14px;
+  border:1.5px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  text-align:left;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+button.art-mode-wizard-option:hover{
+  border-color:var(--indigo);
+}
+
+button.art-mode-wizard-option.is-recommended{
+  border-color:var(--indigo);
+  background:rgba(60,90,110,0.08);
+}
+
+.art-mode-wizard-badge{
+  align-self:flex-start;
+  padding:2px 9px;
+  border-radius:999px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:10px;
+  font-weight:700;
+}
+
+.art-mode-wizard-option-title{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-weight:700;
+  font-size:14px;
+}
+
+.art-mode-wizard-option-desc{
+  font-size:11.5px;
+  line-height:1.6;
+  color:var(--text-sub);
+}
+
+body.dark button.art-mode-wizard-option{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark button.art-mode-wizard-option:hover{
+  border-color:var(--indigo-soft);
+}
+
+body.dark button.art-mode-wizard-option.is-recommended{
+  border-color:var(--indigo-soft);
+  background:rgba(90,125,146,0.14);
+}
+
+body.dark .art-mode-wizard-badge{
+  background:var(--indigo-soft);
+}
+
+body.dark .art-mode-wizard-option-desc{
+  color:#b3a89a;
 }
 
 /* 変換方式プレビュー（標準／なめらか／くっきり） */
@@ -969,7 +1164,9 @@ body.dark .art-crop-hint{
   aspect-ratio:1/1;
   margin:0 auto;
   border-radius:10px;
-  border:1px solid var(--border);
+  /* 「ここが切り抜き範囲そのもの」だと一目で伝わるよう、単なるカード枠ではなく
+     はっきりした藍色の実線にする（比率を変えるとaspect-ratioに合わせて枠自体が変形する） */
+  border:2.5px solid var(--indigo);
   background:
     linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
     linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
@@ -985,7 +1182,7 @@ body.dark .art-crop-hint{
 }
 
 body.dark .art-crop-viewport{
-  border-color:#46423b;
+  border-color:var(--indigo-soft);
 }
 
 #artCropImg{
@@ -995,6 +1192,22 @@ body.dark .art-crop-viewport{
   max-width:none;
   pointer-events:none;
   user-select:none;
+}
+
+/* アイテム別プリセットの輪郭線（襟ぐり・パーツ境界など）を切り抜きプレビュー上に重ねる。
+   キャンバス編集画面側と同じmaskLinesデータをそのまま再利用する */
+#artCropOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.art-crop-mask-hint{
+  text-align:center;
+  margin-top:8px;
 }
 
 .art-crop-zoom-row{
@@ -1290,6 +1503,56 @@ body.dark .art-block-status-2{
 .art-panel-btn-row .art-header-btn{
   flex:1 1 auto;
   justify-content:center;
+}
+
+/* 移動（ずらす）用の十字パッド。上下左右の4方向ボタンだけを中央に集めた
+   コンパクトな配置にする（マス目のような正方形グリッドではなく、視覚的に
+   「押した方向へ動く」ことが直感的に伝わる十字型を採用） */
+.art-nudge-pad{
+  display:grid;
+  grid-template-columns:repeat(3, 40px);
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  gap:4px;
+  justify-content:center;
+  margin-top:10px;
+}
+
+.art-nudge-btn{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  cursor:pointer;
+}
+
+.art-nudge-btn:hover{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.art-nudge-up{ grid-area:up; }
+.art-nudge-down{ grid-area:down; }
+.art-nudge-left{ grid-area:left; }
+.art-nudge-right{ grid-area:right; }
+
+body.dark .art-nudge-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-nudge-btn:hover{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
 }
 
 /* トースト通知（保存完了などの短い確認表示） */

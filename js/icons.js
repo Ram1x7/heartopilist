@@ -97,6 +97,17 @@ const ICONS = {
   eyedropper: `<path d="m7.5 16.5 8-8"/><path d="M14 5.5 18.5 10"/><path d="M15.8 3.7a2.3 2.3 0 0 1 3.2 0l1.3 1.3a2.3 2.3 0 0 1 0 3.2l-1.8 1.8-4.5-4.5Z"/><path d="M7.5 16.5 5 20l3.5-2.5"/>`,
   undo: `<path d="M4 11h9a5.5 5.5 0 0 1 0 11h-3"/><path d="m8 6-4 5 4 5"/>`,
   redo: `<path d="M20 11h-9a5.5 5.5 0 0 0 0 11h3"/><path d="m16 6 4 5-4 5"/>`,
+  shapeLine: `<path d="M6 18 18 6"/><circle cx="6" cy="18" r="1.7" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.7" fill="currentColor" stroke="none"/>`,
+  shapeRect: `<rect x="4.5" y="6.5" width="15" height="11" rx="1.4"/>`,
+  shapeCircle: `<circle cx="12" cy="12" r="7.5"/>`,
+  swap: `<path d="M4 8h13"/><path d="M14 4.5 17.5 8 14 11.5"/><path d="M20 16H7"/><path d="M10 12.5 6.5 16 10 19.5"/>`,
+  flipHorizontal: `<path d="M12 3v18" stroke-dasharray="2.5 2.5"/><path d="M8.5 8 5.5 12l3 4"/><path d="M15.5 8l3 4-3 4"/>`,
+  flipVertical: `<path d="M3 12h18" stroke-dasharray="2.5 2.5"/><path d="M8 8.5 12 5.5l4 3"/><path d="M8 15.5l4 3 4-3"/>`,
+  arrowUp: `<path d="M12 19V5"/><path d="M6.5 10.5 12 5l5.5 5.5"/>`,
+  arrowDown: `<path d="M12 5v14"/><path d="M6.5 13.5 12 19l5.5-5.5"/>`,
+  arrowLeft: `<path d="M19 12H5"/><path d="M10.5 6.5 5 12l5.5 5.5"/>`,
+  arrowRight: `<path d="M5 12h14"/><path d="M13.5 6.5 19 12l-5.5 5.5"/>`,
+  guideLine: `<path d="M4 17c4-9 12-9 16 0" stroke-dasharray="3 2.5"/>`,
 
   // 楽譜エディター
   pause: `<rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/>`,

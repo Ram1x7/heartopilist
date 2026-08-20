@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=37">
+<link rel="stylesheet" href="./css/art.css?v=42">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -122,6 +122,11 @@
       <div class="art-palette" id="artRecentColors"></div>
     </div>
     <div class="art-panel-section">
+      <div class="art-color-replace-banner" id="artColorReplaceBanner" style="display:none;">
+        <span class="art-color-replace-banner-swatch" id="artColorReplaceBannerSwatch"></span>
+        <span class="art-color-replace-banner-text" data-i18n="art_color_replace_banner">この色をパレットから選んで置き換え先にしてください</span>
+        <button class="art-color-replace-banner-cancel" onclick="cancelColorReplace()" data-i18n="art_color_replace_cancel">やめる</button>
+      </div>
       <div class="art-panel-title" data-i18n="art_palette_label">カラー</div>
       <div class="art-palette" id="artPaletteMains"></div>
       <div class="art-palette art-palette-subs" id="artPaletteSubs" style="display:none"></div>
@@ -129,6 +134,19 @@
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
       <div class="art-color-usage" id="artColorUsage"></div>
+    </div>
+    <div class="art-panel-section" id="artTransformSection">
+      <div class="art-panel-title" data-i18n="art_transform_label">反転・移動</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artFlipHBtn" data-i18n="art_flip_h_btn">左右反転</button>
+        <button class="art-header-btn" id="artFlipVBtn" data-i18n="art_flip_v_btn">上下反転</button>
+      </div>
+      <div class="art-nudge-pad" id="artNudgePad">
+        <button class="art-nudge-btn art-nudge-up" data-dir="up" data-i18n-title="art_nudge_up" title="上へ移動"></button>
+        <button class="art-nudge-btn art-nudge-left" data-dir="left" data-i18n-title="art_nudge_left" title="左へ移動"></button>
+        <button class="art-nudge-btn art-nudge-right" data-dir="right" data-i18n-title="art_nudge_right" title="右へ移動"></button>
+        <button class="art-nudge-btn art-nudge-down" data-dir="down" data-i18n-title="art_nudge_down" title="下へ移動"></button>
+      </div>
     </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_paint_guide_label">ぬり方ガイド</div>
@@ -202,6 +220,24 @@
     </div>
     <div id="gridSizeCancelWrap" style="display:none;">
       <button class="modal-close-btn" onclick="closeNewCanvasModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="artModeWizardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-mode-wizard-box">
+    <h3 data-i18n="art_mode_wizard_title">作業の進め方を選んでください</h3>
+    <p class="art-step-hint" data-i18n="art_mode_wizard_hint">あとからいつでも切り替えられます</p>
+    <div class="art-mode-wizard-options">
+      <button class="art-mode-wizard-option is-recommended" id="artModeWizardBlockBtn">
+        <span class="art-mode-wizard-badge" data-i18n="art_mode_wizard_recommended">初心者におすすめ</span>
+        <span class="art-mode-wizard-option-title" data-i18n="art_mode_wizard_block_title">ブロック作業モード</span>
+        <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_block_desc">10×10マスずつ区切って、1ブロックずつ集中して塗り進められます</span>
+      </button>
+      <button class="art-mode-wizard-option" id="artModeWizardNormalBtn">
+        <span class="art-mode-wizard-option-title" data-i18n="art_mode_wizard_normal_title">通常作業モード</span>
+        <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_normal_desc">キャンバス全体を見ながら、自由な順番で塗り進められます</span>
+      </button>
     </div>
   </div>
 </div>

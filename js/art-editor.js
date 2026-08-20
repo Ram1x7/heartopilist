@@ -55,6 +55,15 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
+let shapeStartCell = null; // 図形ツール（直線・四角・円）のドラッグ開始マス。ドラッグ中でなければnull
+let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するマス配列（[[x,y], ...]）。確定前のため未確定の色
+let guideLines = []; // 確定済みのガイド線（下描き用の一時的な表示専用オーバーレイ。ピクセルデータには一切影響しない）。
+  // 各要素は{x,y}（マス単位、小数可）の点列。ページを離れると消える想定のためdraftには保存しない
+let currentGuidePath = null; // 描画中のガイド線の点列（確定前）。ドラッグ中でなければnull
+const GUIDE_MOVE_MIN_DIST = 0.15; // ガイド線の点を追加する最小移動量（マス単位）。点が増えすぎるのを防ぐ
+let colorReplaceSourceHex = null; // 色の置き換え：置き換え元の色（この値がnullでない間は、パレットのタップが
+  // 色の選択ではなく「置き換え先の指定」として扱われる。スポイトのツール切替と同じ、一時的なモード切り替え方式）
+let inspectedPaletteHex = null; // タップして調べたマスの色（パレット側のハイライト同期用。undefined区別のため初期値はnull）
 let recentColors = []; // 直近使用した色（新しい順、最大RECENT_COLORS_MAX件）。ワンタップで選び直せるようにする
 const RECENT_COLORS_KEY = "hatopiArt_recentColors";
 const RECENT_COLORS_MAX = 8;
@@ -70,6 +79,7 @@ function initArtEditor(){
   const originalDraft = loadDraft();
   const draft = applyShareCodeFromUrlIfPresent(originalDraft);
   const loadedFromShareUrl = draft !== originalDraft;
+  let showModeWizardOnInit = false;
   if(draft && draft.width && draft.height && Array.isArray(draft.pixelData)){
     gridWidth = draft.width;
     gridHeight = draft.height;
@@ -81,6 +91,13 @@ function initArtEditor(){
     isLocked = !!draft.locked;
     rebuildActiveMask();
     if(loadedFromShareUrl) saveDraft(); // URLのコードから読み込んだ内容を下書きとして永続化する
+    // 画像変換（「画像から作る」）を確定した直後の下書きにだけ立つ目印。作業モード選択の
+    // 導線を出したら、この目印自体は次の保存で自然に消えるようここで即座に保存し直す
+    // （目印が残ったままリロードすると、再度ウィザードが出てしまうのを防ぐため）
+    if(draft.justCreated){
+      showModeWizardOnInit = true;
+      saveDraft();
+    }
   }else{
     showFrameStep1();
     renderFreeSizeOptions();
@@ -99,9 +116,12 @@ function initArtEditor(){
   bindCanvasEvents();
   bindDisplayToggles();
   bindMyDesignsControls();
+  bindTransformControls();
   bindLockControls();
   bindTutorialControls();
   bindShareCodeControls();
+  bindModeWizardControls();
+  if(showModeWizardOnInit) showModeWizard();
   maybeStartTutorial();
 }
 
@@ -140,11 +160,43 @@ function bindDisplayToggles(){
     renderCanvas();
   });
   document.getElementById("artBlockModeToggle").addEventListener("change", (e) => {
-    blockMode = e.target.checked;
+    // 制作開始時のウィザードで最初に選んだ後の変更は、誤操作防止のため確認を挟む
+    const next = e.target.checked;
+    const msg = next
+      ? T("art_confirm_switch_block_mode", "ブロック作業モードに切り替えますか？")
+      : T("art_confirm_switch_normal_mode", "通常作業モードに切り替えますか？");
+    if(!confirm(msg)){
+      e.target.checked = !next; // キャンセル時は表示上のチェック状態も元に戻す
+      return;
+    }
+    blockMode = next;
     renderToolbar();
     renderCanvas();
     renderBlockList();
   });
+}
+
+// ── 作業モード選択ウィザード（制作開始時の一度きりの導線。既存の10×10ブロック表示
+// トグル自体は変更しない。ここではその初期値を、案内つきで最初に選ばせるだけ） ──
+function showModeWizard(){
+  document.getElementById("artModeWizardModal").style.display = "block";
+}
+
+function chooseModeWizard(useBlockMode){
+  blockMode = useBlockMode;
+  const toggle = document.getElementById("artBlockModeToggle");
+  if(toggle) toggle.checked = useBlockMode;
+  document.getElementById("artModeWizardModal").style.display = "none";
+  renderToolbar();
+  renderCanvas();
+  renderBlockList();
+  saveDraft();
+  maybeStartTutorial(); // ウィザード表示中は抑止していたチュートリアルを、閉じた後に改めて判定する
+}
+
+function bindModeWizardControls(){
+  document.getElementById("artModeWizardBlockBtn").addEventListener("click", () => chooseModeWizard(true));
+  document.getElementById("artModeWizardNormalBtn").addEventListener("click", () => chooseModeWizard(false));
 }
 
 // ── 新規キャンバス作成モーダルを「新規作成」ボタンから開く（既存キャンバスがある場合のみキャンセル可能） ──
@@ -312,6 +364,7 @@ function createCanvas(w, h, frameId, partId){
   renderBlockList();
   renderLockUI();
   saveDraft();
+  showModeWizard();
   maybeStartTutorial();
 }
 
@@ -323,11 +376,21 @@ const TOOLS = [
   { id: "eraser", icon: "sumiKeshi", labelKey: "art_tool_eraser", labelFallback: "消しゴム" },
   { id: "bucket", icon: "bucket", labelKey: "art_tool_bucket", labelFallback: "バケツ" },
   { id: "eyedropper", icon: "eyedropper", labelKey: "art_tool_eyedropper", labelFallback: "スポイト" },
+  { id: "line", icon: "shapeLine", labelKey: "art_tool_line", labelFallback: "直線" },
+  { id: "rect", icon: "shapeRect", labelKey: "art_tool_rect", labelFallback: "四角" },
+  { id: "circle", icon: "shapeCircle", labelKey: "art_tool_circle", labelFallback: "円" },
+  { id: "guide", icon: "guideLine", labelKey: "art_tool_guide", labelFallback: "ガイド線" },
 ];
+// 図形ツール：ドラッグ開始点から終点までの直線・四角形の輪郭・円の輪郭を描く。
+// 塗りつぶした図形が欲しい場合は、輪郭を描いた後にバケツツールと組み合わせて使う想定
+// （塗り/線引きの操作を分けることで、既存のペン・バケツの操作感をそのまま活かす）
+const SHAPE_TOOLS = new Set(["line", "rect", "circle"]);
 
 function renderToolbar(){
   const el = document.getElementById("artToolbar");
   el.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
+  const transformSection = document.getElementById("artTransformSection");
+  if(transformSection) transformSection.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
   const toolButtons = TOOLS.map(t => `
     <button class="art-tool-btn${currentTool === t.id ? " active" : ""}" onclick="setTool('${t.id}')" aria-label="${T(t.labelKey, t.labelFallback)}" aria-pressed="${currentTool === t.id}">
       ${icon(t.icon, { size: 18 })}
@@ -341,12 +404,17 @@ function renderToolbar(){
       ${icon("redo", { size: 18 })}
     </button>
   `;
+  const guideClearButton = `
+    <button class="art-tool-btn" id="artGuideClearBtn" onclick="clearGuideLines()" aria-label="${T('art_guide_clear', 'ガイド線を消す')}" ${guideLines.length === 0 ? "disabled" : ""}>
+      ${icon("close", { size: 18 })}
+    </button>
+  `;
   const clearButton = `
     <button class="art-tool-btn" onclick="clearAll()" aria-label="${T('art_tool_clear', '全消去')}">
       ${icon("trash", { size: 18 })}
     </button>
   `;
-  el.innerHTML = toolButtons + undoRedoButtons + clearButton;
+  el.innerHTML = toolButtons + undoRedoButtons + guideClearButton + clearButton;
 }
 
 function updateUndoRedoButtons(){
@@ -569,6 +637,9 @@ function zoomReset(){
 // 一覧性と選択speedを最優先にするため、サイズは名前ラベル追加前の密度に近い形を保つ
 function renderPalette(){
   const mainsEl = document.getElementById("artPaletteMains");
+  // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
+  // 該当なし（未着色マスや、そもそも調べていない）ならnull
+  const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
@@ -578,6 +649,7 @@ function renderPalette(){
     const isActive = entry.no === selectedMainNo;
     const cls = ["art-paper-chip"];
     if(isActive) cls.push("is-selected");
+    if(inspectedGroup && entry.no === inspectedGroup.no) cls.push("is-inspected");
     const swatchCls = ["art-paper-chip-swatch"];
     if(isNone) swatchCls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
@@ -629,9 +701,14 @@ function renderPaletteSubs(){
     return;
   }
   wrap.style.display = "flex";
-  wrap.innerHTML = entry.subs.map((hex, i) => `
-    <button class="art-swatch art-swatch-sub${hex.toUpperCase() === String(currentColor).toUpperCase() ? " is-selected" : ""}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>
-  `).join("");
+  wrap.innerHTML = entry.subs.map((hex, i) => {
+    const cls = ["art-swatch", "art-swatch-sub"];
+    if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
+    if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
+    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
+  }).join("");
+  const inspectedSub = wrap.querySelector(".is-inspected");
+  if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });
   wrap.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex, entry.no));
   });
@@ -640,6 +717,13 @@ function renderPaletteSubs(){
 // mainNoを渡すと、選択元のメインカラー番号が確定しているものとして扱う
 // （サブカラーのクリックなど）。渡さない場合（スポイト等）はhexから逆引きする。
 function setCurrentColor(c, mainNo){
+  // 色の置き換えモード中は、パレット（使用色一覧・最近使った色も含む）での色選択を
+  // 「置き換え先の指定」として扱う。選択肢を絞り込むための展開タップ（サブカラーなしの
+  // メインを開く等）はこの関数を経由しないため、ここでの分岐だけで正しく完結する
+  if(colorReplaceSourceHex !== null){
+    applyColorReplace(colorReplaceSourceHex, c);
+    return;
+  }
   currentColor = c;
   if(c === null){
     selectedMainNo = mainNo || "04";
@@ -703,10 +787,14 @@ function updateColorUsage(){
           <span class="art-usage-number">${colorNumberMap[c]}</span>
           <button class="art-usage-swatch" style="background:${c}" data-select-hex="${c}" aria-label="${T("art_select_this_color", "この色を選ぶ")}"></button>
           <span class="art-usage-count">${n}${T("art_unit_cells", "マス")}</span>
+          <button class="art-usage-replace-btn" data-replace-hex="${c}" aria-label="${T("art_color_replace_btn", "置き換え")}">
+            ${icon("swap", { size: 15 })}
+          </button>
         </div>
       `).join("")
     : `<div class="art-usage-empty">${T("art_usage_empty", "まだ何も塗られていません")}</div>`;
-  // 行全体のタップ＝ハイライト切り替え、スウォッチ自体のタップ＝色をワンタップ選択（別動作）
+  // 行全体のタップ＝ハイライト切り替え、スウォッチ自体のタップ＝色をワンタップ選択、
+  // 置き換えボタンのタップ＝色の置き換え開始（それぞれ別動作）
   el.querySelectorAll(".art-usage-row").forEach(row => {
     row.addEventListener("click", () => toggleHighlight(row.dataset.hex));
   });
@@ -716,6 +804,48 @@ function updateColorUsage(){
       setCurrentColor(btn.dataset.selectHex);
     });
   });
+  el.querySelectorAll("[data-replace-hex]").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      startColorReplace(btn.dataset.replaceHex);
+    });
+  });
+}
+
+// ── 色の置き換え：パレットを選び直す手間なく、使われている色を一括で別の色へ変える ──
+// スポイトツールと同じ「一時的なモード切り替え」方式。開始後は次にパレットで選んだ色が
+// 置き換え先になる（キャンバスの直接タップではなく、パレット側の操作で完結させることで、
+// 誤って1マスだけ塗ってしまう事故を防ぐ）
+function startColorReplace(sourceHex){
+  colorReplaceSourceHex = sourceHex;
+  const banner = document.getElementById("artColorReplaceBanner");
+  const swatch = document.getElementById("artColorReplaceBannerSwatch");
+  if(banner) banner.style.display = "flex";
+  if(swatch) swatch.style.background = sourceHex;
+  showToast(T("art_color_replace_start_toast", "置き換え先の色をパレットから選んでください"));
+}
+
+function cancelColorReplace(){
+  colorReplaceSourceHex = null;
+  const banner = document.getElementById("artColorReplaceBanner");
+  if(banner) banner.style.display = "none";
+}
+
+function applyColorReplace(sourceHex, targetHex){
+  cancelColorReplace();
+  if(sourceHex === targetHex) return;
+  pushHistory();
+  let changed = 0;
+  for(let i = 0; i < pixels.length; i++){
+    if(pixels[i] === sourceHex){
+      pixels[i] = targetHex;
+      changed++;
+    }
+  }
+  renderCanvas();
+  updateColorUsage();
+  saveDraftDebounced();
+  showToast(T("art_color_replace_done_toast", `${changed}マスを置き換えました`, { count: changed }));
 }
 
 function toggleHighlight(c){
@@ -801,6 +931,35 @@ function renderCanvas(){
     drawBlockBoundaryLines(cell);
   }
 
+  // ガイド線（下描き）。ピクセルデータには一切影響しない表示専用のオーバーレイのため、
+  // マス目にスナップさせず、なめらかな二次ベジェ曲線として描く
+  if(guideLines.length || currentGuidePath){
+    ctx.save();
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(226,140,110,0.9)" : "rgba(177,80,59,0.85)";
+    ctx.lineWidth = Math.max(1.5, cell * 0.05);
+    ctx.setLineDash([cell * 0.35, cell * 0.25]);
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    guideLines.forEach(path => drawSmoothGuidePath(path, cell));
+    if(currentGuidePath) drawSmoothGuidePath(currentGuidePath, cell);
+    ctx.restore();
+  }
+
+  // 図形ツール（直線・四角・円）のドラッグ中プレビュー。確定前と分かるよう、
+  // 実際の色より薄く塗った上に、はとぴ図鑑のテーマ色（藍色）で1マスずつ縁取る
+  if(shapePreviewCells && shapePreviewCells.length){
+    const rgb = hexToRgb(currentColor);
+    ctx.fillStyle = `rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.55)`;
+    shapePreviewCells.forEach(([x, y]) => {
+      ctx.fillRect(x * cell, y * cell, cell, cell);
+    });
+    ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.85)" : "rgba(26,24,20,0.75)";
+    ctx.lineWidth = Math.max(1, cell * 0.07);
+    shapePreviewCells.forEach(([x, y]) => {
+      ctx.strokeRect(x * cell + ctx.lineWidth / 2, y * cell + ctx.lineWidth / 2, cell - ctx.lineWidth, cell - ctx.lineWidth);
+    });
+  }
+
   // タップして調べたマスのハイライト（座標・使用色をはっきり分かるように、常に最前面に描く）
   if(inspectedCell && inspectedCell.cx < gridWidth && inspectedCell.cy < gridHeight){
     const ix = inspectedCell.cx, iy = inspectedCell.cy;
@@ -809,6 +968,25 @@ function renderCanvas(){
     const half = ctx.lineWidth / 2;
     ctx.strokeRect(ix * cell + half, iy * cell + half, cell - ctx.lineWidth, cell - ctx.lineWidth);
   }
+
+  syncPaletteHighlightFromInspectedCell();
+}
+
+// マスをタップして調べた時、その色がパレットのどこにあるか（メイン→サブ）も同時に
+// ハイライトする。renderCanvas()は描画中も高頻度で呼ばれるため、実際にハイライト対象の
+// 色が変わった時だけパレットを再描画する（描画ストローク中は常にinspectedCellがnullの
+// ままなので、ここは早期リターンのみで実質コストがかからない）
+function syncPaletteHighlightFromInspectedCell(){
+  const hex = (inspectedCell && inspectedCell.cx < gridWidth && inspectedCell.cy < gridHeight)
+    ? pixels[inspectedCell.cy * gridWidth + inspectedCell.cx]
+    : null;
+  if(hex === inspectedPaletteHex) return;
+  inspectedPaletteHex = hex;
+  if(hex){
+    const group = gamePaletteGroupForHex(hex);
+    if(group && group.subs.length > 0) expandedPaletteMain = group.no;
+  }
+  renderPalette();
 }
 
 // ── 色番号・マス番号ラベル ──
@@ -960,6 +1138,117 @@ function cellFromEvent(e){
   return { cx, cy };
 }
 
+// cellFromEvent()と異なり、キャンバス外にドラッグしてもnullを返さずキャンバス端のマスに
+// 丸める。図形ツールは端まで引ききりたいことが多いドラッグ操作のため、こちらを使う
+function cellFromEventClamped(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const cell = currentCellSize();
+  const cx = Math.min(gridWidth - 1, Math.max(0, Math.floor(x / cell)));
+  const cy = Math.min(gridHeight - 1, Math.max(0, Math.floor(y / cell)));
+  return { cx, cy };
+}
+
+// ガイド線（下描き）用。マス目には一切スナップさせず、マス単位の小数座標をそのまま返す
+// （なめらかな曲線・斜めの直線を、ピクセルの階段状にせず引けるようにするため）
+function gridFloatFromEvent(e){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+  const cell = currentCellSize();
+  return { x: x / cell, y: y / cell };
+}
+
+// 点列を、隣接2点の中点を通過点にした二次ベジェ曲線でなめらかに描く（一般的なフリーハンド
+// スムージング手法）。点が2つだけ（≒ほぼ直線でドラッグした場合）は素直な直線として描く
+function drawSmoothGuidePath(points, cell){
+  if(!points || points.length < 2) return;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x * cell, points[0].y * cell);
+  if(points.length === 2){
+    ctx.lineTo(points[1].x * cell, points[1].y * cell);
+  }else{
+    for(let i = 1; i < points.length - 1; i++){
+      const midX = (points[i].x + points[i + 1].x) / 2 * cell;
+      const midY = (points[i].y + points[i + 1].y) / 2 * cell;
+      ctx.quadraticCurveTo(points[i].x * cell, points[i].y * cell, midX, midY);
+    }
+    ctx.lineTo(points[points.length - 1].x * cell, points[points.length - 1].y * cell);
+  }
+  ctx.stroke();
+}
+
+// ── 図形ツールのジオメトリ（マス単位の座標配列を返す純粋関数） ──
+function bresenhamLineCells(x0, y0, x1, y1){
+  const cells = [];
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy;
+  let x = x0, y = y0;
+  while(true){
+    cells.push([x, y]);
+    if(x === x1 && y === y1) break;
+    const e2 = 2 * err;
+    if(e2 >= dy){ err += dy; x += sx; }
+    if(e2 <= dx){ err += dx; y += sy; }
+  }
+  return cells;
+}
+
+// 塗りつぶした四角ではなく輪郭のみ（塗りつぶしたい場合はバケツを併用する想定のため）
+function rectOutlineCells(x0, y0, x1, y1){
+  const left = Math.min(x0, x1), right = Math.max(x0, x1);
+  const top = Math.min(y0, y1), bottom = Math.max(y0, y1);
+  const cells = [];
+  for(let x = left; x <= right; x++){
+    cells.push([x, top], [x, bottom]);
+  }
+  for(let y = top; y <= bottom; y++){
+    cells.push([left, y], [right, y]);
+  }
+  return cells;
+}
+
+// ミッドポイント円アルゴリズム。中心=ドラッグ開始マス、半径=開始点から現在点までの距離
+function circleOutlineCells(cx0, cy0, cx1, cy1){
+  const r = Math.round(Math.hypot(cx1 - cx0, cy1 - cy0));
+  if(r === 0) return [[cx0, cy0]];
+  const cells = [];
+  let x = r, y = 0, err = 0;
+  while(x >= y){
+    cells.push(
+      [cx0 + x, cy0 + y], [cx0 + y, cy0 + x], [cx0 - y, cy0 + x], [cx0 - x, cy0 + y],
+      [cx0 - x, cy0 - y], [cx0 - y, cy0 - x], [cx0 + y, cy0 - x], [cx0 + x, cy0 - y]
+    );
+    y++;
+    if(err <= 0) err += 2 * y + 1;
+    if(err > 0){ x--; err -= 2 * x + 1; }
+  }
+  return cells;
+}
+
+// 開始マス(x0,y0)〜現在マス(x1,y1)から、ツールに応じたマス配列を求める（キャンバス範囲外は除く）
+function shapeCellsFor(tool, x0, y0, x1, y1){
+  let raw;
+  if(tool === "line") raw = bresenhamLineCells(x0, y0, x1, y1);
+  else if(tool === "rect") raw = rectOutlineCells(x0, y0, x1, y1);
+  else raw = circleOutlineCells(x0, y0, x1, y1);
+  return raw.filter(([x, y]) => x >= 0 && y >= 0 && x < gridWidth && y < gridHeight);
+}
+
+function commitShapeCells(cells, color){
+  if(!cells) return;
+  cells.forEach(([x, y]) => {
+    if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
+    pixels[y * gridWidth + x] = color;
+  });
+}
+
 function applyToolAt(cx, cy){
   const idx = cy * gridWidth + cx;
   if(currentTool === "pen"){
@@ -1078,6 +1367,33 @@ function bindCanvasEvents(){
       return;
     }
 
+    // 図形ツール（直線・四角・円）は、ドラッグ開始点から現在点までのプレビューを
+    // 描きながら、指/マウスを離した時点で確定する。誤タップ防止のため編集モードON時のみ
+    if(SHAPE_TOOLS.has(currentTool)){
+      if(!editMode || isLocked) return;
+      if(inspectedCell){
+        inspectedCell = null;
+      }
+      isDrawing = true;
+      shapeStartCell = c;
+      shapePreviewCells = shapeCellsFor(currentTool, c.cx, c.cy, c.cx, c.cy);
+      renderCanvas();
+      return;
+    }
+
+    // ガイド線（下描き）：マス目にスナップさせず、指/マウスの軌跡をそのまま点列として
+    // 記録する。ピクセルデータには一切書き込まない、表示専用の一時的なオーバーレイ
+    if(currentTool === "guide"){
+      if(!editMode || isLocked) return;
+      if(inspectedCell){
+        inspectedCell = null;
+      }
+      isDrawing = true;
+      currentGuidePath = [gridFloatFromEvent(e)];
+      renderCanvas();
+      return;
+    }
+
     // 実際に描画・消去・塗りつぶしを行うタップかどうか（下の誤タップ防止の条件と同じ）
     const willPaint = currentTool !== "eyedropper" && editMode && !isLocked;
 
@@ -1144,6 +1460,28 @@ function bindCanvasEvents(){
       return;
     }
 
+    // 図形ツールのドラッグ中：現在点までのプレビューを再計算して表示するだけで、
+    // ピクセルの確定は指/マウスを離した時点（releasePointer）まで行わない
+    if(isDrawing && shapeStartCell && SHAPE_TOOLS.has(currentTool)){
+      const c2 = cellFromEventClamped(e);
+      shapePreviewCells = shapeCellsFor(currentTool, shapeStartCell.cx, shapeStartCell.cy, c2.cx, c2.cy);
+      updateCoordReadout(c2);
+      renderCanvas();
+      return;
+    }
+
+    // ガイド線のドラッグ中：一定距離動くたびに点を追加する（毎フレーム記録すると
+    // 点が増えすぎるため、GUIDE_MOVE_MIN_DIST未満の細かい移動は間引く）
+    if(isDrawing && currentGuidePath && currentTool === "guide"){
+      const p = gridFloatFromEvent(e);
+      const last = currentGuidePath[currentGuidePath.length - 1];
+      if(Math.hypot(p.x - last.x, p.y - last.y) >= GUIDE_MOVE_MIN_DIST){
+        currentGuidePath.push(p);
+        renderCanvas();
+      }
+      return;
+    }
+
     // 長押し確認待ち中のタップが、閾値を超えて動いたらドラッグ開始とみなし、
     // マス確認をキャンセルして通常の描画（ストローク）に切り替える
     if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
@@ -1176,6 +1514,23 @@ function bindCanvasEvents(){
   });
 
   const finishStroke = () => {
+    // 図形ツールのドラッグ中に打ち切られた場合（2本目の指が触れた等）は、確定せず
+    // プレビューだけ取り消す。誤った位置での確定を防ぐため、ここでは書き込まない
+    if(shapeStartCell){
+      shapeStartCell = null;
+      shapePreviewCells = null;
+      isDrawing = false;
+      renderCanvas();
+      return;
+    }
+    // ガイド線も同様に、打ち切られた場合は確定せず取り消す（非破壊オーバーレイのため、
+    // 中途半端な線を確定登録するより取り消した方が安全という判断）
+    if(currentGuidePath){
+      currentGuidePath = null;
+      isDrawing = false;
+      renderCanvas();
+      return;
+    }
     if(!isDrawing) return;
     isDrawing = false;
     lastCell = null;
@@ -1183,8 +1538,37 @@ function bindCanvasEvents(){
     saveDraftDebounced();
   };
 
-  const releasePointer = (e) => {
+  // isCancel: pointercancelからの呼び出しならtrue（描画途中でシステム側に奪われた等）。
+  // その場合は図形の確定を行わずプレビューのみ取り消す
+  const releasePointer = (e, isCancel) => {
     activePointers.delete(e.pointerId);
+
+    if(shapeStartCell && SHAPE_TOOLS.has(currentTool)){
+      if(!isCancel && shapePreviewCells && shapePreviewCells.length){
+        pushHistory();
+        commitShapeCells(shapePreviewCells, currentColor);
+        updateColorUsage();
+        saveDraftDebounced();
+      }
+      shapeStartCell = null;
+      shapePreviewCells = null;
+      isDrawing = false;
+      if(pinchState && activePointers.size < 2) pinchState = null;
+      renderCanvas();
+      return;
+    }
+
+    if(currentGuidePath && currentTool === "guide"){
+      if(!isCancel && currentGuidePath.length >= 2){
+        guideLines.push(currentGuidePath);
+        renderToolbar(); // 「ガイド線を消す」ボタンの有効化を反映する
+      }
+      currentGuidePath = null;
+      isDrawing = false;
+      if(pinchState && activePointers.size < 2) pinchState = null;
+      renderCanvas();
+      return;
+    }
 
     if(pendingTouchPaint && pendingTouchPaint.pointerId === e.pointerId){
       // 長押し確認・ドラッグのどちらにもならず指を離した＝単発タップとして、保留していた描画を確定する
@@ -1205,8 +1589,8 @@ function bindCanvasEvents(){
     }
     finishStroke();
   };
-  canvas.addEventListener("pointerup", releasePointer);
-  canvas.addEventListener("pointercancel", releasePointer);
+  canvas.addEventListener("pointerup", (e) => releasePointer(e, false));
+  canvas.addEventListener("pointercancel", (e) => releasePointer(e, true));
   canvas.addEventListener("pointerleave", (e) => {
     finishStroke();
     updateCoordReadout(null);
@@ -1299,6 +1683,14 @@ function zoomToBlock(bx, by){
   area.scrollTop = Math.max(0, (by * BLOCK_SIZE + bh / 2) * cell - area.clientHeight / 2);
 }
 
+// ── ガイド線（下描き）を消す。ピクセルデータには影響しないため確認ダイアログは不要 ──
+function clearGuideLines(){
+  guideLines = [];
+  currentGuidePath = null;
+  renderCanvas();
+  renderToolbar();
+}
+
 // ── 全消去 ──
 function clearAll(){
   if(!confirm(T("art_confirm_clear", "すべて消去しますか？（Undoで元に戻せます）"))) return;
@@ -1308,6 +1700,65 @@ function clearAll(){
   renderCanvas();
   updateColorUsage();
   saveDraft();
+}
+
+// ── 反転・移動（デザイン全体に対する変形。左右対称のデザイン（服の前後など）を
+// 描く際の効率化のため）。全消去と同様、破壊的だがUndoで戻せるため確認ダイアログは
+// 挟まない。ロック中・ブロック表示モード中はrenderToolbar()側でこの操作全体を
+// 無効化するため、ここでは編集モード等の個別チェックは行わない ──
+function flipCanvas(axis){
+  pushHistory();
+  const newPixels = new Array(pixels.length).fill(null);
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const c = pixels[y * gridWidth + x];
+      if(!c) continue;
+      const nx = axis === "horizontal" ? gridWidth - 1 - x : x;
+      const ny = axis === "vertical" ? gridHeight - 1 - y : y;
+      newPixels[ny * gridWidth + nx] = c;
+    }
+  }
+  pixels = newPixels;
+  finishTransform();
+  showToast(axis === "horizontal" ? T("art_flip_h_btn", "左右反転") : T("art_flip_v_btn", "上下反転"));
+}
+
+// キャンバス全体を1マス分ずらす。はみ出た部分は消え、反対側から新しいマスが現れる
+// わけではない（ループはしない。デザインのズレを直すための小さな微調整という位置づけ）
+function nudgeCanvas(dir){
+  pushHistory();
+  const newPixels = new Array(pixels.length).fill(null);
+  const dx = dir === "left" ? -1 : dir === "right" ? 1 : 0;
+  const dy = dir === "up" ? -1 : dir === "down" ? 1 : 0;
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const c = pixels[y * gridWidth + x];
+      if(!c) continue;
+      const nx = x + dx, ny = y + dy;
+      if(nx < 0 || ny < 0 || nx >= gridWidth || ny >= gridHeight) continue;
+      newPixels[ny * gridWidth + nx] = c;
+    }
+  }
+  pixels = newPixels;
+  finishTransform();
+}
+
+function finishTransform(){
+  highlightedColor = null;
+  inspectedCell = null;
+  renderCanvas();
+  updateColorUsage();
+  saveDraftDebounced();
+}
+
+function bindTransformControls(){
+  document.getElementById("artFlipHBtn").addEventListener("click", () => flipCanvas("horizontal"));
+  document.getElementById("artFlipVBtn").addEventListener("click", () => flipCanvas("vertical"));
+  const dirIcons = { up: "arrowUp", down: "arrowDown", left: "arrowLeft", right: "arrowRight" };
+  document.querySelectorAll("#artNudgePad [data-dir]").forEach(btn => {
+    btn.innerHTML = icon(dirIcons[btn.dataset.dir], { size: 16 });
+    btn.addEventListener("click", () => nudgeCanvas(btn.dataset.dir));
+  });
 }
 
 // ── 下書きの自動保存（作業中の状態のみ。名前を付けた保存はSAVED_DESIGNS_KEY側で管理） ──
@@ -1789,6 +2240,10 @@ let tutorialStep = 0;
 // キャンバス作成完了（createCanvas）のタイミングで呼び直される
 function maybeStartTutorial(){
   if(document.getElementById("gridSizeModal").style.display === "block") return;
+  // 作業モード選択ウィザードが出ている間はチュートリアルを重ねて出さない。
+  // ウィザードを閉じた側（chooseModeWizard）からこの関数を呼び直すことで、
+  // 「ウィザード→（初回のみ）チュートリアル」の順に必ず1つずつ表示する
+  if(document.getElementById("artModeWizardModal").style.display === "block") return;
   if(localStorage.getItem(TUTORIAL_DONE_KEY) === "true") return;
   setTimeout(startTutorial, 400);
 }
