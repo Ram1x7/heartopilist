@@ -457,24 +457,41 @@ function renderPaintGuideCanvas(){
     gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
   }
 
-  // 内側マス（バケツ範囲）のかたまりごとに外周を強調表示
-  gctx.strokeStyle = dark ? "#ffe680" : "#ff7a1a";
-  gctx.lineWidth = Math.max(2, cell * 0.22);
-  gctx.lineJoin = "round";
-  gctx.beginPath();
+  // 内側マス（バケツ範囲）のかたまりごとに斜線を重ねて表示。
+  // 以前は外周を縁取り線で強調していたが、今のブロック（10×10）の太枠と
+  // 重なったときに太枠側が見えづらくなっていたため、範囲の外周ではなく
+  // 内側を斜線で塗る方式に変更（太枠とは描く場所が違うので重ならない）
+  gctx.strokeStyle = dark ? "rgba(255,230,128,0.8)" : "rgba(255,122,26,0.8)";
+  gctx.lineWidth = Math.max(1.4, cell * 0.14);
+  const hatchGap = Math.max(4, cell * 0.5);
   step.interiorClusters.forEach(cluster => {
-    const set = new Set(cluster.cells.map(([x, y]) => y * gridWidth + x));
-    const has = (x, y) => set.has(y * gridWidth + x);
-    cluster.cells.forEach(([x, y]) => {
-      if(x < viewport.ox || y < viewport.oy || x >= viewport.ox + viewport.w || y >= viewport.oy + viewport.h) return;
+    const visibleCells = cluster.cells.filter(([x, y]) =>
+      x >= viewport.ox && y >= viewport.oy && x < viewport.ox + viewport.w && y < viewport.oy + viewport.h
+    );
+    if(visibleCells.length === 0) return;
+
+    const clipPath = new Path2D();
+    visibleCells.forEach(([x, y]) => {
       const vx = (x - viewport.ox) * cell, vy = (y - viewport.oy) * cell;
-      if(!has(x - 1, y)){ gctx.moveTo(vx, vy); gctx.lineTo(vx, vy + cell); }
-      if(!has(x + 1, y)){ gctx.moveTo(vx + cell, vy); gctx.lineTo(vx + cell, vy + cell); }
-      if(!has(x, y - 1)){ gctx.moveTo(vx, vy); gctx.lineTo(vx + cell, vy); }
-      if(!has(x, y + 1)){ gctx.moveTo(vx, vy + cell); gctx.lineTo(vx + cell, vy + cell); }
+      clipPath.rect(vx, vy, cell, cell);
     });
+
+    gctx.save();
+    gctx.clip(clipPath);
+    const xs = visibleCells.map(([x]) => x), ys = visibleCells.map(([, y]) => y);
+    const left = (Math.min(...xs) - viewport.ox) * cell;
+    const right = (Math.max(...xs) - viewport.ox + 1) * cell;
+    const top = (Math.min(...ys) - viewport.oy) * cell;
+    const bottom = (Math.max(...ys) - viewport.oy + 1) * cell;
+    const span = (right - left) + (bottom - top);
+    gctx.beginPath();
+    for(let d = -span; d < span; d += hatchGap){
+      gctx.moveTo(left + d, top);
+      gctx.lineTo(left + d + span, top + span);
+    }
+    gctx.stroke();
+    gctx.restore();
   });
-  gctx.stroke();
 
   // 境目マス（個別タップ）は中央に丸印で表示
   const dotColor = dark ? "#9ad0f0" : "#2373a8";
