@@ -1,5 +1,5 @@
 // キャッシュ名（更新時はバージョンを上げる）
-const CACHE_NAME = "hatopi-v2.118.0";
+const CACHE_NAME = "hatopi-v2.119.0";
 
 // キャッシュするファイル一覧
 const CACHE_FILES = [
@@ -98,6 +98,27 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   // GETリクエスト以外はスルー
   if(e.request.method !== "GET") return;
+
+  // 画像：キャッシュ優先＋裏で更新（stale-while-revalidate）
+  // 図鑑の画像は数が多く更新頻度も低いため、毎回ネットワークを待たせず
+  // キャッシュがあれば即座に表示し、裏で最新版に更新しておく
+  if(e.request.destination === "image"){
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        const networkFetch = fetch(e.request)
+          .then((response) => {
+            if(response && response.status === 200){
+              const cloned = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(e.request, cloned));
+            }
+            return response;
+          })
+          .catch(() => cached);
+        return cached || networkFetch;
+      })
+    );
+    return;
+  }
 
   e.respondWith(
     fetch(e.request)
