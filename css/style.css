@@ -637,8 +637,16 @@ body.dark .daily-spot-header{
 
 .daily-spot-header-btns{
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   gap:6px;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+.daily-spot-header-btns::-webkit-scrollbar{
+  display:none;
 }
 
 .daily-spot-calendar-btn{
@@ -653,6 +661,7 @@ body.dark .daily-spot-header{
   align-items:center;
   gap:4px;
   white-space:nowrap;
+  flex-shrink:0;
 }
 
 body.dark .daily-spot-calendar-btn{
