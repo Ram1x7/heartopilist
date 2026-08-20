@@ -38,6 +38,7 @@
   "modal_time": "时间：",
   "modal_close": "关闭",
   "modal_star5_label": "★5条件：",
+  "modal_auth_count_label": "认证所需数量：{n}",
   "modal_all_weather": "全天气",
   "modal_all_time": "全时段",
   "share_title": "分享收集进度",

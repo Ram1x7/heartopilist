@@ -898,6 +898,12 @@ if(c.type === "bird"){
   ? `${T("modal_star5_label","★5条件：")}<br>${c.star5}`
   : "";
 
+ // 認証マスターに必要な捕獲・発見数（対象外の生き物や、まだ判明していない数値は非表示にする）
+ m_authCount.innerText =
+  c.authCount
+  ? T("modal_auth_count_label", `認証に必要な数：${c.authCount.toLocaleString()}`, { n: c.authCount.toLocaleString() })
+  : "";
+
  // 作り方情報（砂像のデザイン形状・三択回答など）
  const craftEl = document.getElementById("m_craftInfo");
  if(craftEl){

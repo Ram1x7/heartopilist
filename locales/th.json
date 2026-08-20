@@ -38,6 +38,7 @@
   "modal_time": "ช่วงเวลา：",
   "modal_close": "ปิด",
   "modal_star5_label": "เงื่อนไข★5：",
+  "modal_auth_count_label": "จำนวนที่ต้องการเพื่อรับรอง：{n}",
   "modal_all_weather": "ทุกสภาพอากาศ",
   "modal_all_time": "ทุกช่วงเวลา",
   "share_title": "แชร์ความคืบหน้า",
