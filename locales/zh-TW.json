@@ -621,5 +621,6 @@
   "art_nudge_up": "向上移動",
   "art_nudge_down": "向下移動",
   "art_nudge_left": "向左移動",
-  "art_nudge_right": "向右移動"
+  "art_nudge_right": "向右移動",
+  "art_crop_mask_hint": "白線是實際形狀的參考。請以此範圍為準調整位置"
 }

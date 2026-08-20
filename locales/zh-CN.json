@@ -621,5 +621,6 @@
   "art_nudge_up": "向上移动",
   "art_nudge_down": "向下移动",
   "art_nudge_left": "向左移动",
-  "art_nudge_right": "向右移动"
+  "art_nudge_right": "向右移动",
+  "art_crop_mask_hint": "白线是实际形状的参考。请以此范围为准调整位置"
 }

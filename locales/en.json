@@ -645,5 +645,6 @@
   "art_nudge_up": "Move up",
   "art_nudge_down": "Move down",
   "art_nudge_left": "Move left",
-  "art_nudge_right": "Move right"
+  "art_nudge_right": "Move right",
+  "art_crop_mask_hint": "The white lines show the actual shape. Line up your image with this area"
 }

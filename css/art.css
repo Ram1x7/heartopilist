@@ -1057,7 +1057,9 @@ body.dark .art-crop-hint{
   aspect-ratio:1/1;
   margin:0 auto;
   border-radius:10px;
-  border:1px solid var(--border);
+  /* 「ここが切り抜き範囲そのもの」だと一目で伝わるよう、単なるカード枠ではなく
+     はっきりした藍色の実線にする（比率を変えるとaspect-ratioに合わせて枠自体が変形する） */
+  border:2.5px solid var(--indigo);
   background:
     linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
     linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
@@ -1073,7 +1075,7 @@ body.dark .art-crop-hint{
 }
 
 body.dark .art-crop-viewport{
-  border-color:#46423b;
+  border-color:var(--indigo-soft);
 }
 
 #artCropImg{
@@ -1083,6 +1085,22 @@ body.dark .art-crop-viewport{
   max-width:none;
   pointer-events:none;
   user-select:none;
+}
+
+/* アイテム別プリセットの輪郭線（襟ぐり・パーツ境界など）を切り抜きプレビュー上に重ねる。
+   キャンバス編集画面側と同じmaskLinesデータをそのまま再利用する */
+#artCropOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.art-crop-mask-hint{
+  text-align:center;
+  margin-top:8px;
 }
 
 .art-crop-zoom-row{

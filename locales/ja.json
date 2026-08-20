@@ -645,5 +645,6 @@
   "art_nudge_up": "上へ移動",
   "art_nudge_down": "下へ移動",
   "art_nudge_left": "左へ移動",
-  "art_nudge_right": "右へ移動"
+  "art_nudge_right": "右へ移動",
+  "art_crop_mask_hint": "白い線は実際の形の目安です。この範囲を意識して位置を合わせてください"
 }

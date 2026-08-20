@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=39">
+<link rel="stylesheet" href="./css/art.css?v=40">
 
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./music.html">
@@ -129,7 +129,9 @@
     <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
     <div class="art-crop-viewport" id="artCropViewport">
       <img id="artCropImg" alt="" draggable="false">
+      <canvas id="artCropOverlay"></canvas>
     </div>
+    <p class="art-crop-hint art-crop-mask-hint" id="artCropMaskHint" style="display:none;" data-i18n="art_crop_mask_hint">白い線は実際の形の目安です。この範囲を意識して位置を合わせてください</p>
     <div class="art-crop-zoom-row">
       <span class="art-crop-zoom-icon">－</span>
       <input type="range" id="artCropZoomSlider" min="100" max="300" value="100">
@@ -344,6 +346,7 @@ function T(key, fallback, vars){
 
 </script>
 <script src="js/art-config.js"></script>
+<script src="js/art-masks.js"></script>
 <script src="js/art-converter.js"></script>
 <script src="js/sw-register.js"></script>
 </body>

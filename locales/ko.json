@@ -621,5 +621,6 @@
   "art_nudge_up": "위로 이동",
   "art_nudge_down": "아래로 이동",
   "art_nudge_left": "왼쪽으로 이동",
-  "art_nudge_right": "오른쪽으로 이동"
+  "art_nudge_right": "오른쪽으로 이동",
+  "art_crop_mask_hint": "흰색 선은 실제 형태의 기준입니다. 이 범위를 고려해서 위치를 맞춰주세요"
 }
