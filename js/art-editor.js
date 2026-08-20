@@ -138,9 +138,6 @@ function rebuildActiveMask(){
   const preset = activeFrameId && typeof PRESET_MASKS !== "undefined" ? PRESET_MASKS[activeFrameId] : null;
   const part = preset && activePartId ? preset[activePartId] : null;
   activeMaskLines = part ? part.maskLines : null;
-  // 3Dプレビュー機能（js/art-3d.js、対応アイテムのみ）のボタン表示・非表示も、
-  // activeFrameIdが変わるこの関数の呼び出しにあわせて同期する
-  if(typeof update3DPreviewButton === "function") update3DPreviewButton();
 }
 
 // ── マイデザイン・エクスポート/共有ボタンの結線 ──
