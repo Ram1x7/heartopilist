@@ -637,6 +637,7 @@ body.dark .daily-spot-header{
 
 .daily-spot-header-btns{
   display:flex;
+  flex-wrap:wrap;
   gap:6px;
 }
 
