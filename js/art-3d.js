@@ -27,16 +27,21 @@ let art3DDisposables = []; // geometry/material/textureをまとめて破棄す�
 
 // パーツごとの立体配置。x/y/zはマス座標系を1/scaleに縮めた3D空間の単位。
 // depthはパネル自体の押し出し厚み。rotYはY軸まわりの回転（ラジアン）
+//
+// 【袖について】実機で確認したところ、袖用キャンバス（64×48）のmaskLinesは、
+// 上部が扇形に広く下部が直線的な「型紙」形状（パフスリーブを縫う前に平らに広げた
+// カッティングパターン）だった。これは平らな板を傾けるだけでは正しい形にならず、
+// 筒状に丸めるジオメトリが必要なため、対応できるまで袖は非表示にしている
+// （partsに含めていない）。フロント・バックの胴体のみで、まず正しい厚み・形に
+// なっているかを確認する
 const FRAME_3D_LAYOUTS = {
   t_shirt: {
     scale: 1 / 16,
-    depth: 0.3,
+    depth: 0.06,
     cameraDistance: 6.5,
     parts: [
-      { partId: "default", x: 0, y: 0, z: 0.55, rotY: 0 },
-      { partId: "canvas-1777194719606", x: 0, y: 0, z: -0.55, rotY: Math.PI },
-      { partId: "canvas-1777197309890", x: -2.35, y: 0.95, z: 0.15, rotY: 0.75 },
-      { partId: "canvas-1777198784026", x: 2.35, y: 0.95, z: 0.15, rotY: -0.75 },
+      { partId: "default", x: 0, y: 0, z: 0.05, rotY: 0 },
+      { partId: "canvas-1777194719606", x: 0, y: 0, z: -0.05, rotY: Math.PI },
     ],
   },
 };
