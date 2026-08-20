@@ -59,6 +59,7 @@ let shapeStartCell = null; // 図形ツール（直線・四角・円）のド�
 let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するプレビュー用のマス配列（[[x,y], ...]）。確定前のため未確定の色
 let colorReplaceSourceHex = null; // 色の置き換え：置き換え元の色（この値がnullでない間は、パレットのタップが
   // 色の選択ではなく「置き換え先の指定」として扱われる。スポイトのツール切替と同じ、一時的なモード切り替え方式）
+let inspectedPaletteHex = null; // タップして調べたマスの色（パレット側のハイライト同期用。undefined区別のため初期値はnull）
 let recentColors = []; // 直近使用した色（新しい順、最大RECENT_COLORS_MAX件）。ワンタップで選び直せるようにする
 const RECENT_COLORS_KEY = "hatopiArt_recentColors";
 const RECENT_COLORS_MAX = 8;
@@ -626,6 +627,9 @@ function zoomReset(){
 // 一覧性と選択speedを最優先にするため、サイズは名前ラベル追加前の密度に近い形を保つ
 function renderPalette(){
   const mainsEl = document.getElementById("artPaletteMains");
+  // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
+  // 該当なし（未着色マスや、そもそも調べていない）ならnull
+  const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
@@ -635,6 +639,7 @@ function renderPalette(){
     const isActive = entry.no === selectedMainNo;
     const cls = ["art-paper-chip"];
     if(isActive) cls.push("is-selected");
+    if(inspectedGroup && entry.no === inspectedGroup.no) cls.push("is-inspected");
     const swatchCls = ["art-paper-chip-swatch"];
     if(isNone) swatchCls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
@@ -686,9 +691,14 @@ function renderPaletteSubs(){
     return;
   }
   wrap.style.display = "flex";
-  wrap.innerHTML = entry.subs.map((hex, i) => `
-    <button class="art-swatch art-swatch-sub${hex.toUpperCase() === String(currentColor).toUpperCase() ? " is-selected" : ""}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>
-  `).join("");
+  wrap.innerHTML = entry.subs.map((hex, i) => {
+    const cls = ["art-swatch", "art-swatch-sub"];
+    if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
+    if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
+    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
+  }).join("");
+  const inspectedSub = wrap.querySelector(".is-inspected");
+  if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });
   wrap.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex, entry.no));
   });
@@ -934,6 +944,25 @@ function renderCanvas(){
     const half = ctx.lineWidth / 2;
     ctx.strokeRect(ix * cell + half, iy * cell + half, cell - ctx.lineWidth, cell - ctx.lineWidth);
   }
+
+  syncPaletteHighlightFromInspectedCell();
+}
+
+// マスをタップして調べた時、その色がパレットのどこにあるか（メイン→サブ）も同時に
+// ハイライトする。renderCanvas()は描画中も高頻度で呼ばれるため、実際にハイライト対象の
+// 色が変わった時だけパレットを再描画する（描画ストローク中は常にinspectedCellがnullの
+// ままなので、ここは早期リターンのみで実質コストがかからない）
+function syncPaletteHighlightFromInspectedCell(){
+  const hex = (inspectedCell && inspectedCell.cx < gridWidth && inspectedCell.cy < gridHeight)
+    ? pixels[inspectedCell.cy * gridWidth + inspectedCell.cx]
+    : null;
+  if(hex === inspectedPaletteHex) return;
+  inspectedPaletteHex = hex;
+  if(hex){
+    const group = gamePaletteGroupForHex(hex);
+    if(group && group.subs.length > 0) expandedPaletteMain = group.no;
+  }
+  renderPalette();
 }
 
 // ── 色番号・マス番号ラベル ──

@@ -461,6 +461,18 @@ body.dark .art-swatch.is-selected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
 }
 
+/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
+   「今の描画色」を示すis-selected（藍色）と混同しないよう朱色にする */
+.art-swatch.is-inspected{
+  border-color:var(--vermillion);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion);
+}
+
+body.dark .art-swatch.is-inspected{
+  border-color:var(--vermillion-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
+}
+
 /* メインカラーパレット：ゲーム内に存在しない色名などは付け足さず、色番号だけで識別する。
    角丸・薄い影の「紙のチップ」風の見た目は保ちつつ、名前ラベルを持たないぶん
    スウォッチにぴったり寄せたサイズにして、一覧性・選択speedを優先する */
@@ -499,6 +511,16 @@ body.dark .art-paper-chip{
 body.dark .art-paper-chip.is-selected{
   border-color:var(--indigo-soft);
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.art-paper-chip.is-inspected{
+  border-color:var(--vermillion);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion), 0 1px 3px rgba(60,40,20,0.1);
+}
+
+body.dark .art-paper-chip.is-inspected{
+  border-color:var(--vermillion-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft), 0 1px 3px rgba(0,0,0,0.3);
 }
 
 body.dark .art-paper-chip-swatch{
