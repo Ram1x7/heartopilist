@@ -614,5 +614,12 @@
   "art_color_replace_banner": "เลือกสีจากจานสีเพื่อใช้แทนที่",
   "art_color_replace_cancel": "ยกเลิก",
   "art_color_replace_start_toast": "เลือกสีที่จะใช้แทนที่จากจานสี",
-  "art_color_replace_done_toast": "แทนที่แล้ว {count} ช่อง"
+  "art_color_replace_done_toast": "แทนที่แล้ว {count} ช่อง",
+  "art_transform_label": "พลิก・ย้าย",
+  "art_flip_h_btn": "พลิกซ้ายขวา",
+  "art_flip_v_btn": "พลิกบนล่าง",
+  "art_nudge_up": "เลื่อนขึ้น",
+  "art_nudge_down": "เลื่อนลง",
+  "art_nudge_left": "เลื่อนซ้าย",
+  "art_nudge_right": "เลื่อนขวา"
 }

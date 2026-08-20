@@ -1380,6 +1380,56 @@ body.dark .art-block-status-2{
   justify-content:center;
 }
 
+/* 移動（ずらす）用の十字パッド。上下左右の4方向ボタンだけを中央に集めた
+   コンパクトな配置にする（マス目のような正方形グリッドではなく、視覚的に
+   「押した方向へ動く」ことが直感的に伝わる十字型を採用） */
+.art-nudge-pad{
+  display:grid;
+  grid-template-columns:repeat(3, 40px);
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  gap:4px;
+  justify-content:center;
+  margin-top:10px;
+}
+
+.art-nudge-btn{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  cursor:pointer;
+}
+
+.art-nudge-btn:hover{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.art-nudge-up{ grid-area:up; }
+.art-nudge-down{ grid-area:down; }
+.art-nudge-left{ grid-area:left; }
+.art-nudge-right{ grid-area:right; }
+
+body.dark .art-nudge-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-nudge-btn:hover{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
 /* トースト通知（保存完了などの短い確認表示） */
 #artToast{
   position:fixed;

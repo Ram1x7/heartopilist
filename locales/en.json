@@ -638,5 +638,12 @@
   "art_color_replace_banner": "Pick a color from the palette to replace it with",
   "art_color_replace_cancel": "Cancel",
   "art_color_replace_start_toast": "Pick the replacement color from the palette",
-  "art_color_replace_done_toast": "{count} cells replaced"
+  "art_color_replace_done_toast": "{count} cells replaced",
+  "art_transform_label": "Flip & move",
+  "art_flip_h_btn": "Flip horizontal",
+  "art_flip_v_btn": "Flip vertical",
+  "art_nudge_up": "Move up",
+  "art_nudge_down": "Move down",
+  "art_nudge_left": "Move left",
+  "art_nudge_right": "Move right"
 }

@@ -614,5 +614,12 @@
   "art_color_replace_banner": "請從調色盤選擇要取代成的顏色",
   "art_color_replace_cancel": "取消",
   "art_color_replace_start_toast": "請從調色盤選擇取代後的顏色",
-  "art_color_replace_done_toast": "已取代{count}格"
+  "art_color_replace_done_toast": "已取代{count}格",
+  "art_transform_label": "翻轉・移動",
+  "art_flip_h_btn": "左右翻轉",
+  "art_flip_v_btn": "上下翻轉",
+  "art_nudge_up": "向上移動",
+  "art_nudge_down": "向下移動",
+  "art_nudge_left": "向左移動",
+  "art_nudge_right": "向右移動"
 }

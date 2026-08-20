@@ -638,5 +638,12 @@
   "art_color_replace_banner": "この色をパレットから選んで置き換え先にしてください",
   "art_color_replace_cancel": "やめる",
   "art_color_replace_start_toast": "置き換え先の色をパレットから選んでください",
-  "art_color_replace_done_toast": "{count}マスを置き換えました"
+  "art_color_replace_done_toast": "{count}マスを置き換えました",
+  "art_transform_label": "反転・移動",
+  "art_flip_h_btn": "左右反転",
+  "art_flip_v_btn": "上下反転",
+  "art_nudge_up": "上へ移動",
+  "art_nudge_down": "下へ移動",
+  "art_nudge_left": "左へ移動",
+  "art_nudge_right": "右へ移動"
 }

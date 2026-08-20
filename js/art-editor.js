@@ -103,6 +103,7 @@ function initArtEditor(){
   bindCanvasEvents();
   bindDisplayToggles();
   bindMyDesignsControls();
+  bindTransformControls();
   bindLockControls();
   bindTutorialControls();
   bindShareCodeControls();
@@ -339,6 +340,8 @@ const SHAPE_TOOLS = new Set(["line", "rect", "circle"]);
 function renderToolbar(){
   const el = document.getElementById("artToolbar");
   el.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
+  const transformSection = document.getElementById("artTransformSection");
+  if(transformSection) transformSection.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
   const toolButtons = TOOLS.map(t => `
     <button class="art-tool-btn${currentTool === t.id ? " active" : ""}" onclick="setTool('${t.id}')" aria-label="${T(t.labelKey, t.labelFallback)}" aria-pressed="${currentTool === t.id}">
       ${icon(t.icon, { size: 18 })}
@@ -1517,6 +1520,65 @@ function clearAll(){
   renderCanvas();
   updateColorUsage();
   saveDraft();
+}
+
+// ── 反転・移動（デザイン全体に対する変形。左右対称のデザイン（服の前後など）を
+// 描く際の効率化のため）。全消去と同様、破壊的だがUndoで戻せるため確認ダイアログは
+// 挟まない。ロック中・ブロック表示モード中はrenderToolbar()側でこの操作全体を
+// 無効化するため、ここでは編集モード等の個別チェックは行わない ──
+function flipCanvas(axis){
+  pushHistory();
+  const newPixels = new Array(pixels.length).fill(null);
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const c = pixels[y * gridWidth + x];
+      if(!c) continue;
+      const nx = axis === "horizontal" ? gridWidth - 1 - x : x;
+      const ny = axis === "vertical" ? gridHeight - 1 - y : y;
+      newPixels[ny * gridWidth + nx] = c;
+    }
+  }
+  pixels = newPixels;
+  finishTransform();
+  showToast(axis === "horizontal" ? T("art_flip_h_btn", "左右反転") : T("art_flip_v_btn", "上下反転"));
+}
+
+// キャンバス全体を1マス分ずらす。はみ出た部分は消え、反対側から新しいマスが現れる
+// わけではない（ループはしない。デザインのズレを直すための小さな微調整という位置づけ）
+function nudgeCanvas(dir){
+  pushHistory();
+  const newPixels = new Array(pixels.length).fill(null);
+  const dx = dir === "left" ? -1 : dir === "right" ? 1 : 0;
+  const dy = dir === "up" ? -1 : dir === "down" ? 1 : 0;
+  for(let y = 0; y < gridHeight; y++){
+    for(let x = 0; x < gridWidth; x++){
+      const c = pixels[y * gridWidth + x];
+      if(!c) continue;
+      const nx = x + dx, ny = y + dy;
+      if(nx < 0 || ny < 0 || nx >= gridWidth || ny >= gridHeight) continue;
+      newPixels[ny * gridWidth + nx] = c;
+    }
+  }
+  pixels = newPixels;
+  finishTransform();
+}
+
+function finishTransform(){
+  highlightedColor = null;
+  inspectedCell = null;
+  renderCanvas();
+  updateColorUsage();
+  saveDraftDebounced();
+}
+
+function bindTransformControls(){
+  document.getElementById("artFlipHBtn").addEventListener("click", () => flipCanvas("horizontal"));
+  document.getElementById("artFlipVBtn").addEventListener("click", () => flipCanvas("vertical"));
+  const dirIcons = { up: "arrowUp", down: "arrowDown", left: "arrowLeft", right: "arrowRight" };
+  document.querySelectorAll("#artNudgePad [data-dir]").forEach(btn => {
+    btn.innerHTML = icon(dirIcons[btn.dataset.dir], { size: 16 });
+    btn.addEventListener("click", () => nudgeCanvas(btn.dataset.dir));
+  });
 }
 
 // ── 下書きの自動保存（作業中の状態のみ。名前を付けた保存はSAVED_DESIGNS_KEY側で管理） ──

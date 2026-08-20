@@ -614,5 +614,12 @@
   "art_color_replace_banner": "팔레트에서 바꿀 색을 선택해주세요",
   "art_color_replace_cancel": "취소",
   "art_color_replace_start_toast": "팔레트에서 바꿀 색을 선택해주세요",
-  "art_color_replace_done_toast": "{count}칸을 바꿨습니다"
+  "art_color_replace_done_toast": "{count}칸을 바꿨습니다",
+  "art_transform_label": "반전・이동",
+  "art_flip_h_btn": "좌우 반전",
+  "art_flip_v_btn": "상하 반전",
+  "art_nudge_up": "위로 이동",
+  "art_nudge_down": "아래로 이동",
+  "art_nudge_left": "왼쪽으로 이동",
+  "art_nudge_right": "오른쪽으로 이동"
 }

@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=38">
+<link rel="stylesheet" href="./css/art.css?v=39">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -134,6 +134,19 @@
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
       <div class="art-color-usage" id="artColorUsage"></div>
+    </div>
+    <div class="art-panel-section" id="artTransformSection">
+      <div class="art-panel-title" data-i18n="art_transform_label">反転・移動</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artFlipHBtn" data-i18n="art_flip_h_btn">左右反転</button>
+        <button class="art-header-btn" id="artFlipVBtn" data-i18n="art_flip_v_btn">上下反転</button>
+      </div>
+      <div class="art-nudge-pad" id="artNudgePad">
+        <button class="art-nudge-btn art-nudge-up" data-dir="up" data-i18n-title="art_nudge_up" title="上へ移動"></button>
+        <button class="art-nudge-btn art-nudge-left" data-dir="left" data-i18n-title="art_nudge_left" title="左へ移動"></button>
+        <button class="art-nudge-btn art-nudge-right" data-dir="right" data-i18n-title="art_nudge_right" title="右へ移動"></button>
+        <button class="art-nudge-btn art-nudge-down" data-dir="down" data-i18n-title="art_nudge_down" title="下へ移動"></button>
+      </div>
     </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_paint_guide_label">ぬり方ガイド</div>
