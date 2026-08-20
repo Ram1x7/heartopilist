@@ -29,11 +29,11 @@ let art3DDisposables = []; // geometry/material/textureをまとめて破棄す�
 // depthはパネル自体の押し出し厚み。rotYはY軸まわりの回転（ラジアン）
 //
 // 【袖について】実機で確認したところ、袖用キャンバス（64×48）のmaskLinesは、
-// 上部が扇形に広く下部が直線的な「型紙」形状（パフスリーブを縫う前に平らに広げた
-// カッティングパターン）だった。これは平らな板を傾けるだけでは正しい形にならず、
-// 筒状に丸めるジオメトリが必要なため、対応できるまで袖は非表示にしている
-// （partsに含めていない）。フロント・バックの胴体のみで、まず正しい厚み・形に
-// なっているかを確認する
+// 上部が円弧状（アームホールに縫い付ける「袖山」のカーブ）、下部が直線（袖口）の
+// 「型紙」形状（パフスリーブを縫う前に平らに広げたカッティングパターン）だった。
+// 平らな板を傾けるだけでは正しい形にならないため、wrapRadiusを指定したパーツは
+// buildWrapGeometry()で型紙の横方向（lx）を円柱面に巻き付け、筒状に丸めてから
+// 配置する。lyの向きはそのまま＝袖山側（型紙上部）が肩に接する側になる
 const FRAME_3D_LAYOUTS = {
   t_shirt: {
     scale: 1 / 16,
@@ -42,6 +42,8 @@ const FRAME_3D_LAYOUTS = {
     parts: [
       { partId: "default", x: 0, y: 0, z: 0.05, rotY: 0 },
       { partId: "canvas-1777194719606", x: 0, y: 0, z: -0.05, rotY: Math.PI },
+      { partId: "canvas-1777197309890", x: -1.7, y: 0.85, z: 0.02, rotY: 0.55, wrapRadius: 0.9 },
+      { partId: "canvas-1777198784026", x: 1.7, y: 0.85, z: 0.02, rotY: -0.55, wrapRadius: 0.9 },
     ],
   },
 };
@@ -102,9 +104,27 @@ function pixelsToTextureCanvas(pixelData, w, h, fallbackColor){
   return c;
 }
 
-// 1パーツ分のパネル（輪郭線を押し出した立体＋テクスチャ）を組み立てる。
-// 保存済みデータがまだないパーツは、無地の生地色で仮表示する（部分的にしか塗って
-// いなくても、モデル全体の形は常に確認できるようにするため）
+// 平らな型紙形状（THREE.Shape）を円柱面に巻き付けた立体に変換する。
+// 型紙のローカルX（lx）を「円柱を上から見た時の角度」とみなし、円周方向に丸める。
+// Y（縦方向）はそのまま高さとして使う（＝袖山〜袖口の向きは維持される）。
+// 押し出しは行わず、面1枚（表裏はDoubleSideマテリアル側で表現）とする
+function buildWrapGeometry(THREE, shape, radius){
+  const geometry = new THREE.ShapeGeometry(shape, 12);
+  const pos = geometry.attributes.position;
+  for(let i = 0; i < pos.count; i++){
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const angle = x / radius;
+    pos.setXYZ(i, radius * Math.sin(angle), y, radius * (1 - Math.cos(angle)));
+  }
+  pos.needsUpdate = true;
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+// 1パーツ分のパネル（輪郭線を押し出した立体、または筒状に巻いた立体＋テクスチャ）を
+// 組み立てる。保存済みデータがまだないパーツは、無地の生地色で仮表示する
+// （部分的にしか塗っていなくても、モデル全体の形は常に確認できるようにするため）
 function buildPanelMesh(THREE, frameId, layout, layoutPart){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
   const partMeta = frame && frame.parts.find(p => p.id === layoutPart.partId);
@@ -120,7 +140,9 @@ function buildPanelMesh(THREE, frameId, layout, layoutPart){
     if(i === 0) shape.moveTo(lx, ly); else shape.lineTo(lx, ly);
   });
 
-  const geometry = new THREE.ExtrudeGeometry(shape, { depth: layout.depth, bevelEnabled: false, curveSegments: 2 });
+  const geometry = layoutPart.wrapRadius
+    ? buildWrapGeometry(THREE, shape, layoutPart.wrapRadius)
+    : new THREE.ExtrudeGeometry(shape, { depth: layout.depth, bevelEnabled: false, curveSegments: 2 });
 
   const found = findPixelDataForPart(frameId, layoutPart.partId);
   const fabricColor = document.body.classList.contains("dark") ? "#4a453c" : "#f4ecd8";
