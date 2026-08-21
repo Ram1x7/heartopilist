@@ -1,15 +1,15 @@
 // js/art-3d.js
 // アイテム別プリセットの3Dプレビュー（検証段階：スウェットのみ対応）。
 //
-// ゲーム内の3Dアセットは一切使わない。既存のmaskLines（輪郭線データ、js/art-masks.js）を
-// 「1着の服を組み立てるための2D型紙」として扱い、フロント・バックの輪郭を頂点レベルで
-// 直接つなぎ合わせた1つの立体として服を構築する。板（PlaneGeometry/ShapeGeometryを
-// そのまま使った平面）を並べる方式は使わない。頂点・法線・インデックスはすべて
-// BufferGeometryとして自前で組み立てる。
+// ゲーム内の3Dアセットは一切使わない。既存のmaskLines（輪郭線データ、js/art-masks.js）は
+// 「正面から見たときのシルエット（幅）」を決めるためだけに使い、奥行き方向の体積は
+// 高さごとの楕円断面リングを積み重ねて生成する。フロント面とバック面を作って薄く
+// つなぐ方式（板を曲げただけに見える）はやめ、最初から立体（横長の楕円〜カプセル状の
+// 断面）として胴体・袖を組み立てる。
 //
-// 現段階ではまず形状の正しさを確認するため、テクスチャは使わず白一色のマテリアルで
-// 表示する。テクスチャ（UVマッピング）は、白いモデルで1着の服として成立している
-// ことを確認できてから追加する。
+// 現段階ではまず形状の正しさを確認するため、テクスチャは使わずグレー一色の
+// マテリアルで表示する。テクスチャ（UVマッピング）は、この形状で1着の服として
+// 成立していることを確認できてから追加する。
 //
 // three.js本体は重いため、ページ読み込み時には読み込まず、3Dプレビューを実際に
 // 開いた時だけCDNから遅延読み込みする（js/music-hum.jsのBasic Pitch読み込みと同じ方式）。
@@ -26,49 +26,59 @@ let art3DAnimHandle = null;
 let art3DResizeObserver = null;
 let art3DDisposables = []; // geometry/material/textureをまとめて破棄するため
 
-// スウェット本体の輪郭（maskLines）のうち、各部位がどのインデックス範囲にあたるかを
-// 実データから特定した固定値。フロント・バックとも同じ順番（肩L→襟ぐり→肩R→
-// 右脇の下→脇〜裾→裾→脇〜裾→左脇の下、を1周）でたどれるようにしてある。
-// armholeR/armholeLは、肩・脇の中間点・脇の下という3点の並び（肩→脇の下の向き）。
-// この3点はそのまま袖の付け根（肩リング）としても使うため、本体側と袖側で
-// 同じ座標を共有する（別々に配置し直さない＝隙間ができない）
-const BODY_LANDMARKS = {
-  front: {
-    shoulderL: 0, neckStart: 1, neckEnd: 9, shoulderR: 10,
-    armholeR: [10, 11, 12], sideHemR: [12, 13], hem: [13, 14],
-    sideHemL: [14, 15], armholeL: [15, 16, 0],
-  },
-  back: {
-    shoulderL: 0, neckStart: 1, neckEnd: 7, shoulderR: 8,
-    armholeR: [8, 9, 10], sideHemR: [10, 11, 12], hem: [12, 13],
-    sideHemL: [13, 14, 15], armholeL: [15, 16, 0],
-  },
-};
+// フロント型紙の右側輪郭を「高さ(ピクセルY)→半幅(中心からのピクセルX)」の折れ線として
+// 持っておき、任意の高さでの胴体の半幅を線形補間で求める（実データから特定した値）。
+// 肩(y=20)〜脇の下の曲がり角(y=48)までは半幅24（肩幅そのまま）、そこから脇の下の
+// 一番外側(y=55)にかけて半幅30まで広がり、裾(y=80)まで半幅30のまま、という実際の
+// テンプレートの形状に合わせている
+const FRONT_WIDTH_PROFILE = [
+  { y: 20, halfX: 24 },
+  { y: 48, halfX: 24 },
+  { y: 55, halfX: 30 },
+  { y: 80, halfX: 30 },
+];
 
-// 襟ぐりの分割点数（フロント9点・バック7点なので、共通の点数にそろえる）。
-// 脇〜裾の分割点数（フロント2点・バック3点なので、同じくそろえる）
-const NECK_RESAMPLE = 9;
-const SIDE_HEM_RESAMPLE = 3;
+// 襟ぐりの実際の開口幅（フロントの襟ぐりの凹みが(28,20)〜(52,20)の間にあることから、
+// 中心からの半幅は(52-28)/2=12ピクセル）
+const NECK_HOLE_HALF_X = 12;
+
+function halfWidthAtPixelY(y){
+  const profile = FRONT_WIDTH_PROFILE;
+  if(y <= profile[0].y) return profile[0].halfX;
+  if(y >= profile[profile.length - 1].y) return profile[profile.length - 1].halfX;
+  for(let i = 0; i < profile.length - 1; i++){
+    const a = profile[i], b = profile[i + 1];
+    if(y >= a.y && y <= b.y){
+      const t = (y - a.y) / (b.y - a.y || 1);
+      return a.halfX + (b.halfX - a.halfX) * t;
+    }
+  }
+  return profile[profile.length - 1].halfX;
+}
 
 const FRAME_3D_LAYOUTS = {
   sweatshirt: {
     scale: 1 / 16,
-    depth: 0.1,
-    cameraDistance: 7.5,
-    front: { partId: "default" },
-    back: { partId: "canvas-1777618043251" },
-    collarRaise: 0.35,
-    collarShrink: 0.85,
-    hemLipRaise: 0.15,
-    hemLipShrink: 0.9,
+    cameraDistance: 8,
+    torso: {
+      // 肩のすぐ下〜裾までを何段の断面リングでたどるか（ピクセルY、実データの
+      // 高さ範囲に合わせている）
+      ringPixelYs: [22, 38, 52, 66, 80],
+      segments: 24,
+      depthMin: 0.32, // 肩・裾に近いところの前後の厚み
+      depthMax: 0.55, // 胴の中央付近の前後の厚み（ここが最大になる）
+      collarRaise: 0.4,
+      collarShrink: 0.8,
+    },
     sleeve: {
-      distances: [0, 0.8, 1.6, 2.4, 3.2],
-      taper: [1, 0.95, 0.85, 0.78, 0.7],
-      blend: [0, 0.3, 0.55, 0.8, 1.0],
-      targetRy: 0.55,
-      targetRz: 0.42,
-      axisRight: { x: 1, y: -0.22, z: 0.08 },
-      axisLeft: { x: -1, y: -0.22, z: 0.08 },
+      segments: 20,
+      ringCount: 6,
+      length: 3.4,
+      startHalfWidth: 0.5,
+      startDepth: 0.42,
+      cuffTaper: 0.68,
+      axisRight: { x: 1, y: -0.32, z: 0.05 },
+      axisLeft: { x: -1, y: -0.32, z: 0.05 },
     },
   },
 };
@@ -125,205 +135,35 @@ function pixelsToTextureCanvas(pixelData, w, h, fallbackColor){
   return c;
 }
 
-// maskLinesの1点（キャンバスのマス座標）を3D空間のローカル座標(x,y)に変換する
-function localizePath(path, w, h, scale){
-  return path.map(pt => ({
-    x: (pt.x - w / 2) * scale,
-    y: (h / 2 - pt.y) * scale, // マス座標は下向きが正のため、3D空間の上向きに反転する
-  }));
-}
-
-// 開いた折れ線（ループしない）を、弧長に沿ってn個の点へ均等に再分割する。
-// 元の点数とnが同じ場合は、余計な補間による誤差を避けるためそのまま返す
-function resampleOpenPoints(pts, n){
-  if(pts.length === n) return pts.map(p => ({ x: p.x, y: p.y }));
-  const segLens = [];
-  let total = 0;
-  for(let i = 0; i < pts.length - 1; i++){
-    const d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
-    segLens.push(d);
-    total += d;
-  }
-  const out = [];
-  for(let k = 0; k < n; k++){
-    const target = n > 1 ? total * k / (n - 1) : 0;
-    let acc = 0, i = 0;
-    while(i < segLens.length - 1 && acc + segLens[i] < target){ acc += segLens[i]; i++; }
-    const a = pts[i], b = pts[i + 1] || pts[i];
-    const segLen = segLens[i] || 1e-9;
-    const t = Math.min(1, Math.max(0, (target - acc) / segLen));
-    out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
-  }
-  return out;
-}
-
-// 本体輪郭（フロントまたはバック）を、肩L→襟ぐり→肩R→右脇の下→脇〜裾→裾→
-// 脇〜裾→左脇の下、の順に1周ぶんの点列としてつなげる。境界の点が前後の区間で
-// 重複しないよう、区間の先頭点は（直前の区間の末尾と同じであるため）省く
-function buildBodyPerimeter(localPts, landmarks){
-  const ordered = [];
-  const push = pts => { pts.forEach(p => ordered.push(p)); };
-
-  push([localPts[landmarks.shoulderL]]);
-  push(resampleOpenPoints(localPts.slice(landmarks.neckStart, landmarks.neckEnd + 1), NECK_RESAMPLE));
-  push([localPts[landmarks.shoulderR]]);
-
-  const armR = landmarks.armholeR.map(i => localPts[i]); // 肩→中間→脇の下
-  push(armR.slice(1));
-
-  const sideHemR = resampleOpenPoints(landmarks.sideHemR.map(i => localPts[i]), SIDE_HEM_RESAMPLE);
-  push(sideHemR.slice(1));
-
-  push([localPts[landmarks.hem[1]]]);
-
-  const sideHemL = resampleOpenPoints(landmarks.sideHemL.map(i => localPts[i]), SIDE_HEM_RESAMPLE);
-  push(sideHemL.slice(1));
-
-  const armL = landmarks.armholeL.map(i => localPts[i]); // 脇の下→中間→肩（肩は次の周でordered[0]と重複するため含めない）
-  push(armL.slice(1, -1));
-
-  return ordered;
-}
+function vlen(v){ return Math.hypot(v.x, v.y, v.z) || 1e-9; }
+function vnorm(v){ const l = vlen(v); return { x: v.x / l, y: v.y / l, z: v.z / l }; }
+function vcross(a, b){ return { x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x }; }
+function vadd(a, b){ return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; }
+function vscale(a, s){ return { x: a.x * s, y: a.y * s, z: a.z * s }; }
 
 function pushTri(positions, p0, p1, p2){
   positions.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
 }
 
-// フロントとバックの輪郭（同じ点数になるようbuildBodyPerimeter()で揃えてある）を
-// 直接つなぎ合わせて1つの胴体メッシュを組み立てる（frontCap＋backCap＋側面）。
-// 右脇・左脇の付け根部分（armholeR/armholeLの3点）は、袖の付け根リングと同じ座標を
-// 共有するため、ここで新たに点を作り直したりはしない
-function buildTorsoGeometry(THREE, frontRing, backRing){
-  const N = frontRing.length;
-  const positions = [];
-
-  const frontContour = frontRing.map(p => new THREE.Vector2(p.x, p.y));
-  THREE.ShapeUtils.triangulateShape(frontContour, []).forEach(([i0, i1, i2]) => {
-    pushTri(positions, frontRing[i0], frontRing[i1], frontRing[i2]);
-  });
-
-  const backContour = backRing.map(p => new THREE.Vector2(p.x, p.y));
-  THREE.ShapeUtils.triangulateShape(backContour, []).forEach(([i0, i1, i2]) => {
-    // バック側は法線が-Z側を向くよう、頂点順序を反転する
-    pushTri(positions, backRing[i0], backRing[i2], backRing[i1]);
-  });
-
-  for(let i = 0; i < N; i++){
-    const j = (i + 1) % N;
-    const f0 = frontRing[i], f1 = frontRing[j], b0 = backRing[i], b1 = backRing[j];
-    pushTri(positions, f0, f1, b1);
-    pushTri(positions, f0, b1, b0);
-  }
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-// 隣接するリング同士をクアッド面（三角形2枚）でつなぎ、連続した筒状メッシュを作る。
-// 両端は開いたまま（キャップは付けない＝首穴・袖口は実際に空洞として見える）
-function buildTubeGeometry(THREE, rings){
-  const positions = [];
-  const K = rings[0].length;
-  for(let r = 0; r < rings.length - 1; r++){
-    const ringA = rings[r], ringB = rings[r + 1];
-    for(let k = 0; k < K; k++){
-      const k2 = (k + 1) % K;
-      const a0 = ringA[k], a1 = ringA[k2], b0 = ringB[k], b1 = ringB[k2];
-      pushTri(positions, a0, a1, b1);
-      pushTri(positions, a0, b1, b0);
-    }
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-function vlen(v){ return Math.hypot(v.x, v.y, v.z) || 1e-9; }
-function vnorm(v){ const l = vlen(v); return { x: v.x / l, y: v.y / l, z: v.z / l }; }
-function vcross(a, b){ return { x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x }; }
-function vdot(a, b){ return a.x * b.x + a.y * b.y + a.z * b.z; }
-function vsub(a, b){ return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z }; }
-function vadd(a, b){ return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; }
-function vscale(a, s){ return { x: a.x * s, y: a.y * s, z: a.z * s }; }
-
-// 肩の付け根リング（armholeHex、6点。本体の脇の下データと同じ座標＝共有頂点）は
-// 六角形のまま（ここを滑らかにすると本体側との溶接が崩れるため）。そこから先は、
-// 六角形の各辺をSLEEVE_RING_SUBSTEPS個に分割した点を基準にして、少しずつ
-// 「平たい断面の楕円」に近づけていく（完全な円筒にはしないが、分割点数を増やす
-// ことで見た目の角ばりを減らし丸みを持たせる）。角度（atan2）を基準にブレンド
-// することで、リングがねじれないようにしている
-const SLEEVE_RING_SUBSTEPS = 3; // 六角形の1辺あたりの分割数（rings[1]以降の点数 = 6 * 3 = 18）
-
-function buildSleeveGeometry(THREE, armholeHex, cfg, axisDir){
-  const axis = vnorm(axisDir);
-  const worldUp = { x: 0, y: 1, z: 0 };
-  let basisV = vcross(axis, worldUp);
-  if(vlen(basisV) < 1e-6) basisV = { x: 0, y: 0, z: 1 };
-  basisV = vnorm(basisV);
-  const basisU = vnorm(vcross(basisV, axis));
-
-  let center0 = { x: 0, y: 0, z: 0 };
-  armholeHex.forEach(p => { center0 = vadd(center0, p); });
-  center0 = vscale(center0, 1 / armholeHex.length);
-
-  const K0 = armholeHex.length;
-  const hexUV = armholeHex.map(p => {
-    const d = vsub(p, center0);
-    return { u: vdot(d, basisU), v: vdot(d, basisV) };
-  });
-
-  // 六角形の各辺をSLEEVE_RING_SUBSTEPS個に線形補間で分割し、なめらかな断面の
-  // 元になる点列を作る（角度はこの補間後の(u,v)から求め直す）
-  const smoothUV = [];
-  for(let k = 0; k < K0; k++){
-    const a = hexUV[k], b = hexUV[(k + 1) % K0];
-    for(let s = 0; s < SLEEVE_RING_SUBSTEPS; s++){
-      const t = s / SLEEVE_RING_SUBSTEPS;
-      const u = a.u + (b.u - a.u) * t;
-      const v = a.v + (b.v - a.v) * t;
-      smoothUV.push({ u, v, angle: Math.atan2(v, u) });
-    }
-  }
-
-  function ringAt(ringIdx){
-    const dist = cfg.distances[ringIdx];
-    const t = cfg.blend[ringIdx];
-    const tp = cfg.taper[ringIdx];
-    const center = vadd(center0, vscale(axis, dist));
-    return smoothUV.map(p => {
-      const ovalU = Math.cos(p.angle) * cfg.targetRy;
-      const ovalV = Math.sin(p.angle) * cfg.targetRz;
-      const u = (p.u * (1 - t) + ovalU * t) * tp;
-      const v = (p.v * (1 - t) + ovalV * t) * tp;
-      return vadd(center, vadd(vscale(basisU, u), vscale(basisV, v)));
+// 中心(center)・半幅(halfWidth、X方向)・奥行き(depth、Z方向)を持つ楕円形の断面リングを
+// segments個の頂点で作る。X=身幅方向、Z=前後方向という胴体の座標系に合わせている
+function buildEllipseRing(center, halfWidth, depth, segments){
+  const ring = [];
+  for(let k = 0; k < segments; k++){
+    const angle = (k / segments) * Math.PI * 2;
+    ring.push({
+      x: center.x + halfWidth * Math.cos(angle),
+      y: center.y,
+      z: center.z + depth * Math.sin(angle),
     });
   }
+  return ring;
+}
 
-  const rings = cfg.distances.map((dist, ringIdx) => (ringIdx === 0 ? armholeHex : ringAt(ringIdx)));
-
-  const positions = [];
-
-  // ring0（6点、本体と共有）→ring1（18点）の橋渡し。六角形の各辺ごとに、
-  // 対応する4つのring1側の点（この辺を3分割してできる境界点）とをつないでいく
-  const ring0 = rings[0], ring1 = rings[1];
-  for(let k = 0; k < K0; k++){
-    const k2 = (k + 1) % K0;
-    const base = k * SLEEVE_RING_SUBSTEPS;
-    const r1a = ring1[base];
-    const r1b = ring1[base + 1];
-    const r1c = ring1[(base + 2) % ring1.length];
-    const r1d = ring1[(base + SLEEVE_RING_SUBSTEPS) % ring1.length];
-    pushTri(positions, ring0[k], r1a, r1b);
-    pushTri(positions, ring0[k], r1b, ring0[k2]);
-    pushTri(positions, ring0[k2], r1b, r1c);
-    pushTri(positions, ring0[k2], r1c, r1d);
-  }
-
-  // ring1〜ring4（すべて同じ点数）は通常のクアッド接続でつなぐ
-  for(let r = 1; r < rings.length - 1; r++){
+// 隣接するリング同士（同じ頂点数であること）をクアッド面（三角形2枚）でつなぎ、
+// 連続した筒状メッシュを作る。両端は開いたまま（キャップは別途capRing()で塞ぐ）
+function lofteRings(positions, rings){
+  for(let r = 0; r < rings.length - 1; r++){
     const ringA = rings[r], ringB = rings[r + 1];
     const K = ringA.length;
     for(let k = 0; k < K; k++){
@@ -332,6 +172,99 @@ function buildSleeveGeometry(THREE, armholeHex, cfg, axisDir){
       pushTri(positions, ringA[k], ringB[k2], ringB[k]);
     }
   }
+}
+
+// 1つのリングを、その重心から放射状の三角形（ファン）で塞ぐ。裾の底面のように、
+// 筒の端を閉じたい場合に使う。reverse=trueで面の表裏（法線の向き）を反転する
+function capRing(positions, ring, reverse){
+  let center = { x: 0, y: 0, z: 0 };
+  ring.forEach(p => { center = vadd(center, p); });
+  center = vscale(center, 1 / ring.length);
+  const K = ring.length;
+  for(let k = 0; k < K; k++){
+    const k2 = (k + 1) % K;
+    if(reverse) pushTri(positions, center, ring[k2], ring[k]);
+    else pushTri(positions, center, ring[k], ring[k2]);
+  }
+}
+
+// 胴体：肩のすぐ下から裾まで、高さごとの楕円断面リングを積み重ねてつなぎ、
+// 「板を曲げたもの」ではなく最初から体積のある立体として作る。
+// 正面から見たときのシルエット（各リングの半幅）は、実際のテンプレートの
+// 輪郭幅（halfWidthAtPixelY）をそのまま使う。奥行き（前後の厚み）は、肩・裾に
+// 近いところで薄く、胴の中央付近で最大になるよう独立したカーブで決める。
+// 首元は、襟ぐりの実際の開口幅に合わせた小さな輪（neckHoleRing）から、少し
+// 内側に縮めて持ち上げた輪（襟の自由端）へさらにロフトすることで、実際に
+// 空洞が見えるリング状の立ち襟にする。裾は底面をふさいで閉じる
+function buildTorsoGeometry(THREE, cfg, scale){
+  const positions = [];
+  const canvasH = 88; // フロント/バックのキャンバス高さ（両方とも80x88）
+  const halfCanvasH = canvasH / 2;
+  const toLocalY = pixelY => (halfCanvasH - pixelY) * scale;
+
+  const shoulderPixelY = cfg.ringPixelYs[0];
+  const shoulderY = toLocalY(shoulderPixelY);
+  const neckHoleHalfWidth = NECK_HOLE_HALF_X * scale;
+
+  const mainRings = cfg.ringPixelYs.map((pixelY, i) => {
+    const y = toLocalY(pixelY);
+    const halfWidth = halfWidthAtPixelY(pixelY) * scale;
+    const t = cfg.ringPixelYs.length > 1 ? i / (cfg.ringPixelYs.length - 1) : 0;
+    const depth = cfg.depthMin + (cfg.depthMax - cfg.depthMin) * Math.sin(Math.PI * t);
+    return buildEllipseRing({ x: 0, y, z: 0 }, halfWidth, depth, cfg.segments);
+  });
+
+  const neckOuter = buildEllipseRing({ x: 0, y: shoulderY, z: 0 }, neckHoleHalfWidth, neckHoleHalfWidth * 0.6, cfg.segments);
+  const neckInner = buildEllipseRing(
+    { x: 0, y: shoulderY + cfg.collarRaise, z: 0 },
+    neckHoleHalfWidth * cfg.collarShrink,
+    neckHoleHalfWidth * 0.6 * cfg.collarShrink,
+    cfg.segments
+  );
+
+  // 首の内側リング（立ち襟の自由端）→襟ぐりの開口→肩→…→裾、という順に全部つなげる。
+  // 首の内側リングの先（さらに上）は開いたまま＝実際に空洞として見える
+  const allRings = [neckInner, neckOuter, ...mainRings];
+  lofteRings(positions, allRings);
+  capRing(positions, mainRings[mainRings.length - 1], false); // 裾の底面を閉じる
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return { geometry, shoulderY };
+}
+
+// 袖：肩から袖口まで、高さ（腕の軸方向の距離）ごとの楕円断面リングを積み重ねて
+// 連続した筒状メッシュにする。円ではなく楕円断面にし、肩から袖口に向かって
+// 少しずつ細くする。腕は重力でわずかに下に垂れているような角度（axisDir）にする。
+// 付け根は胴体の肩の高さ・幅に合わせた位置に置き、めり込ませることで隙間なく
+// 接続する（頂点そのものを完全に共有する溶接までは行っていない）
+function buildSleeveGeometry(THREE, cfg, originCenter, axisDir){
+  const axis = vnorm(axisDir);
+  const worldUp = { x: 0, y: 1, z: 0 };
+  let basisV = vcross(axis, worldUp);
+  if(vlen(basisV) < 1e-6) basisV = { x: 0, y: 0, z: 1 };
+  basisV = vnorm(basisV);
+  const basisU = vnorm(vcross(basisV, axis));
+
+  const rings = [];
+  for(let i = 0; i < cfg.ringCount; i++){
+    const t = cfg.ringCount > 1 ? i / (cfg.ringCount - 1) : 0;
+    const dist = cfg.length * t;
+    const taper = 1 - (1 - cfg.cuffTaper) * t;
+    const center = vadd(originCenter, vscale(axis, dist));
+    const ring = [];
+    for(let k = 0; k < cfg.segments; k++){
+      const angle = (k / cfg.segments) * Math.PI * 2;
+      const u = cfg.startHalfWidth * taper * Math.cos(angle);
+      const v = cfg.startDepth * taper * Math.sin(angle);
+      ring.push(vadd(center, vadd(vscale(basisU, u), vscale(basisV, v))));
+    }
+    rings.push(ring);
+  }
+
+  const positions = [];
+  lofteRings(positions, rings);
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
@@ -339,93 +272,28 @@ function buildSleeveGeometry(THREE, armholeHex, cfg, axisDir){
   return geometry;
 }
 
-// 首まわりのリブ襟・裾のふち：外周リング（体表面にある実際の輪郭）と、それを少し
-// 中心側へ縮めて持ち上げた内周リングの間をロフトし、リング状の立体（両端が開いた
-// 筒）を作る。首元は「外周リング〜内周リングの筒」＋「内周リングの内側は何も
-// 塞がない」ことで、実際に空洞として見える首穴になる
-function buildLipGeometry(THREE, outerRing, raise, shrink){
-  let centroid = { x: 0, y: 0, z: 0 };
-  outerRing.forEach(p => { centroid = vadd(centroid, p); });
-  centroid = vscale(centroid, 1 / outerRing.length);
-  const innerRing = outerRing.map(p => ({
-    x: centroid.x + (p.x - centroid.x) * shrink,
-    y: p.y + raise,
-    z: centroid.z + (p.z - centroid.z) * shrink,
-  }));
-  return buildTubeGeometry(THREE, [outerRing, innerRing]);
-}
-
-// 本体の襟ぐり（フロントの弧＋バックの弧）を1つの連続したリングにする。
-// フロント弧は肩L側→肩R側、バック弧も肩L側→肩R側の順に取れるので、バック側は
-// 逆順にしてつなぐことで、肩L→…→肩R→（バックの肩R側）→…→肩L、という
-// 1周する輪にする
-function buildNeckRing(frontLocal, backLocal, halfDepth){
-  const f = BODY_LANDMARKS.front, b = BODY_LANDMARKS.back;
-  const frontNeck = resampleOpenPoints(frontLocal.slice(f.neckStart, f.neckEnd + 1), NECK_RESAMPLE)
-    .map(p => ({ x: p.x, y: p.y, z: halfDepth }));
-  const backNeck = resampleOpenPoints(backLocal.slice(b.neckStart, b.neckEnd + 1), NECK_RESAMPLE)
-    .map(p => ({ x: p.x, y: p.y, z: -halfDepth }));
-  return frontNeck.concat(backNeck.slice().reverse());
-}
-
-// スウェット1着分の立体をTHREE.Groupとして組み立てる（現段階はテクスチャなし、白一色）。
-// Body（フロント・バック・側面・肩・脇の下を1つのロフトでつなぐ）／Sleeves（肩の
-// 付け根から袖口まで連続したリングの筒）／Collar（首ぐりのリング状の立ち襟）／
-// Hem（裾の内側の折り返し風のふち）で構成する
+// スウェット1着分の立体をTHREE.Groupとして組み立てる（現段階はテクスチャなし、
+// グレー一色）。胴体は高さごとの楕円断面リングを積み重ねた1つの立体、首元は
+// 実際に空洞のあるリング状の立ち襟、袖は肩から袖口まで楕円断面が連続する筒
 function buildSweatshirtGroup(THREE){
   const cfg = FRAME_3D_LAYOUTS.sweatshirt;
-  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === "sweatshirt");
   const group = new THREE.Group();
-  const halfDepth = cfg.depth / 2;
-
-  const frontMeta = frame.parts.find(p => p.id === cfg.front.partId);
-  const backMeta = frame.parts.find(p => p.id === cfg.back.partId);
-  const frontPath = PRESET_MASKS.sweatshirt[cfg.front.partId].maskLines[1];
-  const backPath = PRESET_MASKS.sweatshirt[cfg.back.partId].maskLines[1];
-  const frontLocal = localizePath(frontPath, frontMeta.width, frontMeta.height, cfg.scale);
-  const backLocal = localizePath(backPath, backMeta.width, backMeta.height, cfg.scale);
-
-  const frontOrdered = buildBodyPerimeter(frontLocal, BODY_LANDMARKS.front).map(p => ({ x: p.x, y: p.y, z: halfDepth }));
-  const backOrdered = buildBodyPerimeter(backLocal, BODY_LANDMARKS.back).map(p => ({ x: p.x, y: p.y, z: -halfDepth }));
-
-  const material = new THREE.MeshStandardMaterial({ color: 0xffffff, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  const material = new THREE.MeshStandardMaterial({ color: 0xbfbab0, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
   art3DDisposables.push(material);
 
-  const torsoGeometry = buildTorsoGeometry(THREE, frontOrdered, backOrdered);
+  const { geometry: torsoGeometry, shoulderY } = buildTorsoGeometry(THREE, cfg.torso, cfg.scale);
   art3DDisposables.push(torsoGeometry);
   group.add(new THREE.Mesh(torsoGeometry, material));
 
-  // 首元：フロント・バックの襟ぐりを1つのリングにし、少し持ち上げた内周リングとの
-  // 間をロフトして、穴の開いた立ち襟にする
-  const neckOuter = buildNeckRing(frontLocal, backLocal, halfDepth);
-  const collarGeometry = buildLipGeometry(THREE, neckOuter, cfg.collarRaise, cfg.collarShrink);
-  art3DDisposables.push(collarGeometry);
-  group.add(new THREE.Mesh(collarGeometry, material));
-
-  // 裾：本体の裾（フロント2点＋バック2点）を1つのリングにし、少し内側に縮めて
-  // 持ち上げた内周リングとの間をロフトして、裾の折り返しのような厚みを作る
-  const hemOuter = [
-    { x: frontLocal[BODY_LANDMARKS.front.hem[0]].x, y: frontLocal[BODY_LANDMARKS.front.hem[0]].y, z: halfDepth },
-    { x: frontLocal[BODY_LANDMARKS.front.hem[1]].x, y: frontLocal[BODY_LANDMARKS.front.hem[1]].y, z: halfDepth },
-    { x: backLocal[BODY_LANDMARKS.back.hem[1]].x, y: backLocal[BODY_LANDMARKS.back.hem[1]].y, z: -halfDepth },
-    { x: backLocal[BODY_LANDMARKS.back.hem[0]].x, y: backLocal[BODY_LANDMARKS.back.hem[0]].y, z: -halfDepth },
-  ];
-  const hemGeometry = buildLipGeometry(THREE, hemOuter, cfg.hemLipRaise, cfg.hemLipShrink);
-  art3DDisposables.push(hemGeometry);
-  group.add(new THREE.Mesh(hemGeometry, material));
-
-  // 袖：肩の付け根（本体のarmholeR/armholeLと同じ座標）から袖口まで、連続した
-  // リングの筒として生成する。本体側の点をそのまま使うため、肩と袖の間に
-  // 隙間ができない
+  const shoulderHalfWidth = halfWidthAtPixelY(cfg.torso.ringPixelYs[0]) * cfg.scale;
   [
-    { armhole: BODY_LANDMARKS.front.armholeR, armholeBack: BODY_LANDMARKS.back.armholeR, axis: cfg.sleeve.axisRight },
-    { armhole: BODY_LANDMARKS.front.armholeL, armholeBack: BODY_LANDMARKS.back.armholeL, axis: cfg.sleeve.axisLeft },
+    { sign: 1, axis: cfg.sleeve.axisRight },
+    { sign: -1, axis: cfg.sleeve.axisLeft },
   ].forEach(side => {
-    const frontArm = side.armhole.map(i => ({ x: frontLocal[i].x, y: frontLocal[i].y, z: halfDepth }));
-    const backArm = side.armholeBack.map(i => ({ x: backLocal[i].x, y: backLocal[i].y, z: -halfDepth }));
-    // 肩→中間→脇の下（フロント）→脇の下→中間→肩（バック、逆順）で閉じた六角形リングにする
-    const shoulderRing = [frontArm[0], frontArm[1], frontArm[2], backArm[2], backArm[1], backArm[0]];
-    const sleeveGeometry = buildSleeveGeometry(THREE, shoulderRing, cfg.sleeve, side.axis);
+    // 肩リングの側面（角度0＝右／角度180度＝左に相当する点）のすぐ内側に袖の
+    // 付け根を置くことで、胴体の表面と重なり合い、隙間ができないようにする
+    const originCenter = { x: side.sign * shoulderHalfWidth * 0.85, y: shoulderY - 0.15, z: 0 };
+    const sleeveGeometry = buildSleeveGeometry(THREE, cfg.sleeve, originCenter, side.axis);
     art3DDisposables.push(sleeveGeometry);
     group.add(new THREE.Mesh(sleeveGeometry, material));
   });
