@@ -1,18 +1,29 @@
 // js/art-screenshot-import.js
 // 「スクショから取り込む」機能（art-create.htmlの「新規作成」モーダルから開く）。
 //
-// フロー：スクショをアップロード → 衣装が写っている範囲をドラッグで指定 →
-// 既存のDESIGN_FRAME_PRESETS（js/art-config.js）と範囲のアスペクト比を比較して
+// フロー：スクショをアップロード → 画像全体を自動解析して衣装らしき範囲を検出 →
+// 既存のDESIGN_FRAME_PRESETS（js/art-config.js）と検出範囲のアスペクト比を比較して
 // 候補キャンバスを提示 → ユーザーが確認（または一覧から手動選択）→ パーツ選択 →
 // 色数・背景処理を調整しながらプレビュー → 既存のhatopiArt_currentDraft経由で
 // art-editorへ引き渡す。
 //
+// 範囲はユーザーがドラッグ指定するのではなく、画像から自動検出する
+// （手作業での範囲指定は不要という要望に基づく）。
+//
 // 重要：外部AI APIには一切依存しない。画像処理・パレット変換は js/art-pixelate.js
 // （元々js/art-converter.jsにあった処理を共通化したもの）をそのまま利用する。
 //
+// 範囲の自動検出について（正直な制約の開示）：
+// 四隅から連結する近似色領域を「背景」とみなすフラッドフィル（js/art-pixelate.jsの
+// computeBackgroundMask、既存の「画像から作る」機能の背景除去と同じロジック）を使い、
+// 背景ではないと判定された部分の外接矩形を「衣装が写っている範囲」とみなしている。
+// そのため、背景が単色に近い（キャラクター表示画面のような無地寄りの背景）ほど精度が
+// 上がり、背景が複雑な通常のゲーム画面では検出範囲が画像全体に近くなることがある。
+// 本格的な人物・衣装の輪郭認識ではなく、あくまで背景色との差分に基づく簡易検出である。
+//
 // キャンバス自動判定について（正直な制約の開示）：
 // 「衣装の輪郭・特徴点からの本格的な画像認識」はブラウザ内・AI API無しでは
-// 安定した精度が出せないため、今回はアスペクト比（選択範囲の縦横比 と
+// 安定した精度が出せないため、今回はアスペクト比（検出範囲の縦横比 と
 // 各テンプレートパーツのwidth:height比の近さ）＋衣装カテゴリでの絞り込みのみを
 // 使った控えめなヒューリスティックとしている。自信度が低い場合や、同じ比率の
 // パーツ（例：Tシャツのフロントとバック）は区別できないため、常に手動選択・
@@ -20,24 +31,24 @@
 
 const SSI_MAX_WORKING_DIM = 1600; // iPad等でのメモリ超過を避けるための内部処理用画像の最大辺
 const SSI_MIN_IMAGE_DIM = 64; // これより小さい画像はエラーにする
-const SSI_MIN_REGION_CSS_PX = 24; // 範囲選択の最小サイズ（CSSピクセル、誤操作防止）
 const SSI_COLOR_COUNTS = [4, 8, 16, 32, 64, 128];
 const SSI_BG_MODES = [
   { id: "auto", labelKey: "art_ssi_bg_auto", labelFallback: "自動" },
   { id: "keep", labelKey: "art_ssi_bg_keep", labelFallback: "そのまま" },
   { id: "white", labelKey: "art_ssi_bg_white", labelFallback: "白背景" },
 ];
-const SSI_HANDLE_HIT_PX = 22; // 四隅ハンドルの当たり判定（CSSピクセル）
 
 let ssiWorkingCanvas = null; // 縮小済みの内部処理用画像（ここから範囲切り抜き・変換を行う）
-let ssiRegionRect = null; // 確定した範囲（working canvasのピクセル座標）{x,y,w,h}
-let ssiDraftRectCss = null; // 選択中（未確定）の範囲。CSS座標 {x,y,w,h}
-let ssiDragMode = null; // "new" | "move-corner" | null
-let ssiDragHandleIndex = -1; // ドラッグ中の角のインデックス（0:左上,1:右上,2:右下,3:左下）
-let ssiDragStart = null;
+let ssiRegionRect = null; // 自動検出された範囲（working canvasのピクセル座標）{x,y,w,h}
 let ssiSelectedFrameId = null;
 let ssiSelectedPartId = null;
-let ssiSettings = { colors: 32, dither: true, bg: "auto" };
+// bgの既定値は"keep"（背景除去なし）にしている。自動検出した範囲は既に
+// 「背景ではない部分」の外接矩形へタイトに切り詰められているため、ここでさらに
+// auto背景除去をかけると、単色の衣装（例：無地Tシャツ）がクロップ全体を占めて
+// 四隅まで同じ色になり、それ自体を「背景」と誤認して丸ごと消えてしまうことがある。
+// 背景の写り込みが残っている場合のために"auto"/"white"は選べるようにしておくが、
+// 既定はユーザーが明示的に選ぶまで安全側の"keep"とする
+let ssiSettings = { colors: 32, dither: true, bg: "keep" };
 let ssiLastComputedPixels = null;
 
 function ssiT(key, fallback){
@@ -63,19 +74,16 @@ function closeScreenshotImportModal(){
 function ssiResetState(){
   ssiWorkingCanvas = null;
   ssiRegionRect = null;
-  ssiDraftRectCss = null;
-  ssiDragMode = null;
   ssiSelectedFrameId = null;
   ssiSelectedPartId = null;
   ssiLastComputedPixels = null;
   document.getElementById("artSsiFileInput").value = "";
   document.getElementById("artSsiUploadError").textContent = "";
   document.getElementById("artSsiSettingsError").textContent = "";
-  document.getElementById("artSsiRegionConfirmBtn").disabled = true;
   document.getElementById("artSsiManualFrameOptions").style.display = "none";
 }
 
-const SSI_STEPS = ["upload", "region", "candidates", "part", "settings"];
+const SSI_STEPS = ["upload", "candidates", "part", "settings"];
 function ssiGoToStep(step){
   SSI_STEPS.forEach(s => {
     document.getElementById(`artSsiStep${s.charAt(0).toUpperCase()}${s.slice(1)}`).style.display = (s === step) ? "" : "none";
@@ -108,13 +116,14 @@ function ssiHandleFileSelect(file){
       }
       try{
         ssiPrepareWorkingCanvas(img);
+        ssiRegionRect = ssiAutoDetectRegion(ssiWorkingCanvas);
       }catch(e){
         console.error(e);
         errorEl.textContent = ssiT("art_ssi_error_processing", "この端末では画像の処理に失敗しました。別の画像や端末でお試しください");
         return;
       }
-      ssiGoToStep("region");
-      ssiSetupRegionStage();
+      ssiGoToStep("candidates");
+      ssiRenderCandidates();
     };
     img.src = reader.result;
   };
@@ -135,154 +144,36 @@ function ssiPrepareWorkingCanvas(img){
   ssiWorkingCanvas = canvas;
 }
 
-// ── STEP2: 範囲選択 ──
-function ssiSetupRegionStage(){
-  const img = document.getElementById("artSsiImg");
-  const overlay = document.getElementById("artSsiRegionOverlay");
-  img.src = ssiWorkingCanvas.toDataURL("image/png");
-  ssiDraftRectCss = null;
-  document.getElementById("artSsiRegionConfirmBtn").disabled = true;
-  img.onload = () => {
-    ssiResizeOverlayToImage();
-    ssiRenderRegionOverlay();
-  };
-}
-
-function ssiResizeOverlayToImage(){
-  const img = document.getElementById("artSsiImg");
-  const overlay = document.getElementById("artSsiRegionOverlay");
-  const dpr = window.devicePixelRatio || 1;
-  const w = img.clientWidth || img.naturalWidth;
-  const h = img.clientHeight || img.naturalHeight;
-  overlay.style.width = w + "px";
-  overlay.style.height = h + "px";
-  overlay.width = Math.round(w * dpr);
-  overlay.height = Math.round(h * dpr);
-}
-
-function ssiRenderRegionOverlay(){
-  const overlay = document.getElementById("artSsiRegionOverlay");
-  const ctx = overlay.getContext("2d");
-  const dpr = window.devicePixelRatio || 1;
-  const w = overlay.width, h = overlay.height;
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "rgba(0,0,0,0.45)";
-  ctx.fillRect(0, 0, w, h);
-  const rect = ssiDraftRectCss;
-  if(!rect) return;
-  const rx = rect.x * dpr, ry = rect.y * dpr, rw = rect.w * dpr, rh = rect.h * dpr;
-  ctx.clearRect(rx, ry, rw, rh);
-  ctx.strokeStyle = "#ffdd55";
-  ctx.lineWidth = 2 * dpr;
-  ctx.strokeRect(rx, ry, rw, rh);
-  const handleSize = 10 * dpr;
-  const corners = ssiRectCorners(rect);
-  ctx.fillStyle = "#ffdd55";
-  corners.forEach(([cx, cy]) => {
-    ctx.fillRect(cx * dpr - handleSize / 2, cy * dpr - handleSize / 2, handleSize, handleSize);
-  });
-}
-
-function ssiRectCorners(rect){
-  return [
-    [rect.x, rect.y],
-    [rect.x + rect.w, rect.y],
-    [rect.x + rect.w, rect.y + rect.h],
-    [rect.x, rect.y + rect.h],
-  ];
-}
-
-function ssiPointerPos(e){
-  const overlay = document.getElementById("artSsiRegionOverlay");
-  const box = overlay.getBoundingClientRect();
-  return { x: e.clientX - box.left, y: e.clientY - box.top };
-}
-
-function ssiFindHandleAt(pos){
-  if(!ssiDraftRectCss) return -1;
-  const corners = ssiRectCorners(ssiDraftRectCss);
-  for(let i = 0; i < corners.length; i++){
-    const [cx, cy] = corners[i];
-    if(Math.abs(pos.x - cx) <= SSI_HANDLE_HIT_PX && Math.abs(pos.y - cy) <= SSI_HANDLE_HIT_PX) return i;
+// 画像全体から「衣装が写っていそうな範囲」を自動検出する。
+// js/art-pixelate.jsのcomputeBackgroundMask（四隅から連結する近似色領域を背景とみなす
+// フラッドフィル、既存の「画像から作る」機能の背景除去と同じロジック）を流用し、
+// 背景ではないと判定された全ピクセルの外接矩形を範囲として使う。
+// 背景除去で何も検出できなかった場合（画面全体が単色に近い等）は画像全体を対象にする
+function ssiAutoDetectRegion(canvas){
+  const w = canvas.width, h = canvas.height;
+  const ctx = canvas.getContext("2d");
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const bgMask = computeBackgroundMask(imgData, "auto");
+  let minX = w, minY = h, maxX = -1, maxY = -1;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      if(!bgMask[y * w + x]){
+        if(x < minX) minX = x;
+        if(x > maxX) maxX = x;
+        if(y < minY) minY = y;
+        if(y > maxY) maxY = y;
+      }
+    }
   }
-  return -1;
+  if(maxX < minX || maxY < minY){
+    return { x: 0, y: 0, w, h };
+  }
+  return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
 }
 
-function ssiBindRegionInteractions(){
-  const overlay = document.getElementById("artSsiRegionOverlay");
-  overlay.style.touchAction = "none";
-
-  overlay.addEventListener("pointerdown", (e) => {
-    overlay.setPointerCapture(e.pointerId);
-    const pos = ssiPointerPos(e);
-    const handleIdx = ssiFindHandleAt(pos);
-    if(handleIdx >= 0){
-      ssiDragMode = "move-corner";
-      ssiDragHandleIndex = handleIdx;
-    }else{
-      ssiDragMode = "new";
-      ssiDraftRectCss = { x: pos.x, y: pos.y, w: 0, h: 0 };
-      ssiDragStart = pos;
-    }
-    e.preventDefault();
-  });
-
-  overlay.addEventListener("pointermove", (e) => {
-    if(!ssiDragMode) return;
-    const pos = ssiPointerPos(e);
-    const overlayW = overlay.clientWidth, overlayH = overlay.clientHeight;
-    const cx = Math.max(0, Math.min(overlayW, pos.x));
-    const cy = Math.max(0, Math.min(overlayH, pos.y));
-    if(ssiDragMode === "new"){
-      const x0 = Math.min(ssiDragStart.x, cx), y0 = Math.min(ssiDragStart.y, cy);
-      const x1 = Math.max(ssiDragStart.x, cx), y1 = Math.max(ssiDragStart.y, cy);
-      ssiDraftRectCss = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
-    }else if(ssiDragMode === "move-corner"){
-      const corners = ssiRectCorners(ssiDraftRectCss);
-      const opposite = corners[(ssiDragHandleIndex + 2) % 4];
-      const x0 = Math.min(opposite[0], cx), y0 = Math.min(opposite[1], cy);
-      const x1 = Math.max(opposite[0], cx), y1 = Math.max(opposite[1], cy);
-      ssiDraftRectCss = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
-    }
-    ssiRenderRegionOverlay();
-    e.preventDefault();
-  });
-
-  const endDrag = () => {
-    ssiDragMode = null;
-    ssiDragHandleIndex = -1;
-    const rect = ssiDraftRectCss;
-    document.getElementById("artSsiRegionConfirmBtn").disabled =
-      !rect || rect.w < SSI_MIN_REGION_CSS_PX || rect.h < SSI_MIN_REGION_CSS_PX;
-  };
-  overlay.addEventListener("pointerup", endDrag);
-  overlay.addEventListener("pointercancel", endDrag);
-
-  window.addEventListener("resize", () => {
-    if(document.getElementById("artSsiStepRegion").style.display === "none") return;
-    ssiResizeOverlayToImage();
-    ssiRenderRegionOverlay();
-  });
-}
-
-function ssiConfirmRegion(){
-  const rect = ssiDraftRectCss;
-  if(!rect || rect.w < SSI_MIN_REGION_CSS_PX || rect.h < SSI_MIN_REGION_CSS_PX) return;
-  const img = document.getElementById("artSsiImg");
-  const scale = ssiWorkingCanvas.width / (img.clientWidth || ssiWorkingCanvas.width);
-  ssiRegionRect = {
-    x: Math.round(rect.x * scale),
-    y: Math.round(rect.y * scale),
-    w: Math.max(1, Math.round(rect.w * scale)),
-    h: Math.max(1, Math.round(rect.h * scale)),
-  };
-  ssiGoToStep("candidates");
-  ssiRenderCandidates();
-}
-
-// ── STEP3: キャンバス候補 ──
-// 正直な前提：ここでは本格的な画像認識は行わず、選択範囲のアスペクト比と各テンプレート
-// パーツのwidth:height比の近さだけをスコアにしている（対数比の差を正規化）。
+// ── STEP2: キャンバス候補 ──
+// 正直な前提：ここでは本格的な画像認識は行わず、自動検出した範囲のアスペクト比と
+// 各テンプレートパーツのwidth:height比の近さだけをスコアにしている（対数比の差を正規化）。
 // 同じ比率のパーツ（例：フロントとバック）は区別できないため、フレーム単位で
 // スコアリングし、パーツの選択は次のステップでユーザー自身に行ってもらう。
 function ssiComputeCandidates(rect){
@@ -306,6 +197,21 @@ const SSI_CONFIDENCE_THRESHOLD = 0.55;
 
 function ssiRenderCandidates(){
   const lang = (typeof currentLang === "function") ? currentLang() : "ja";
+
+  // 自動検出した範囲をプレビュー表示（透明性のため。操作は不要）
+  const previewCanvas = document.getElementById("artSsiDetectedPreview");
+  if(previewCanvas && ssiWorkingCanvas && ssiRegionRect){
+    const maxBox = 140;
+    const scale = Math.min(1, maxBox / Math.max(ssiRegionRect.w, ssiRegionRect.h));
+    previewCanvas.width = Math.max(1, Math.round(ssiRegionRect.w * scale));
+    previewCanvas.height = Math.max(1, Math.round(ssiRegionRect.h * scale));
+    previewCanvas.getContext("2d").drawImage(
+      ssiWorkingCanvas,
+      ssiRegionRect.x, ssiRegionRect.y, ssiRegionRect.w, ssiRegionRect.h,
+      0, 0, previewCanvas.width, previewCanvas.height
+    );
+  }
+
   const candidates = ssiComputeCandidates(ssiRegionRect);
   const top = candidates.slice(0, 5);
   const listEl = document.getElementById("artSsiCandidateList");
@@ -377,7 +283,7 @@ function ssiRenderPartOptions(frame){
   });
 }
 
-// ── STEP4: 色数・背景の調整とプレビュー ──
+// ── STEP3: 色数・背景の調整とプレビュー ──
 function ssiCurrentPart(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === ssiSelectedFrameId);
   if(!frame) return null;
@@ -422,7 +328,7 @@ function ssiUpdatePreview(){
     drawPixelsToCanvas(resultCanvas, pixels, part.width, part.height, maxBox);
   }catch(e){
     console.error(e);
-    errorEl.textContent = ssiT("art_ssi_error_extract_failed", "デザインの抽出に失敗しました。範囲を選び直すか、別の画像でお試しください");
+    errorEl.textContent = ssiT("art_ssi_error_extract_failed", "デザインの抽出に失敗しました。別の画像でお試しください");
   }
 }
 
@@ -446,7 +352,7 @@ function ssiApplyToEditor(){
   const part = ssiCurrentPart();
   const errorEl = document.getElementById("artSsiSettingsError");
   if(!part || !ssiLastComputedPixels){
-    errorEl.textContent = ssiT("art_ssi_error_extract_failed", "デザインの抽出に失敗しました。範囲を選び直すか、別の画像でお試しください");
+    errorEl.textContent = ssiT("art_ssi_error_extract_failed", "デザインの抽出に失敗しました。別の画像でお試しください");
     return;
   }
   const existing = localStorage.getItem("hatopiArt_currentDraft");
@@ -479,8 +385,6 @@ function bindScreenshotImportControls(){
   document.getElementById("artSsiFileInput").addEventListener("change", (e) => {
     ssiHandleFileSelect(e.target.files && e.target.files[0]);
   });
-  ssiBindRegionInteractions();
-  document.getElementById("artSsiRegionConfirmBtn").addEventListener("click", ssiConfirmRegion);
   document.getElementById("artSsiManualPickLink").addEventListener("click", () => {
     const el = document.getElementById("artSsiManualFrameOptions");
     el.style.display = el.style.display === "none" ? "" : "none";

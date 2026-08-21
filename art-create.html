@@ -247,26 +247,13 @@
       <div class="art-ssi-error" id="artSsiUploadError"></div>
     </div>
 
-    <div id="artSsiStepRegion" style="display:none">
-      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('upload')">
-        <span id="artSsiRegionBackIcon"></span>
-        <span data-i18n="art_gridsize_back">戻る</span>
-      </a>
-      <p class="art-step-hint" data-i18n="art_ssi_region_hint">衣装が写っている範囲をドラッグして囲んでください。四隅をドラッグして微調整もできます</p>
-      <div class="art-ssi-region-wrap" id="artSsiRegionWrap">
-        <img id="artSsiImg" alt="" draggable="false">
-        <canvas id="artSsiRegionOverlay"></canvas>
-      </div>
-      <div class="art-panel-btn-row">
-        <button class="art-header-btn" id="artSsiRegionConfirmBtn" data-i18n="art_ssi_region_confirm" disabled>この範囲で決定</button>
-      </div>
-    </div>
-
     <div id="artSsiStepCandidates" style="display:none">
-      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('region')">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('upload')">
         <span id="artSsiCandidatesBackIcon"></span>
         <span data-i18n="art_gridsize_back">戻る</span>
       </a>
+      <p class="art-step-hint" data-i18n="art_ssi_auto_detect_hint">画像から衣装らしき範囲を自動検出しました（背景が単色に近いほど精度が上がります）</p>
+      <canvas class="art-ssi-detected-preview" id="artSsiDetectedPreview"></canvas>
       <div id="artSsiCandidateAutoWrap">
         <p class="art-step-hint" data-i18n="art_ssi_candidate_hint">このキャンバスで合っていますか？</p>
         <div class="art-ssi-candidate-list" id="artSsiCandidateList"></div>
