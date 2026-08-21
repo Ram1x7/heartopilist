@@ -249,11 +249,15 @@ function vsub(a, b){ return { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z }; }
 function vadd(a, b){ return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; }
 function vscale(a, s){ return { x: a.x * s, y: a.y * s, z: a.z * s }; }
 
-// 肩の付け根リング（armholeHex、本体の脇の下データと同じ座標＝共有頂点）を出発点に、
-// 腕の軸方向にリングを並べていく。各リングは、肩リングの実際の（左右非対称な）形から、
-// 少しずつ「平たい断面の楕円」に近づけていく（完全な円筒にはしない）。
-// 角度（atan2）を基準にブレンドすることで、リングがねじれないようにしている
-function buildSleeveRings(armholeHex, cfg, axisDir){
+// 肩の付け根リング（armholeHex、6点。本体の脇の下データと同じ座標＝共有頂点）は
+// 六角形のまま（ここを滑らかにすると本体側との溶接が崩れるため）。そこから先は、
+// 六角形の各辺をSLEEVE_RING_SUBSTEPS個に分割した点を基準にして、少しずつ
+// 「平たい断面の楕円」に近づけていく（完全な円筒にはしないが、分割点数を増やす
+// ことで見た目の角ばりを減らし丸みを持たせる）。角度（atan2）を基準にブレンド
+// することで、リングがねじれないようにしている
+const SLEEVE_RING_SUBSTEPS = 3; // 六角形の1辺あたりの分割数（rings[1]以降の点数 = 6 * 3 = 18）
+
+function buildSleeveGeometry(THREE, armholeHex, cfg, axisDir){
   const axis = vnorm(axisDir);
   const worldUp = { x: 0, y: 1, z: 0 };
   let basisV = vcross(axis, worldUp);
@@ -265,31 +269,74 @@ function buildSleeveRings(armholeHex, cfg, axisDir){
   armholeHex.forEach(p => { center0 = vadd(center0, p); });
   center0 = vscale(center0, 1 / armholeHex.length);
 
-  const baseOffsets = armholeHex.map(p => {
+  const K0 = armholeHex.length;
+  const hexUV = armholeHex.map(p => {
     const d = vsub(p, center0);
-    const u = vdot(d, basisU);
-    const v = vdot(d, basisV);
-    return { u, v, angle: Math.atan2(v, u) };
+    return { u: vdot(d, basisU), v: vdot(d, basisV) };
   });
 
-  return cfg.distances.map((dist, ringIdx) => {
-    if(ringIdx === 0){
-      // 肩の付け根リング（本体のarmholeR/armholeLと共有する頂点）はそのまま返す。
-      // ここで（u,v）平面へ射影して作り直すと、軸方向の成分が失われて元の座標から
-      // ずれてしまい、本体側との溶接（隙間なし）が崩れてしまうため
-      return armholeHex.map(p => ({ x: p.x, y: p.y, z: p.z }));
+  // 六角形の各辺をSLEEVE_RING_SUBSTEPS個に線形補間で分割し、なめらかな断面の
+  // 元になる点列を作る（角度はこの補間後の(u,v)から求め直す）
+  const smoothUV = [];
+  for(let k = 0; k < K0; k++){
+    const a = hexUV[k], b = hexUV[(k + 1) % K0];
+    for(let s = 0; s < SLEEVE_RING_SUBSTEPS; s++){
+      const t = s / SLEEVE_RING_SUBSTEPS;
+      const u = a.u + (b.u - a.u) * t;
+      const v = a.v + (b.v - a.v) * t;
+      smoothUV.push({ u, v, angle: Math.atan2(v, u) });
     }
-    const center = vadd(center0, vscale(axis, dist));
+  }
+
+  function ringAt(ringIdx){
+    const dist = cfg.distances[ringIdx];
     const t = cfg.blend[ringIdx];
     const tp = cfg.taper[ringIdx];
-    return baseOffsets.map(o => {
-      const ovalU = Math.cos(o.angle) * cfg.targetRy;
-      const ovalV = Math.sin(o.angle) * cfg.targetRz;
-      const u = (o.u * (1 - t) + ovalU * t) * tp;
-      const v = (o.v * (1 - t) + ovalV * t) * tp;
+    const center = vadd(center0, vscale(axis, dist));
+    return smoothUV.map(p => {
+      const ovalU = Math.cos(p.angle) * cfg.targetRy;
+      const ovalV = Math.sin(p.angle) * cfg.targetRz;
+      const u = (p.u * (1 - t) + ovalU * t) * tp;
+      const v = (p.v * (1 - t) + ovalV * t) * tp;
       return vadd(center, vadd(vscale(basisU, u), vscale(basisV, v)));
     });
-  });
+  }
+
+  const rings = cfg.distances.map((dist, ringIdx) => (ringIdx === 0 ? armholeHex : ringAt(ringIdx)));
+
+  const positions = [];
+
+  // ring0（6点、本体と共有）→ring1（18点）の橋渡し。六角形の各辺ごとに、
+  // 対応する4つのring1側の点（この辺を3分割してできる境界点）とをつないでいく
+  const ring0 = rings[0], ring1 = rings[1];
+  for(let k = 0; k < K0; k++){
+    const k2 = (k + 1) % K0;
+    const base = k * SLEEVE_RING_SUBSTEPS;
+    const r1a = ring1[base];
+    const r1b = ring1[base + 1];
+    const r1c = ring1[(base + 2) % ring1.length];
+    const r1d = ring1[(base + SLEEVE_RING_SUBSTEPS) % ring1.length];
+    pushTri(positions, ring0[k], r1a, r1b);
+    pushTri(positions, ring0[k], r1b, ring0[k2]);
+    pushTri(positions, ring0[k2], r1b, r1c);
+    pushTri(positions, ring0[k2], r1c, r1d);
+  }
+
+  // ring1〜ring4（すべて同じ点数）は通常のクアッド接続でつなぐ
+  for(let r = 1; r < rings.length - 1; r++){
+    const ringA = rings[r], ringB = rings[r + 1];
+    const K = ringA.length;
+    for(let k = 0; k < K; k++){
+      const k2 = (k + 1) % K;
+      pushTri(positions, ringA[k], ringA[k2], ringB[k2]);
+      pushTri(positions, ringA[k], ringB[k2], ringB[k]);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
 }
 
 // 首まわりのリブ襟・裾のふち：外周リング（体表面にある実際の輪郭）と、それを少し
@@ -378,8 +425,7 @@ function buildSweatshirtGroup(THREE){
     const backArm = side.armholeBack.map(i => ({ x: backLocal[i].x, y: backLocal[i].y, z: -halfDepth }));
     // 肩→中間→脇の下（フロント）→脇の下→中間→肩（バック、逆順）で閉じた六角形リングにする
     const shoulderRing = [frontArm[0], frontArm[1], frontArm[2], backArm[2], backArm[1], backArm[0]];
-    const rings = buildSleeveRings(shoulderRing, cfg.sleeve, side.axis);
-    const sleeveGeometry = buildTubeGeometry(THREE, rings);
+    const sleeveGeometry = buildSleeveGeometry(THREE, shoulderRing, cfg.sleeve, side.axis);
     art3DDisposables.push(sleeveGeometry);
     group.add(new THREE.Mesh(sleeveGeometry, material));
   });
