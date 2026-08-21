@@ -756,18 +756,51 @@ async function ensureBasicPitchLoaded(onStatus) {
   basicPitchLoaded = true;
 }
 
-// decodeAudioDataは音声コンテナ（wav/mp3/m4a等）専用で、.mov等の動画コンテナを
-// 直接デコードできず例外を投げることがある。その場合のフォールバックとして、
-// <video>要素に実際に読み込ませてcaptureStream()で音声トラックだけを取り出し、
-// MediaRecorderで録音し直すことで、ブラウザが再生さえできればコンテナ形式を
-// 問わず音声データを取得できる（動画ファイルからの譜面生成に対応するため）
-async function humExtractAudioFromVideoBlob(blob) {
+// decodeAudioDataは音声コンテナ（wav/mp3/m4a等）専用で、動画コンテナ（.mov/.mp4等）を
+// 直接デコードできず例外を投げることがある。特にiOS/iPadOS標準の画面収録(ReplayKit)で
+// 書き出された.movは、通常のカメラ撮影.movと内部のコンテナ構造が異なることが多く、
+// decodeAudioDataが直接失敗しやすい。
+//
+// そのフォールバックとして、以前は<video>+captureStream()+MediaRecorderで
+// 音声を録音し直す方式を使っていたが、実機調査の結果、iOS SafariはHTMLVideoElementの
+// captureStream()自体を一切サポートしていない（2026年時点、caniuse/WebKit bugzilla調べ）
+// ことが判明した。通常のカメラ撮影動画はdecodeAudioDataの直接デコードで成功するため
+// このフォールバックに到達せず問題が表面化しなかったが、画面収録動画は必ずこの
+// フォールバックに入るため、iOS実機では確実に失敗していた。
+//
+// captureStream()を経由せず、createMediaElementSource()（iOS Safariでも古くから
+// 安定して動く基礎的なWeb Audio API）で<video>要素の音声をWeb Audioグラフへ直接つなぎ、
+// 実再生時間分だけScriptProcessorNodeでPCMをそのまま集めてAudioBufferを組み立てる
+// 方式にした。MediaRecorderの対応mimeType判定という別の不確実性も同時に避けられ、
+// 再エンコードによる音質劣化もなくなる（実行時間が動画の実長さ分かかる点はトレードオフ）
+async function humExtractAudioFromVideoBlob(blob, ctx, onStatus) {
+  const debugEnabled = DEBUG_MELODY_ANALYSIS || (typeof window !== "undefined" && (window.HUM_DEBUG || window.MELODY_DEBUG));
+  const log = (...args) => {
+    if (debugEnabled) console.debug("[HUM-VIDEO]", ...args);
+  };
+
+  if (onStatus) onStatus(T("music_hum_progress_extracting_video", "動画から音声を取り出し中…"));
+
   const url = URL.createObjectURL(blob);
   const video = document.createElement("video");
+  // 画面外に実際にDOM接続して再生する（非接続の<video>だと再生・音声取得が
+  // 不安定になるブラウザがあるため）
+  video.style.position = "fixed";
+  video.style.width = "1px";
+  video.style.height = "1px";
+  video.style.opacity = "0";
+  video.style.pointerEvents = "none";
+  document.body.appendChild(video);
+
+  let sourceNode = null;
+  let processorNode = null;
+  let silentGainNode = null;
+
   try {
     video.src = url;
-    video.muted = true; // ミュートしておけばユーザー操作なしの自動再生がブラウザに許可され、
-    video.volume = 0; // captureStream()で取れる音声トラック自体には影響しない
+    video.muted = true; // ミュートしておけばユーザー操作なしでもブラウザが自動再生を許可する。
+    // 音声はcreateMediaElementSource経由でしか取り出さずdestinationへは
+    // ゼロゲイン経由でしかつながないため、スピーカーへ音が出ることはない
     video.playsInline = true;
     video.preload = "auto";
 
@@ -776,20 +809,44 @@ async function humExtractAudioFromVideoBlob(blob) {
       video.addEventListener("error", () => reject(new Error("video load failed")), { once: true });
     });
 
-    const captureFn = video.captureStream || video.mozCaptureStream || video.webkitCaptureStream;
-    if (!captureFn) throw new Error("captureStream not supported");
-    const audioTracks = captureFn.call(video).getAudioTracks();
-    if (!audioTracks.length) throw new Error("no audio track in video");
-
-    const audioStream = new MediaStream(audioTracks);
-    const recorder = new MediaRecorder(audioStream);
-    const chunks = [];
-    recorder.addEventListener("dataavailable", (e) => {
-      if (e.data && e.data.size > 0) chunks.push(e.data);
+    log("loadedmetadata", {
+      duration: video.duration,
+      videoWidth: video.videoWidth,
+      videoHeight: video.videoHeight,
+      readyState: video.readyState,
+      audioTracks: video.audioTracks ? video.audioTracks.length : "unsupported",
     });
-    const stopped = new Promise((resolve) => recorder.addEventListener("stop", resolve, { once: true }));
 
-    recorder.start();
+    // video.audioTracksはWebKit系の非標準拡張。取得できて0件なら、この動画に
+    // 音声トラックが無いことがほぼ確実（画面収録でアプリ音声が無音だった場合等）
+    if (video.audioTracks && video.audioTracks.length === 0) {
+      throw new Error("no audio track in video");
+    }
+
+    if (ctx.state === "suspended") {
+      await ctx.resume();
+    }
+    log("audioContextState", ctx.state);
+
+    sourceNode = ctx.createMediaElementSource(video);
+    const channelCount = Math.max(1, sourceNode.channelCount || 2);
+    processorNode = ctx.createScriptProcessor(4096, channelCount, channelCount);
+    silentGainNode = ctx.createGain();
+    silentGainNode.gain.value = 0; // スピーカーには一切音を出さないためのゼロゲイン
+
+    const collected = Array.from({ length: channelCount }, () => []);
+    processorNode.onaudioprocess = (e) => {
+      for (let ch = 0; ch < channelCount; ch++) {
+        collected[ch].push(new Float32Array(e.inputBuffer.getChannelData(ch)));
+      }
+    };
+
+    // ScriptProcessorNodeはdestinationまで経路がつながっていないと
+    // onaudioprocessが発火しないブラウザがあるため、ゼロゲイン経由でdestinationへつなぐ
+    sourceNode.connect(processorNode);
+    processorNode.connect(silentGainNode);
+    silentGainNode.connect(ctx.destination);
+
     await video.play();
     await new Promise((resolve) => {
       video.addEventListener("ended", resolve, { once: true });
@@ -797,14 +854,33 @@ async function humExtractAudioFromVideoBlob(blob) {
       const durationMs = isFinite(video.duration) && video.duration > 0 ? video.duration * 1000 : 60000;
       setTimeout(resolve, durationMs + 3000);
     });
-    recorder.stop();
-    await stopped;
 
-    return new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
+    const totalFrames = collected[0].reduce((sum, chunk) => sum + chunk.length, 0);
+    if (totalFrames === 0) throw new Error("no audio captured from video");
+
+    const audioBuffer = ctx.createBuffer(channelCount, totalFrames, ctx.sampleRate);
+    for (let ch = 0; ch < channelCount; ch++) {
+      const merged = new Float32Array(totalFrames);
+      let offset = 0;
+      for (const chunk of collected[ch]) {
+        merged.set(chunk, offset);
+        offset += chunk.length;
+      }
+      audioBuffer.copyToChannel(merged, ch);
+    }
+
+    log("captured", { channelCount, totalFrames, sampleRate: ctx.sampleRate, duration: audioBuffer.duration });
+
+    return audioBuffer;
   } finally {
+    if (processorNode) processorNode.onaudioprocess = null;
+    if (sourceNode) sourceNode.disconnect();
+    if (processorNode) processorNode.disconnect();
+    if (silentGainNode) silentGainNode.disconnect();
     video.pause();
     video.removeAttribute("src");
     video.load();
+    video.remove();
     URL.revokeObjectURL(url);
   }
 }
@@ -814,19 +890,21 @@ async function humExtractAudioFromVideoBlob(blob) {
 // バラバラなため、デコード後にOfflineAudioContextで必ずこの形式へリサンプルし直す
 async function humDecodeAudioToBuffer(blob, onStatus) {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const debugEnabled = DEBUG_MELODY_ANALYSIS || (typeof window !== "undefined" && (window.HUM_DEBUG || window.MELODY_DEBUG));
   let decoded;
   try {
     try {
       decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
+      if (debugEnabled) console.debug("[HUM-VIDEO] decodeAudioData direct: success", { sampleRate: decoded.sampleRate });
     } catch (directErr) {
-      if (onStatus) onStatus(T("music_hum_progress_extracting_video", "動画から音声を取り出し中…"));
-      const audioBlob = await humExtractAudioFromVideoBlob(blob);
-      decoded = await ctx.decodeAudioData(await audioBlob.arrayBuffer());
+      if (debugEnabled) console.debug("[HUM-VIDEO] decodeAudioData direct: failed", directErr && directErr.message);
+      decoded = await humExtractAudioFromVideoBlob(blob, ctx, onStatus);
     }
   } finally {
     ctx.close();
   }
   if (decoded.sampleRate === BASIC_PITCH_SAMPLE_RATE && decoded.numberOfChannels === 1) {
+    if (debugEnabled) console.debug("[HUM-VIDEO] final AudioBuffer (no resample needed)", { duration: decoded.duration, sampleRate: decoded.sampleRate, numberOfChannels: decoded.numberOfChannels });
     return decoded;
   }
   const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * BASIC_PITCH_SAMPLE_RATE), BASIC_PITCH_SAMPLE_RATE);
@@ -836,7 +914,9 @@ async function humDecodeAudioToBuffer(blob, onStatus) {
   // Web Audio API標準の自動ミックス（左右chを合成）でそのまま行われる
   source.connect(offlineCtx.destination);
   source.start(0);
-  return await offlineCtx.startRendering();
+  const resampled = await offlineCtx.startRendering();
+  if (debugEnabled) console.debug("[HUM-VIDEO] final AudioBuffer (resampled)", { duration: resampled.duration, sampleRate: resampled.sampleRate, numberOfChannels: resampled.numberOfChannels });
+  return resampled;
 }
 
 // basic-pitchの標準的な使い方：evaluateModelにAudioBufferを渡し、フレーム単位の
@@ -1146,6 +1226,14 @@ function onHumFileChosen(e) {
     return;
   }
   humSourceBlob = file;
+  if (DEBUG_MELODY_ANALYSIS || (typeof window !== "undefined" && (window.HUM_DEBUG || window.MELODY_DEBUG))) {
+    console.debug("[HUM-VIDEO] file selected", {
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      lastModified: file.lastModified,
+    });
+  }
   document.getElementById("musicHumFileRow").style.display = "";
   document.getElementById("musicHumFileName").textContent = file.name;
   document.getElementById("musicHumAnalyzeBtn").disabled = false;
