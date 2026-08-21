@@ -265,10 +265,32 @@ function buildEllipseRing(center, halfWidth, depth, segments){
   return ring;
 }
 
+// 角度（0〜2π、buildEllipseRingの定義でangle=0がワールド+X＝正面カメラの画面右、
+// angle=πがワールド-X＝正面カメラの画面左）から、胴体用テクスチャのU座標を求める。
+//
+// 【鏡像バグの原因と修正】
+// フロント半分（角度0〜π）に単純にangle/(2π)を使うと、angle=0（画面右）でU=0＝
+// フロント画像の左端（pixel_x=0）を参照してしまう。つまり「元画像の左端」が
+// 「3Dモデルの画面右」に表示され、鏡に映したような左右反転になっていた。
+// 「元画像の左＝モデルの左」にするには、フロント画像の左端（pixel_x=0）は
+// モデルの画面左（角度π、ワールド-X）に対応させる必要があるため、フロント側だけ
+// 向きを反転する（U = 0.5 - angle/(2π)）。
+//
+// バック半分（角度π〜2π）は反転しない。フロント・バックの型紙データは同じ左右の
+// 向き（例えば両者とも(16,20)が肩の同じ側を指す）で作られていることを胴体の
+// ロフト実装時に実データで確認済みで、フロントの左端と同じ縫い目（角度π）を
+// 基準にバック画像の左端を合わせる、という素直な対応（U = angle/(2π)）で
+// 正しく、鏡像にはならない。
+function textureUFromAngle(angle){
+  const a = ((angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  if(a <= Math.PI) return 0.5 - a / (Math.PI * 2);
+  return a / (Math.PI * 2);
+}
+
 // リングの全頂点に、角度から求めたU座標と、指定のV座標を設定する
 function assignRingUV(ring, v){
   ring.forEach(p => {
-    p.u = (p.angle || 0) / (Math.PI * 2);
+    p.u = textureUFromAngle(p.angle || 0);
     p.v = v;
   });
 }
