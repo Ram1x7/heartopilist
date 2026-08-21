@@ -617,6 +617,7 @@
   "music_hum_model_load_error": "解析模型加载失败。请检查网络连接后重试",
   "music_melody_unsupported_file": "无法读取此文件。请确认是否为受支持的格式（MP3、WAV、M4A、AAC、OGG、WebM、MP4、MOV等）",
   "music_melody_duration_too_long": "音频时长过长（上限6分钟）。请剪辑后重试",
+  "music_melody_duration_too_short": "音频时长过短（至少需要3秒）。请使用更长的音频重试",
   "music_melody_file_too_large": "文件过大（此文件：约{size}MB / 上限{limit}MB）。请压缩或缩短文件后重试",
   "music_melody_no_notes_file": "未能检测到主旋律。请尝试其他文件",
   "music_review_clear": "全部标记为已确认",

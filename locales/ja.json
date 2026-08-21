@@ -641,6 +641,7 @@
   "music_hum_model_load_error": "解析モデルの読み込みに失敗しました。通信環境を確認してからもう一度お試しください",
   "music_melody_unsupported_file": "このファイルを読み込めませんでした。対応形式（MP3, WAV, M4A, AAC, OGG, WebM, MP4, MOV等）かご確認ください",
   "music_melody_duration_too_long": "音声が長すぎます（上限6分）。ファイルを短く編集してからお試しください",
+  "music_melody_duration_too_short": "音声が短すぎます（3秒以上必要です）。もう少し長い音声でお試しください",
   "music_melody_file_too_large": "ファイルサイズが大きすぎます（このファイル: 約{size}MB / 上限{limit}MB）。ファイルを短くするか圧縮してからお試しください",
   "music_melody_no_notes_file": "主旋律を検出できませんでした。別のファイルでお試しください",
   "music_review_clear": "すべて確認済みにする",

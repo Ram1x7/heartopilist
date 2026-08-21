@@ -734,6 +734,12 @@ const BASIC_PITCH_MIN_NOTE_LENGTH_FRAMES = 5;
 // 実際に60MBで短い動画まで弾いてしまう不具合が報告されたため、大幅に緩めた）
 const MELODY_SOURCE_MAX_FILE_BYTES = 250 * 1024 * 1024; // 250MB
 const MELODY_SOURCE_MAX_DURATION_SEC = 360; // 6分
+// basic-pitch本体が内部で固定サイズのウィンドウ処理（1ウィンドウ約2秒分）をしており、
+// それより短い音声を渡すとテンソルの次元がマイナスになり例外を投げて解析全体が
+// 失敗する（ハミング／音源／動画のどの入力でも起こりうる、モデル側の制約）。
+// そのため解析を始める前に弾き、原因不明の「解析に失敗しました」ではなく
+// 具体的に分かるメッセージを出す
+const MELODY_SOURCE_MIN_DURATION_SEC = 3;
 
 let basicPitchLoaded = false;
 let basicPitchModel = null;
@@ -1291,6 +1297,10 @@ async function onHumAnalyzeClick() {
 
   if (audioBuffer.duration > MELODY_SOURCE_MAX_DURATION_SEC) {
     fail(T("music_melody_duration_too_long", "音声が長すぎます（上限6分）。ファイルを短く編集してからお試しください"));
+    return;
+  }
+  if (audioBuffer.duration < MELODY_SOURCE_MIN_DURATION_SEC) {
+    fail(T("music_melody_duration_too_short", "音声が短すぎます（3秒以上必要です）。もう少し長い音声でお試しください"));
     return;
   }
 

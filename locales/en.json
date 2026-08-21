@@ -641,6 +641,7 @@
   "music_hum_model_load_error": "Failed to load the analysis model. Check your connection and try again",
   "music_melody_unsupported_file": "Couldn't read this file. Check that it's a supported format (MP3, WAV, M4A, AAC, OGG, WebM, MP4, MOV, etc.)",
   "music_melody_duration_too_long": "This audio is too long (limit: 6 minutes). Trim the file and try again",
+  "music_melody_duration_too_short": "This audio is too short (needs to be at least 3 seconds). Try a longer clip",
   "music_melody_file_too_large": "This file is too large (this file: about {size}MB / limit: {limit}MB). Trim or compress it and try again",
   "music_melody_no_notes_file": "Couldn't detect a main melody. Try a different file",
   "music_review_clear": "Mark all as reviewed",
