@@ -21,10 +21,15 @@
 // 純粋関数として実装しており、Node上でも単体テストできる）。
 //
 //   生ノート列
-//   → normalizeHumNoteEvents（同時発音の統合・同一音の断片統合・ビブラート吸収・ノイズ除去）
+//   → normalizeHumNoteEvents（同時発音の統合・同一音の断片統合・不安定クラスターの統合・
+//                             ビブラート吸収・ノイズ除去）
 //   → quantizeHumRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
 //   → mapHumMelodyToInstrument（オクターブシフト＋前後の音との関係を考慮したゲーム内音への変換）
 //   → tokens
+//
+// DEBUG_HUM_ANALYSIS を true にすると、上記の各段階（生データ／正規化後／量子化後／
+// 変換後）をconsoleへ出力できる（調査用。通常利用時はfalseのままにする）
+const DEBUG_HUM_ANALYSIS = false;
 
 // ── 音高変換（ここから下は音声処理を伴わない純粋な計算のみで、Node上でも単体テストできる） ──
 
@@ -143,6 +148,83 @@ function mergeHumNoteEvents(sortedEvents, opts) {
   return merged.map(({ pitchMidi, startTimeSeconds, durationSeconds }) => ({ pitchMidi, startTimeSeconds, durationSeconds }));
 }
 
+// mergeHumNoteEvents（隣接ペアが0.6半音以内でないと統合しない）や
+// suppressPitchWobbleEvents（前後がちょうど同じ音程に戻る場合しか吸収しない）では
+// 拾いきれない、声が2つ以上の近い音程の間を細かく往復する不安定な区間
+// （グライド・ビブラート・息継ぎ等で実際に起こる）を1つの音へ統合する。
+// 「短い断片が」「隙間なく連続し」「全体としては狭い音程帯に収まっている」かつ
+// 「上下に往復している（一方向に進み続けていない）」塊だけを対象にすることで、
+// 以下と区別する。
+//   - 実際に間隔をあけて弾き直した同音連打（隙間が大きいので対象外）
+//   - 速いスケール走句のような正当な連続音（一方向に進み続けるため対象外。
+//     半音刻みの速い動きは狭い音程帯にも収まりうるが、往復ではなく一方向の
+//     進行なので、音程帯の広さだけでは正しく区別できない）
+function consolidateUnstablePitchClusters(events, opts) {
+  const options = opts || {};
+  const shortFragmentSec = options.shortFragmentSec != null ? options.shortFragmentSec : 0.15;
+  const maxClusterGapSec = options.maxClusterGapSec != null ? options.maxClusterGapSec : 0.06;
+  const maxClusterRangeSemitones = options.maxClusterRangeSemitones != null ? options.maxClusterRangeSemitones : 3;
+  const minClusterSize = options.minClusterSize != null ? options.minClusterSize : 3;
+
+  // 隣接する断片同士の音程差の符号に、上昇と下降の両方が含まれるかどうかを見る。
+  // 一方向にしか進まない(単調増加/単調減少)場合は、速いスケール走句等の正当な
+  // メロディの可能性が高いため統合の対象から外す
+  const hasDirectionReversal = (pitches) => {
+    let sawUp = false;
+    let sawDown = false;
+    for (let i = 1; i < pitches.length; i++) {
+      const diff = pitches[i] - pitches[i - 1];
+      if (diff > 0.05) sawUp = true;
+      else if (diff < -0.05) sawDown = true;
+    }
+    return sawUp && sawDown;
+  };
+
+  const result = [];
+  let cluster = [];
+
+  const flushCluster = () => {
+    if (!cluster.length) return;
+    const eligible = cluster.length >= minClusterSize && hasDirectionReversal(cluster.map((e) => e.pitchMidi));
+    if (!eligible) {
+      cluster.forEach((e) => result.push(e));
+    } else {
+      const start = cluster[0].startTimeSeconds;
+      const last = cluster[cluster.length - 1];
+      const end = last.startTimeSeconds + last.durationSeconds;
+      const totalDur = cluster.reduce((s, e) => s + e.durationSeconds, 0);
+      // 各断片の長さで重み付けした平均音程を、実際に歌っていたであろう音とみなす
+      const weightedPitch = cluster.reduce((s, e) => s + e.pitchMidi * e.durationSeconds, 0) / totalDur;
+      result.push({ pitchMidi: weightedPitch, startTimeSeconds: start, durationSeconds: end - start });
+    }
+    cluster = [];
+  };
+
+  events.forEach((ev) => {
+    if (ev.durationSeconds > shortFragmentSec) {
+      flushCluster();
+      result.push(ev);
+      return;
+    }
+    if (!cluster.length) {
+      cluster.push(ev);
+      return;
+    }
+    const prev = cluster[cluster.length - 1];
+    const gap = ev.startTimeSeconds - (prev.startTimeSeconds + prev.durationSeconds);
+    const pitches = cluster.map((e) => e.pitchMidi).concat(ev.pitchMidi);
+    const range = Math.max(...pitches) - Math.min(...pitches);
+    if (gap <= maxClusterGapSec && range <= maxClusterRangeSemitones) {
+      cluster.push(ev);
+    } else {
+      flushCluster();
+      cluster.push(ev);
+    }
+  });
+  flushCluster();
+  return result;
+}
+
 // 歌声のビブラートやピッチの揺れで、ロングトーンの途中に一瞬だけ別音程が
 // 検出された場合、それを別音符にせず前後の音へ吸収する。
 // 「短時間だけ現れ」「前後の音とほぼ同じ音程で」「かつ前後の音が同じ音程に戻る
@@ -197,14 +279,15 @@ function filterHumNoiseEvents(events, bpmValue, opts) {
 }
 
 // Basic Pitchの生ノート列[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を、
-// 上記の各段階（同時発音の統合→同一音の断片統合→ビブラート吸収→ノイズ除去）に
-// かけて整える
+// 上記の各段階（同時発音の統合→同一音の断片統合→不安定クラスターの統合→
+// ビブラート吸収→ノイズ除去）にかけて整える
 function normalizeHumNoteEvents(rawEvents, bpmValue, opts) {
   const options = opts || {};
   const sorted = rawEvents.slice().sort((a, b) => a.startTimeSeconds - b.startTimeSeconds);
   const collapsed = collapseSimultaneousHumNoteEvents(sorted, options.simultaneous);
   const merged = mergeHumNoteEvents(collapsed, options.merge);
-  const wobbleSuppressed = suppressPitchWobbleEvents(merged, options.wobble);
+  const clustered = consolidateUnstablePitchClusters(merged, options.cluster);
+  const wobbleSuppressed = suppressPitchWobbleEvents(clustered, options.wobble);
   return filterHumNoiseEvents(wobbleSuppressed, bpmValue, options.noise);
 }
 
@@ -317,28 +400,54 @@ function mapHumMelodyToInstrument(events, layout, opts) {
   return { tokens, changes, octaveShift: shift };
 }
 
+// MIDI番号を「音名＋オクターブ」の表示用ラベルに変換する（デバッグログ専用）
+function humMidiLabel(midi) {
+  const rounded = Math.round(midi);
+  const name = HUM_PITCH_CHROMATIC_NAMES[((rounded % 12) + 12) % 12];
+  return `${name}${Math.floor(rounded / 12) - 1}`;
+}
+
+// 「中間部分から異音が混じる」等の不具合調査用。生データ／正規化後／量子化後／
+// 変換後の4段階をconsoleに出す。DEBUG_HUM_ANALYSISがtrueの時、または
+// window.HUM_DEBUGがtrueの時だけ呼ばれる
+function logHumAnalysisStages(rawEvents, normalized, timeline, tokens, changes, octaveShift) {
+  console.log("=== HUM ANALYSIS ===");
+  console.log(`RAW (${rawEvents.length}件)`);
+  rawEvents.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${humMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
+  console.log(`NORMALIZED (${normalized.length}件)`);
+  normalized.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${humMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
+  console.log(`QUANTIZED (${timeline.length}件)`);
+  timeline.forEach((e) => console.log(e.midi == null ? `rest  ${e.beats}拍` : `${humMidiLabel(e.midi)}  ${e.beats}拍`));
+  console.log(`MAPPED (オクターブシフト${octaveShift / 12}オクターブ、変更${changes.length}件)`);
+  const changeByIndex = new Map(changes.map((c) => [c.index, c]));
+  tokens.forEach((t, i) => {
+    if (!t.notes.length) {
+      console.log("rest");
+      return;
+    }
+    const change = changeByIndex.get(i);
+    const label = humMidiLabel(humNoteToMidi(t.notes[0]));
+    console.log(change ? `${humMidiLabel(change.fromMidi)} -> ${humMidiLabel(change.toMidi)}` : `${label} -> ${label}`);
+  });
+}
+
 // Basic Pitchのノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を
 // tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）に変換する
 // （normalizeHumNoteEvents → quantizeHumRhythm → mapHumMelodyToInstrumentの3段階）
 function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
+  const debugEnabled = options.debug || DEBUG_HUM_ANALYSIS || (typeof window !== "undefined" && window.HUM_DEBUG);
   const normalized = normalizeHumNoteEvents(noteEvents, bpmValue, options.normalize);
-  if (!normalized.length) return [];
+  if (!normalized.length) {
+    if (debugEnabled) logHumAnalysisStages(noteEvents, normalized, [], [], [], 0);
+    return [];
+  }
 
   const timeline = quantizeHumRhythm(normalized, bpmValue, options.rhythm);
   const { tokens, changes, octaveShift } = mapHumMelodyToInstrument(timeline, layout, options.mapping);
 
-  const debugEnabled = options.debug || (typeof window !== "undefined" && window.HUM_DEBUG);
-  if (debugEnabled && changes.length) {
-    const label = (midi) => {
-      const rounded = Math.round(midi);
-      const name = HUM_PITCH_CHROMATIC_NAMES[((rounded % 12) + 12) % 12];
-      return `${name}${Math.floor(rounded / 12) - 1}`;
-    };
-    console.debug(
-      `[hum] オクターブシフト: ${octaveShift / 12}オクターブ / ゲーム内音域に合わせて変更した音: ${changes.length}件`,
-      changes.map((c) => `${label(c.fromMidi)}→${label(c.toMidi)}`)
-    );
+  if (debugEnabled) {
+    logHumAnalysisStages(noteEvents, normalized, timeline, tokens, changes, octaveShift);
   }
   return tokens;
 }
