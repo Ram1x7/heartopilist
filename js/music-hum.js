@@ -1,7 +1,8 @@
 // js/music-hum.js
-// 「ハミングから作る」：録音またはアップロードした鼻歌から、Basic Pitch
-// （Spotifyが公開しているオープンソースのピッチ検出モデル、TensorFlow.js版）を
-// 使って音の高さ・発音タイミングを検出し、譜面（tokens）に自動変換する。
+// 「ハミングから作る」「音源から作る」「動画から作る」：録音・鼻歌・音源ファイル・
+// 動画ファイルから、Basic Pitch（Spotifyが公開しているオープンソースのピッチ検出
+// モデル、TensorFlow.js版）を使って音の高さ・発音タイミングを検出し、はとぴ図鑑の
+// 譜面（tokens）に自動変換する。
 //
 // TensorFlow.js本体とBasic Pitchのモデルはサイズが大きく、常時読み込むと
 // エディター本体のオフライン起動が遅くなるため、この機能を実際に開いたときだけ
@@ -19,22 +20,33 @@
 // 別音程として検出していたりと「そのまま譜面化するには荒すぎる」状態のため、
 // 以下の段階を経てからゲーム内音階へ変換する（各段階は音声処理を伴わない
 // 純粋関数として実装しており、Node上でも単体テストできる）。
+// この汎用パイプラインは入力元（ハミング／音源ファイル／動画ファイル、将来的には
+// MIDIファイルも）に依存しない共通処理で、入力ごとの違いは「生ノート列を
+// どうやって得るか」（録音+Basic Pitch／ファイルデコード+Basic Pitch等）の部分だけ。
 //
 //   生ノート列
-//   → normalizeHumNoteEvents（同時発音の統合・同一音の断片統合・不安定クラスターの統合・
+//   → normalizeMelodyNoteEvents（同時発音の統合・同一音の断片統合・不安定クラスターの統合・
 //                             ビブラート吸収・ノイズ除去）
-//   → quantizeHumRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
-//   → mapHumMelodyToInstrument（オクターブシフト＋前後の音との関係を考慮したゲーム内音への変換）
+//   → quantizeMelodyRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
+//   → mapMelodyToInstrument（オクターブシフト＋前後の音との関係を考慮したゲーム内音への変換）
+//   → optimizeMelodyForHeartopia（異常な同音連打の解決・繰り返しフレーズの一貫性）
 //   → tokens
 //
-// DEBUG_HUM_ANALYSIS を true にすると、上記の各段階（生データ／正規化後／量子化後／
+// 上記全体をまとめる convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts) の
+// opts.sourceType（"humming"｜"audio"｜"video"｜将来の"midi"）は、同時発音統合の
+// 判定方法（ハミング＝単旋律前提で最長優先／音源・動画＝主旋律らしさの経験則で
+// 高音優先）にのみ影響し、それ以外の段階はsourceTypeによらず完全に共通処理。
+// 既存の convertHumNotesToTokens() はこの関数を sourceType:"humming" 固定で
+// 呼び出す後方互換の薄いラッパーとして残してある。
+//
+// DEBUG_MELODY_ANALYSIS を true にすると、上記の各段階（生データ／正規化後／量子化後／
 // 変換後）をconsoleへ出力できる（調査用。通常利用時はfalseのままにする）
-const DEBUG_HUM_ANALYSIS = false;
+const DEBUG_MELODY_ANALYSIS = false;
 
 // ── 音高変換（ここから下は音声処理を伴わない純粋な計算のみで、Node上でも単体テストできる） ──
 
 // 度数・臨時記号・オクターブの組から絶対MIDI番号を求める（60 = 度数1・オクターブ0 = middle C相当）
-function humNoteToMidi(note) {
+function melodyNoteToMidi(note) {
   const semis = DEGREE_SEMITONES[note.degree] + (ACCIDENTAL_SEMITONE_OFFSET[note.accidental] || 0);
   return 60 + semis + note.octave * 12;
 }
@@ -46,12 +58,12 @@ function humNoteToMidi(note) {
 // : layout.grid`。編集モードの譜面入力グリッド切り替えと共通のSingle Source
 // of Truth）を用いる。chromaticGridは自然音＋半音の両方を含むため、有効時は
 // それだけで良く、無効時（またはchromaticGridを持たない配置）はgridのみを使う
-function buildHumInstrumentNoteMap(layout, semitoneEnabled) {
+function buildInstrumentNoteMap(layout, semitoneEnabled) {
   const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
   const byMidi = new Map();
   grid.forEach((row) => {
     row.forEach((note) => {
-      const midi = humNoteToMidi(note);
+      const midi = melodyNoteToMidi(note);
       if (!byMidi.has(midi)) byMidi.set(midi, note);
     });
   });
@@ -64,7 +76,7 @@ function buildHumInstrumentNoteMap(layout, semitoneEnabled) {
 // （12半音刻み）を求める。音域の中心同士を合わせる案を基準に、その前後のオクターブも
 // 試して「音域に収まる音の数」→「楽器の実際の音への距離の合計」の順で最も良いものを選ぶ
 // （範囲の広い曲と狭い曲を同じ扱いにしない）
-function computeHumOctaveShift(detectedMidis, availableNotes) {
+function computeMelodyOctaveShift(detectedMidis, availableNotes) {
   if (!detectedMidis.length || !availableNotes.length) return 0;
   const melodyMin = Math.min(...detectedMidis);
   const melodyMax = Math.max(...detectedMidis);
@@ -100,17 +112,24 @@ function computeHumOctaveShift(detectedMidis, availableNotes) {
   return bestShift;
 }
 
-// ほぼ同時刻に鳴っている複数の検出（倍音・ハモりの誤検出の可能性）のうち、
-// 単旋律を想定して最も長く鳴っている1音だけを残す（Basic Pitchはポリフォニー対応の
-// モデルのため、鼻歌のような単旋律入力でも倍音等を別音として拾うことがある）
-function collapseSimultaneousHumNoteEvents(sortedEvents, opts) {
+// ほぼ同時刻に鳴っている複数の検出のうち、1つだけを残す。
+// ハミング（本来単旋律）の場合は「倍音・ハモりの誤検出」の可能性が高いため、
+// 最も長く鳴っている音を主音とみなす(preferHigherPitch:false、既定)。
+// 音源・動画ファイル（伴奏・ベース等を含む混合音）の場合は、主旋律は一般的に
+// 同時に鳴っている音の中で最も高い音であることが多いという簡易的な経験則
+// （完全な音源分離の代わりに用いる、最小限の主旋律らしさの判定）から、
+// より高い音を優先する(preferHigherPitch:true)。呼び出し側(normalizeMelodyNoteEvents)
+// がsourceTypeに応じてこのオプションを渡す
+function collapseSimultaneousNoteEvents(sortedEvents, opts) {
   const options = opts || {};
   const simulEpsilonSec = options.simulEpsilonSec != null ? options.simulEpsilonSec : 0.03;
+  const preferHigherPitch = !!options.preferHigherPitch;
   const result = [];
   sortedEvents.forEach((ev) => {
     const last = result[result.length - 1];
     if (last && Math.abs(ev.startTimeSeconds - last.startTimeSeconds) <= simulEpsilonSec) {
-      if (ev.durationSeconds > last.durationSeconds) {
+      const shouldReplace = preferHigherPitch ? ev.pitchMidi > last.pitchMidi : ev.durationSeconds > last.durationSeconds;
+      if (shouldReplace) {
         result[result.length - 1] = { pitchMidi: ev.pitchMidi, startTimeSeconds: ev.startTimeSeconds, durationSeconds: ev.durationSeconds };
       }
       return;
@@ -125,7 +144,7 @@ function collapseSimultaneousHumNoteEvents(sortedEvents, opts) {
 // 「隙間がほぼ無い（=検出の継ぎ目）」場合だけを統合対象とすることで、実際に
 // 人が意図して同じ音を弾き直した「ド ド ド」のような明確なリズムの連打
 // （音と音の間に実際の無音・区切りがある）とは区別する
-function mergeHumNoteEvents(sortedEvents, opts) {
+function mergeMelodyNoteEvents(sortedEvents, opts) {
   const options = opts || {};
   const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : 0.6;
   const maxGapSec = options.maxGapSec != null ? options.maxGapSec : 0.04;
@@ -150,7 +169,7 @@ function mergeHumNoteEvents(sortedEvents, opts) {
   return merged.map(({ pitchMidi, startTimeSeconds, durationSeconds }) => ({ pitchMidi, startTimeSeconds, durationSeconds }));
 }
 
-// mergeHumNoteEvents（隣接ペアが0.6半音以内でないと統合しない）や
+// mergeMelodyNoteEvents（隣接ペアが0.6半音以内でないと統合しない）や
 // suppressPitchWobbleEvents（前後がちょうど同じ音程に戻る場合しか吸収しない）では
 // 拾いきれない、声が2つ以上の近い音程の間を細かく往復する不安定な区間
 // （グライド・ビブラート・息継ぎ等で実際に起こる）を1つの音へ統合する。
@@ -270,7 +289,7 @@ function suppressPitchWobbleEvents(events, opts) {
 // 曲のテンポ（BPM）から見て極端に短すぎる検出はノイズとみなして除外する。
 // 固定値ではなく1拍の長さに対する割合で決めることで、速い曲の短い正規音符まで
 // 消してしまわないようにする（ただし極端な値にならないよう上下限を設ける）
-function filterHumNoiseEvents(events, bpmValue, opts) {
+function filterMelodyNoiseEvents(events, bpmValue, opts) {
   const options = opts || {};
   const beatSec = 60 / bpmValue;
   const floorSec = options.minDurationFloorSec != null ? options.minDurationFloorSec : 0.035;
@@ -282,15 +301,20 @@ function filterHumNoiseEvents(events, bpmValue, opts) {
 
 // Basic Pitchの生ノート列[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を、
 // 上記の各段階（同時発音の統合→同一音の断片統合→不安定クラスターの統合→
-// ビブラート吸収→ノイズ除去）にかけて整える
-function normalizeHumNoteEvents(rawEvents, bpmValue, opts) {
+// ビブラート吸収→ノイズ除去）にかけて整える。
+// sourceType（"humming"｜"audio"｜"video"｜"midi"）は、同時発音の統合方法
+// （collapseSimultaneousNoteEventsのpreferHigherPitch）にのみ影響する。
+// それ以外の段階は入力元によらず共通の処理のままにしてある（分岐を増やしすぎない）
+function normalizeMelodyNoteEvents(rawEvents, bpmValue, opts) {
   const options = opts || {};
+  const sourceType = options.sourceType || "humming";
+  const simultaneousOptions = { preferHigherPitch: sourceType !== "humming", ...options.simultaneous };
   const sorted = rawEvents.slice().sort((a, b) => a.startTimeSeconds - b.startTimeSeconds);
-  const collapsed = collapseSimultaneousHumNoteEvents(sorted, options.simultaneous);
-  const merged = mergeHumNoteEvents(collapsed, options.merge);
+  const collapsed = collapseSimultaneousNoteEvents(sorted, simultaneousOptions);
+  const merged = mergeMelodyNoteEvents(collapsed, options.merge);
   const clustered = consolidateUnstablePitchClusters(merged, options.cluster);
   const wobbleSuppressed = suppressPitchWobbleEvents(clustered, options.wobble);
-  return filterHumNoiseEvents(wobbleSuppressed, bpmValue, options.noise);
+  return filterMelodyNoiseEvents(wobbleSuppressed, bpmValue, options.noise);
 }
 
 // 整えたノート列の発音開始位置を、曲全体で共有する1つの拍グリッド（既定では
@@ -300,8 +324,8 @@ function normalizeHumNoteEvents(rawEvents, bpmValue, opts) {
 // 開始位置まで伸ばして隙間なくつなげる（Basic Pitchの検出の途切れを休符に
 // してしまわないようにするため）。
 // 戻り値は [{midi, beats}, ...]（休符はmidi:null）で、まだゲーム内音への
-// 変換はしていない（それはmapHumMelodyToInstrumentの役目）
-function quantizeHumRhythm(events, bpmValue, opts) {
+// 変換はしていない（それはmapMelodyToInstrumentの役目）
+function quantizeMelodyRhythm(events, bpmValue, opts) {
   const options = opts || {};
   if (!events.length) return [];
   const beatSec = 60 / bpmValue;
@@ -334,7 +358,7 @@ function quantizeHumRhythm(events, bpmValue, opts) {
 // ペナルティを加えて選ぶ。距離がはっきり近い候補があればそれを優先し、僅差の
 // ときだけ輪郭を優先する（ゲームに存在しない音を、前後関係を無視した単純な
 // 最近傍だけで決めないようにするため）
-function pickClosestHumNoteWithContour(midi, availableNotes, ctx) {
+function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
   const context = ctx || {};
   let best = null;
   let bestScore = Infinity;
@@ -358,10 +382,10 @@ function pickClosestHumNoteWithContour(midi, availableNotes, ctx) {
   return best.note;
 }
 
-// quantizeHumRhythmが返した[{midi, beats}, ...]（休符はmidi:null）を、
+// quantizeMelodyRhythmが返した[{midi, beats}, ...]（休符はmidi:null）を、
 // 楽器の音域へのオクターブシフト＋前後関係を考慮したゲーム内音への変換を経て
 // tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）にする。
-// availableNotesは呼び出し側でbuildHumInstrumentNoteMap()により、現在の
+// availableNotesは呼び出し側でbuildInstrumentNoteMap()により、現在の
 // 楽器・配置・半音表示ON/OFFから求めた「実際に演奏できる音」の一覧を渡す
 // （このためF#等の半音は、半音表示ONの時は候補として使われ、ちょうど
 // 一致する音があれば距離0で必ず選ばれる。半音表示OFFの時は候補にすら
@@ -369,11 +393,11 @@ function pickClosestHumNoteWithContour(midi, availableNotes, ctx) {
 // 休符を挟むとメロディの輪郭比較はいったんリセットする（休符の前後は別フレーズ
 // とみなす）。changesには実際に「検出音そのままの音」から変更が生じた音を
 // 記録し、開発時の確認用ログにのみ使う
-function mapHumMelodyToInstrument(events, availableNotes, opts) {
+function mapMelodyToInstrument(events, availableNotes, opts) {
   if (!availableNotes.length) return { tokens: events.map((e) => ({ notes: [], beats: e.beats })), changes: [], octaveShift: 0, rawShiftedMidis: events.map(() => null) };
 
   const detectedMidis = events.filter((e) => e.midi != null).map((e) => Math.round(e.midi));
-  const shift = computeHumOctaveShift(detectedMidis, availableNotes);
+  const shift = computeMelodyOctaveShift(detectedMidis, availableNotes);
 
   const tokens = [];
   const changes = [];
@@ -398,8 +422,8 @@ function mapHumMelodyToInstrument(events, availableNotes, opts) {
         break;
       }
     }
-    const chosen = pickClosestHumNoteWithContour(shiftedMidi, availableNotes, { prevShiftedMidi, prevMappedMidi, nextShiftedMidi });
-    const chosenMidi = humNoteToMidi(chosen);
+    const chosen = pickClosestMelodyNoteWithContour(shiftedMidi, availableNotes, { prevShiftedMidi, prevMappedMidi, nextShiftedMidi });
+    const chosenMidi = melodyNoteToMidi(chosen);
     tokens.push({ notes: [{ degree: chosen.degree, accidental: chosen.accidental || null, octave: chosen.octave }], beats: e.beats });
     rawShiftedMidis.push(shiftedMidi);
     if (chosenMidi !== shiftedMidi) changes.push({ index: i, fromMidi: shiftedMidi, toMidi: chosenMidi });
@@ -410,8 +434,8 @@ function mapHumMelodyToInstrument(events, availableNotes, opts) {
 }
 
 // ── Heartopia Melody Optimizer ──────────────────────────────────────────
-// mapHumMelodyToInstrumentは前後1音までしか見ておらず、狭い帯域の細かい
-// ピッチの揺れはnormalizeHumNoteEvents側のconsolidateUnstablePitchClustersで
+// mapMelodyToInstrumentは前後1音までしか見ておらず、狭い帯域の細かい
+// ピッチの揺れはnormalizeMelodyNoteEvents側のconsolidateUnstablePitchClustersで
 // 既に吸収済みだが、由来の異なる複数の実音（本来別々の音程）が、ゲーム内
 // 音への変換時にたまたま同じ1音へ衝突してしまうケースまでは防げない。
 // この層は、そうした「マッピング後に生じた異常な同音連打」を検出したときだけ、
@@ -421,7 +445,7 @@ function mapHumMelodyToInstrument(events, availableNotes, opts) {
 // なのに変換結果がバラつくことを防ぐ。
 //
 // リズム(beats)は一切変更しない。convertHumNotesToTokens内で一度だけ、
-// mapHumMelodyToInstrumentの直後に呼ばれる（二重に最適化がかかることはない）
+// mapMelodyToInstrumentの直後に呼ばれる（二重に最適化がかかることはない）
 
 // 指定インデックスの「輪郭比較用の参照点」を求める。processedUpTo以前は
 // このパスで既に確定した音（result側のマッピング後MIDI）を、それより先は
@@ -430,7 +454,7 @@ function heartopiaNeighborContext(idx, result, rawShiftedMidis, processedUpTo) {
   if (idx < 0 || idx >= result.length) return { raw: null, mapped: null };
   const raw = rawShiftedMidis[idx];
   if (raw == null) return { raw: null, mapped: null }; // 休符をまたいだ先は参照しない
-  const mapped = idx <= processedUpTo && result[idx].notes.length ? humNoteToMidi(result[idx].notes[0]) : raw;
+  const mapped = idx <= processedUpTo && result[idx].notes.length ? melodyNoteToMidi(result[idx].notes[0]) : raw;
   return { raw, mapped };
 }
 
@@ -492,10 +516,10 @@ function resolveHeartopiaNoteWithWideContext(k, result, rawShiftedMidis, availab
   return tied[0].entry.note;
 }
 
-// mapHumMelodyToInstrumentの結果(tokens)を、休符または長い音（既定2拍以上）で
+// mapMelodyToInstrumentの結果(tokens)を、休符または長い音（既定2拍以上）で
 // 区切って「フレーズ」に分割する。各フレーズについて、そのインデックス列・
 // 生データ側のシフト後MIDI列・現在のnotesのコピーを返す
-function splitHumPhrases(result, rawShiftedMidis, opts) {
+function splitMelodyPhrases(result, rawShiftedMidis, opts) {
   const options = opts || {};
   const longNoteBeats = options.longNoteBeats != null ? options.longNoteBeats : 2;
   const phrases = [];
@@ -518,10 +542,10 @@ function splitHumPhrases(result, rawShiftedMidis, opts) {
   return phrases;
 }
 
-// mapHumMelodyToInstrumentが返したtokensを、上記の考え方で仕上げる。
+// mapMelodyToInstrumentが返したtokensを、上記の考え方で仕上げる。
 // 戻り値のoptimizerLogは、実際に変更した音のみを{index, originalMidi,
 // mappedMidi, optimizedMidi, reason}の形で記録し、開発確認用ログにのみ使う
-function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, opts) {
+function optimizeMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, opts) {
   const options = opts || {};
   const burstMinRun = options.burstMinRun != null ? options.burstMinRun : 3;
   // 元データのシフト後MIDIがこの半音数を超えてばらけているのに最終的な音が
@@ -537,7 +561,7 @@ function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, 
   const optimizerLog = [];
   if (!availableNotes.length) return { tokens: result, optimizerLog };
 
-  const mappedMidiAt = (idx) => (result[idx].notes.length ? humNoteToMidi(result[idx].notes[0]) : null);
+  const mappedMidiAt = (idx) => (result[idx].notes.length ? melodyNoteToMidi(result[idx].notes[0]) : null);
 
   // ── 1. 異常な同音連打の検出と再解決 ──
   let i = 0;
@@ -556,9 +580,9 @@ function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, 
         for (let k = i; k <= j; k++) {
           const before = mappedMidiAt(k);
           const resolved = resolveHeartopiaNoteWithWideContext(k, result, rawShiftedMidis, availableNotes);
-          if (resolved && humNoteToMidi(resolved) !== before) {
+          if (resolved && melodyNoteToMidi(resolved) !== before) {
             result[k].notes = [{ degree: resolved.degree, accidental: resolved.accidental || null, octave: resolved.octave }];
-            optimizerLog.push({ index: k, originalMidi: rawShiftedMidis[k], mappedMidi: before, optimizedMidi: humNoteToMidi(resolved), reason: "burst-resolution" });
+            optimizerLog.push({ index: k, originalMidi: rawShiftedMidis[k], mappedMidi: before, optimizedMidi: melodyNoteToMidi(resolved), reason: "burst-resolution" });
           }
         }
       }
@@ -567,7 +591,7 @@ function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, 
   }
 
   // ── 2. 繰り返しフレーズの一貫性 ──
-  const phrases = splitHumPhrases(result, rawShiftedMidis, options.phrase);
+  const phrases = splitMelodyPhrases(result, rawShiftedMidis, options.phrase);
   const seenBySignature = new Map();
   phrases.forEach((phrase) => {
     if (phrase.rawShifted.length < 3 || phrase.rawShifted.some((m) => m == null)) return; // 短すぎるものは対象外
@@ -585,7 +609,7 @@ function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, 
       );
       if (!isPlayable) return;
       const before = mappedMidiAt(idx);
-      const wantedMidi = humNoteToMidi(wantedNote);
+      const wantedMidi = melodyNoteToMidi(wantedNote);
       if (before !== wantedMidi) {
         result[idx].notes = [{ ...wantedNote }];
         optimizerLog.push({ index: idx, originalMidi: rawShiftedMidis[idx], mappedMidi: before, optimizedMidi: wantedMidi, reason: "phrase-consistency" });
@@ -597,7 +621,7 @@ function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, 
 }
 
 // MIDI番号を「音名＋オクターブ」の表示用ラベルに変換する（デバッグログ専用）
-function humMidiLabel(midi) {
+function melodyMidiLabel(midi) {
   const rounded = Math.round(midi);
   const name = HUM_PITCH_CHROMATIC_NAMES[((rounded % 12) + 12) % 12];
   return `${name}${Math.floor(rounded / 12) - 1}`;
@@ -605,16 +629,16 @@ function humMidiLabel(midi) {
 
 // 「中間部分から異音が混じる」等の不具合調査用。生データ／正規化後／量子化後／
 // マッピング後／最適化後の5段階をconsoleに出す（[HUM-OPT]行は実際に最適化層で
-// 変更が入った音のみ）。DEBUG_HUM_ANALYSISがtrueの時、またはwindow.HUM_DEBUGが
+// 変更が入った音のみ）。DEBUG_MELODY_ANALYSISがtrueの時、またはwindow.HUM_DEBUGが
 // trueの時だけ呼ばれる
-function logHumAnalysisStages(rawEvents, normalized, timeline, mappedTokens, changes, octaveShift, optimizedTokens, optimizerLog) {
+function logMelodyAnalysisStages(rawEvents, normalized, timeline, mappedTokens, changes, octaveShift, optimizedTokens, optimizerLog) {
   console.log("=== HUM ANALYSIS ===");
   console.log(`RAW (${rawEvents.length}件)`);
-  rawEvents.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${humMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
+  rawEvents.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${melodyMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
   console.log(`NORMALIZED (${normalized.length}件)`);
-  normalized.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${humMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
+  normalized.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${melodyMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
   console.log(`QUANTIZED (${timeline.length}件)`);
-  timeline.forEach((e) => console.log(e.midi == null ? `rest  ${e.beats}拍` : `${humMidiLabel(e.midi)}  ${e.beats}拍`));
+  timeline.forEach((e) => console.log(e.midi == null ? `rest  ${e.beats}拍` : `${melodyMidiLabel(e.midi)}  ${e.beats}拍`));
   console.log(`MAPPED (オクターブシフト${octaveShift / 12}オクターブ、変更${changes.length}件)`);
   const changeByIndex = new Map(changes.map((c) => [c.index, c]));
   mappedTokens.forEach((t, i) => {
@@ -623,15 +647,15 @@ function logHumAnalysisStages(rawEvents, normalized, timeline, mappedTokens, cha
       return;
     }
     const change = changeByIndex.get(i);
-    const label = humMidiLabel(humNoteToMidi(t.notes[0]));
-    console.log(change ? `${humMidiLabel(change.fromMidi)} -> ${humMidiLabel(change.toMidi)}` : `${label} -> ${label}`);
+    const label = melodyMidiLabel(melodyNoteToMidi(t.notes[0]));
+    console.log(change ? `${melodyMidiLabel(change.fromMidi)} -> ${melodyMidiLabel(change.toMidi)}` : `${label} -> ${label}`);
   });
   if (optimizedTokens) {
     console.log(`OPTIMIZED (Heartopia Melody Optimizer, 変更${optimizerLog.length}件)`);
-    optimizedTokens.forEach((t, i) => console.log(t.notes.length ? humMidiLabel(humNoteToMidi(t.notes[0])) : "rest"));
+    optimizedTokens.forEach((t, i) => console.log(t.notes.length ? melodyMidiLabel(melodyNoteToMidi(t.notes[0])) : "rest"));
     optimizerLog.forEach((c) => {
       console.log(
-        `[HUM-OPT] index=${c.index} original=${humMidiLabel(c.originalMidi)} mapped=${humMidiLabel(c.mappedMidi)} optimized=${humMidiLabel(c.optimizedMidi)} reason=${c.reason}`
+        `[HUM-OPT] index=${c.index} original=${melodyMidiLabel(c.originalMidi)} mapped=${melodyMidiLabel(c.mappedMidi)} optimized=${melodyMidiLabel(c.optimizedMidi)} reason=${c.reason}`
       );
     });
   }
@@ -639,32 +663,39 @@ function logHumAnalysisStages(rawEvents, normalized, timeline, mappedTokens, cha
 
 // Basic Pitchのノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を
 // tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）に変換する
-// （normalizeHumNoteEvents → quantizeHumRhythm → mapHumMelodyToInstrument →
+// （normalizeMelodyNoteEvents → quantizeMelodyRhythm → mapMelodyToInstrument →
 // optimizeHumMelodyForHeartopeaの4段階。最適化層はマッピング直後に一度だけ通す）
-function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
+function convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
-  const debugEnabled = options.debug || DEBUG_HUM_ANALYSIS || (typeof window !== "undefined" && window.HUM_DEBUG);
+  const sourceType = options.sourceType || "humming"; // "humming" | "audio" | "video" | "midi"（midiはフェーズ2で追加予定、未実装）
+  const debugEnabled = options.debug || DEBUG_MELODY_ANALYSIS || (typeof window !== "undefined" && (window.HUM_DEBUG || window.MELODY_DEBUG));
   // 「実際に演奏できる音」は、楽器・配置に加えて半音表示ON/OFFでも変わる
   // （22キー＋半音ONならF#等も使用可能）。呼び出し側から明示的に渡された値を
   // 最優先し、渡されなければmusic-editor.js側の半音表示トグル(semitoneEnabled)の
   // 現在値を見る（どちらも無ければOFF相当として自然音のみ扱う）
   const resolvedSemitoneEnabled =
     options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
-  const availableNotes = buildHumInstrumentNoteMap(layout, resolvedSemitoneEnabled);
-  const normalized = normalizeHumNoteEvents(noteEvents, bpmValue, options.normalize);
+  const availableNotes = buildInstrumentNoteMap(layout, resolvedSemitoneEnabled);
+  const normalized = normalizeMelodyNoteEvents(noteEvents, bpmValue, { sourceType, ...options.normalize });
   if (!normalized.length) {
-    if (debugEnabled) logHumAnalysisStages(noteEvents, normalized, [], [], [], 0);
+    if (debugEnabled) logMelodyAnalysisStages(noteEvents, normalized, [], [], [], 0);
     return [];
   }
 
-  const timeline = quantizeHumRhythm(normalized, bpmValue, options.rhythm);
-  const { tokens: mappedTokens, changes, octaveShift, rawShiftedMidis } = mapHumMelodyToInstrument(timeline, availableNotes, options.mapping);
-  const { tokens, optimizerLog } = optimizeHumMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, options.optimize);
+  const timeline = quantizeMelodyRhythm(normalized, bpmValue, options.rhythm);
+  const { tokens: mappedTokens, changes, octaveShift, rawShiftedMidis } = mapMelodyToInstrument(timeline, availableNotes, options.mapping);
+  const { tokens, optimizerLog } = optimizeMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, options.optimize);
 
   if (debugEnabled) {
-    logHumAnalysisStages(noteEvents, normalized, timeline, mappedTokens, changes, octaveShift, tokens, optimizerLog);
+    logMelodyAnalysisStages(noteEvents, normalized, timeline, mappedTokens, changes, octaveShift, tokens, optimizerLog);
   }
   return tokens;
+}
+
+// 後方互換のための薄いラッパー。「ハミングから作る」機能はこの名前のまま
+// 呼び出し続けられる（sourceTypeは既定の"humming"のまま）
+function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
+  return convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts);
 }
 
 // ── ここから下はブラウザAPI（マイク・CDN読み込み・TensorFlow.js）に依存する部分 ──
@@ -686,11 +717,19 @@ const BASIC_PITCH_SAMPLE_RATE = 22050;
 // outputToNotesPolyの解析パラメータ（onset閾値・frame閾値・最小音符長(フレーム数)）。
 // この3値が検出結果の粒度（1つの音が細かく分割されるかどうか等）に直接影響するため
 // 名前付きの定数として切り出してあるが、実機の鼻歌データで比較検証できていないため、
-// 値そのものは既存のまま変更していない（分割された音の統合はnormalizeHumNoteEvents側の
+// 値そのものは既存のまま変更していない（分割された音の統合はnormalizeMelodyNoteEvents側の
 // 後処理で対応する）
 const BASIC_PITCH_ONSET_THRESHOLD = 0.25;
 const BASIC_PITCH_FRAME_THRESHOLD = 0.25;
 const BASIC_PITCH_MIN_NOTE_LENGTH_FRAMES = 5;
+
+// 「音源から作る」「動画から作る」で選べるファイルの上限。iPhone/iPadのSafariは
+// タブあたりのメモリに厳しい制限があり、巨大なAudioBuffer（特にOfflineAudioContextでの
+// リサンプル時に倍増する）でタブごとクラッシュしうるため、事前に上限を設けて弾く。
+// 値は「数分程度の楽曲なら確実に収まり、長時間の録画等の極端なケースだけを弾く」
+// ことを狙った目安（実機での上限検証はできていない。詳細は実装後の報告を参照）
+const MELODY_SOURCE_MAX_FILE_BYTES = 60 * 1024 * 1024; // 60MB
+const MELODY_SOURCE_MAX_DURATION_SEC = 360; // 6分
 
 let basicPitchLoaded = false;
 let basicPitchModel = null;
@@ -700,6 +739,10 @@ let humRecordedChunks = [];
 let humRecordingStartTime = 0;
 let humRecordingTimer = null;
 let humSourceBlob = null;
+// 現在開いているモーダルの入力元。"humming"（録音+ハミングアップロード）は
+// 既存動作のまま、"audio"/"video"はファイル選択のみのモードとして同じモーダルを
+// 使い回す（重複するUI/処理を避けるため、新しいモーダルを別途作らない）
+let humSourceMode = "humming";
 
 async function ensureBasicPitchLoaded(onStatus) {
   if (basicPitchLoaded) return;
@@ -997,16 +1040,62 @@ function updateHumRecordingClock() {
 }
 
 // ── モーダルの開閉・操作結線 ──
-function openHumModal() {
+// モードごとのモーダル文言・受け付けるファイル種別。"humming"は既存の
+// 録音+アップロード両対応のまま、"audio"/"video"はアップロードのみ（録音行を隠す）
+const MELODY_SOURCE_MODE_CONFIG = {
+  humming: {
+    accept: "audio/*,video/*",
+    titleKey: ["music_hum_modal_title", "ハミングから作る"],
+    cautionKey: ["music_hum_caution", "ゆっくり・はっきりと、1音ずつ鼻歌を歌うと綺麗に変換されます。速い曲や和音、伴奏が混ざった音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、録音・アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません"],
+    uploadKey: ["music_hum_upload", "音声・動画ファイルを選ぶ"],
+    showRecordRow: true,
+  },
+  audio: {
+    accept: "audio/*",
+    titleKey: ["music_audio_modal_title", "音源から作る"],
+    cautionKey: ["music_audio_caution", "ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されます。伴奏やドラム、ベースが強い音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません（6分・60MBまでのファイルに対応しています）"],
+    uploadKey: ["music_audio_upload", "音声ファイルを選ぶ"],
+    showRecordRow: false,
+  },
+  video: {
+    accept: "video/*",
+    titleKey: ["music_video_modal_title", "動画から作る"],
+    cautionKey: ["music_video_caution", "動画から音声トラックを取り出して解析します。ボーカルや主旋律がはっきり聞こえる動画ほど綺麗に変換されます。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした動画はこの端末のブラウザ内だけで処理され、外部に送信されることはありません（6分・60MBまでのファイルに対応しています）"],
+    uploadKey: ["music_video_upload", "動画ファイルを選ぶ"],
+    showRecordRow: false,
+  },
+};
+
+function openMelodySourceModal(mode) {
+  humSourceMode = mode;
+  const config = MELODY_SOURCE_MODE_CONFIG[mode];
   humSourceBlob = null;
   document.getElementById("musicHumError").textContent = "";
   document.getElementById("musicHumRecordingRow").style.display = "none";
   document.getElementById("musicHumFileRow").style.display = "none";
   document.getElementById("musicHumProgressRow").style.display = "none";
-  document.getElementById("musicHumRecordBtn").style.display = "";
+  document.getElementById("musicHumRecordBtn").style.display = config.showRecordRow ? "" : "none";
+  document.getElementById("musicHumPitchRow").style.display = "none";
   document.getElementById("musicHumFileInput").value = "";
+  document.getElementById("musicHumFileInput").accept = config.accept;
   document.getElementById("musicHumAnalyzeBtn").disabled = true;
+  document.getElementById("musicHumModalTitle").textContent = T(...config.titleKey);
+  document.getElementById("musicHumCautionText").textContent = T(...config.cautionKey);
+  document.getElementById("musicHumUploadText").textContent = T(...config.uploadKey);
   document.getElementById("musicHumModal").style.display = "block";
+}
+
+// 既存の「ハミングから作る」ボタンから呼ばれる後方互換の薄いラッパー
+function openHumModal() {
+  openMelodySourceModal("humming");
+}
+
+function openAudioSourceModal() {
+  openMelodySourceModal("audio");
+}
+
+function openVideoSourceModal() {
+  openMelodySourceModal("video");
 }
 
 function closeHumModal() {
@@ -1039,12 +1128,24 @@ async function onHumStopClick() {
 function onHumFileChosen(e) {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
+  const errorEl = document.getElementById("musicHumError");
+  errorEl.textContent = "";
+  if (file.size > MELODY_SOURCE_MAX_FILE_BYTES) {
+    errorEl.textContent = T("music_melody_file_too_large", "ファイルサイズが大きすぎます（上限60MB）。ファイルを短くするか圧縮してからお試しください");
+    e.target.value = "";
+    return;
+  }
   humSourceBlob = file;
   document.getElementById("musicHumFileRow").style.display = "";
   document.getElementById("musicHumFileName").textContent = file.name;
   document.getElementById("musicHumAnalyzeBtn").disabled = false;
 }
 
+// 「ハミングから作る」「音源から作る」「動画から作る」共通の解析処理。
+// ファイル形式・サイズ・長さ・モデル読み込み・解析・0件検出のそれぞれで、
+// どこで失敗したかが利用者に分かるよう個別のメッセージを出す
+// （「メモリ不足」自体はJSから確実に検知できない＝ブラウザがタブごと
+// 落ちる形で失敗しうるため、事前のファイルサイズ・長さ上限で予防する方針にした）
 async function onHumAnalyzeClick() {
   if (!humSourceBlob) return;
   const errorEl = document.getElementById("musicHumError");
@@ -1061,27 +1162,68 @@ async function onHumAnalyzeClick() {
     if (typeof pct === "number") progressFill.style.width = `${Math.round(pct * 100)}%`;
     if (label) progressLabel.textContent = label;
   };
+  const fail = (message) => {
+    errorEl.textContent = message;
+    analyzeBtn.disabled = false;
+    progressRow.style.display = "none";
+  };
 
   try {
     await ensureBasicPitchLoaded((label) => setProgress(0, label));
+  } catch (e) {
+    console.error(e);
+    fail(T("music_hum_model_load_error", "解析モデルの読み込みに失敗しました。通信環境を確認してからもう一度お試しください"));
+    return;
+  }
+
+  let audioBuffer;
+  try {
     setProgress(0.1, T("music_hum_progress_decoding", "音声を解析用に変換中…"));
-    const audioBuffer = await humDecodeAudioToBuffer(humSourceBlob, (label) => setProgress(0.1, label));
+    audioBuffer = await humDecodeAudioToBuffer(humSourceBlob, (label) => setProgress(0.1, label));
+  } catch (e) {
+    console.error(e);
+    fail(
+      T(
+        "music_melody_unsupported_file",
+        "このファイルを読み込めませんでした。対応形式（MP3, WAV, M4A, AAC, OGG, WebM, MP4, MOV等）かご確認ください"
+      )
+    );
+    return;
+  }
+
+  if (audioBuffer.duration > MELODY_SOURCE_MAX_DURATION_SEC) {
+    fail(T("music_melody_duration_too_long", "音声が長すぎます（上限6分）。ファイルを短く編集してからお試しください"));
+    return;
+  }
+
+  let noteEvents;
+  try {
     setProgress(0.2, T("music_hum_progress_detecting", "音の高さを検出中…"));
-    const noteEvents = await runBasicPitchAnalysis(audioBuffer, (p) =>
+    noteEvents = await runBasicPitchAnalysis(audioBuffer, (p) =>
       setProgress(0.2 + p * 0.7, T("music_hum_progress_detecting", "音の高さを検出中…"))
     );
+  } catch (e) {
+    console.error(e);
+    fail(T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください"));
+    return;
+  }
+
+  try {
     setProgress(0.95, T("music_hum_progress_converting", "譜面に変換中…"));
 
     const inst = getInstrument(currentInstrumentId);
     const layout = getLayout(inst, currentLayoutId);
     // 半音表示ON/OFFの現在の設定(music-editor.js側のトグル)をそのまま使う。
-    // 22キー＋半音ONならF#等も実際に演奏できる音として扱われる
-    const newTokens = convertHumNotesToTokens(noteEvents, layout, bpm, { semitoneEnabled });
+    // 22キー＋半音ONならF#等も実際に演奏できる音として扱われる。
+    // sourceTypeは現在開いているモーダルの種別（ハミング/音源/動画）をそのまま渡す
+    const newTokens = convertMelodyToScoreTokens(noteEvents, layout, bpm, { semitoneEnabled, sourceType: humSourceMode });
 
     if (!newTokens.length) {
-      errorEl.textContent = T("music_hum_no_notes", "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください");
-      analyzeBtn.disabled = false;
-      progressRow.style.display = "none";
+      fail(
+        humSourceMode === "humming"
+          ? T("music_hum_no_notes", "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください")
+          : T("music_melody_no_notes_file", "主旋律を検出できませんでした。別のファイルでお試しください")
+      );
       return;
     }
 
@@ -1098,14 +1240,14 @@ async function onHumAnalyzeClick() {
     showToast(T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
   } catch (e) {
     console.error(e);
-    errorEl.textContent = T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください");
-    analyzeBtn.disabled = false;
-    progressRow.style.display = "none";
+    fail(T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください"));
   }
 }
 
 function bindHumControls() {
   document.getElementById("musicHumOpenBtn").addEventListener("click", openHumModal);
+  document.getElementById("musicAudioOpenBtn").addEventListener("click", openAudioSourceModal);
+  document.getElementById("musicVideoOpenBtn").addEventListener("click", openVideoSourceModal);
   document.getElementById("musicHumCloseBtn").addEventListener("click", closeHumModal);
   document.getElementById("musicHumRecordBtn").addEventListener("click", onHumRecordClick);
   document.getElementById("musicHumStopBtn").addEventListener("click", onHumStopClick);
