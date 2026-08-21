@@ -1503,30 +1503,12 @@ body.dark .art-ssi-error{
   color:#e07060;
 }
 
-.art-ssi-region-wrap{
-  position:relative;
-  width:100%;
-  overflow:hidden;
+.art-ssi-detected-preview{
+  display:block;
+  max-width:100%;
+  margin:0 auto 14px;
   border-radius:8px;
   border:1px solid var(--border, #ddd);
-  margin-bottom:12px;
-  line-height:0;
-}
-
-.art-ssi-region-wrap img{
-  display:block;
-  width:100%;
-  height:auto;
-  pointer-events:none;
-  user-select:none;
-}
-
-.art-ssi-region-wrap canvas{
-  position:absolute;
-  top:0;
-  left:0;
-  cursor:crosshair;
-  touch-action:none;
 }
 
 .art-ssi-candidate-list{
