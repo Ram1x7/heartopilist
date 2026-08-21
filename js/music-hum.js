@@ -371,6 +371,7 @@ function mapHumMelodyToInstrument(events, layout, opts) {
 
   const tokens = [];
   const changes = [];
+  const rawShiftedMidis = []; // 各tokenに対応する「シフト後・ゲーム内音へスナップする前」のMIDI(休符はnull)。後段の最適化層が参照する
   let prevMappedMidi = null;
   let prevShiftedMidi = null;
 
@@ -378,6 +379,7 @@ function mapHumMelodyToInstrument(events, layout, opts) {
     const e = events[i];
     if (e.midi == null) {
       tokens.push({ notes: [], beats: e.beats });
+      rawShiftedMidis.push(null);
       prevMappedMidi = null;
       prevShiftedMidi = null;
       continue;
@@ -393,11 +395,200 @@ function mapHumMelodyToInstrument(events, layout, opts) {
     const chosen = pickClosestHumNoteWithContour(shiftedMidi, availableNotes, { prevShiftedMidi, prevMappedMidi, nextShiftedMidi });
     const chosenMidi = humNoteToMidi(chosen);
     tokens.push({ notes: [{ degree: chosen.degree, accidental: chosen.accidental || null, octave: chosen.octave }], beats: e.beats });
+    rawShiftedMidis.push(shiftedMidi);
     if (chosenMidi !== shiftedMidi) changes.push({ index: i, fromMidi: shiftedMidi, toMidi: chosenMidi });
     prevMappedMidi = chosenMidi;
     prevShiftedMidi = shiftedMidi;
   }
-  return { tokens, changes, octaveShift: shift };
+  return { tokens, changes, octaveShift: shift, rawShiftedMidis };
+}
+
+// ── Heartopia Melody Optimizer ──────────────────────────────────────────
+// mapHumMelodyToInstrumentは前後1音までしか見ておらず、狭い帯域の細かい
+// ピッチの揺れはnormalizeHumNoteEvents側のconsolidateUnstablePitchClustersで
+// 既に吸収済みだが、由来の異なる複数の実音（本来別々の音程）が、ゲーム内
+// 音への変換時にたまたま同じ1音へ衝突してしまうケースまでは防げない。
+// この層は、そうした「マッピング後に生じた異常な同音連打」を検出したときだけ、
+// 前後2音まで見た広いコンテキスト（輪郭・音程差の形）で候補を再評価する。
+// あわせて、休符や長い音で区切られた「フレーズ」が曲中に繰り返し出現する
+// 場合、初出時の変換結果を後続の同じ音程パターンにも適用し、同じフレーズ
+// なのに変換結果がバラつくことを防ぐ。
+//
+// リズム(beats)は一切変更しない。convertHumNotesToTokens内で一度だけ、
+// mapHumMelodyToInstrumentの直後に呼ばれる（二重に最適化がかかることはない）
+
+// 指定インデックスの「輪郭比較用の参照点」を求める。processedUpTo以前は
+// このパスで既に確定した音（result側のマッピング後MIDI）を、それより先は
+// まだ確定していない同じ塊の内部なので生データ側のシフト後MIDIを代わりに使う
+function heartopiaNeighborContext(idx, result, rawShiftedMidis, processedUpTo) {
+  if (idx < 0 || idx >= result.length) return { raw: null, mapped: null };
+  const raw = rawShiftedMidis[idx];
+  if (raw == null) return { raw: null, mapped: null }; // 休符をまたいだ先は参照しない
+  const mapped = idx <= processedUpTo && result[idx].notes.length ? humNoteToMidi(result[idx].notes[0]) : raw;
+  return { raw, mapped };
+}
+
+// 候補音1つのスコアを計算する。距離を主軸に、直前・直後それぞれ1音・2音先まで
+// 見た輪郭（上昇/下降）の食い違いと、直前の音との音程差の形の違いにペナルティを
+// 加える（2音先・音程差の形は、直前1音の輪郭より弱い重みとする）
+function scoreHeartopiaCandidate(candidateMidi, targetMidi, prev2, prev1, next1, next2) {
+  let score = Math.abs(candidateMidi - targetMidi);
+  if (prev1.mapped != null && prev1.raw != null) {
+    const detectedDir = Math.sign(targetMidi - prev1.raw);
+    const candidateDir = Math.sign(candidateMidi - prev1.mapped);
+    if (detectedDir !== 0 && candidateDir !== 0 && detectedDir !== candidateDir) score += 0.9;
+    const detectedInterval = targetMidi - prev1.raw;
+    const candidateInterval = candidateMidi - prev1.mapped;
+    score += Math.abs(detectedInterval - candidateInterval) * 0.15;
+  }
+  if (next1.mapped != null && next1.raw != null) {
+    const detectedDirNext = Math.sign(next1.raw - targetMidi);
+    const candidateDirNext = Math.sign(next1.mapped - candidateMidi);
+    if (detectedDirNext !== 0 && candidateDirNext !== 0 && detectedDirNext !== candidateDirNext) score += 0.4;
+  }
+  if (prev2.mapped != null && prev2.raw != null) {
+    const detectedDir2 = Math.sign(targetMidi - prev2.raw);
+    const candidateDir2 = Math.sign(candidateMidi - prev2.mapped);
+    if (detectedDir2 !== 0 && candidateDir2 !== 0 && detectedDir2 !== candidateDir2) score += 0.3;
+  }
+  if (next2.mapped != null && next2.raw != null) {
+    const detectedDir2Next = Math.sign(next2.raw - targetMidi);
+    const candidateDir2Next = Math.sign(next2.mapped - candidateMidi);
+    if (detectedDir2Next !== 0 && candidateDir2Next !== 0 && detectedDir2Next !== candidateDir2Next) score += 0.2;
+  }
+  return score;
+}
+
+// インデックスkの音を、前後2音までの広いコンテキストで再評価し、最も自然な
+// ゲーム内音を返す。スコアがほぼ同点の候補が複数ある場合（例：狭い音階配置で
+// 元の音がちょうど2つの使用可能音の中間にあるようなケース）、単純に距離が
+// 小さい方を機械的に選ぶと直前の音への「不自然な連打」を増やしやすいため、
+// 同点内で直前の音と異なる候補があればそちらを優先する
+function resolveHeartopiaNoteWithWideContext(k, result, rawShiftedMidis, availableNotes) {
+  const targetMidi = rawShiftedMidis[k];
+  if (targetMidi == null) return null;
+  const prev1 = heartopiaNeighborContext(k - 1, result, rawShiftedMidis, k - 1);
+  const prev2 = heartopiaNeighborContext(k - 2, result, rawShiftedMidis, k - 1);
+  const next1 = heartopiaNeighborContext(k + 1, result, rawShiftedMidis, k - 1);
+  const next2 = heartopiaNeighborContext(k + 2, result, rawShiftedMidis, k - 1);
+
+  const scored = availableNotes
+    .map((entry) => ({ entry, score: scoreHeartopiaCandidate(entry.midi, targetMidi, prev2, prev1, next1, next2) }))
+    .sort((a, b) => a.score - b.score);
+  if (!scored.length) return null;
+
+  const tieEpsilon = 0.05;
+  const tied = scored.filter((s) => s.score - scored[0].score <= tieEpsilon);
+  if (tied.length > 1 && prev1.mapped != null) {
+    const differing = tied.find((s) => s.entry.midi !== prev1.mapped);
+    if (differing) return differing.entry.note;
+  }
+  return tied[0].entry.note;
+}
+
+// mapHumMelodyToInstrumentの結果(tokens)を、休符または長い音（既定2拍以上）で
+// 区切って「フレーズ」に分割する。各フレーズについて、そのインデックス列・
+// 生データ側のシフト後MIDI列・現在のnotesのコピーを返す
+function splitHumPhrases(result, rawShiftedMidis, opts) {
+  const options = opts || {};
+  const longNoteBeats = options.longNoteBeats != null ? options.longNoteBeats : 2;
+  const phrases = [];
+  let current = { indexes: [], rawShifted: [], notes: [] };
+  const flush = () => {
+    if (current.indexes.length) phrases.push(current);
+    current = { indexes: [], rawShifted: [], notes: [] };
+  };
+  result.forEach((t, idx) => {
+    if (!t.notes.length) {
+      flush();
+      return;
+    }
+    current.indexes.push(idx);
+    current.rawShifted.push(rawShiftedMidis[idx]);
+    current.notes.push({ ...t.notes[0] });
+    if (t.beats >= longNoteBeats) flush();
+  });
+  flush();
+  return phrases;
+}
+
+// mapHumMelodyToInstrumentが返したtokensを、上記の考え方で仕上げる。
+// 戻り値のoptimizerLogは、実際に変更した音のみを{index, originalMidi,
+// mappedMidi, optimizedMidi, reason}の形で記録し、開発確認用ログにのみ使う
+function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, layout, opts) {
+  const options = opts || {};
+  const burstMinRun = options.burstMinRun != null ? options.burstMinRun : 3;
+  // 元データのシフト後MIDIがこの半音数を超えてばらけているのに最終的な音が
+  // 同じ場合だけ「マッピング時の衝突による異常な連打」とみなす。人が同じ音を
+  // 意図して繰り返す場合の自然なピッチのブレは概ね0.2〜0.3半音程度のため、
+  // それより十分大きい0.5半音を閾値とする。狭い帯域の揺れそのものは正規化
+  // 段階(consolidateUnstablePitchClusters)で既に1音へ統合済みのため、ここまで
+  // 残っている同音連打は基本的に、狭い音階配置(全音・半音間隔)特有の
+  // 「別々の実音が同じ1つの使用可能音へ吸着する」衝突である
+  const burstOriginalSpreadSemitones = options.burstOriginalSpreadSemitones != null ? options.burstOriginalSpreadSemitones : 0.5;
+
+  const availableNotes = buildHumInstrumentNoteMap(layout);
+  const result = tokens.map((t) => ({ notes: t.notes.map((n) => ({ ...n })), beats: t.beats }));
+  const optimizerLog = [];
+  if (!availableNotes.length) return { tokens: result, optimizerLog };
+
+  const mappedMidiAt = (idx) => (result[idx].notes.length ? humNoteToMidi(result[idx].notes[0]) : null);
+
+  // ── 1. 異常な同音連打の検出と再解決 ──
+  let i = 0;
+  while (i < result.length) {
+    if (mappedMidiAt(i) == null) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j + 1 < result.length && mappedMidiAt(j + 1) === mappedMidiAt(i)) j++;
+    const runLength = j - i + 1;
+    if (runLength >= burstMinRun) {
+      const originalSlice = rawShiftedMidis.slice(i, j + 1).filter((m) => m != null);
+      const spread = originalSlice.length ? Math.max(...originalSlice) - Math.min(...originalSlice) : 0;
+      if (spread > burstOriginalSpreadSemitones) {
+        for (let k = i; k <= j; k++) {
+          const before = mappedMidiAt(k);
+          const resolved = resolveHeartopiaNoteWithWideContext(k, result, rawShiftedMidis, availableNotes);
+          if (resolved && humNoteToMidi(resolved) !== before) {
+            result[k].notes = [{ degree: resolved.degree, accidental: resolved.accidental || null, octave: resolved.octave }];
+            optimizerLog.push({ index: k, originalMidi: rawShiftedMidis[k], mappedMidi: before, optimizedMidi: humNoteToMidi(resolved), reason: "burst-resolution" });
+          }
+        }
+      }
+    }
+    i = j + 1;
+  }
+
+  // ── 2. 繰り返しフレーズの一貫性 ──
+  const phrases = splitHumPhrases(result, rawShiftedMidis, options.phrase);
+  const seenBySignature = new Map();
+  phrases.forEach((phrase) => {
+    if (phrase.rawShifted.length < 3 || phrase.rawShifted.some((m) => m == null)) return; // 短すぎるものは対象外
+    const signature = phrase.rawShifted.slice(1).map((m, idx) => Math.round(m - phrase.rawShifted[idx])).join(",");
+    const seen = seenBySignature.get(signature);
+    if (!seen) {
+      seenBySignature.set(signature, phrase);
+      return;
+    }
+    phrase.indexes.forEach((idx, pos) => {
+      const wantedNote = seen.notes[pos];
+      if (!wantedNote) return;
+      const isPlayable = availableNotes.some(
+        (a) => a.note.degree === wantedNote.degree && (a.note.accidental || null) === (wantedNote.accidental || null) && a.note.octave === wantedNote.octave
+      );
+      if (!isPlayable) return;
+      const before = mappedMidiAt(idx);
+      const wantedMidi = humNoteToMidi(wantedNote);
+      if (before !== wantedMidi) {
+        result[idx].notes = [{ ...wantedNote }];
+        optimizerLog.push({ index: idx, originalMidi: rawShiftedMidis[idx], mappedMidi: before, optimizedMidi: wantedMidi, reason: "phrase-consistency" });
+      }
+    });
+  });
+
+  return { tokens: result, optimizerLog };
 }
 
 // MIDI番号を「音名＋オクターブ」の表示用ラベルに変換する（デバッグログ専用）
@@ -408,9 +599,10 @@ function humMidiLabel(midi) {
 }
 
 // 「中間部分から異音が混じる」等の不具合調査用。生データ／正規化後／量子化後／
-// 変換後の4段階をconsoleに出す。DEBUG_HUM_ANALYSISがtrueの時、または
-// window.HUM_DEBUGがtrueの時だけ呼ばれる
-function logHumAnalysisStages(rawEvents, normalized, timeline, tokens, changes, octaveShift) {
+// マッピング後／最適化後の5段階をconsoleに出す（[HUM-OPT]行は実際に最適化層で
+// 変更が入った音のみ）。DEBUG_HUM_ANALYSISがtrueの時、またはwindow.HUM_DEBUGが
+// trueの時だけ呼ばれる
+function logHumAnalysisStages(rawEvents, normalized, timeline, mappedTokens, changes, octaveShift, optimizedTokens, optimizerLog) {
   console.log("=== HUM ANALYSIS ===");
   console.log(`RAW (${rawEvents.length}件)`);
   rawEvents.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${humMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
@@ -420,7 +612,7 @@ function logHumAnalysisStages(rawEvents, normalized, timeline, tokens, changes, 
   timeline.forEach((e) => console.log(e.midi == null ? `rest  ${e.beats}拍` : `${humMidiLabel(e.midi)}  ${e.beats}拍`));
   console.log(`MAPPED (オクターブシフト${octaveShift / 12}オクターブ、変更${changes.length}件)`);
   const changeByIndex = new Map(changes.map((c) => [c.index, c]));
-  tokens.forEach((t, i) => {
+  mappedTokens.forEach((t, i) => {
     if (!t.notes.length) {
       console.log("rest");
       return;
@@ -429,11 +621,21 @@ function logHumAnalysisStages(rawEvents, normalized, timeline, tokens, changes, 
     const label = humMidiLabel(humNoteToMidi(t.notes[0]));
     console.log(change ? `${humMidiLabel(change.fromMidi)} -> ${humMidiLabel(change.toMidi)}` : `${label} -> ${label}`);
   });
+  if (optimizedTokens) {
+    console.log(`OPTIMIZED (Heartopia Melody Optimizer, 変更${optimizerLog.length}件)`);
+    optimizedTokens.forEach((t, i) => console.log(t.notes.length ? humMidiLabel(humNoteToMidi(t.notes[0])) : "rest"));
+    optimizerLog.forEach((c) => {
+      console.log(
+        `[HUM-OPT] index=${c.index} original=${humMidiLabel(c.originalMidi)} mapped=${humMidiLabel(c.mappedMidi)} optimized=${humMidiLabel(c.optimizedMidi)} reason=${c.reason}`
+      );
+    });
+  }
 }
 
 // Basic Pitchのノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を
 // tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）に変換する
-// （normalizeHumNoteEvents → quantizeHumRhythm → mapHumMelodyToInstrumentの3段階）
+// （normalizeHumNoteEvents → quantizeHumRhythm → mapHumMelodyToInstrument →
+// optimizeHumMelodyForHeartopeaの4段階。最適化層はマッピング直後に一度だけ通す）
 function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
   const debugEnabled = options.debug || DEBUG_HUM_ANALYSIS || (typeof window !== "undefined" && window.HUM_DEBUG);
@@ -444,10 +646,11 @@ function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   }
 
   const timeline = quantizeHumRhythm(normalized, bpmValue, options.rhythm);
-  const { tokens, changes, octaveShift } = mapHumMelodyToInstrument(timeline, layout, options.mapping);
+  const { tokens: mappedTokens, changes, octaveShift, rawShiftedMidis } = mapHumMelodyToInstrument(timeline, layout, options.mapping);
+  const { tokens, optimizerLog } = optimizeHumMelodyForHeartopia(mappedTokens, rawShiftedMidis, layout, options.optimize);
 
   if (debugEnabled) {
-    logHumAnalysisStages(noteEvents, normalized, timeline, tokens, changes, octaveShift);
+    logHumAnalysisStages(noteEvents, normalized, timeline, mappedTokens, changes, octaveShift, tokens, optimizerLog);
   }
   return tokens;
 }
