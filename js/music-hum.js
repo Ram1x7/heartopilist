@@ -39,18 +39,20 @@ function humNoteToMidi(note) {
   return 60 + semis + note.octave * 12;
 }
 
-// 楽器・配置(layout)が実際に鳴らせる音の一覧を、MIDI番号の昇順で返す
-// （22キーはchromaticGridも含めて半音まで対象にする。それ以外は自然音のみのgridで十分）
-function buildHumInstrumentNoteMap(layout) {
-  const grids = [layout.grid];
-  if (layout.chromaticGrid) grids.push(layout.chromaticGrid);
+// 楽器・配置(layout)が実際に鳴らせる音の一覧を、MIDI番号の昇順で返す。
+// 「22キー」ピアノは、実機と同じく半音(♯)表示のON/OFFで演奏できる音が
+// 変わるため、music-editor.js側の半音表示トグル(semitoneEnabled)と全く同じ
+// 条件分岐（`semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid
+// : layout.grid`。編集モードの譜面入力グリッド切り替えと共通のSingle Source
+// of Truth）を用いる。chromaticGridは自然音＋半音の両方を含むため、有効時は
+// それだけで良く、無効時（またはchromaticGridを持たない配置）はgridのみを使う
+function buildHumInstrumentNoteMap(layout, semitoneEnabled) {
+  const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
   const byMidi = new Map();
-  grids.forEach((rows) => {
-    rows.forEach((row) => {
-      row.forEach((note) => {
-        const midi = humNoteToMidi(note);
-        if (!byMidi.has(midi)) byMidi.set(midi, note);
-      });
+  grid.forEach((row) => {
+    row.forEach((note) => {
+      const midi = humNoteToMidi(note);
+      if (!byMidi.has(midi)) byMidi.set(midi, note);
     });
   });
   return Array.from(byMidi.entries())
@@ -359,12 +361,16 @@ function pickClosestHumNoteWithContour(midi, availableNotes, ctx) {
 // quantizeHumRhythmが返した[{midi, beats}, ...]（休符はmidi:null）を、
 // 楽器の音域へのオクターブシフト＋前後関係を考慮したゲーム内音への変換を経て
 // tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）にする。
+// availableNotesは呼び出し側でbuildHumInstrumentNoteMap()により、現在の
+// 楽器・配置・半音表示ON/OFFから求めた「実際に演奏できる音」の一覧を渡す
+// （このためF#等の半音は、半音表示ONの時は候補として使われ、ちょうど
+// 一致する音があれば距離0で必ず選ばれる。半音表示OFFの時は候補にすら
+// 含まれないため、使用可能な自然音へ変換される）。
 // 休符を挟むとメロディの輪郭比較はいったんリセットする（休符の前後は別フレーズ
 // とみなす）。changesには実際に「検出音そのままの音」から変更が生じた音を
 // 記録し、開発時の確認用ログにのみ使う
-function mapHumMelodyToInstrument(events, layout, opts) {
-  const availableNotes = buildHumInstrumentNoteMap(layout);
-  if (!availableNotes.length) return { tokens: events.map((e) => ({ notes: [], beats: e.beats })), changes: [], octaveShift: 0 };
+function mapHumMelodyToInstrument(events, availableNotes, opts) {
+  if (!availableNotes.length) return { tokens: events.map((e) => ({ notes: [], beats: e.beats })), changes: [], octaveShift: 0, rawShiftedMidis: events.map(() => null) };
 
   const detectedMidis = events.filter((e) => e.midi != null).map((e) => Math.round(e.midi));
   const shift = computeHumOctaveShift(detectedMidis, availableNotes);
@@ -515,7 +521,7 @@ function splitHumPhrases(result, rawShiftedMidis, opts) {
 // mapHumMelodyToInstrumentが返したtokensを、上記の考え方で仕上げる。
 // 戻り値のoptimizerLogは、実際に変更した音のみを{index, originalMidi,
 // mappedMidi, optimizedMidi, reason}の形で記録し、開発確認用ログにのみ使う
-function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, layout, opts) {
+function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, opts) {
   const options = opts || {};
   const burstMinRun = options.burstMinRun != null ? options.burstMinRun : 3;
   // 元データのシフト後MIDIがこの半音数を超えてばらけているのに最終的な音が
@@ -527,7 +533,6 @@ function optimizeHumMelodyForHeartopia(tokens, rawShiftedMidis, layout, opts) {
   // 「別々の実音が同じ1つの使用可能音へ吸着する」衝突である
   const burstOriginalSpreadSemitones = options.burstOriginalSpreadSemitones != null ? options.burstOriginalSpreadSemitones : 0.5;
 
-  const availableNotes = buildHumInstrumentNoteMap(layout);
   const result = tokens.map((t) => ({ notes: t.notes.map((n) => ({ ...n })), beats: t.beats }));
   const optimizerLog = [];
   if (!availableNotes.length) return { tokens: result, optimizerLog };
@@ -639,6 +644,13 @@ function logHumAnalysisStages(rawEvents, normalized, timeline, mappedTokens, cha
 function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
   const debugEnabled = options.debug || DEBUG_HUM_ANALYSIS || (typeof window !== "undefined" && window.HUM_DEBUG);
+  // 「実際に演奏できる音」は、楽器・配置に加えて半音表示ON/OFFでも変わる
+  // （22キー＋半音ONならF#等も使用可能）。呼び出し側から明示的に渡された値を
+  // 最優先し、渡されなければmusic-editor.js側の半音表示トグル(semitoneEnabled)の
+  // 現在値を見る（どちらも無ければOFF相当として自然音のみ扱う）
+  const resolvedSemitoneEnabled =
+    options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
+  const availableNotes = buildHumInstrumentNoteMap(layout, resolvedSemitoneEnabled);
   const normalized = normalizeHumNoteEvents(noteEvents, bpmValue, options.normalize);
   if (!normalized.length) {
     if (debugEnabled) logHumAnalysisStages(noteEvents, normalized, [], [], [], 0);
@@ -646,8 +658,8 @@ function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   }
 
   const timeline = quantizeHumRhythm(normalized, bpmValue, options.rhythm);
-  const { tokens: mappedTokens, changes, octaveShift, rawShiftedMidis } = mapHumMelodyToInstrument(timeline, layout, options.mapping);
-  const { tokens, optimizerLog } = optimizeHumMelodyForHeartopia(mappedTokens, rawShiftedMidis, layout, options.optimize);
+  const { tokens: mappedTokens, changes, octaveShift, rawShiftedMidis } = mapHumMelodyToInstrument(timeline, availableNotes, options.mapping);
+  const { tokens, optimizerLog } = optimizeHumMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, options.optimize);
 
   if (debugEnabled) {
     logHumAnalysisStages(noteEvents, normalized, timeline, mappedTokens, changes, octaveShift, tokens, optimizerLog);
@@ -1062,7 +1074,9 @@ async function onHumAnalyzeClick() {
 
     const inst = getInstrument(currentInstrumentId);
     const layout = getLayout(inst, currentLayoutId);
-    const newTokens = convertHumNotesToTokens(noteEvents, layout, bpm);
+    // 半音表示ON/OFFの現在の設定(music-editor.js側のトグル)をそのまま使う。
+    // 22キー＋半音ONならF#等も実際に演奏できる音として扱われる
+    const newTokens = convertHumNotesToTokens(noteEvents, layout, bpm, { semitoneEnabled });
 
     if (!newTokens.length) {
       errorEl.textContent = T("music_hum_no_notes", "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください");
