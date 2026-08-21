@@ -2,13 +2,17 @@
 // アイテム別プリセットの3Dプレビュー（検証段階：スウェットのみ対応）。
 //
 // ゲーム内の3Dアセットは一切使わない。既存のmaskLines（輪郭線データ、js/art-masks.js）を
-// 押し出して「ペーパークラフト風」の立体パネルを組み立て、実際に塗ったピクセル画像を
-// テクスチャとして貼り付けるという方式（参考サイトの制作者が「形はキャンバスのガイド線
-// から作っており、ゲーム内のモデルは使用していない」と明言しているものと同じ発想）。
+// 「1着の服を組み立てるための2D型紙」として扱い、フロント・バックの輪郭を直接つなぎ
+// 合わせた1つの立体（ロフト）として服を構築する。実際に塗ったピクセル画像をテクスチャ
+// として貼り付ける（参考サイトの制作者が「形はキャンバスのガイド線から作っており、
+// ゲーム内のモデルは使用していない」と明言しているものと同じ発想）。
 //
-// パーツをどう立体的に配置するか（位置・角度）はmaskLinesの座標だけからは自動で
-// 決まらないため、アイテムの種類ごとに手作業でレイアウトを定義する（FRAME_3D_LAYOUTS）。
-// 現時点ではスウェットのみ対応し、動作・見た目を確認してから他アイテムへ広げる想定。
+// 以前の実装はパーツごとに独立した平らな板（ExtrudeGeometry）を並べるだけだったため、
+// 「板を配置しただけ」に見えるという指摘を受けた。今回は、フロントとバックの輪郭を
+// 弧長に沿って同じ点数に再分割し、対応する点同士を側面でつないで1つの連続した胴体
+// メッシュを作る。首元も同様に、襟ぐりの弧を体表面〜少し持ち上げた高さの間でロフトし、
+// リング状の立ち襟にする。袖は円柱状に巻いた連続メッシュとして、実データから求めた
+// 肩〜脇の位置に取り付ける。
 //
 // three.js本体は重いため、ページ読み込み時には読み込まず、3Dプレビューを実際に
 // 開いた時だけCDNから遅延読み込みする（js/music-hum.jsのBasic Pitch読み込みと同じ方式）。
@@ -25,32 +29,32 @@ let art3DAnimHandle = null;
 let art3DResizeObserver = null;
 let art3DDisposables = []; // geometry/material/textureをまとめて破棄するため
 
-// パーツごとの立体配置。x/y/zはマス座標系を1/scaleに縮めた3D空間の単位。
-// depthはパネル自体の押し出し厚み。rotX/rotYはそれぞれの軸まわりの回転（ラジアン）。
+// スウェットの構造・寸法の設定。
 //
-// スウェットのmaskLinesは1パーツにつき2本のパス（path）で構成されている：
-// ・フロント/バックの本体（pathIndex:1）＝襟ぐりの切り込みが輪郭に直接含まれた
-//   胴体全体の形。t_shirtと同じく、そのまま平らな1枚パネルとして押し出せる
-// ・フロント/バックの襟（pathIndex:0）＝本体の外、襟ぐりのすぐ上に位置する
-//   小さな長方形。立ち襟のリブ部分にあたる別パーツとして、本体とは別に
-//   小さなパネルを組み立てる
-// ・袖（pathIndex:0/1）＝1枚の共有キャンバスに左右の袖が並んで描かれている。
-//   袖山（上部の丸いカーブ）と袖口（下部の直線）を持つ「型紙」形状なので、
-//   buildWrapGeometry()で円柱面に巻き付けて筒状にする。centerXは袖ごとの
-//   ローカルX中心（型紙の中心）で、そこを軸に対称に巻き付ける
+// front/back.neckArcRangeは、本体の輪郭（maskLines）のうち「襟ぐりが凹んでいる区間」
+// を指す配列の開始・終了インデックス（slice用、終了側は含まない）。これは
+// js/art-masks.jsの実データを直接調べて求めた固定値：
+// ・フロント本体の輪郭は index1〜9が襟ぐりの凹み（両端は肩の平らな線の終点）
+// ・バック本体の輪郭は index1〜7が襟ぐりの凹み（フロントよりわずかに浅い）
+// collarPathIndexは、同じキャンバスにある襟リブ用の小さな長方形パス（本体とは別パス）。
+//
+// sleeve.right/leftのx/y/zは、本体の肩(64,20)〜脇(64,48〜55)の実座標から求めた
+// おおよその取り付け位置（暫定値）。wrapRadius/wrapCenterXは袖の型紙をどの半径・
+// どの中心で円柱に巻き付けるか
 const FRAME_3D_LAYOUTS = {
   sweatshirt: {
     scale: 1 / 16,
-    depth: 0.06,
+    depth: 0.1,
+    torsoResample: 40,
+    collarRaise: 0.5,
     cameraDistance: 7.5,
-    parts: [
-      { partId: "default", pathIndex: 1, x: 0, y: 0, z: 0.05, rotY: 0 },
-      { partId: "canvas-1777618043251", pathIndex: 1, x: 0, y: 0, z: -0.05, rotY: Math.PI },
-      { partId: "default", pathIndex: 0, x: 0, y: 0, z: 0.08, rotY: 0 },
-      { partId: "canvas-1777618043251", pathIndex: 0, x: 0, y: 0, z: -0.08, rotY: Math.PI },
-      { partId: "canvas-1777618057689", pathIndex: 0, x: 1.9, y: 1.3, z: 0, rotY: -0.6, wrapRadius: 1.0, wrapCenterX: 1.875 },
-      { partId: "canvas-1777618057689", pathIndex: 1, x: -1.9, y: 1.3, z: 0, rotY: 0.6, wrapRadius: 1.0, wrapCenterX: -1.875 },
-    ],
+    front: { partId: "default", bodyPathIndex: 1, collarPathIndex: 0, neckArcRange: [1, 10] },
+    back: { partId: "canvas-1777618043251", bodyPathIndex: 1, collarPathIndex: 0, neckArcRange: [1, 8] },
+    sleeve: {
+      partId: "canvas-1777618057689",
+      right: { pathIndex: 0, wrapCenterX: 1.875, wrapRadius: 1.1, x: 1.7, y: 0.4, z: 0, rotY: -0.6 },
+      left: { pathIndex: 1, wrapCenterX: -1.875, wrapRadius: 1.1, x: -1.7, y: 0.4, z: 0, rotY: 0.6 },
+    },
   },
 };
 
@@ -110,13 +114,168 @@ function pixelsToTextureCanvas(pixelData, w, h, fallbackColor){
   return c;
 }
 
-// キャンバス上のピクセル座標をそのままUVに変換する。1つのキャンバスに複数の
-// パーツ（例：袖キャンバスの左右）が描かれている場合、ExtrudeGeometry/ShapeGeometryの
-// 既定のUV自動生成は「そのシェイプ自身の外接矩形」を基準に0〜1へ正規化するため、
-// キャンバス全体のうち自分の担当範囲だけを使うパーツでは誤ったUV（テクスチャ全体を
-// 引き伸ばして表示）になってしまう。そのため、キャンバスの実サイズ(w,h)を基準に
-// 明示的にUVを計算し直す。呼び出しは、位置をまだ立体化（巻き付けなど）する前の
-// 平らな状態のうちに行うこと（立体化後の座標からは元のピクセル位置を復元できないため）
+// maskLinesの1点（キャンバスのマス座標）を3D空間のローカル座標に変換する。
+// 元のピクセル座標(px,py)も持たせておき、後でテクスチャのUVを計算するのに使う
+function localizePath(path, w, h, scale){
+  return path.map(pt => ({
+    x: (pt.x - w / 2) * scale,
+    y: (h / 2 - pt.y) * scale, // マス座標は下向きが正のため、3D空間の上向きに反転する
+    px: pt.x,
+    py: pt.y,
+  }));
+}
+
+function pixelUV(pt, w, h){
+  return [pt.px / w, 1 - pt.py / h];
+}
+
+// 始点と終点が重なっている（閉じたループを表す）場合、重複した終点を取り除く
+function dedupClosed(pts){
+  if(pts.length > 1){
+    const a = pts[0], b = pts[pts.length - 1];
+    if(Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6) return pts.slice(0, -1);
+  }
+  return pts;
+}
+
+// 閉じたループ（重複終点は事前にdedupClosed()で取り除いておく）を、弧長に沿って
+// n個の点へ均等に再分割する。x/y/px/pyをすべて線形補間するので、これで作った
+// フロント・バックそれぞれのリングは「輪郭に沿った同じ割合の位置」同士が対応する
+function resampleClosedPath(pts, n){
+  const segLens = [];
+  let total = 0;
+  for(let i = 0; i < pts.length; i++){
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    const d = Math.hypot(b.x - a.x, b.y - a.y);
+    segLens.push(d);
+    total += d;
+  }
+  const out = [];
+  for(let k = 0; k < n; k++){
+    const target = total * k / n;
+    let acc = 0, i = 0;
+    while(i < segLens.length - 1 && acc + segLens[i] < target){ acc += segLens[i]; i++; }
+    const a = pts[i], b = pts[(i + 1) % pts.length];
+    const segLen = segLens[i] || 1e-9;
+    const t = Math.min(1, Math.max(0, (target - acc) / segLen));
+    out.push({
+      x: a.x + (b.x - a.x) * t,
+      y: a.y + (b.y - a.y) * t,
+      px: a.px + (b.px - a.px) * t,
+      py: a.py + (b.py - a.py) * t,
+    });
+  }
+  return out;
+}
+
+// フロントとバックの輪郭を弧長に沿って同じ点数に分割し、対応する点同士を側面で
+// つないだ1つの胴体メッシュを組み立てる（frontCap＋backCap＋側面）。
+// マテリアルは[フロント用, バック用, 側面用(無地)]の3つで、geometry.groups側で
+// 面ごとにどのマテリアルを使うかを振り分ける
+function buildLoftGeometry(THREE, frontRing, backRing, frontW, frontH, backW, backH){
+  const N = frontRing.length;
+  const positions = [];
+  const uvs = [];
+  const groups = [];
+
+  function pushTri(p0, p1, p2, uv0, uv1, uv2){
+    positions.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+    uvs.push(uv0[0], uv0[1], uv1[0], uv1[1], uv2[0], uv2[1]);
+  }
+
+  // フロントキャップ（+Z向き）
+  const frontStart = positions.length / 3;
+  const frontContour = frontRing.map(p => new THREE.Vector2(p.x, p.y));
+  THREE.ShapeUtils.triangulateShape(frontContour, []).forEach(([i0, i1, i2]) => {
+    pushTri(
+      frontRing[i0], frontRing[i1], frontRing[i2],
+      pixelUV(frontRing[i0], frontW, frontH), pixelUV(frontRing[i1], frontW, frontH), pixelUV(frontRing[i2], frontW, frontH)
+    );
+  });
+  groups.push([frontStart, positions.length / 3 - frontStart, 0]);
+
+  // バックキャップ（-Z向きになるよう、頂点順序を反転する）
+  const backStart = positions.length / 3;
+  const backContour = backRing.map(p => new THREE.Vector2(p.x, p.y));
+  THREE.ShapeUtils.triangulateShape(backContour, []).forEach(([i0, i1, i2]) => {
+    pushTri(
+      backRing[i0], backRing[i2], backRing[i1],
+      pixelUV(backRing[i0], backW, backH), pixelUV(backRing[i2], backW, backH), pixelUV(backRing[i1], backW, backH)
+    );
+  });
+  groups.push([backStart, positions.length / 3 - backStart, 1]);
+
+  // 側面（フロントとバックの対応する点同士をつなぐ。専用のアート画像がないため
+  // テクスチャは貼らず、無地の生地色マテリアルを使う）
+  const sideStart = positions.length / 3;
+  for(let i = 0; i < N; i++){
+    const j = (i + 1) % N;
+    const f0 = frontRing[i], f1 = frontRing[j], b0 = backRing[i], b1 = backRing[j];
+    pushTri(f0, f1, b1, [0, 0], [0, 0], [0, 0]);
+    pushTri(f0, b1, b0, [0, 0], [0, 0], [0, 0]);
+  }
+  groups.push([sideStart, positions.length / 3 - sideStart, 2]);
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  groups.forEach(([start, count, materialIndex]) => geometry.addGroup(start, count, materialIndex));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+// 首まわりのリブ襟：本体輪郭のうち襟ぐりの凹み部分の弧だけを取り出し、体表面の高さと
+// 少し持ち上げた高さの間でロフトして、立ち襟のような筒状の壁（両端は開いたリング状）
+// を作る。3D形状は本体の襟ぐり（neckArcRange）から、テクスチャは同じキャンバスにある
+// 襟リブ専用の小さな長方形パーツ（collarPathIndex）から取る
+function buildCollarGeometry(THREE, cfgSide, localBody, w, h, z, raise){
+  const [s, e] = cfgSide.neckArcRange;
+  const arc = localBody.slice(s, e);
+  const collarPath = PRESET_MASKS.sweatshirt[cfgSide.partId].maskLines[cfgSide.collarPathIndex];
+  const collarPx = collarPath.map(p => p.x);
+  const collarPy = collarPath.map(p => p.y);
+  const rectMinX = Math.min(...collarPx), rectMaxX = Math.max(...collarPx);
+  const rectMinY = Math.min(...collarPy), rectMaxY = Math.max(...collarPy);
+
+  let total = 0;
+  const cum = [0];
+  for(let i = 0; i < arc.length - 1; i++){
+    total += Math.hypot(arc[i + 1].x - arc[i].x, arc[i + 1].y - arc[i].y);
+    cum.push(total);
+  }
+
+  const positions = [];
+  const uvs = [];
+  for(let i = 0; i < arc.length - 1; i++){
+    const t0 = total > 0 ? cum[i] / total : 0;
+    const t1 = total > 0 ? cum[i + 1] / total : 0;
+    const px0 = rectMinX + t0 * (rectMaxX - rectMinX);
+    const px1 = rectMinX + t1 * (rectMaxX - rectMinX);
+    const uvBody0 = [px0 / w, 1 - rectMaxY / h], uvBody1 = [px1 / w, 1 - rectMaxY / h];
+    const uvTop0 = [px0 / w, 1 - rectMinY / h], uvTop1 = [px1 / w, 1 - rectMinY / h];
+    const a0 = { x: arc[i].x, y: arc[i].y, z };
+    const a1 = { x: arc[i + 1].x, y: arc[i + 1].y, z };
+    const b0 = { x: arc[i].x, y: arc[i].y + raise, z };
+    const b1 = { x: arc[i + 1].x, y: arc[i + 1].y + raise, z };
+    positions.push(a0.x, a0.y, a0.z, a1.x, a1.y, a1.z, b1.x, b1.y, b1.z);
+    uvs.push(uvBody0[0], uvBody0[1], uvBody1[0], uvBody1[1], uvTop1[0], uvTop1[1]);
+    positions.push(a0.x, a0.y, a0.z, b1.x, b1.y, b1.z, b0.x, b0.y, b0.z);
+    uvs.push(uvBody0[0], uvBody0[1], uvTop1[0], uvTop1[1], uvTop0[0], uvTop0[1]);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+// キャンバス上のピクセル座標をそのままUVに変換する。1つのキャンバスに複数のパーツ
+// （袖キャンバスの左右）が描かれている場合、ExtrudeGeometry/ShapeGeometryの既定の
+// UV自動生成は「そのシェイプ自身の外接矩形」を基準に0〜1へ正規化するため、部分的な
+// 範囲しか使わないパーツでは誤ったUVになってしまう。そのため、キャンバスの実サイズ
+// (w,h)を基準に明示的にUVを計算し直す。呼び出しは、位置をまだ立体化（巻き付けなど）
+// する前の平らな状態のうちに行うこと
 function applyPixelUV(THREE, geometry, w, h, scale){
   const pos = geometry.attributes.position;
   const uv = new Float32Array(pos.count * 2);
@@ -149,54 +308,88 @@ function buildWrapGeometry(THREE, shape, radius, centerX, w, h, scale){
   return geometry;
 }
 
-// 1パーツ分のパネル（輪郭線を押し出した立体、または筒状に巻いた立体＋テクスチャ）を
-// 組み立てる。保存済みデータがまだないパーツは、無地の生地色で仮表示する
-// （部分的にしか塗っていなくても、モデル全体の形は常に確認できるようにするため）
-function buildPartMesh(THREE, frameId, layout, layoutPart, textureCache){
-  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
-  const partMeta = frame && frame.parts.find(p => p.id === layoutPart.partId);
-  const maskEntry = PRESET_MASKS[frameId] && PRESET_MASKS[frameId][layoutPart.partId];
-  const pathIndex = layoutPart.pathIndex || 0;
-  if(!partMeta || !maskEntry || !maskEntry.maskLines[pathIndex]) return null;
-
-  const w = partMeta.width, h = partMeta.height, scale = layout.scale;
-  const path = maskEntry.maskLines[pathIndex];
-  const shape = new THREE.Shape();
-  path.forEach((pt, i) => {
-    const lx = (pt.x - w / 2) * scale;
-    const ly = (h / 2 - pt.y) * scale; // マス座標は下向きが正のため、3D空間の上向きに反転する
-    if(i === 0) shape.moveTo(lx, ly); else shape.lineTo(lx, ly);
-  });
-
-  let geometry;
-  if(layoutPart.wrapRadius){
-    geometry = buildWrapGeometry(THREE, shape, layoutPart.wrapRadius, layoutPart.wrapCenterX || 0, w, h, scale);
-  }else{
-    geometry = new THREE.ExtrudeGeometry(shape, { depth: layout.depth, bevelEnabled: false, curveSegments: 2 });
-    applyPixelUV(THREE, geometry, w, h, scale);
-  }
-
-  let cached = textureCache.get(layoutPart.partId);
+// テクスチャキャッシュ（同じパーツ／キャンバスを複数箇所で使う場合に使い回す）
+function getPartTexture(THREE, textureCache, partId, w, h){
+  let cached = textureCache.get(partId);
   if(!cached){
-    const found = findPixelDataForPart(frameId, layoutPart.partId);
+    const found = findPixelDataForPart("sweatshirt", partId);
     const fabricColor = document.body.classList.contains("dark") ? "#4a453c" : "#f4ecd8";
-    const textureCanvas = found
+    const canvas = found
       ? pixelsToTextureCanvas(found.pixelData, found.width, found.height, fabricColor)
       : pixelsToTextureCanvas(new Array(w * h).fill(null), w, h, fabricColor);
-    const texture = new THREE.CanvasTexture(textureCanvas);
+    const texture = new THREE.CanvasTexture(canvas);
     if(THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
     cached = { texture };
-    textureCache.set(layoutPart.partId, cached);
+    textureCache.set(partId, cached);
     art3DDisposables.push(texture);
   }
+  return cached.texture;
+}
 
-  const material = new THREE.MeshStandardMaterial({ map: cached.texture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
-  const mesh = new THREE.Mesh(geometry, material);
-  mesh.position.set(layoutPart.x, layoutPart.y, layoutPart.z);
-  mesh.rotation.y = layoutPart.rotY || 0;
-  mesh.rotation.x = layoutPart.rotX || 0;
-  art3DDisposables.push(geometry, material);
-  return mesh;
+// スウェット1着分の立体をTHREE.Groupとして組み立てる。
+// 「板を並べる」のではなく、フロント・バックの輪郭を直接ロフトでつないだ1つの胴体、
+// 襟ぐりから立ち上げた襟リング、肩〜脇に取り付けた円柱状の袖、という構成にする
+function buildSweatshirtGroup(THREE, textureCache){
+  const cfg = FRAME_3D_LAYOUTS.sweatshirt;
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === "sweatshirt");
+  const group = new THREE.Group();
+  const halfDepth = cfg.depth / 2;
+  const fabricColor = document.body.classList.contains("dark") ? 0x4a453c : 0xf4ecd8;
+
+  const frontMeta = frame.parts.find(p => p.id === cfg.front.partId);
+  const backMeta = frame.parts.find(p => p.id === cfg.back.partId);
+  const fw = frontMeta.width, fh = frontMeta.height;
+  const bw = backMeta.width, bh = backMeta.height;
+
+  const frontBodyPath = PRESET_MASKS.sweatshirt[cfg.front.partId].maskLines[cfg.front.bodyPathIndex];
+  const backBodyPath = PRESET_MASKS.sweatshirt[cfg.back.partId].maskLines[cfg.back.bodyPathIndex];
+  const frontBodyLocal = localizePath(frontBodyPath, fw, fh, cfg.scale);
+  const backBodyLocal = localizePath(backBodyPath, bw, bh, cfg.scale);
+
+  const N = cfg.torsoResample;
+  const frontRing = resampleClosedPath(dedupClosed(frontBodyLocal), N).map(p => ({ ...p, z: halfDepth }));
+  const backRing = resampleClosedPath(dedupClosed(backBodyLocal), N).map(p => ({ ...p, z: -halfDepth }));
+
+  const frontTexture = getPartTexture(THREE, textureCache, cfg.front.partId, fw, fh);
+  const backTexture = getPartTexture(THREE, textureCache, cfg.back.partId, bw, bh);
+
+  const torsoGeometry = buildLoftGeometry(THREE, frontRing, backRing, fw, fh, bw, bh);
+  const frontMat = new THREE.MeshStandardMaterial({ map: frontTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  const backMat = new THREE.MeshStandardMaterial({ map: backTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  const sideMat = new THREE.MeshStandardMaterial({ color: fabricColor, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  const torsoMesh = new THREE.Mesh(torsoGeometry, [frontMat, backMat, sideMat]);
+  art3DDisposables.push(torsoGeometry, frontMat, backMat, sideMat);
+  group.add(torsoMesh);
+
+  const frontCollarGeometry = buildCollarGeometry(THREE, cfg.front, frontBodyLocal, fw, fh, halfDepth, cfg.collarRaise);
+  const backCollarGeometry = buildCollarGeometry(THREE, cfg.back, backBodyLocal, bw, bh, -halfDepth, cfg.collarRaise);
+  const frontCollarMat = new THREE.MeshStandardMaterial({ map: frontTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  const backCollarMat = new THREE.MeshStandardMaterial({ map: backTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  art3DDisposables.push(frontCollarGeometry, backCollarGeometry, frontCollarMat, backCollarMat);
+  group.add(new THREE.Mesh(frontCollarGeometry, frontCollarMat));
+  group.add(new THREE.Mesh(backCollarGeometry, backCollarMat));
+
+  const sleeveMeta = frame.parts.find(p => p.id === cfg.sleeve.partId);
+  const sw = sleeveMeta.width, sh = sleeveMeta.height;
+  const sleeveTexture = getPartTexture(THREE, textureCache, cfg.sleeve.partId, sw, sh);
+  [cfg.sleeve.right, cfg.sleeve.left].forEach(side => {
+    const path = PRESET_MASKS.sweatshirt[cfg.sleeve.partId].maskLines[side.pathIndex];
+    const shape = new THREE.Shape();
+    path.forEach((pt, i) => {
+      const lx = (pt.x - sw / 2) * cfg.scale;
+      const ly = (sh / 2 - pt.y) * cfg.scale;
+      if(i === 0) shape.moveTo(lx, ly); else shape.lineTo(lx, ly);
+    });
+    const geometry = buildWrapGeometry(THREE, shape, side.wrapRadius, side.wrapCenterX, sw, sh, cfg.scale);
+    const material = new THREE.MeshStandardMaterial({ map: sleeveTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(side.x, side.y, side.z);
+    mesh.rotation.y = side.rotY || 0;
+    art3DDisposables.push(geometry, material);
+    group.add(mesh);
+  });
+
+  return group;
 }
 
 async function open3DPreview(){
@@ -236,10 +429,9 @@ async function open3DPreview(){
   art3DScene.add(ambient, dir);
 
   const textureCache = new Map();
-  layout.parts.forEach(layoutPart => {
-    const mesh = buildPartMesh(THREE, activeFrameId, layout, layoutPart, textureCache);
-    if(mesh) art3DScene.add(mesh);
-  });
+  if(activeFrameId === "sweatshirt"){
+    art3DScene.add(buildSweatshirtGroup(THREE, textureCache));
+  }
 
   art3DControls = new OrbitControlsClass(art3DCamera, art3DRenderer.domElement);
   art3DControls.enableDamping = true;
