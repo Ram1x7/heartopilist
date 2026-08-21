@@ -9,9 +9,9 @@
 // 付け根リングとして使うことで、頂点を共有した1つの連続したメッシュにする
 // （胴体・袖という別パーツを重ねて配置する方式はやめた）。
 //
-// 現段階ではまず形状の正しさを確認するため、テクスチャは使わずグレー一色の
-// マテリアルで表示する。テクスチャ（UVマッピング）は、この形状で1着の服として
-// 成立していることを確認できてから追加する。
+// 形状が1着の服として成立することを確認できたため、実際に塗った画像を
+// UVマッピングでメッシュに貼り付ける（buildFrontBackTexture/buildSinglePartTexture、
+// buildSweatshirtGroup内のコメント参照）。
 //
 // three.js本体は重いため、ページ読み込み時には読み込まず、3Dプレビューを実際に
 // 開いた時だけCDNから遅延読み込みする（js/music-hum.jsのBasic Pitch読み込みと同じ方式）。
@@ -182,6 +182,53 @@ function pixelsToTextureCanvas(pixelData, w, h, fallbackColor){
   return c;
 }
 
+// pixelData（w×hのフラット配列）から、x0〜x1の範囲だけを切り出した新しいpixelDataを作る。
+// 袖のキャンバス（1枚に左右の袖が並んで描かれている）から、片側だけを取り出すのに使う
+function cropPixelData(pixelData, w, h, x0, x1){
+  const cw = x1 - x0;
+  const out = new Array(cw * h).fill(null);
+  for(let y = 0; y < h; y++){
+    for(let x = x0; x < x1; x++){
+      out[y * cw + (x - x0)] = pixelData[y * w + x];
+    }
+  }
+  return { pixelData: out, width: cw, height: h };
+}
+
+// フロント・バックの2枚の展開図を、1枚の胴体用テクスチャに合成する。左半分(u:0〜0.5)に
+// フロント、右半分(u:0.5〜1)にバックを、どちらも向きを反転せずにそのまま並べる
+// （フロント・バックの型紙データは同じ左右の向きで作られているため、鏡映しにする
+// 必要はない＝js/art-masks.jsの実データから確認済み）
+function buildFrontBackTexture(THREE, frontPixelData, frontW, frontH, backPixelData, backW, backH, fallbackColor){
+  const cell = 6;
+  const c = document.createElement("canvas");
+  c.width = (frontW + backW) * cell;
+  c.height = Math.max(frontH, backH) * cell;
+  const tctx = c.getContext("2d");
+  tctx.fillStyle = fallbackColor;
+  tctx.fillRect(0, 0, c.width, c.height);
+
+  const frontCanvas = pixelsToTextureCanvas(frontPixelData, frontW, frontH, fallbackColor);
+  const backCanvas = pixelsToTextureCanvas(backPixelData, backW, backH, fallbackColor);
+  tctx.drawImage(frontCanvas, 0, 0);
+  tctx.drawImage(backCanvas, frontW * cell, 0);
+
+  const texture = new THREE.CanvasTexture(c);
+  if(THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function buildSinglePartTexture(THREE, pixelData, w, h, fallbackColor){
+  const canvas = pixelsToTextureCanvas(pixelData, w, h, fallbackColor);
+  const texture = new THREE.CanvasTexture(canvas);
+  if(THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function fabricFallbackColor(){
+  return document.body.classList.contains("dark") ? "#4a453c" : "#f4ecd8";
+}
+
 function vlen(v){ return Math.hypot(v.x, v.y, v.z) || 1e-9; }
 function vnorm(v){ const l = vlen(v); return { x: v.x / l, y: v.y / l, z: v.z / l }; }
 function vcross(a, b){ return { x: a.y * b.z - a.z * b.y, y: a.z * b.x - a.x * b.z, z: a.x * b.y - a.y * b.x }; }
@@ -191,12 +238,19 @@ function vadd(a, b){ return { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }; }
 function vscale(a, s){ return { x: a.x * s, y: a.y * s, z: a.z * s }; }
 function vlerp(a, b, t){ return vadd(vscale(a, 1 - t), vscale(b, t)); }
 
-function pushTri(positions, p0, p1, p2){
+// 各頂点は{x,y,z}に加えて、テクスチャ座標{u,v}も持たせる（呼び出し側が用途に応じて
+// 設定する。同じ位置の頂点でも、胴体用・袖用でu,vの意味が異なるため、位置を共有する
+// 頂点（肩の窓の境界など）でも、それぞれのジオメトリを組み立てる際に上書きしてよい。
+// pushTriはその時点のp.u/p.vをそのままコピーするだけなので、後から上書きしても
+// 既に組み立て済みのジオメトリには影響しない）
+function pushTri(positions, uvs, p0, p1, p2){
   positions.push(p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z);
+  uvs.push(p0.u || 0, p0.v || 0, p1.u || 0, p1.v || 0, p2.u || 0, p2.v || 0);
 }
 
 // 中心(center)・半幅(halfWidth、X方向)・奥行き(depth、Z方向)を持つ楕円形の断面リングを
-// segments個の頂点で作る。X=身幅方向、Z=前後方向という胴体の座標系に合わせている
+// segments個の頂点で作る。X=身幅方向、Z=前後方向という胴体の座標系に合わせている。
+// 各頂点にangle（0〜2π）も持たせ、後でテクスチャのU座標を求めるのに使う
 function buildEllipseRing(center, halfWidth, depth, segments){
   const ring = [];
   for(let k = 0; k < segments; k++){
@@ -205,32 +259,41 @@ function buildEllipseRing(center, halfWidth, depth, segments){
       x: center.x + halfWidth * Math.cos(angle),
       y: center.y,
       z: center.z + depth * Math.sin(angle),
+      angle,
     });
   }
   return ring;
 }
 
+// リングの全頂点に、角度から求めたU座標と、指定のV座標を設定する
+function assignRingUV(ring, v){
+  ring.forEach(p => {
+    p.u = (p.angle || 0) / (Math.PI * 2);
+    p.v = v;
+  });
+}
+
 // 隣接するリング同士（同じ頂点数であること）をクアッド面（三角形2枚）でつなぎ、
 // 連続した筒状メッシュを作る
-function lofteRings(positions, ringA, ringB){
+function lofteRings(positions, uvs, ringA, ringB){
   const K = ringA.length;
   for(let k = 0; k < K; k++){
     const k2 = (k + 1) % K;
-    pushTri(positions, ringA[k], ringA[k2], ringB[k2]);
-    pushTri(positions, ringA[k], ringB[k2], ringB[k]);
+    pushTri(positions, uvs, ringA[k], ringA[k2], ringB[k2]);
+    pushTri(positions, uvs, ringA[k], ringB[k2], ringB[k]);
   }
 }
 
 // lofteRings()と同じだが、skipSpans（角度の区間、袖を取り付けるための「窓」）に
 // あたる部分だけ面を作らない。窓の境界（skipSpansの外側の点）はそのまま袖の
 // 付け根リングとして使うため、ここでは触れない
-function lofteRingsWithWindow(positions, ringA, ringB, skipSpans){
+function lofteRingsWithWindow(positions, uvs, ringA, ringB, skipSpans){
   const K = ringA.length;
   for(let k = 0; k < K; k++){
     if(skipSpans.has(k)) continue;
     const k2 = (k + 1) % K;
-    pushTri(positions, ringA[k], ringA[k2], ringB[k2]);
-    pushTri(positions, ringA[k], ringB[k2], ringB[k]);
+    pushTri(positions, uvs, ringA[k], ringA[k2], ringB[k2]);
+    pushTri(positions, uvs, ringA[k], ringB[k2], ringB[k]);
   }
 }
 
@@ -242,22 +305,29 @@ function windowSpans(window){
 
 // 1つのリングを塞ぐ。半径40%の内側リングを経由してから中心へファンする2段構成にし、
 // 巨大な三角形が1枚だけできる（半径いっぱいに広がる扇）のを避ける
-function capRing(positions, ring, reverse){
+function capRing(positions, uvs, ring, reverse){
   let center = { x: 0, y: 0, z: 0 };
   ring.forEach(p => { center = vadd(center, p); });
   center = vscale(center, 1 / ring.length);
+  center.u = 0.5;
+  center.v = ring[0].v;
   const K = ring.length;
-  const inner = ring.map(p => vadd(center, vscale(vsub(p, center), 0.4)));
+  const inner = ring.map(p => {
+    const ip = vadd(center, vscale(vsub(p, center), 0.4));
+    ip.u = p.u;
+    ip.v = p.v;
+    return ip;
+  });
   for(let k = 0; k < K; k++){
     const k2 = (k + 1) % K;
     if(reverse){
-      pushTri(positions, ring[k2], ring[k], inner[k]);
-      pushTri(positions, ring[k2], inner[k], inner[k2]);
-      pushTri(positions, center, inner[k2], inner[k]);
+      pushTri(positions, uvs, ring[k2], ring[k], inner[k]);
+      pushTri(positions, uvs, ring[k2], inner[k], inner[k2]);
+      pushTri(positions, uvs, center, inner[k2], inner[k]);
     }else{
-      pushTri(positions, ring[k], ring[k2], inner[k2]);
-      pushTri(positions, ring[k], inner[k2], inner[k]);
-      pushTri(positions, center, inner[k], inner[k2]);
+      pushTri(positions, uvs, ring[k], ring[k2], inner[k2]);
+      pushTri(positions, uvs, ring[k], inner[k2], inner[k]);
+      pushTri(positions, uvs, center, inner[k], inner[k2]);
     }
   }
 }
@@ -275,9 +345,11 @@ function capRing(positions, ring, reverse){
 // して返すことで、胴体と袖が頂点を共有した1つのメッシュになるようにする
 function buildTorsoGeometry(THREE, cfg, scale){
   const positions = [];
+  const uvs = [];
   const canvasH = 88; // フロント/バックのキャンバス高さ（両方とも80x88）
   const halfCanvasH = canvasH / 2;
   const toLocalY = pixelY => (halfCanvasH - pixelY) * scale;
+  const vAtPixelY = pixelY => 1 - pixelY / canvasH; // テクスチャのV座標（v=1が上端）
 
   const shoulderPixelY = cfg.ringPixelYs[0];
   const shoulderY = toLocalY(shoulderPixelY);
@@ -292,7 +364,9 @@ function buildTorsoGeometry(THREE, cfg, scale){
   const mainRings = cfg.ringPixelYs.map((pixelY, i) => {
     const y = toLocalY(pixelY);
     const halfWidth = halfWidthAtPixelY(pixelY) * scale;
-    return buildEllipseRing({ x: 0, y, z: 0 }, halfWidth, ringDepths[i], cfg.segments);
+    const ring = buildEllipseRing({ x: 0, y, z: 0 }, halfWidth, ringDepths[i], cfg.segments);
+    assignRingUV(ring, vAtPixelY(pixelY));
+    return ring;
   });
 
   const neckOuterDepth = neckHoleHalfWidth * 0.6;
@@ -309,33 +383,40 @@ function buildTorsoGeometry(THREE, cfg, scale){
     neckHoleHalfWidth * 0.6 * cfg.collarShrink,
     cfg.segments
   );
+  // 首まわりのリングは、テンプレート上で対応する専用の領域を持たないため、
+  // 肩の高さ（shoulderPixelY付近）のV座標を流用する
+  assignRingUV(neckOuter, vAtPixelY(shoulderPixelY));
+  assignRingUV(neckMid, vAtPixelY(shoulderPixelY));
+  assignRingUV(neckInner, vAtPixelY(Math.max(0, shoulderPixelY - 8)));
 
   // 首の内側リング（立ち襟の自由端、上端は開いたまま）→襟ぐりの開口→
   // （なだらかな移行用のリング）→肩→…の順につなぐ
-  lofteRings(positions, neckInner, neckOuter);
-  lofteRings(positions, neckOuter, neckMid);
-  lofteRings(positions, neckMid, mainRings[0]);
+  lofteRings(positions, uvs, neckInner, neckOuter);
+  lofteRings(positions, uvs, neckOuter, neckMid);
+  lofteRings(positions, uvs, neckMid, mainRings[0]);
 
   // 肩リング（mainRings[0]）とその1つ下（mainRings[1]）の間は、左右の窓を除いて
   // 通常どおりつなぐ
-  lofteRingsWithWindow(positions, mainRings[0], mainRings[1], new Set([...windowSpans(RIGHT_WINDOW), ...windowSpans(LEFT_WINDOW)]));
+  lofteRingsWithWindow(positions, uvs, mainRings[0], mainRings[1], new Set([...windowSpans(RIGHT_WINDOW), ...windowSpans(LEFT_WINDOW)]));
 
   for(let i = 1; i < mainRings.length - 1; i++){
-    lofteRings(positions, mainRings[i], mainRings[i + 1]);
+    lofteRings(positions, uvs, mainRings[i], mainRings[i + 1]);
   }
 
   // 裾のふち：一番下のリングをそのまま底面としてふさぐと切断面のように見えるため、
   // わずかに内側へ縮めて少し下げたリングを間に挟んでからふさぐ（折り返しのリブ風）
   const hemRing = mainRings[mainRings.length - 1];
+  const hemPixelY = cfg.ringPixelYs[cfg.ringPixelYs.length - 1];
   let hemCenter = { x: 0, y: 0, z: 0 };
   hemRing.forEach(p => { hemCenter = vadd(hemCenter, p); });
   hemCenter = vscale(hemCenter, 1 / hemRing.length);
   const hemLip = hemRing.map(p => {
     const shrunk = vadd(hemCenter, vscale(vsub(p, hemCenter), cfg.hemLipShrink));
-    return { x: shrunk.x, y: shrunk.y - cfg.hemLipDrop, z: shrunk.z };
+    return { x: shrunk.x, y: shrunk.y - cfg.hemLipDrop, z: shrunk.z, angle: p.angle };
   });
-  lofteRings(positions, hemRing, hemLip);
-  capRing(positions, hemLip, false); // 裾の底面を閉じる
+  assignRingUV(hemLip, vAtPixelY(hemPixelY));
+  lofteRings(positions, uvs, hemRing, hemLip);
+  capRing(positions, uvs, hemLip, false); // 裾の底面を閉じる
 
   // 窓の境界（肩リングの窓部分＋1つ下のリングの窓部分を逆順にしたもの）を、
   // 袖の付け根リングとして返す
@@ -347,6 +428,7 @@ function buildTorsoGeometry(THREE, cfg, scale){
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
   geometry.computeVertexNormals();
   return {
     geometry,
@@ -390,7 +472,13 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
 
   const hexUV = shoulderLoop.map(p => {
     const d = vsub(p, center0);
-    return { u: vdot(d, basisU0), v: vdot(d, basisV0) };
+    return { u: vdot(d, basisU0), v: vdot(d, basisV0), angle: Math.atan2(vdot(d, basisV0), vdot(d, basisU0)) };
+  });
+  // ring0（本体と共有する頂点）のテクスチャ座標：円周方向の角度からU、肩の付け根
+  // なのでVは1（袖テクスチャの上端）にする
+  shoulderLoop.forEach((p, k) => {
+    p.u = (hexUV[k].angle + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2);
+    p.v = 1;
   });
 
   const SUBSTEPS = 4;
@@ -418,18 +506,24 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
     // 肩は太く、肘のあたりから袖口にかけて少しずつ細くなる（直線的な細まりにしない）
     const taper = 1 - (1 - cfg.cuffTaper) * smoothstep(t);
     const center = ringCenters[ringIdx];
+    // Vは肩(1)→袖口(0)へ、リングの並び順に沿って一様に下げる
+    const ringV = 1 - t;
     return smoothUV.map(p => {
       const ovalU = Math.cos(p.angle) * cfg.startHalfWidth;
       const ovalV = Math.sin(p.angle) * cfg.startDepth;
       const u = (p.u * (1 - blend) + ovalU * blend) * taper;
       const v = (p.v * (1 - blend) + ovalV * blend) * taper;
-      return vadd(center, vadd(vscale(basisU, u), vscale(basisV, v)));
+      const pos = vadd(center, vadd(vscale(basisU, u), vscale(basisV, v)));
+      pos.u = (p.angle + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2);
+      pos.v = ringV;
+      return pos;
     });
   }
 
   const rings = ringCenters.map((_, idx) => (idx === 0 ? shoulderLoop : ringAt(idx)));
 
   const positions = [];
+  const uvs = [];
 
   // ring0（K0点、本体と共有）→ring1（K0*SUBSTEPS点）の橋渡し
   const ring0 = rings[0], ring1 = rings[1];
@@ -440,15 +534,15 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
     const r1b = ring1[base + 1];
     const r1c = ring1[(base + 2) % ring1.length];
     const r1d = ring1[(base + SUBSTEPS) % ring1.length];
-    pushTri(positions, ring0[k], r1a, r1b);
-    pushTri(positions, ring0[k], r1b, ring0[k2]);
-    pushTri(positions, ring0[k2], r1b, r1c);
-    pushTri(positions, ring0[k2], r1c, r1d);
+    pushTri(positions, uvs, ring0[k], r1a, r1b);
+    pushTri(positions, uvs, ring0[k], r1b, ring0[k2]);
+    pushTri(positions, uvs, ring0[k2], r1b, r1c);
+    pushTri(positions, uvs, ring0[k2], r1c, r1d);
   }
 
   // ring1〜ring[N-1]（すべて同じ点数）は通常のクアッド接続でつなぐ
   for(let r = 1; r < rings.length - 1; r++){
-    lofteRings(positions, rings[r], rings[r + 1]);
+    lofteRings(positions, uvs, rings[r], rings[r + 1]);
   }
 
   // 袖口のリブ：最後の断面をそのまま袖口にすると切断面のように見えるため、
@@ -459,36 +553,88 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
   let cuffPivot = { x: 0, y: 0, z: 0 };
   cuffRing.forEach(p => { cuffPivot = vadd(cuffPivot, p); });
   cuffPivot = vscale(cuffPivot, 1 / cuffRing.length);
-  const cuffRib = cuffRing.map(p => vadd(cuffCenter, vscale(vsub(p, cuffPivot), cfg.cuffRibFlare)));
-  lofteRings(positions, cuffRing, cuffRib);
+  const cuffRib = cuffRing.map(p => {
+    const rp = vadd(cuffCenter, vscale(vsub(p, cuffPivot), cfg.cuffRibFlare));
+    rp.u = p.u;
+    rp.v = p.v;
+    return rp;
+  });
+  lofteRings(positions, uvs, cuffRing, cuffRib);
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
   geometry.computeVertexNormals();
   return geometry;
 }
 
-// スウェット1着分の立体をTHREE.Groupとして組み立てる（現段階はテクスチャなし、
-// グレー一色）。胴体は高さごとの楕円断面リングを積み重ねた1つの立体で、肩の
-// 左右に袖取り付け用の窓を開けてある。袖はその窓の境界を付け根リングとして
-// 共有し、腕の軸方向に楕円断面を積み重ねた連続した筒として続く
+const SWEATSHIRT_PART_IDS = {
+  front: "default",
+  back: "canvas-1777618043251",
+  sleeve: "canvas-1777618057689",
+};
+
+// スウェット1着分の立体をTHREE.Groupとして組み立てる。胴体は高さごとの楕円断面リングを
+// 積み重ねた1つの立体で、肩の左右に袖取り付け用の窓を開けてある。袖はその窓の境界を
+// 付け根リングとして共有し、腕の軸方向に楕円断面を積み重ねた連続した筒として続く。
+//
+// テクスチャ：胴体にはフロント・バックの実際に塗った画像を、U座標が0〜0.5をフロント、
+// 0.5〜1をバックとなるよう1枚に合成したものを貼る（フロント・バックとも向きは
+// そのまま、鏡映しにはしない＝js/art-masks.jsの実データで確認済みの並び）。袖には、
+// 左右の袖が1枚のキャンバスに並んで描かれた画像から該当する半分を切り出したものを貼る。
+// 左右どちらが正しい向きになるかは実機で未確認のため、鏡映しに見える場合は
+// 対応が必要かもしれない
 function buildSweatshirtGroup(THREE){
   const cfg = FRAME_3D_LAYOUTS.sweatshirt;
+  const frame = DESIGN_FRAME_PRESETS.find(f => f.id === "sweatshirt");
   const group = new THREE.Group();
-  const material = new THREE.MeshStandardMaterial({ color: 0xbfbab0, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
-  art3DDisposables.push(material);
+  const fallbackColor = fabricFallbackColor();
+
+  function partData(partId){
+    const meta = frame.parts.find(p => p.id === partId);
+    const found = findPixelDataForPart("sweatshirt", partId);
+    return {
+      width: meta.width,
+      height: meta.height,
+      pixelData: found ? found.pixelData : new Array(meta.width * meta.height).fill(null),
+    };
+  }
+
+  const frontData = partData(SWEATSHIRT_PART_IDS.front);
+  const backData = partData(SWEATSHIRT_PART_IDS.back);
+  const sleeveData = partData(SWEATSHIRT_PART_IDS.sleeve);
+
+  const torsoTexture = buildFrontBackTexture(
+    THREE,
+    frontData.pixelData, frontData.width, frontData.height,
+    backData.pixelData, backData.width, backData.height,
+    fallbackColor
+  );
+  art3DDisposables.push(torsoTexture);
+  const torsoMaterial = new THREE.MeshStandardMaterial({ map: torsoTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+  art3DDisposables.push(torsoMaterial);
 
   const { geometry: torsoGeometry, rightShoulderLoop, leftShoulderLoop } = buildTorsoGeometry(THREE, cfg.torso, cfg.scale);
   art3DDisposables.push(torsoGeometry);
-  group.add(new THREE.Mesh(torsoGeometry, material));
+  group.add(new THREE.Mesh(torsoGeometry, torsoMaterial));
+
+  // 袖キャンバスは1枚に左右が並んで描かれているため、中央で左右に切り出す
+  const sleeveMid = Math.round(sleeveData.width / 2);
+  const rightSleeveCrop = cropPixelData(sleeveData.pixelData, sleeveData.width, sleeveData.height, sleeveMid, sleeveData.width);
+  const leftSleeveCrop = cropPixelData(sleeveData.pixelData, sleeveData.width, sleeveData.height, 0, sleeveMid);
 
   [
-    { loop: rightShoulderLoop, axisStart: cfg.sleeve.axisStartRight, axisEnd: cfg.sleeve.axisEndRight },
-    { loop: leftShoulderLoop, axisStart: cfg.sleeve.axisStartLeft, axisEnd: cfg.sleeve.axisEndLeft },
+    { loop: rightShoulderLoop, axisStart: cfg.sleeve.axisStartRight, axisEnd: cfg.sleeve.axisEndRight, crop: rightSleeveCrop },
+    { loop: leftShoulderLoop, axisStart: cfg.sleeve.axisStartLeft, axisEnd: cfg.sleeve.axisEndLeft, crop: leftSleeveCrop },
   ].forEach(side => {
+    const sleeveTexture = buildSinglePartTexture(THREE, side.crop.pixelData, side.crop.width, side.crop.height, fallbackColor);
+    art3DDisposables.push(sleeveTexture);
+    const sleeveMaterial = new THREE.MeshStandardMaterial({ map: sleeveTexture, side: THREE.DoubleSide, roughness: 0.9, metalness: 0 });
+    art3DDisposables.push(sleeveMaterial);
+
     const sleeveGeometry = buildSleeveGeometry(THREE, side.loop, cfg.sleeve, side.axisStart, side.axisEnd);
     art3DDisposables.push(sleeveGeometry);
-    group.add(new THREE.Mesh(sleeveGeometry, material));
+    group.add(new THREE.Mesh(sleeveGeometry, sleeveMaterial));
   });
 
   return group;
@@ -540,10 +686,14 @@ async function open3DPreview(){
   art3DRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   host.appendChild(art3DRenderer.domElement);
 
-  const ambient = new THREE.AmbientLight(0xffffff, 0.8);
-  const dir = new THREE.DirectionalLight(0xffffff, 0.85);
+  const ambient = new THREE.AmbientLight(0xffffff, 0.75);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
   dir.position.set(3, 5, 4);
-  art3DScene.add(ambient, dir);
+  // 反対側からの弱いフィルライト：主光源だけだと陰になる面が真っ黒に沈んで
+  // 曲面かどうか分かりにくくなるため、立体感を保ったまま影を持ち上げる
+  const fill = new THREE.DirectionalLight(0xffffff, 0.3);
+  fill.position.set(-4, 2, -3);
+  art3DScene.add(ambient, dir, fill);
 
   if(activeFrameId === "sweatshirt"){
     art3DScene.add(buildSweatshirtGroup(THREE));
