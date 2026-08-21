@@ -407,7 +407,7 @@ const eventData = [
     id: 37,
     category: "event",
     name: "フェス「原始の鳴き声」",
-    img: "./images/events/e035.JPG",
+    img: "./images/events/e035.jpg",
     start: "2026-08-29 06:00",
     end: "2026-10-09 05:59",
     exchangeEnd: null,
