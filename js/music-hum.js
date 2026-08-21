@@ -764,6 +764,14 @@ async function ensureBasicPitchLoaded(onStatus) {
 async function humExtractAudioFromVideoBlob(blob) {
   const url = URL.createObjectURL(blob);
   const video = document.createElement("video");
+  // WebKit（Safari/iOS）はDOMに接続されていない<video>だと、captureStream()の
+  // 音声トラックが正しく流れてこないことがあるため、画面外に配置して実際にDOMへ追加する
+  video.style.position = "fixed";
+  video.style.width = "1px";
+  video.style.height = "1px";
+  video.style.opacity = "0";
+  video.style.pointerEvents = "none";
+  document.body.appendChild(video);
   try {
     video.src = url;
     video.muted = true; // ミュートしておけばユーザー操作なしの自動再生がブラウザに許可され、
@@ -782,7 +790,13 @@ async function humExtractAudioFromVideoBlob(blob) {
     if (!audioTracks.length) throw new Error("no audio track in video");
 
     const audioStream = new MediaStream(audioTracks);
-    const recorder = new MediaRecorder(audioStream);
+    // Safariはwebm系mimeTypeに対応しておらず、MediaRecorderにmimeType未指定のまま渡すと
+    // 生成や録音に失敗することがあるため、対応形式を検出してから明示的に渡す
+    const recorderMimeCandidates = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg"];
+    const supportedMime = recorderMimeCandidates.find(
+      (mime) => typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported(mime)
+    );
+    const recorder = supportedMime ? new MediaRecorder(audioStream, { mimeType: supportedMime }) : new MediaRecorder(audioStream);
     const chunks = [];
     recorder.addEventListener("dataavailable", (e) => {
       if (e.data && e.data.size > 0) chunks.push(e.data);
@@ -805,6 +819,7 @@ async function humExtractAudioFromVideoBlob(blob) {
     video.pause();
     video.removeAttribute("src");
     video.load();
+    video.remove();
     URL.revokeObjectURL(url);
   }
 }
