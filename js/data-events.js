@@ -233,7 +233,7 @@ const eventData = [
     name: "『ハートピアスローライフ』 × サンリオ",
     img: "./images/events/e020.jpg",
     start: "2026-07-17 06:00",
-    end: "2026-08-23 05:59",
+    end: "2026-08-24 05:59",
     exchangeEnd: null,
     detail: "サンリオコラボ開始",
     link: "https://x.com/heartopia_jp/status/2076230081530196473?s=61",
@@ -402,6 +402,17 @@ const eventData = [
     exchangeEnd: null,
     detail: "イベント期間中、ドングリ百貨店に限定ファッション「如意令・願い集め」と「如意令・言の葉集め」が入荷します。ぜひお見逃しなく！",
     link: "https://x.com/heartopia_jp/status/2086739341120786582?s=61",
+  },
+  {
+    id: 37,
+    category: "event",
+    name: "フェス「原始の鳴き声」",
+    img: "./images/events/e035.JPG",
+    start: "2026-08-29 06:00",
+    end: "2026-10-09 05:59",
+    exchangeEnd: null,
+    detail: "参加条件：開拓者レベル7に到達し、チュートリアル「答えはここにある」冒険クエストを完了",
+    link: "https://x.com/heartopia_jp/status/2088913666540208356?s=61",
   },
   // 以下、イベントを追加していく
   // {
