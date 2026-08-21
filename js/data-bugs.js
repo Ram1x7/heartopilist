@@ -830,11 +830,12 @@ const bugData = [
  nameI18n:{"ja":"オオサマゴライアス","en":"Goliath Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:12,
  authCount:300,
+ price:440,
  weather:["虹"],
  time:["18-0","0-6"],
  location:"森林-コジカ塔",
  locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"images/bugs/070.PNG"
 },
 {
  name:"トウワタバッタ",
