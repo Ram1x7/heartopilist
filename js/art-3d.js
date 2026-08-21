@@ -58,11 +58,12 @@ function halfWidthAtPixelY(y){
   return profile[profile.length - 1].halfX;
 }
 
-// 断面の分割数（24分割＝15度刻み）。角度0が右、角度180度(=index SEGMENTS/2)が左。
-// 肩の袖取り付け用の「窓」をこの分割のどこに開けるかも、この分割数を基準に決める
-const TORSO_SEGMENTS = 24;
-const RIGHT_WINDOW = [22, 23, 0, 1, 2]; // 右肩：角度0を中心に前後2つ分（計75度幅）をあける
-const LEFT_WINDOW = [10, 11, 12, 13, 14]; // 左肩：角度180度（index12）を中心に同様にあける
+// 断面の分割数（32分割＝11.25度刻み）。角度0が右、角度180度(=index SEGMENTS/2)が左。
+// 肩の袖取り付け用の「窓」をこの分割のどこに開けるかも、この分割数を基準に決める。
+// 分割数を増やすことで、胴体・肩・袖のカーブを滑らかにし、角張りを減らす
+const TORSO_SEGMENTS = 32;
+const RIGHT_WINDOW = [29, 30, 31, 0, 1, 2, 3]; // 右肩：角度0を中心に前後3つ分をあける
+const LEFT_WINDOW = [13, 14, 15, 16, 17, 18, 19]; // 左肩：角度180度（index16）を中心に同様にあける
 
 const FRAME_3D_LAYOUTS = {
   sweatshirt: {
@@ -71,20 +72,29 @@ const FRAME_3D_LAYOUTS = {
     torso: {
       // 肩のすぐ下〜裾までを何段の断面リングでたどるか（ピクセルY）。段数を増やすほど
       // 縦方向のグリッドが細かくなり、箱っぽさが減る
-      ringPixelYs: [22, 31, 40, 49, 58, 67, 80],
+      ringPixelYs: [22, 28, 34, 41, 48, 55, 62, 69, 76, 80],
       segments: TORSO_SEGMENTS,
       depthMin: 0.3,
       depthMax: 0.56,
       depthPeakT: 0.4, // 前後の厚みが最大になる高さ（0=肩寄り、1=裾寄り）。胸をやや厚めにする
-      collarRaise: 0.4,
-      collarShrink: 0.8,
+      // 首の立ち上がりの高さ（低いリブ程度に抑え、タートルネックのように見えないようにする）
+      collarRaise: 0.12,
+      collarShrink: 0.85,
+      // 裾のふち：断面をわずかに内側へ縮めてから底面を閉じることで、切断面ではなく
+      // 折り返しのリブのように見せる
+      hemLipShrink: 0.92,
+      hemLipDrop: 0.06,
     },
     sleeve: {
       ringCount: 6,
       length: 3.2,
       startHalfWidth: 0.5,
       startDepth: 0.42,
-      cuffTaper: 0.68,
+      cuffTaper: 0.62,
+      // 袖口のリブ：最後の断面をわずかに広げてから閉じることで、別パーツではなく
+      // 袖の続きとして自然なリブに見せる
+      cuffRibFlare: 1.06,
+      cuffRibLength: 0.12,
       // 肩側の向きから袖口側の向きへ少しずつ曲げていくことで、腕が重力で
       // わずかに垂れているような自然な曲線にする（完全な直線にしない）
       axisStartRight: { x: 1, y: -0.12, z: 0.06 },
@@ -288,7 +298,19 @@ function buildTorsoGeometry(THREE, cfg, scale){
   for(let i = 1; i < mainRings.length - 1; i++){
     lofteRings(positions, mainRings[i], mainRings[i + 1]);
   }
-  capRing(positions, mainRings[mainRings.length - 1], false); // 裾の底面を閉じる
+
+  // 裾のふち：一番下のリングをそのまま底面としてふさぐと切断面のように見えるため、
+  // わずかに内側へ縮めて少し下げたリングを間に挟んでからふさぐ（折り返しのリブ風）
+  const hemRing = mainRings[mainRings.length - 1];
+  let hemCenter = { x: 0, y: 0, z: 0 };
+  hemRing.forEach(p => { hemCenter = vadd(hemCenter, p); });
+  hemCenter = vscale(hemCenter, 1 / hemRing.length);
+  const hemLip = hemRing.map(p => {
+    const shrunk = vadd(hemCenter, vscale(vsub(p, hemCenter), cfg.hemLipShrink));
+    return { x: shrunk.x, y: shrunk.y - cfg.hemLipDrop, z: shrunk.z };
+  });
+  lofteRings(positions, hemRing, hemLip);
+  capRing(positions, hemLip, false); // 裾の底面を閉じる
 
   // 窓の境界（肩リングの窓部分＋1つ下のリングの窓部分を逆順にしたもの）を、
   // 袖の付け根リングとして返す
@@ -346,7 +368,7 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
     return { u: vdot(d, basisU0), v: vdot(d, basisV0) };
   });
 
-  const SUBSTEPS = 3;
+  const SUBSTEPS = 4;
   const smoothUV = [];
   for(let k = 0; k < K0; k++){
     const a = hexUV[k], b = hexUV[(k + 1) % K0];
@@ -365,8 +387,9 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
     basisV = vnorm(basisV);
     const basisU = vnorm(vcross(basisV, dir));
     const t = ringIdx / stepCount;
-    const blend = Math.min(1, t / 0.6); // 早め（袖の途中）で滑らかな楕円へ移行しきる
-    const taper = 1 - (1 - cfg.cuffTaper) * t;
+    const blend = Math.min(1, t / 0.8); // 肩の実際の形を長めに残し、なだらかに楕円へ移行する
+    // 肩は太く、肘のあたりから袖口にかけて少しずつ細くなる（直線的な細まりにしない）
+    const taper = 1 - (1 - cfg.cuffTaper) * Math.pow(t, 0.8);
     const center = ringCenters[ringIdx];
     return smoothUV.map(p => {
       const ovalU = Math.cos(p.angle) * cfg.startHalfWidth;
@@ -400,6 +423,17 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
   for(let r = 1; r < rings.length - 1; r++){
     lofteRings(positions, rings[r], rings[r + 1]);
   }
+
+  // 袖口のリブ：最後の断面をそのまま袖口にすると切断面のように見えるため、
+  // 少し先までわずかに広げたリングを足し、薄いリブとして自然につながるようにする
+  const cuffRing = rings[rings.length - 1];
+  const cuffDir = ringDirs[ringDirs.length - 1];
+  const cuffCenter = vadd(ringCenters[ringCenters.length - 1], vscale(cuffDir, cfg.cuffRibLength));
+  let cuffPivot = { x: 0, y: 0, z: 0 };
+  cuffRing.forEach(p => { cuffPivot = vadd(cuffPivot, p); });
+  cuffPivot = vscale(cuffPivot, 1 / cuffRing.length);
+  const cuffRib = cuffRing.map(p => vadd(cuffCenter, vscale(vsub(p, cuffPivot), cfg.cuffRibFlare)));
+  lofteRings(positions, cuffRing, cuffRib);
 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
