@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=47">
+<link rel="stylesheet" href="./css/art.css?v=48">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -211,6 +211,9 @@
   <div class="modal-box art-newcanvas-box">
     <div id="gridSizeStep1">
       <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
+      <div class="art-panel-btn-row art-ssi-entry-row">
+        <button class="art-header-btn art-ssi-entry-btn" id="artScreenshotImportOpenBtn" data-i18n="art_ssi_entry_btn">スクショから取り込む</button>
+      </div>
       <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
       <div class="art-gridsize-options art-ratio-grid" id="artRatioOptions"></div>
       <div class="art-gridsize-options art-frame-grid" id="artFrameItemOptions"></div>
@@ -227,6 +230,95 @@
     </div>
     <div id="gridSizeCancelWrap" style="display:none;">
       <button class="modal-close-btn" onclick="closeNewCanvasModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="artSsiModal" onclick="if(event.target.id==='artSsiModal') closeScreenshotImportModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+  <div class="modal-box art-newcanvas-box art-ssi-box">
+    <h3 data-i18n="art_ssi_title">スクショから取り込む</h3>
+
+    <div id="artSsiStepUpload">
+      <p class="art-step-hint" data-i18n="art_ssi_upload_hint">ゲーム内で衣装を表示した状態のスクリーンショットを選んでください</p>
+      <div class="art-panel-btn-row">
+        <label class="art-header-btn" for="artSsiFileInput" data-i18n="art_ssi_upload_btn">画像を選ぶ</label>
+      </div>
+      <input type="file" id="artSsiFileInput" accept="image/*" style="display:none">
+      <div class="art-ssi-error" id="artSsiUploadError"></div>
+    </div>
+
+    <div id="artSsiStepRegion" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('upload')">
+        <span id="artSsiRegionBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <p class="art-step-hint" data-i18n="art_ssi_region_hint">衣装が写っている範囲をドラッグして囲んでください。四隅をドラッグして微調整もできます</p>
+      <div class="art-ssi-region-wrap" id="artSsiRegionWrap">
+        <img id="artSsiImg" alt="" draggable="false">
+        <canvas id="artSsiRegionOverlay"></canvas>
+      </div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSsiRegionConfirmBtn" data-i18n="art_ssi_region_confirm" disabled>この範囲で決定</button>
+      </div>
+    </div>
+
+    <div id="artSsiStepCandidates" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('region')">
+        <span id="artSsiCandidatesBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <div id="artSsiCandidateAutoWrap">
+        <p class="art-step-hint" data-i18n="art_ssi_candidate_hint">このキャンバスで合っていますか？</p>
+        <div class="art-ssi-candidate-list" id="artSsiCandidateList"></div>
+      </div>
+      <p class="art-step-hint" id="artSsiLowConfidenceHint" style="display:none" data-i18n="art_ssi_low_confidence">キャンバスを自動判定できませんでした。一覧から選んでください</p>
+      <a class="art-back-link" href="javascript:void(0)" id="artSsiManualPickLink" data-i18n="art_ssi_manual_pick_link">別のキャンバスを選択</a>
+      <div class="art-gridsize-options art-frame-grid" id="artSsiManualFrameOptions" style="display:none"></div>
+    </div>
+
+    <div id="artSsiStepPart" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('candidates')">
+        <span id="artSsiPartBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <h3 data-i18n="art_gridsize_step2_title">キャンバスを選択</h3>
+      <div class="art-gridsize-options art-frame-grid art-part-grid" id="artSsiPartOptions"></div>
+    </div>
+
+    <div id="artSsiStepSettings" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('candidates')">
+        <span id="artSsiSettingsBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <p class="art-step-hint" data-i18n="art_ssi_settings_hint">色数などを調整してから取り込めます</p>
+      <div class="art-ssi-preview-row">
+        <div class="art-ssi-preview-col">
+          <div class="art-ssi-preview-label" data-i18n="art_ssi_preview_original">元の範囲</div>
+          <canvas id="artSsiPreviewOriginal"></canvas>
+        </div>
+        <div class="art-ssi-preview-col">
+          <div class="art-ssi-preview-label" data-i18n="art_ssi_preview_result">変換後</div>
+          <canvas id="artSsiPreviewResult"></canvas>
+        </div>
+      </div>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ssi_colors_label">色数</div>
+      <div class="art-gridsize-options" id="artSsiColorOptions"></div>
+      <label class="art-toggle-row">
+        <span data-i18n="art_ssi_dither_label">ディザリング</span>
+        <input type="checkbox" id="artSsiDitherToggle" checked>
+      </label>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ssi_bg_label">背景の扱い</div>
+      <div class="art-gridsize-options" id="artSsiBgOptions"></div>
+      <div class="art-ssi-error" id="artSsiSettingsError"></div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSsiApplyBtn" data-i18n="art_ssi_apply_btn">この内容で取り込む</button>
+      </div>
+    </div>
+
+    <p class="art-step-hint" id="artSsiProgress" style="display:none" data-i18n="art_ssi_processing">処理中…</p>
+
+    <div>
+      <button class="modal-close-btn" onclick="closeScreenshotImportModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
     </div>
   </div>
 </div>
@@ -499,12 +591,14 @@ function T(key, fallback, vars){
 </script>
 <script src="js/art-config.js"></script>
 <script src="js/art-masks.js"></script>
+<script src="js/art-pixelate.js"></script>
 <script src="js/lz-string.min.js"></script>
 <script src="js/qrcode.js"></script>
 <script src="js/art-share-code.js"></script>
 <script src="js/art-editor.js"></script>
 <script src="js/art-paint-guide.js"></script>
 <script src="js/art-3d.js"></script>
+<script src="js/art-screenshot-import.js"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
