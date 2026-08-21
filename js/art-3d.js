@@ -28,11 +28,13 @@ let art3DAnimHandle = null;
 let art3DResizeObserver = null;
 let art3DDisposables = []; // geometry/material/textureをまとめて破棄するため
 
-// フロント型紙の右側輪郭を「高さ(ピクセルY)→半幅(中心からのピクセルX)」の折れ線として
-// 持っておき、任意の高さでの胴体の半幅を線形補間で求める（実データから特定した値）。
-// 肩(y=20)〜脇の下の曲がり角(y=48)までは半幅24（肩幅そのまま）、そこから脇の下の
-// 一番外側(y=55)にかけて半幅30まで広がり、裾(y=80)まで半幅30のまま、という実際の
-// テンプレートの形状に合わせている
+// フロント型紙の右側輪郭を「高さ(ピクセルY)→半幅(中心からのピクセルX)」の制御点として
+// 持っておき、任意の高さでの胴体の半幅をCatmull-Romスプラインで求める（実データから
+// 特定した値）。肩(y=20)〜脇の下の曲がり角(y=48)までは半幅24（肩幅そのまま）、そこから
+// 脇の下の一番外側(y=55)にかけて半幅30まで広がり、裾(y=80)まで半幅30のまま、という
+// 実際のテンプレートの形状に合わせている。制御点の値そのもの（＝テンプレートの
+// シルエット）は変えず、制御点の間をスプラインで滑らかに補間することで、折れ線が
+// 持っていたy=48・y=55の折れ（傾きの不連続）をなくす
 const FRONT_WIDTH_PROFILE = [
   { y: 20, halfX: 24 },
   { y: 48, halfX: 24 },
@@ -44,18 +46,41 @@ const FRONT_WIDTH_PROFILE = [
 // 中心からの半幅は(52-28)/2=12ピクセル）
 const NECK_HOLE_HALF_X = 12;
 
+// Catmull-Romスプライン補間（p1〜p2の間をt=0〜1で補間する。p0・p3は前後の制御点で
+// 接線の向きを決めるために使う）
+function catmullRom(p0, p1, p2, p3, t){
+  const t2 = t * t, t3 = t2 * t;
+  return 0.5 * (
+    (2 * p1) +
+    (-p0 + p2) * t +
+    (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+    (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+  );
+}
+
+// {x, y}の制御点列（xの昇順）から、任意のxでの値をCatmull-Romスプラインで求める。
+// 両端の外側は同じ値をそのまま使う（外挿はしない）
+function splineAt(points, x){
+  if(x <= points[0].x) return points[0].y;
+  if(x >= points[points.length - 1].x) return points[points.length - 1].y;
+  let i = 0;
+  while(i < points.length - 2 && x > points[i + 1].x) i++;
+  const p0 = points[Math.max(0, i - 1)].y;
+  const p1 = points[i].y;
+  const p2 = points[i + 1].y;
+  const p3 = points[Math.min(points.length - 1, i + 2)].y;
+  const t = (x - points[i].x) / (points[i + 1].x - points[i].x || 1);
+  return catmullRom(p0, p1, p2, p3, t);
+}
+
+function smoothstep(t){
+  const c = Math.min(1, Math.max(0, t));
+  return c * c * (3 - 2 * c);
+}
+
 function halfWidthAtPixelY(y){
-  const profile = FRONT_WIDTH_PROFILE;
-  if(y <= profile[0].y) return profile[0].halfX;
-  if(y >= profile[profile.length - 1].y) return profile[profile.length - 1].halfX;
-  for(let i = 0; i < profile.length - 1; i++){
-    const a = profile[i], b = profile[i + 1];
-    if(y >= a.y && y <= b.y){
-      const t = (y - a.y) / (b.y - a.y || 1);
-      return a.halfX + (b.halfX - a.halfX) * t;
-    }
-  }
-  return profile[profile.length - 1].halfX;
+  const points = FRONT_WIDTH_PROFILE.map(p => ({ x: p.y, y: p.halfX }));
+  return splineAt(points, y);
 }
 
 // 断面の分割数（32分割＝11.25度刻み）。角度0が右、角度180度(=index SEGMENTS/2)が左。
@@ -387,9 +412,11 @@ function buildSleeveGeometry(THREE, shoulderLoop, cfg, axisStart, axisEnd){
     basisV = vnorm(basisV);
     const basisU = vnorm(vcross(basisV, dir));
     const t = ringIdx / stepCount;
-    const blend = Math.min(1, t / 0.8); // 肩の実際の形を長めに残し、なだらかに楕円へ移行する
+    // smoothstepで傾きが滑らかに変化するようにする（肩の実際の形を長めに残しつつ、
+    // 折れのない自然なカーブで楕円へ移行し、袖口へ向けて細くなる）
+    const blend = smoothstep(t / 0.8); // 肩の実際の形を長めに残し、なだらかに楕円へ移行する
     // 肩は太く、肘のあたりから袖口にかけて少しずつ細くなる（直線的な細まりにしない）
-    const taper = 1 - (1 - cfg.cuffTaper) * Math.pow(t, 0.8);
+    const taper = 1 - (1 - cfg.cuffTaper) * smoothstep(t);
     const center = ringCenters[ringIdx];
     return smoothUV.map(p => {
       const ovalU = Math.cos(p.angle) * cfg.startHalfWidth;
