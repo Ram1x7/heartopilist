@@ -726,9 +726,13 @@ const BASIC_PITCH_MIN_NOTE_LENGTH_FRAMES = 5;
 // 「音源から作る」「動画から作る」で選べるファイルの上限。iPhone/iPadのSafariは
 // タブあたりのメモリに厳しい制限があり、巨大なAudioBuffer（特にOfflineAudioContextでの
 // リサンプル時に倍増する）でタブごとクラッシュしうるため、事前に上限を設けて弾く。
-// 値は「数分程度の楽曲なら確実に収まり、長時間の録画等の極端なケースだけを弾く」
-// ことを狙った目安（実機での上限検証はできていない。詳細は実装後の報告を参照）
-const MELODY_SOURCE_MAX_FILE_BYTES = 60 * 1024 * 1024; // 60MB
+// メモリ消費に直結するのはデコード後の「音声の長さ」であり、ファイルサイズ（特に
+// 動画は音声以外の映像データが大半を占める）はそれとあまり比例しないため、
+// 実際に効かせるべき主なガードはMELODY_SOURCE_MAX_DURATION_SEC（長さ）の方で、
+// ファイルサイズの上限はそれよりずっと緩い「極端に巨大なアップロードだけ弾く」
+// 目的の目安にとどめる（数分程度の動画で60MBを超えることは普通にあり、
+// 実際に60MBで短い動画まで弾いてしまう不具合が報告されたため、大幅に緩めた）
+const MELODY_SOURCE_MAX_FILE_BYTES = 250 * 1024 * 1024; // 250MB
 const MELODY_SOURCE_MAX_DURATION_SEC = 360; // 6分
 
 let basicPitchLoaded = false;
@@ -1053,14 +1057,14 @@ const MELODY_SOURCE_MODE_CONFIG = {
   audio: {
     accept: "audio/*",
     titleKey: ["music_audio_modal_title", "音源から作る"],
-    cautionKey: ["music_audio_caution", "ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されます。伴奏やドラム、ベースが強い音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません（6分・60MBまでのファイルに対応しています）"],
+    cautionKey: ["music_audio_caution", "ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されます。伴奏やドラム、ベースが強い音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません（6分まで対応。ファイルサイズの上限は250MBです）"],
     uploadKey: ["music_audio_upload", "音声ファイルを選ぶ"],
     showRecordRow: false,
   },
   video: {
     accept: "video/*",
     titleKey: ["music_video_modal_title", "動画から作る"],
-    cautionKey: ["music_video_caution", "動画から音声トラックを取り出して解析します。ボーカルや主旋律がはっきり聞こえる動画ほど綺麗に変換されます。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした動画はこの端末のブラウザ内だけで処理され、外部に送信されることはありません（6分・60MBまでのファイルに対応しています）"],
+    cautionKey: ["music_video_caution", "動画から音声トラックを取り出して解析します。ボーカルや主旋律がはっきり聞こえる動画ほど綺麗に変換されます。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした動画はこの端末のブラウザ内だけで処理され、外部に送信されることはありません（6分まで対応。ファイルサイズの上限は250MBです）"],
     uploadKey: ["music_video_upload", "動画ファイルを選ぶ"],
     showRecordRow: false,
   },
@@ -1131,7 +1135,13 @@ function onHumFileChosen(e) {
   const errorEl = document.getElementById("musicHumError");
   errorEl.textContent = "";
   if (file.size > MELODY_SOURCE_MAX_FILE_BYTES) {
-    errorEl.textContent = T("music_melody_file_too_large", "ファイルサイズが大きすぎます（上限60MB）。ファイルを短くするか圧縮してからお試しください");
+    const sizeMb = Math.round(file.size / (1024 * 1024));
+    const limitMb = Math.round(MELODY_SOURCE_MAX_FILE_BYTES / (1024 * 1024));
+    errorEl.textContent = T(
+      "music_melody_file_too_large",
+      `ファイルサイズが大きすぎます（このファイル: 約${sizeMb}MB / 上限${limitMb}MB）。ファイルを短くするか圧縮してからお試しください`,
+      { size: sizeMb, limit: limitMb }
+    );
     e.target.value = "";
     return;
   }
