@@ -13,6 +13,18 @@
 // 選べる音（黒鍵の無い配置なら自然音だけ、など）に音ごとスナップする。
 // キーの移動を利用者任せにせず自動で合わせるこの処理が、参考にした他アプリ
 // （SkyScores等）との差別化ポイントになる。
+//
+// 【変換パイプラインの全体像】
+// Basic Pitchの生ノート列は、1つの音を複数の断片に分割していたり、ビブラートを
+// 別音程として検出していたりと「そのまま譜面化するには荒すぎる」状態のため、
+// 以下の段階を経てからゲーム内音階へ変換する（各段階は音声処理を伴わない
+// 純粋関数として実装しており、Node上でも単体テストできる）。
+//
+//   生ノート列
+//   → normalizeHumNoteEvents（同時発音の統合・同一音の断片統合・ビブラート吸収・ノイズ除去）
+//   → quantizeHumRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
+//   → mapHumMelodyToInstrument（オクターブシフト＋前後の音との関係を考慮したゲーム内音への変換）
+//   → tokens
 
 // ── 音高変換（ここから下は音声処理を伴わない純粋な計算のみで、Node上でも単体テストできる） ──
 
@@ -41,22 +53,10 @@ function buildHumInstrumentNoteMap(layout) {
     .sort((a, b) => a.midi - b.midi);
 }
 
-// 指定したMIDI番号に一番近い、楽器で実際に選べる音を返す
-function findClosestHumNote(midi, availableNotes) {
-  let best = availableNotes[0];
-  let bestDiff = Infinity;
-  for (const entry of availableNotes) {
-    const diff = Math.abs(entry.midi - midi);
-    if (diff < bestDiff) {
-      bestDiff = diff;
-      best = entry;
-    }
-  }
-  return best.note;
-}
-
-// 検出したメロディ全体の音域の中心と、楽器が鳴らせる音域の中心が一致するように、
-// オクターブ単位（12半音刻み）でシフトする量を求める
+// 検出したメロディ全体が、楽器の音域になるべく多く・自然に収まるオクターブシフト量
+// （12半音刻み）を求める。音域の中心同士を合わせる案を基準に、その前後のオクターブも
+// 試して「音域に収まる音の数」→「楽器の実際の音への距離の合計」の順で最も良いものを選ぶ
+// （範囲の広い曲と狭い曲を同じ扱いにしない）
 function computeHumOctaveShift(detectedMidis, availableNotes) {
   if (!detectedMidis.length || !availableNotes.length) return 0;
   const melodyMin = Math.min(...detectedMidis);
@@ -65,47 +65,282 @@ function computeHumOctaveShift(detectedMidis, availableNotes) {
   const instMin = availableNotes[0].midi;
   const instMax = availableNotes[availableNotes.length - 1].midi;
   const instCenter = (instMin + instMax) / 2;
-  return Math.round((instCenter - melodyCenter) / 12) * 12;
+  const centerShift = Math.round((instCenter - melodyCenter) / 12) * 12;
+
+  const candidateShifts = new Set([centerShift - 24, centerShift - 12, centerShift, centerShift + 12, centerShift + 24]);
+  let bestShift = centerShift;
+  let bestScore = Infinity;
+  candidateShifts.forEach((shift) => {
+    let inRangeCount = 0;
+    let totalDistance = 0;
+    detectedMidis.forEach((midi) => {
+      const shifted = midi + shift;
+      if (shifted >= instMin && shifted <= instMax) inRangeCount++;
+      let nearest = Infinity;
+      availableNotes.forEach((entry) => {
+        const d = Math.abs(entry.midi - shifted);
+        if (d < nearest) nearest = d;
+      });
+      totalDistance += nearest;
+    });
+    // 音域に収まる音の数を最優先し、同数なら実音への距離の合計が小さい方を選ぶ
+    const score = (detectedMidis.length - inRangeCount) * 100 + totalDistance;
+    if (score < bestScore) {
+      bestScore = score;
+      bestShift = shift;
+    }
+  });
+  return bestShift;
+}
+
+// ほぼ同時刻に鳴っている複数の検出（倍音・ハモりの誤検出の可能性）のうち、
+// 単旋律を想定して最も長く鳴っている1音だけを残す（Basic Pitchはポリフォニー対応の
+// モデルのため、鼻歌のような単旋律入力でも倍音等を別音として拾うことがある）
+function collapseSimultaneousHumNoteEvents(sortedEvents, opts) {
+  const options = opts || {};
+  const simulEpsilonSec = options.simulEpsilonSec != null ? options.simulEpsilonSec : 0.03;
+  const result = [];
+  sortedEvents.forEach((ev) => {
+    const last = result[result.length - 1];
+    if (last && Math.abs(ev.startTimeSeconds - last.startTimeSeconds) <= simulEpsilonSec) {
+      if (ev.durationSeconds > last.durationSeconds) {
+        result[result.length - 1] = { pitchMidi: ev.pitchMidi, startTimeSeconds: ev.startTimeSeconds, durationSeconds: ev.durationSeconds };
+      }
+      return;
+    }
+    result.push({ pitchMidi: ev.pitchMidi, startTimeSeconds: ev.startTimeSeconds, durationSeconds: ev.durationSeconds });
+  });
+  return result;
+}
+
+// Basic Pitchが同じ音を細かい断片に分割して検出した場合（例：C4が0.18秒刻みで
+// 4つに分かれて検出される等）、それらを1つの音へ統合する。
+// 「隙間がほぼ無い（=検出の継ぎ目）」場合だけを統合対象とすることで、実際に
+// 人が意図して同じ音を弾き直した「ド ド ド」のような明確なリズムの連打
+// （音と音の間に実際の無音・区切りがある）とは区別する
+function mergeHumNoteEvents(sortedEvents, opts) {
+  const options = opts || {};
+  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : 0.6;
+  const maxGapSec = options.maxGapSec != null ? options.maxGapSec : 0.04;
+
+  const merged = [];
+  sortedEvents.forEach((ev) => {
+    const last = merged[merged.length - 1];
+    if (last) {
+      const gap = ev.startTimeSeconds - (last.startTimeSeconds + last.durationSeconds);
+      const pitchDiff = Math.abs(ev.pitchMidi - last.pitchMidi);
+      if (gap <= maxGapSec && pitchDiff <= semitoneTolerance) {
+        const newEnd = Math.max(last.startTimeSeconds + last.durationSeconds, ev.startTimeSeconds + ev.durationSeconds);
+        // 長く鳴っていた方の断片のピッチを採用する（短い断片は検出のブレの可能性が高い）
+        if (ev.durationSeconds > last._sourceMaxDur) last.pitchMidi = ev.pitchMidi;
+        last._sourceMaxDur = Math.max(last._sourceMaxDur, ev.durationSeconds);
+        last.durationSeconds = newEnd - last.startTimeSeconds;
+        return;
+      }
+    }
+    merged.push({ pitchMidi: ev.pitchMidi, startTimeSeconds: ev.startTimeSeconds, durationSeconds: ev.durationSeconds, _sourceMaxDur: ev.durationSeconds });
+  });
+  return merged.map(({ pitchMidi, startTimeSeconds, durationSeconds }) => ({ pitchMidi, startTimeSeconds, durationSeconds }));
+}
+
+// 歌声のビブラートやピッチの揺れで、ロングトーンの途中に一瞬だけ別音程が
+// 検出された場合、それを別音符にせず前後の音へ吸収する。
+// 「短時間だけ現れ」「前後の音とほぼ同じ音程で」「かつ前後の音が同じ音程に戻る
+// （山型に戻ってくる）」場合だけを対象とすることで、実際のメロディの経過音・
+// 装飾音（別の音へ進んでいくもの）は変更しない。
+// 前後が同じ音程に戻るということは、揺れの前後は本来1つの続いた音であるため、
+// 揺れの音だけでなく後ろの音も直前の音へまとめて統合する（統合後に隙間なく
+// 同音程の音が2つ並んで残ってしまうのを避けるため）
+function suppressPitchWobbleEvents(events, opts) {
+  const options = opts || {};
+  const maxWobbleDurationSec = options.maxWobbleDurationSec != null ? options.maxWobbleDurationSec : 0.12;
+  const relativeFactor = options.relativeFactor != null ? options.relativeFactor : 0.35;
+  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : 2;
+
+  if (events.length < 3) return events.map((e) => ({ ...e }));
+
+  const result = [];
+  let i = 0;
+  while (i < events.length) {
+    const prev = result[result.length - 1];
+    const cur = events[i];
+    const next = i + 1 < events.length ? events[i + 1] : null;
+    if (prev && next) {
+      const isShort = cur.durationSeconds <= maxWobbleDurationSec && cur.durationSeconds <= relativeFactor * Math.min(prev.durationSeconds, next.durationSeconds);
+      const closeToPrev = Math.abs(cur.pitchMidi - prev.pitchMidi) <= semitoneTolerance;
+      const closeToNext = Math.abs(cur.pitchMidi - next.pitchMidi) <= semitoneTolerance;
+      const bumpReturnsToSamePitch = Math.round(prev.pitchMidi) === Math.round(next.pitchMidi);
+      if (isShort && closeToPrev && closeToNext && bumpReturnsToSamePitch) {
+        // 揺れの前後は本来1つの音なので、揺れとその後ろの音をまとめて直前の音へ吸収する
+        prev.durationSeconds = next.startTimeSeconds + next.durationSeconds - prev.startTimeSeconds;
+        i += 2;
+        continue;
+      }
+    }
+    result.push({ ...cur });
+    i++;
+  }
+  return result;
+}
+
+// 曲のテンポ（BPM）から見て極端に短すぎる検出はノイズとみなして除外する。
+// 固定値ではなく1拍の長さに対する割合で決めることで、速い曲の短い正規音符まで
+// 消してしまわないようにする（ただし極端な値にならないよう上下限を設ける）
+function filterHumNoiseEvents(events, bpmValue, opts) {
+  const options = opts || {};
+  const beatSec = 60 / bpmValue;
+  const floorSec = options.minDurationFloorSec != null ? options.minDurationFloorSec : 0.035;
+  const ceilSec = options.minDurationCeilSec != null ? options.minDurationCeilSec : 0.09;
+  const beatFraction = options.minDurationBeatFraction != null ? options.minDurationBeatFraction : 0.12;
+  const minDurationSec = Math.min(ceilSec, Math.max(floorSec, beatSec * beatFraction));
+  return events.filter((e) => e.durationSeconds >= minDurationSec);
+}
+
+// Basic Pitchの生ノート列[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を、
+// 上記の各段階（同時発音の統合→同一音の断片統合→ビブラート吸収→ノイズ除去）に
+// かけて整える
+function normalizeHumNoteEvents(rawEvents, bpmValue, opts) {
+  const options = opts || {};
+  const sorted = rawEvents.slice().sort((a, b) => a.startTimeSeconds - b.startTimeSeconds);
+  const collapsed = collapseSimultaneousHumNoteEvents(sorted, options.simultaneous);
+  const merged = mergeHumNoteEvents(collapsed, options.merge);
+  const wobbleSuppressed = suppressPitchWobbleEvents(merged, options.wobble);
+  return filterHumNoiseEvents(wobbleSuppressed, bpmValue, options.noise);
+}
+
+// 整えたノート列の発音開始位置を、曲全体で共有する1つの拍グリッド（既定では
+// 16分音符＝0.25拍刻み。手動編集で選べる最短の音価と合わせている）へスナップし、
+// 音符ごとに独立して丸めることで生じるリズムのズレの蓄積を防ぐ。
+// 次の音との間隔が十分あれば休符を挟み、そうでなければこの音の長さを次の音の
+// 開始位置まで伸ばして隙間なくつなげる（Basic Pitchの検出の途切れを休符に
+// してしまわないようにするため）。
+// 戻り値は [{midi, beats}, ...]（休符はmidi:null）で、まだゲーム内音への
+// 変換はしていない（それはmapHumMelodyToInstrumentの役目）
+function quantizeHumRhythm(events, bpmValue, opts) {
+  const options = opts || {};
+  if (!events.length) return [];
+  const beatSec = 60 / bpmValue;
+  const gridUnit = options.gridUnit != null ? options.gridUnit : 0.25;
+  const restGapBeats = options.restGapBeats != null ? options.restGapBeats : 0.3;
+
+  const toBeat = (sec) => sec / beatSec;
+  const snapToGrid = (beat) => Math.round(beat / gridUnit) * gridUnit;
+
+  const starts = events.map((e) => snapToGrid(toBeat(e.startTimeSeconds)));
+  const ownEnds = events.map((e, i) => Math.max(starts[i] + gridUnit, snapToGrid(toBeat(e.startTimeSeconds + e.durationSeconds))));
+
+  const result = [];
+  events.forEach((e, i) => {
+    const nextStart = i + 1 < events.length ? starts[i + 1] : null;
+    const gapAfter = nextStart == null ? null : nextStart - ownEnds[i];
+    const isRestAfter = gapAfter != null && gapAfter >= restGapBeats;
+    const lengthBeats = !isRestAfter && nextStart != null ? Math.max(gridUnit, nextStart - starts[i]) : Math.max(gridUnit, ownEnds[i] - starts[i]);
+
+    result.push({ midi: e.pitchMidi, beats: snapBeatsToPreset(lengthBeats) });
+    if (isRestAfter) {
+      result.push({ midi: null, beats: snapBeatsToPreset(gapAfter) });
+    }
+  });
+  return result;
+}
+
+// 指定したMIDI番号に対して、楽器で実際に選べる音の中から「距離の近さ」を主軸に、
+// 直前・直後の検出音との上がる/下がるの関係（輪郭）が食い違う候補にはわずかな
+// ペナルティを加えて選ぶ。距離がはっきり近い候補があればそれを優先し、僅差の
+// ときだけ輪郭を優先する（ゲームに存在しない音を、前後関係を無視した単純な
+// 最近傍だけで決めないようにするため）
+function pickClosestHumNoteWithContour(midi, availableNotes, ctx) {
+  const context = ctx || {};
+  let best = null;
+  let bestScore = Infinity;
+  availableNotes.forEach((entry) => {
+    let score = Math.abs(entry.midi - midi);
+    if (context.prevMappedMidi != null && context.prevShiftedMidi != null) {
+      const detectedDir = Math.sign(midi - context.prevShiftedMidi);
+      const candidateDir = Math.sign(entry.midi - context.prevMappedMidi);
+      if (detectedDir !== 0 && candidateDir !== 0 && detectedDir !== candidateDir) score += 0.9;
+    }
+    if (context.nextShiftedMidi != null) {
+      const detectedDirNext = Math.sign(context.nextShiftedMidi - midi);
+      const candidateDirNext = Math.sign(context.nextShiftedMidi - entry.midi);
+      if (detectedDirNext !== 0 && candidateDirNext !== 0 && detectedDirNext !== candidateDirNext) score += 0.4;
+    }
+    if (score < bestScore) {
+      bestScore = score;
+      best = entry;
+    }
+  });
+  return best.note;
+}
+
+// quantizeHumRhythmが返した[{midi, beats}, ...]（休符はmidi:null）を、
+// 楽器の音域へのオクターブシフト＋前後関係を考慮したゲーム内音への変換を経て
+// tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）にする。
+// 休符を挟むとメロディの輪郭比較はいったんリセットする（休符の前後は別フレーズ
+// とみなす）。changesには実際に「検出音そのままの音」から変更が生じた音を
+// 記録し、開発時の確認用ログにのみ使う
+function mapHumMelodyToInstrument(events, layout, opts) {
+  const availableNotes = buildHumInstrumentNoteMap(layout);
+  if (!availableNotes.length) return { tokens: events.map((e) => ({ notes: [], beats: e.beats })), changes: [], octaveShift: 0 };
+
+  const detectedMidis = events.filter((e) => e.midi != null).map((e) => Math.round(e.midi));
+  const shift = computeHumOctaveShift(detectedMidis, availableNotes);
+
+  const tokens = [];
+  const changes = [];
+  let prevMappedMidi = null;
+  let prevShiftedMidi = null;
+
+  for (let i = 0; i < events.length; i++) {
+    const e = events[i];
+    if (e.midi == null) {
+      tokens.push({ notes: [], beats: e.beats });
+      prevMappedMidi = null;
+      prevShiftedMidi = null;
+      continue;
+    }
+    const shiftedMidi = Math.round(e.midi) + shift;
+    let nextShiftedMidi = null;
+    for (let j = i + 1; j < events.length; j++) {
+      if (events[j].midi != null) {
+        nextShiftedMidi = Math.round(events[j].midi) + shift;
+        break;
+      }
+    }
+    const chosen = pickClosestHumNoteWithContour(shiftedMidi, availableNotes, { prevShiftedMidi, prevMappedMidi, nextShiftedMidi });
+    const chosenMidi = humNoteToMidi(chosen);
+    tokens.push({ notes: [{ degree: chosen.degree, accidental: chosen.accidental || null, octave: chosen.octave }], beats: e.beats });
+    if (chosenMidi !== shiftedMidi) changes.push({ index: i, fromMidi: shiftedMidi, toMidi: chosenMidi });
+    prevMappedMidi = chosenMidi;
+    prevShiftedMidi = shiftedMidi;
+  }
+  return { tokens, changes, octaveShift: shift };
 }
 
 // Basic Pitchのノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を
-// tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）に変換する。
-// 音同士の間に一定以上の無音があれば休符を挟む
+// tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）に変換する
+// （normalizeHumNoteEvents → quantizeHumRhythm → mapHumMelodyToInstrumentの3段階）
 function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
-  const minDurationSec = options.minDurationSec != null ? options.minDurationSec : 0.08; // 短すぎる誤検出を除外
-  const restGapSec = options.restGapSec != null ? options.restGapSec : 0.12; // これより長い無音は休符にする
+  const normalized = normalizeHumNoteEvents(noteEvents, bpmValue, options.normalize);
+  if (!normalized.length) return [];
 
-  const filtered = noteEvents
-    .filter((n) => n.durationSeconds >= minDurationSec)
-    .slice()
-    .sort((a, b) => a.startTimeSeconds - b.startTimeSeconds);
+  const timeline = quantizeHumRhythm(normalized, bpmValue, options.rhythm);
+  const { tokens, changes, octaveShift } = mapHumMelodyToInstrument(timeline, layout, options.mapping);
 
-  if (!filtered.length) return [];
-
-  const availableNotes = buildHumInstrumentNoteMap(layout);
-  const detectedMidis = filtered.map((n) => Math.round(n.pitchMidi));
-  const shift = computeHumOctaveShift(detectedMidis, availableNotes);
-
-  const beatSec = 60 / bpmValue;
-  const result = [];
-  let cursorTime = filtered[0].startTimeSeconds;
-
-  filtered.forEach((n) => {
-    const gap = n.startTimeSeconds - cursorTime;
-    if (gap >= restGapSec) {
-      result.push({ notes: [], beats: snapBeatsToPreset(gap / beatSec) });
-    }
-    const shiftedMidi = Math.round(n.pitchMidi) + shift;
-    const note = findClosestHumNote(shiftedMidi, availableNotes);
-    result.push({
-      notes: [{ degree: note.degree, accidental: note.accidental || null, octave: note.octave }],
-      beats: snapBeatsToPreset(n.durationSeconds / beatSec),
-    });
-    cursorTime = Math.max(cursorTime, n.startTimeSeconds + n.durationSeconds);
-  });
-
-  return result;
+  const debugEnabled = options.debug || (typeof window !== "undefined" && window.HUM_DEBUG);
+  if (debugEnabled && changes.length) {
+    const label = (midi) => {
+      const rounded = Math.round(midi);
+      const name = HUM_PITCH_CHROMATIC_NAMES[((rounded % 12) + 12) % 12];
+      return `${name}${Math.floor(rounded / 12) - 1}`;
+    };
+    console.debug(
+      `[hum] オクターブシフト: ${octaveShift / 12}オクターブ / ゲーム内音域に合わせて変更した音: ${changes.length}件`,
+      changes.map((c) => `${label(c.fromMidi)}→${label(c.toMidi)}`)
+    );
+  }
+  return tokens;
 }
 
 // ── ここから下はブラウザAPI（マイク・CDN読み込み・TensorFlow.js）に依存する部分 ──
@@ -124,6 +359,14 @@ const BASIC_PITCH_MODEL_URL = "https://cdn.jsdelivr.net/npm/@spotify/basic-pitch
 // basic-pitchのevaluateModelは、この値と異なるサンプルレートの音声を渡すと
 // 例外を投げて解析全体が失敗する（「解析に失敗しました」の主な原因だった）
 const BASIC_PITCH_SAMPLE_RATE = 22050;
+// outputToNotesPolyの解析パラメータ（onset閾値・frame閾値・最小音符長(フレーム数)）。
+// この3値が検出結果の粒度（1つの音が細かく分割されるかどうか等）に直接影響するため
+// 名前付きの定数として切り出してあるが、実機の鼻歌データで比較検証できていないため、
+// 値そのものは既存のまま変更していない（分割された音の統合はnormalizeHumNoteEvents側の
+// 後処理で対応する）
+const BASIC_PITCH_ONSET_THRESHOLD = 0.25;
+const BASIC_PITCH_FRAME_THRESHOLD = 0.25;
+const BASIC_PITCH_MIN_NOTE_LENGTH_FRAMES = 5;
 
 let basicPitchLoaded = false;
 let basicPitchModel = null;
@@ -245,7 +488,10 @@ async function runBasicPitchAnalysis(audioBuffer, onProgress) {
     }
   );
   const rawNotes = basicPitchLib.noteFramesToTime(
-    basicPitchLib.addPitchBendsToNoteEvents(contours, basicPitchLib.outputToNotesPoly(frames, onsets, 0.25, 0.25, 5))
+    basicPitchLib.addPitchBendsToNoteEvents(
+      contours,
+      basicPitchLib.outputToNotesPoly(frames, onsets, BASIC_PITCH_ONSET_THRESHOLD, BASIC_PITCH_FRAME_THRESHOLD, BASIC_PITCH_MIN_NOTE_LENGTH_FRAMES)
+    )
   );
   return rawNotes.map((n) => ({
     pitchMidi: n.pitchMidi,
