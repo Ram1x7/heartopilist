@@ -817,11 +817,11 @@ async function humExtractAudioFromVideoBlob(blob, ctx, onStatus) {
       audioTracks: video.audioTracks ? video.audioTracks.length : "unsupported",
     });
 
-    // video.audioTracksはWebKit系の非標準拡張。取得できて0件なら、この動画に
-    // 音声トラックが無いことがほぼ確実（画面収録でアプリ音声が無音だった場合等）
-    if (video.audioTracks && video.audioTracks.length === 0) {
-      throw new Error("no audio track in video");
-    }
+    // video.audioTracksはWebKit系の非標準拡張で、実際には音声トラックがあっても
+    // loadedmetadata時点では0件と報告されることがある（実機で確認済み：音声入りの
+    // 画面収録でもこの値が信用できないケースがあった）ため、ここでは診断ログにのみ
+    // 使い、判定には使わない。実際に音声が取得できたかどうかは後段の
+    // totalFrames（実際にキャプチャできたPCM量）で判定する
 
     if (ctx.state === "suspended") {
       await ctx.resume();
