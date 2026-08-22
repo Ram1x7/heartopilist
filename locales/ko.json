@@ -509,6 +509,8 @@
   "art_ssi_low_confidence": "캔버스를 자동으로 판정하지 못했습니다. 목록에서 선택해 주세요",
   "art_ssi_manual_pick_link": "다른 캔버스 선택",
   "art_ssi_use_canvas_btn": "이 캔버스 사용",
+  "art_ssi_adjust_hint": "감지된 범위가 어긋난 경우, 테두리를 드래그해서 이동하거나 모서리를 드래그해서 크기를 조정해 주세요",
+  "art_ssi_adjust_confirm": "이 범위로 다음으로",
   "art_ssi_settings_hint": "색상 수 등을 조정한 후 가져올 수 있습니다",
   "art_ssi_preview_original": "선택한 범위",
   "art_ssi_preview_result": "변환 후",

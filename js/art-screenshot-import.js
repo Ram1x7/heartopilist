@@ -52,6 +52,16 @@ let ssiSelectedPartId = null;
 let ssiSettings = { colors: 32, dither: true, bg: "keep" };
 let ssiLastComputedPixels = null;
 
+// 手動調整ステップ（自動検出がずれていた場合の補正用）の状態。
+// 矩形は常に「調整用<img>の表示サイズ（CSSピクセル）」の座標系で保持し、
+// working canvas座標への変換はssiWorkingRectToCss/ssiCssRectToWorkingで行う
+let ssiAdjustRect = null; // {x,y,w,h}
+let ssiAdjustDragMode = null; // "move" | "resize" | null
+let ssiAdjustHandleIndex = null; // 0:左上 1:右上 2:右下 3:左下
+let ssiAdjustDragStart = null; // {x,y,rect}
+let ssiAdjustResizeObserver = null;
+const SSI_ADJUST_HANDLE_RADIUS = 16; // iPadでも指で掴みやすいよう大きめに
+
 function ssiT(key, fallback){
   return (typeof T === "function") ? T(key, fallback) : (typeof i18n !== "undefined" ? i18n.t(key) : fallback) || fallback;
 }
@@ -79,13 +89,18 @@ function ssiResetState(){
   ssiSelectedFrameId = null;
   ssiSelectedPartId = null;
   ssiLastComputedPixels = null;
+  ssiAdjustRect = null;
+  if(ssiAdjustResizeObserver){
+    ssiAdjustResizeObserver.disconnect();
+    ssiAdjustResizeObserver = null;
+  }
   document.getElementById("artSsiFileInput").value = "";
   document.getElementById("artSsiUploadError").textContent = "";
   document.getElementById("artSsiSettingsError").textContent = "";
   document.getElementById("artSsiManualFrameOptions").style.display = "none";
 }
 
-const SSI_STEPS = ["upload", "candidates", "part", "settings"];
+const SSI_STEPS = ["upload", "candidates", "part", "adjust", "settings"];
 function ssiGoToStep(step){
   SSI_STEPS.forEach(s => {
     document.getElementById(`artSsiStep${s.charAt(0).toUpperCase()}${s.slice(1)}`).style.display = (s === step) ? "" : "none";
@@ -276,8 +291,8 @@ function ssiSelectFrame(frameId){
   ssiSelectedFrameId = frameId;
   if(frame.parts.length === 1){
     ssiSelectedPartId = frame.parts[0].id;
-    ssiGoToStep("settings");
-    ssiSetupSettingsStage();
+    ssiGoToStep("adjust");
+    ssiSetupAdjustStage();
   }else{
     ssiRenderPartOptions(frame);
     ssiGoToStep("part");
@@ -296,13 +311,172 @@ function ssiRenderPartOptions(frame){
   el.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => {
       ssiSelectedPartId = btn.dataset.value;
-      ssiGoToStep("settings");
-      ssiSetupSettingsStage();
+      ssiGoToStep("adjust");
+      ssiSetupAdjustStage();
     });
   });
 }
 
-// ── STEP3: 色数・背景の調整とプレビュー ──
+// ── STEP3: 検出範囲の手動調整 ──
+// 自動検出（補助線照合）がずれている・不正確な場合の補正手段。
+// working canvas全体を表示し、その上に検出済み（または画像全体フォールバック）の
+// 矩形を重ねて、ドラッグでの移動・四隅ドラッグでのリサイズができるようにする
+function ssiSetupAdjustStage(){
+  const img = document.getElementById("artSsiAdjustImg");
+  const seedRect = ssiResolveRegionRect(ssiSelectedFrameId, ssiSelectedPartId);
+  img.onload = () => {
+    ssiAdjustRect = ssiWorkingRectToCss(seedRect);
+    ssiDrawAdjustOverlay();
+    ssiBindAdjustResize();
+  };
+  img.src = ssiWorkingCanvas.toDataURL();
+}
+
+function ssiBindAdjustResize(){
+  if(ssiAdjustResizeObserver) ssiAdjustResizeObserver.disconnect();
+  if(typeof ResizeObserver === "undefined") return;
+  const wrap = document.getElementById("artSsiAdjustWrap");
+  ssiAdjustResizeObserver = new ResizeObserver(() => ssiDrawAdjustOverlay());
+  ssiAdjustResizeObserver.observe(wrap);
+}
+
+// working canvas座標（元画像の内部処理解像度）⇔ 調整用<img>の表示サイズ（CSSピクセル）の相互変換
+function ssiWorkingRectToCss(rect){
+  const img = document.getElementById("artSsiAdjustImg");
+  const scale = (img.clientWidth || ssiWorkingCanvas.width) / ssiWorkingCanvas.width;
+  return { x: rect.x * scale, y: rect.y * scale, w: rect.w * scale, h: rect.h * scale };
+}
+
+function ssiCssRectToWorking(rect){
+  const img = document.getElementById("artSsiAdjustImg");
+  const scale = ssiWorkingCanvas.width / (img.clientWidth || ssiWorkingCanvas.width);
+  return {
+    x: Math.round(rect.x * scale),
+    y: Math.round(rect.y * scale),
+    w: Math.round(rect.w * scale),
+    h: Math.round(rect.h * scale),
+  };
+}
+
+function ssiAdjustHandlePoints(){
+  const r = ssiAdjustRect;
+  return [
+    { x: r.x, y: r.y },
+    { x: r.x + r.w, y: r.y },
+    { x: r.x + r.w, y: r.y + r.h },
+    { x: r.x, y: r.y + r.h },
+  ];
+}
+
+function ssiDrawAdjustOverlay(){
+  const img = document.getElementById("artSsiAdjustImg");
+  const canvas = document.getElementById("artSsiAdjustOverlay");
+  const w = img.clientWidth;
+  const h = img.clientHeight;
+  if(!w || !h || !ssiAdjustRect) return;
+  canvas.width = w;
+  canvas.height = h;
+  // 画面回転等で表示サイズが変わった場合も矩形が枠内に収まるよう補正する
+  ssiAdjustRect.w = Math.min(ssiAdjustRect.w, w);
+  ssiAdjustRect.h = Math.min(ssiAdjustRect.h, h);
+  ssiAdjustRect.x = Math.max(0, Math.min(ssiAdjustRect.x, w - ssiAdjustRect.w));
+  ssiAdjustRect.y = Math.max(0, Math.min(ssiAdjustRect.y, h - ssiAdjustRect.h));
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, w, h);
+  ctx.fillStyle = "rgba(0,0,0,0.45)";
+  ctx.fillRect(0, 0, w, h);
+  ctx.clearRect(ssiAdjustRect.x, ssiAdjustRect.y, ssiAdjustRect.w, ssiAdjustRect.h);
+  ctx.strokeStyle = "#4dd0e1";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(ssiAdjustRect.x, ssiAdjustRect.y, ssiAdjustRect.w, ssiAdjustRect.h);
+  ctx.fillStyle = "#4dd0e1";
+  ssiAdjustHandlePoints().forEach(pt => {
+    ctx.beginPath();
+    ctx.arc(pt.x, pt.y, SSI_ADJUST_HANDLE_RADIUS / 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function ssiHitTestHandle(x, y){
+  const pts = ssiAdjustHandlePoints();
+  for(let i = 0; i < pts.length; i++){
+    const dx = x - pts[i].x, dy = y - pts[i].y;
+    if(Math.sqrt(dx * dx + dy * dy) <= SSI_ADJUST_HANDLE_RADIUS) return i;
+  }
+  return null;
+}
+
+function ssiPointerPos(e, canvas){
+  const rect = canvas.getBoundingClientRect();
+  const point = (e.touches && e.touches[0]) ? e.touches[0] : e;
+  return { x: point.clientX - rect.left, y: point.clientY - rect.top };
+}
+
+function ssiBindAdjustInteractions(){
+  const canvas = document.getElementById("artSsiAdjustOverlay");
+  const onStart = (e) => {
+    if(!ssiAdjustRect) return;
+    const pos = ssiPointerPos(e, canvas);
+    const handle = ssiHitTestHandle(pos.x, pos.y);
+    if(handle !== null){
+      ssiAdjustDragMode = "resize";
+      ssiAdjustHandleIndex = handle;
+    }else if(
+      pos.x >= ssiAdjustRect.x && pos.x <= ssiAdjustRect.x + ssiAdjustRect.w &&
+      pos.y >= ssiAdjustRect.y && pos.y <= ssiAdjustRect.y + ssiAdjustRect.h
+    ){
+      ssiAdjustDragMode = "move";
+    }else{
+      return;
+    }
+    ssiAdjustDragStart = { x: pos.x, y: pos.y, rect: { ...ssiAdjustRect } };
+    e.preventDefault();
+  };
+  const onMove = (e) => {
+    if(!ssiAdjustDragMode) return;
+    const pos = ssiPointerPos(e, canvas);
+    const dx = pos.x - ssiAdjustDragStart.x;
+    const dy = pos.y - ssiAdjustDragStart.y;
+    const start = ssiAdjustDragStart.rect;
+    const w = canvas.width, h = canvas.height;
+    if(ssiAdjustDragMode === "move"){
+      ssiAdjustRect.x = Math.max(0, Math.min(start.x + dx, w - start.w));
+      ssiAdjustRect.y = Math.max(0, Math.min(start.y + dy, h - start.h));
+      ssiAdjustRect.w = start.w;
+      ssiAdjustRect.h = start.h;
+    }else if(ssiAdjustDragMode === "resize"){
+      let x0 = start.x, y0 = start.y, x1 = start.x + start.w, y1 = start.y + start.h;
+      const minSize = 8;
+      if(ssiAdjustHandleIndex === 0){ x0 += dx; y0 += dy; }
+      else if(ssiAdjustHandleIndex === 1){ x1 += dx; y0 += dy; }
+      else if(ssiAdjustHandleIndex === 2){ x1 += dx; y1 += dy; }
+      else if(ssiAdjustHandleIndex === 3){ x0 += dx; y1 += dy; }
+      x0 = Math.max(0, Math.min(x0, x1 - minSize));
+      y0 = Math.max(0, Math.min(y0, y1 - minSize));
+      x1 = Math.min(w, Math.max(x1, x0 + minSize));
+      y1 = Math.min(h, Math.max(y1, y0 + minSize));
+      ssiAdjustRect.x = x0;
+      ssiAdjustRect.y = y0;
+      ssiAdjustRect.w = x1 - x0;
+      ssiAdjustRect.h = y1 - y0;
+    }
+    ssiDrawAdjustOverlay();
+    e.preventDefault();
+  };
+  const onEnd = () => {
+    ssiAdjustDragMode = null;
+    ssiAdjustHandleIndex = null;
+    ssiAdjustDragStart = null;
+  };
+  canvas.addEventListener("mousedown", onStart);
+  canvas.addEventListener("touchstart", onStart, { passive: false });
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("mouseup", onEnd);
+  window.addEventListener("touchend", onEnd);
+}
+
+// ── STEP4: 色数・背景の調整とプレビュー ──
 function ssiCurrentPart(){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === ssiSelectedFrameId);
   if(!frame) return null;
@@ -310,7 +484,7 @@ function ssiCurrentPart(){
 }
 
 function ssiSetupSettingsStage(){
-  ssiRegionRect = ssiResolveRegionRect(ssiSelectedFrameId, ssiSelectedPartId);
+  // ssiRegionRectは手動調整ステップ（STEP3）で確定済みのためここでは再計算しない
   renderOptionGroup("artSsiColorOptions", SSI_COLOR_COUNTS.map(n => ({ id: n, label: String(n) })), ssiSettings.colors, (v) => {
     ssiSettings.colors = Number(v);
     ssiUpdatePreview();
@@ -414,6 +588,12 @@ function bindScreenshotImportControls(){
     ssiUpdatePreview();
   });
   document.getElementById("artSsiApplyBtn").addEventListener("click", ssiApplyToEditor);
+  document.getElementById("artSsiAdjustConfirmBtn").addEventListener("click", () => {
+    ssiRegionRect = ssiCssRectToWorking(ssiAdjustRect);
+    ssiGoToStep("settings");
+    ssiSetupSettingsStage();
+  });
+  ssiBindAdjustInteractions();
 }
 
 bindScreenshotImportControls();

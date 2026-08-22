@@ -533,6 +533,8 @@
   "art_ssi_low_confidence": "Couldn't auto-detect the canvas. Please choose one from the list",
   "art_ssi_manual_pick_link": "Choose a different canvas",
   "art_ssi_use_canvas_btn": "Use this canvas",
+  "art_ssi_adjust_hint": "If the detected area looks off, drag the box to move it or drag the corners to resize it",
+  "art_ssi_adjust_confirm": "Continue with this area",
   "art_ssi_settings_hint": "You can adjust the color count and other settings before importing",
   "art_ssi_preview_original": "Selected region",
   "art_ssi_preview_result": "Converted",

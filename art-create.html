@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/art.css?v=48">
+<link rel="stylesheet" href="./css/art.css?v=49">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -271,8 +271,23 @@
       <div class="art-gridsize-options art-frame-grid art-part-grid" id="artSsiPartOptions"></div>
     </div>
 
-    <div id="artSsiStepSettings" style="display:none">
+    <div id="artSsiStepAdjust" style="display:none">
       <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('candidates')">
+        <span id="artSsiAdjustBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <p class="art-step-hint" data-i18n="art_ssi_adjust_hint">検出した範囲がずれている場合は、枠をドラッグして動かしたり、四隅をドラッグして大きさを調整してください</p>
+      <div class="art-ssi-adjust-wrap" id="artSsiAdjustWrap">
+        <img id="artSsiAdjustImg" alt="" draggable="false">
+        <canvas id="artSsiAdjustOverlay"></canvas>
+      </div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSsiAdjustConfirmBtn" data-i18n="art_ssi_adjust_confirm">この範囲で次へ</button>
+      </div>
+    </div>
+
+    <div id="artSsiStepSettings" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('adjust')">
         <span id="artSsiSettingsBackIcon"></span>
         <span data-i18n="art_gridsize_back">戻る</span>
       </a>

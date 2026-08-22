@@ -533,6 +533,8 @@
   "art_ssi_low_confidence": "キャンバスを自動判定できませんでした。一覧から選んでください",
   "art_ssi_manual_pick_link": "別のキャンバスを選択",
   "art_ssi_use_canvas_btn": "このキャンバスを使用",
+  "art_ssi_adjust_hint": "検出した範囲がずれている場合は、枠をドラッグして動かしたり、四隅をドラッグして大きさを調整してください",
+  "art_ssi_adjust_confirm": "この範囲で次へ",
   "art_ssi_settings_hint": "色数などを調整してから取り込めます",
   "art_ssi_preview_original": "元の範囲",
   "art_ssi_preview_result": "変換後",
