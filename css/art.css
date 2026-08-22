@@ -1503,13 +1503,6 @@ body.dark .art-ssi-error{
   color:#e07060;
 }
 
-.art-ssi-detected-preview{
-  display:block;
-  max-width:100%;
-  margin:0 auto 14px;
-  border-radius:8px;
-  border:1px solid var(--border, #ddd);
-}
 
 .art-ssi-candidate-list{
   display:flex;
