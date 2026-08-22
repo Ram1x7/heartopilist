@@ -1595,6 +1595,32 @@ body.dark .art-ssi-candidate-score-bar{
   image-rendering:pixelated;
 }
 
+.art-ssi-adjust-wrap{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  border-radius:8px;
+  border:1px solid var(--border, #ddd);
+  margin-bottom:12px;
+  line-height:0;
+}
+
+.art-ssi-adjust-wrap img{
+  display:block;
+  width:100%;
+  height:auto;
+  pointer-events:none;
+  user-select:none;
+}
+
+.art-ssi-adjust-wrap canvas{
+  position:absolute;
+  top:0;
+  left:0;
+  cursor:move;
+  touch-action:none;
+}
+
 /* 座標表示 */
 .art-coord-readout{
   display:none;

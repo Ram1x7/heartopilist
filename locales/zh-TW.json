@@ -509,6 +509,8 @@
   "art_ssi_low_confidence": "無法自動判斷畫布。請從清單中選擇",
   "art_ssi_manual_pick_link": "選擇其他畫布",
   "art_ssi_use_canvas_btn": "使用此畫布",
+  "art_ssi_adjust_hint": "如果偵測到的範圍有偏差，可以拖曳方框移動位置，或拖曳四角調整大小",
+  "art_ssi_adjust_confirm": "使用此範圍繼續",
   "art_ssi_settings_hint": "可以調整顏色數等設定後再匯入",
   "art_ssi_preview_original": "所選範圍",
   "art_ssi_preview_result": "轉換後",

@@ -509,6 +509,8 @@
   "art_ssi_low_confidence": "ไม่สามารถตรวจจับแคนวาสอัตโนมัติได้ กรุณาเลือกจากรายการ",
   "art_ssi_manual_pick_link": "เลือกแคนวาสอื่น",
   "art_ssi_use_canvas_btn": "ใช้แคนวาสนี้",
+  "art_ssi_adjust_hint": "หากบริเวณที่ตรวจพบไม่ตรง ให้ลากกรอบเพื่อย้ายตำแหน่ง หรือลากมุมเพื่อปรับขนาด",
+  "art_ssi_adjust_confirm": "ดำเนินการต่อด้วยบริเวณนี้",
   "art_ssi_settings_hint": "สามารถปรับจำนวนสีและอื่นๆ ก่อนนำเข้าได้",
   "art_ssi_preview_original": "บริเวณที่เลือก",
   "art_ssi_preview_result": "หลังแปลง",
