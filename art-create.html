@@ -252,8 +252,7 @@
         <span id="artSsiCandidatesBackIcon"></span>
         <span data-i18n="art_gridsize_back">戻る</span>
       </a>
-      <p class="art-step-hint" data-i18n="art_ssi_auto_detect_hint">画像から衣装らしき範囲を自動検出しました（背景が単色に近いほど精度が上がります）</p>
-      <canvas class="art-ssi-detected-preview" id="artSsiDetectedPreview"></canvas>
+      <p class="art-step-hint" data-i18n="art_ssi_auto_detect_hint">スクショに写っている補助線を照合し、キャンバスと位置を自動判定しました（補助線がはっきり写っているほど精度が上がります）</p>
       <div id="artSsiCandidateAutoWrap">
         <p class="art-step-hint" data-i18n="art_ssi_candidate_hint">このキャンバスで合っていますか？</p>
         <div class="art-ssi-candidate-list" id="artSsiCandidateList"></div>
@@ -579,6 +578,7 @@ function T(key, fallback, vars){
 <script src="js/art-config.js"></script>
 <script src="js/art-masks.js"></script>
 <script src="js/art-pixelate.js"></script>
+<script src="js/art-template-match.js"></script>
 <script src="js/lz-string.min.js"></script>
 <script src="js/qrcode.js"></script>
 <script src="js/art-share-code.js"></script>

@@ -1,35 +1,27 @@
 // js/art-screenshot-import.js
 // 「スクショから取り込む」機能（art-create.htmlの「新規作成」モーダルから開く）。
 //
-// フロー：スクショをアップロード → 画像全体を自動解析して衣装らしき範囲を検出 →
-// 既存のDESIGN_FRAME_PRESETS（js/art-config.js）と検出範囲のアスペクト比を比較して
-// 候補キャンバスを提示 → ユーザーが確認（または一覧から手動選択）→ パーツ選択 →
-// 色数・背景処理を調整しながらプレビュー → 既存のhatopiArt_currentDraft経由で
-// art-editorへ引き渡す。
+// フロー：スクショをアップロード → スクショに写り込む補助線（ゲーム内デザイン枠画面に
+// 表示される目安線で、はとぴ図鑑のアートページで使っているPRESET_MASKSの輪郭線と
+// 同じ形のもの）を検出し、各テンプレートパーツの輪郭線データと照合してキャンバス判定＋
+// 位置合わせを同時に行う → 候補キャンバスを提示（ユーザーが確認、または一覧から手動選択）
+// → パーツ選択 → 色数・背景処理を調整しながらプレビュー →
+// 既存のhatopiArt_currentDraft経由でart-editorへ引き渡す。
 //
-// 範囲はユーザーがドラッグ指定するのではなく、画像から自動検出する
-// （手作業での範囲指定は不要という要望に基づく）。
+// 重要：外部AI APIには一切依存しない。テンプレート照合はjs/art-template-match.js
+// （エッジ検出→距離変換→チャンファーマッチングという古典的な画像処理のみ）、
+// 画像処理・パレット変換はjs/art-pixelate.js（元々js/art-converter.jsにあった処理を
+// 共通化したもの）をそのまま利用する。
 //
-// 重要：外部AI APIには一切依存しない。画像処理・パレット変換は js/art-pixelate.js
-// （元々js/art-converter.jsにあった処理を共通化したもの）をそのまま利用する。
-//
-// 範囲の自動検出について（正直な制約の開示）：
-// 四隅から連結する近似色領域を「背景」とみなすフラッドフィル（js/art-pixelate.jsの
-// computeBackgroundMask、既存の「画像から作る」機能の背景除去と同じロジック）を使い、
-// 背景ではないと判定された部分の外接矩形を「衣装が写っている範囲」とみなしている。
-// そのため、背景が単色に近い（キャラクター表示画面のような無地寄りの背景）ほど精度が
-// 上がり、背景が複雑な通常のゲーム画面では検出範囲が画像全体に近くなることがある。
-// 本格的な人物・衣装の輪郭認識ではなく、あくまで背景色との差分に基づく簡易検出である。
-//
-// キャンバス自動判定について（正直な制約の開示）：
-// 「衣装の輪郭・特徴点からの本格的な画像認識」はブラウザ内・AI API無しでは
-// 安定した精度が出せないため、今回はアスペクト比（検出範囲の縦横比 と
-// 各テンプレートパーツのwidth:height比の近さ）＋衣装カテゴリでの絞り込みのみを
-// 使った控えめなヒューリスティックとしている。自信度が低い場合や、同じ比率の
-// パーツ（例：Tシャツのフロントとバック）は区別できないため、常に手動選択・
-// パーツ選択の導線を用意し、自動判定は「候補の提示」に留める。
+// キャンバス判定・位置合わせについて（正直な制約の開示）：
+// スクショに実際に補助線がはっきり写っている（背景・キャラクターに隠れていない、
+// 極端に暗い/ぼやけていない）ことを前提にした精度になる。補助線が写っていない、
+// または不明瞭な通常の写真等では自動判定の精度は低くなるため、自信度が低い場合は
+// 「自動判定できませんでした」として手動でのテンプレート選択を促す
+// （間違ったテンプレートを自動適用するより、候補を提示して確認してもらうことを優先）。
 
-const SSI_MAX_WORKING_DIM = 1600; // iPad等でのメモリ超過を避けるための内部処理用画像の最大辺
+const SSI_MAX_WORKING_DIM = 1600; // iPad等でのメモリ超過を避けるための内部処理用画像の最大辺（最終的な切り抜き用）
+const SSI_SEARCH_MAX_DIM = 360; // テンプレート照合（エッジ検出・チャンファーマッチング）専用の、さらに縮小した探索用画像の最大辺
 const SSI_MIN_IMAGE_DIM = 64; // これより小さい画像はエラーにする
 const SSI_COLOR_COUNTS = [4, 8, 16, 32, 64, 128];
 const SSI_BG_MODES = [
@@ -37,17 +29,26 @@ const SSI_BG_MODES = [
   { id: "keep", labelKey: "art_ssi_bg_keep", labelFallback: "そのまま" },
   { id: "white", labelKey: "art_ssi_bg_white", labelFallback: "白背景" },
 ];
+// チャンファーマッチングの探索パラメータ。精度と処理時間のバランスを見て調整したもの
+// （js/art-template-match.jsの既定値より軽め。iPad等でも実用的な時間で終わらせるため）
+const SSI_MATCH_OPTIONS = { spacing: 4, scaleSteps: 8, posSteps: 6, refineIters: 20 };
+// チャンファーコスト→0〜1スコアへ変換する際の正規化係数（探索用画像のピクセル単位が基準）
+const SSI_SCORE_NORMALIZER = 6;
+// このスコアを下回ったら「自動判定できませんでした」として手動選択を促す。
+// また、選択されたテンプレートの当てはめスコアがこれを下回る場合、位置合わせ結果は
+// 信頼できないとみなし、切り抜き範囲は画像全体にフォールバックする
+const SSI_CONFIDENCE_THRESHOLD = 0.35;
 
 let ssiWorkingCanvas = null; // 縮小済みの内部処理用画像（ここから範囲切り抜き・変換を行う）
-let ssiRegionRect = null; // 自動検出された範囲（working canvasのピクセル座標）{x,y,w,h}
+let ssiSearchScaleToWorking = 1; // 探索用画像の座標をssiWorkingCanvas座標へ変換する倍率
+let ssiMatchResults = []; // 全テンプレートパーツの照合結果 [{frameId, partId, frame, part, match, score}, ...]（スコア降順）
+let ssiRegionRect = null; // 選択中のテンプレートについて決定した切り抜き範囲（working canvas座標）{x,y,w,h}
 let ssiSelectedFrameId = null;
 let ssiSelectedPartId = null;
-// bgの既定値は"keep"（背景除去なし）にしている。自動検出した範囲は既に
-// 「背景ではない部分」の外接矩形へタイトに切り詰められているため、ここでさらに
-// auto背景除去をかけると、単色の衣装（例：無地Tシャツ）がクロップ全体を占めて
-// 四隅まで同じ色になり、それ自体を「背景」と誤認して丸ごと消えてしまうことがある。
-// 背景の写り込みが残っている場合のために"auto"/"white"は選べるようにしておくが、
-// 既定はユーザーが明示的に選ぶまで安全側の"keep"とする
+// bgの既定値は"keep"（背景除去なし）。補助線照合による切り抜きは対象パーツの範囲へ
+// 直接位置合わせされるため、そのままauto背景除去をかけると単色の衣装（例：無地Tシャツ）が
+// 丸ごと「背景」と誤認されて消えてしまうことがある。背景の写り込みが残る場合のために
+// "auto"/"white"は選べるようにしておくが、既定はユーザーが明示的に選ぶまで安全側の"keep"とする
 let ssiSettings = { colors: 32, dither: true, bg: "keep" };
 let ssiLastComputedPixels = null;
 
@@ -73,6 +74,7 @@ function closeScreenshotImportModal(){
 
 function ssiResetState(){
   ssiWorkingCanvas = null;
+  ssiMatchResults = [];
   ssiRegionRect = null;
   ssiSelectedFrameId = null;
   ssiSelectedPartId = null;
@@ -116,14 +118,27 @@ function ssiHandleFileSelect(file){
       }
       try{
         ssiPrepareWorkingCanvas(img);
-        ssiRegionRect = ssiAutoDetectRegion(ssiWorkingCanvas);
       }catch(e){
         console.error(e);
         errorEl.textContent = ssiT("art_ssi_error_processing", "この端末では画像の処理に失敗しました。別の画像や端末でお試しください");
         return;
       }
-      ssiGoToStep("candidates");
-      ssiRenderCandidates();
+      // テンプレート照合（エッジ検出＋チャンファーマッチング）は数百ms〜数秒かかりうるため、
+      // 進捗表示を実際に描画させてから重い同期処理を実行する
+      document.getElementById("artSsiProgress").textContent = ssiT("art_ssi_matching", "補助線を照合中…");
+      document.getElementById("artSsiProgress").style.display = "";
+      setTimeout(() => {
+        try{
+          ssiRunTemplateMatching();
+        }catch(e){
+          console.error(e);
+          errorEl.textContent = ssiT("art_ssi_error_processing", "この端末では画像の処理に失敗しました。別の画像や端末でお試しください");
+          document.getElementById("artSsiProgress").style.display = "none";
+          return;
+        }
+        ssiGoToStep("candidates");
+        ssiRenderCandidates();
+      }, 30);
     };
     img.src = reader.result;
   };
@@ -144,86 +159,90 @@ function ssiPrepareWorkingCanvas(img){
   ssiWorkingCanvas = canvas;
 }
 
-// 画像全体から「衣装が写っていそうな範囲」を自動検出する。
-// js/art-pixelate.jsのcomputeBackgroundMask（四隅から連結する近似色領域を背景とみなす
-// フラッドフィル、既存の「画像から作る」機能の背景除去と同じロジック）を流用し、
-// 背景ではないと判定された全ピクセルの外接矩形を範囲として使う。
-// 背景除去で何も検出できなかった場合（画面全体が単色に近い等）は画像全体を対象にする
-function ssiAutoDetectRegion(canvas){
-  const w = canvas.width, h = canvas.height;
-  const ctx = canvas.getContext("2d");
-  const imgData = ctx.getImageData(0, 0, w, h);
-  const bgMask = computeBackgroundMask(imgData, "auto");
-  let minX = w, minY = h, maxX = -1, maxY = -1;
-  for(let y = 0; y < h; y++){
-    for(let x = 0; x < w; x++){
-      if(!bgMask[y * w + x]){
-        if(x < minX) minX = x;
-        if(x > maxX) maxX = x;
-        if(y < minY) minY = y;
-        if(y > maxY) maxY = y;
-      }
-    }
+// ── 補助線照合（テンプレート判定＋位置合わせ） ──
+// js/art-template-match.jsのアルゴリズム（エッジ検出→距離変換→チャンファーマッチング）を
+// 使い、衣装カテゴリの全パーツについて、スクショ内の補助線との当てはまりを評価する
+function ssiRunTemplateMatching(){
+  // 探索はssiWorkingCanvasよりさらに縮小した専用の画像で行う（速度優先。最終的な
+  // 切り抜き自体はssiWorkingCanvas側の座標へスケールし直すため、精度への影響は小さい）
+  const searchScale = Math.min(1, SSI_SEARCH_MAX_DIM / Math.max(ssiWorkingCanvas.width, ssiWorkingCanvas.height));
+  const sw = Math.max(1, Math.round(ssiWorkingCanvas.width * searchScale));
+  const sh = Math.max(1, Math.round(ssiWorkingCanvas.height * searchScale));
+  const searchCanvas = document.createElement("canvas");
+  searchCanvas.width = sw;
+  searchCanvas.height = sh;
+  searchCanvas.getContext("2d").drawImage(ssiWorkingCanvas, 0, 0, sw, sh);
+  ssiSearchScaleToWorking = ssiWorkingCanvas.width / sw;
+
+  const imgData = searchCanvas.getContext("2d").getImageData(0, 0, sw, sh);
+  const mag = computeEdgeMagnitude(imgData);
+  const edgeMask = binarizeEdgesOtsu(mag);
+  const distField = computeDistanceTransform(edgeMask, sw, sh);
+
+  const candidateParts = [];
+  ssiClothesFrames().forEach(frame => {
+    frame.parts.forEach(part => {
+      const maskEntry = (typeof PRESET_MASKS !== "undefined" && PRESET_MASKS[frame.id]) ? PRESET_MASKS[frame.id][part.id] : null;
+      if(!maskEntry || !maskEntry.maskLines || !maskEntry.maskLines.length) return;
+      candidateParts.push({ frameId: frame.id, partId: part.id, frame, part, width: part.width, height: part.height, maskLines: maskEntry.maskLines });
+    });
+  });
+
+  const scored = scoreAllTemplateMatches(distField, sw, sh, candidateParts, SSI_MATCH_OPTIONS, edgeMask);
+  ssiMatchResults = scored.map(r => ({
+    frameId: r.entry.frameId,
+    partId: r.entry.partId,
+    frame: r.entry.frame,
+    part: r.entry.part,
+    match: r.match,
+    score: chamferCostToScore(r.match.cost, SSI_SCORE_NORMALIZER),
+  }));
+}
+
+function ssiFindMatchResult(frameId, partId){
+  return ssiMatchResults.find(r => r.frameId === frameId && r.partId === partId) || null;
+}
+
+// 選択されたテンプレートパーツの当てはめ結果から、working canvas座標での切り抜き範囲を決める。
+// 当てはめの信頼度が低い場合（十分に一致する補助線が見つからなかった場合）は、
+// 誤った位置合わせのまま切り抜くよりも安全な「画像全体」にフォールバックする
+function ssiResolveRegionRect(frameId, partId){
+  const result = ssiFindMatchResult(frameId, partId);
+  if(result && result.score >= SSI_CONFIDENCE_THRESHOLD){
+    const m = result.match;
+    return {
+      x: Math.round(m.offsetX * ssiSearchScaleToWorking),
+      y: Math.round(m.offsetY * ssiSearchScaleToWorking),
+      w: Math.max(1, Math.round(result.part.width * m.scale * ssiSearchScaleToWorking)),
+      h: Math.max(1, Math.round(result.part.height * m.scale * ssiSearchScaleToWorking)),
+    };
   }
-  if(maxX < minX || maxY < minY){
-    return { x: 0, y: 0, w, h };
-  }
-  return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  return { x: 0, y: 0, w: ssiWorkingCanvas.width, h: ssiWorkingCanvas.height };
 }
 
 // ── STEP2: キャンバス候補 ──
-// 正直な前提：ここでは本格的な画像認識は行わず、自動検出した範囲のアスペクト比と
-// 各テンプレートパーツのwidth:height比の近さだけをスコアにしている（対数比の差を正規化）。
-// 同じ比率のパーツ（例：フロントとバック）は区別できないため、フレーム単位で
-// スコアリングし、パーツの選択は次のステップでユーザー自身に行ってもらう。
-function ssiComputeCandidates(rect){
-  const cropRatio = rect.w / rect.h;
-  const frames = ssiClothesFrames();
-  const scored = frames.map(frame => {
-    let bestScore = -Infinity, bestPart = frame.parts[0];
-    frame.parts.forEach(part => {
-      const partRatio = part.width / part.height;
-      const diff = Math.abs(Math.log(cropRatio / partRatio));
-      const score = Math.max(0, 1 - diff / Math.log(3));
-      if(score > bestScore){ bestScore = score; bestPart = part; }
-    });
-    return { frame, bestPart, score: bestScore };
-  });
-  scored.sort((a, b) => b.score - a.score);
-  return scored;
-}
-
-const SSI_CONFIDENCE_THRESHOLD = 0.55;
-
 function ssiRenderCandidates(){
   const lang = (typeof currentLang === "function") ? currentLang() : "ja";
 
-  // 自動検出した範囲をプレビュー表示（透明性のため。操作は不要）
-  const previewCanvas = document.getElementById("artSsiDetectedPreview");
-  if(previewCanvas && ssiWorkingCanvas && ssiRegionRect){
-    const maxBox = 140;
-    const scale = Math.min(1, maxBox / Math.max(ssiRegionRect.w, ssiRegionRect.h));
-    previewCanvas.width = Math.max(1, Math.round(ssiRegionRect.w * scale));
-    previewCanvas.height = Math.max(1, Math.round(ssiRegionRect.h * scale));
-    previewCanvas.getContext("2d").drawImage(
-      ssiWorkingCanvas,
-      ssiRegionRect.x, ssiRegionRect.y, ssiRegionRect.w, ssiRegionRect.h,
-      0, 0, previewCanvas.width, previewCanvas.height
-    );
-  }
+  // フレーム単位で最良スコアのパーツを代表として候補一覧に出す（同じフレームの
+  // 複数パーツが上位を占めて紛らわしくなるのを防ぐため。パーツそのものの選択は次のステップで行う）
+  const byFrame = new Map();
+  ssiMatchResults.forEach(r => {
+    const existing = byFrame.get(r.frameId);
+    if(!existing || r.score > existing.score) byFrame.set(r.frameId, r);
+  });
+  const top = [...byFrame.values()].sort((a, b) => b.score - a.score).slice(0, 5);
 
-  const candidates = ssiComputeCandidates(ssiRegionRect);
-  const top = candidates.slice(0, 5);
   const listEl = document.getElementById("artSsiCandidateList");
   listEl.innerHTML = top.map((c, i) => `
-    <div class="art-ssi-candidate-item${i === 0 ? " art-ssi-candidate-top" : ""}" data-frame="${c.frame.id}">
+    <div class="art-ssi-candidate-item${i === 0 ? " art-ssi-candidate-top" : ""}" data-frame="${c.frameId}">
       <img class="art-ssi-candidate-icon" src="${c.frame.icon}" alt="" width="36" height="36">
       <div class="art-ssi-candidate-info">
         <div class="art-ssi-candidate-name">${frameName(c.frame, lang)}</div>
         <div class="art-ssi-candidate-score-bar"><div class="art-ssi-candidate-score-fill" style="width:${Math.round(c.score * 100)}%"></div></div>
         <div class="art-ssi-candidate-score-label">${Math.round(c.score * 100)}%</div>
       </div>
-      <button class="art-header-btn art-ssi-candidate-use-btn" data-frame="${c.frame.id}">${ssiT("art_ssi_use_canvas_btn", "このキャンバスを使用")}</button>
+      <button class="art-header-btn art-ssi-candidate-use-btn" data-frame="${c.frameId}">${ssiT("art_ssi_use_canvas_btn", "このキャンバスを使用")}</button>
     </div>
   `).join("");
   listEl.querySelectorAll(".art-ssi-candidate-use-btn").forEach(btn => {
@@ -291,6 +310,7 @@ function ssiCurrentPart(){
 }
 
 function ssiSetupSettingsStage(){
+  ssiRegionRect = ssiResolveRegionRect(ssiSelectedFrameId, ssiSelectedPartId);
   renderOptionGroup("artSsiColorOptions", SSI_COLOR_COUNTS.map(n => ({ id: n, label: String(n) })), ssiSettings.colors, (v) => {
     ssiSettings.colors = Number(v);
     ssiUpdatePreview();
