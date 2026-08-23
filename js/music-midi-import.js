@@ -30,13 +30,24 @@
 //   （MIDIファイルの場合はparseMidiFile、音源/動画の場合はBasic Pitchの
 //   ポリフォニック検出結果がそのままこの形式になる）
 //   → groupNoteEventsIntoChords（同時刻に開始する複数ノートを1つの和音グループへ）
+//   → limitChordPolyphony（ユーザー指定の「同時に押す指の本数」を超える和音を、
+//                          主旋律(最高音)・低音(最低音)を優先して間引く）
 //   → buildFreeTimingChordTimeline（既定）／quantizeChordRhythm（量子化する場合のみ）
 //     （前者は実際の時間(durationMs)をそのまま使う「フリーテンポ譜面」を作る。
 //      後者は曲全体で共有する拍グリッドへ開始位置を揃えた「拍子ベース譜面」を作る）
 //   → mapChordsToInstrument（オクターブシフト＋楽器で実際に選べる音へのスナップ。
 //                            和音内の各音は独立してスナップし、重複は取り除く）
 //   → tokens
-// （convertPolyphonicNoteEventsToScoreTokensがこの3段階をまとめて呼び出す）
+// （convertPolyphonicNoteEventsToScoreTokensがこの4段階をまとめて呼び出す）
+//
+// 【同時に押す指の本数の上限について】
+// MIDI/音声/動画から検出した和音をそのまま譜面にすると、実際にプレイヤーが
+// 同時に押せる指の本数を超えることがある。変換UI（js/music-hum.jsの
+// #musicHumMaxNotesInput、MIDI・音源・動画の変換共通）で1〜10本の上限を
+// 指定でき、それを超える和音はlimitChordPolyphonyで自動的に間引かれる。
+// 楽器の音域外の音への対応（オクターブシフト・最寄り音へのスナップ）とは
+// 独立した、純粋に「同時に鳴らす音の数」だけの制約であり、その後段の
+// mapChordsToInstrumentの処理には一切影響しない。
 //
 // 【フリーテンポ譜面について】
 // MIDI・音源・動画からの自動生成は、実際のタイミングをテンポ・拍子の量子化に
@@ -300,6 +311,32 @@ function groupNoteEventsIntoChords(noteEvents, opts) {
   return groups;
 }
 
+// 和音1つぶんのMIDI番号列(midis)が指定本数(maxNotes)を超える場合に、
+// 優先順位に沿って間引く。曲全体を通した「どれが主旋律か」は推定せず、
+// この和音グループ単独のピッチ位置だけで判断する。優先順位：
+//   1. 最も高いピッチ（主旋律とみなせる音）を最優先で残す
+//   2. 次に最も低いピッチ（低音・伴奏の土台）を残す
+//   3. 残り枠は、高い方から順に内側（2番目に高い→3番目に高い…）を埋めていく
+//      （外側の音＝旋律・低音を優先し、間に挟まれる内声から間引かれる）
+function pickPriorityChordNotes(midis, maxNotes) {
+  const sorted = midis.slice().sort((a, b) => a - b);
+  const n = sorted.length;
+  if (maxNotes >= n) return sorted;
+  if (maxNotes <= 1) return [sorted[n - 1]]; // 最高音（主旋律）だけ残す
+  const picked = [sorted[0]]; // 最低音を確保
+  const remaining = maxNotes - 1;
+  for (let i = 0; i < remaining; i++) picked.push(sorted[n - 1 - i]); // 最高音から順に内側へ
+  return picked.sort((a, b) => a - b);
+}
+
+// groupNoteEventsIntoChordsが返した和音グループ列に、上記の間引きを適用する。
+// maxNotesが未指定(null/undefined)の場合は上限なし（間引かない）とし、
+// 既存の呼び出し元の挙動を変えない
+function limitChordPolyphony(groups, maxNotes) {
+  if (maxNotes == null) return groups;
+  return groups.map((g) => (g.midis.length > maxNotes ? { ...g, midis: pickPriorityChordNotes(g.midis, maxNotes) } : g));
+}
+
 // フリーテンポ譜面用：拍グリッドへのスナップは一切行わず、検出した実際の
 // 時間(秒)をそのままtokenの長さ(durationMs)として使う。次のグループとの
 // 間隔が十分空いていれば休符を挟み、そうでなければこの音の長さを次の音の
@@ -425,10 +462,11 @@ function convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, bpmValue, 
   const resolvedSemitoneEnabled = options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
   const availableNotes = buildInstrumentNoteMap(layout, resolvedSemitoneEnabled);
   const groups = groupNoteEventsIntoChords(noteEvents, options.chord);
+  const limitedGroups = limitChordPolyphony(groups, options.maxSimultaneousNotes);
   const freeTiming = options.freeTiming !== false;
   const timeline = freeTiming
-    ? buildFreeTimingChordTimeline(groups, options.freeTimingRhythm)
-    : quantizeChordRhythm(groups, bpmValue, options.rhythm);
+    ? buildFreeTimingChordTimeline(limitedGroups, options.freeTimingRhythm)
+    : quantizeChordRhythm(limitedGroups, bpmValue, options.rhythm);
   return mapChordsToInstrument(timeline, availableNotes);
 }
 
@@ -523,8 +561,12 @@ function finishMidiConversion(parsed, noteEvents, sourceBpm) {
   // 既定でフリーテンポ譜面として生成する（量子化なし。実際の音の長さをそのまま
   // durationMsに入れる）。テンポ表示自体はMIDIファイル自身が持つ値をそのまま
   // 採用する（小節線の目安表示に使うため。エディタ側で既に設定していたBPMに
-  // 合わせてしまうと、原曲のテンポ感と表示がずれてしまう）
-  const newTokens = convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, clampedBpm, { semitoneEnabled });
+  // 合わせてしまうと、原曲のテンポ感と表示がずれてしまう）。
+  // 同時に押す指の本数の上限は、変換モーダル(#musicHumMaxNotesInput)で
+  // 解析開始前にユーザーが指定した値をそのまま使う（readMaxSimultaneousNotesは
+  // js/music-hum.js側で定義、同じモーダルを使う音源/動画パスと共通）
+  const maxSimultaneousNotes = readMaxSimultaneousNotes();
+  const newTokens = convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, clampedBpm, { semitoneEnabled, maxSimultaneousNotes });
 
   if (!newTokens.length) {
     document.getElementById("musicHumError").textContent = T("music_midi_no_notes", "このMIDIファイルには音が含まれていませんでした");
