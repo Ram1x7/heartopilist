@@ -48,6 +48,22 @@ let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
 let playTimer = null;
 
+// ── 再生シークバー：曲全体を実時間の連続バーとして扱うためのタイムライン ──
+// playbackTimeline[i] = token iの再生開始時刻（曲の先頭からの秒数、tokenDurationSec basis）。
+// tokens・bpm・scoreReferenceBpmが変わるたびrebuildPlaybackTimeline()で作り直す
+let playbackTimeline = [];
+let playbackTotalDurationSec = 0;
+// 一時停止中（またはシーク直後でまだ再生していない間）の再生位置。cursorは
+// あくまでハイライト対象トークンの特定に使い、シークバーの位置計算は常にこちらを使う
+let pausedElapsedSec = 0;
+// 自動再生中の現在tickの開始時刻(performance.now())と、そのtokenの曲内での長さ(秒)。
+// rAFの毎フレーム、この2つから「今まさに鳴っている位置」を逆算する
+let playbackTickStartWallClock = 0;
+let playbackTickDurSec = 0;
+let playbackClockRaf = null;
+// シークバーをドラッグ中は自動更新で位置を上書きしない
+let isSeekDragging = false;
+
 // 区間リピート：苦手な部分だけを選んで繰り返し練習・再生できる（練習モード・追従モード共通）
 let loopStart = null; // ループ区間の開始インデックス（tokens内）
 let loopEnd = null; // ループ区間の終了インデックス
@@ -695,6 +711,62 @@ function presetBeatsToApproxMs(beats) {
   return beats * (60000 / scoreReferenceBpm);
 }
 
+// ── 再生シークバー：タイムライン基盤 ──
+// tokensが変わるたび（またはbpm/scoreReferenceBpmが変わり各tokenの実時間の長さが
+// 変わるたび）に呼び直し、各tokenの開始秒・曲全体の合計秒を計算し直す。
+// renderScoreDisplay()はtokens変更の全経路（追加・削除・読み込み等）で必ず
+// 呼ばれる箇所なので、そこから呼ぶことで個別に呼び忘れる心配をなくしている
+function rebuildPlaybackTimeline() {
+  playbackTimeline = [];
+  let t = 0;
+  tokens.forEach((tok, i) => {
+    playbackTimeline[i] = t;
+    t += tokenDurationSec(tok);
+  });
+  playbackTotalDurationSec = t;
+  if (!isSeekDragging) updateSeekBarUI();
+}
+
+// 実時間位置(秒)に対応するtokensインデックスを探す（曲が長くてもドラッグの
+// 追従性能が落ちないよう、線形探索ではなく二分探索にしてある）。
+// playbackTimelineは開始時刻の昇順なので、「開始時刻がsec以下である最後のtoken」を返す
+function findTokenIndexAtSec(sec) {
+  if (!tokens.length) return -1;
+  let lo = 0;
+  let hi = tokens.length - 1;
+  let ans = 0;
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (playbackTimeline[mid] <= sec) {
+      ans = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
+    }
+  }
+  return ans;
+}
+
+function formatSeekTime(sec) {
+  const s = Math.max(0, Math.floor(sec || 0));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${String(r).padStart(2, "0")}`;
+}
+
+// 「今まさに再生している位置」を曲内の経過秒数として返す。再生中はperformance.now()と
+// 直前tick()開始時刻の差にplaySpeedを掛けて、setTimeoutの発火を待たずに滑らかな
+// 値を得る。停止・一時停止中はpausedElapsedSec（一時停止・シーク時に確定させた
+// 位置）をそのまま返す
+function getCurrentElapsedSec() {
+  if (!isPlaying) return cursor >= 0 ? pausedElapsedSec : 0;
+  if (cursor < 0 || !tokens[cursor]) return 0;
+  const startSec = playbackTimeline[cursor] || 0;
+  const wallElapsedSec = (performance.now() - playbackTickStartWallClock) / 1000;
+  const partial = Math.min(playbackTickDurSec, Math.max(0, wallElapsedSec * playSpeed));
+  return startSec + partial;
+}
+
 // ── 音の長さ選択（編集モード・非録音時用） ──
 function renderDurationOptions() {
   const el = document.getElementById("musicDurationOptions");
@@ -839,6 +911,7 @@ function forgetTokenIndexesFrom(index) {
 // 小節線は保存せず、拍子(timeSignature)をもとに毎回その場で計算して表示する ──
 function renderScoreDisplay() {
   const el = document.getElementById("musicScoreDisplay");
+  rebuildPlaybackTimeline();
   updateNoteToolbarUI();
   updateReviewBannerUI();
   if (!tokens.length) {
@@ -1091,14 +1164,16 @@ function loopBadgeText() {
 
 // 追従モード：ボタンを出さず、今の音（と次の音のプレビュー）だけを大きく表示する。
 // 実機の画面と並べて使う想定で、離れた位置からでも見やすいことを優先する
-function renderFollowDisplay() {
+// previewIdxを渡すと、実際のcursorではなくそのインデックスを表示する
+// （シークバーのドラッグ中プレビュー用。省略時は通常通りcursorを使う）
+function renderFollowDisplay(previewIdx) {
   const el = document.getElementById("musicFollowDisplay");
   if (!el) return;
   if (!tokens.length) {
     el.innerHTML = `<div class="music-follow-empty">${T("music_score_empty", "まだ音が入力されていません")}</div>`;
     return;
   }
-  const idx = cursor >= 0 ? cursor : 0;
+  const idx = previewIdx != null ? previewIdx : cursor >= 0 ? cursor : 0;
   const cur = tokens[idx];
   const nextIdx = nextNoteIndex(idx);
   const next = nextIdx !== null ? tokens[nextIdx] : null;
@@ -1167,24 +1242,32 @@ function tryAdvancePracticeChord() {
 // 次に弾くべき音（nextNoteIndex(cursor)のtoken）に対応する演奏ボタンを薄く
 // 光らせる。再生停止中のタップ先取りでも表示されたままにする（renderScoreDisplay
 // から毎回呼ばれるため、cursorが動かない限りは同じ状態を維持し続けるだけになる）
-function updatePracticeGuideHighlight() {
+// 演奏ボタンのうち、tokens[idx]の音に対応するものへclassNameを付け外しする共通処理。
+// 先読みガイド(practice-guide)とシークバーのドラッグプレビュー(seek-preview)の
+// どちらも「あるtokenインデックスの音に対応するボタンを光らせる」という点で
+// 同じロジックなので、対象クラス名だけを引数にして共有している
+function applyGuideHighlightForIndex(idx, className) {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
-  frame.querySelectorAll(".music-note-btn.practice-guide").forEach((b) => b.classList.remove("practice-guide"));
-  // 自動再生中は、cursorがちょうど「今まさに鳴っている音」を指している
-  // （tick()がcursor=idxを代入した直後にrenderScoreDisplay経由でここが呼ばれるため）ので、
-  // それをそのまま光らせる。停止中のタップ先取りでは、まだ何も鳴っていないため
-  // 「次に弾くべき音」(nextNoteIndex(cursor))を光らせる。isPlaying基準で分けないと、
-  // 自動再生中は常に1つ先の音が光ってしまい、鳴っている音とずれて見える
-  const idx = isPlaying ? cursor : nextNoteIndex(cursor);
+  frame.querySelectorAll(`.music-note-btn.${className}`).forEach((b) => b.classList.remove(className));
   if (idx == null || idx < 0) return;
   const tok = tokens[idx];
   if (!tok || !tok.notes.length) return;
   const keys = new Set(tok.notes.map(noteKey));
   frame.querySelectorAll(".music-note-btn").forEach((btn) => {
     const note = JSON.parse(btn.dataset.note);
-    if (keys.has(noteKey(note))) btn.classList.add("practice-guide");
+    if (keys.has(noteKey(note))) btn.classList.add(className);
   });
+}
+
+function updatePracticeGuideHighlight() {
+  // 自動再生中は、cursorがちょうど「今まさに鳴っている音」を指している
+  // （tick()がcursor=idxを代入した直後にrenderScoreDisplay経由でここが呼ばれるため）ので、
+  // それをそのまま光らせる。停止中のタップ先取りでは、まだ何も鳴っていないため
+  // 「次に弾くべき音」(nextNoteIndex(cursor))を光らせる。isPlaying基準で分けないと、
+  // 自動再生中は常に1つ先の音が光ってしまい、鳴っている音とずれて見える
+  const idx = isPlaying ? cursor : nextNoteIndex(cursor);
+  applyGuideHighlightForIndex(idx, "practice-guide");
 }
 
 // 正しく押せた瞬間、和音内の全ボタンを一瞬強く光らせてフェードアウトさせる
@@ -1220,31 +1303,61 @@ function startPlayback() {
   if (isPlaying) return;
   if (loopEnabled && loopStart !== null && loopEnd !== null) {
     // ループ区間の外から再生を始めたら、区間の頭から始める
-    if (cursor < loopStart - 1 || cursor > loopEnd) cursor = loopStart - 1;
+    if (cursor < loopStart - 1 || cursor > loopEnd) {
+      cursor = loopStart - 1;
+      pausedElapsedSec = cursor >= 0 ? (playbackTimeline[cursor] || 0) + tokenDurationSec(tokens[cursor]) : 0;
+    }
   } else if (nextNoteIndex(cursor) === null) {
     cursor = -1; // 最後まで行っていたら最初から
+    pausedElapsedSec = 0;
   }
   isPlaying = true;
   updatePlaybackUI();
-  tick();
+  startPlaybackClock();
+  resumeFromCurrentPosition();
+}
+
+// 一時停止・シークの位置から再生を再開する。pausedElapsedSecがcursorトークンの
+// 途中を指している場合（シークで曲の途中に移動した直後など）は、そのtokenの音を
+// 再度鳴らし直さず、残り時間ぶんだけ無音で待ってから通常のtick()チェーンに合流する
+// （tick()はnextNoteIndex(cursor)から次の音を鳴らすため、続きから自然につながる）
+function resumeFromCurrentPosition() {
+  if (cursor < 0 || !tokens[cursor]) {
+    tick();
+    return;
+  }
+  const tok = tokens[cursor];
+  const tokStartSec = playbackTimeline[cursor] || 0;
+  const tokSongDurSec = tokenDurationSec(tok);
+  const elapsedInTokSec = Math.max(0, Math.min(tokSongDurSec, pausedElapsedSec - tokStartSec));
+  const remainingSongSec = Math.max(0, tokSongDurSec - elapsedInTokSec);
+  playbackTickStartWallClock = performance.now() - (elapsedInTokSec / playSpeed) * 1000;
+  playbackTickDurSec = tokSongDurSec;
+  playTimer = setTimeout(tick, (remainingSongSec / playSpeed) * 1000);
 }
 
 function pausePlayback() {
+  pausedElapsedSec = getCurrentElapsedSec(); // isPlayingをfalseにする前に、今の位置を確定させる
   isPlaying = false;
   clearTimeout(playTimer);
+  stopPlaybackClock();
   updatePlaybackUI();
   // isPlayingがfalseになった時点で先読みガイドを「次に弾くべき音」表示へ
   // 切り替える（そのままにすると、直前に鳴っていた音の点灯が停止後も残り続ける）
   updatePracticeGuideHighlight();
+  updateSeekBarUI();
 }
 
 function stopPlayback() {
+  pausedElapsedSec = getCurrentElapsedSec();
   isPlaying = false;
   clearTimeout(playTimer);
+  stopPlaybackClock();
   updatePlaybackUI();
   // 曲の終わりまで自動再生した場合、tick()側はrenderScoreDisplay()を呼ばずに
   // ここへ来るため、最後に鳴っていた音の先読みガイドが点灯したまま残らないようにする
   updatePracticeGuideHighlight();
+  updateSeekBarUI();
 }
 
 function tick() {
@@ -1256,7 +1369,10 @@ function tick() {
   cursor = idx;
   renderScoreDisplay();
   const tok = tokens[idx];
-  const durSec = tokenDurationSec(tok) / playSpeed;
+  const songDurSec = tokenDurationSec(tok);
+  const durSec = songDurSec / playSpeed;
+  playbackTickStartWallClock = performance.now();
+  playbackTickDurSec = songDurSec;
   tok.notes.forEach((n) => playTone(noteFrequency(n), durSec));
   playTimer = setTimeout(tick, durSec * 1000);
 }
@@ -1268,7 +1384,10 @@ function scheduleNextTick() {
     return;
   }
   const tok = tokens[cursor];
-  const durSec = tokenDurationSec(tok) / playSpeed;
+  const songDurSec = tokenDurationSec(tok);
+  const durSec = songDurSec / playSpeed;
+  playbackTickStartWallClock = performance.now();
+  playbackTickDurSec = songDurSec;
   playTimer = setTimeout(tick, durSec * 1000);
 }
 
@@ -1280,6 +1399,91 @@ function updatePlaybackUI() {
 function setPlaySpeed(v) {
   playSpeed = Math.max(0.1, Math.min(1, Number(v)));
   document.getElementById("musicSpeedLabel").textContent = `${playSpeed.toFixed(2)}${T("music_speed_suffix", "倍")}`;
+}
+
+// ── 再生シークバー：再生中の見た目の更新(rAF)・ドラッグ操作 ──
+// setTimeoutチェーン(tick)は音を鳴らすタイミングの管理に専念させ、シークバーの
+// つまみ・時刻表示だけは別途requestAnimationFrameで毎フレーム滑らかに更新する
+function startPlaybackClock() {
+  if (playbackClockRaf != null) return;
+  const step = () => {
+    updateSeekBarUI();
+    playbackClockRaf = requestAnimationFrame(step);
+  };
+  playbackClockRaf = requestAnimationFrame(step);
+}
+
+function stopPlaybackClock() {
+  if (playbackClockRaf != null) cancelAnimationFrame(playbackClockRaf);
+  playbackClockRaf = null;
+}
+
+function updateSeekBarUI() {
+  const slider = document.getElementById("musicSeekSlider");
+  const label = document.getElementById("musicSeekTimeLabel");
+  if (!slider || !label) return;
+  if (isSeekDragging) return; // ドラッグ中はユーザー操作を優先し、自動更新で上書きしない
+  const total = playbackTotalDurationSec;
+  const elapsed = Math.min(getCurrentElapsedSec(), total);
+  slider.max = String(Math.max(1, Math.round(total * 1000)));
+  slider.value = String(Math.round(elapsed * 1000));
+  label.textContent = `${formatSeekTime(elapsed)} / ${formatSeekTime(total)}`;
+}
+
+// シークバーをドラッグ中：実際の再生位置は動かさず、その時点で鳴る（鳴る予定の）
+// 音をプレビュー表示するだけにとどめる（音は鳴らさない）
+function onSeekInputPreview(e) {
+  isSeekDragging = true;
+  const sec = Number(e.target.value) / 1000;
+  const label = document.getElementById("musicSeekTimeLabel");
+  if (label) label.textContent = `${formatSeekTime(sec)} / ${formatSeekTime(playbackTotalDurationSec)}`;
+  const idx = findTokenIndexAtSec(sec);
+  updateSeekPreviewHighlight(idx);
+}
+
+function updateSeekPreviewHighlight(idx) {
+  if (pageMode === "practice") {
+    applyGuideHighlightForIndex(idx, "seek-preview");
+  } else if (pageMode === "follow") {
+    renderFollowDisplay(idx);
+  } else {
+    const el = document.getElementById("musicScoreDisplay");
+    if (!el) return;
+    el.querySelectorAll(".music-chip.seek-preview").forEach((c) => c.classList.remove("seek-preview"));
+    const chip = idx != null && idx >= 0 ? el.querySelector(`.music-chip[data-index="${idx}"]`) : null;
+    if (chip) chip.classList.add("seek-preview");
+  }
+}
+
+function clearSeekPreviewHighlight() {
+  const frame = document.getElementById("musicStageFrame");
+  if (frame) frame.querySelectorAll(".music-note-btn.seek-preview").forEach((b) => b.classList.remove("seek-preview"));
+  const el = document.getElementById("musicScoreDisplay");
+  if (el) el.querySelectorAll(".music-chip.seek-preview").forEach((c) => c.classList.remove("seek-preview"));
+  if (pageMode === "follow") renderFollowDisplay();
+}
+
+// シークバーを離した時点で、実際にその実時間位置へ再生位置をジャンプさせる
+function onSeekCommit(e) {
+  const sec = Number(e.target.value) / 1000;
+  isSeekDragging = false;
+  clearSeekPreviewHighlight();
+  seekPlaybackTo(sec);
+}
+
+// トークン途中の位置へシークした場合、そのtokenの音を再度鳴らし直すことはせず、
+// 残り時間ぶん無音のまま経過させてから次のtokenの通常再生を再開する（要件通り）。
+// 一時停止中にシークした場合は、再生ボタンでその位置から再開できるよう
+// pausedElapsedSecに反映するだけにとどめる
+function seekPlaybackTo(sec) {
+  if (!tokens.length) return;
+  const clamped = Math.max(0, Math.min(sec, playbackTotalDurationSec));
+  cursor = findTokenIndexAtSec(clamped);
+  pausedElapsedSec = clamped;
+  clearTimeout(playTimer);
+  renderScoreDisplay(); // ハイライトをジャンプ後の位置に即座に反映する
+  if (isPlaying) resumeFromCurrentPosition();
+  updateSeekBarUI();
 }
 
 // ── 簡易合成音 ──
@@ -1661,7 +1865,10 @@ function bindControls() {
     tempoWarningDismissed = true; // テンポを自分で確認・変更したので、録音前の確認案内はもう不要
     // フリーテンポ譜面は、基準テンポ(scoreReferenceBpm)からの比率で実際の再生速度が
     // 変わる（tokenDurationSec）。小節線は基準テンポ側で計算するため表示は変わらず、
-    // 再生中の場合は次の音から新しい速度が反映される（再描画は不要）
+    // 再生中の場合は次の音から新しい速度が反映される（譜面自体の再描画は不要）。
+    // ただし各tokenの実時間の長さ・曲全体の合計時間はbpmに応じて変わるため、
+    // シークバーのタイムラインだけは作り直す
+    rebuildPlaybackTimeline();
     saveDraftDebounced();
   });
   document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {
@@ -1695,6 +1902,8 @@ function bindControls() {
 
   document.getElementById("musicPlayPauseBtn").addEventListener("click", togglePlayback);
   document.getElementById("musicSpeedSlider").addEventListener("input", (e) => setPlaySpeed(e.target.value));
+  document.getElementById("musicSeekSlider").addEventListener("input", onSeekInputPreview);
+  document.getElementById("musicSeekSlider").addEventListener("change", onSeekCommit);
 
   document.getElementById("musicSoundToggleBtn").addEventListener("click", toggleSound);
 }
