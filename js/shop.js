@@ -190,21 +190,24 @@ function createShopCard(item){
   return div;
 }
 
-function renderSeasonBanner(){
-  const banner = document.getElementById("shopSeasonBanner");
-  if(!banner || typeof shopSeasons === "undefined") return;
-
-  const { season, ended } = getCurrentShopSeason();
-  if(!season){ banner.style.display = "none"; return; }
-
+// シーズンバナーの表示内容（アイコン・名称・開催状況・期間）。畳んだ状態の
+// 「アイテム一覧を表示」プロンプト内でも同じ内容を使い回すため関数化している
+function buildSeasonBannerHtml(season, ended){
   const label = (season.labelI18n && season.labelI18n[currentLang()]) || season.label;
   const [startDate] = season.start.split(" ");
   const [endDate] = season.end.split(" ");
-
-  banner.classList.toggle("ended", ended);
-  banner.innerHTML = ended
+  return ended
     ? `${icon("warning",{size:13})} ${label}${T("shop_season_ended_suffix"," は終了しています")}（${startDate}〜${endDate}）`
     : `${icon("pin",{size:13})} ${label}${T("shop_season_active_suffix"," 開催中")}（${startDate}〜${endDate}）`;
+}
+
+function renderSeasonBanner(season, ended){
+  const banner = document.getElementById("shopSeasonBanner");
+  if(!banner || typeof shopSeasons === "undefined") return;
+  if(!season){ banner.style.display = "none"; return; }
+
+  banner.classList.toggle("ended", ended);
+  banner.innerHTML = buildSeasonBannerHtml(season, ended);
 }
 
 function renderProgress(){
@@ -215,18 +218,26 @@ function renderProgress(){
   document.getElementById("shopProgressFill").style.width = pct + "%";
 }
 
-function renderRevealPrompt(ended){
+// シーズン終了後は、説明バナー・コンプ数ゲージ・検索/並び替え・一覧をまとめて畳んでおき、
+// 「アイテム一覧を表示」を押した場合のみ表示する。次のシーズン/フェスの商店が始まったら
+// （＝ended:falseになったら）通常通りすべて常時表示になる
+function renderRevealPrompt(season, ended){
+  const banner = document.getElementById("shopSeasonBanner");
+  const progress = document.querySelector(".shop-progress");
   const wrap = document.getElementById("shopRevealWrap");
   const controls = document.querySelector(".shop-controls");
   const content = document.getElementById("shopContent");
   const showPrompt = ended && !shopItemsRevealed;
 
   wrap.style.display = showPrompt ? "" : "none";
+  banner.style.display = showPrompt ? "none" : "";
+  progress.style.display = showPrompt ? "none" : "";
   controls.style.display = showPrompt ? "none" : "";
   if(showPrompt) content.innerHTML = "";
 
   if(!showPrompt) return false;
   wrap.innerHTML = `
+    <p class="shop-reveal-title">${buildSeasonBannerHtml(season, ended)}</p>
     <p>${T("shop_ended_reveal_hint","このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます")}</p>
     <button class="shop-reveal-btn" id="shopRevealBtn">${T("shop_ended_reveal_btn","アイテム一覧を表示")}</button>
   `;
@@ -238,11 +249,11 @@ function renderRevealPrompt(ended){
 }
 
 function render(){
-  renderSeasonBanner();
+  const { season, ended } = getCurrentShopSeason();
+  renderSeasonBanner(season, ended);
   renderProgress();
 
-  const { ended } = getCurrentShopSeason();
-  if(renderRevealPrompt(ended)) return;
+  if(renderRevealPrompt(season, ended)) return;
 
   const content = document.getElementById("shopContent");
   content.innerHTML = "";
