@@ -344,6 +344,18 @@
   </div>
 </div>
 
+<div id="musicMidiTrackModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2001;">
+  <div class="modal-box music-hum-box">
+    <h3 data-i18n="music_midi_track_modal_title">トラックを選択</h3>
+    <p class="music-step-hint" data-i18n="music_midi_track_modal_hint">複数のトラックが見つかりました。すべてまとめて1つの譜面（和音）にするか、いずれか1つのトラックだけを選んで変換できます</p>
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicMidiMergeAllBtn" data-i18n="music_midi_merge_all_btn">全トラックをまとめて変換</button>
+    </div>
+    <div class="music-saved-list" id="musicMidiTrackList"></div>
+    <button class="modal-close-btn" id="musicMidiTrackCloseBtn" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box music-help-box">
     <h3 style="text-align:center;">使い方</h3>
@@ -441,6 +453,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/music-config.js"></script>
 <script src="js/music-hum.js"></script>
+<script src="js/music-midi-import.js"></script>
 <script src="js/music-editor.js"></script>
 <script src="js/sw-register.js"></script>
 </body>
