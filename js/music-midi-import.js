@@ -1,5 +1,8 @@
 // js/music-midi-import.js
-// 「音源から作る」にMIDIファイルの読み込みを統合する機能。
+// 「音源から作る」にMIDIファイルの読み込みを統合する機能、および、あらゆる
+// ポリフォニック（複数音同時）ノートイベント列をゲーム内の和音対応tokensへ
+// 変換する共通パイプライン（元はMIDI専用として実装したが、js/music-hum.jsの
+// Basic Pitchによる音源/動画解析からも共有して使う）。
 //
 // MIDIファイルは.mid/.midi拡張子（またはaudio/midi系のMIMEタイプ）で判定し、
 // 通常の音声解析（Basic Pitch）とは完全に別の経路で処理する。MIDIには
@@ -10,33 +13,33 @@
 // npmパッケージをバンドルする代わりに、フォーマット自体は複雑ではないため
 // 直接実装した）。
 //
-// 【他の変換元との違い】
-// ハミング／音源／動画ファイルの変換（js/music-hum.js）は、Basic Pitchの
-// ポリフォニック（複数音同時）検出結果を「主旋律1本」に絞り込む
-// （collapseSimultaneousNoteEvents）。これは検出結果に含まれる倍音・ハモり・
-// 伴奏等の誤検出を1つの正しいメロディへ収束させるための処理であり、
-// 「複数の音が同時に鳴っている」という検出結果そのものが信頼できないことが
-// 前提になっている。
-// 一方、MIDIファイルの同時発音は実際に作曲者が意図した和音そのものであり、
-// 内容を信頼して良い。そのためMIDI変換では同時発音を1音に絞り込まず、
-// tokenのnotes配列にそのまま複数音として残す（ゲーム内の演奏画面は理論上
-// 無制限の同時押しに対応しているため、オカリナ/ほら貝を含む全楽器で和音を
-// 許可する）。
+// 【和音グループ化パイプラインの共有について】
+// ハミングの変換（js/music-hum.jsのconvertMelodyToScoreTokens）は、Basic
+// Pitchのポリフォニック検出結果を「主旋律1本」に絞り込む
+// （collapseSimultaneousNoteEvents）。ハミングは本来単旋律（1人の声）である
+// ため、複数音の同時検出は倍音・ノイズ等の誤検出である可能性が高いという
+// 前提に基づく処理であり、この絞り込みはハミング専用のまま維持する。
+// 一方、MIDIファイルの同時発音は作曲者が意図した本物の和音であり、また
+// 音源/動画ファイル（Basic Pitchのポリフォニック解析）で検出される同時発音も
+// 実際の伴奏・和音である可能性が高いため、どちらも絞り込まずtokenのnotes配列に
+// そのまま複数音として残す（ゲーム内の演奏画面は理論上無制限の同時押しに
+// 対応しているため、オカリナ/ほら貝を含む全楽器で和音を許可する）。
 //
-// 【変換パイプライン】
-//   MIDIファイル
-//   → parseMidiFile（SMFパース。トラックごとのノートイベント[{pitchMidi,
-//                    startTimeSeconds, durationSeconds}]とテンポを抽出）
-//   → groupMidiNotesIntoChords（同時刻に開始する複数ノートを1つの和音グループへ）
-//   → quantizeMidiChordRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
-//   → mapMidiChordsToInstrument（オクターブシフト＋楽器で実際に選べる音へのスナップ。
-//                                和音内の各音は独立してスナップし、重複は取り除く）
+// 【共通の和音対応変換パイプライン】
+//   ノートイベント列 [{pitchMidi, startTimeSeconds, durationSeconds}, ...]
+//   （MIDIファイルの場合はparseMidiFile、音源/動画の場合はBasic Pitchの
+//   ポリフォニック検出結果がそのままこの形式になる）
+//   → groupNoteEventsIntoChords（同時刻に開始する複数ノートを1つの和音グループへ）
+//   → quantizeChordRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
+//   → mapChordsToInstrument（オクターブシフト＋楽器で実際に選べる音へのスナップ。
+//                            和音内の各音は独立してスナップし、重複は取り除く）
 //   → tokens
+// （convertPolyphonicNoteEventsToScoreTokensがこの3段階をまとめて呼び出す）
 //
 // オクターブシフト・音へのスナップは js/music-hum.js の
 // computeMelodyOctaveShift / buildInstrumentNoteMap をそのまま再利用する
 // （同じ考え方＝「検出した音域を、楽器が実際に鳴らせる音域へオクターブ単位で
-// まるごとシフトしてから、実際に選べる音へスナップする」をMIDIにも適用する）。
+// まるごとシフトしてから、実際に選べる音へスナップする」を共通で適用する）。
 
 // ── SMF(Standard MIDI File)バイナリパーサー ──
 // ここから下は音声処理を一切伴わない純粋な計算のみで、Node上でも単体テストできる
@@ -264,11 +267,11 @@ function parseMidiFile(arrayBuffer) {
   return { format, ticksPerQuarter, initialBpm, tracks };
 }
 
-// ── ノートイベント → 和音対応tokensへの変換 ──
+// ── ノートイベント → 和音対応tokensへの変換（MIDI・音源/動画ファイル共通） ──
 
 // 同時刻（既定30ms以内）に開始する複数ノートを1つの和音グループへまとめる。
 // グループの長さは、含まれる音のうち最も長く鳴っていたものを採用する
-function groupMidiNotesIntoChords(noteEvents, opts) {
+function groupNoteEventsIntoChords(noteEvents, opts) {
   const options = opts || {};
   const simulEpsilonSec = options.simulEpsilonSec != null ? options.simulEpsilonSec : 0.03;
   const sorted = noteEvents.slice().sort((a, b) => a.startTimeSeconds - b.startTimeSeconds);
@@ -287,9 +290,9 @@ function groupMidiNotesIntoChords(noteEvents, opts) {
 
 // 和音グループ列を、曲全体で共有する1つの拍グリッド（既定0.25拍刻み）へ
 // 開始位置をスナップし、次のグループとの間隔から休符を判定する。
-// js/music-hum.js の quantizeMelodyRhythm と同じ考え方を、単一MIDIではなく
+// js/music-hum.js の quantizeMelodyRhythm と同じ考え方を、単一音ではなく
 // 和音（MIDI番号の配列）に対して行う（休符はmidis:null）
-function quantizeMidiChordRhythm(groups, bpmValue, opts) {
+function quantizeChordRhythm(groups, bpmValue, opts) {
   const options = opts || {};
   if (!groups.length) return [];
   const beatSec = 60 / bpmValue;
@@ -334,13 +337,13 @@ function pickNearestInstrumentNote(midi, availableNotes) {
   return best.note;
 }
 
-// quantizeMidiChordRhythmが返した[{midis, beats}, ...]（休符はmidis:null）を、
+// quantizeChordRhythmが返した[{midis, beats}, ...]（休符はmidis:null）を、
 // 楽器の音域へのオクターブシフト＋実際に選べる音へのスナップを経てtokens形式
 // （[{notes:[{degree,accidental,octave}], beats}, ...]）にする。
 // オクターブシフトは曲全体のすべての音をまとめて1回だけ計算する（和音の一部だけを
-// 別のオクターブへ動かすと和音の音程関係が崩れるため）。和音内で複数のMIDI音が
+// 別のオクターブへ動かすと和音の音程関係が崩れるため）。和音内で複数の音が
 // 同じ使用可能音へスナップした場合は、dedupeNotesで重複を取り除く
-function mapMidiChordsToInstrument(chordTimeline, availableNotes) {
+function mapChordsToInstrument(chordTimeline, availableNotes) {
   if (!availableNotes.length) {
     return chordTimeline.map((g) => ({ notes: [], beats: g.beats }));
   }
@@ -357,16 +360,18 @@ function mapMidiChordsToInstrument(chordTimeline, availableNotes) {
   });
 }
 
-// MIDIから抽出したノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を
-// tokens形式に変換する（groupMidiNotesIntoChords → quantizeMidiChordRhythm →
-// mapMidiChordsToInstrumentの3段階）
-function convertMidiNoteEventsToScoreTokens(noteEvents, layout, bpmValue, opts) {
+// MIDIファイル・音源/動画ファイル(Basic Pitchのポリフォニック検出結果)の
+// どちらから来たノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]も
+// この1つの関数でtokens形式に変換できる（groupNoteEventsIntoChords →
+// quantizeChordRhythm → mapChordsToInstrumentの3段階。同時発音は絞り込まず
+// 和音としてそのまま残す）
+function convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
   const resolvedSemitoneEnabled = options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
   const availableNotes = buildInstrumentNoteMap(layout, resolvedSemitoneEnabled);
-  const groups = groupMidiNotesIntoChords(noteEvents, options.chord);
-  const timeline = quantizeMidiChordRhythm(groups, bpmValue, options.rhythm);
-  return mapMidiChordsToInstrument(timeline, availableNotes);
+  const groups = groupNoteEventsIntoChords(noteEvents, options.chord);
+  const timeline = quantizeChordRhythm(groups, bpmValue, options.rhythm);
+  return mapChordsToInstrument(timeline, availableNotes);
 }
 
 // ── ここから下はブラウザAPI（DOM・ファイル選択・モーダル）に依存する部分 ──
@@ -457,7 +462,7 @@ function finishMidiConversion(parsed, noteEvents, sourceBpm) {
   const clampedBpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Math.round(sourceBpm || DEFAULT_BPM)));
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
-  const newTokens = convertMidiNoteEventsToScoreTokens(noteEvents, layout, clampedBpm, { semitoneEnabled });
+  const newTokens = convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, clampedBpm, { semitoneEnabled });
 
   if (!newTokens.length) {
     document.getElementById("musicHumError").textContent = T("music_midi_no_notes", "このMIDIファイルには音が含まれていませんでした");
