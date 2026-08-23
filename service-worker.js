@@ -1,5 +1,5 @@
 // キャッシュ名（更新時はバージョンを上げる）
-const CACHE_NAME = "hatopi-v2.172.0";
+const CACHE_NAME = "hatopi-v2.173.0";
 
 // キャッシュするファイル一覧
 const CACHE_FILES = [
@@ -59,17 +59,18 @@ const CACHE_FILES = [
   "./js/music-editor.js",
   "./js/music-hum.js",
   "./js/music-midi-import.js",
+  "./js/music-presets.js",
   "./js/i18n.js",
   "./js/icons.js",
   "./js/icon-size.js",
   "./js/currency-icons.js",
   "./js/sw-register.js",
-  "./locales/ja.json?v=12",
-  "./locales/en.json?v=12",
-  "./locales/ko.json?v=12",
-  "./locales/th.json?v=12",
-  "./locales/zh-CN.json?v=12",
-  "./locales/zh-TW.json?v=12",
+  "./locales/ja.json?v=13",
+  "./locales/en.json?v=13",
+  "./locales/ko.json?v=13",
+  "./locales/th.json?v=13",
+  "./locales/zh-CN.json?v=13",
+  "./locales/zh-TW.json?v=13",
   "./manifest.json",
 ];
 
