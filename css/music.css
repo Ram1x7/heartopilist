@@ -844,6 +844,19 @@ body.dark .music-note-kana{
 }
 
 .music-note-btn{
+  /* 押し込み表現（押し感）の調整用変数。強さ・速さをここの数値だけで
+     調整できるようにまとめてある（先読みガイド／正解フィードバックと同じ方針）。
+     押し込み中(--press-*)は反応の速さを損なわないよう100ms未満にし、
+     離した後に元へ戻る(--press-release-*)側だけ軽いバウンド感を出す時間・
+     イージングにしている */
+  --press-scale:0.92;
+  --press-duration:70ms;
+  --press-ease:ease-out;
+  --press-release-duration:220ms;
+  --press-release-ease:cubic-bezier(0.34, 1.56, 0.64, 1); /* 少しだけ行き過ぎてから戻る「バウンド」イージング */
+  --press-shadow-rest:0 2px 0 rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.12);
+  --press-shadow-active:0 0 0 rgba(0, 0, 0, 0);
+
   flex:1;
   display:flex;
   flex-direction:column;
@@ -855,6 +868,12 @@ body.dark .music-note-kana{
   border:1px solid var(--border);
   background:var(--card-sub);
   cursor:pointer;
+  box-shadow:var(--press-shadow-rest);
+  /* 離した後に元のサイズ・影へ戻る動き（バウンド感を出すため少し長め・
+     オーバーシュートするイージング）。押し込み中はtransition-durationだけ
+     .pressed/:active側で上書きして速くする（プロパティ自体はここで一括定義） */
+  transition:transform var(--press-release-duration) var(--press-release-ease),
+    box-shadow var(--press-release-duration) var(--press-release-ease);
   -webkit-tap-highlight-color:transparent;
   /* 長押し（録音・練習モードでの押しっぱなし）でOS標準のテキスト選択や
      コピー/調べるメニューが出てしまうのを防ぐ */
@@ -1122,6 +1141,14 @@ body.dark .music-calib-btn.music-calib-lock-btn{
 .music-note-btn:active,
 .music-note-btn.pressed{
   background:var(--indigo);
+  /* 「物理的に押し込んだ」感覚：わずかに縮小しつつ、浮き上がって見えていた
+     影(--press-shadow-rest)を潰して沈み込んだように見せる。押し込み中は
+     反応の速さを損なわないよう、ここでtransition-durationだけ短く上書きする
+     （プロパティ自体はベースの.music-note-btnで定義済み） */
+  transform:scale(var(--press-scale));
+  box-shadow:var(--press-shadow-active);
+  transition-duration:var(--press-duration);
+  transition-timing-function:var(--press-ease);
 }
 
 .music-note-btn:active .music-note-digit,
@@ -1129,6 +1156,16 @@ body.dark .music-calib-btn.music-calib-lock-btn{
 .music-note-btn.pressed .music-note-digit,
 .music-note-btn.pressed .music-note-kana{
   color:#fdf9ef;
+}
+
+/* 練習モードの演奏ボタン(.music-stage-btn)はtranslate(-50%,-50%)で中心寄せ
+   配置されているため、上のルールのようにtransform:scale(...)だけを書くと
+   その位置指定が上書きされボタンがずれて見えてしまう（正解フィードバックの
+   アニメーションで対処した問題と同じ）。ここでもtranslateとscaleを同じ
+   transform値の中に明示的にまとめて書く必要がある */
+.music-stage-btn:active,
+.music-stage-btn.pressed{
+  transform:translate(-50%, -50%) scale(var(--press-scale));
 }
 
 /* ピアノの黒鍵（半音ボタン）は実機同様、ダークモードに関わらず常に黒で固定する */
@@ -1257,6 +1294,8 @@ body.dark .music-note-btn.practice-correct{
 body.dark .music-note-btn{
   background:#383329;
   border-color:#46423b;
+  /* 暗い背景の上では黒い影の視認性が下がるため、不透明度を上げて釣り合わせる */
+  --press-shadow-rest:0 2px 0 rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.35);
 }
 
 body.dark .music-note-btn.accidental{
