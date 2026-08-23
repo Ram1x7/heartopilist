@@ -1095,48 +1095,104 @@ body.dark .music-calib-btn.music-calib-lock-btn{
   color:#fdf9ef;
 }
 
+/* ── 練習モードのキー点灯（先読みガイド／正解フィードバック）調整用変数 ──
+   強さ・色・速さをここの数値だけで調整できるようにまとめてある。
+   色はRGB成分だけを持たせ、rgba()側で不透明度を変えられるようにしている
+   （--indigo/--vermillion等の既存パレット変数とちょうど同じ値。演奏ボタンの
+   .pressedや他のUI要素と衝突しない、既存のアクセントカラーをそのまま使う） */
+.music-note-btn.practice-guide,
+.music-note-btn.practice-correct{
+  --practice-guide-rgb:60, 90, 110;        /* 先読みガイドの色(indigo) */
+  --practice-guide-rgb-dark:90, 125, 146;  /* ダークモード時 */
+  --practice-guide-ring-width:5px;
+  --practice-guide-outline-width:2px;
+  --practice-guide-glow-blur:24px;
+  --practice-guide-glow-spread:9px;
+  --practice-guide-glow-blur-peak:32px;
+  --practice-guide-glow-spread-peak:12px;
+  --practice-guide-opacity-peak:0.95;
+  --practice-guide-opacity-low:0.6;
+  --practice-guide-bg-opacity:0.32;
+  --practice-guide-pulse-duration:1s;
+
+  --practice-correct-rgb:177, 80, 59;        /* 正解フィードバックの色(vermillion) */
+  --practice-correct-rgb-dark:201, 112, 88;  /* ダークモード時 */
+  --practice-correct-ring-width:8px;
+  --practice-correct-glow-blur:40px;
+  --practice-correct-glow-spread:16px;
+  --practice-correct-opacity-peak:1;
+  --practice-correct-scale-peak:1.16;
+  --practice-correct-duration:0.75s;
+}
+
 /* 練習モードのキー点灯：次に弾くべき音への先読みガイド。
    .pressed（実際に押した瞬間の背景色変化）とは独立して付け外しするため
-   背景色は変えずbox-shadowで表現するが、色が薄く目立たないという指摘を
-   受けて、リング幅・不透明度を上げ、常時ゆっくり明滅させることで
-   小さいボタンの上でも視認しやすくした */
+   背景色は変えずbox-shadow・outlineで表現する。常時点灯のため、
+   ゆっくり明滅させて「光っているのが分かる」強さを保ちつつ目のチカチカを防ぐ。
+   実機はボタンが密集しているため、隣接ボタンへ極端ににじまない範囲のぼかし幅にしてある */
 .music-note-btn.practice-guide{
-  background:rgba(60, 90, 110, 0.22);
-  box-shadow:0 0 0 4px var(--indigo), 0 0 18px 6px rgba(60, 90, 110, 0.8);
-  animation:music-practice-guide-pulse 1.2s ease-in-out infinite;
+  background:rgba(var(--practice-guide-rgb), var(--practice-guide-bg-opacity));
+  outline:var(--practice-guide-outline-width) solid rgb(var(--practice-guide-rgb));
+  outline-offset:1px;
+  box-shadow:0 0 0 var(--practice-guide-ring-width) rgb(var(--practice-guide-rgb)), 0 0 var(--practice-guide-glow-blur) var(--practice-guide-glow-spread) rgba(var(--practice-guide-rgb), var(--practice-guide-opacity-peak));
+  animation:music-practice-guide-pulse var(--practice-guide-pulse-duration) ease-in-out infinite;
 }
 
 @keyframes music-practice-guide-pulse{
-  0%, 100%{ box-shadow:0 0 0 4px var(--indigo), 0 0 18px 6px rgba(60, 90, 110, 0.8); }
-  50%{ box-shadow:0 0 0 4px var(--indigo), 0 0 26px 10px rgba(60, 90, 110, 0.35); }
+  0%, 100%{ box-shadow:0 0 0 var(--practice-guide-ring-width) rgb(var(--practice-guide-rgb)), 0 0 var(--practice-guide-glow-blur) var(--practice-guide-glow-spread) rgba(var(--practice-guide-rgb), var(--practice-guide-opacity-peak)); }
+  50%{ box-shadow:0 0 0 var(--practice-guide-ring-width) rgb(var(--practice-guide-rgb)), 0 0 var(--practice-guide-glow-blur-peak) var(--practice-guide-glow-spread-peak) rgba(var(--practice-guide-rgb), var(--practice-guide-opacity-low)); }
 }
 
 body.dark .music-note-btn.practice-guide{
-  background:rgba(90, 125, 146, 0.3);
-  box-shadow:0 0 0 4px var(--indigo-soft), 0 0 18px 6px rgba(90, 125, 146, 0.85);
+  background:rgba(var(--practice-guide-rgb-dark), calc(var(--practice-guide-bg-opacity) + 0.05));
+  outline-color:rgb(var(--practice-guide-rgb-dark));
+  box-shadow:0 0 0 var(--practice-guide-ring-width) rgb(var(--practice-guide-rgb-dark)), 0 0 var(--practice-guide-glow-blur) var(--practice-guide-glow-spread) rgba(var(--practice-guide-rgb-dark), var(--practice-guide-opacity-peak));
   animation-name:music-practice-guide-pulse-dark;
 }
 
 @keyframes music-practice-guide-pulse-dark{
-  0%, 100%{ box-shadow:0 0 0 4px var(--indigo-soft), 0 0 18px 6px rgba(90, 125, 146, 0.85); }
-  50%{ box-shadow:0 0 0 4px var(--indigo-soft), 0 0 26px 10px rgba(90, 125, 146, 0.4); }
+  0%, 100%{ box-shadow:0 0 0 var(--practice-guide-ring-width) rgb(var(--practice-guide-rgb-dark)), 0 0 var(--practice-guide-glow-blur) var(--practice-guide-glow-spread) rgba(var(--practice-guide-rgb-dark), var(--practice-guide-opacity-peak)); }
+  50%{ box-shadow:0 0 0 var(--practice-guide-ring-width) rgb(var(--practice-guide-rgb-dark)), 0 0 var(--practice-guide-glow-blur-peak) var(--practice-guide-glow-spread-peak) rgba(var(--practice-guide-rgb-dark), var(--practice-guide-opacity-low)); }
 }
 
-/* 正解フィードバック：正しく押した瞬間、一段強く光ってから短時間でフェードアウトする。
-   先読みガイド(indigo・常時明滅)より一回り太いリング・高い不透明度にして、
-   「今光っているのは先読みか、正解の瞬間か」が見分けやすいようにする */
+/* 正解フィードバック：正しく押した瞬間、先読みガイドより一回り太いリング・
+   高い不透明度で強く光り、一瞬だけ拡大してから元の大きさに戻りつつ
+   フェードアウトする（「押せた」ことが直感的に伝わるように）。
+   translate(-50%, -50%)は演奏ボタン本体の中心寄せ配置(.music-stage-btn)を
+   保つために必須（scale()だけを書くとその位置指定が上書きされ、ボタンが
+   ずれて見えてしまう） */
 @keyframes music-practice-correct-flash{
-  0%{ box-shadow:0 0 0 6px var(--vermillion), 0 0 26px 10px rgba(177, 80, 59, 0.95); }
-  100%{ box-shadow:0 0 0 6px rgba(177, 80, 59, 0), 0 0 0 0 rgba(177, 80, 59, 0); }
+  0%{
+    transform:translate(-50%, -50%) scale(1);
+    box-shadow:0 0 0 var(--practice-correct-ring-width) rgb(var(--practice-correct-rgb)), 0 0 var(--practice-correct-glow-blur) var(--practice-correct-glow-spread) rgba(var(--practice-correct-rgb), var(--practice-correct-opacity-peak));
+  }
+  20%{
+    transform:translate(-50%, -50%) scale(var(--practice-correct-scale-peak));
+    box-shadow:0 0 0 var(--practice-correct-ring-width) rgb(var(--practice-correct-rgb)), 0 0 var(--practice-correct-glow-blur) var(--practice-correct-glow-spread) rgba(var(--practice-correct-rgb), var(--practice-correct-opacity-peak));
+  }
+  100%{
+    transform:translate(-50%, -50%) scale(1);
+    box-shadow:0 0 0 var(--practice-correct-ring-width) rgba(var(--practice-correct-rgb), 0), 0 0 0 0 rgba(var(--practice-correct-rgb), 0);
+  }
 }
 
 @keyframes music-practice-correct-flash-dark{
-  0%{ box-shadow:0 0 0 6px var(--vermillion-soft), 0 0 26px 10px rgba(201, 112, 88, 0.95); }
-  100%{ box-shadow:0 0 0 6px rgba(201, 112, 88, 0), 0 0 0 0 rgba(201, 112, 88, 0); }
+  0%{
+    transform:translate(-50%, -50%) scale(1);
+    box-shadow:0 0 0 var(--practice-correct-ring-width) rgb(var(--practice-correct-rgb-dark)), 0 0 var(--practice-correct-glow-blur) var(--practice-correct-glow-spread) rgba(var(--practice-correct-rgb-dark), var(--practice-correct-opacity-peak));
+  }
+  20%{
+    transform:translate(-50%, -50%) scale(var(--practice-correct-scale-peak));
+    box-shadow:0 0 0 var(--practice-correct-ring-width) rgb(var(--practice-correct-rgb-dark)), 0 0 var(--practice-correct-glow-blur) var(--practice-correct-glow-spread) rgba(var(--practice-correct-rgb-dark), var(--practice-correct-opacity-peak));
+  }
+  100%{
+    transform:translate(-50%, -50%) scale(1);
+    box-shadow:0 0 0 var(--practice-correct-ring-width) rgba(var(--practice-correct-rgb-dark), 0), 0 0 0 0 rgba(var(--practice-correct-rgb-dark), 0);
+  }
 }
 
 .music-note-btn.practice-correct{
-  animation:music-practice-correct-flash 0.55s ease-out;
+  animation:music-practice-correct-flash var(--practice-correct-duration) ease-out;
 }
 
 body.dark .music-note-btn.practice-correct{
