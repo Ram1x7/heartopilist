@@ -343,6 +343,8 @@
   "shop_currency": "トレンドコイン",
   "shop_season_active_suffix": " 開催中",
   "shop_season_ended_suffix": " は終了しています",
+  "shop_ended_reveal_hint": "このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます",
+  "shop_ended_reveal_btn": "アイテム一覧を表示",
   "shop_search_placeholder": "アイテム名で検索",
   "shop_sort_book": "並び順",
   "shop_sort_unchecked": "未所持順",

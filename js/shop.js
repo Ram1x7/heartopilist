@@ -125,6 +125,18 @@ function isSeasonEnded(season){
   return Date.now() > parseJstDateTimeStr(season.end).getTime();
 }
 
+// 現在表示中データのシーズン情報を返す（複数シーズン対応時は表示中データのseasonを見る）
+function getCurrentShopSeason(){
+  const seasonKey = shopData[0] ? shopData[0].season : null;
+  const season = seasonKey && typeof shopSeasons !== "undefined" ? shopSeasons[seasonKey] : null;
+  if(!season) return { season: null, ended: false };
+  return { season, ended: isSeasonEnded(season) };
+}
+
+// シーズン終了後は入手不可のアイテムが並ぶだけになるため、初回表示では一覧を畳んでおき、
+// ユーザーが明示的に開いた場合のみ表示する（開催中のシーズンは従来通り常に表示する）
+let shopItemsRevealed = false;
+
 // ── カテゴリ・サブカテゴリの表示順とラベル ──
 const SHOP_CATEGORIES = [
   {
@@ -182,12 +194,9 @@ function renderSeasonBanner(){
   const banner = document.getElementById("shopSeasonBanner");
   if(!banner || typeof shopSeasons === "undefined") return;
 
-  // 現在このページで使っているシーズン（複数対応時は表示中データのseasonを見る）
-  const seasonKey = shopData[0] ? shopData[0].season : null;
-  const season = seasonKey ? shopSeasons[seasonKey] : null;
+  const { season, ended } = getCurrentShopSeason();
   if(!season){ banner.style.display = "none"; return; }
 
-  const ended = isSeasonEnded(season);
   const label = (season.labelI18n && season.labelI18n[currentLang()]) || season.label;
   const [startDate] = season.start.split(" ");
   const [endDate] = season.end.split(" ");
@@ -206,9 +215,34 @@ function renderProgress(){
   document.getElementById("shopProgressFill").style.width = pct + "%";
 }
 
+function renderRevealPrompt(ended){
+  const wrap = document.getElementById("shopRevealWrap");
+  const controls = document.querySelector(".shop-controls");
+  const content = document.getElementById("shopContent");
+  const showPrompt = ended && !shopItemsRevealed;
+
+  wrap.style.display = showPrompt ? "" : "none";
+  controls.style.display = showPrompt ? "none" : "";
+  if(showPrompt) content.innerHTML = "";
+
+  if(!showPrompt) return false;
+  wrap.innerHTML = `
+    <p>${T("shop_ended_reveal_hint","このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます")}</p>
+    <button class="shop-reveal-btn" id="shopRevealBtn">${T("shop_ended_reveal_btn","アイテム一覧を表示")}</button>
+  `;
+  document.getElementById("shopRevealBtn").onclick = () => {
+    shopItemsRevealed = true;
+    render();
+  };
+  return true;
+}
+
 function render(){
   renderSeasonBanner();
   renderProgress();
+
+  const { ended } = getCurrentShopSeason();
+  if(renderRevealPrompt(ended)) return;
 
   const content = document.getElementById("shopContent");
   content.innerHTML = "";

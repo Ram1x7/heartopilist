@@ -343,6 +343,8 @@
   "shop_currency": "Trend Coins",
   "shop_season_active_suffix": " is ongoing",
   "shop_season_ended_suffix": " has ended",
+  "shop_ended_reveal_hint": "Items from this season can no longer be obtained. You can still view the list as a past record",
+  "shop_ended_reveal_btn": "Show item list",
   "shop_search_placeholder": "Search by item name",
   "shop_sort_book": "Default",
   "shop_sort_unchecked": "Unpurchased first",

@@ -273,7 +273,7 @@ const flowerData = [
     colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","緑","青","夜光"],
     auth: false,
     season: true,
-    ended: false,
+    ended: true,
     eventName: "ホエールシーズン",
     bookIndex: 17,
   },
