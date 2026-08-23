@@ -609,9 +609,17 @@ function bindNoteButtonHold(btn, note) {
     stopSustainedTone(e.pointerId);
     if (activeHolds.size === 0) finalizeGroup();
   };
-  btn.addEventListener("pointerdown", start);
+  // pointerdown/up/cancelはpointerId単位で個別に管理しているため、複数指の
+  // 同時押しもそれぞれ独立して処理される（マウス由来のtouchstart/touchend単一
+  // 想定の問題は元々ない）。pointerdownはデフォルトでpassiveではないため
+  // {passive:false}を明示しなくてもpreventDefault()は効くが、念のため明示しておく
+  btn.addEventListener("pointerdown", start, { passive: false });
   btn.addEventListener("pointerup", end);
   btn.addEventListener("pointercancel", end);
+  // CSS(touch-action:none / -webkit-touch-callout:none / user-select:none)だけでは
+  // 機種・ブラウザによって長押し時のコンテキストメニュー（コピー等）が出てしまう
+  // ことがあるため、JS側でも確実に抑止する
+  btn.addEventListener("contextmenu", (e) => e.preventDefault());
 }
 
 // 和音グループの全ての指が離れた時点で確定する（編集モードのみ譜面に追加。

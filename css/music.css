@@ -861,6 +861,13 @@ body.dark .music-note-kana{
   user-select:none;
   -webkit-user-select:none;
   -webkit-touch-callout:none;
+  /* touch-actionがauto(既定)のままだと、ブラウザが「スクロール/ピンチ操作の
+     可能性」を判定するためタップ開始からpointerdownの確定発火までを一瞬保留する
+     ことがあり、同時押し・連打で一部の指の反応が遅れる/取りこぼされる原因になる。
+     このボタン上では独自にpointerイベントだけを処理するため、ブラウザ標準の
+     ジェスチャー認識自体を無効化し即座にpointerdownが届くようにする
+     （副作用として長押し時のテキスト選択・拡大鏡UIの抑止にも寄与する） */
+  touch-action:none;
 }
 
 .music-note-digit,
