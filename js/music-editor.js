@@ -1151,8 +1151,13 @@ function updatePracticeGuideHighlight() {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
   frame.querySelectorAll(".music-note-btn.practice-guide").forEach((b) => b.classList.remove("practice-guide"));
-  const idx = nextNoteIndex(cursor);
-  if (idx === null) return;
+  // 自動再生中は、cursorがちょうど「今まさに鳴っている音」を指している
+  // （tick()がcursor=idxを代入した直後にrenderScoreDisplay経由でここが呼ばれるため）ので、
+  // それをそのまま光らせる。停止中のタップ先取りでは、まだ何も鳴っていないため
+  // 「次に弾くべき音」(nextNoteIndex(cursor))を光らせる。isPlaying基準で分けないと、
+  // 自動再生中は常に1つ先の音が光ってしまい、鳴っている音とずれて見える
+  const idx = isPlaying ? cursor : nextNoteIndex(cursor);
+  if (idx == null || idx < 0) return;
   const tok = tokens[idx];
   if (!tok || !tok.notes.length) return;
   const keys = new Set(tok.notes.map(noteKey));
@@ -1208,12 +1213,18 @@ function pausePlayback() {
   isPlaying = false;
   clearTimeout(playTimer);
   updatePlaybackUI();
+  // isPlayingがfalseになった時点で先読みガイドを「次に弾くべき音」表示へ
+  // 切り替える（そのままにすると、直前に鳴っていた音の点灯が停止後も残り続ける）
+  updatePracticeGuideHighlight();
 }
 
 function stopPlayback() {
   isPlaying = false;
   clearTimeout(playTimer);
   updatePlaybackUI();
+  // 曲の終わりまで自動再生した場合、tick()側はrenderScoreDisplay()を呼ばずに
+  // ここへ来るため、最後に鳴っていた音の先読みガイドが点灯したまま残らないようにする
+  updatePracticeGuideHighlight();
 }
 
 function tick() {
@@ -1437,6 +1448,8 @@ function closeNewScoreTypeModal() {
 }
 
 function chooseNewScoreType(freeTiming) {
+  cursor = -1;
+  stopPlayback();
   tokens = [];
   scoreName = "";
   currentScoreId = null;
