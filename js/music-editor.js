@@ -116,6 +116,7 @@ function initMusicEditor() {
   bindControls();
   bindOnboardingControls();
   bindHumControls();
+  bindMidiImportControls();
   maybeShowOnboarding();
 }
 

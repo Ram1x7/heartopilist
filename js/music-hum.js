@@ -753,6 +753,12 @@ let humSourceBlob = null;
 // 既存動作のまま、"audio"/"video"はファイル選択のみのモードとして同じモーダルを
 // 使い回す（重複するUI/処理を避けるため、新しいモーダルを別途作らない）
 let humSourceMode = "humming";
+// 選択したファイルがMIDI(.mid/.midi)かどうか。"audio"モードでのみ、ファイル選択時に
+// 拡張子/MIMEタイプから自動判定する（js/music-midi-import.jsのisMidiFile）。
+// trueの場合、解析ボタンを押すとBasic Pitchではなくjs/music-midi-import.jsの
+// 専用パーサーへ処理を委譲する（MIDIは正確なピッチ・タイミング情報を最初から
+// 持っているため、重い解析モデルの読み込み自体が不要になる）
+let humSourceIsMidi = false;
 
 async function ensureBasicPitchLoaded(onStatus) {
   if (basicPitchLoaded) return;
@@ -1141,9 +1147,11 @@ const MELODY_SOURCE_MODE_CONFIG = {
     showRecordRow: true,
   },
   audio: {
-    accept: "audio/*",
+    // MIDIファイル(.mid/.midi)もこの入口で受け付ける。ネイティブのファイル選択ダイアログが
+    // 拡張子ベースで絞り込む端末もあるため、MIMEタイプだけでなく拡張子も明示しておく
+    accept: "audio/*,.mid,.midi",
     titleKey: ["music_audio_modal_title", "音源から作る"],
-    cautionKey: ["music_audio_caution", "ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されます。伴奏やドラム、ベースが強い音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません（6分まで対応。ファイルサイズの上限は250MBです）"],
+    cautionKey: ["music_audio_caution", "ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されます。伴奏やドラム、ベースが強い音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません（6分まで対応。ファイルサイズの上限は250MBです）。MIDIファイル（.mid）を選んだ場合は、解析モデルを使わずそのままピッチ・タイミング情報を読み取って変換します（和音もそのまま再現されます）"],
     uploadKey: ["music_audio_upload", "音声ファイルを選ぶ"],
     showRecordRow: false,
   },
@@ -1160,6 +1168,7 @@ function openMelodySourceModal(mode) {
   humSourceMode = mode;
   const config = MELODY_SOURCE_MODE_CONFIG[mode];
   humSourceBlob = null;
+  humSourceIsMidi = false;
   document.getElementById("musicHumError").textContent = "";
   document.getElementById("musicHumRecordingRow").style.display = "none";
   document.getElementById("musicHumFileRow").style.display = "none";
@@ -1232,17 +1241,37 @@ function onHumFileChosen(e) {
     return;
   }
   humSourceBlob = file;
+  // MIDIファイルかどうかは"audio"モードでのみ意味を持つ（ハミング/動画はMIDI非対応）。
+  // 解析ボタンを押した時点でこのフラグを見て、Basic PitchかMIDIパーサーかを振り分ける
+  humSourceIsMidi = humSourceMode === "audio" && typeof isMidiFile === "function" && isMidiFile(file);
   if (DEBUG_MELODY_ANALYSIS || (typeof window !== "undefined" && (window.HUM_DEBUG || window.MELODY_DEBUG))) {
     console.debug("[HUM-VIDEO] file selected", {
       name: file.name,
       type: file.type,
       size: file.size,
       lastModified: file.lastModified,
+      isMidi: humSourceIsMidi,
     });
   }
   document.getElementById("musicHumFileRow").style.display = "";
   document.getElementById("musicHumFileName").textContent = file.name;
   document.getElementById("musicHumAnalyzeBtn").disabled = false;
+}
+
+// 変換結果(tokens)を実際に譜面へ反映する共通処理。ハミング/音源/動画（Basic Pitch経由）と
+// MIDIインポート（js/music-midi-import.js）の両方から呼ばれる
+function applyGeneratedMelodyTokens(newTokens, doneToastMessage) {
+  tokens = newTokens;
+  resetLoop();
+  // 認識精度が完璧ではないため、変換直後の音は全て「未確認」としてマークし、
+  // 編集モードでタップして手直しした音から順にマークが消えるようにする
+  humReviewIndexes = new Set(newTokens.map((_, i) => i));
+  selectedTokenIndex = null;
+  setPageMode("edit");
+  renderScoreDisplay();
+  saveDraftDebounced();
+  closeHumModal();
+  showToast(doneToastMessage);
 }
 
 // 「ハミングから作る」「音源から作る」「動画から作る」共通の解析処理。
@@ -1271,6 +1300,13 @@ async function onHumAnalyzeClick() {
     analyzeBtn.disabled = false;
     progressRow.style.display = "none";
   };
+
+  // MIDIファイルは正確なピッチ・タイミング情報を最初から持っているため、
+  // Basic Pitch（重い解析モデル）を一切経由せず、専用パーサーへ完全に処理を委ねる
+  if (humSourceIsMidi) {
+    await onMidiFileAnalyze(humSourceBlob, { setProgress, fail });
+    return;
+  }
 
   try {
     await ensureBasicPitchLoaded((label) => setProgress(0, label));
@@ -1335,17 +1371,7 @@ async function onHumAnalyzeClick() {
       return;
     }
 
-    tokens = newTokens;
-    resetLoop();
-    // 認識精度が完璧ではないため、変換直後の音は全て「未確認」としてマークし、
-    // 編集モードでタップして手直しした音から順にマークが消えるようにする
-    humReviewIndexes = new Set(newTokens.map((_, i) => i));
-    selectedTokenIndex = null;
-    setPageMode("edit");
-    renderScoreDisplay();
-    saveDraftDebounced();
-    closeHumModal();
-    showToast(T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
+    applyGeneratedMelodyTokens(newTokens, T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
   } catch (e) {
     console.error(e);
     fail(T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください"));
