@@ -15,14 +15,12 @@
 // キーの移動を利用者任せにせず自動で合わせるこの処理が、参考にした他アプリ
 // （SkyScores等）との差別化ポイントになる。
 //
-// 【変換パイプラインの全体像】
-// Basic Pitchの生ノート列は、1つの音を複数の断片に分割していたり、ビブラートを
-// 別音程として検出していたりと「そのまま譜面化するには荒すぎる」状態のため、
-// 以下の段階を経てからゲーム内音階へ変換する（各段階は音声処理を伴わない
-// 純粋関数として実装しており、Node上でも単体テストできる）。
-// この汎用パイプラインは入力元（ハミング／音源ファイル／動画ファイル、将来的には
-// MIDIファイルも）に依存しない共通処理で、入力ごとの違いは「生ノート列を
-// どうやって得るか」（録音+Basic Pitch／ファイルデコード+Basic Pitch等）の部分だけ。
+// 【変換パイプラインの全体像：ハミング（単旋律専用）】
+// ハミングは本来単旋律（1人の声）のため、Basic Pitchのポリフォニック（複数音
+// 同時）検出結果のうち複数音が同時に検出された場合は、倍音・ノイズ等の誤検出の
+// 可能性が高いとみなして主旋律1本に絞り込む。この単旋律専用パイプラインは
+// 以下の段階を経る（各段階は音声処理を伴わない純粋関数として実装しており、
+// Node上でも単体テストできる）。
 //
 //   生ノート列
 //   → normalizeMelodyNoteEvents（同時発音の統合・同一音の断片統合・不安定クラスターの統合・
@@ -32,15 +30,22 @@
 //   → optimizeMelodyForHeartopia（異常な同音連打の解決・繰り返しフレーズの一貫性）
 //   → tokens
 //
-// 上記全体をまとめる convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts) の
-// opts.sourceType（"humming"｜"audio"｜"video"｜将来の"midi"）は、同時発音統合の
-// 判定方法（ハミング＝単旋律前提で最長優先／音源・動画＝主旋律らしさの経験則で
-// 高音優先）にのみ影響し、それ以外の段階はsourceTypeによらず完全に共通処理。
-// 既存の convertHumNotesToTokens() はこの関数を sourceType:"humming" 固定で
-// 呼び出す後方互換の薄いラッパーとして残してある。
+// 上記全体をまとめる convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts) は、
+// 現在はハミング（sourceType:"humming"固定）専用として使われる。
+// 既存の convertHumNotesToTokens() はこの関数を呼び出す後方互換の薄いラッパー。
 //
-// DEBUG_MELODY_ANALYSIS を true にすると、上記の各段階（生データ／正規化後／量子化後／
-// 変換後）をconsoleへ出力できる（調査用。通常利用時はfalseのままにする）
+// 【音源/動画ファイルは和音対応のポリフォニックパイプラインを使う】
+// 「音源から作る」「動画から作る」は、和音・複数パートを含む音源にも対応するため、
+// Basic Pitchのポリフォニック検出結果を主旋律に絞り込まず、js/music-midi-import.jsの
+// MIDIインポートと共通の和音対応パイプライン（convertPolyphonicNoteEventsToScoreTokens：
+// groupNoteEventsIntoChords → quantizeChordRhythm → mapChordsToInstrument）へそのまま渡す
+// （onHumAnalyzeClick内で分岐している）。ノイズ除去のみ既存のfilterMelodyNoiseEventsを
+// 流用し、それ以外の断片統合・ビブラート吸収等（前後関係を前提にした単旋律専用の処理）は
+// 適用しない（複数の声部が入り交じる和音データに対して行うと、別々の声部の音を誤って
+// 1つに統合してしまう恐れがあるため）。
+//
+// DEBUG_MELODY_ANALYSIS を true にすると、ハミング側パイプラインの各段階（生データ／
+// 正規化後／量子化後／変換後）をconsoleへ出力できる（調査用。通常利用時はfalseのままにする）
 const DEBUG_MELODY_ANALYSIS = false;
 
 // ── 音高変換（ここから下は音声処理を伴わない純粋な計算のみで、Node上でも単体テストできる） ──
@@ -1359,14 +1364,32 @@ async function onHumAnalyzeClick() {
     const layout = getLayout(inst, currentLayoutId);
     // 半音表示ON/OFFの現在の設定(music-editor.js側のトグル)をそのまま使う。
     // 22キー＋半音ONならF#等も実際に演奏できる音として扱われる。
-    // sourceTypeは現在開いているモーダルの種別（ハミング/音源/動画）をそのまま渡す
-    const newTokens = convertMelodyToScoreTokens(noteEvents, layout, bpm, { semitoneEnabled, sourceType: humSourceMode });
+    let newTokens;
+    if (humSourceMode === "humming") {
+      // ハミングは本来単旋律（1人の声）のため、これまで通り主旋律1本に絞り込む
+      // 変換パイプライン(sourceType="humming"固定)を使う
+      newTokens = convertMelodyToScoreTokens(noteEvents, layout, bpm, { semitoneEnabled, sourceType: "humming" });
+    } else {
+      // 音源/動画は和音・複数パートを含みうるため、Basic Pitchのポリフォニック
+      // 検出結果を主旋律に絞り込まず、js/music-midi-import.jsのMIDIインポートと
+      // 共通の和音対応パイプラインへそのまま渡す（新しい変換ロジックを別途作らず、
+      // 既存のパイプラインを再利用する）。
+      // ノイズ除去（極端に短い誤検出の除外）はソース非依存の単純な長さフィルタ
+      // (filterMelodyNoiseEvents)のみ適用する。前後関係を前提にした
+      // 断片統合・ビブラート吸収等はハミング（単旋律前提）専用のまま残す
+      // （複数の声部が入り交じる和音データに対して行うと、別々の声部の音を
+      // 誤って1つに統合してしまう恐れがあるため）。
+      // 同時発音の判定は、実際の楽器音源では検出のわずかなタイミングのズレが
+      // MIDIファイルより大きくなりうるため、既定(30ms)より少し広い許容誤差を使う
+      const filtered = filterMelodyNoiseEvents(noteEvents, bpm);
+      newTokens = convertPolyphonicNoteEventsToScoreTokens(filtered, layout, bpm, { semitoneEnabled, chord: { simulEpsilonSec: 0.05 } });
+    }
 
     if (!newTokens.length) {
       fail(
         humSourceMode === "humming"
           ? T("music_hum_no_notes", "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください")
-          : T("music_melody_no_notes_file", "主旋律を検出できませんでした。別のファイルでお試しください")
+          : T("music_melody_no_notes_file", "音を検出できませんでした。別のファイルでお試しください")
       );
       return;
     }
