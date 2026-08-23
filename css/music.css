@@ -476,8 +476,39 @@ body.dark .music-header-btn{
   margin-top:10px;
 }
 
-/* 再生（練習モード） */
+/* 再生（編集／練習／追従の全モード共通。#musicPlaybackRowが1つのDOMノードとして
+   各モードのアンカーへ付け替えられるため、ここで一度定義するだけで全モードに反映される） */
 .music-playback-row{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:6px;
+}
+
+/* シークバー：曲全体を実時間の連続バーとして表示し、任意の位置へドラッグできる。
+   token単位のスナップではなく、min="0" max="1000"の目盛りを曲の合計時間(ms)に
+   割り当てることで連続的な位置指定にしている（JS側で値/1000を秒として扱う） */
+.music-seek-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.music-seek-slider{
+  flex:1;
+  accent-color:var(--indigo);
+}
+
+.music-seek-time{
+  flex-shrink:0;
+  font-size:11px;
+  color:var(--text-sub);
+  min-width:76px;
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+
+.music-playback-controls-row{
   display:flex;
   align-items:center;
   gap:14px;
@@ -698,6 +729,15 @@ body.dark .music-chip.selected{
   border-style:dashed;
   border-color:var(--gold);
   box-shadow:0 0 0 1px rgba(200,168,107,0.45);
+}
+
+/* シークバーをドラッグ中のプレビュー位置（音は鳴らさず、その時点の音だけを示す）。
+   先読みガイド(indigo)・正解フィードバック(vermillion)・区間リピート(vermillion)と
+   衝突しない色として--goldを使う */
+.music-chip.seek-preview{
+  border-style:dashed;
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px rgba(200,168,107,0.4);
 }
 
 /* 選んだ音を手直しする操作パネル */
@@ -1199,6 +1239,14 @@ body.dark .music-note-btn.practice-correct{
   animation-name:music-practice-correct-flash-dark;
 }
 
+/* シークバーをドラッグ中、その時点で鳴る予定の音を無音のままプレビュー表示する。
+   先読みガイド(indigo)・正解フィードバック(vermillion)と見分けやすいよう--goldを使う */
+.music-note-btn.seek-preview{
+  outline:2px dashed rgb(200, 168, 107);
+  outline-offset:1px;
+  box-shadow:0 0 0 4px rgba(200, 168, 107, 0.35);
+}
+
 body.dark .music-note-btn{
   background:#383329;
   border-color:#46423b;
@@ -1274,10 +1322,29 @@ body.dark .music-practice-stage{
   gap:8px;
 }
 
-/* 練習ステージでは、演奏ボタンの表示面積を実機に近づけるため、再生操作を
-   上部バーに集約する（別の行として縦幅を消費させない） */
+/* 練習ステージでは上部バーの横幅が限られるため、シークバーを追加した
+   再生操作一式(#musicPlaybackAnchorPractice)だけを折り返して専用の行にし、
+   exit/曲名/位置調整/音量ボタンは引き続き1行目に収める */
+.music-practice-stage-topbar{
+  flex-wrap:wrap;
+}
+
+.music-practice-stage-topbar > #musicPlaybackAnchorPractice{
+  order:5;
+  flex-basis:100%;
+}
+
 .music-practice-stage #musicPlaybackAnchorPractice .music-playback-row{
   flex-shrink:0;
+  gap:2px;
+}
+
+.music-practice-stage #musicPlaybackAnchorPractice .music-seek-time{
+  font-size:10px;
+  min-width:64px;
+}
+
+.music-practice-stage #musicPlaybackAnchorPractice .music-playback-controls-row{
   display:flex;
   align-items:center;
   gap:6px;
