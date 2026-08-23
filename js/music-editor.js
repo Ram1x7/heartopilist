@@ -103,6 +103,7 @@ let calibBgObjectUrl = null;
 // ── 初期化 ──
 function initMusicEditor() {
   loadSavedScores();
+  seedDefaultPresetScores();
 
   const draft = loadDraft();
   if (draft && Array.isArray(draft.tokens)) {
@@ -1638,6 +1639,10 @@ function saveCurrentAsScore() {
   const existing = savedScores.find((s) => s.id === currentScoreId);
   if (existing) {
     existing.name = scoreName || T("music_default_score_name", "譜面");
+    // サンプル譜面を上書き保存したら、以後はユーザー自身の名前として固定する
+    // （nameKeyが残ったままだと、次回表示時に翻訳し直されて上の行の名前が
+    // 無視されてしまうため）
+    delete existing.nameKey;
     existing.instrumentId = currentInstrumentId;
     existing.layoutId = currentLayoutId;
     existing.semitoneEnabled = semitoneEnabled;
@@ -1750,20 +1755,24 @@ function renderSavedList() {
   }
   const sorted = savedScores.slice().sort((a, b) => b.updatedAt - a.updatedAt);
   el.innerHTML = sorted
-    .map(
-      (s) => `
+    .map((s) => {
+      const inst = getInstrument(s.instrumentId);
+      // 楽器に配置が複数ある場合（ピアノ・ギター等）は、同じ楽器名の項目が並んでも
+      // どの配置(2列/3列/22キー等)の譜面か一覧だけで見分けられるよう配置名も添える
+      const layoutLabel = inst.layouts.length > 1 ? ` ・ ${T(getLayout(inst, s.layoutId).labelKey, getLayout(inst, s.layoutId).labelFallback)}` : "";
+      return `
     <div class="music-saved-item${s.id === currentScoreId ? " current" : ""}">
       <div class="music-saved-info">
-        <div class="music-saved-name">${escapeHtml(s.name)}</div>
-        <div class="music-saved-meta">${T(getInstrument(s.instrumentId).nameKey, getInstrument(s.instrumentId).nameFallback)} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")}</div>
+        <div class="music-saved-name">${escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name)}</div>
+        <div class="music-saved-meta">${T(inst.nameKey, inst.nameFallback)}${layoutLabel} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")}</div>
       </div>
       <div class="music-saved-actions">
         <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
         <button onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
       </div>
     </div>
-  `
-    )
+  `;
+    })
     .join("");
 }
 
@@ -1779,7 +1788,9 @@ function loadScore(id) {
   timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
   scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
   scoreReferenceBpm = score.referenceBpm != null ? score.referenceBpm : bpm;
-  scoreName = score.name;
+  // サンプル譜面(nameKey付き)は表示言語に合わせてその都度翻訳し直す。
+  // ユーザー自身が付けた名前(nameKeyなし)はそのまま使う
+  scoreName = score.nameKey ? T(score.nameKey, score.name) : score.name;
   currentScoreId = score.id;
   cursor = -1;
   stopPlayback();
