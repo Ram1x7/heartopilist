@@ -1179,6 +1179,15 @@ body.dark .music-calib-btn.music-calib-lock-btn{
   color:#fdf9ef;
 }
 
+/* 黒鍵も白鍵と同じく、押している間は色が変わって押し込んだことが分かるようにする。
+   通常時に黒固定にしている.music-note-btn.accidentalと詳細度が同じ(クラス2つ)だと
+   後に定義された側が勝つだけになり打ち消し合ってしまうため、:active/.pressedを
+   加えて詳細度を上げて確実に上書きする */
+.music-note-btn.accidental:active,
+.music-note-btn.accidental.pressed{
+  background:var(--indigo);
+}
+
 /* ── 練習モードのキー点灯（先読みガイド／正解フィードバック）調整用変数 ──
    強さ・色・速さをここの数値だけで調整できるようにまとめてある。
    色はRGB成分だけを持たせ、rgba()側で不透明度を変えられるようにしている
@@ -1298,9 +1307,24 @@ body.dark .music-note-btn{
   --press-shadow-rest:0 2px 0 rgba(0, 0, 0, 0.4), 0 3px 6px rgba(0, 0, 0, 0.35);
 }
 
+/* body.dark .music-note-btn(型セレクタ込みで詳細度が高い)がそのままだと、
+   ダークモードでは.pressed/:active側のindigo背景が上書きされてしまい
+   白鍵を押しても色が変わって見えなかったため、同じ形で明示的に上書きする */
+body.dark .music-note-btn:active,
+body.dark .music-note-btn.pressed{
+  background:var(--indigo);
+}
+
 body.dark .music-note-btn.accidental{
   background:#1a1a1a;
   border-color:#000;
+}
+
+/* body.dark .music-note-btn.accidental(型セレクタ込みで詳細度が高い)に対抗して
+   ダークモードでも黒鍵の押下時色変化を確実に上書きするため、同じ形で明示する */
+body.dark .music-note-btn.accidental:active,
+body.dark .music-note-btn.accidental.pressed{
+  background:var(--indigo);
 }
 
 /* 練習モード：全画面の専用ステージ。実機の指の感覚に合わせて練習できるよう、
