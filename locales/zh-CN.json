@@ -310,6 +310,8 @@
   "shop_currency": "潮流币",
   "shop_season_active_suffix": " 进行中",
   "shop_season_ended_suffix": " 已结束",
+  "shop_ended_reveal_hint": "本季的物品已无法获得。您仍可查看该列表作为过往记录",
+  "shop_ended_reveal_btn": "显示物品列表",
   "shop_search_placeholder": "按物品名称搜索",
   "shop_sort_book": "默认顺序",
   "shop_sort_unchecked": "未购买优先",

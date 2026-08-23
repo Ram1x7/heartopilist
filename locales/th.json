@@ -310,6 +310,8 @@
   "shop_currency": "เทรนด์คอยน์",
   "shop_season_active_suffix": " กำลังจัดอยู่",
   "shop_season_ended_suffix": " สิ้นสุดแล้ว",
+  "shop_ended_reveal_hint": "ไม่สามารถรับไอเทมของซีซันนี้ได้อีกต่อไป คุณยังสามารถดูรายการเป็นบันทึกย้อนหลังได้",
+  "shop_ended_reveal_btn": "แสดงรายการไอเทม",
   "shop_search_placeholder": "ค้นหาด้วยชื่อไอเทม",
   "shop_sort_book": "เรียงตามลำดับ",
   "shop_sort_unchecked": "ยังไม่ซื้อก่อน",

@@ -281,7 +281,7 @@ const cropData = [
     weedCount: 3,
     auth: false,
     season: true,
-    ended: false,
+    ended: true,
     eventName: "ホエールシーズン",
     bookIndex: 18,
   },
