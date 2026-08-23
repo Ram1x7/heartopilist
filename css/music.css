@@ -1095,30 +1095,48 @@ body.dark .music-calib-btn.music-calib-lock-btn{
   color:#fdf9ef;
 }
 
-/* 練習モードのキー点灯：次に弾くべき音への先読みガイド（薄い発光）。
-   .pressed（実際に押した瞬間の背景色変化）とは独立して付け外しするため、
-   既存の見た目を崩さないよう背景色は変えずbox-shadowだけで表現する */
+/* 練習モードのキー点灯：次に弾くべき音への先読みガイド。
+   .pressed（実際に押した瞬間の背景色変化）とは独立して付け外しするため
+   背景色は変えずbox-shadowで表現するが、色が薄く目立たないという指摘を
+   受けて、リング幅・不透明度を上げ、常時ゆっくり明滅させることで
+   小さいボタンの上でも視認しやすくした */
 .music-note-btn.practice-guide{
-  box-shadow:0 0 0 3px var(--indigo), 0 0 12px 3px rgba(90, 110, 200, 0.55);
+  background:rgba(60, 90, 110, 0.22);
+  box-shadow:0 0 0 4px var(--indigo), 0 0 18px 6px rgba(60, 90, 110, 0.8);
+  animation:music-practice-guide-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes music-practice-guide-pulse{
+  0%, 100%{ box-shadow:0 0 0 4px var(--indigo), 0 0 18px 6px rgba(60, 90, 110, 0.8); }
+  50%{ box-shadow:0 0 0 4px var(--indigo), 0 0 26px 10px rgba(60, 90, 110, 0.35); }
 }
 
 body.dark .music-note-btn.practice-guide{
-  box-shadow:0 0 0 3px var(--indigo-soft), 0 0 12px 3px rgba(160, 180, 255, 0.45);
+  background:rgba(90, 125, 146, 0.3);
+  box-shadow:0 0 0 4px var(--indigo-soft), 0 0 18px 6px rgba(90, 125, 146, 0.85);
+  animation-name:music-practice-guide-pulse-dark;
 }
 
-/* 正解フィードバック：正しく押した瞬間、一段強く光ってから短時間でフェードアウトする */
+@keyframes music-practice-guide-pulse-dark{
+  0%, 100%{ box-shadow:0 0 0 4px var(--indigo-soft), 0 0 18px 6px rgba(90, 125, 146, 0.85); }
+  50%{ box-shadow:0 0 0 4px var(--indigo-soft), 0 0 26px 10px rgba(90, 125, 146, 0.4); }
+}
+
+/* 正解フィードバック：正しく押した瞬間、一段強く光ってから短時間でフェードアウトする。
+   先読みガイド(indigo・常時明滅)より一回り太いリング・高い不透明度にして、
+   「今光っているのは先読みか、正解の瞬間か」が見分けやすいようにする */
 @keyframes music-practice-correct-flash{
-  0%{ box-shadow:0 0 0 5px var(--vermillion), 0 0 22px 8px rgba(177, 80, 59, 0.85); }
-  100%{ box-shadow:0 0 0 5px rgba(177, 80, 59, 0), 0 0 0 0 rgba(177, 80, 59, 0); }
+  0%{ box-shadow:0 0 0 6px var(--vermillion), 0 0 26px 10px rgba(177, 80, 59, 0.95); }
+  100%{ box-shadow:0 0 0 6px rgba(177, 80, 59, 0), 0 0 0 0 rgba(177, 80, 59, 0); }
 }
 
 @keyframes music-practice-correct-flash-dark{
-  0%{ box-shadow:0 0 0 5px var(--vermillion-soft), 0 0 22px 8px rgba(201, 112, 88, 0.85); }
-  100%{ box-shadow:0 0 0 5px rgba(201, 112, 88, 0), 0 0 0 0 rgba(201, 112, 88, 0); }
+  0%{ box-shadow:0 0 0 6px var(--vermillion-soft), 0 0 26px 10px rgba(201, 112, 88, 0.95); }
+  100%{ box-shadow:0 0 0 6px rgba(201, 112, 88, 0), 0 0 0 0 rgba(201, 112, 88, 0); }
 }
 
 .music-note-btn.practice-correct{
-  animation:music-practice-correct-flash 0.45s ease-out;
+  animation:music-practice-correct-flash 0.55s ease-out;
 }
 
 body.dark .music-note-btn.practice-correct{
