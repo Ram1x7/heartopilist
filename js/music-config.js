@@ -271,6 +271,13 @@ const DEFAULT_BPM = 100;
 const MIN_BPM = 40;
 const MAX_BPM = 220;
 
+// MIDI/音源/動画からの変換時、和音の「同時に押す指の本数」の上限（1本＝1指）。
+// 検出した和音がこれを超える場合、js/music-midi-import.jsのlimitChordPolyphonyで
+// 主旋律・低音を優先して自動的に間引く
+const MIN_CHORD_POLYPHONY = 1;
+const MAX_CHORD_POLYPHONY = 10;
+const DEFAULT_CHORD_POLYPHONY = 4;
+
 // 拍子プリセット（beatsPerBarは4分音符=1拍換算での1小節あたりの拍数。
 // 例えば6/8は8分音符6つ=4分音符換算で3拍として小節線の位置を計算する）
 const TIME_SIGNATURES = [

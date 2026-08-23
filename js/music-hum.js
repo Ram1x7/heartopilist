@@ -1150,6 +1150,7 @@ const MELODY_SOURCE_MODE_CONFIG = {
     cautionKey: ["music_hum_caution", "ゆっくり・はっきりと、1音ずつ鼻歌を歌うと綺麗に変換されます。速い曲や和音、伴奏が混ざった音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、録音・アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません"],
     uploadKey: ["music_hum_upload", "音声・動画ファイルを選ぶ"],
     showRecordRow: true,
+    showMaxNotesRow: false, // ハミングは単旋律専用パイプラインのため和音の間引き設定は不要
   },
   audio: {
     // MIDIファイル(.mid/.midi)もこの入口で受け付ける。ネイティブのファイル選択ダイアログが
@@ -1159,6 +1160,7 @@ const MELODY_SOURCE_MODE_CONFIG = {
     cautionKey: ["music_audio_caution", "ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されます。伴奏やドラム、ベースが強い音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません（6分まで対応。ファイルサイズの上限は250MBです）。MIDIファイル（.mid）を選んだ場合は、解析モデルを使わずそのままピッチ・タイミング情報を読み取って変換します（和音もそのまま再現されます）"],
     uploadKey: ["music_audio_upload", "音声ファイルを選ぶ"],
     showRecordRow: false,
+    showMaxNotesRow: true, // 音源(basic-pitch)・MIDIどちらもここから同時押し本数の上限を指定できる
   },
   video: {
     accept: "video/*",
@@ -1166,8 +1168,31 @@ const MELODY_SOURCE_MODE_CONFIG = {
     cautionKey: ["music_video_caution", "動画から音声トラックを取り出して解析します。ボーカルや主旋律がはっきり聞こえる動画ほど綺麗に変換されます。初回のみ解析モデルの読み込みに通信が必要ですが、アップロードした動画はこの端末のブラウザ内だけで処理され、外部に送信されることはありません（6分まで対応。ファイルサイズの上限は250MBです）"],
     uploadKey: ["music_video_upload", "動画ファイルを選ぶ"],
     showRecordRow: false,
+    showMaxNotesRow: true,
   },
 };
+
+// 変換時の「同時に押す指の本数」設定。譜面データ(score)には保存せず、この
+// モーダルでの選択のみlocalStorageに記憶し、次回変換時の初期値として使う
+const MUSIC_MAXNOTES_KEY = "hatopiMusic_maxSimultaneousNotes";
+
+function loadMaxSimultaneousNotesSetting() {
+  const raw = localStorage.getItem(MUSIC_MAXNOTES_KEY);
+  const val = Math.round(Number(raw));
+  if (!raw || !Number.isFinite(val)) return DEFAULT_CHORD_POLYPHONY;
+  return Math.max(MIN_CHORD_POLYPHONY, Math.min(MAX_CHORD_POLYPHONY, val));
+}
+
+// #musicHumMaxNotesInputの現在値を1〜10に丸めて返す（js/music-midi-import.jsの
+// finishMidiConversionからも呼ばれる、MIDI・音源・動画で共通のモーダルのため）
+function readMaxSimultaneousNotes() {
+  const input = document.getElementById("musicHumMaxNotesInput");
+  if (!input) return DEFAULT_CHORD_POLYPHONY;
+  const val = Math.round(Number(input.value));
+  const clamped = Number.isFinite(val) ? Math.max(MIN_CHORD_POLYPHONY, Math.min(MAX_CHORD_POLYPHONY, val)) : DEFAULT_CHORD_POLYPHONY;
+  input.value = clamped;
+  return clamped;
+}
 
 function openMelodySourceModal(mode) {
   humSourceMode = mode;
@@ -1186,6 +1211,9 @@ function openMelodySourceModal(mode) {
   document.getElementById("musicHumModalTitle").textContent = T(...config.titleKey);
   document.getElementById("musicHumCautionText").textContent = T(...config.cautionKey);
   document.getElementById("musicHumUploadText").textContent = T(...config.uploadKey);
+  document.getElementById("musicHumMaxNotesRow").style.display = config.showMaxNotesRow ? "" : "none";
+  document.getElementById("musicHumMaxNotesHint").style.display = config.showMaxNotesRow ? "" : "none";
+  if (config.showMaxNotesRow) document.getElementById("musicHumMaxNotesInput").value = loadMaxSimultaneousNotesSetting();
   document.getElementById("musicHumModal").style.display = "block";
 }
 
@@ -1385,9 +1413,11 @@ async function onHumAnalyzeClick() {
       // 同時発音の判定は、実際の楽器音源では検出のわずかなタイミングのズレが
       // MIDIファイルより大きくなりうるため、既定(30ms)より少し広い許容誤差を使う。
       // 既定(opts.freeTiming省略=true)でフリーテンポ譜面として生成する
-      // （実際に検出した音の長さをテンポ・拍子の量子化に無理やり当てはめない）
+      // （実際に検出した音の長さをテンポ・拍子の量子化に無理やり当てはめない）。
+      // 同時に押す指の本数の上限は、変換モーダルで解析開始前に指定した値をそのまま使う
       const filtered = filterMelodyNoiseEvents(noteEvents, bpm);
-      newTokens = convertPolyphonicNoteEventsToScoreTokens(filtered, layout, bpm, { semitoneEnabled, chord: { simulEpsilonSec: 0.05 } });
+      const maxSimultaneousNotes = readMaxSimultaneousNotes();
+      newTokens = convertPolyphonicNoteEventsToScoreTokens(filtered, layout, bpm, { semitoneEnabled, chord: { simulEpsilonSec: 0.05 }, maxSimultaneousNotes });
     }
     if (!newTokens.length) {
       fail(
@@ -1415,4 +1445,7 @@ function bindHumControls() {
   document.getElementById("musicHumStopBtn").addEventListener("click", onHumStopClick);
   document.getElementById("musicHumFileInput").addEventListener("change", onHumFileChosen);
   document.getElementById("musicHumAnalyzeBtn").addEventListener("click", onHumAnalyzeClick);
+  document.getElementById("musicHumMaxNotesInput").addEventListener("change", () => {
+    localStorage.setItem(MUSIC_MAXNOTES_KEY, String(readMaxSimultaneousNotes()));
+  });
 }
