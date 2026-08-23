@@ -17,6 +17,8 @@ https://ram1x7.github.io/heartopilist/
 | コード（`codes.html`） | 有効なギフトコード一覧 |
 | イベント（`events.html`） | 開催中・開催予定のイベント／ガチャ情報 |
 | 場所動画（`videos.html`） | ピンクバブル・虹の日・流星雨の発生記録動画 |
+| アート（`art-create.html`） | ドット絵デザインの作成・変換・3Dプレビュー（`art-convert.html`は「画像から作る」単体ページ） |
+| 楽譜（`music.html`） | 数字譜（簡譜）の作成・自動採譜・演奏練習 |
 | Q&A（`faq.html`） | よくある質問・要望・不具合の対応状況 |
 
 ## 主な機能
@@ -81,6 +83,28 @@ https://ram1x7.github.io/heartopilist/
 - 直近発生したものは自動的に展開表示（流星雨は発生から24時間以内、虹の日は6時間以内、ピンクバブルはその週の間）
 - 図鑑ページの「今日やることリスト」から、該当カテゴリへワンタップで移動可能
 
+### アート
+- ドット絵デザインの作成ツール（ペン・消しゴム・バケツ・スポイト・直線/四角/円などの図形ツール、太さ変更、色の置き換え、反転・移動）
+- ゲーム内で実際に選べる色と完全一致したカラーパレット
+- デザイン枠（衣装・家具などの実寸キャンバス）の輪郭線表示、10×10ブロック表示・進捗記録
+- 画像から作る（写真・イラストをドット絵に自動変換。色数・ディザリング・背景処理などを調整可能）
+- スクショから取り込む（ゲーム内デザイン画面のスクリーンショットをアップロードすると、画面に写り込む補助線を照合してキャンバスと位置を自動判定。自動判定が難しい場合は候補一覧からの手動選択や、範囲のドラッグ移動・リサイズによる手動調整も可能）
+- ぬり方ガイド（10×10ブロックごとに効率のいい塗り順を自動ズームで案内、残り時間の目安、完了までの進捗記録）
+- 3Dプレビュー（試験公開。対応キャンバスをドラッグで回転させて立体的に確認）
+- マイデザイン一覧（未着手／作業中／完了のステータス管理、進捗％表示）
+- PNGエクスポート・画像共有
+- 共有コード（アカウント不要で、デザインを文字列・URL・QRコードとしてバックアップ・受け渡し。サーバー送信なし）
+- 拡大率スライダー・ピンチズーム、マスの座標・使用色番号の確認機能
+- 完全オフライン対応（アカウント登録不要、データはブラウザ内のみに保存）
+
+### 楽譜
+- 数字譜（簡譜）エディタ。楽器を選び、音の長さを指定してタップ入力、または演奏しながら録音してそのまま譜面化（複数同時押しで和音も記録）
+- ハミングから作る／音源から作る／動画から作る：鼻歌の録音や既存の音声・動画ファイルから自動で採譜し、譜面を生成
+- テンポ（BPM）・拍子の設定、休符の追加、区間リピート（苦手な部分だけを選んで繰り返し練習）
+- 練習モード：譜面と演奏ボタンのみの全画面表示。実機と同じ指の感覚になるよう自動レイアウトされ、譜面を0.1〜1.0倍速で自動再生しながらタップ練習ができる。演奏ボタンの位置・大きさは実機画面の写真を重ねながら微調整可能
+- 追従モード：iPadの分割画面（Split View）などで実機と並べて使う想定の、次に弾く音を大きく表示するモード
+- 保存・一覧から呼び出し（アカウント不要、ブラウザ内保存のみ）
+
 ### Q&A
 - 質問・要望・不具合の対応状況を一覧表示（対応済み／対応中／検討中／対応見送り）
 - 匿名フォームからの問い合わせ受付
@@ -119,6 +143,8 @@ https://ram1x7.github.io/heartopilist/
 heartopilist/
 ├── index.html / foods.html / garden.html / pet.html / shop.html
 ├── codes.html / events.html / videos.html / faq.html
+├── art-create.html / art-convert.html      … アートページ（作成 / 画像から作る単体ページ）
+├── music.html                                … 楽譜ページ
 ├── js/
 │   ├── data-*.js          … 各ページのデータ定義
 │   ├── main.js             … 図鑑ページのロジック
@@ -126,7 +152,12 @@ heartopilist/
 │   ├── food-auth-calc.js    … 認証マスター計算ツール
 │   ├── data-sync.js         … データ同期（書き出し・読み込み）
 │   ├── i18n.js               … 多言語対応
-│   └── firebase-init.js      … 通知機能の初期化
+│   ├── firebase-init.js      … 通知機能の初期化
+│   ├── art-editor.js / art-config.js / art-masks.js … アートページ本体・キャンバス定義・輪郭線データ
+│   ├── art-converter.js / art-pixelate.js            … 画像→ドット絵変換の共通処理
+│   ├── art-template-match.js / art-screenshot-import.js … スクショから取り込む機能（補助線照合）
+│   ├── art-paint-guide.js / art-3d.js / art-share-code.js … ぬり方ガイド・3Dプレビュー・共有コード
+│   └── music-editor.js / music-config.js / music-hum.js … 楽譜エディタ本体・設定・自動採譜
 ├── locales/                  … 多言語翻訳ファイル（ja / en / ko / th / zh-CN / zh-TW）
 ├── images/ / fish/ / bugs/ / birds/ … 画像アセット
 ├── functions/                 … Firebase Cloud Functions（通知API）
@@ -171,6 +202,8 @@ https://ram1x7.github.io/heartopilist/
 | Codes (`codes.html`) | List of active gift codes |
 | Events (`events.html`) | Ongoing and upcoming events/gacha info |
 | Location Videos (`videos.html`) | Pink Bubble / Rainbow Day / Meteor Shower footage archive |
+| Art (`art-create.html`) | Pixel art design creation, image conversion, and 3D preview (`art-convert.html` is a standalone "create from image" page) |
+| Sheet Music (`music.html`) | Numbered-notation sheet music editor, auto-transcription, and performance practice |
 | Q&A (`faq.html`) | FAQ, feature requests, and bug status |
 
 ## Features
@@ -235,6 +268,28 @@ https://ram1x7.github.io/heartopilist/
 - The most recent occurrence auto-expands (Meteor Shower within 24 hours of starting, Rainbow Day within 6 hours, Pink Bubble for the rest of its week)
 - One tap from the Encyclopedia page's daily to-do dashboard jumps straight to the relevant category
 
+### Art
+- Pixel art creation tools (pen, eraser, bucket fill, eyedropper, line/rectangle/circle shape tools, adjustable brush size, color replace, flip/move)
+- Color palette that exactly matches the colors actually selectable in-game
+- Outline overlay for design frames (the actual in-game canvas area for clothing/furniture), 10x10 block view with per-block progress tracking
+- Create from image (auto-converts a photo or illustration into pixel art, with adjustable color count, dithering, and background handling)
+- Import from screenshot (upload a screenshot of the in-game design screen; the guide lines visible in the screenshot are matched against each canvas template to automatically detect the canvas and position. If auto-detection isn't confident, you can pick from a candidate list or manually drag-move/resize the crop area)
+- Paint order guide (walks through efficient painting order block-by-block with auto-zoom, an estimated time remaining, and progress tracking to completion)
+- 3D preview (experimental; drag to rotate supported canvases in 3D)
+- My Designs list (not-started / in-progress / complete status tracking with progress %)
+- PNG export and image sharing
+- Share codes (back up or hand off a design as a short code, URL, or QR code — no account needed, nothing sent to a server)
+- Zoom slider and pinch-to-zoom, tap-to-inspect a cell's coordinates and color number
+- Fully offline-capable (no account needed, all data stored locally in your browser)
+
+### Sheet Music
+- Numbered-notation (jianpu-style) sheet music editor. Pick an instrument, choose a note length and tap to enter notes, or record while performing to transcribe as you play (simultaneous key presses are recorded as chords)
+- Create from humming / Create from audio / Create from video: auto-transcribes a hummed recording or an existing audio/video file into sheet music
+- Tempo (BPM) and time signature settings, adding rests, section repeat (select and loop just the part you're struggling with)
+- Practice mode: a full-screen view with just the score and performance buttons. The layout automatically matches the finger spacing of the real in-game controls, and you can tap along as the score auto-plays at 0.1x–1.0x speed. Button position/size can be fine-tuned by overlaying a photo of your real device
+- Follow mode: a mode meant for use alongside the real game (e.g. in iPad Split View), showing the current and next note large on screen
+- Save and recall from a list (no account needed, browser-local storage only)
+
 ### Q&A
 - Status tracking for questions, feature requests, and bug reports
   (fixed / in progress / considering / won't fix)
@@ -268,6 +323,34 @@ https://ram1x7.github.io/heartopilist/
 - Notifications: Firebase Cloud Messaging + Cloud Functions (Firestore)
 - Firebase Functions are deployed automatically via GitHub Actions
   (triggered on changes under `functions/`)
+
+### Directory structure (excerpt)
+
+```
+heartopilist/
+├── index.html / foods.html / garden.html / pet.html / shop.html
+├── codes.html / events.html / videos.html / faq.html
+├── art-create.html / art-convert.html   … Art pages (main editor / standalone "create from image")
+├── music.html                             … Sheet music page
+├── js/
+│   ├── data-*.js          … Data definitions for each page
+│   ├── main.js             … Encyclopedia page logic
+│   ├── shop.js              … Shop page logic
+│   ├── food-auth-calc.js    … Master certification calculator
+│   ├── data-sync.js         … Data sync (export/import)
+│   ├── i18n.js               … Multi-language support
+│   ├── firebase-init.js      … Notification setup
+│   ├── art-editor.js / art-config.js / art-masks.js … Art editor core / canvas definitions / outline data
+│   ├── art-converter.js / art-pixelate.js            … Shared image → pixel art conversion logic
+│   ├── art-template-match.js / art-screenshot-import.js … Import-from-screenshot (guide-line matching)
+│   ├── art-paint-guide.js / art-3d.js / art-share-code.js … Paint order guide / 3D preview / share codes
+│   └── music-editor.js / music-config.js / music-hum.js … Sheet music editor core / config / auto-transcription
+├── locales/                  … Translation files (ja / en / ko / th / zh-CN / zh-TW)
+├── images/ / fish/ / bugs/ / birds/ … Image assets
+├── functions/                 … Firebase Cloud Functions (notification API)
+├── tools/                      … Weather data entry/validation tools
+└── manifest.json               … PWA settings
+```
 
 ## Disclaimer
 
