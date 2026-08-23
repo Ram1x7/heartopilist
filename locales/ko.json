@@ -591,7 +591,7 @@
   "music_new_type_free_title": "프리템포 악보",
   "music_new_type_free_body": "템포에 얽매이지 않고 실제 음의 길이를 그대로 기록합니다. MIDI・음원・동영상에서 자동 생성할 때 적합합니다",
   "music_freetiming_approx_badge": "참고용",
-  "music_freetiming_hint": "프리템포 악보입니다. 템포・박자는 마디선 참고 표시에만 사용되며 실제 연주 타이밍에는 영향을 주지 않습니다",
+  "music_freetiming_hint": "프리템포 악보입니다. 템포를 바꾸면 연습/따라하기 모드의 실제 재생 속도가 그 비율로 바뀝니다. 박자는 마디선 참고 표시에만 사용되며 연주 타이밍에는 영향을 주지 않습니다",
   "music_convert_to_bar_btn": "박자 기반 악보로 변환하기",
   "music_confirm_convert_to_bar": "현재 템포・박자를 기준으로 박자 기반 악보로 변환합니다. 계속하시겠습니까?",
   "music_toast_converted_to_bar": "박자 기반 악보로 변환했습니다",
