@@ -1429,6 +1429,10 @@ async function onHumAnalyzeClick() {
     }
 
     scoreFreeTiming = humSourceMode !== "humming";
+    // 音源/動画は生成時にbpmを変更しない（既存のエディタのテンポのまま）ため、
+    // その時点のbpmをそのまま基準テンポとして記録する（MIDIインポートと異なり
+    // 音源自体にテンポ情報を持たないため、これが唯一の妥当な基準になる）
+    scoreReferenceBpm = bpm;
     applyGeneratedMelodyTokens(newTokens, T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
   } catch (e) {
     console.error(e);

@@ -591,7 +591,7 @@
   "music_new_type_free_title": "自由節奏樂譜",
   "music_new_type_free_body": "不受速度限制，直接記錄每個音符的實際長度。適合從MIDI、音訊、影片自動生成",
   "music_freetiming_approx_badge": "僅供參考",
-  "music_freetiming_hint": "這是自由節奏樂譜。速度和拍號僅用於小節線的參考顯示，不影響實際演奏時間",
+  "music_freetiming_hint": "這是自由節奏樂譜。變更速度會依比例改變練習/跟隨模式下的實際播放速度。拍號僅用於小節線的參考顯示，不影響演奏時間",
   "music_convert_to_bar_btn": "轉換為拍號樂譜",
   "music_confirm_convert_to_bar": "將根據目前的速度和拍號轉換為拍號樂譜，是否繼續？",
   "music_toast_converted_to_bar": "已轉換為拍號樂譜",

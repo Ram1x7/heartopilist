@@ -16,12 +16,18 @@ let selectedDurationId = "quarter";
 let isRecording = false; // 編集モード：ONの間はボタンを押した長さがそのまま音の長さになる
 let bpm = DEFAULT_BPM;
 let timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
-// フリーテンポ譜面：テンポ・拍子の量子化を持たず、各tokenが beats の代わりに
+// フリーテンポ譜面：拍子の量子化を持たず、各tokenが beats の代わりに
 // 実時間の長さ durationMs(ミリ秒) を持つ（排他的。両方持つtokenは存在しない）。
 // MIDI・音源・動画からの自動生成は既定でこちらになる（js/music-midi-import.js、
-// js/music-hum.js）。テンポ・拍子の入力欄自体は残すが、小節線の目安表示にしか
-// 使わず、実際の演奏タイミングには一切影響しない
+// js/music-hum.js）。拍子の入力欄は小節線の目安表示にしか使わないが、
+// テンポ(bpm)は「基準テンポ(scoreReferenceBpm)に対する再生速度の倍率」として
+// 実際に働く（動画の再生速度を変えるのと同じ考え方。音同士の相対的な長さの
+// 比率は変えず、全体の速さだけを変える）
 let scoreFreeTiming = false;
+// フリーテンポ譜面のtokensのdurationMsが「もともとどのテンポで記録されたか」。
+// bpmがこの値と一致していれば等倍速で再生される。MIDI取り込み時はファイル自身の
+// テンポ、音源/動画取り込み時はその時点のエディタのテンポをそのまま採用する
+let scoreReferenceBpm = DEFAULT_BPM;
 let scoreName = "";
 let currentScoreId = null;
 let savedScores = [];
@@ -93,6 +99,9 @@ function initMusicEditor() {
     bpm = draft.bpm || DEFAULT_BPM;
     timeSignatureId = draft.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
     scoreFreeTiming = !!draft.freeTiming; // 古い形式の下書きにはfreeTimingが無いため、その場合は拍子ベース(false)として扱う
+    // 古い形式の下書きにはreferenceBpmが無いため、その場合は保存されていたbpmを
+    // そのまま基準テンポとして扱う（＝読み込み直後は等倍速で再生される）
+    scoreReferenceBpm = draft.referenceBpm != null ? draft.referenceBpm : bpm;
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
   } else {
@@ -609,13 +618,19 @@ function finalizeGroup() {
 // 演奏ボタンを押していた実時間から、現在のモードに応じたtokenの長さを求める。
 // 拍子ベース：録音中は一番近い長さプリセットへスナップ、非録音時は選んでいる
 // 長さプリセットをそのまま使う（従来通り）。
-// フリーテンポ：録音中は押していた実時間(ms)をそのまま使い、非録音時は
-// 選んでいる長さプリセットの拍数を、その場のBPMでおおよその実時間(ms)に変換する
-// （目安入力。プリセットのUI自体はフリーテンポでも残す）
+// フリーテンポ：録音中は押していた実時間(ms)を「今のbpmで録音したものが、
+// 基準テンポ(scoreReferenceBpm)でも同じ実時間で再生されるように」bpm/scoreReferenceBpm倍
+// して保存する（tokenDurationSecはscoreReferenceBpm/bpm倍して再生するため、
+// 今と同じbpmのままなら録音した通りの長さで鳴る）。非録音時は選んでいる
+// 長さプリセットの拍数を、基準テンポでの実時間(ms)に変換する
 function computeHeldDurationValue() {
   const heldSec = (performance.now() - groupStartTime) / 1000;
   if (scoreFreeTiming) {
-    return { durationMs: isRecording ? heldSec * 1000 : presetBeatsToApproxMs(getDuration(selectedDurationId).beats) };
+    return {
+      durationMs: isRecording
+        ? heldSec * 1000 * (bpm / scoreReferenceBpm)
+        : presetBeatsToApproxMs(getDuration(selectedDurationId).beats),
+    };
   }
   return { beats: isRecording ? snapBeatsToPreset(heldSec / (60 / bpm)) : getDuration(selectedDurationId).beats };
 }
@@ -654,25 +669,30 @@ function snapBeatsToPreset(rawBeats) {
 }
 
 // ── フリーテンポ譜面のtokenの長さ変換（beats/durationMsは排他的） ──
-// 再生時に実際に待つ秒数。フリーテンポはdurationMsをそのまま使う（bpmに一切
-// 依存しない）。拍子ベースは従来通りbpmから計算する
+// 再生時に実際に待つ秒数。フリーテンポのdurationMsは「基準テンポ(scoreReferenceBpm)で
+// 記録された実時間」なので、bpmが基準テンポからどれだけ変わったかの比率
+// (scoreReferenceBpm/bpm)をかけて実際の待ち時間にする（動画の再生速度を変えるのと
+// 同じ考え方：bpmを基準テンポの2倍にすれば再生は半分の時間で終わる）。
+// bpmが基準テンポと同じままなら、この比率は1倍＝記録した通りの長さのまま
 function tokenDurationSec(tok) {
-  if (tok.durationMs != null) return tok.durationMs / 1000;
+  if (tok.durationMs != null) return (tok.durationMs / 1000) * (scoreReferenceBpm / bpm);
   return (60 / bpm) * tok.beats;
 }
 
-// 小節線の表示位置の計算専用。durationMsを持つtokenは、その時点のbpmを使って
-// 「見た目の目安の拍数」に変換する（演奏タイミングには一切影響しない。
-// 正確である必要はなく、あくまで小節線をだいたいの位置に表示するためだけの値）
+// 小節線の表示位置の計算専用。durationMsを持つtokenは、基準テンポ(scoreReferenceBpm)を
+// 使って「その音が本来何拍ぶんの長さか」に変換する。現在のbpm（再生速度）が
+// 変わっても、この「本来の長さ」自体は変わらないため、テンポを変えるたびに
+// 小節線の位置がぶれることはない（正確である必要はなく、あくまで小節線を
+// だいたいの位置に表示するためだけの値）
 function tokenApproxBeats(tok) {
   if (tok.beats != null) return tok.beats;
-  return tok.durationMs / 1000 / (60 / bpm);
+  return tok.durationMs / 1000 / (60 / scoreReferenceBpm);
 }
 
-// 長さプリセットの拍数(beats)を、その場のbpmでおおよその実時間(ms)に変換する
-// （フリーテンポ譜面での手動入力・休符追加用。目安の値でよい）
+// 長さプリセットの拍数(beats)を、基準テンポ(scoreReferenceBpm)での実時間(ms)に
+// 変換する（フリーテンポ譜面での手動入力・休符追加用。目安の値でよい）
 function presetBeatsToApproxMs(beats) {
-  return beats * (60000 / bpm);
+  return beats * (60000 / scoreReferenceBpm);
 }
 
 // ── 音の長さ選択（編集モード・非録音時用） ──
@@ -1151,8 +1171,13 @@ function updatePracticeGuideHighlight() {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
   frame.querySelectorAll(".music-note-btn.practice-guide").forEach((b) => b.classList.remove("practice-guide"));
-  const idx = nextNoteIndex(cursor);
-  if (idx === null) return;
+  // 自動再生中は、cursorがちょうど「今まさに鳴っている音」を指している
+  // （tick()がcursor=idxを代入した直後にrenderScoreDisplay経由でここが呼ばれるため）ので、
+  // それをそのまま光らせる。停止中のタップ先取りでは、まだ何も鳴っていないため
+  // 「次に弾くべき音」(nextNoteIndex(cursor))を光らせる。isPlaying基準で分けないと、
+  // 自動再生中は常に1つ先の音が光ってしまい、鳴っている音とずれて見える
+  const idx = isPlaying ? cursor : nextNoteIndex(cursor);
+  if (idx == null || idx < 0) return;
   const tok = tokens[idx];
   if (!tok || !tok.notes.length) return;
   const keys = new Set(tok.notes.map(noteKey));
@@ -1208,12 +1233,18 @@ function pausePlayback() {
   isPlaying = false;
   clearTimeout(playTimer);
   updatePlaybackUI();
+  // isPlayingがfalseになった時点で先読みガイドを「次に弾くべき音」表示へ
+  // 切り替える（そのままにすると、直前に鳴っていた音の点灯が停止後も残り続ける）
+  updatePracticeGuideHighlight();
 }
 
 function stopPlayback() {
   isPlaying = false;
   clearTimeout(playTimer);
   updatePlaybackUI();
+  // 曲の終わりまで自動再生した場合、tick()側はrenderScoreDisplay()を呼ばずに
+  // ここへ来るため、最後に鳴っていた音の先読みガイドが点灯したまま残らないようにする
+  updatePracticeGuideHighlight();
 }
 
 function tick() {
@@ -1353,6 +1384,7 @@ function saveDraft() {
       bpm,
       timeSignatureId,
       freeTiming: scoreFreeTiming,
+      referenceBpm: scoreReferenceBpm,
       name: scoreName,
       scoreId: currentScoreId,
     })
@@ -1400,6 +1432,7 @@ function saveCurrentAsScore() {
     existing.bpm = bpm;
     existing.timeSignatureId = timeSignatureId;
     existing.freeTiming = scoreFreeTiming;
+    existing.referenceBpm = scoreReferenceBpm;
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
     persistSavedScores();
@@ -1415,6 +1448,7 @@ function saveCurrentAsScore() {
     bpm,
     timeSignatureId,
     freeTiming: scoreFreeTiming,
+    referenceBpm: scoreReferenceBpm,
     tokens: tokens.slice(),
     updatedAt: Date.now(),
   };
@@ -1437,10 +1471,13 @@ function closeNewScoreTypeModal() {
 }
 
 function chooseNewScoreType(freeTiming) {
+  cursor = -1;
+  stopPlayback();
   tokens = [];
   scoreName = "";
   currentScoreId = null;
   bpm = DEFAULT_BPM;
+  scoreReferenceBpm = DEFAULT_BPM;
   timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
   scoreFreeTiming = freeTiming;
   resetLoop();
@@ -1453,10 +1490,11 @@ function chooseNewScoreType(freeTiming) {
   closeNewScoreTypeModal();
 }
 
-// ── フリーテンポ譜面：BPM・拍子入力欄の「目安」表示、拍子ベースへの変換 ──
+// ── フリーテンポ譜面：拍子入力欄の「目安」表示、拍子ベースへの変換 ──
+// テンポ(bpm)は実際に再生速度を左右する（scoreReferenceBpmとの比率）ため、
+// 「目安」バッジは付けない。拍子は小節線の目安表示専用のままなので付ける
 function renderFreeTimingUI() {
   const show = scoreFreeTiming;
-  document.getElementById("musicBpmApproxBadge").style.display = show ? "" : "none";
   document.getElementById("musicTimeSigApproxBadge").style.display = show ? "" : "none";
   document.getElementById("musicFreeTimingHint").style.display = show ? "" : "none";
   // 譜面が空でも変換ボタン自体は出す（押しても何も無ければ何も起きないだけで害はなく、
@@ -1464,10 +1502,12 @@ function renderFreeTimingUI() {
   document.getElementById("musicFreeTimingConvertRow").style.display = show ? "" : "none";
 }
 
-// フリーテンポ譜面を、現在のBPM・拍子をもとに拍子ベースの譜面へ変換する
-// （既存の量子化ロジック(snapBeatsToPreset)をそのまま流用する。各tokenの
-// durationMsを現在のBPMで目安の拍数(tokenApproxBeats)に変換してからスナップ
-// するだけの単純な変換。逆方向(拍子ベース→フリーテンポ)は用意しない）
+// フリーテンポ譜面を、現在のテンポ・拍子をもとに拍子ベースの譜面へ変換する
+// （既存の量子化ロジック(snapBeatsToPreset)をそのまま流用する）。
+// tokenApproxBeatsは基準テンポ(scoreReferenceBpm)を使って「本来の長さ」を
+// 求めるが、変換後のtokens(beats)は現在のbpmで再生されるため、結果的に
+// 「現在のテンポで聞こえていた速さ」がそのまま拍子ベース譜面に引き継がれる
+// （逆方向(拍子ベース→フリーテンポ)は用意しない）
 function convertFreeTimingScoreToBarBased() {
   if (!scoreFreeTiming || !tokens.length) return;
   if (!confirm(T("music_confirm_convert_to_bar", "現在のテンポ・拍子をもとに、拍子ベースの譜面に変換します。よろしいですか？"))) return;
@@ -1526,6 +1566,7 @@ function loadScore(id) {
   bpm = score.bpm || DEFAULT_BPM;
   timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
   scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
+  scoreReferenceBpm = score.referenceBpm != null ? score.referenceBpm : bpm;
   scoreName = score.name;
   currentScoreId = score.id;
   cursor = -1;
@@ -1618,9 +1659,9 @@ function bindControls() {
     bpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Number(e.target.value) || DEFAULT_BPM));
     e.target.value = bpm;
     tempoWarningDismissed = true; // テンポを自分で確認・変更したので、録音前の確認案内はもう不要
-    // フリーテンポ譜面は、BPMが小節線の目安表示にのみ影響する（演奏タイミングは
-    // 変わらない）ため、変更時に表示だけ更新する
-    if (scoreFreeTiming) renderScoreDisplay();
+    // フリーテンポ譜面は、基準テンポ(scoreReferenceBpm)からの比率で実際の再生速度が
+    // 変わる（tokenDurationSec）。小節線は基準テンポ側で計算するため表示は変わらず、
+    // 再生中の場合は次の音から新しい速度が反映される（再描画は不要）
     saveDraftDebounced();
   });
   document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {

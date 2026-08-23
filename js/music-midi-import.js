@@ -559,9 +559,12 @@ function finishMidiConversion(parsed, noteEvents, sourceBpm) {
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
   // 既定でフリーテンポ譜面として生成する（量子化なし。実際の音の長さをそのまま
-  // durationMsに入れる）。テンポ表示自体はMIDIファイル自身が持つ値をそのまま
-  // 採用する（小節線の目安表示に使うため。エディタ側で既に設定していたBPMに
-  // 合わせてしまうと、原曲のテンポ感と表示がずれてしまう）。
+  // durationMsに入れる）。テンポ表示・基準テンポ(scoreReferenceBpm)ともに
+  // MIDIファイル自身が持つ値をそのまま採用する（エディタ側で既に設定していた
+  // BPMに合わせてしまうと、原曲のテンポ感と表示がずれてしまう）。
+  // scoreReferenceBpmを基準テンポとして記録しておくことで、生成後にユーザーが
+  // テンポを変更すると、その比率で練習/追従モードの再生速度が実際に変わる
+  // （bpm===scoreReferenceBpmの間は原曲通りの速さのまま）。
   // 同時に押す指の本数の上限は、変換モーダル(#musicHumMaxNotesInput)で
   // 解析開始前にユーザーが指定した値をそのまま使う（readMaxSimultaneousNotesは
   // js/music-hum.js側で定義、同じモーダルを使う音源/動画パスと共通）
@@ -575,6 +578,7 @@ function finishMidiConversion(parsed, noteEvents, sourceBpm) {
   }
 
   bpm = clampedBpm;
+  scoreReferenceBpm = clampedBpm;
   scoreFreeTiming = true;
   renderScoreMeta();
   closeMidiTrackPickerModal();

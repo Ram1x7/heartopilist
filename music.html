@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/music.css?v=31">
+<link rel="stylesheet" href="./css/music.css?v=32">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -121,7 +121,6 @@
         <span data-i18n="music_bpm_label">テンポ</span>
         <input type="number" id="musicBpmInput" class="music-bpm-input" min="40" max="220" value="100">
         <span data-i18n="music_bpm_unit">BPM</span>
-        <span class="music-freetiming-badge" id="musicBpmApproxBadge" style="display:none" data-i18n="music_freetiming_approx_badge">目安</span>
       </div>
       <div class="music-timesig-row">
         <span data-i18n="music_timesig_label">拍子</span>
@@ -129,7 +128,7 @@
         <span class="music-freetiming-badge" id="musicTimeSigApproxBadge" style="display:none" data-i18n="music_freetiming_approx_badge">目安</span>
       </div>
     </div>
-    <p class="music-record-hint" id="musicFreeTimingHint" style="display:none" data-i18n="music_freetiming_hint">フリーテンポ譜面です。テンポ・拍子は小節線の目安表示にのみ使われ、実際の演奏タイミングには影響しません</p>
+    <p class="music-record-hint" id="musicFreeTimingHint" style="display:none" data-i18n="music_freetiming_hint">フリーテンポ譜面です。テンポを変えると、練習/追従モードでの再生速度がその比率で変わります。拍子は小節線の目安表示にのみ使われ、演奏タイミングには影響しません</p>
     <div class="music-panel-btn-row" id="musicFreeTimingConvertRow" style="display:none">
       <button class="music-header-btn" id="musicConvertToBarBtn" data-i18n="music_convert_to_bar_btn">拍子ベースの譜面に変換する</button>
     </div>
@@ -403,7 +402,7 @@
     音声ファイル・動画ファイルをアップロードすると、自動で音の高さ・長さを検出して譜面に変換します。ハミングとは異なり和音や複数の音が同時に鳴る音源にも対応しており、同時に検出した音はそのまま和音として譜面に反映されます。検出した音域は、今選んでいる楽器・配置が実際に鳴らせる音域にオクターブ単位で自動的に合わせられ、その楽器で選べない音は一番近い音に自動で置き換えられます。ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されますが、伴奏やドラム、効果音が強く混ざっている場合は誤検出が増えることがあるので、変換後は聴きながら手直ししてください。MIDIファイル（.mid）をアップロードした場合は、解析モデルを使わずそのままピッチ・タイミング情報を読み取って変換します。初回利用時のみ、解析モデル自体をネットワーク経由で読み込むための通信が必要ですが（MIDIファイルの場合は不要です）、解析処理・データはこの端末のブラウザ内だけで完結し、外部に送信されることはありません。これらの機能で作った譜面は既定で「フリーテンポ譜面」（下記参照）として生成されます。テンポ・拍子に無理やり当てはめず、検出した実際の音の長さをそのまま使うためです。変換前に「同時に押す指の本数（1〜10、推奨2〜4本）」を指定でき、検出した和音がこの本数を超える場合は、主旋律（最も高い音）・低音（最も低い音）を優先して自動的に間引きます（実際に演奏ボタンで同時に押せる指の本数を超えないようにするための設定です）。</p>
 
     <p style="margin-top:10px;"><strong>フリーテンポ譜面</strong><br>
-    「新規作成」時に選べるもう1つの譜面の種類です。通常の「拍子あり譜面」がテンポ・拍子をもとに音の長さを一定の単位（4分音符など）で管理するのに対し、フリーテンポ譜面は実際の音の長さをそのまま記録します。テンポの概念に縛られない曲や、MIDI・音源・動画からの自動生成に向いています。テンポ・拍子の入力欄は目安表示として残りますが、演奏・再生のタイミングには一切影響しません（小節線の位置も見た目の目安です）。あとから「拍子ベースの譜面に変換する」ボタンで拍子ベースの譜面に変換できます（フリーテンポ→拍子ベースの一方向のみで、逆はできません）。</p>
+    「新規作成」時に選べるもう1つの譜面の種類です。通常の「拍子あり譜面」がテンポ・拍子をもとに音の長さを一定の単位（4分音符など）で管理するのに対し、フリーテンポ譜面は実際の音の長さをそのまま記録します。テンポの概念に縛られない曲や、MIDI・音源・動画からの自動生成に向いています。テンポの入力欄は、生成・記録した時点の速さを基準に、練習/追従モードでの実際の再生速度を左右します（基準のテンポのままなら生成・記録した通りの速さで再生され、テンポを上げ下げするとその比率で再生速度も変わります。音同士の相対的な長さの関係は変わりません）。拍子の入力欄は小節線の位置の目安表示専用で、演奏・再生のタイミングには影響しません。あとから「拍子ベースの譜面に変換する」ボタンで、その時点のテンポ・拍子をもとに拍子ベースの譜面に変換できます（フリーテンポ→拍子ベースの一方向のみで、逆はできません）。</p>
 
     <p style="margin-top:10px;"><strong>編集モード</strong><br>
     「音の長さ」を選んでから演奏ボタンを押すと、その音が譜面に追加されます。音を出さない「休符」を入れたいときは「休符を追加」を押すと、選んでいる長さの休符が譜面の最後に追加されます（数字譜では「0」で表示されます）。「最後を削除」で1つ前に戻せます。</p>
