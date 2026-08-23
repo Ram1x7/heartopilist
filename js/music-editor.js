@@ -16,6 +16,12 @@ let selectedDurationId = "quarter";
 let isRecording = false; // 編集モード：ONの間はボタンを押した長さがそのまま音の長さになる
 let bpm = DEFAULT_BPM;
 let timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
+// フリーテンポ譜面：テンポ・拍子の量子化を持たず、各tokenが beats の代わりに
+// 実時間の長さ durationMs(ミリ秒) を持つ（排他的。両方持つtokenは存在しない）。
+// MIDI・音源・動画からの自動生成は既定でこちらになる（js/music-midi-import.js、
+// js/music-hum.js）。テンポ・拍子の入力欄自体は残すが、小節線の目安表示にしか
+// 使わず、実際の演奏タイミングには一切影響しない
+let scoreFreeTiming = false;
 let scoreName = "";
 let currentScoreId = null;
 let savedScores = [];
@@ -86,6 +92,7 @@ function initMusicEditor() {
     semitoneEnabled = !!draft.semitoneEnabled;
     bpm = draft.bpm || DEFAULT_BPM;
     timeSignatureId = draft.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
+    scoreFreeTiming = !!draft.freeTiming; // 古い形式の下書きにはfreeTimingが無いため、その場合は拍子ベース(false)として扱う
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
   } else {
@@ -109,6 +116,7 @@ function initMusicEditor() {
   renderInstrumentGrid();
   renderScoreDisplay();
   renderScoreMeta();
+  renderFreeTimingUI();
   updateLoopUI();
   updateSoundToggleUI();
   updateModeUI();
@@ -561,7 +569,12 @@ function bindNoteButtonHold(btn, note) {
     activeHolds.set(e.pointerId, { note, btn, startTime: performance.now() });
     currentGroupNotes.push(note);
     startSustainedTone(e.pointerId, noteFrequency(note));
-    if (pageMode === "practice") tryAdvancePracticeChord();
+    if (pageMode === "practice") {
+      const advancedIdx = tryAdvancePracticeChord();
+      // 正しく押せて先へ進んだ場合だけ、その和音の全ボタンを強く光らせる
+      // （先読みハイライトとは別クラス。押した瞬間の一時的なフィードバック）
+      if (advancedIdx !== null) flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
+    }
   };
   const end = (e) => {
     const held = activeHolds.get(e.pointerId);
@@ -582,15 +595,36 @@ function finalizeGroup() {
   if (!currentGroupNotes.length) return;
   const notes = dedupeNotes(currentGroupNotes);
   if (pageMode === "edit") {
-    const beats = isRecording ? snapBeatsToPreset((performance.now() - groupStartTime) / 1000 / (60 / bpm)) : getDuration(selectedDurationId).beats;
+    const durationValue = computeHeldDurationValue();
     // 譜面の音を選択中なら、末尾に追加するのではなくその音をまるごと置き換える
     if (selectedTokenIndex !== null) {
-      replaceTokenAt(selectedTokenIndex, notes, beats);
+      replaceTokenAt(selectedTokenIndex, notes, durationValue);
     } else {
-      addChordToken(notes, beats);
+      addChordToken(notes, durationValue);
     }
   }
   currentGroupNotes = [];
+}
+
+// 演奏ボタンを押していた実時間から、現在のモードに応じたtokenの長さを求める。
+// 拍子ベース：録音中は一番近い長さプリセットへスナップ、非録音時は選んでいる
+// 長さプリセットをそのまま使う（従来通り）。
+// フリーテンポ：録音中は押していた実時間(ms)をそのまま使い、非録音時は
+// 選んでいる長さプリセットの拍数を、その場のBPMでおおよその実時間(ms)に変換する
+// （目安入力。プリセットのUI自体はフリーテンポでも残す）
+function computeHeldDurationValue() {
+  const heldSec = (performance.now() - groupStartTime) / 1000;
+  if (scoreFreeTiming) {
+    return { durationMs: isRecording ? heldSec * 1000 : presetBeatsToApproxMs(getDuration(selectedDurationId).beats) };
+  }
+  return { beats: isRecording ? snapBeatsToPreset(heldSec / (60 / bpm)) : getDuration(selectedDurationId).beats };
+}
+
+// 選んでいる長さプリセットから、現在のモードに応じたtokenの長さを求める
+// （休符追加など、実際に演奏ボタンを押さずに長さを決める場合に使う）
+function selectedDurationValue() {
+  const beats = getDuration(selectedDurationId).beats;
+  return scoreFreeTiming ? { durationMs: presetBeatsToApproxMs(beats) } : { beats };
 }
 
 function dedupeNotes(notes) {
@@ -617,6 +651,28 @@ function snapBeatsToPreset(rawBeats) {
     }
   });
   return best;
+}
+
+// ── フリーテンポ譜面のtokenの長さ変換（beats/durationMsは排他的） ──
+// 再生時に実際に待つ秒数。フリーテンポはdurationMsをそのまま使う（bpmに一切
+// 依存しない）。拍子ベースは従来通りbpmから計算する
+function tokenDurationSec(tok) {
+  if (tok.durationMs != null) return tok.durationMs / 1000;
+  return (60 / bpm) * tok.beats;
+}
+
+// 小節線の表示位置の計算専用。durationMsを持つtokenは、その時点のbpmを使って
+// 「見た目の目安の拍数」に変換する（演奏タイミングには一切影響しない。
+// 正確である必要はなく、あくまで小節線をだいたいの位置に表示するためだけの値）
+function tokenApproxBeats(tok) {
+  if (tok.beats != null) return tok.beats;
+  return tok.durationMs / 1000 / (60 / bpm);
+}
+
+// 長さプリセットの拍数(beats)を、その場のbpmでおおよその実時間(ms)に変換する
+// （フリーテンポ譜面での手動入力・休符追加用。目安の値でよい）
+function presetBeatsToApproxMs(beats) {
+  return beats * (60000 / bpm);
 }
 
 // ── 音の長さ選択（編集モード・非録音時用） ──
@@ -671,10 +727,12 @@ function updateRecordingUI() {
 }
 
 // ── 譜面の編集 ──
-function addChordToken(notes, beats) {
+// durationValueは{beats}または{durationMs}（排他的。フリーテンポ譜面かどうかで
+// 呼び出し側が使い分ける。computeHeldDurationValue/selectedDurationValueが作る）
+function addChordToken(notes, durationValue) {
   tokens.push({
     notes: notes.map((n) => ({ degree: n.degree, accidental: n.accidental || null, octave: n.octave })),
-    beats,
+    ...durationValue,
   });
   renderScoreDisplay();
   saveDraftDebounced();
@@ -682,7 +740,7 @@ function addChordToken(notes, beats) {
 
 // 休符（notes:[]の音）を、選んでいる長さで譜面の最後に追加する
 function addRestToken() {
-  addChordToken([], getDuration(selectedDurationId).beats);
+  addChordToken([], selectedDurationValue());
 }
 
 function deleteLastToken() {
@@ -718,12 +776,12 @@ function deselectToken() {
   renderScoreDisplay();
 }
 
-// 選択中の音を、次に弾いた音(notes)・長さ(beats)でそのまま置き換える
-function replaceTokenAt(index, notes, beats) {
+// 選択中の音を、次に弾いた音(notes)・長さ(durationValue:{beats}または{durationMs})でそのまま置き換える
+function replaceTokenAt(index, notes, durationValue) {
   if (index < 0 || index >= tokens.length) return;
   tokens[index] = {
     notes: notes.map((n) => ({ degree: n.degree, accidental: n.accidental || null, octave: n.octave })),
-    beats,
+    ...durationValue,
   };
   humReviewIndexes.delete(index); // 手直し済みなので自動検出マークを消す
   selectedTokenIndex = null;
@@ -792,7 +850,7 @@ function renderScoreDisplay() {
     const kana = isChord || isRest ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
     const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending", isSelected && "selected", needsReview && "hum-review"].filter(Boolean).join(" ");
     html += `<span class="${cls}" data-index="${i}">${digits}${kana}</span>`;
-    beatsSinceBar += tok.beats;
+    beatsSinceBar += tokenApproxBeats(tok);
   });
   el.innerHTML = html;
 
@@ -801,6 +859,7 @@ function renderScoreDisplay() {
     if (cur) cur.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }
   if (pageMode === "follow") renderFollowDisplay();
+  if (pageMode === "practice") updatePracticeGuideHighlight();
 }
 
 // 譜面の音を1つ選んでいる間、置き換え・削除の操作パネルを出す
@@ -1067,10 +1126,12 @@ function skipLeadingRests() {
   }
 }
 
+// 戻り値：先取りが成立して進んだ場合はその音のtokensインデックス、
+// 成立しなかった場合はnull（正解ハイライトを出すかどうかの判定に使う）
 function tryAdvancePracticeChord() {
   const idx = nextNoteIndex(cursor);
-  if (idx === null) return;
-  if (!notesSetEqual(currentGroupNotes, tokens[idx].notes)) return;
+  if (idx === null) return null;
+  if (!notesSetEqual(currentGroupNotes, tokens[idx].notes)) return null;
   cursor = idx;
   skipLeadingRests();
   renderScoreDisplay();
@@ -1079,6 +1140,43 @@ function tryAdvancePracticeChord() {
     scheduleNextTick();
   }
   if (nextNoteIndex(cursor) === null) stopPlayback();
+  return idx;
+}
+
+// ── 練習モードのキー点灯（先読みガイド＋正解フィードバック） ──
+// 次に弾くべき音（nextNoteIndex(cursor)のtoken）に対応する演奏ボタンを薄く
+// 光らせる。再生停止中のタップ先取りでも表示されたままにする（renderScoreDisplay
+// から毎回呼ばれるため、cursorが動かない限りは同じ状態を維持し続けるだけになる）
+function updatePracticeGuideHighlight() {
+  const frame = document.getElementById("musicStageFrame");
+  if (!frame) return;
+  frame.querySelectorAll(".music-note-btn.practice-guide").forEach((b) => b.classList.remove("practice-guide"));
+  const idx = nextNoteIndex(cursor);
+  if (idx === null) return;
+  const tok = tokens[idx];
+  if (!tok || !tok.notes.length) return;
+  const keys = new Set(tok.notes.map(noteKey));
+  frame.querySelectorAll(".music-note-btn").forEach((btn) => {
+    const note = JSON.parse(btn.dataset.note);
+    if (keys.has(noteKey(note))) btn.classList.add("practice-guide");
+  });
+}
+
+// 正しく押せた瞬間、和音内の全ボタンを一瞬強く光らせてフェードアウトさせる
+// （CSS側の@keyframesで見た目を作る。同じボタンを連打された場合でもアニメーションが
+// 再生し直されるよう、一度クラスを外してから付け直す）
+function flashPracticeCorrectHighlight(notes) {
+  const frame = document.getElementById("musicStageFrame");
+  if (!frame) return;
+  const keys = new Set(notes.map(noteKey));
+  frame.querySelectorAll(".music-note-btn").forEach((btn) => {
+    const note = JSON.parse(btn.dataset.note);
+    if (!keys.has(noteKey(note))) return;
+    btn.classList.remove("practice-correct");
+    void btn.offsetWidth; // reflowでアニメーションを再始動させる
+    btn.classList.add("practice-correct");
+    btn.addEventListener("animationend", () => btn.classList.remove("practice-correct"), { once: true });
+  });
 }
 
 function notesSetEqual(a, b) {
@@ -1127,7 +1225,7 @@ function tick() {
   cursor = idx;
   renderScoreDisplay();
   const tok = tokens[idx];
-  const durSec = (60 / bpm) * tok.beats / playSpeed;
+  const durSec = tokenDurationSec(tok) / playSpeed;
   tok.notes.forEach((n) => playTone(noteFrequency(n), durSec));
   playTimer = setTimeout(tick, durSec * 1000);
 }
@@ -1139,7 +1237,7 @@ function scheduleNextTick() {
     return;
   }
   const tok = tokens[cursor];
-  const durSec = (60 / bpm) * tok.beats / playSpeed;
+  const durSec = tokenDurationSec(tok) / playSpeed;
   playTimer = setTimeout(tick, durSec * 1000);
 }
 
@@ -1254,6 +1352,7 @@ function saveDraft() {
       semitoneEnabled,
       bpm,
       timeSignatureId,
+      freeTiming: scoreFreeTiming,
       name: scoreName,
       scoreId: currentScoreId,
     })
@@ -1300,6 +1399,7 @@ function saveCurrentAsScore() {
     existing.semitoneEnabled = semitoneEnabled;
     existing.bpm = bpm;
     existing.timeSignatureId = timeSignatureId;
+    existing.freeTiming = scoreFreeTiming;
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
     persistSavedScores();
@@ -1314,6 +1414,7 @@ function saveCurrentAsScore() {
     semitoneEnabled,
     bpm,
     timeSignatureId,
+    freeTiming: scoreFreeTiming,
     tokens: tokens.slice(),
     updatedAt: Date.now(),
   };
@@ -1324,19 +1425,60 @@ function saveCurrentAsScore() {
   showToast(T("music_toast_saved", "保存しました"));
 }
 
+// 新規作成：譜面の種類（拍子あり／フリーテンポ）を選ぶモーダルを開く。
+// 実際のリセット処理はchooseNewScoreTypeで行う（キャンセルした場合は何もしない）
 function newScore() {
   if (tokens.length && !confirm(T("music_confirm_new", "編集中の譜面を破棄して新規作成しますか？"))) return;
+  document.getElementById("musicNewScoreTypeModal").style.display = "block";
+}
+
+function closeNewScoreTypeModal() {
+  document.getElementById("musicNewScoreTypeModal").style.display = "none";
+}
+
+function chooseNewScoreType(freeTiming) {
   tokens = [];
   scoreName = "";
   currentScoreId = null;
   bpm = DEFAULT_BPM;
   timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
+  scoreFreeTiming = freeTiming;
   resetLoop();
   selectedTokenIndex = null;
   humReviewIndexes = new Set();
   renderScoreMeta();
+  renderFreeTimingUI();
   renderScoreDisplay();
   saveDraft();
+  closeNewScoreTypeModal();
+}
+
+// ── フリーテンポ譜面：BPM・拍子入力欄の「目安」表示、拍子ベースへの変換 ──
+function renderFreeTimingUI() {
+  const show = scoreFreeTiming;
+  document.getElementById("musicBpmApproxBadge").style.display = show ? "" : "none";
+  document.getElementById("musicTimeSigApproxBadge").style.display = show ? "" : "none";
+  document.getElementById("musicFreeTimingHint").style.display = show ? "" : "none";
+  // 譜面が空でも変換ボタン自体は出す（押しても何も無ければ何も起きないだけで害はなく、
+  // 音を1つ追加するたびに毎回renderFreeTimingUIを呼び直す必要が無くなる）
+  document.getElementById("musicFreeTimingConvertRow").style.display = show ? "" : "none";
+}
+
+// フリーテンポ譜面を、現在のBPM・拍子をもとに拍子ベースの譜面へ変換する
+// （既存の量子化ロジック(snapBeatsToPreset)をそのまま流用する。各tokenの
+// durationMsを現在のBPMで目安の拍数(tokenApproxBeats)に変換してからスナップ
+// するだけの単純な変換。逆方向(拍子ベース→フリーテンポ)は用意しない）
+function convertFreeTimingScoreToBarBased() {
+  if (!scoreFreeTiming || !tokens.length) return;
+  if (!confirm(T("music_confirm_convert_to_bar", "現在のテンポ・拍子をもとに、拍子ベースの譜面に変換します。よろしいですか？"))) return;
+  tokens = tokens.map((t) => ({ notes: t.notes, beats: snapBeatsToPreset(tokenApproxBeats(t)) }));
+  scoreFreeTiming = false;
+  resetLoop();
+  selectedTokenIndex = null;
+  renderFreeTimingUI();
+  renderScoreDisplay();
+  saveDraftDebounced();
+  showToast(T("music_toast_converted_to_bar", "拍子ベースの譜面に変換しました"));
 }
 
 function openSavedListModal() {
@@ -1383,6 +1525,7 @@ function loadScore(id) {
   semitoneEnabled = !!score.semitoneEnabled;
   bpm = score.bpm || DEFAULT_BPM;
   timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
+  scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
   scoreName = score.name;
   currentScoreId = score.id;
   cursor = -1;
@@ -1394,6 +1537,7 @@ function loadScore(id) {
   renderLayoutSelector();
   renderInstrumentGrid();
   renderScoreMeta();
+  renderFreeTimingUI();
   renderScoreDisplay();
   saveDraft();
   closeSavedListModal();
@@ -1417,7 +1561,11 @@ function closeHelpModal() {
 
 // ── ユーティリティ ──
 // 和音対応前（{degree,accidental,octave,beats}）に保存された譜面を
-// 現在の形式（{notes:[...], beats}）に変換する
+// 現在の形式（{notes:[...], beats}または{notes:[...], durationMs}）に変換する。
+// 和音対応前の古い形式は常にbeatsを持っていた（durationMs・フリーテンポの概念が
+// 存在しなかったため）ので、そのまま素通ししてよい。新しい形式（notesが配列）の
+// tokenはbeats/durationMsのどちらか一方を既に持っているため、freeTimingスコアに
+// 対してbeatsを強制することはない
 function normalizeTokens(rawTokens) {
   if (!Array.isArray(rawTokens)) return [];
   return rawTokens.map((t) => {
@@ -1457,6 +1605,11 @@ function bindControls() {
   document.getElementById("musicSaveBtn").addEventListener("click", saveCurrentAsScore);
   document.getElementById("musicOpenListBtn").addEventListener("click", openSavedListModal);
 
+  document.getElementById("musicNewScoreTypeBarBtn").addEventListener("click", () => chooseNewScoreType(false));
+  document.getElementById("musicNewScoreTypeFreeBtn").addEventListener("click", () => chooseNewScoreType(true));
+  document.getElementById("musicNewScoreTypeCloseBtn").addEventListener("click", closeNewScoreTypeModal);
+  document.getElementById("musicConvertToBarBtn").addEventListener("click", convertFreeTimingScoreToBarBased);
+
   document.getElementById("musicScoreNameInput").addEventListener("input", (e) => {
     scoreName = e.target.value;
     saveDraftDebounced();
@@ -1465,6 +1618,9 @@ function bindControls() {
     bpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Number(e.target.value) || DEFAULT_BPM));
     e.target.value = bpm;
     tempoWarningDismissed = true; // テンポを自分で確認・変更したので、録音前の確認案内はもう不要
+    // フリーテンポ譜面は、BPMが小節線の目安表示にのみ影響する（演奏タイミングは
+    // 変わらない）ため、変更時に表示だけ更新する
+    if (scoreFreeTiming) renderScoreDisplay();
     saveDraftDebounced();
   });
   document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {

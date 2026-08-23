@@ -315,6 +315,21 @@ body.dark .music-timesig-select{
   color:#ece4d4;
 }
 
+/* フリーテンポ譜面：BPM・拍子は演奏に影響しない「目安」であることを示す小さなバッジ */
+.music-freetiming-badge{
+  padding:2px 8px;
+  border-radius:999px;
+  background:var(--vermillion);
+  color:#fdf9ef;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+body.dark .music-freetiming-badge{
+  background:var(--vermillion-soft);
+}
+
 /* 録音トグル */
 .music-record-toggle-row{
   display:flex;
@@ -1078,6 +1093,36 @@ body.dark .music-calib-btn.music-calib-lock-btn{
 .music-note-btn.accidental .music-note-digit,
 .music-note-btn.accidental .music-note-kana{
   color:#fdf9ef;
+}
+
+/* 練習モードのキー点灯：次に弾くべき音への先読みガイド（薄い発光）。
+   .pressed（実際に押した瞬間の背景色変化）とは独立して付け外しするため、
+   既存の見た目を崩さないよう背景色は変えずbox-shadowだけで表現する */
+.music-note-btn.practice-guide{
+  box-shadow:0 0 0 3px var(--indigo), 0 0 12px 3px rgba(90, 110, 200, 0.55);
+}
+
+body.dark .music-note-btn.practice-guide{
+  box-shadow:0 0 0 3px var(--indigo-soft), 0 0 12px 3px rgba(160, 180, 255, 0.45);
+}
+
+/* 正解フィードバック：正しく押した瞬間、一段強く光ってから短時間でフェードアウトする */
+@keyframes music-practice-correct-flash{
+  0%{ box-shadow:0 0 0 5px var(--vermillion), 0 0 22px 8px rgba(177, 80, 59, 0.85); }
+  100%{ box-shadow:0 0 0 5px rgba(177, 80, 59, 0), 0 0 0 0 rgba(177, 80, 59, 0); }
+}
+
+@keyframes music-practice-correct-flash-dark{
+  0%{ box-shadow:0 0 0 5px var(--vermillion-soft), 0 0 22px 8px rgba(201, 112, 88, 0.85); }
+  100%{ box-shadow:0 0 0 5px rgba(201, 112, 88, 0), 0 0 0 0 rgba(201, 112, 88, 0); }
+}
+
+.music-note-btn.practice-correct{
+  animation:music-practice-correct-flash 0.45s ease-out;
+}
+
+body.dark .music-note-btn.practice-correct{
+  animation-name:music-practice-correct-flash-dark;
 }
 
 body.dark .music-note-btn{

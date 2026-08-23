@@ -30,11 +30,23 @@
 //   （MIDIファイルの場合はparseMidiFile、音源/動画の場合はBasic Pitchの
 //   ポリフォニック検出結果がそのままこの形式になる）
 //   → groupNoteEventsIntoChords（同時刻に開始する複数ノートを1つの和音グループへ）
-//   → quantizeChordRhythm（曲全体で共有する拍グリッドへ開始位置を揃え、休符を判定）
+//   → buildFreeTimingChordTimeline（既定）／quantizeChordRhythm（量子化する場合のみ）
+//     （前者は実際の時間(durationMs)をそのまま使う「フリーテンポ譜面」を作る。
+//      後者は曲全体で共有する拍グリッドへ開始位置を揃えた「拍子ベース譜面」を作る）
 //   → mapChordsToInstrument（オクターブシフト＋楽器で実際に選べる音へのスナップ。
 //                            和音内の各音は独立してスナップし、重複は取り除く）
 //   → tokens
 // （convertPolyphonicNoteEventsToScoreTokensがこの3段階をまとめて呼び出す）
+//
+// 【フリーテンポ譜面について】
+// MIDI・音源・動画からの自動生成は、実際のタイミングをテンポ・拍子の量子化に
+// 無理やり当てはめると違和感が出るため、既定では量子化を一切行わない
+// 「フリーテンポ譜面」（score.freeTiming:true、各tokenがbeatsの代わりに
+// 実時間の長さdurationMs(ミリ秒)を持つ）として生成する。手動でも
+// 「新規作成」時にフリーテンポ譜面を選べる（js/music-editor.js）。
+// フリーテンポ譜面は、生成後にエディター側の「拍子ベースの譜面に変換する」
+// ボタン（js/music-editor.jsのconvertFreeTimingScoreToBarBased）で、いつでも
+// 拍子ベースの譜面へ変換できる（逆方向の変換はできない）
 //
 // オクターブシフト・音へのスナップは js/music-hum.js の
 // computeMelodyOctaveShift / buildInstrumentNoteMap をそのまま再利用する
@@ -288,10 +300,39 @@ function groupNoteEventsIntoChords(noteEvents, opts) {
   return groups;
 }
 
+// フリーテンポ譜面用：拍グリッドへのスナップは一切行わず、検出した実際の
+// 時間(秒)をそのままtokenの長さ(durationMs)として使う。次のグループとの
+// 間隔が十分空いていれば休符を挟み、そうでなければこの音の長さを次の音の
+// 開始位置まで伸ばして隙間なくつなげる（考え方はquantizeChordRhythmと同じだが、
+// 拍ではなく実時間(秒)で判定・保持する点だけが異なる）
+function buildFreeTimingChordTimeline(groups, opts) {
+  const options = opts || {};
+  if (!groups.length) return [];
+  const restGapSec = options.restGapSec != null ? options.restGapSec : 0.15;
+  const minDurationMs = options.minDurationMs != null ? options.minDurationMs : 60;
+
+  const result = [];
+  groups.forEach((g, i) => {
+    const ownEnd = g.startTimeSeconds + g.durationSeconds;
+    const nextStart = i + 1 < groups.length ? groups[i + 1].startTimeSeconds : null;
+    const gapAfter = nextStart == null ? null : nextStart - ownEnd;
+    const isRestAfter = gapAfter != null && gapAfter >= restGapSec;
+    const lengthSec = !isRestAfter && nextStart != null ? Math.max(g.durationSeconds, nextStart - g.startTimeSeconds) : g.durationSeconds;
+
+    result.push({ midis: g.midis, durationMs: Math.max(minDurationMs, lengthSec * 1000) });
+    if (isRestAfter) {
+      result.push({ midis: null, durationMs: Math.max(minDurationMs, gapAfter * 1000) });
+    }
+  });
+  return result;
+}
+
 // 和音グループ列を、曲全体で共有する1つの拍グリッド（既定0.25拍刻み）へ
 // 開始位置をスナップし、次のグループとの間隔から休符を判定する。
 // js/music-hum.js の quantizeMelodyRhythm と同じ考え方を、単一音ではなく
-// 和音（MIDI番号の配列）に対して行う（休符はmidis:null）
+// 和音（MIDI番号の配列）に対して行う（休符はmidis:null）。
+// フリーテンポ譜面から拍子ベースへ変換したい場合にのみ使う（既定では
+// buildFreeTimingChordTimelineの方を使う。詳しくはファイル冒頭のコメント参照）
 function quantizeChordRhythm(groups, bpmValue, opts) {
   const options = opts || {};
   if (!groups.length) return [];
@@ -337,15 +378,23 @@ function pickNearestInstrumentNote(midi, availableNotes) {
   return best.note;
 }
 
-// quantizeChordRhythmが返した[{midis, beats}, ...]（休符はmidis:null）を、
-// 楽器の音域へのオクターブシフト＋実際に選べる音へのスナップを経てtokens形式
-// （[{notes:[{degree,accidental,octave}], beats}, ...]）にする。
+// グループ1つぶんの長さを、そのグループが持つ形式（拍子ベース=beats／
+// フリーテンポ=durationMs）のままtoken用のプロパティに変換する。
+// beats/durationMsは排他的なため、どちらか一方だけを含むオブジェクトを返す
+function chordGroupDurationValue(g) {
+  return g.durationMs != null ? { durationMs: g.durationMs } : { beats: g.beats };
+}
+
+// quantizeChordRhythm/buildFreeTimingChordTimelineが返した
+// [{midis, beats|durationMs}, ...]（休符はmidis:null）を、楽器の音域への
+// オクターブシフト＋実際に選べる音へのスナップを経てtokens形式
+// （[{notes:[{degree,accidental,octave}], beats|durationMs}, ...]）にする。
 // オクターブシフトは曲全体のすべての音をまとめて1回だけ計算する（和音の一部だけを
 // 別のオクターブへ動かすと和音の音程関係が崩れるため）。和音内で複数の音が
 // 同じ使用可能音へスナップした場合は、dedupeNotesで重複を取り除く
 function mapChordsToInstrument(chordTimeline, availableNotes) {
   if (!availableNotes.length) {
-    return chordTimeline.map((g) => ({ notes: [], beats: g.beats }));
+    return chordTimeline.map((g) => ({ notes: [], ...chordGroupDurationValue(g) }));
   }
   const allMidis = [];
   chordTimeline.forEach((g) => {
@@ -354,23 +403,32 @@ function mapChordsToInstrument(chordTimeline, availableNotes) {
   const shift = computeMelodyOctaveShift(allMidis, availableNotes);
 
   return chordTimeline.map((g) => {
-    if (!g.midis) return { notes: [], beats: g.beats };
+    if (!g.midis) return { notes: [], ...chordGroupDurationValue(g) };
     const mappedNotes = g.midis.map((m) => pickNearestInstrumentNote(m + shift, availableNotes));
-    return { notes: dedupeNotes(mappedNotes), beats: g.beats };
+    return { notes: dedupeNotes(mappedNotes), ...chordGroupDurationValue(g) };
   });
 }
 
 // MIDIファイル・音源/動画ファイル(Basic Pitchのポリフォニック検出結果)の
 // どちらから来たノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]も
 // この1つの関数でtokens形式に変換できる（groupNoteEventsIntoChords →
-// quantizeChordRhythm → mapChordsToInstrumentの3段階。同時発音は絞り込まず
-// 和音としてそのまま残す）
+// buildFreeTimingChordTimeline/quantizeChordRhythm → mapChordsToInstrumentの3段階。
+// 同時発音は絞り込まず和音としてそのまま残す）。
+// opts.freeTimingは既定でtrue：テンポ・拍子の量子化を一切行わない
+// 「フリーテンポ譜面」として生成する（実際に検出した音の長さをそのまま使うため、
+// テンポ・拍子の概念に無理やり当てはめて違和感が出ることを避ける）。
+// false を指定すると、従来通りbpmValueの拍グリッドへ量子化した拍子ベースの
+// tokensを生成する（音の長さの分布に依存しないので、既存の量子化ロジックは
+// そのまま流用できる）
 function convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
   const resolvedSemitoneEnabled = options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
   const availableNotes = buildInstrumentNoteMap(layout, resolvedSemitoneEnabled);
   const groups = groupNoteEventsIntoChords(noteEvents, options.chord);
-  const timeline = quantizeChordRhythm(groups, bpmValue, options.rhythm);
+  const freeTiming = options.freeTiming !== false;
+  const timeline = freeTiming
+    ? buildFreeTimingChordTimeline(groups, options.freeTimingRhythm)
+    : quantizeChordRhythm(groups, bpmValue, options.rhythm);
   return mapChordsToInstrument(timeline, availableNotes);
 }
 
@@ -462,6 +520,10 @@ function finishMidiConversion(parsed, noteEvents, sourceBpm) {
   const clampedBpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Math.round(sourceBpm || DEFAULT_BPM)));
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
+  // 既定でフリーテンポ譜面として生成する（量子化なし。実際の音の長さをそのまま
+  // durationMsに入れる）。テンポ表示自体はMIDIファイル自身が持つ値をそのまま
+  // 採用する（小節線の目安表示に使うため。エディタ側で既に設定していたBPMに
+  // 合わせてしまうと、原曲のテンポ感と表示がずれてしまう）
   const newTokens = convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, clampedBpm, { semitoneEnabled });
 
   if (!newTokens.length) {
@@ -471,6 +533,7 @@ function finishMidiConversion(parsed, noteEvents, sourceBpm) {
   }
 
   bpm = clampedBpm;
+  scoreFreeTiming = true;
   renderScoreMeta();
   closeMidiTrackPickerModal();
   applyGeneratedMelodyTokens(

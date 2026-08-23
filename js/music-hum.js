@@ -1274,6 +1274,7 @@ function applyGeneratedMelodyTokens(newTokens, doneToastMessage) {
   selectedTokenIndex = null;
   setPageMode("edit");
   renderScoreDisplay();
+  renderFreeTimingUI();
   saveDraftDebounced();
   closeHumModal();
   showToast(doneToastMessage);
@@ -1367,7 +1368,9 @@ async function onHumAnalyzeClick() {
     let newTokens;
     if (humSourceMode === "humming") {
       // ハミングは本来単旋律（1人の声）のため、これまで通り主旋律1本に絞り込む
-      // 変換パイプライン(sourceType="humming"固定)を使う
+      // 変換パイプライン(sourceType="humming"固定)を使う。従来通り拍子ベースの
+      // 譜面として生成する（フリーテンポは対象外。単旋律はテンポに沿った
+      // 手直しがしやすいため、あえてフリーテンポ化しない）
       newTokens = convertMelodyToScoreTokens(noteEvents, layout, bpm, { semitoneEnabled, sourceType: "humming" });
     } else {
       // 音源/動画は和音・複数パートを含みうるため、Basic Pitchのポリフォニック
@@ -1380,11 +1383,12 @@ async function onHumAnalyzeClick() {
       // （複数の声部が入り交じる和音データに対して行うと、別々の声部の音を
       // 誤って1つに統合してしまう恐れがあるため）。
       // 同時発音の判定は、実際の楽器音源では検出のわずかなタイミングのズレが
-      // MIDIファイルより大きくなりうるため、既定(30ms)より少し広い許容誤差を使う
+      // MIDIファイルより大きくなりうるため、既定(30ms)より少し広い許容誤差を使う。
+      // 既定(opts.freeTiming省略=true)でフリーテンポ譜面として生成する
+      // （実際に検出した音の長さをテンポ・拍子の量子化に無理やり当てはめない）
       const filtered = filterMelodyNoiseEvents(noteEvents, bpm);
       newTokens = convertPolyphonicNoteEventsToScoreTokens(filtered, layout, bpm, { semitoneEnabled, chord: { simulEpsilonSec: 0.05 } });
     }
-
     if (!newTokens.length) {
       fail(
         humSourceMode === "humming"
@@ -1394,6 +1398,7 @@ async function onHumAnalyzeClick() {
       return;
     }
 
+    scoreFreeTiming = humSourceMode !== "humming";
     applyGeneratedMelodyTokens(newTokens, T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
   } catch (e) {
     console.error(e);
