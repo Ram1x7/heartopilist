@@ -255,7 +255,9 @@ body.has-bottom-nav{
    ボトムナビ表示中はナビの高さ分だけ押し上げて重なりを防ぐ */
 body.has-bottom-nav #foodToast,
 body.has-bottom-nav #gardenToast,
-body.has-bottom-nav #toast{
+body.has-bottom-nav #toast,
+body.has-bottom-nav #artToast,
+body.has-bottom-nav #musicToast{
   bottom:calc(78px + env(safe-area-inset-bottom));
 }
 
