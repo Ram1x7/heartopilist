@@ -100,6 +100,50 @@ body.dark .music-sound-btn.muted{
   border-color:var(--vermillion-soft);
 }
 
+/* 編集モードのサブタブ（準備／作る）。常時表示のコントロールを最小限にするため、
+   編集/練習/追従の主タブ(.music-mode-tabs)のすぐ下に、同じ丸ピル型で一段
+   小さめのサブタブとして配置し、既存タブと統一感を保ちつつ階層を分かりやすくする */
+.music-edit-tabs{
+  display:flex;
+  gap:6px;
+  margin-bottom:12px;
+}
+
+.music-edit-tab-btn{
+  flex:1 1 auto;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.music-edit-tab-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .music-edit-tab-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .music-edit-tab-btn.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.music-edit-tab-panel{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
 /* レイアウト（パネルを縦積み） */
 .music-layout{
   display:flex;
@@ -468,6 +512,45 @@ body.dark .music-header-btn{
 .music-header-btn:disabled{
   opacity:0.4;
   cursor:not-allowed;
+}
+
+/* ボタンの視覚的優先度：主要(無指定＝.music-header-btnの既定の塗りつぶし)／
+   副次(.music-btn-secondary)／破壊的操作(.music-btn-danger)の3段階に統一する。
+   形状(パディング・角丸等)は個々のベースクラスに任せ、ここでは色だけ上書きする */
+.music-btn-secondary{
+  background:var(--card-sub);
+  border-color:var(--border);
+  color:var(--text-sub);
+}
+
+body.dark .music-btn-secondary{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.music-btn-danger{
+  background:transparent;
+  border-color:var(--vermillion);
+  color:var(--vermillion);
+}
+
+body.dark .music-btn-danger{
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
+}
+
+/* 保存済み譜面一覧の「削除」ボタンは.music-saved-actions button側の見た目が
+   詳細度で勝ってしまうため、ここだけ個別に上書きする */
+.music-saved-actions button.music-btn-danger{
+  border-color:var(--vermillion);
+  color:var(--vermillion);
+  background:transparent;
+}
+
+body.dark .music-saved-actions button.music-btn-danger{
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
 }
 
 #musicScoreEditRow{
@@ -2058,19 +2141,6 @@ body.dark .music-onboard-choice-btn span{
 .music-onboard-nav .music-header-btn{
   flex:1;
   justify-content:center;
-}
-
-/* スキップ・戻るは「次へ」より控えめな見た目にして、主要な操作を分かりやすくする */
-.music-onboard-nav-secondary{
-  background:var(--card-sub);
-  border-color:var(--border);
-  color:var(--text-sub);
-}
-
-body.dark .music-onboard-nav-secondary{
-  background:#2c2823;
-  border-color:#46423b;
-  color:#b3a89a;
 }
 
 /* ヘルプモーダル */

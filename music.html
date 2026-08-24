@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=10">
-<link rel="stylesheet" href="./css/music.css?v=37">
+<link rel="stylesheet" href="./css/music.css?v=38">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -90,52 +90,80 @@
   <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="toggle sound"></button>
 </div>
 
+<div class="music-edit-tabs" id="musicEditTabs">
+  <button class="music-edit-tab-btn active" id="musicEditTabPrepareBtn" data-i18n="music_tab_prepare">準備</button>
+  <button class="music-edit-tab-btn" id="musicEditTabCreateBtn" data-i18n="music_tab_create">作る</button>
+</div>
+
 <div class="music-layout" id="musicEditLayout">
-  <div class="music-panel-section">
-    <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
-    <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
-    <details class="music-advanced-settings" id="musicAdvancedSettings">
-      <summary data-i18n="music_advanced_settings_label">詳細設定（配置・半音表示）</summary>
-      <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
-      <label class="music-semitone-row" id="musicSemitoneRow" style="display:none">
-        <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
-        <input type="checkbox" id="musicSemitoneToggle">
-      </label>
-    </details>
+  <div class="music-edit-tab-panel" id="musicTabPanelPrepare">
+    <div class="music-panel-section">
+      <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
+      <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
+      <details class="music-advanced-settings" id="musicAdvancedSettings">
+        <summary data-i18n="music_advanced_settings_label">詳細設定（配置・半音表示）</summary>
+        <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
+        <label class="music-semitone-row" id="musicSemitoneRow" style="display:none">
+          <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+          <input type="checkbox" id="musicSemitoneToggle">
+        </label>
+      </details>
+    </div>
+
+    <div class="music-panel-section" id="musicEditControls">
+      <div class="music-panel-title" data-i18n="music_song_settings_label">曲の管理</div>
+      <div class="music-score-meta-row">
+        <input type="text" id="musicScoreNameInput" class="music-score-name-input" placeholder="曲名" data-i18n-placeholder="music_score_name_placeholder">
+        <div class="music-bpm-row">
+          <span data-i18n="music_bpm_label">テンポ</span>
+          <input type="number" id="musicBpmInput" class="music-bpm-input" min="40" max="220" value="100">
+          <span data-i18n="music_bpm_unit">BPM</span>
+        </div>
+        <div class="music-timesig-row">
+          <span data-i18n="music_timesig_label">拍子</span>
+          <select id="musicTimeSigSelect" class="music-timesig-select"></select>
+          <span class="music-freetiming-badge" id="musicTimeSigApproxBadge" style="display:none" data-i18n="music_freetiming_approx_badge">目安</span>
+        </div>
+      </div>
+      <p class="music-record-hint" id="musicFreeTimingHint" style="display:none" data-i18n="music_freetiming_hint">フリーテンポ譜面です。テンポを変えると、練習/追従モードでの再生速度がその比率で変わります。拍子は小節線の目安表示にのみ使われ、演奏タイミングには影響しません</p>
+      <div class="music-panel-btn-row" id="musicFreeTimingConvertRow" style="display:none">
+        <button class="music-header-btn music-btn-secondary" id="musicConvertToBarBtn" data-i18n="music_convert_to_bar_btn">拍子ベースの譜面に変換する</button>
+      </div>
+      <div class="music-panel-btn-row">
+        <button class="music-header-btn music-btn-secondary" id="musicNewBtn" data-i18n="music_new">新規作成</button>
+        <button class="music-header-btn" id="musicSaveBtn" data-i18n="music_save">保存する</button>
+        <button class="music-header-btn music-btn-secondary" id="musicOpenListBtn" data-i18n="music_open_list">一覧を見る</button>
+      </div>
+    </div>
   </div>
 
-  <div class="music-panel-section">
-    <div class="music-panel-title" data-i18n="music_melody_section_title">楽譜を自動生成</div>
-    <p class="music-step-hint" data-i18n="music_melody_section_hint">ハミング・音源ファイル・動画ファイルから、自動で譜面に変換します（β機能。初回のみ解析モデルの読み込みに通信が必要ですが、音声・動画データ自体は外部に送信されません）</p>
-    <div class="music-panel-btn-row">
-      <button class="music-header-btn" id="musicHumOpenBtn" data-i18n="music_hum_open">ハミングから作る</button>
-      <button class="music-header-btn" id="musicAudioOpenBtn" data-i18n="music_audio_open">音源から作る</button>
-      <button class="music-header-btn" id="musicVideoOpenBtn" data-i18n="music_video_open">動画から作る</button>
+  <div class="music-edit-tab-panel" id="musicTabPanelCreate" style="display:none">
+    <div class="music-panel-section">
+      <div class="music-panel-title" data-i18n="music_melody_section_title">楽譜を自動生成</div>
+      <p class="music-step-hint" data-i18n="music_melody_section_hint">ハミング・音源ファイル・動画ファイルから、自動で譜面に変換します（β機能。初回のみ解析モデルの読み込みに通信が必要ですが、音声・動画データ自体は外部に送信されません）</p>
+      <div class="music-panel-btn-row">
+        <button class="music-header-btn" id="musicHumOpenBtn" data-i18n="music_hum_open">ハミングから作る</button>
+        <button class="music-header-btn" id="musicAudioOpenBtn" data-i18n="music_audio_open">音源から作る</button>
+        <button class="music-header-btn" id="musicVideoOpenBtn" data-i18n="music_video_open">動画から作る</button>
+      </div>
     </div>
-  </div>
 
-  <div class="music-panel-section" id="musicEditControls">
-    <div class="music-score-meta-row">
-      <input type="text" id="musicScoreNameInput" class="music-score-name-input" placeholder="曲名" data-i18n-placeholder="music_score_name_placeholder">
-      <div class="music-bpm-row">
-        <span data-i18n="music_bpm_label">テンポ</span>
-        <input type="number" id="musicBpmInput" class="music-bpm-input" min="40" max="220" value="100">
-        <span data-i18n="music_bpm_unit">BPM</span>
+    <div class="music-panel-section">
+      <div class="music-panel-title" data-i18n="music_manual_input_label">手入力・録音</div>
+      <div class="music-panel-btn-row" id="musicScoreEditRow">
+        <label class="music-record-toggle-row">
+          <span data-i18n="music_record_toggle">録音する</span>
+          <input type="checkbox" id="musicRecordToggle">
+        </label>
+        <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります</p>
+        <div class="music-duration-options" id="musicDurationOptions"></div>
+        <p class="music-record-hint" id="musicDurationHint" data-i18n="music_duration_hint">上で選んでいる長さが、演奏ボタンで入力する音符にも「休符を追加」の休符にも使われます</p>
+        <div class="music-panel-btn-row">
+          <button class="music-header-btn music-add-rest-btn" id="musicAddRestBtn" data-i18n="music_add_rest">休符を追加</button>
+          <button class="music-header-btn music-btn-danger" id="musicDeleteLastBtn" data-i18n="music_delete_last">最後を削除</button>
+          <button class="music-header-btn music-btn-danger" id="musicClearBtn" data-i18n="music_clear_all">全消去</button>
+        </div>
       </div>
-      <div class="music-timesig-row">
-        <span data-i18n="music_timesig_label">拍子</span>
-        <select id="musicTimeSigSelect" class="music-timesig-select"></select>
-        <span class="music-freetiming-badge" id="musicTimeSigApproxBadge" style="display:none" data-i18n="music_freetiming_approx_badge">目安</span>
-      </div>
-    </div>
-    <p class="music-record-hint" id="musicFreeTimingHint" style="display:none" data-i18n="music_freetiming_hint">フリーテンポ譜面です。テンポを変えると、練習/追従モードでの再生速度がその比率で変わります。拍子は小節線の目安表示にのみ使われ、演奏タイミングには影響しません</p>
-    <div class="music-panel-btn-row" id="musicFreeTimingConvertRow" style="display:none">
-      <button class="music-header-btn" id="musicConvertToBarBtn" data-i18n="music_convert_to_bar_btn">拍子ベースの譜面に変換する</button>
-    </div>
-    <div class="music-panel-btn-row">
-      <button class="music-header-btn" id="musicNewBtn" data-i18n="music_new">新規作成</button>
-      <button class="music-header-btn" id="musicSaveBtn" data-i18n="music_save">保存する</button>
-      <button class="music-header-btn" id="musicOpenListBtn" data-i18n="music_open_list">一覧を見る</button>
     </div>
   </div>
 
@@ -151,34 +179,20 @@
     </div>
     <div class="music-note-toolbar" id="musicNoteToolbar" style="display:none">
       <span class="music-note-toolbar-label" id="musicNoteToolbarLabel"></span>
-      <button class="music-header-btn music-onboard-nav-secondary" id="musicNoteDeleteBtn" data-i18n="music_note_delete">この音を削除</button>
-      <button class="music-header-btn music-onboard-nav-secondary" id="musicNoteDeselectBtn" data-i18n="music_note_deselect">選択解除</button>
+      <button class="music-header-btn music-btn-danger" id="musicNoteDeleteBtn" data-i18n="music_note_delete">この音を削除</button>
+      <button class="music-header-btn music-btn-secondary" id="musicNoteDeselectBtn" data-i18n="music_note_deselect">選択解除</button>
     </div>
     <p class="music-record-hint" id="musicNoteToolbarHint" data-i18n="music_note_toolbar_hint" style="display:none">そのまま音を弾くと、選んだ音がその音に置き換わります</p>
     <div class="music-loop-row" id="musicLoopRow">
-      <button class="music-header-btn" id="musicLoopSelectBtn">区間を選ぶ</button>
+      <button class="music-header-btn music-btn-secondary" id="musicLoopSelectBtn">区間を選ぶ</button>
       <span class="music-loop-range" id="musicLoopRangeLabel" style="display:none"></span>
       <label class="music-loop-toggle" id="musicLoopToggleRow" style="display:none">
         <input type="checkbox" id="musicLoopToggle">
         <span data-i18n="music_loop_enabled">この区間をループ</span>
       </label>
-      <button class="music-header-btn" id="musicLoopClearBtn" style="display:none" data-i18n="music_loop_clear">解除</button>
+      <button class="music-header-btn music-btn-secondary" id="musicLoopClearBtn" style="display:none" data-i18n="music_loop_clear">解除</button>
     </div>
     <p class="music-record-hint" id="musicLoopHint" style="display:none">譜面の音をタップして、開始の音を選んでください</p>
-    <div class="music-panel-btn-row" id="musicScoreEditRow">
-      <label class="music-record-toggle-row">
-        <span data-i18n="music_record_toggle">録音する</span>
-        <input type="checkbox" id="musicRecordToggle">
-      </label>
-      <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります</p>
-      <div class="music-duration-options" id="musicDurationOptions"></div>
-      <p class="music-record-hint" id="musicDurationHint" data-i18n="music_duration_hint">上で選んでいる長さが、演奏ボタンで入力する音符にも「休符を追加」の休符にも使われます</p>
-      <div class="music-panel-btn-row">
-        <button class="music-header-btn music-add-rest-btn" id="musicAddRestBtn" data-i18n="music_add_rest">休符を追加</button>
-        <button class="music-header-btn" id="musicDeleteLastBtn" data-i18n="music_delete_last">最後を削除</button>
-        <button class="music-header-btn" id="musicClearBtn" data-i18n="music_clear_all">全消去</button>
-      </div>
-    </div>
   </div>
 
   <div class="music-panel-section">
@@ -327,8 +341,8 @@
     </div>
 
     <div class="music-onboard-nav">
-      <button class="music-header-btn music-onboard-nav-secondary" id="musicOnboardSkipBtn" data-i18n="music_onboard_skip">スキップ</button>
-      <button class="music-header-btn music-onboard-nav-secondary" id="musicOnboardBackBtn" data-i18n="music_onboard_back" style="display:none">戻る</button>
+      <button class="music-header-btn music-btn-secondary" id="musicOnboardSkipBtn" data-i18n="music_onboard_skip">スキップ</button>
+      <button class="music-header-btn music-btn-secondary" id="musicOnboardBackBtn" data-i18n="music_onboard_back" style="display:none">戻る</button>
       <button class="music-header-btn" id="musicOnboardNextBtn" data-i18n="music_onboard_next">次へ</button>
     </div>
   </div>
@@ -349,7 +363,7 @@
     <div class="music-hum-recording-row" id="musicHumRecordingRow" style="display:none">
       <span class="music-hum-rec-dot"></span>
       <span id="musicHumRecordingTime">0:00</span>
-      <button class="music-header-btn music-onboard-nav-secondary" id="musicHumStopBtn" data-i18n="music_hum_record_stop">録音を止める</button>
+      <button class="music-header-btn music-btn-secondary" id="musicHumStopBtn" data-i18n="music_hum_record_stop">録音を止める</button>
     </div>
     <div class="music-hum-pitch-row" id="musicHumPitchRow" style="display:none">
       <span class="music-hum-pitch-value" id="musicHumLivePitch">-</span>
