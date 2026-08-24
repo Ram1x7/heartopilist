@@ -269,6 +269,15 @@ const codesData = [
     expiry: "2026-10-01 00:59",
     active: true,
   },
+  {
+    code: "k5p1r8a2n6q7",
+    reward: "願い星×3，染色剤×2，無垢な蛍石×1",
+    rewardI18n:{"ja":"願い星×3，染色剤×2，無垢な蛍石×1","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"願い星×3，染色剤×2，無垢な蛍石×1","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    rewardI18n:{"ja":"願い星×3，染色剤×2，無垢な蛍石×1","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-10-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
