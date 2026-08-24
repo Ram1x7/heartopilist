@@ -91,23 +91,37 @@ body::after{
   z-index:-1;
 }
 
-/* ダークモード（墨色ベース） */
+/* ダークモード（墨色ベース）
+   個々のセレクタが参照するダーク用トークンをここでまとめて定義する */
 body.dark{
+  --dark-bg-top:#25221d;
+  --dark-bg-bottom:#1a1814;
+  --dark-text:#ece4d4;
+  --dark-text-sub:#b3a89a;
+  --dark-card:#2c2823;
+  --dark-card-alt:#383329;
+  --dark-border:#46423b;
+  --dark-accent:#e8d2a8;
+  --dark-highlight:#e07060;
+  --dark-thumb-bg:#2a2620;
+  --dark-decor-1:rgba(200,168,107,0.08);
+  --dark-decor-2:rgba(143,180,201,0.06);
+
   background:
     linear-gradient(
       180deg,
-      #25221d 0%,
-      #1a1814 100%
+      var(--dark-bg-top) 0%,
+      var(--dark-bg-bottom) 100%
     );
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 body.dark::before{
-  background:rgba(200,168,107,0.08);
+  background:var(--dark-decor-1);
 }
 
 body.dark::after{
-  background:rgba(143,180,201,0.06);
+  background:var(--dark-decor-2);
 }
 
 /* タイトルエリア */
@@ -154,24 +168,24 @@ body.dark .card,
 body.dark .item,
 body.dark .modal-box,
 body.dark .sticky{
-  background:#2c2823;
-  color:#ece4d4;
-  border:1px solid #46423b;
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
 }
 
 /* ダーク時画像背景 */
 body.dark .item img,
 body.dark .modal-box img{
-  background:#383329;
+  background:var(--dark-card-alt);
 }
 
 /* ダーク時入力 */
 body.dark .search,
 body.dark .mini-search{
-  background:#383329;
-  color:#ece4d4;
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
   box-shadow:none;
-  border:1px solid #46423b;
+  border:1px solid var(--dark-border);
 }
 
 /* ダーク時ボタン */
@@ -180,9 +194,9 @@ body.dark .modal-box button,
 body.dark #darkToggle,
 body.dark #helpBtn,
 body.dark #minimizeBtn{
-  background:#383329;
-  color:#ece4d4;
-  border:1px solid #46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
 }
 
 /* ダーク時ONボタン（藍色） */
@@ -223,9 +237,9 @@ body.dark .active{
 }
 
 body.dark #lang-select{
-  background:#383329;
-  color:#ece4d4;
-  border:1px solid #46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
 }
 
 /* ヘルプボタン */
@@ -255,7 +269,7 @@ body.dark .time,
 body.dark a,
 body.dark p,
 body.dark h3{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .dark body::before,
@@ -277,7 +291,7 @@ h1{
 
 /* ダークモード時 */
 body.dark h1{
-  color:#e8d2a8;
+  color:var(--dark-accent);
   text-shadow:none;
 }
 
@@ -296,7 +310,7 @@ body.dark h1{
 }
 
 body.dark .page-header h1{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .page-subtitle{
@@ -316,7 +330,7 @@ body.dark .page-header h1{
 }
 
 body.dark .page-tutorial-hint{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* カード */
@@ -373,11 +387,11 @@ body.dark .page-tutorial-hint{
 
 /* ダークモード */
 body.dark .weather-now{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 body.dark .weather-next{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* サーバー選択 */
@@ -401,9 +415,9 @@ body.dark .weather-next{
 }
 
 body.dark .server-select{
-  background:#383329;
-  color:#ece4d4;
-  border:1px solid #46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
 }
 
 /* 時間 */
@@ -543,9 +557,9 @@ body.dark .server-select{
 }
 
 body.dark #clearBtn{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 /* フィルター */
@@ -582,7 +596,7 @@ body.dark #clearBtn{
 }
 
 body.dark .modal-make-steps{
-  background:#383329;
+  background:var(--dark-card-alt);
 }
 
 .modal-make-steps-title{
@@ -592,7 +606,7 @@ body.dark .modal-make-steps{
 }
 
 body.dark .modal-make-steps-title{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .modal-make-steps-list{
@@ -632,7 +646,7 @@ body.dark .modal-make-steps-title{
 }
 
 body.dark .daily-spot-header{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .daily-spot-header-btns{
@@ -665,9 +679,9 @@ body.dark .daily-spot-header{
 }
 
 body.dark .daily-spot-calendar-btn{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 .daily-spot-grid{
@@ -686,7 +700,7 @@ body.dark .daily-spot-calendar-btn{
 }
 
 body.dark .daily-spot-item{
-  background:#383329;
+  background:var(--dark-card-alt);
 }
 
 .daily-spot-item img{
@@ -699,7 +713,7 @@ body.dark .daily-spot-item{
 }
 
 body.dark .daily-spot-item img{
-  background:#2c2823;
+  background:var(--dark-card);
 }
 
 .daily-spot-item-info{
@@ -715,7 +729,7 @@ body.dark .daily-spot-item img{
 }
 
 body.dark .daily-spot-item-label{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .daily-spot-item-location{
@@ -728,7 +742,7 @@ body.dark .daily-spot-item-label{
 }
 
 body.dark .daily-spot-item-location{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 /* カレンダーモーダル */
@@ -795,7 +809,7 @@ body.dark .daily-spot-item-location{
 }
 
 body.dark .weekly-shop-hint{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .weekly-shop-countdown{
@@ -807,7 +821,7 @@ body.dark .weekly-shop-hint{
 }
 
 body.dark .weekly-shop-countdown{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .daily-task-section{
@@ -841,7 +855,7 @@ body.dark .weekly-shop-countdown{
 }
 
 body.dark .daily-task-section-title{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .daily-task-checkbox{
@@ -857,7 +871,7 @@ body.dark .daily-task-section-title{
 }
 
 body.dark .daily-task-checkbox input{
-  accent-color:#e8d2a8;
+  accent-color:var(--dark-accent);
 }
 
 .daily-task-row{
@@ -873,7 +887,7 @@ body.dark .daily-task-checkbox input{
 }
 
 body.dark .daily-task-row{
-  background:#383329;
+  background:var(--dark-card-alt);
 }
 
 .daily-task-link{
@@ -896,7 +910,7 @@ body.dark .daily-task-row{
 }
 
 body.dark .daily-task-label{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .daily-task-sub{
@@ -923,7 +937,7 @@ body.dark .daily-task-label{
 }
 
 body.dark .daily-task-thumb{
-  background:#2a2620;
+  background:var(--dark-thumb-bg);
 }
 
 .daily-task-value{
@@ -935,7 +949,7 @@ body.dark .daily-task-thumb{
 }
 
 body.dark .daily-task-value{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .daily-task-value.highlight{
@@ -943,7 +957,7 @@ body.dark .daily-task-value{
 }
 
 body.dark .daily-task-value.highlight{
-  color:#e07060;
+  color:var(--dark-highlight);
 }
 
 .daily-task-empty{
@@ -992,7 +1006,7 @@ body.dark .daily-task-value.highlight{
 }
 
 body.dark .daily-spot-calendar-row{
-  border-color:#46423b;
+  border-color:var(--dark-border);
 }
 
 .daily-spot-calendar-row.today{
@@ -1001,7 +1015,7 @@ body.dark .daily-spot-calendar-row{
 }
 
 body.dark .daily-spot-calendar-row.today{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .daily-spot-calendar-date{
@@ -1086,7 +1100,7 @@ body[data-icon-size="large"] .grid{
   border-left:3px solid var(--gold);
 }
 
-body.dark .section-label{ color:#e8d2a8; }
+body.dark .section-label{ color:var(--dark-accent); }
 
 .event-ended-banner{
   background:var(--card-sub);
@@ -1196,7 +1210,7 @@ body[data-icon-size="large"] .item{
 }
 
 body.dark #m_name{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 /* モーダル情報横並び */
@@ -1209,7 +1223,7 @@ body.dark #m_name{
 }
 
 body.dark .modal-info-row{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* 左 */
@@ -1243,14 +1257,14 @@ body.dark .modal-info-row{
 }
 
 body.dark .update-popup-box{
-  background:#2c2823;
-  color:#ece4d4;
-  border:1px solid #46423b;
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
 }
 
 body.dark .update-popup-box p,
 body.dark .update-popup-box h3{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 /* ヘルプモーダル */
@@ -1266,16 +1280,16 @@ body.dark .update-popup-box h3{
 
 /* ダークモード */
 body.dark .help-modal-box{
-  background:#2c2823;
-  color:#ece4d4;
-  border:1px solid #46423b;
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
 }
 
 /* ヘルプ内の文字 */
 body.dark .help-modal-box p,
 body.dark .help-modal-box h3,
 body.dark .help-modal-box strong{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 h3{
@@ -1285,7 +1299,7 @@ h3{
 }
 
 body.dark h3{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 /* ボタン */
@@ -1343,7 +1357,7 @@ body.dark h3{
 }
 
 body.dark .mini-status{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 #miniTime{
@@ -1358,7 +1372,7 @@ body.dark .mini-status{
 }
 
 body.dark #miniTime{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 /* リンク色 */
@@ -1431,15 +1445,15 @@ a{
 }
 
 body.dark #dataSyncBtn{
-  background:#383329;
-  color:#ece4d4;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border-color:var(--dark-border);
 }
 
 body.dark #shareBtn{
-  background:#383329;
-  color:#ece4d4;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border-color:var(--dark-border);
 }
 
 /* シェアモーダル */
@@ -1469,7 +1483,7 @@ body.dark #shareBtn{
 }
 
 body.dark #shareCanvas{
-  border-color:#46423b;
+  border-color:var(--dark-border);
 }
 
 /* ナビゲーションバー */
@@ -1507,9 +1521,9 @@ body.dark #shareCanvas{
 }
 
 body.dark .site-nav-item{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 body.dark .site-nav-item.active{
@@ -1549,7 +1563,7 @@ img.currency-icon{
 }
 
 body.dark #helpBtn, body.dark #shareBtn, body.dark #dataSyncBtn, body.dark #darkToggle{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 /* ボタン内アイコン＋テキストのレイアウト */
@@ -1594,7 +1608,7 @@ body.dark #helpBtn, body.dark #shareBtn, body.dark #dataSyncBtn, body.dark #dark
 }
 
 body.dark .search-icon{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .search-wrap .search{
@@ -1616,7 +1630,7 @@ body.dark .search-icon{
 }
 
 body.dark .server-select-icon{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 /* ══════════════════════════════════════
@@ -1631,8 +1645,8 @@ body.dark .server-select-icon{
 }
 
 body.dark .accordion{
-  background:#383329;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
 }
 
 .accordion-toggle{
@@ -1652,7 +1666,7 @@ body.dark .accordion{
 }
 
 body.dark .accordion-toggle{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .accordion-toggle-label{
@@ -1668,7 +1682,7 @@ body.dark .accordion-toggle{
 }
 
 body.dark .accordion-toggle-icon{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .accordion-chevron{
@@ -1679,7 +1693,7 @@ body.dark .accordion-toggle-icon{
 }
 
 body.dark .accordion-chevron{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .accordion-toggle.open .accordion-chevron{
@@ -1723,7 +1737,7 @@ body.dark .accordion-chevron{
 
 body.dark .filter-group-label,
 body.dark .filter-group-label-row{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .level-slider{
@@ -1746,7 +1760,7 @@ body.dark .filter-group-label-row{
 }
 
 body.dark .help-title-icon{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .help-icon{
@@ -1757,7 +1771,7 @@ body.dark .help-title-icon{
 }
 
 body.dark .help-icon{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .contact-form-btn{

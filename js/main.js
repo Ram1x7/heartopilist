@@ -1716,6 +1716,7 @@ if(dataSyncModal){
 
 // 初期化
 updateTime();
+if(typeof renderBottomNav === "function") renderBottomNav("home");
 // 保存データ読込
 searchInput.value =
   localStorage.getItem("searchKeyword") || "";
@@ -1775,6 +1776,9 @@ document.addEventListener("langchange", ()=>{
   updateDailySpotCalendarTabLabels();
   if(dailySpotCalendarModal && dailySpotCalendarModal.style.display === "block"){
     renderDailySpotCalendar();
+  }
+  if(typeof renderTodayDashboard === "function" && document.getElementById("todayDashboard")){
+    renderTodayDashboard();
   }
 });
 
@@ -1886,6 +1890,194 @@ function renderDailySpotCalendar(){
 // 初期描画
 renderDailySpots();
 updateDailySpotCalendarTabLabels();
+
+// ══════════════════════════════════════
+// 今日のハートピア ダッシュボード（index.html専用）
+// ══════════════════════════════════════
+
+async function initTodayDashboard(){
+  if(!document.getElementById("todayDashboard")) return;
+  await Promise.all([
+    loadScriptOnce("js/data-daily-tasks.js"),
+    loadScriptOnce("js/data-events.js"),
+    loadScriptOnce("js/data-codes.js"),
+  ]);
+  renderTodayDashboard();
+}
+
+// イベント自体の期間からのステータス判定（events.htmlのgetStatus()と同じロジック）
+function todayDashboardEventStatus(ev){
+  const now = new Date();
+  const start = ev.start ? new Date(ev.start.replace(" ", "T")) : null;
+  const end = ev.end ? new Date(ev.end.replace(" ", "T")) : null;
+  if(end && end < now) return "ended";
+  if(start && start > now) return "upcoming";
+  return "active";
+}
+
+function renderTodayDashboard(){
+  const root = document.getElementById("todayDashboard");
+  if(!root) return;
+
+  const iconByEl = {
+    dashTodayTasksIcon: "checklist",
+    dashAvailableNowIcon: "weatherSun",
+    dashEndingSoonIcon: "warning",
+    dashCompletionIcon: "trophy",
+  };
+  Object.keys(iconByEl).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = icon(iconByEl[id], {size:15});
+  });
+
+  renderDashTodayTasks();
+  renderDashAvailableNow();
+  renderDashEndingSoon();
+  renderDashCompletion();
+  renderDashShortcuts();
+}
+
+function renderDashTodayTasks(){
+  const body = document.getElementById("dashTodayTasksBody");
+  if(!body) return;
+
+  if(typeof dailyUpdates === "undefined" || dailyUpdates.length === 0){
+    body.innerHTML = `<div class="dash-empty">${T("daily_tasks_empty","現在表示できる情報がありません")}</div>`;
+    return;
+  }
+
+  const resetDayWeekday = new Date(getJstDate().getTime() - 6 * 3600000).getUTCDay();
+  const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
+  const pending = dailyUpdates
+    .filter(u => !u.weekdays || u.weekdays.includes(resetDayWeekday))
+    .filter(u => checks[u.name] !== getUpdateCycleKey(u.resetTime))
+    .slice(0, 5);
+
+  if(pending.length === 0){
+    body.innerHTML = `<div class="dash-empty">${T("dash_today_tasks_done","今日のタスクは完了しました！")}</div>`;
+    return;
+  }
+
+  body.innerHTML = pending.map(u => {
+    const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
+    return `
+      <div class="dash-row">
+        <span class="dash-row-label">${label}</span>
+        <label class="daily-task-checkbox">
+          <input type="checkbox" onchange="toggleDailyUpdateCheck(this, '${u.name}', ${u.resetTime ? `'${u.resetTime}'` : "undefined"}); renderDashTodayTasks();">
+        </label>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderDashAvailableNow(){
+  const body = document.getElementById("dashAvailableNowBody");
+  if(!body) return;
+
+  let html = "";
+
+  if(currentWeather){
+    html += `
+      <div class="dash-weather-row">
+        ${icon("weatherSun",{size:20})}
+        <span>${translateWeatherWord(currentWeather)}</span>
+      </div>
+    `;
+  }
+
+  if(typeof eventData !== "undefined"){
+    const activeEvents = eventData.filter(ev => todayDashboardEventStatus(ev) === "active").slice(0, 3);
+    if(activeEvents.length > 0){
+      html += activeEvents.map(ev => `
+        <a class="dash-row" href="events.html">
+          <span class="dash-row-label">${icon("tent",{size:14})} ${ev.name}</span>
+          <span class="dash-row-value">${icon("arrowRight",{size:12})}</span>
+        </a>
+      `).join("");
+    } else {
+      html += `<div class="dash-empty">${T("dash_no_ongoing_events","現在開催中のイベントはありません")}</div>`;
+    }
+  }
+
+  body.innerHTML = html;
+}
+
+function renderDashEndingSoon(){
+  const body = document.getElementById("dashEndingSoonBody");
+  if(!body) return;
+
+  if(typeof getEndingSoonItems !== "function"){
+    body.innerHTML = `<div class="dash-empty">${T("dash_no_ending_soon","もうすぐ終わるものはありません")}</div>`;
+    return;
+  }
+
+  const items = getEndingSoonItems(3).slice(0, 5);
+  if(items.length === 0){
+    body.innerHTML = `<div class="dash-empty">${T("dash_no_ending_soon","もうすぐ終わるものはありません")}</div>`;
+    return;
+  }
+
+  body.innerHTML = items.map(item => `
+    <div class="dash-row">
+      <span class="dash-row-label">${item.name}</span>
+      <span class="dash-row-value">${T("daily_tasks_days_left","あと{n}日").replace("{n}", item.daysLeft)}</span>
+    </div>
+  `).join("");
+}
+
+function renderDashCompletion(){
+  const body = document.getElementById("dashCompletionBody");
+  if(!body) return;
+
+  const stats = getStats();
+  const pct = (done, total) => total > 0 ? Math.round((done / total) * 100) : 0;
+
+  const rows = [
+    { label: T("nav_zukan","図鑑"), done: stats.done, total: stats.total },
+    { label: T("nav_food","料理"), done: stats.foodDone, total: stats.foodTotal },
+    { label: T("nav_garden","園芸"), done: stats.gardenDone, total: stats.gardenTotal },
+  ];
+  const overallDone  = rows.reduce((s,r) => s + r.done, 0);
+  const overallTotal = rows.reduce((s,r) => s + r.total, 0);
+
+  const progressRow = (label, done, total) => `
+    <div class="dash-progress-row">
+      <span class="dash-progress-label">${label}</span>
+      <div class="dash-progress-track"><div class="dash-progress-fill" style="width:${pct(done,total)}%"></div></div>
+      <span class="dash-progress-pct">${pct(done,total)}%</span>
+    </div>
+  `;
+
+  body.innerHTML = `
+    <div class="dash-progress-list">
+      ${progressRow(T("dash_completion_overall","全体"), overallDone, overallTotal)}
+      ${rows.map(r => progressRow(r.label, r.done, r.total)).join("")}
+    </div>
+  `;
+}
+
+function renderDashShortcuts(){
+  const el = document.getElementById("dashShortcuts");
+  if(!el) return;
+
+  const items = [
+    { href: "#topPanel",       iconName: "search", key: "dash_shortcut_search", fallback: "探す・集める" },
+    { href: "art-create.html", iconName: "fude",   key: "dash_shortcut_create", fallback: "作る" },
+    { href: "music.html",      iconName: "play",   key: "dash_shortcut_play",   fallback: "楽譜を弾く" },
+    { href: "garden.html",     iconName: "sprout", key: "dash_shortcut_garden", fallback: "育てる" },
+    { href: "pet.html",        iconName: "paw",    key: "dash_shortcut_pet",    fallback: "おせわする" },
+  ];
+
+  el.innerHTML = items.map(it => `
+    <a class="dash-shortcut" href="${it.href}">
+      ${icon(it.iconName, {size:22})}
+      <span>${T(it.key, it.fallback)}</span>
+    </a>
+  `).join("");
+}
+
+initTodayDashboard();
 
 // ══════════════════════════════════════
 // 今日やることリスト ダッシュボード
