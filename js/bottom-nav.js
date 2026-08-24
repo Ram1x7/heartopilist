@@ -6,7 +6,7 @@
  */
 
 const BOTTOM_NAV_ITEMS = [
-  { key: "home",   href: "./index.html",  icon: "home", labelKey: "bottomnav_home",   labelFallback: "ホーム" },
+  { key: "home",   href: "./index.html#todayDashboard",  icon: "home", labelKey: "bottomnav_home",   labelFallback: "ホーム" },
   { key: "zukan",  href: "./index.html",  icon: "book", labelKey: "bottomnav_zukan",  labelFallback: "図鑑" },
   { key: "tools",  href: "./art-create.html", icon: "wrench", labelKey: "bottomnav_tools", labelFallback: "ツール" },
   { key: "mypage", href: "./index.html#dashCompletionCard", icon: "star", labelKey: "bottomnav_mypage", labelFallback: "マイページ" },
