@@ -251,6 +251,14 @@ body.has-bottom-nav{
   padding-bottom:calc(70px + env(safe-area-inset-bottom));
 }
 
+/* foods/garden/codes.html は独自の固定トースト(画面下部中央)を持っているため、
+   ボトムナビ表示中はナビの高さ分だけ押し上げて重なりを防ぐ */
+body.has-bottom-nav #foodToast,
+body.has-bottom-nav #gardenToast,
+body.has-bottom-nav #toast{
+  bottom:calc(78px + env(safe-area-inset-bottom));
+}
+
 /* ══════════════════════════════════════
    「今日のハートピア」ダッシュボード
    ══════════════════════════════════════ */

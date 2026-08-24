@@ -28,6 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=11">
+<link rel="stylesheet" href="./css/design-system.css?v=1">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -427,6 +428,8 @@ body.dark .footer{
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/bottom-nav.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/data-events.js"></script>
 <script>
@@ -650,6 +653,7 @@ function renderEvents(){
 }
 
 renderEvents();
+if(typeof renderBottomNav === "function") renderBottomNav("zukan");
 </script>
 <script src="js/sw-register.js"></script>
 </body>
