@@ -241,6 +241,9 @@ function finishOnboarding(startRecording) {
   updateRecordingUI();
   // テンポのステップを実際に通過済みなので、直後に録音を始めても改めて確認しない
   tempoWarningDismissed = true;
+  // 案内完了後は、実際に音を入力する「作る」タブへ自動的に移動する
+  // （①楽器→②テンポは「準備」タブ、③録音/手入力の選択は「作る」タブの内容に対応するため）
+  setEditTab("create");
   saveDraftDebounced();
   closeOnboarding(true);
 }
@@ -1099,6 +1102,20 @@ function setPageMode(mode) {
   renderScoreDisplay();
 }
 
+// ── 編集モードのサブタブ（準備／作る） ──
+// 常時見えるコントロールを最小限にするため、「楽器選択・曲の管理」と
+// 「自動生成・手入力/録音」をタブで分けて表示する。譜面表示・区間リピート・
+// 演奏グリッドはどちらのタブでも常に必要な操作のため、タブの外に常時表示する
+let editTab = "prepare"; // "prepare" | "create"
+
+function setEditTab(tab) {
+  editTab = tab;
+  document.getElementById("musicEditTabPrepareBtn").classList.toggle("active", tab === "prepare");
+  document.getElementById("musicEditTabCreateBtn").classList.toggle("active", tab === "create");
+  document.getElementById("musicTabPanelPrepare").style.display = tab === "prepare" ? "" : "none";
+  document.getElementById("musicTabPanelCreate").style.display = tab === "create" ? "" : "none";
+}
+
 // 押しっぱなしの指を全て強制的に離した扱いにする（モード切り替え時などの後始末）
 function releaseAllHolds() {
   activeHolds.forEach((held) => held.btn.classList.remove("pressed"));
@@ -1768,7 +1785,7 @@ function renderSavedList() {
       </div>
       <div class="music-saved-actions">
         <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
-        <button onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
+        <button class="music-btn-danger" onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
       </div>
     </div>
   `;
@@ -1855,6 +1872,8 @@ function bindControls() {
   document.getElementById("musicModeEditBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicModePracticeBtn").addEventListener("click", () => setPageMode("practice"));
   document.getElementById("musicModeFollowBtn").addEventListener("click", () => setPageMode("follow"));
+  document.getElementById("musicEditTabPrepareBtn").addEventListener("click", () => setEditTab("prepare"));
+  document.getElementById("musicEditTabCreateBtn").addEventListener("click", () => setEditTab("create"));
   document.getElementById("musicPracticeExitBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicFollowExitBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicSoundToggleBtnStage").addEventListener("click", toggleSound);
