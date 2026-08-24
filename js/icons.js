@@ -113,6 +113,12 @@ const ICONS = {
   pause: `<rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/>`,
   volumeOn: `<path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z"/><path d="M16 9a4.5 4.5 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/>`,
   volumeOff: `<path d="M4 9.5h3.5L12 5.5v13L7.5 14.5H4Z"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5"/>`,
+
+  // ボトムナビ
+  home: `<path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9.5h12V10"/><path d="M10 19.5v-6h4v6"/>`,
+  book: `<path d="M12 6.5c-1.6-1.3-3.8-2-6.5-2v13c2.7 0 4.9.7 6.5 2 1.6-1.3 3.8-2 6.5-2v-13c-2.7 0-4.9.7-6.5 2Z"/><path d="M12 6.5v13"/>`,
+  menu: `<path d="M4 7h16M4 12h16M4 17h16"/>`,
+  paw: `<circle cx="12" cy="15.3" r="3.6"/><circle cx="6" cy="10" r="2"/><circle cx="18" cy="10" r="2"/><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/>`,
 };
 
 /**

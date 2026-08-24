@@ -1,0 +1,460 @@
+/* ============================================================
+   design-system.css
+   サイト全体UI/UX再設計プロジェクトで段階的に導入する共通デザイン
+   トークン／コンポーネント。既存の css/style.css は書き換えず、
+   新規クラス・新規CSS変数の追加のみを行う（既存ページの見た目は
+   このファイルの読み込みだけでは変化しない）。
+   ============================================================ */
+
+:root{
+  --radius-sm:10px;
+  --radius-md:16px;
+  --radius-lg:22px;
+
+  --shadow-sm:0 3px 8px rgba(52,48,43,0.08);
+  --shadow-md:0 8px 22px rgba(52,48,43,0.1);
+
+  --font-size-sm:11px;
+  --font-size-base:13px;
+  --font-size-lg:16px;
+  --font-size-xl:22px;
+
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:24px;
+}
+
+body.dark{
+  --shadow-sm:0 3px 8px rgba(0,0,0,0.25);
+  --shadow-md:0 8px 22px rgba(0,0,0,0.3);
+}
+
+/* ══════════════════════════════════════
+   ボタン（主要・副次・破壊的の3階層）
+   ══════════════════════════════════════ */
+.ds-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:44px;
+  padding:10px 18px;
+  border-radius:999px;
+  border:1px solid transparent;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:var(--font-size-base);
+  cursor:pointer;
+  text-decoration:none;
+  transition:0.15s;
+  box-sizing:border-box;
+}
+
+.ds-btn:active{
+  transform:translateY(1px) scale(0.97);
+}
+
+.ds-btn-primary{
+  background:var(--indigo);
+  color:#fdf9ef;
+  box-shadow:var(--shadow-sm);
+}
+
+.ds-btn-secondary{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-color:var(--border);
+}
+
+.ds-btn-danger{
+  background:transparent;
+  color:var(--vermillion);
+  border-color:var(--vermillion);
+}
+
+body.dark .ds-btn-primary{
+  background:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+body.dark .ds-btn-secondary{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+body.dark .ds-btn-danger{
+  color:var(--dark-highlight);
+  border-color:var(--dark-highlight);
+}
+
+/* ══════════════════════════════════════
+   カード（既存 .card と視覚互換の共通受け皿）
+   ══════════════════════════════════════ */
+.ds-card{
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  padding:var(--space-3);
+  margin-top:var(--space-3);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-md);
+}
+
+body.dark .ds-card{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+/* ══════════════════════════════════════
+   トースト通知
+   ══════════════════════════════════════ */
+.ds-toast-container{
+  position:fixed;
+  left:50%;
+  bottom:calc(20px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  z-index:3000;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  align-items:center;
+  pointer-events:none;
+  width:100%;
+  padding:0 16px;
+  box-sizing:border-box;
+}
+
+.ds-toast{
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 18px;
+  border-radius:999px;
+  font-size:var(--font-size-sm);
+  box-shadow:var(--shadow-md);
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity 0.2s ease, transform 0.2s ease;
+  max-width:100%;
+  text-align:center;
+}
+
+.ds-toast.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+body.dark .ds-toast{
+  background:var(--indigo-soft);
+}
+
+/* ══════════════════════════════════════
+   ボトムシート（モバイルでのモーダル代替）
+   ══════════════════════════════════════ */
+.ds-sheet-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(40,36,30,0.5);
+  z-index:2600;
+}
+
+.ds-sheet-overlay.open{
+  display:block;
+}
+
+.ds-sheet{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:var(--card);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:var(--space-4);
+  padding-bottom:calc(var(--space-4) + env(safe-area-inset-bottom));
+  box-shadow:0 -10px 30px rgba(52,48,43,0.2);
+  transform:translateY(100%);
+  transition:transform 0.22s ease;
+  max-height:80vh;
+  overflow-y:auto;
+  box-sizing:border-box;
+}
+
+.ds-sheet-overlay.open .ds-sheet{
+  transform:translateY(0);
+}
+
+body.dark .ds-sheet{
+  background:var(--dark-card);
+  color:var(--dark-text);
+}
+
+/* ══════════════════════════════════════
+   モバイル用ボトムナビ（5項目、PCでは非表示）
+   ══════════════════════════════════════ */
+.ds-bottom-nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  z-index:1500;
+  display:flex;
+  justify-content:space-around;
+  background:var(--card);
+  border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 14px rgba(52,48,43,0.08);
+}
+
+body.dark .ds-bottom-nav{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.ds-bottom-nav-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  min-height:44px;
+  padding:4px;
+  color:var(--text-sub);
+  text-decoration:none;
+  font-size:10px;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark .ds-bottom-nav-item{
+  color:var(--dark-text-sub);
+}
+
+.ds-bottom-nav-item.active{
+  color:var(--indigo);
+  font-weight:700;
+}
+
+body.dark .ds-bottom-nav-item.active{
+  color:var(--dark-accent);
+}
+
+/* PCでは既存の .site-nav が主導線のため、ボトムナビは表示しない */
+@media (min-width:900px){
+  .ds-bottom-nav{
+    display:none;
+  }
+}
+
+/* ボトムナビ表示中、ページ下端の内容がナビに隠れないよう余白を確保 */
+body.has-bottom-nav{
+  padding-bottom:calc(70px + env(safe-area-inset-bottom));
+}
+
+/* ══════════════════════════════════════
+   「今日のハートピア」ダッシュボード
+   ══════════════════════════════════════ */
+.dash-card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+  font-weight:700;
+  font-size:var(--font-size-base);
+  color:var(--indigo);
+  margin-bottom:var(--space-2);
+}
+
+body.dark .dash-card-header{
+  color:var(--dark-accent);
+}
+
+.dash-card-title{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.dash-see-all{
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:var(--font-size-sm);
+  padding:5px 12px;
+  min-height:28px;
+  cursor:pointer;
+}
+
+body.dark .dash-see-all{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+.dash-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:7px 10px;
+  border-radius:var(--radius-sm);
+  background:var(--card-sub);
+  margin-bottom:5px;
+  font-size:var(--font-size-sm);
+  text-decoration:none;
+}
+
+body.dark .dash-row{
+  background:var(--dark-card-alt);
+}
+
+.dash-row-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+  color:var(--text);
+}
+
+body.dark .dash-row-label{
+  color:var(--dark-text);
+}
+
+.dash-row-value{
+  flex-shrink:0;
+  font-weight:700;
+  color:var(--vermillion);
+  white-space:nowrap;
+}
+
+body.dark .dash-row-value{
+  color:var(--dark-highlight);
+}
+
+.dash-empty{
+  font-size:var(--font-size-sm);
+  color:var(--text-sub);
+  text-align:center;
+  padding:8px 0;
+}
+
+body.dark .dash-empty{
+  color:var(--dark-text-sub);
+}
+
+.dash-weather-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  font-size:var(--font-size-lg);
+  color:var(--indigo);
+  padding:4px 0 10px;
+}
+
+body.dark .dash-weather-row{
+  color:var(--dark-accent);
+}
+
+.dash-progress-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.dash-progress-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.dash-progress-label{
+  flex-shrink:0;
+  width:56px;
+  font-size:var(--font-size-sm);
+  color:var(--text-sub);
+}
+
+body.dark .dash-progress-label{
+  color:var(--dark-text-sub);
+}
+
+.dash-progress-track{
+  flex:1;
+  height:8px;
+  border-radius:999px;
+  background:var(--card-sub);
+  overflow:hidden;
+}
+
+body.dark .dash-progress-track{
+  background:var(--dark-card-alt);
+}
+
+.dash-progress-fill{
+  height:100%;
+  border-radius:999px;
+  background:var(--indigo);
+  transition:width 0.25s ease;
+}
+
+body.dark .dash-progress-fill{
+  background:var(--indigo-soft);
+}
+
+.dash-progress-pct{
+  flex-shrink:0;
+  width:38px;
+  text-align:right;
+  font-size:var(--font-size-sm);
+  font-weight:700;
+  color:var(--indigo);
+}
+
+body.dark .dash-progress-pct{
+  color:var(--dark-accent);
+}
+
+.dash-shortcuts{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin:14px 0;
+}
+
+.dash-shortcut{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  min-height:64px;
+  padding:8px 4px;
+  border-radius:var(--radius-md);
+  background:var(--card);
+  border:1px solid var(--border);
+  color:var(--indigo);
+  text-decoration:none;
+  font-size:10px;
+  text-align:center;
+  box-shadow:var(--shadow-sm);
+}
+
+.dash-shortcut:active{
+  transform:scale(0.96);
+}
+
+body.dark .dash-shortcut{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-accent);
+}
+
+@media (max-width:380px){
+  .dash-shortcuts{
+    grid-template-columns:repeat(3,1fr);
+  }
+}

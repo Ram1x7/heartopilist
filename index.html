@@ -51,7 +51,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=10">
+<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="stylesheet" href="css/design-system.css?v=1">
 
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -107,6 +108,43 @@
   <p class="page-subtitle" data-i18n="page_header_subtitle">
     ハートピアの天気と今の時間に合わせた図鑑表示
   </p>
+</div>
+
+<!-- 今日のハートピア ダッシュボード -->
+<div id="todayDashboard">
+
+  <div class="card dash-card" id="dashTodayTasksCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashTodayTasksIcon"></span><span data-i18n="dash_section_today_tasks">今日やること</span></span>
+      <button type="button" class="dash-see-all" onclick="document.getElementById('dailyTasksBtn').click()" data-i18n="dash_see_all">すべて見る</button>
+    </div>
+    <div class="dash-card-body" id="dashTodayTasksBody"></div>
+  </div>
+
+  <div class="card dash-card" id="dashAvailableNowCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashAvailableNowIcon"></span><span data-i18n="dash_section_available_now">今できること</span></span>
+    </div>
+    <div class="dash-card-body" id="dashAvailableNowBody"></div>
+  </div>
+
+  <div class="card dash-card" id="dashEndingSoonCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashEndingSoonIcon"></span><span data-i18n="dash_section_ending_soon">もうすぐ</span></span>
+      <button type="button" class="dash-see-all" onclick="document.getElementById('dailyTasksBtn').click()" data-i18n="dash_see_all">すべて見る</button>
+    </div>
+    <div class="dash-card-body" id="dashEndingSoonBody"></div>
+  </div>
+
+  <div class="card dash-card" id="dashCompletionCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashCompletionIcon"></span><span data-i18n="dash_section_completion">コンプ状況</span></span>
+    </div>
+    <div class="dash-card-body" id="dashCompletionBody"></div>
+  </div>
+
+  <div class="dash-shortcuts" id="dashShortcuts"></div>
+
 </div>
 
 <!-- 蛍石・オークの木：今日の場所 -->
@@ -600,7 +638,9 @@ text-align:left;
 <script src="js/data-sync.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
-<script src="js/main.js?v=14"></script>
+<script src="js/toast.js"></script>
+<script src="js/bottom-nav.js"></script>
+<script src="js/main.js?v=15"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

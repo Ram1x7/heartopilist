@@ -1,5 +1,5 @@
 // キャッシュ名（更新時はバージョンを上げる）
-const CACHE_NAME = "hatopi-v2.174.0";
+const CACHE_NAME = "hatopi-v2.175.0";
 
 // キャッシュするファイル一覧
 const CACHE_FILES = [
@@ -16,10 +16,13 @@ const CACHE_FILES = [
   "./art-convert.html",
   "./music.html",
   "./faq.html",
-  "./css/style.css?v=10",
+  "./css/style.css?v=11",
+  "./css/design-system.css?v=1",
   "./css/art.css?v=49",
   "./css/music.css?v=38",
-  "./js/main.js?v=14",
+  "./js/main.js?v=15",
+  "./js/toast.js",
+  "./js/bottom-nav.js",
   "./js/price-calc.js",
   "./js/shop.js?v=3",
   "./js/data-shop.js",
@@ -65,12 +68,12 @@ const CACHE_FILES = [
   "./js/icon-size.js",
   "./js/currency-icons.js",
   "./js/sw-register.js",
-  "./locales/ja.json?v=13",
-  "./locales/en.json?v=13",
-  "./locales/ko.json?v=13",
-  "./locales/th.json?v=13",
-  "./locales/zh-CN.json?v=13",
-  "./locales/zh-TW.json?v=13",
+  "./locales/ja.json?v=14",
+  "./locales/en.json?v=14",
+  "./locales/ko.json?v=14",
+  "./locales/th.json?v=14",
+  "./locales/zh-CN.json?v=14",
+  "./locales/zh-TW.json?v=14",
   "./manifest.json",
 ];
 
