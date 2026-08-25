@@ -216,8 +216,6 @@
   <div class="music-calib-guide music-calib-guide-v" id="musicCalibGuideV"></div>
   <div class="music-practice-stage-overlay-top">
     <div class="music-practice-stage-topbar">
-      <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="close"></button>
-      <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
       <div id="musicPlaybackAnchorPractice">
         <div class="music-playback-row" id="musicPlaybackRow">
           <div class="music-seek-row">
@@ -233,11 +231,16 @@
           </div>
         </div>
       </div>
-      <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="adjust position"></button>
-      <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="toggle sound"></button>
+      <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
+      <div class="music-practice-topbar-icons">
+        <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="adjust position"></button>
+        <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="toggle sound"></button>
+        <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="close"></button>
+      </div>
     </div>
     <div id="musicScoreDisplayAnchorPractice"></div>
   </div>
+  <div class="music-practice-song-info" id="musicPracticeSongInfo"></div>
   <div class="music-calib-overlay" id="musicCalibOverlay">
     <p class="music-calib-hint" data-i18n="music_calib_hint">ドラッグで移動、2本指ピンチで拡大縮小できます</p>
     <div class="music-calib-btn-row">
