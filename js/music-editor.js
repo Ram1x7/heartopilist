@@ -919,6 +919,27 @@ function forgetTokenIndexesFrom(index) {
   });
 }
 
+// 1マス分の「ミニ鍵盤ドット」を組み立てる。今選んでいる楽器・配置の
+// 演奏ボタンと同じ行×列で、実際に押す音の位置だけを点灯させる
+// （参考画像のグリッド譜と同じ考え方）
+function buildChipGridHTML(tok) {
+  const inst = getInstrument(currentInstrumentId);
+  const layout = getLayout(inst, currentLayoutId);
+  const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
+  const rows = grid
+    .map((row) => {
+      const dots = row
+        .map((gridNote) => {
+          const isActive = tok.notes.some((n) => notesEqual(n, gridNote));
+          return `<span class="chip-dot${isActive ? " active" : ""}"></span>`;
+        })
+        .join("");
+      return `<span class="chip-dot-row">${dots}</span>`;
+    })
+    .join("");
+  return `<span class="music-chip-grid">${rows}</span>`;
+}
+
 // ── 譜面の表示（編集中のプレビュー／練習モードのハイライト共通）。
 // 小節線は保存せず、拍子(timeSignature)をもとに毎回その場で計算して表示する ──
 function renderScoreDisplay() {
@@ -949,12 +970,9 @@ function renderScoreDisplay() {
     const pendingLoopStart = loopSelecting && loopStart !== null && loopEnd === null && i === loopStart;
     const isSelected = pageMode === "edit" && i === selectedTokenIndex;
     const needsReview = humReviewIndexes.has(i);
-    const digits = isRest
-      ? `<span class="music-note-digit">0</span>`
-      : tok.notes.map((n) => `<span class="music-note-digit">${noteDisplayDigit(n)}</span>`).join("");
-    const kana = isChord || isRest ? "" : `<span class="music-note-kana">${DEGREE_LABELS[tok.notes[0].degree]}</span>`;
+    const gridHtml = buildChipGridHTML(tok);
     const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending", isSelected && "selected", needsReview && "hum-review"].filter(Boolean).join(" ");
-    html += `<span class="${cls}" data-index="${i}">${digits}${kana}</span>`;
+    html += `<span class="${cls}" data-index="${i}" aria-label="${isRest ? T("music_note_rest_label", "休符") : tok.notes.map((n) => noteDisplayDigit(n)).join("・")}">${gridHtml}</span>`;
     beatsSinceBar += tokenApproxBeats(tok);
   });
   el.innerHTML = html;
@@ -1173,7 +1191,19 @@ function renderPracticeStageName() {
   const instLabel = T(inst.nameKey, inst.nameFallback);
   const layoutLabel = inst.layouts.length > 1 ? `・${T(layout.labelKey, layout.labelFallback)}` : "";
   const name = scoreName || T("music_default_score_name", "譜面");
-  document.getElementById("musicPracticeStageName").textContent = `${name} ・ ${instLabel}${layoutLabel}${loopBadgeText()}`;
+  document.getElementById("musicPracticeStageName").textContent = name;
+
+  // 参考画像の左下パネルと同じ考え方で、曲名・楽器/配置・テンポ・長さをまとめて表示する
+  const info = document.getElementById("musicPracticeSongInfo");
+  if (info) {
+    const total = playbackTotalDurationSec || 0;
+    info.innerHTML = `
+      <div class="music-practice-song-title">${name}${loopBadgeText()}</div>
+      <div class="music-practice-song-meta">${instLabel}${layoutLabel}</div>
+      <div class="music-practice-song-meta">${T("music_bpm_label", "テンポ")} ${bpm} BPM</div>
+      <div class="music-practice-song-meta">${formatSeekTime(total)}</div>
+    `;
+  }
 }
 
 // 追従ステージ上部に曲名だけを表示する（ボタンが無いので楽器・配置は不要）
@@ -1453,7 +1483,17 @@ function updateSeekBarUI() {
   const elapsed = Math.min(getCurrentElapsedSec(), total);
   slider.max = String(Math.max(1, Math.round(total * 1000)));
   slider.value = String(Math.round(elapsed * 1000));
-  label.textContent = `${formatSeekTime(elapsed)} / ${formatSeekTime(total)}`;
+  label.textContent = formatSeekOrPercentLabel(elapsed, total);
+}
+
+// 練習ステージでは参考画像と同じ「進捗％」、それ以外(編集/追従)では従来通り
+// 「経過時間 / 合計時間」を、同じ表示欄(#musicSeekTimeLabel)に出し分ける
+function formatSeekOrPercentLabel(elapsedSec, totalSec) {
+  if (pageMode === "practice") {
+    const pct = totalSec > 0 ? (elapsedSec / totalSec) * 100 : 0;
+    return `${Math.max(0, Math.min(100, pct)).toFixed(1)}%`;
+  }
+  return `${formatSeekTime(elapsedSec)} / ${formatSeekTime(totalSec)}`;
 }
 
 // シークバーをドラッグ中：実際の再生位置は動かさず、その時点で鳴る（鳴る予定の）
@@ -1462,7 +1502,7 @@ function onSeekInputPreview(e) {
   isSeekDragging = true;
   const sec = Number(e.target.value) / 1000;
   const label = document.getElementById("musicSeekTimeLabel");
-  if (label) label.textContent = `${formatSeekTime(sec)} / ${formatSeekTime(playbackTotalDurationSec)}`;
+  if (label) label.textContent = formatSeekOrPercentLabel(sec, playbackTotalDurationSec);
   const idx = findTokenIndexAtSec(sec);
   updateSeekPreviewHighlight(idx);
 }
