@@ -687,18 +687,19 @@ body.dark .music-duration-btn.active{
   border-color:var(--indigo-soft);
 }
 
-/* 譜面表示（数字譜。編集プレビュー・練習ハイライト共通） */
+/* 譜面表示（グリッド譜。編集プレビュー・練習ハイライト共通）。
+   時系列のマスが折り返しながら並び、各マスの中に「演奏ボタンと同じ形」の
+   ミニ鍵盤ドットを表示して、押す位置がひと目で分かるようにする */
 .music-score-display{
   display:flex;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  gap:4px;
-  padding:10px 6px;
+  flex-wrap:wrap;
+  overflow-x:visible;
+  gap:6px;
+  padding:10px;
   border-radius:12px;
   background:var(--card-sub);
   min-height:56px;
-  align-items:center;
+  align-items:flex-start;
 }
 
 body.dark .music-score-display{
@@ -715,30 +716,62 @@ body.dark .music-score-display{
 .music-chip{
   flex-shrink:0;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-  width:34px;
-  height:40px;
-  border-radius:8px;
+  padding:5px;
+  border-radius:9px;
   background:var(--card);
   border:1px solid var(--border);
   user-select:none;
   -webkit-user-select:none;
   -webkit-touch-callout:none;
+  transition:background .12s ease, border-color .12s ease, box-shadow .12s ease;
 }
 
-/* 和音（複数の音を同時に押した1つのまとまり）。音符を縦に並べて表示する */
-.music-chip.chord{
-  height:auto;
-  min-height:40px;
-  padding:4px 2px;
-  gap:1px;
+/* マス内のミニ鍵盤ドット（演奏ボタンと同じ行×列の配置を再現） */
+.music-chip-grid{
+  display:flex;
+  flex-direction:column;
+  gap:3px;
 }
 
-.music-chip.chord .music-note-digit{
-  font-size:12px;
-  line-height:1.15;
+.chip-dot-row{
+  display:flex;
+  gap:3px;
+}
+
+.chip-dot{
+  width:6px;
+  height:6px;
+  border-radius:2px;
+  background:var(--text-sub);
+  opacity:.35;
+  flex-shrink:0;
+}
+
+/* 実際に押す音＝画像の白い四角にあたる部分 */
+.chip-dot.active{
+  width:12px;
+  height:12px;
+  border-radius:3px;
+  background:var(--text);
+  opacity:1;
+}
+
+body.dark .chip-dot{
+  background:#8a8074;
+}
+
+body.dark .chip-dot.active{
+  background:#ece4d4;
+}
+
+.music-chip.current .chip-dot.active{
+  background:#fdf9ef;
+}
+
+.music-chip.selected .chip-dot.active{
+  background:#fdf9ef;
 }
 
 .music-chip.current{
@@ -746,26 +779,15 @@ body.dark .music-score-display{
   border-color:var(--indigo);
 }
 
-.music-chip.current .music-note-digit,
-.music-chip.current .music-note-kana{
-  color:#fdf9ef;
-}
-
-/* 休符：他の音符と見分けやすいよう、枠を破線にして少し控えめな色にする */
+/* 休符：画像の「消灯したマス」と同じ見た目にする。ドットは全て非点灯のまま、
+   マス全体を控えめにして他の音符と見分けやすくする */
 .music-chip.rest{
   border-style:dashed;
+  opacity:.55;
 }
 
-.music-chip.rest .music-note-digit{
-  color:var(--text-sub);
-}
-
-.music-chip.rest.current .music-note-digit{
-  color:#fdf9ef;
-}
-
-body.dark .music-chip.rest .music-note-digit{
-  color:#b3a89a;
+.music-chip.rest.current{
+  opacity:1;
 }
 
 .music-chip-bar{
@@ -1469,53 +1491,73 @@ body.dark .music-practice-stage{
 }
 
 .music-practice-stage-topbar{
+  position:relative;
   flex-shrink:0;
   display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-/* 練習ステージでは上部バーの横幅が限られるため、シークバーを追加した
-   再生操作一式(#musicPlaybackAnchorPractice)だけを折り返して専用の行にし、
-   exit/曲名/位置調整/音量ボタンは引き続き1行目に収める */
-.music-practice-stage-topbar{
-  flex-wrap:wrap;
-}
-
-.music-practice-stage-topbar > #musicPlaybackAnchorPractice{
-  order:5;
-  flex-basis:100%;
+  flex-direction:column;
+  gap:4px;
+  padding-right:96px; /* 右上に重ねるアイコン類とぶつからないよう余白を確保 */
 }
 
 .music-practice-stage #musicPlaybackAnchorPractice .music-playback-row{
   flex-shrink:0;
-  gap:2px;
-}
-
-.music-practice-stage #musicPlaybackAnchorPractice .music-seek-time{
-  font-size:10px;
-  min-width:64px;
-}
-
-.music-practice-stage #musicPlaybackAnchorPractice .music-playback-controls-row{
-  display:flex;
-  align-items:center;
   gap:6px;
 }
 
-.music-practice-stage #musicPlaybackAnchorPractice .music-playpause-btn{
-  width:24px;
-  height:24px;
+/* シークバーは参考画像のような目立たない進捗バーとして上部に細く表示する。
+   ドラッグでの移動は引き続きできる */
+.music-practice-stage #musicPlaybackAnchorPractice .music-seek-row{
+  gap:8px;
+}
+
+.music-practice-stage #musicPlaybackAnchorPractice .music-seek-slider{
+  height:4px;
+}
+
+/* 経過時間の表示欄を、参考画像と同じ「進捗％」として再利用する
+   （JS側でpageMode==="practice"のときだけ％表示に切り替える） */
+.music-practice-stage #musicPlaybackAnchorPractice .music-seek-time{
+  min-width:44px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .music-practice-stage #musicPlaybackAnchorPractice .music-seek-time{
+  color:#ece4d4;
+}
+
+/* 参考画像と同じく、左に大きな再生/一時停止ボタンを置く */
+.music-practice-stage #musicPlaybackAnchorPractice .music-playback-controls-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.music-practice-stage .music-playpause-btn{
+  width:52px;
+  height:52px;
 }
 
 .music-practice-stage #musicPlaybackAnchorPractice .music-speed-control{
-  flex:none; /* 基本ルールのflex:1(flex-basis:0%)がwidthより優先されてしまい、
-                スライダーが伸びて右隣の調整・音量ボタンと重なっていたのを防ぐ */
-  width:70px;
+  flex:none;
+  width:100px;
 }
 
-.music-practice-stage #musicPlaybackAnchorPractice .music-speed-control span{
+/* 曲名は表示せず、詳しい情報は下部の曲情報パネル(.music-practice-song-info)にまとめる */
+.music-practice-stage-name{
   display:none;
+}
+
+/* 位置調整・音量・閉じるは、参考画像のように右上に小さくまとめて重ねる */
+.music-practice-topbar-icons{
+  position:absolute;
+  top:0;
+  right:0;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:6px;
 }
 
 .music-practice-exit-btn{
@@ -1543,28 +1585,11 @@ body.dark .music-practice-exit-btn{
   color:#b3a89a;
 }
 
-.music-practice-stage-name{
-  flex:1;
-  min-width:0;
-  font-size:12px;
-  font-weight:700;
-  color:var(--text-sub);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  /* 演奏ボタンの長押し中にiOSがこのテキストを選択候補とみなし、
-     コピー/調べるメニューが出てしまうのを防ぐ */
-  user-select:none;
-  -webkit-user-select:none;
-  -webkit-touch-callout:none;
-}
-
-body.dark .music-practice-stage-name{
-  color:#b3a89a;
-}
-
 .music-practice-stage-overlay-top #musicScoreDisplayAnchorPractice{
-  flex-shrink:0;
+  flex-shrink:1;
+  min-height:0;
+  overflow:hidden;
+  margin-top:8px;
 }
 
 /* 演奏ボタン領域はステージ全体(position:fixed;inset:0の.music-practice-stage)を
@@ -1584,30 +1609,75 @@ body.dark .music-practice-stage-name{
   overflow:hidden;
 }
 
+/* 練習ステージの譜面プレビューは、参考画像と同じくマスを折り返して複数行表示し、
+   演奏ボタンの邪魔をしない範囲(画面上部)いっぱいに見せる。現在位置の行が
+   常に見えるよう、縦方向にスクロールできるようにする */
 .music-practice-stage .music-score-display{
   margin:0;
   min-height:0;
-  padding:4px 6px;
+  max-height:100%;
+  padding:8px;
+  flex-wrap:wrap;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  background:rgba(0,0,0,0.28);
+  border-radius:14px;
+  align-content:flex-start;
 }
 
-/* 演奏ボタンの表示面積を優先するため、練習ステージの譜面プレビューは
-   通常より小さいチップで表示する */
+body.dark .music-practice-stage .music-score-display{
+  background:rgba(0,0,0,0.35);
+}
+
 .music-practice-stage .music-chip{
-  width:22px;
-  height:26px;
-  border-radius:6px;
-}
-
-.music-practice-stage .music-chip .music-note-digit{
-  font-size:11px;
-}
-
-.music-practice-stage .music-chip .music-note-kana{
-  font-size:7px;
+  width:auto;
+  height:auto;
+  padding:5px;
+  border-radius:8px;
 }
 
 .music-practice-stage .music-chip-bar{
-  height:20px;
+  height:auto;
+  align-self:stretch;
+}
+
+/* 左下：曲名・楽器/配置・テンポ・長さをまとめた情報パネル（参考画像の左下相当） */
+.music-practice-song-info{
+  position:absolute;
+  left:14px;
+  bottom:calc(33% + 10px);
+  z-index:2;
+  max-width:60%;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  text-shadow:0 1px 3px rgba(0,0,0,0.4);
+}
+
+.music-practice-song-title{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.music-practice-song-meta{
+  font-size:10px;
+  color:var(--text-sub);
+  line-height:1.5;
+}
+
+body.dark .music-practice-song-title{
+  color:#ece4d4;
+}
+
+body.dark .music-practice-song-meta{
+  color:#b3a89a;
 }
 
 /* 端末が縦向きのまま練習モードに入ったとき、画面全体はCSSで横画面に見えるよう
