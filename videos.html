@@ -315,7 +315,6 @@ body.dark .footer{
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
-<script src="js/bottom-nav.js"></script>
 <script src="js/data-videos.js"></script>
 <script>
 
@@ -514,7 +513,6 @@ function toggleVideo(id){
 }
 
 setCat(currentCat);
-if(typeof renderBottomNav === "function") renderBottomNav("zukan");
 
 // 言語切替時に再描画
 document.addEventListener("langchange", renderVideos);

@@ -250,6 +250,30 @@ body.dark #artCanvas{
     #2c2823;
 }
 
+/* スマートフォン（767px以下）：主要ツール（ペン/消しゴム/バケツ/スポイト/Undo/Redo等）を
+   画面下端に固定し、パネルを下までスクロールしなくても常に片手で届く位置に置く。
+   グリッド上の配置（DOM順・グリッドエリア）自体は変更せず、position:fixedで
+   ツールバーだけを画面に貼り付ける追加指定のみ（キャンバスの座標計算は
+   getBoundingClientRect()ベースで位置に依存しないため影響を受けない） */
+@media (max-width:767px){
+  .art-toolbar{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    z-index:500;
+    border-radius:16px 16px 0 0;
+    border-bottom:none;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom));
+    box-shadow:0 -4px 14px rgba(52,48,43,0.1);
+  }
+
+  /* 固定したツールバーの高さぶん、パネル最下部のボタン等が隠れないよう余白を確保 */
+  .art-layout{
+    padding-bottom:calc(60px + env(safe-area-inset-bottom));
+  }
+}
+
 /* iPad（768px〜）：ツールバー上／Canvas中央／パネル下、余白を広めに */
 @media (min-width:768px){
   .art-canvas-area{
@@ -276,6 +300,7 @@ body.dark #artCanvas{
 
 /* ツールバーのボタン */
 .art-tool-btn{
+  position:relative;
   flex-shrink:0;
   display:flex;
   align-items:center;
@@ -294,6 +319,19 @@ body.dark #artCanvas{
   background:var(--indigo);
   border-color:var(--indigo);
   color:#fdf9ef;
+}
+
+/* 色だけに頼らず、選択中かどうかをバッジの有無でも示す */
+.art-tool-btn.active::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
 }
 
 .art-tool-btn:disabled{
@@ -395,6 +433,7 @@ body.dark .art-zoom-slider{
 }
 
 .art-brush-size-options button{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -414,6 +453,18 @@ body.dark .art-zoom-slider{
   background:var(--indigo);
   border-color:var(--indigo);
   color:#fdf9ef;
+}
+
+.art-brush-size-options button.active::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
 }
 
 body.dark .art-brush-size-options button{
@@ -1078,6 +1129,96 @@ body.dark .art-header-btn{
   border-color:var(--indigo-soft);
 }
 
+/* 変換フローの現在地表示（4段階：画像/サイズ/位置/仕上げ） */
+.art-convert-progress{
+  display:flex;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.art-convert-progress-step{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:3px;
+  padding:2px 4px;
+  border:none;
+  background:none;
+  cursor:default;
+  flex-shrink:0;
+}
+
+.art-convert-progress-step[data-clickable="true"]{
+  cursor:pointer;
+}
+
+.art-convert-progress-num{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  font-size:11px;
+  font-weight:700;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+.art-convert-progress-label{
+  font-size:9px;
+  color:var(--text-sub);
+  white-space:nowrap;
+}
+
+.art-convert-progress-step.active .art-convert-progress-num{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.art-convert-progress-step.active .art-convert-progress-label{
+  color:var(--indigo);
+  font-weight:700;
+}
+
+.art-convert-progress-step.completed .art-convert-progress-num{
+  background:var(--gold);
+  border-color:var(--gold);
+  color:#5c4300;
+}
+
+.art-convert-progress-step.completed .art-convert-progress-num::before{
+  content:"✓";
+}
+
+.art-convert-progress-line{
+  flex:1;
+  height:2px;
+  background:var(--border);
+  margin:0 2px;
+  margin-bottom:14px;
+}
+
+body.dark .art-convert-progress-num{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-convert-progress-label{
+  color:#b3a89a;
+}
+
+body.dark .art-convert-progress-step.active .art-convert-progress-label{
+  color:#8fbdc9;
+}
+
+body.dark .art-convert-progress-line{
+  background:#46423b;
+}
+
 .art-back-link{
   display:inline-flex;
   align-items:center;
@@ -1171,6 +1312,7 @@ body.dark .art-preview-label{
 }
 
 .art-preview-frame{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -1179,6 +1321,33 @@ body.dark .art-preview-label{
   border:1px solid var(--border);
   border-radius:16px;
   box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.art-preview-zoom-btn{
+  position:absolute;
+  right:6px;
+  bottom:6px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 2px 8px rgba(52,48,43,0.15);
+}
+
+.art-preview-zoom-btn:active{
+  transform:scale(0.92);
+}
+
+body.dark .art-preview-zoom-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#e8d2a8;
 }
 
 body.dark .art-preview-frame{
@@ -1203,6 +1372,148 @@ body.dark .art-preview-frame{
 
 .art-use-btn{
   justify-content:center;
+}
+
+/* 変換結果：使用色数・使用マス数・作業量の目安 */
+.art-convert-result-info{
+  margin-top:12px;
+  padding:12px 14px;
+  background:var(--card-sub);
+  border-radius:14px;
+}
+
+body.dark .art-convert-result-info{
+  background:#383329;
+}
+
+.art-result-stats{
+  display:flex;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.art-result-stat{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  text-align:center;
+}
+
+.art-result-stat-label{
+  font-size:10px;
+  color:var(--text-sub);
+}
+
+body.dark .art-result-stat-label{
+  color:#b3a89a;
+}
+
+.art-result-stat-value{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .art-result-stat-value{
+  color:#ece4d4;
+}
+
+.art-work-tier-low{ color:var(--indigo); }
+.art-work-tier-mid{ color:var(--gold); }
+.art-work-tier-high{ color:var(--vermillion); }
+body.dark .art-work-tier-low{ color:#8fbdc9; }
+body.dark .art-work-tier-mid{ color:#e8d2a8; }
+body.dark .art-work-tier-high{ color:#e07060; }
+
+.art-result-color-list{
+  font-size:12px;
+}
+
+.art-result-color-list summary{
+  cursor:pointer;
+  color:var(--indigo);
+  font-weight:700;
+  padding:4px 0;
+}
+
+body.dark .art-result-color-list summary{
+  color:#8fbdc9;
+}
+
+.art-result-color-rows{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(90px, 1fr));
+  gap:6px;
+  margin-top:8px;
+}
+
+.art-result-color-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 7px;
+  border-radius:8px;
+  background:var(--card);
+}
+
+body.dark .art-result-color-row{
+  background:#2c2823;
+}
+
+.art-result-color-swatch{
+  width:16px;
+  height:16px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+
+body.dark .art-result-color-swatch{
+  border-color:#46423b;
+}
+
+.art-result-color-code{
+  font-size:10px;
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .art-result-color-code{
+  color:#b3a89a;
+}
+
+.art-result-color-count{
+  font-size:10px;
+  color:var(--text);
+  margin-left:auto;
+}
+
+body.dark .art-result-color-count{
+  color:#ece4d4;
+}
+
+/* 変換結果の拡大表示モーダル */
+.art-result-zoom-box{
+  max-width:90vw;
+  width:auto;
+  text-align:center;
+}
+
+.art-result-zoom-frame{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:8px 0;
+}
+
+.art-result-zoom-frame canvas{
+  max-width:100%;
+  height:auto;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  border-radius:8px;
 }
 
 .art-preview-actions{
@@ -1456,6 +1767,66 @@ body.dark .art-toggle-row{
 
 .art-newcanvas-section-title{
   margin-top:16px;
+}
+
+/* 初回モーダルの主な入口（画像から作る／保存済みを開く／使い方） */
+.art-entry-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:4px;
+}
+
+.art-entry-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:64px;
+  padding:10px 6px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--card-sub);
+  color:var(--text);
+  text-decoration:none;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.art-entry-card:active{
+  transform:scale(0.97);
+}
+
+.art-entry-card-primary{
+  grid-column:1 / -1;
+  flex-direction:row;
+  min-height:48px;
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-size:13px;
+  font-weight:700;
+}
+
+.art-entry-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+body.dark .art-entry-card{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-entry-card-primary{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
 }
 
 .art-newcanvas-box h3{
@@ -1971,6 +2342,49 @@ body.dark .art-share-code-error{
   max-height:85vh;
   overflow-y:auto;
   text-align:left;
+}
+
+/* 初めて使う人向けの要点（詳細説明の前に短く表示） */
+.art-help-quickstart{
+  margin:10px 0;
+  padding:10px 14px;
+  background:var(--card-sub);
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.9;
+  list-style:none;
+}
+
+body.dark .art-help-quickstart{
+  background:#383329;
+}
+
+.art-help-details{
+  margin-top:12px;
+}
+
+.art-help-details summary{
+  font-size:12px;
+  font-weight:700;
+  color:var(--indigo);
+  cursor:pointer;
+  list-style:none;
+}
+
+.art-help-details summary::-webkit-details-marker{
+  display:none;
+}
+
+.art-help-details summary::before{
+  content:"▸ ";
+}
+
+.art-help-details[open] summary::before{
+  content:"▾ ";
+}
+
+body.dark .art-help-details summary{
+  color:#8fbdc9;
 }
 
 /* 初回チュートリアル（関連ボタンを順番に吹き出しで案内する） */

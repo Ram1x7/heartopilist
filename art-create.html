@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=11">
-<link rel="stylesheet" href="./css/art.css?v=49">
+<link rel="stylesheet" href="./css/art.css?v=50">
 <link rel="stylesheet" href="./css/design-system.css?v=1">
 
 <link rel="prefetch" href="./index.html">
@@ -89,7 +89,7 @@
 </div>
 
 <div class="art-notice" data-i18n="art_coming_soon">
-  現在開発中の機能です。今後のアップデートで順次使えるようになります。
+  一部の機能は試験公開中です。より使いやすくなるよう順次改善していきます。
 </div>
 
 <div class="art-offline-banner" id="artOfflineBanner" style="display:none;">
@@ -99,8 +99,8 @@
 </div>
 
 <div class="art-canvas-status-bar" id="artCanvasStatusBar">
-  <button class="art-edit-mode-btn" id="artEditModeBtn"></button>
-  <button class="art-lock-btn" id="artLockBtn"></button>
+  <button class="art-edit-mode-btn" id="artEditModeBtn" data-i18n="art_edit_mode_on">編集する</button>
+  <button class="art-lock-btn" id="artLockBtn" data-i18n="art_lock">固定する</button>
 </div>
 
 <div class="art-layout">
@@ -212,6 +212,23 @@
   <div class="modal-box art-newcanvas-box">
     <div id="gridSizeStep1">
       <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
+
+      <div class="art-entry-options" id="artEntryOptions">
+        <a href="./art-convert.html" class="art-entry-card art-entry-card-primary">
+          <span class="art-entry-icon" id="artEntryConvertIcon"></span>
+          <span class="art-entry-label" data-i18n="art_entry_from_image">画像から作る</span>
+        </a>
+        <button type="button" class="art-entry-card" id="artEntryOpenSavedBtn" style="display:none;">
+          <span class="art-entry-icon" id="artEntrySavedIcon"></span>
+          <span class="art-entry-label" data-i18n="art_entry_open_saved">保存したデザインを開く</span>
+        </button>
+        <button type="button" class="art-entry-card" id="artEntryHelpBtn">
+          <span class="art-entry-icon" id="artEntryHelpIcon"></span>
+          <span class="art-entry-label" data-i18n="art_entry_help">使い方を見る</span>
+        </button>
+      </div>
+
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_entry_new_canvas">新しく作る（キャンバスサイズを選ぶ）</div>
       <div class="art-panel-btn-row art-ssi-entry-row">
         <button class="art-header-btn art-ssi-entry-btn" id="artScreenshotImportOpenBtn" data-i18n="art_ssi_entry_btn">スクショから取り込む</button>
       </div>
@@ -414,6 +431,17 @@
   <div class="modal-box art-help-box">
     <h3 style="text-align:center;">使い方</h3>
 
+    <ul class="art-help-quickstart">
+      <li><strong>タップ</strong>：マスを塗る（ペン/消しゴム/バケツ選択中）</li>
+      <li><strong>ドラッグ</strong>：連続して塗る</li>
+      <li><strong>ピンチ</strong>：拡大・縮小</li>
+      <li><strong>長押し</strong>：そのマスの色・座標を確認</li>
+      <li><strong>Undo/Redo</strong>：直前の操作を取り消す/やり直す</li>
+    </ul>
+
+    <details class="art-help-details">
+    <summary data-i18n="art_help_details_summary">すべての機能を見る</summary>
+
     <p><strong>ぬり方ガイド（おすすめ）</strong><br>
     「効率のいい順番を見る」を押すと、「10×10ブロック表示」と同じ番号のブロックを1つずつ順番にめぐりながら、そのブロックの中で色ごとに手順をまとめて案内します。画面は常にその時案内しているブロックへ自動でズームするので、全体図の中の遠い場所を探す必要はありません（右上のボタンでいつでも全体表示にも切り替えられます）。ゲーム内のバケツ（塗りつぶし）ツールは隙間なく囲まれた範囲を全部塗るため、斜めも含めた周囲8マスのどこかに違う色・未着色・キャンバスの外があるマスは先に塗って壁を作らないと、その隙間から意図した範囲を越えて塗り広がってしまいます（キャンバスの一番外側も特別扱いせず、同じように壁が必要な場所として扱います）。そのため、境目のマスは丸印で個別にタップする場所として、周囲8マス全てが同じ色のマスで埋まっている「内側のマス」は境目を塗ったあとバケツでまとめて塗れる場所として示します。画面上部には残り時間の目安が表示され、実際に進めるペースに合わせて自動で更新されます。ブロックを塗り終えるたびに軽い通知（振動含む）でお知らせし、最後まで塗り終えると、かかった時間と塗ったマス数のまとめ画面が表示され、そのままPNGでの保存や共有コードの発行に進めます。</p>
 
@@ -452,6 +480,8 @@
 
     <p style="margin-top:10px;"><strong>10×10ブロック表示</strong><br>
     10×10マスごとの区切り線は、このOFF/ONに関わらず常に薄く表示されます。ONにすると各ブロックに色分けと番号が付き、タップすると未着手・作業中・完了の3段階で進捗を記録できます。</p>
+
+    </details>
 
     <button class="modal-close-btn" onclick="replayTutorial()" style="margin-top:14px;">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
@@ -526,7 +556,6 @@
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
-<script src="js/bottom-nav.js"></script>
 <script>
 
 document.getElementById("artConvertIcon").innerHTML = icon("upload", { size: 15 });
@@ -605,7 +634,6 @@ function T(key, fallback, vars){
 <script src="js/art-3d.js"></script>
 <script src="js/art-screenshot-import.js"></script>
 <script>
-if(typeof renderBottomNav === "function") renderBottomNav("tools");
 </script>
 <script src="js/sw-register.js"></script>
 </body>

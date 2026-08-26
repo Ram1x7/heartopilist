@@ -101,9 +101,11 @@ function initArtEditor(){
   }else{
     showFrameStep1();
     renderFreeSizeOptions();
+    refreshArtEntryOptionsVisibility();
     document.getElementById("gridSizeModal").style.display = "block";
   }
 
+  setupArtEntryOptions();
   renderToolbar();
   renderZoomControls();
   renderBrushSizeControls();
@@ -209,7 +211,24 @@ function openNewCanvasModal(){
   document.getElementById("gridSizeCancelWrap").style.display = "block";
   showFrameStep1();
   renderFreeSizeOptions();
+  refreshArtEntryOptionsVisibility();
   document.getElementById("gridSizeModal").style.display = "block";
+}
+
+// ── キャンバスサイズ選択モーダル冒頭の「主な入口」（画像から作る／保存したデザインを開く／使い方） ──
+function setupArtEntryOptions(){
+  document.getElementById("artEntryConvertIcon").innerHTML = icon("upload", { size: 20 });
+  document.getElementById("artEntrySavedIcon").innerHTML = icon("archive", { size: 20 });
+  document.getElementById("artEntryHelpIcon").innerHTML = icon("help", { size: 20 });
+
+  document.getElementById("artEntryOpenSavedBtn").addEventListener("click", openMyDesignsModal);
+  // ヘルプは既存の閉じられないモーダル（初回は必須）の上に重ねて表示するだけでよく、
+  // サイズ選択モーダル自体を閉じる必要はない（閉じた後は元の状態のまま続けられる）
+  document.getElementById("artEntryHelpBtn").addEventListener("click", openHelpModal);
+}
+
+function refreshArtEntryOptionsVisibility(){
+  document.getElementById("artEntryOpenSavedBtn").style.display = savedDesigns.length > 0 ? "flex" : "none";
 }
 
 // デザイン枠のパーツ選択は、元サイトと同様に「戻る」付きの別画面へ切り替える方式
@@ -1996,6 +2015,10 @@ function loadDesign(id){
   renderBlockList();
   renderLockUI();
   saveDraft();
+  // 初回訪問時の必須モーダル（サイズ未選択の間は閉じられない）が開いたままの状態で
+  // 「保存したデザインを開く」から読み込んだ場合、有効なキャンバスが用意できたので
+  // ここで確実に閉じる（closeNewCanvasModal()はキャンセル不可の間は何もしないため使わない）
+  document.getElementById("gridSizeModal").style.display = "none";
 }
 
 function deleteDesign(id){
