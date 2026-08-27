@@ -70,6 +70,130 @@ let loopEnd = null; // ループ区間の終了インデックス
 let loopEnabled = false; // ループ再生のON/OFF（区間は選んだままON/OFFだけ切り替えられる）
 let loopSelecting = false; // 譜面をタップして区間を選んでいる最中かどうか
 
+// ── Undo/Redo：譜面編集の履歴管理 ──
+// コマンドパターン（操作ごとに逆操作を持つ）ではなく、編集が完了するたびに
+// 譜面データ全体をスナップショットとして積む方式を採る。対象operationの種類が多く
+// （音符追加・削除・置換・BPM・拍子・楽器変更・ループ範囲変更など）、どれも
+// 「以下のフィールド群のうちどれかを書き換える」という共通の形をしているため。
+// 曲名(scoreName)・currentScoreIdは対象操作の一覧に含まれておらず、曲名は
+// input（1文字ごとに発火）のため含めると打鍵のたびに履歴が積まれてしまうので
+// 意図的に対象外とする
+const UNDO_MAX_HISTORY = 50;
+let scoreHistory = [];
+let scoreHistoryIndex = -1;
+let historySavedIndex = -1; // 直近でsaveCurrentAsScore()が成功した時点のscoreHistoryIndex
+let isApplyingHistory = false; // 巻き戻し適用中に誤って新しい履歴を積まないためのガード
+
+function captureScoreSnapshot() {
+  return {
+    tokens: JSON.parse(JSON.stringify(tokens)),
+    bpm,
+    timeSignatureId,
+    scoreFreeTiming,
+    scoreReferenceBpm,
+    currentInstrumentId,
+    currentLayoutId,
+    semitoneEnabled,
+    loopStart,
+    loopEnd,
+    loopEnabled,
+  };
+}
+
+// 新しい譜面を開いた・作った・変換ツールで生成した直後など、「ここより前には
+// 戻れない基準点」を作る。以後の編集はここからのUndo/Redo対象になる
+function resetHistory() {
+  scoreHistory = [captureScoreSnapshot()];
+  scoreHistoryIndex = 0;
+  historySavedIndex = 0;
+  updateUndoRedoUI();
+}
+
+// 1つの編集操作が完了するたびに呼ぶ。以降のRedo履歴は破棄する
+function commitHistory() {
+  if (isApplyingHistory) return;
+  scoreHistory = scoreHistory.slice(0, scoreHistoryIndex + 1);
+  scoreHistory.push(captureScoreSnapshot());
+  scoreHistoryIndex++;
+  if (scoreHistory.length > UNDO_MAX_HISTORY) {
+    const overflow = scoreHistory.length - UNDO_MAX_HISTORY;
+    scoreHistory.splice(0, overflow);
+    scoreHistoryIndex -= overflow;
+    historySavedIndex -= overflow;
+  }
+  updateUndoRedoUI();
+}
+
+function applyScoreSnapshot(snap) {
+  isApplyingHistory = true;
+  stopPlayback();
+  cursor = -1;
+  tokens = JSON.parse(JSON.stringify(snap.tokens));
+  bpm = snap.bpm;
+  timeSignatureId = snap.timeSignatureId;
+  scoreFreeTiming = snap.scoreFreeTiming;
+  scoreReferenceBpm = snap.scoreReferenceBpm;
+  currentInstrumentId = snap.currentInstrumentId;
+  currentLayoutId = snap.currentLayoutId;
+  semitoneEnabled = snap.semitoneEnabled;
+  loopStart = snap.loopStart;
+  loopEnd = snap.loopEnd;
+  loopEnabled = snap.loopEnabled;
+  loopSelecting = false;
+  // Undo/Redoでインデックスがずれる可能性があるため、選択中の音・未確認マークは
+  // 巻き戻り後に持ち越さず解除する（不整合な参照を避ける安全側の選択）
+  selectedTokenIndex = null;
+  humReviewIndexes = new Set();
+  renderInstrumentSelector();
+  renderLayoutSelector();
+  renderInstrumentGrid();
+  renderScoreMeta();
+  renderFreeTimingUI();
+  updateLoopUI();
+  renderScoreDisplay();
+  saveDraftDebounced();
+  isApplyingHistory = false;
+  updateUndoRedoUI();
+}
+
+function undoEdit() {
+  if (scoreHistoryIndex <= 0) return;
+  scoreHistoryIndex--;
+  applyScoreSnapshot(scoreHistory[scoreHistoryIndex]);
+}
+
+function redoEdit() {
+  if (scoreHistoryIndex >= scoreHistory.length - 1) return;
+  scoreHistoryIndex++;
+  applyScoreSnapshot(scoreHistory[scoreHistoryIndex]);
+}
+
+function updateUndoRedoUI() {
+  const undoBtn = document.getElementById("musicUndoBtn");
+  const redoBtn = document.getElementById("musicRedoBtn");
+  if (undoBtn) undoBtn.disabled = scoreHistoryIndex <= 0;
+  if (redoBtn) redoBtn.disabled = scoreHistoryIndex >= scoreHistory.length - 1;
+  const unsavedEl = document.getElementById("musicUnsavedIndicator");
+  if (unsavedEl) unsavedEl.style.display = scoreHistoryIndex !== historySavedIndex ? "" : "none";
+}
+
+function handleHistoryKeydown(e) {
+  if (pageMode !== "edit") return;
+  const tag = e.target && e.target.tagName;
+  const isEditableField = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (e.target && e.target.isContentEditable);
+  if (isEditableField) return;
+  const mod = e.ctrlKey || e.metaKey;
+  if (!mod) return;
+  const key = e.key.toLowerCase();
+  if (key === "z" && !e.shiftKey) {
+    e.preventDefault();
+    undoEdit();
+  } else if (key === "y" || (key === "z" && e.shiftKey)) {
+    e.preventDefault();
+    redoEdit();
+  }
+}
+
 // 個別の音の手直し：編集モードで譜面の音を1つタップすると選択状態になり、
 // 次に演奏ボタンを弾くとその音が置き換わる（末尾からの「最後を削除」しかなかった
 // 操作を、途中の音1つだけの修正でも使えるようにする）
@@ -126,6 +250,9 @@ function initMusicEditor() {
     scoreReferenceBpm = draft.referenceBpm != null ? draft.referenceBpm : bpm;
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
+    // 保存済み譜面の読込(loadScore)と同じ正規化を使う。古い形式の下書き（ループ情報が
+    // 無い）・音符数が減って範囲が不正になった下書きのどちらも安全にフォールバックする
+    restoreLoopFromScore(draft, tokens.length);
   } else {
     currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
   }
@@ -140,6 +267,8 @@ function initMusicEditor() {
   document.getElementById("musicFollowExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicRotatePromptIcon").innerHTML = icon("rotateDevice", { size: 32 });
   document.getElementById("musicCalibToggleBtn").innerHTML = icon("wrench", { size: 15 });
+  document.getElementById("musicUndoBtn").innerHTML = icon("undo", { size: 16 });
+  document.getElementById("musicRedoBtn").innerHTML = icon("redo", { size: 16 });
 
   renderInstrumentSelector();
   renderDurationOptions();
@@ -158,6 +287,8 @@ function initMusicEditor() {
   bindHumControls();
   bindMidiImportControls();
   maybeShowOnboarding();
+  resetHistory();
+  document.addEventListener("keydown", handleHistoryKeydown);
 }
 
 // ── はじめての案内（①楽器を選ぶ→②テンポを決める→③録音か手入力かを選ぶ） ──
@@ -251,6 +382,7 @@ function finishOnboarding(startRecording) {
   // （①楽器→②テンポは「準備」タブ、③録音/手入力の選択は「作る」タブの内容に対応するため）
   setEditTab("create");
   saveDraftDebounced();
+  resetHistory();
   closeOnboarding(true);
 }
 
@@ -285,6 +417,7 @@ function selectInstrument(id) {
   renderLayoutSelector();
   renderInstrumentGrid();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // 楽器ごとの初期配置（ピアノは実機の初期選択に合わせ「22キー」、それ以外は先頭の配置）
@@ -326,6 +459,7 @@ function selectLayout(id) {
   renderLayoutSelector();
   renderInstrumentGrid();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // ピアノの「22キー」配置の時だけ、半音(♯)表示のON/OFFトグルを見せる
@@ -342,6 +476,8 @@ function updateSemitoneToggleVisibility() {
 function toggleSemitone() {
   semitoneEnabled = !semitoneEnabled;
   renderInstrumentGrid();
+  saveDraftDebounced();
+  commitHistory();
 }
 
 // ── 楽器の演奏ボタン（実機の配置を再現。押している間だけ音が鳴る） ──
@@ -891,6 +1027,7 @@ function addChordToken(notes, durationValue) {
   });
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // 休符（notes:[]の音）を、選んでいる長さで譜面の最後に追加する
@@ -904,6 +1041,7 @@ function deleteLastToken() {
   forgetTokenIndexesFrom(tokens.length);
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 function clearScore() {
@@ -915,6 +1053,7 @@ function clearScore() {
   humReviewIndexes = new Set();
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // 譜面の途中の音を1つだけタップして選び、置き換え・削除できるようにする
@@ -942,6 +1081,7 @@ function replaceTokenAt(index, notes, durationValue) {
   selectedTokenIndex = null;
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 function deleteSelectedToken() {
@@ -960,6 +1100,7 @@ function deleteSelectedToken() {
   selectedTokenIndex = null;
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // index以降を指すインデックスの記録(自動検出マークなど)を取り除く。
@@ -1103,6 +1244,11 @@ function handleScoreChipTap(index) {
       if (loopEnd < loopStart) [loopStart, loopEnd] = [loopEnd, loopStart];
       loopSelecting = false;
       loopEnabled = true;
+      updateLoopUI();
+      renderScoreDisplay();
+      saveDraftDebounced();
+      commitHistory();
+      return;
     }
     updateLoopUI();
     renderScoreDisplay();
@@ -1115,6 +1261,8 @@ function toggleLoopEnabled() {
   loopEnabled = !loopEnabled;
   updateLoopUI();
   renderScoreDisplay();
+  saveDraftDebounced();
+  commitHistory();
 }
 
 function clearLoop() {
@@ -1124,6 +1272,8 @@ function clearLoop() {
   loopSelecting = false;
   updateLoopUI();
   renderScoreDisplay();
+  saveDraftDebounced();
+  commitHistory();
 }
 
 function updateLoopUI() {
@@ -1778,6 +1928,9 @@ function saveDraft() {
       timeSignatureId,
       freeTiming: scoreFreeTiming,
       referenceBpm: scoreReferenceBpm,
+      loopStart,
+      loopEnd,
+      loopEnabled,
       name: scoreName,
       scoreId: currentScoreId,
     })
@@ -1836,6 +1989,8 @@ function saveCurrentAsScore() {
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
     persistSavedScores();
+    historySavedIndex = scoreHistoryIndex;
+    updateUndoRedoUI();
     showToast(T("music_toast_updated", "更新しました"));
     return;
   }
@@ -1859,6 +2014,8 @@ function saveCurrentAsScore() {
   persistSavedScores();
   currentScoreId = score.id;
   saveDraft();
+  historySavedIndex = scoreHistoryIndex;
+  updateUndoRedoUI();
   showToast(T("music_toast_saved", "保存しました"));
 }
 
@@ -1890,6 +2047,7 @@ function chooseNewScoreType(freeTiming) {
   renderFreeTimingUI();
   renderScoreDisplay();
   saveDraft();
+  resetHistory();
   closeNewScoreTypeModal();
 }
 
@@ -1921,6 +2079,7 @@ function convertFreeTimingScoreToBarBased() {
   renderFreeTimingUI();
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
   showToast(T("music_toast_converted_to_bar", "拍子ベースの譜面に変換しました"));
 }
 
@@ -1990,6 +2149,7 @@ function loadScore(id) {
   renderFreeTimingUI();
   renderScoreDisplay();
   saveDraft();
+  resetHistory();
   closeSavedListModal();
 }
 
@@ -2055,6 +2215,8 @@ function bindControls() {
 
   document.getElementById("musicNewBtn").addEventListener("click", newScore);
   document.getElementById("musicSaveBtn").addEventListener("click", saveCurrentAsScore);
+  document.getElementById("musicUndoBtn").addEventListener("click", undoEdit);
+  document.getElementById("musicRedoBtn").addEventListener("click", redoEdit);
   document.getElementById("musicOpenListBtn").addEventListener("click", openSavedListModal);
 
   document.getElementById("musicNewScoreTypeBarBtn").addEventListener("click", () => chooseNewScoreType(false));
@@ -2077,12 +2239,14 @@ function bindControls() {
     // シークバーのタイムラインだけは作り直す
     rebuildPlaybackTimeline();
     saveDraftDebounced();
+    commitHistory();
   });
   document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {
     timeSignatureId = e.target.value;
     tempoWarningDismissed = true;
     renderScoreDisplay();
     saveDraftDebounced();
+    commitHistory();
   });
 
   document.getElementById("musicRecordToggle").addEventListener("change", toggleRecording);

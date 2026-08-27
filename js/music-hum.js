@@ -1304,6 +1304,9 @@ function applyGeneratedMelodyTokens(newTokens, doneToastMessage) {
   renderScoreDisplay();
   renderFreeTimingUI();
   saveDraftDebounced();
+  // ここより前(変換前の譜面)にはUndoで戻れないようにする。そうしないと、変換後に
+  // 1回でも手動編集すると、その1回のUndoで変換結果ごと消えてしまうため
+  resetHistory();
   closeHumModal();
   showToast(doneToastMessage);
 }

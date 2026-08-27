@@ -176,6 +176,59 @@ body.dark .music-panel-title{
   color:#b3a89a;
 }
 
+.music-score-header-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.music-score-header-row .music-panel-title{
+  margin-bottom:0;
+}
+
+.music-history-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-shrink:0;
+}
+
+.music-unsaved-indicator{
+  font-size:11px;
+  color:var(--vermillion);
+  white-space:nowrap;
+}
+
+body.dark .music-unsaved-indicator{
+  color:var(--dark-highlight);
+}
+
+.music-history-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:30px;
+  height:30px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+}
+
+.music-history-btn:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
+
+body.dark .music-history-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
 /* 楽器選択 */
 .music-instrument-buttons{
   display:flex;
