@@ -713,6 +713,8 @@
   "music_midi_merge_all_btn": "全トラックをまとめて変換",
   "music_midi_use_track_btn": "このトラックだけ変換",
   "music_midi_track_unnamed": "トラック{n}",
+  "music_midi_channel_unnamed": "チャンネル{n}",
+  "music_midi_channel_with_track_name": "{name}（チャンネル{n}）",
   "music_midi_too_many_notes": "音符数が多すぎます（検出数:約{count}音 / 上限:{limit}音）。曲の一部だけを含むMIDIファイルにするか、トラックを絞ってからお試しください",
   "music_midi_all_tracks_label": "全トラック",
   "music_midi_preview_title": "変換結果のプレビュー",

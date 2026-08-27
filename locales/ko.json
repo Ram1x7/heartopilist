@@ -689,6 +689,8 @@
   "music_midi_merge_all_btn": "모든 트랙 합쳐서 변환",
   "music_midi_use_track_btn": "이 트랙만 변환",
   "music_midi_track_unnamed": "트랙 {n}",
+  "music_midi_channel_unnamed": "채널 {n}",
+  "music_midi_channel_with_track_name": "{name} (채널 {n})",
   "music_midi_too_many_notes": "음표 수가 너무 많습니다(검출: 약 {count} / 상한: {limit}). 곡의 일부만 포함된 MIDI 파일을 사용하거나 트랙을 줄여서 다시 시도해 주세요",
   "music_midi_all_tracks_label": "모든 트랙",
   "music_midi_preview_title": "변환 결과 미리보기",
