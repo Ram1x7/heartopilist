@@ -1264,7 +1264,11 @@ function renderScoreDisplay() {
   let beatsSinceBar = 0;
   tokens.forEach((tok, i) => {
     const inBlock = !isPracticeBlockView || (i >= blockStart && i < blockEnd);
-    if (i > 0 && beatsSinceBar >= beatsPerBar) {
+    // 小節線は、手入力（キーボード演奏入力等）で作った拍子ベースの譜面でのみ表示する。
+    // フリーテンポ譜面（MIDI/音源/動画/ハミングからの自動変換は全てこちら）は
+    // 実時間の長さ(durationMs)しか持たず、小節線の位置はあくまで基準テンポからの
+    // 近似でしかないため、不正確な位置に表示して誤解を招くより、そもそも表示しない
+    if (!scoreFreeTiming && i > 0 && beatsSinceBar >= beatsPerBar) {
       if (inBlock) html += `<span class="music-chip music-chip-bar"></span>`;
       beatsSinceBar = 0;
     }

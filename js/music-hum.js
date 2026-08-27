@@ -482,6 +482,41 @@ function quantizeMelodyRhythm(events, bpmValue, opts) {
   return result;
 }
 
+// フリーテンポ譜面用：拍グリッドへのスナップは一切行わず、検出した実際の時間(秒)を
+// そのままtokenの長さ(durationMs)として使う（quantizeMelodyRhythmのフリーテンポ版。
+// 考え方はjs/music-midi-import.jsのbuildFreeTimingChordTimelineと完全に同じで、
+// 和音(midis配列)ではなく単音(midi)を扱う点だけが異なる）。
+// ハミング・音源・動画のいずれも、手入力（キーボード演奏入力）以外は全てこちらを使い、
+// 拍子ベースへの量子化(quantizeMelodyRhythm)は行わない
+function buildFreeTimingMelodyTimeline(events, opts) {
+  const options = opts || {};
+  if (!events.length) return [];
+  const restGapSec = options.restGapSec != null ? options.restGapSec : 0.15;
+  const minDurationMs = options.minDurationMs != null ? options.minDurationMs : 60;
+
+  const result = [];
+  events.forEach((e, i) => {
+    const ownEnd = e.startTimeSeconds + e.durationSeconds;
+    const nextStart = i + 1 < events.length ? events[i + 1].startTimeSeconds : null;
+    const gapAfter = nextStart == null ? null : nextStart - ownEnd;
+    const isRestAfter = gapAfter != null && gapAfter >= restGapSec;
+    const lengthSec = !isRestAfter && nextStart != null ? Math.max(e.durationSeconds, nextStart - e.startTimeSeconds) : e.durationSeconds;
+
+    result.push({ midi: e.pitchMidi, durationMs: Math.max(minDurationMs, lengthSec * 1000) });
+    if (isRestAfter) {
+      result.push({ midi: null, durationMs: Math.max(minDurationMs, gapAfter * 1000) });
+    }
+  });
+  return result;
+}
+
+// 拍子ベース(beats)・フリーテンポ(durationMs)どちらの形式のtokenでも同じように
+// 扱えるよう、長さ情報だけをそのまま引き継ぐ（js/music-midi-import.jsの
+// chordGroupDurationValueと同じ考え方。単音用にこちらにも同じ実装を持つ）
+function melodyEventDurationValue(e) {
+  return e.durationMs != null ? { durationMs: e.durationMs } : { beats: e.beats };
+}
+
 // 指定したMIDI番号に対して、楽器で実際に選べる音の中から最も適切な候補を選ぶ
 // （MIDI/音源/動画の和音対応パイプライン(js/music-midi-import.jsのpickNearestInstrumentNote)、
 // ハミング/音源/動画の単旋律パイプライン(このすぐ下のpickClosestMelodyNoteWithContour)の
@@ -568,7 +603,8 @@ function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
 // とみなす）。changesには実際に「検出音そのままの音」から変更が生じた音を
 // 記録し、開発時の確認用ログにのみ使う
 function mapMelodyToInstrument(events, availableNotes, opts) {
-  if (!availableNotes.length) return { tokens: events.map((e) => ({ notes: [], beats: e.beats })), changes: [], octaveShift: 0, rawShiftedMidis: events.map(() => null) };
+  if (!availableNotes.length)
+    return { tokens: events.map((e) => ({ notes: [], ...melodyEventDurationValue(e) })), changes: [], octaveShift: 0, rawShiftedMidis: events.map(() => null) };
 
   // opts.octaveShiftOverrideは省略可能（既定0）：音源/動画/ハミングの変換プレビューで、
   // 自動算出オクターブに対しユーザーが手動で±1オクターブ調整したい場合にのみ使う
@@ -586,7 +622,7 @@ function mapMelodyToInstrument(events, availableNotes, opts) {
   for (let i = 0; i < events.length; i++) {
     const e = events[i];
     if (e.midi == null) {
-      tokens.push({ notes: [], beats: e.beats });
+      tokens.push({ notes: [], ...melodyEventDurationValue(e) });
       rawShiftedMidis.push(null);
       prevMappedMidi = null;
       prevShiftedMidi = null;
@@ -602,7 +638,7 @@ function mapMelodyToInstrument(events, availableNotes, opts) {
     }
     const chosen = pickClosestMelodyNoteWithContour(shiftedMidi, availableNotes, { prevShiftedMidi, prevMappedMidi, nextShiftedMidi });
     const chosenMidi = melodyNoteToMidi(chosen);
-    tokens.push({ notes: [{ degree: chosen.degree, accidental: chosen.accidental || null, octave: chosen.octave }], beats: e.beats });
+    tokens.push({ notes: [{ degree: chosen.degree, accidental: chosen.accidental || null, octave: chosen.octave }], ...melodyEventDurationValue(e) });
     rawShiftedMidis.push(shiftedMidi);
     if (chosenMidi !== shiftedMidi) changes.push({ index: i, fromMidi: shiftedMidi, toMidi: chosenMidi });
     prevMappedMidi = chosenMidi;
@@ -694,12 +730,17 @@ function resolveHeartopiaNoteWithWideContext(k, result, rawShiftedMidis, availab
   return tied[0].entry.note;
 }
 
-// mapMelodyToInstrumentの結果(tokens)を、休符または長い音（既定2拍以上）で
+// mapMelodyToInstrumentの結果(tokens)を、休符または長い音（既定2拍相当以上）で
 // 区切って「フレーズ」に分割する。各フレーズについて、そのインデックス列・
-// 生データ側のシフト後MIDI列・現在のnotesのコピーを返す
-function splitMelodyPhrases(result, rawShiftedMidis, opts) {
+// 生データ側のシフト後MIDI列・現在のnotesのコピーを返す。
+// tokenがbeats(拍子ベース)・durationMs(フリーテンポ)のどちらの形式でも同じ
+// 基準で判定できるよう、「長い音」のしきい値はbpmValueを使って常にミリ秒へ
+// 換算してから比較する（拍子ベースの場合も、そのtokenの拍数を同じ換算で
+// ミリ秒相当に直すことで扱いを揃える）
+function splitMelodyPhrases(result, rawShiftedMidis, bpmValue, opts) {
   const options = opts || {};
   const longNoteBeats = options.longNoteBeats != null ? options.longNoteBeats : 2;
+  const longNoteMs = longNoteBeats * (60000 / bpmValue);
   const phrases = [];
   let current = { indexes: [], rawShifted: [], notes: [] };
   const flush = () => {
@@ -714,7 +755,8 @@ function splitMelodyPhrases(result, rawShiftedMidis, opts) {
     current.indexes.push(idx);
     current.rawShifted.push(rawShiftedMidis[idx]);
     current.notes.push({ ...t.notes[0] });
-    if (t.beats >= longNoteBeats) flush();
+    const noteMs = t.durationMs != null ? t.durationMs : t.beats * (60000 / bpmValue);
+    if (noteMs >= longNoteMs) flush();
   });
   flush();
   return phrases;
@@ -723,7 +765,7 @@ function splitMelodyPhrases(result, rawShiftedMidis, opts) {
 // mapMelodyToInstrumentが返したtokensを、上記の考え方で仕上げる。
 // 戻り値のoptimizerLogは、実際に変更した音のみを{index, originalMidi,
 // mappedMidi, optimizedMidi, reason}の形で記録し、開発確認用ログにのみ使う
-function optimizeMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, opts) {
+function optimizeMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, bpmValue, opts) {
   const options = opts || {};
   const burstMinRun = options.burstMinRun != null ? options.burstMinRun : 3;
   // 元データのシフト後MIDIがこの半音数を超えてばらけているのに最終的な音が
@@ -735,7 +777,7 @@ function optimizeMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, opt
   // 「別々の実音が同じ1つの使用可能音へ吸着する」衝突である
   const burstOriginalSpreadSemitones = options.burstOriginalSpreadSemitones != null ? options.burstOriginalSpreadSemitones : 0.5;
 
-  const result = tokens.map((t) => ({ notes: t.notes.map((n) => ({ ...n })), beats: t.beats }));
+  const result = tokens.map((t) => ({ notes: t.notes.map((n) => ({ ...n })), ...melodyEventDurationValue(t) }));
   const optimizerLog = [];
   if (!availableNotes.length) return { tokens: result, optimizerLog };
 
@@ -769,7 +811,7 @@ function optimizeMelodyForHeartopia(tokens, rawShiftedMidis, availableNotes, opt
   }
 
   // ── 2. 繰り返しフレーズの一貫性 ──
-  const phrases = splitMelodyPhrases(result, rawShiftedMidis, options.phrase);
+  const phrases = splitMelodyPhrases(result, rawShiftedMidis, bpmValue, options.phrase);
   const seenBySignature = new Map();
   phrases.forEach((phrase) => {
     if (phrase.rawShifted.length < 3 || phrase.rawShifted.some((m) => m == null)) return; // 短すぎるものは対象外
@@ -816,7 +858,10 @@ function logMelodyAnalysisStages(rawEvents, normalized, timeline, mappedTokens, 
   console.log(`NORMALIZED (${normalized.length}件)`);
   normalized.forEach((e) => console.log(`${e.startTimeSeconds.toFixed(2)}s  ${melodyMidiLabel(e.pitchMidi)}  ${e.durationSeconds.toFixed(2)}s`));
   console.log(`QUANTIZED (${timeline.length}件)`);
-  timeline.forEach((e) => console.log(e.midi == null ? `rest  ${e.beats}拍` : `${melodyMidiLabel(e.midi)}  ${e.beats}拍`));
+  timeline.forEach((e) => {
+    const durationLabel = e.durationMs != null ? `${Math.round(e.durationMs)}ms` : `${e.beats}拍`;
+    console.log(e.midi == null ? `rest  ${durationLabel}` : `${melodyMidiLabel(e.midi)}  ${durationLabel}`);
+  });
   console.log(`MAPPED (オクターブシフト${octaveShift / 12}オクターブ、変更${changes.length}件)`);
   const changeByIndex = new Map(changes.map((c) => [c.index, c]));
   mappedTokens.forEach((t, i) => {
@@ -840,9 +885,11 @@ function logMelodyAnalysisStages(rawEvents, normalized, timeline, mappedTokens, 
 }
 
 // Basic Pitchのノートイベント[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を
-// tokens形式（[{notes:[{degree,accidental,octave}], beats}, ...]）に変換する
-// （normalizeMelodyNoteEvents → quantizeMelodyRhythm → mapMelodyToInstrument →
-// optimizeHumMelodyForHeartopeaの4段階。最適化層はマッピング直後に一度だけ通す）
+// tokens形式（[{notes:[{degree,accidental,octave}], durationMs}, ...]）に変換する
+// （normalizeMelodyNoteEvents → buildFreeTimingMelodyTimeline → mapMelodyToInstrument →
+// optimizeHumMelodyForHeartopeaの4段階。最適化層はマッピング直後に一度だけ通す）。
+// 手入力（キーボード演奏入力）以外は全てフリーテンポ譜面として扱うため、
+// 拍子ベースへの量子化(quantizeMelodyRhythm)は使わない
 function convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts) {
   const options = opts || {};
   const sourceType = options.sourceType || "humming"; // "humming" | "audio" | "video" | "midi"（midiはフェーズ2で追加予定、未実装）
@@ -860,9 +907,9 @@ function convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts) {
     return [];
   }
 
-  const timeline = quantizeMelodyRhythm(normalized, bpmValue, options.rhythm);
+  const timeline = buildFreeTimingMelodyTimeline(normalized, options.freeTimingRhythm);
   const { tokens: mappedTokens, changes, octaveShift, rawShiftedMidis } = mapMelodyToInstrument(timeline, availableNotes, options.mapping);
-  const { tokens, optimizerLog } = optimizeMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, options.optimize);
+  const { tokens, optimizerLog } = optimizeMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, bpmValue, options.optimize);
 
   if (debugEnabled) {
     logMelodyAnalysisStages(noteEvents, normalized, timeline, mappedTokens, changes, octaveShift, tokens, optimizerLog);
@@ -877,7 +924,7 @@ function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
 }
 
 // ハミング（単旋律）変換プレビュー専用：convertMelodyToScoreTokensと全く同じ
-// 変換段階（normalizeMelodyNoteEvents → quantizeMelodyRhythm →
+// 変換段階（normalizeMelodyNoteEvents → buildFreeTimingMelodyTimeline →
 // mapMelodyToInstrument → optimizeMelodyForHeartopia）を実行しつつ、変換結果と
 // 一緒に統計情報も返す。js/music-midi-import.jsのconvertMidiWithPreviewStats
 // （和音対応パイプライン側の同種の関数）と対になる、単旋律パイプライン側の
@@ -891,10 +938,10 @@ function convertMelodyWithPreviewStats(noteEvents, layout, bpmValue, opts) {
     return { tokens: [], stats: { tokenCount: 0, noteCount: 0, restCount: 0, outOfRangeCount: 0, autoOctaveShift: 0, manualOctaveOffset: options.octaveShiftOverride || 0, totalDurationSec: 0 } };
   }
 
-  const timeline = quantizeMelodyRhythm(normalized, bpmValue, options.rhythm);
+  const timeline = buildFreeTimingMelodyTimeline(normalized, options.freeTimingRhythm);
   const mappingOpts = { ...options.mapping, octaveShiftOverride: options.octaveShiftOverride };
   const { tokens: mappedTokens, rawShiftedMidis } = mapMelodyToInstrument(timeline, availableNotes, mappingOpts);
-  const { tokens } = optimizeMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, options.optimize);
+  const { tokens } = optimizeMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, bpmValue, options.optimize);
 
   const detectedMidis = timeline.filter((e) => e.midi != null).map((e) => Math.round(e.midi));
   const autoOctaveShift = computeMelodyOctaveShift(detectedMidis, availableNotes);
@@ -910,7 +957,7 @@ function convertMelodyWithPreviewStats(noteEvents, layout, bpmValue, opts) {
       if (m != null && (m < instMin || m > instMax)) outOfRangeCount++;
     });
   }
-  const totalDurationSec = tokens.reduce((sum, t) => sum + (t.beats || 0), 0) * (60 / bpmValue);
+  const totalDurationSec = tokens.reduce((sum, t) => sum + (t.durationMs || 0), 0) / 1000;
 
   return {
     tokens,
@@ -1864,7 +1911,7 @@ function applyMelodyPreviewToCurrentScore() {
   currentInstrumentId = melodyPreviewState.instrumentId;
   currentLayoutId = melodyPreviewState.layoutId;
   semitoneEnabled = melodyPreviewState.semitoneEnabled;
-  scoreFreeTiming = melodyPreviewState.kind !== "humming";
+  scoreFreeTiming = true; // ハミング・音源・動画のいずれも手入力以外は全てフリーテンポ譜面にする
   scoreReferenceBpm = melodyPreviewState.bpm;
   renderInstrumentSelector();
   renderLayoutSelector();
@@ -1885,7 +1932,7 @@ function saveMelodyPreviewAsNewScore() {
     semitoneEnabled: melodyPreviewState.semitoneEnabled,
     bpm,
     timeSignatureId,
-    freeTiming: melodyPreviewState.kind !== "humming",
+    freeTiming: true, // ハミング・音源・動画のいずれも手入力以外は全てフリーテンポ譜面にする
     referenceBpm: melodyPreviewState.bpm,
     tokens: melodyPreviewState.latestTokens,
   });
