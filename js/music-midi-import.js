@@ -417,35 +417,15 @@ function quantizeChordRhythm(groups, bpmValue, opts) {
   return result;
 }
 
-// 指定MIDI番号に最も近い、楽器で実際に選べる音を返す（単純な最近傍。
-// 和音内の同時発音には「前後の輪郭」という概念が無いため、
-// js/music-hum.jsのpickClosestMelodyNoteWithContourのような文脈補正はせず、
-// 距離だけで機械的に決める）。
-// 曲全体の音域が楽器の音域より広い場合（オクターブシフトを1つに決めても
-// 全ての音は収まらない場合）や、手動のオクターブ調整で意図的に音域外へ
-// 出た場合、単純な絶対距離だけで最も近いボタンを探すと、音域から大きく
-// 外れた別々の音が全て同じ境界のボタンへ潰れてしまい、メロディの起伏が
-// 失われる（例：楽器の音域外まで大きく跳躍する音が続けて出てくると、
-// 本来は違う高さのはずの音がすべて同じボタンに変換されてしまう）。
-// これを避けるため、まず対象の音をオクターブ単位(12半音)で楽器の音域内へ
-// 折り返してから最も近いボタンを探す。音域内の音はそのまま(折り返し0回)
-// なので、この変更による挙動の変化は音域外の音にのみ生じる
-function pickNearestInstrumentNote(midi, availableNotes) {
-  const instMin = availableNotes[0].midi;
-  const instMax = availableNotes[availableNotes.length - 1].midi;
-  let folded = midi;
-  while (folded < instMin) folded += 12;
-  while (folded > instMax) folded -= 12;
-  let best = availableNotes[0];
-  let bestDist = Infinity;
-  availableNotes.forEach((entry) => {
-    const dist = Math.abs(entry.midi - folded);
-    if (dist < bestDist) {
-      bestDist = dist;
-      best = entry;
-    }
-  });
-  return best.note;
+// 指定MIDI番号に最も適切な、楽器で実際に選べる音を返す。実体は
+// js/music-hum.jsのpickInstrumentNoteCandidate（MIDI/音源/動画とハミングで
+// 共有する候補選択の実装。音域外の折り返し・半音ボタンが無い楽器での
+// 前後関係を考慮した選択の詳しい説明もそちらのコメントを参照）。
+// ctxは省略可能：和音の同時発音には単一の「前後」という概念が無いため、
+// mapChordsToInstrumentは各和音グループの最高音（主旋律とみなす音、
+// pickPriorityChordNotesと同じ考え方）どうしの前後関係をctxとして渡す
+function pickNearestInstrumentNote(midi, availableNotes, ctx) {
+  return pickInstrumentNoteCandidate(midi, availableNotes, ctx).note;
 }
 
 // グループ1つぶんの長さを、そのグループが持つ形式（拍子ベース=beats／
@@ -464,7 +444,15 @@ function chordGroupDurationValue(g) {
 // 同じ使用可能音へスナップした場合は、dedupeNotesで重複を取り除く。
 // opts.octaveShiftOverrideは省略可能（既定0）：MIDI変換プレビューで、自動算出
 // オクターブに対しユーザーが手動で±1オクターブ調整したい場合にのみ使う
-// （半音単位。既存の呼び出し元は省略するため挙動は変わらない）
+// （半音単位。既存の呼び出し元は省略するため挙動は変わらない）。
+//
+// 半音ボタンが無い楽器（availableNotesにaccidentalの候補が無い場合）へ変換する時、
+// 各音を和音グループ単独の絶対距離だけで決めると、前後の和音との間でメロディの
+// 上下方向が崩れることがある。和音には単一の「前後関係」という概念が無いため、
+// 各グループの最高音（pickPriorityChordNotesと同じく主旋律とみなす音）どうしの
+// 前後関係を、グループ内の全ての音へ共通のヒントとして渡す（単音のみのグループ
+// （＝実質的に和音を含まないMIDIトラック）ではこれがそのまま単旋律の前後関係と
+// 一致する）
 function mapChordsToInstrument(chordTimeline, availableNotes, opts) {
   const octaveShiftOverride = (opts && opts.octaveShiftOverride) || 0;
   if (!availableNotes.length) {
@@ -476,11 +464,31 @@ function mapChordsToInstrument(chordTimeline, availableNotes, opts) {
   });
   const shift = computeMelodyOctaveShift(allMidis, availableNotes) + octaveShiftOverride;
 
-  return chordTimeline.map((g) => {
-    if (!g.midis) return { notes: [], ...chordGroupDurationValue(g) };
-    const mappedNotes = g.midis.map((m) => pickNearestInstrumentNote(m + shift, availableNotes));
-    return { notes: dedupeNotes(mappedNotes), ...chordGroupDurationValue(g) };
+  const result = [];
+  let prevTopInputMidi = null;
+  let prevTopOutputMidi = null;
+  chordTimeline.forEach((g, i) => {
+    if (!g.midis) {
+      result.push({ notes: [], ...chordGroupDurationValue(g) });
+      prevTopInputMidi = null;
+      prevTopOutputMidi = null;
+      return;
+    }
+    const shiftedMidis = g.midis.map((m) => m + shift);
+    let nextTopInputMidi = null;
+    for (let j = i + 1; j < chordTimeline.length; j++) {
+      if (chordTimeline[j].midis) {
+        nextTopInputMidi = Math.max(...chordTimeline[j].midis.map((m) => m + shift));
+        break;
+      }
+    }
+    const ctx = { prevInputMidi: prevTopInputMidi, prevOutputMidi: prevTopOutputMidi, nextInputMidi: nextTopInputMidi };
+    const mappedNotes = shiftedMidis.map((m) => pickNearestInstrumentNote(m, availableNotes, ctx));
+    result.push({ notes: dedupeNotes(mappedNotes), ...chordGroupDurationValue(g) });
+    prevTopInputMidi = Math.max(...shiftedMidis);
+    prevTopOutputMidi = Math.max(...mappedNotes.map(melodyNoteToMidi));
   });
+  return result;
 }
 
 // MIDIファイル・音源/動画ファイル(Basic Pitchのポリフォニック検出結果)の
@@ -504,7 +512,7 @@ function convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, bpmValue, 
   const timeline = freeTiming
     ? buildFreeTimingChordTimeline(limitedGroups, options.freeTimingRhythm)
     : quantizeChordRhythm(limitedGroups, bpmValue, options.rhythm);
-  return mapChordsToInstrument(timeline, availableNotes);
+  return mapChordsToInstrument(timeline, availableNotes, { octaveShiftOverride: options.octaveShiftOverride });
 }
 
 // MIDIプレビュー専用：convertPolyphonicNoteEventsToScoreTokensと全く同じ変換段階
@@ -989,7 +997,7 @@ function encodeScoreAsMidiBytes(exportTokens, exportBpm, exportTimeSignatureId, 
 
 // ファイル名として安全な文字列にする（パス区切り文字・制御文字を除去）
 function sanitizeMidiExportFileName(name) {
-  const cleaned = (name || "").replace(/[\\/:*?"<>| -]/g, "_").trim();
+  const cleaned = (name || "").replace(/[\\/:*?"<>|\x00-\x1f]/g, "_").trim();
   return cleaned || T("music_default_score_name", "譜面");
 }
 
