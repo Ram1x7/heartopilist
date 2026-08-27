@@ -425,7 +425,14 @@ function limitChordPolyphony(groups, maxNotes) {
 // 時間(秒)をそのままtokenの長さ(durationMs)として使う。次のグループとの
 // 間隔が十分空いていれば休符を挟み、そうでなければこの音の長さを次の音の
 // 開始位置まで伸ばして隙間なくつなげる（考え方はquantizeChordRhythmと同じだが、
-// 拍ではなく実時間(秒)で判定・保持する点だけが異なる）
+// 拍ではなく実時間(秒)で判定・保持する点だけが異なる）。
+// tokenの列は「この和音を鳴らし終えたら次の和音」という一列の並びでしか長さを
+// 表現できないため、この和音の実際の長さが次の和音の開始位置より後まで
+// 鳴っている（複数トラック/チャンネルを結合した際、他パートの音が鳴っている
+// 間もこの音が伸び続けているようなケース）場合でも、次の開始位置で必ず
+// 打ち切る。ここをnextStart-startとg.durationSecondsの大きい方にしてしまうと、
+// 重なっている分がそのまま加算され続け、曲全体の長さが実際より大幅に
+// 長くなってしまう（実際に和音が重なる曲で発生した不具合）
 function buildFreeTimingChordTimeline(groups, opts) {
   const options = opts || {};
   if (!groups.length) return [];
@@ -438,7 +445,7 @@ function buildFreeTimingChordTimeline(groups, opts) {
     const nextStart = i + 1 < groups.length ? groups[i + 1].startTimeSeconds : null;
     const gapAfter = nextStart == null ? null : nextStart - ownEnd;
     const isRestAfter = gapAfter != null && gapAfter >= restGapSec;
-    const lengthSec = !isRestAfter && nextStart != null ? Math.max(g.durationSeconds, nextStart - g.startTimeSeconds) : g.durationSeconds;
+    const lengthSec = !isRestAfter && nextStart != null ? nextStart - g.startTimeSeconds : g.durationSeconds;
 
     result.push({ midis: g.midis, durationMs: Math.max(minDurationMs, lengthSec * 1000) });
     if (isRestAfter) {
