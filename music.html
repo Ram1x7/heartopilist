@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=11">
-<link rel="stylesheet" href="./css/music.css?v=39">
+<link rel="stylesheet" href="./css/music.css?v=40">
 <link rel="stylesheet" href="./css/design-system.css?v=1">
 
 <link rel="prefetch" href="./index.html">
@@ -56,8 +56,8 @@
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
-    <button id="darkToggle" aria-label="toggle dark mode"></button>
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="Help" data-i18n-aria-label="aria_help_label"></button>
+    <button id="darkToggle" aria-label="Toggle dark mode" data-i18n-aria-label="aria_dark_mode_label"></button>
   </div>
 </div>
 
@@ -84,16 +84,16 @@
   現在開発中の機能です。今後のアップデートで順次使えるようになります。
 </div>
 
-<div class="music-mode-tabs">
-  <button class="music-mode-btn active" id="musicModeEditBtn" data-i18n="music_mode_edit">編集</button>
-  <button class="music-mode-btn" id="musicModePracticeBtn" data-i18n="music_mode_practice">練習</button>
-  <button class="music-mode-btn" id="musicModeFollowBtn" data-i18n="music_mode_follow">追従</button>
-  <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="toggle sound"></button>
+<div class="music-mode-tabs" role="tablist">
+  <button class="music-mode-btn active" id="musicModeEditBtn" role="tab" aria-selected="true" data-i18n="music_mode_edit">編集</button>
+  <button class="music-mode-btn" id="musicModePracticeBtn" role="tab" aria-selected="false" data-i18n="music_mode_practice">練習</button>
+  <button class="music-mode-btn" id="musicModeFollowBtn" role="tab" aria-selected="false" data-i18n="music_mode_follow">追従</button>
+  <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
 </div>
 
-<div class="music-edit-tabs" id="musicEditTabs">
-  <button class="music-edit-tab-btn active" id="musicEditTabPrepareBtn" data-i18n="music_tab_prepare">準備</button>
-  <button class="music-edit-tab-btn" id="musicEditTabCreateBtn" data-i18n="music_tab_create">作る</button>
+<div class="music-edit-tabs" id="musicEditTabs" role="tablist">
+  <button class="music-edit-tab-btn active" id="musicEditTabPrepareBtn" role="tab" aria-selected="true" data-i18n="music_tab_prepare">準備</button>
+  <button class="music-edit-tab-btn" id="musicEditTabCreateBtn" role="tab" aria-selected="false" data-i18n="music_tab_create">作る</button>
 </div>
 
 <div class="music-layout" id="musicEditLayout">
@@ -219,13 +219,13 @@
       <div id="musicPlaybackAnchorPractice">
         <div class="music-playback-row" id="musicPlaybackRow">
           <div class="music-seek-row">
-            <input type="range" class="music-seek-slider" id="musicSeekSlider" min="0" max="1000" step="1" value="0" aria-label="seek">
+            <input type="range" class="music-seek-slider" id="musicSeekSlider" min="0" max="1000" step="1" value="0" aria-label="Seek" data-i18n-aria-label="music_aria_seek">
             <span class="music-seek-time" id="musicSeekTimeLabel">0:00 / 0:00</span>
           </div>
           <div class="music-playback-controls-row">
-            <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="play/pause"></button>
+            <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="Play or pause" data-i18n-aria-label="music_aria_play_pause"></button>
             <div class="music-speed-control">
-              <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1">
+              <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1" aria-label="Playback speed" data-i18n-aria-label="music_aria_speed">
               <span id="musicSpeedLabel">1.00倍</span>
             </div>
           </div>
@@ -234,16 +234,17 @@
       <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
       <div class="music-practice-accuracy" id="musicPracticeAccuracy"></div>
       <div class="music-practice-topbar-icons">
-        <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="adjust position"></button>
-        <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="toggle sound"></button>
-        <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="close"></button>
+        <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="Match game screen" data-i18n-aria-label="music_calib_toggle_label" aria-pressed="false"></button>
+        <div class="music-calib-hint-bubble" id="musicCalibHintBubble" data-i18n="music_calib_hint_once">画面がずれる場合は、ここで「ゲーム画面に合わせる」を調整できます</div>
+        <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+        <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
       </div>
     </div>
     <div id="musicScoreDisplayAnchorPractice"></div>
   </div>
   <div class="music-practice-song-info" id="musicPracticeSongInfo"></div>
   <div class="music-calib-overlay" id="musicCalibOverlay">
-    <p class="music-calib-hint" data-i18n="music_calib_hint">ドラッグで移動、2本指ピンチで拡大縮小できます</p>
+    <p class="music-calib-hint" data-i18n="music_calib_hint">ドラッグで移動、2本指ピンチで拡大縮小できます。この端末でのすべての楽器・配置に共通で適用されます</p>
     <div class="music-calib-btn-row">
       <label class="music-calib-btn" id="musicCalibBgLabel">
         <input type="file" accept="image/*" id="musicCalibBgInput" style="display:none">
@@ -267,9 +268,9 @@
      練習モードと違って横画面には固定しない -->
 <div class="music-follow-stage" id="musicFollowStage">
   <div class="music-practice-stage-topbar">
-    <button class="music-practice-exit-btn" id="musicFollowExitBtn" aria-label="close"></button>
+    <button class="music-practice-exit-btn" id="musicFollowExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
     <div class="music-practice-stage-name" id="musicFollowStageName"></div>
-    <button class="music-sound-btn" id="musicSoundToggleBtnFollow" aria-label="toggle sound"></button>
+    <button class="music-sound-btn" id="musicSoundToggleBtnFollow" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
   </div>
   <div class="music-follow-display" id="musicFollowDisplay"></div>
   <div id="musicPlaybackAnchorFollow"></div>
@@ -280,7 +281,7 @@
   ※本サイトは非公式のファンツールです
 </div>
 
-<div id="musicSavedListModal" onclick="if(event.target.id==='musicSavedListModal') closeSavedListModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+<div id="musicSavedListModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='musicSavedListModal') closeSavedListModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box music-saved-box">
     <h3 data-i18n="music_saved_title">保存した譜面</h3>
     <div class="music-saved-list" id="musicSavedList"></div>
@@ -288,7 +289,7 @@
   </div>
 </div>
 
-<div id="musicNewScoreTypeModal" onclick="if(event.target.id==='musicNewScoreTypeModal') closeNewScoreTypeModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+<div id="musicNewScoreTypeModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='musicNewScoreTypeModal') closeNewScoreTypeModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
   <div class="modal-box music-onboarding-box">
     <h3 data-i18n="music_new_type_title">譜面の種類を選ぶ</h3>
     <p class="music-onboard-hint" data-i18n="music_new_type_hint">あとから「拍子ベースの譜面に変換する」でフリーテンポ→拍子ベースへの変換はできます（逆方向はできません）</p>
@@ -304,7 +305,7 @@
   </div>
 </div>
 
-<div id="musicOnboardingModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+<div id="musicOnboardingModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
   <div class="modal-box music-onboarding-box">
     <div class="music-onboarding-progress">
       <span class="music-onboarding-dot" data-step="1"></span>
@@ -353,7 +354,7 @@
   </div>
 </div>
 
-<div id="musicHumModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+<div id="musicHumModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box music-hum-box">
     <h3 id="musicHumModalTitle" data-i18n="music_hum_modal_title">ハミングから作る</h3>
     <p class="music-hum-caution" id="musicHumCautionText" data-i18n="music_hum_caution">ゆっくり・はっきりと、1音ずつ鼻歌を歌うと綺麗に変換されます。速い曲や和音、伴奏が混ざった音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、録音・アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません</p>
@@ -397,7 +398,7 @@
   </div>
 </div>
 
-<div id="musicMidiTrackModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2001;">
+<div id="musicMidiTrackModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2001;">
   <div class="modal-box music-hum-box">
     <h3 data-i18n="music_midi_track_modal_title">トラックを選択</h3>
     <p class="music-step-hint" data-i18n="music_midi_track_modal_hint">複数のトラックが見つかりました。すべてまとめて1つの譜面（和音）にするか、いずれか1つのトラックだけを選んで変換できます</p>
@@ -409,7 +410,7 @@
   </div>
 </div>
 
-<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+<div id="helpModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box music-help-box">
     <h3 style="text-align:center;">使い方</h3>
 
@@ -460,7 +461,7 @@
   </div>
 </div>
 
-<div id="musicToast"></div>
+<div id="musicToast" role="status" aria-live="polite"></div>
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>

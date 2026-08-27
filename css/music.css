@@ -1103,6 +1103,7 @@ body.dark .music-calib-guide{
 }
 
 .music-calib-toggle-btn{
+  position:relative;
   flex-shrink:0;
   display:flex;
   align-items:center;
@@ -1122,6 +1123,20 @@ body.dark .music-calib-guide{
   color:#fdf9ef;
 }
 
+/* 前回ロックして保存した調整値がデフォルトと異なる（＝調整済み）ことを示す印。
+   色だけに頼らないよう、通常時には存在しない小さな丸自体の有無で判別できるようにする */
+.music-calib-toggle-btn.has-custom::after{
+  content:"";
+  position:absolute;
+  top:-2px;
+  right:-2px;
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:var(--vermillion);
+  border:1.5px solid var(--card);
+}
+
 body.dark .music-calib-toggle-btn{
   background:#383329;
   border-color:#46423b;
@@ -1131,6 +1146,49 @@ body.dark .music-calib-toggle-btn{
 body.dark .music-calib-toggle-btn.active{
   background:var(--indigo-soft);
   border-color:var(--indigo-soft);
+}
+
+body.dark .music-calib-toggle-btn.has-custom::after{
+  background:var(--vermillion-soft);
+  border-color:#2c2823;
+}
+
+/* 練習モードに初めて入った時だけ、調整ボタンの存在を一度だけ知らせる吹き出し */
+.music-calib-hint-bubble{
+  display:none;
+  position:absolute;
+  top:34px;
+  right:0;
+  z-index:4;
+  max-width:150px;
+  padding:6px 10px;
+  border-radius:10px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:11px;
+  line-height:1.4;
+  text-align:left;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+}
+
+.music-calib-hint-bubble.show{
+  display:block;
+}
+
+.music-calib-hint-bubble::before{
+  content:"";
+  position:absolute;
+  top:-5px;
+  right:10px;
+  width:10px;
+  height:10px;
+  background:var(--indigo);
+  transform:rotate(45deg);
+}
+
+body.dark .music-calib-hint-bubble,
+body.dark .music-calib-hint-bubble::before{
+  background:var(--indigo-soft);
 }
 
 /* 調整モード中に画面下部へ出す操作パネル（背景画像を選ぶ／リセット／ロック） */
@@ -2353,4 +2411,40 @@ body.dark .music-onboard-choice-btn span{
     max-width:640px;
     margin:0 auto;
   }
+}
+
+/* OSで「視差効果を減らす」設定がオンの場合、常時ループするアニメーション・
+   演出用のフラッシュ演出を無効化する（音そのものや操作結果の判定には影響しない） */
+@media (prefers-reduced-motion:reduce){
+  .music-chip.loop-pending,
+  .music-note-btn.practice-guide,
+  .music-note-btn.practice-correct,
+  .music-note-btn.practice-miss,
+  .music-rotate-prompt-icon,
+  .music-hum-rec-dot{
+    animation:none !important;
+  }
+}
+
+/* キーボード操作時にフォーカス位置が視覚的に分かるようにする
+   （マウス/タッチのクリックでは表示されない:focus-visibleを使う） */
+.music-mode-btn:focus-visible,
+.music-edit-tab-btn:focus-visible,
+.music-instrument-btn:focus-visible,
+.music-layout-btn:focus-visible,
+.music-duration-btn:focus-visible,
+.music-header-btn:focus-visible,
+.music-sound-btn:focus-visible,
+.music-calib-toggle-btn:focus-visible,
+.music-playpause-btn:focus-visible,
+.music-practice-exit-btn:focus-visible,
+.music-note-btn:focus-visible,
+.music-chip:focus-visible,
+.music-seek-slider:focus-visible,
+.music-timesig-select:focus-visible,
+input:focus-visible,
+select:focus-visible,
+button:focus-visible{
+  outline:2px solid var(--indigo);
+  outline-offset:2px;
 }

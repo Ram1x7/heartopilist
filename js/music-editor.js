@@ -134,6 +134,7 @@ function initMusicEditor() {
   if (savedSound !== null) soundEnabled = savedSound === "1";
 
   calib = loadCalibration();
+  updateCalibIndicator();
 
   document.getElementById("musicPracticeExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicFollowExitBtn").innerHTML = icon("close", { size: 18 });
@@ -266,7 +267,7 @@ function renderInstrumentSelector() {
   const el = document.getElementById("musicInstrumentButtons");
   el.innerHTML = INSTRUMENTS.map(
     (inst) => `
-    <button class="music-instrument-btn${inst.id === currentInstrumentId ? " active" : ""}" data-instrument="${inst.id}">
+    <button class="music-instrument-btn${inst.id === currentInstrumentId ? " active" : ""}" data-instrument="${inst.id}" aria-pressed="${inst.id === currentInstrumentId}">
       ${T(inst.nameKey, inst.nameFallback)}
     </button>
   `
@@ -311,7 +312,7 @@ function renderLayoutSelector() {
   el.style.display = "";
   el.innerHTML = inst.layouts
     .map(
-      (l) => `<button class="music-layout-btn${l.id === currentLayoutId ? " active" : ""}" data-layout="${l.id}">${T(l.labelKey, l.labelFallback)}</button>`
+      (l) => `<button class="music-layout-btn${l.id === currentLayoutId ? " active" : ""}" data-layout="${l.id}" aria-pressed="${l.id === currentLayoutId}">${T(l.labelKey, l.labelFallback)}</button>`
     )
     .join("");
   el.querySelectorAll("button").forEach((btn) => {
@@ -437,6 +438,35 @@ function saveCalibration() {
   localStorage.setItem(MUSIC_CALIB_KEY, JSON.stringify(calib));
 }
 
+// ボタンにデフォルト値と異なる調整値が保存されているかどうかを、小さな印で常時示す
+// （「調整モード中」を示す.activeとは別に、「既に調整済み」を示す状態）
+function updateCalibIndicator() {
+  const isDefault = calib.scale === MUSIC_CALIB_DEFAULT.scale && calib.offsetX === MUSIC_CALIB_DEFAULT.offsetX && calib.offsetY === MUSIC_CALIB_DEFAULT.offsetY;
+  const btn = document.getElementById("musicCalibToggleBtn");
+  if (btn) btn.classList.toggle("has-custom", !isDefault);
+}
+
+const MUSIC_CALIB_HINT_SEEN_KEY = "hatopiMusic_calibHintSeen";
+let calibHintTimer = null;
+
+// 練習モードに初めて入った時だけ、ボタン調整機能の存在を一度だけ吹き出しで知らせる
+function maybeShowCalibHint() {
+  if (localStorage.getItem(MUSIC_CALIB_HINT_SEEN_KEY)) return;
+  const bubble = document.getElementById("musicCalibHintBubble");
+  if (!bubble) return;
+  bubble.classList.add("show");
+  clearTimeout(calibHintTimer);
+  calibHintTimer = setTimeout(dismissCalibHint, 5000);
+}
+
+function dismissCalibHint() {
+  clearTimeout(calibHintTimer);
+  calibHintTimer = null;
+  const bubble = document.getElementById("musicCalibHintBubble");
+  if (bubble) bubble.classList.remove("show");
+  localStorage.setItem(MUSIC_CALIB_HINT_SEEN_KEY, "1");
+}
+
 function applyCalibTransform() {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
@@ -444,6 +474,7 @@ function applyCalibTransform() {
 }
 
 function toggleCalibMode() {
+  dismissCalibHint();
   if (calibActive) {
     cancelCalibMode();
   } else {
@@ -456,6 +487,7 @@ function enterCalibMode() {
   calibBackup = { ...calib };
   document.getElementById("musicPracticeStage").classList.add("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.add("active");
+  document.getElementById("musicCalibToggleBtn").setAttribute("aria-pressed", "true");
   const catcher = document.getElementById("musicCalibCatcher");
   catcher.addEventListener("pointerdown", onCalibPointerDown);
   catcher.addEventListener("pointermove", onCalibPointerMove);
@@ -471,6 +503,7 @@ function exitCalibModeUI() {
   clearCalibGuides();
   document.getElementById("musicPracticeStage").classList.remove("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.remove("active");
+  document.getElementById("musicCalibToggleBtn").setAttribute("aria-pressed", "false");
   const catcher = document.getElementById("musicCalibCatcher");
   catcher.removeEventListener("pointerdown", onCalibPointerDown);
   catcher.removeEventListener("pointermove", onCalibPointerMove);
@@ -492,12 +525,14 @@ function cancelCalibMode() {
 function lockCalibration() {
   saveCalibration();
   calibBackup = null;
+  updateCalibIndicator();
   exitCalibModeUI();
 }
 
 function resetCalibration() {
   calib = { ...MUSIC_CALIB_DEFAULT };
   applyCalibTransform();
+  showToast(T("music_toast_calib_reset", "リセットしました"));
 }
 
 function calibDistance(a, b) {
@@ -799,7 +834,7 @@ function getCurrentElapsedSec() {
 function renderDurationOptions() {
   const el = document.getElementById("musicDurationOptions");
   el.innerHTML = DURATION_PRESETS.map(
-    (d) => `<button class="music-duration-btn${d.id === selectedDurationId ? " active" : ""}" data-duration="${d.id}">${T(d.labelKey, d.labelFallback)}</button>`
+    (d) => `<button class="music-duration-btn${d.id === selectedDurationId ? " active" : ""}" data-duration="${d.id}" aria-pressed="${d.id === selectedDurationId}">${T(d.labelKey, d.labelFallback)}</button>`
   ).join("");
   el.querySelectorAll("button").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1122,6 +1157,25 @@ function resetLoop() {
   updateLoopUI();
 }
 
+// 保存された譜面からループ区間を復元する。古い形式（フィールド自体が無い）・
+// 譜面編集後に音符数が変わって範囲外になったデータのどちらも、値が不正なら
+// resetLoop()と同じ「丸ごと初期化」で安全側に倒す（部分的な補正はしない。
+// deleteLastToken()が範囲外になった時に採る既存の方針と揃える）
+function restoreLoopFromScore(score, tokenCount) {
+  const start = score.loopStart;
+  const end = score.loopEnd;
+  const isValidRange = Number.isInteger(start) && Number.isInteger(end) && start >= 0 && start <= end && end < tokenCount;
+  if (!isValidRange) {
+    resetLoop();
+    return;
+  }
+  loopStart = start;
+  loopEnd = end;
+  loopEnabled = !!score.loopEnabled;
+  loopSelecting = false;
+  updateLoopUI();
+}
+
 // ── モード切り替え(編集/練習) ──
 function setPageMode(mode) {
   if (pageMode === mode) return;
@@ -1135,6 +1189,7 @@ function setPageMode(mode) {
   if (pageMode === "practice") {
     skipLeadingRests();
     resetPracticeAccuracy();
+    maybeShowCalibHint();
   }
   updateModeUI();
   renderScoreDisplay();
@@ -1148,8 +1203,12 @@ let editTab = "prepare"; // "prepare" | "create"
 
 function setEditTab(tab) {
   editTab = tab;
-  document.getElementById("musicEditTabPrepareBtn").classList.toggle("active", tab === "prepare");
-  document.getElementById("musicEditTabCreateBtn").classList.toggle("active", tab === "create");
+  const prepareBtn = document.getElementById("musicEditTabPrepareBtn");
+  const createBtn = document.getElementById("musicEditTabCreateBtn");
+  prepareBtn.classList.toggle("active", tab === "prepare");
+  createBtn.classList.toggle("active", tab === "create");
+  prepareBtn.setAttribute("aria-selected", String(tab === "prepare"));
+  createBtn.setAttribute("aria-selected", String(tab === "create"));
   document.getElementById("musicTabPanelPrepare").style.display = tab === "prepare" ? "" : "none";
   document.getElementById("musicTabPanelCreate").style.display = tab === "create" ? "" : "none";
 }
@@ -1166,6 +1225,9 @@ function updateModeUI() {
   document.getElementById("musicModeEditBtn").classList.toggle("active", pageMode === "edit");
   document.getElementById("musicModePracticeBtn").classList.toggle("active", pageMode === "practice");
   document.getElementById("musicModeFollowBtn").classList.toggle("active", pageMode === "follow");
+  document.getElementById("musicModeEditBtn").setAttribute("aria-selected", String(pageMode === "edit"));
+  document.getElementById("musicModePracticeBtn").setAttribute("aria-selected", String(pageMode === "practice"));
+  document.getElementById("musicModeFollowBtn").setAttribute("aria-selected", String(pageMode === "follow"));
   document.getElementById("musicEditControls").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicScoreEditRow").style.display = pageMode === "edit" ? "" : "none";
 
@@ -1699,6 +1761,7 @@ function updateSoundToggleUI() {
     if (!btn) return;
     btn.innerHTML = icon(soundEnabled ? "volumeOn" : "volumeOff", { size: 18 });
     btn.classList.toggle("muted", !soundEnabled);
+    btn.setAttribute("aria-pressed", String(!soundEnabled));
   });
 }
 
@@ -1767,6 +1830,9 @@ function saveCurrentAsScore() {
     existing.timeSignatureId = timeSignatureId;
     existing.freeTiming = scoreFreeTiming;
     existing.referenceBpm = scoreReferenceBpm;
+    existing.loopStart = loopStart;
+    existing.loopEnd = loopEnd;
+    existing.loopEnabled = loopEnabled;
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
     persistSavedScores();
@@ -1783,6 +1849,9 @@ function saveCurrentAsScore() {
     timeSignatureId,
     freeTiming: scoreFreeTiming,
     referenceBpm: scoreReferenceBpm,
+    loopStart,
+    loopEnd,
+    loopEnabled,
     tokens: tokens.slice(),
     updatedAt: Date.now(),
   };
@@ -1911,7 +1980,7 @@ function loadScore(id) {
   currentScoreId = score.id;
   cursor = -1;
   stopPlayback();
-  resetLoop();
+  restoreLoopFromScore(score, tokens.length);
   selectedTokenIndex = null;
   humReviewIndexes = new Set();
   renderInstrumentSelector();
