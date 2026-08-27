@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/design-system.css?v=1">
+<link rel="stylesheet" href="./css/design-system.css?v=2">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -598,7 +598,6 @@ body.dark .garden-footer{
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
-<script src="js/bottom-nav.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/price-calc.js"></script>
 <script src="js/data-crops.js"></script>
@@ -1366,7 +1365,6 @@ document.getElementById("helpBtn").onclick = () => {
 // 初期化
 cleanExpiredTimers();
 renderContent();
-if(typeof renderBottomNav === "function") renderBottomNav("zukan");
 
 // 言語切替時に再描画
 document.addEventListener("langchange", () => {
