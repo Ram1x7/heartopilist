@@ -487,16 +487,24 @@ function ssiSetupSettingsStage(){
   // ssiRegionRectは手動調整ステップ（STEP3）で確定済みのためここでは再計算しない
   renderOptionGroup("artSsiColorOptions", SSI_COLOR_COUNTS.map(n => ({ id: n, label: String(n) })), ssiSettings.colors, (v) => {
     ssiSettings.colors = Number(v);
-    ssiUpdatePreview();
+    ssiScheduleUpdatePreview();
   });
   renderOptionGroup(
     "artSsiBgOptions",
     SSI_BG_MODES.map(m => ({ id: m.id, label: ssiT(m.labelKey, m.labelFallback) })),
     ssiSettings.bg,
-    (v) => { ssiSettings.bg = v; ssiUpdatePreview(); }
+    (v) => { ssiSettings.bg = v; ssiScheduleUpdatePreview(); }
   );
   document.getElementById("artSsiDitherToggle").checked = ssiSettings.dither;
   ssiUpdatePreview();
+}
+
+let ssiPreviewTimer = null;
+// 設定変更の連続入力（色数・背景・ディザリング切替）で毎回すぐ再計算しないよう、
+// art-converter.jsのscheduleConvert()と同じ150msのデバウンスをかける
+function ssiScheduleUpdatePreview(){
+  clearTimeout(ssiPreviewTimer);
+  ssiPreviewTimer = setTimeout(ssiUpdatePreview, 150);
 }
 
 function ssiUpdatePreview(){
@@ -585,7 +593,7 @@ function bindScreenshotImportControls(){
   });
   document.getElementById("artSsiDitherToggle").addEventListener("change", (e) => {
     ssiSettings.dither = e.target.checked;
-    ssiUpdatePreview();
+    ssiScheduleUpdatePreview();
   });
   document.getElementById("artSsiApplyBtn").addEventListener("click", ssiApplyToEditor);
   document.getElementById("artSsiAdjustConfirmBtn").addEventListener("click", () => {

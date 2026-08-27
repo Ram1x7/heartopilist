@@ -71,6 +71,37 @@ let settings = {
 let resultPixels = null;
 let convertTimer = null;
 
+// ── 変換フローの現在地表示（4段階） ──
+const CONVERT_STAGE_ORDER = ["upload", "size", "crop", "finish"];
+// 「サイズ」「位置」は既存のshowSizeStage()/openCropStage(false)でいつでも戻れるため
+// クリックで直接ジャンプ可能。「画像」はやり直す専用の導線が無いためクリック対象外
+const CONVERT_STAGE_JUMP_FN = {
+  size: () => showSizeStage(),
+  crop: () => openCropStage(false),
+};
+
+function updateConvertStepProgress(stage){
+  const idx = CONVERT_STAGE_ORDER.indexOf(stage);
+  document.querySelectorAll("#artConvertProgress .art-convert-progress-step").forEach(btn => {
+    const bIdx = CONVERT_STAGE_ORDER.indexOf(btn.dataset.stage);
+    const isPast = bIdx < idx;
+    btn.classList.toggle("completed", isPast);
+    btn.classList.toggle("active", bIdx === idx);
+    const canJump = isPast && !!CONVERT_STAGE_JUMP_FN[btn.dataset.stage];
+    btn.disabled = !canJump;
+    btn.dataset.clickable = canJump ? "true" : "false";
+  });
+}
+
+function bindConvertStepProgress(){
+  document.querySelectorAll("#artConvertProgress .art-convert-progress-step").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const fn = CONVERT_STAGE_JUMP_FN[btn.dataset.stage];
+      if(fn && !btn.disabled) fn();
+    });
+  });
+}
+
 // ── UI初期化 ──
 function initArtConverter(){
   renderConvertSizeOptions();
@@ -116,8 +147,16 @@ function initArtConverter(){
   document.getElementById("artChangeSizeBtn").addEventListener("click", showSizeStage);
   document.getElementById("artSizeConfirmBtn").addEventListener("click", confirmSizeStage);
 
+  const zoomBtn = document.getElementById("artResultZoomBtn");
+  zoomBtn.setAttribute("aria-label", T("art_zoom_result", "拡大表示"));
+  zoomBtn.addEventListener("click", openResultZoomModal);
+  document.getElementById("artResultZoomIcon").innerHTML = icon("search", { size: 16 });
+
   bindConvertTutorialControls();
   maybeStartConvertTutorialPhase("upload");
+
+  bindConvertStepProgress();
+  updateConvertStepProgress("upload");
 }
 
 // キャンバスサイズ選択（自由サイズ：比率→サイズレベルの2段階／デザイン枠：カテゴリ→アイテム→パーツ）
@@ -322,6 +361,7 @@ function showSizeStage(){
   document.getElementById("artConvertPanel").style.display = "none";
   document.getElementById("artConvertSizeStage").style.display = "block";
   maybeStartConvertTutorialPhase("size");
+  updateConvertStepProgress("size");
 }
 
 // サイズ確定 → 位置調整ステップへ。openCropStage内でキャンバスサイズが前回から
@@ -340,6 +380,7 @@ function openCropStage(reset){
   document.getElementById("artConvertPreview").style.display = "none";
   document.getElementById("artConvertPanel").style.display = "none";
   document.getElementById("artCropStage").style.display = "block";
+  updateConvertStepProgress("crop");
 
   const targetKey = `${settings.width}x${settings.height}`;
   const viewport = document.getElementById("artCropViewport");
@@ -481,6 +522,7 @@ function confirmCrop(){
   document.getElementById("artConvertPanel").style.display = "block";
   convert();
   maybeStartConvertTutorialPhase("panel");
+  updateConvertStepProgress("finish");
 }
 
 function scheduleConvert(){
@@ -575,6 +617,80 @@ function renderPresetPreviews(){
 function renderResultPreview(){
   const canvas = document.getElementById("artResultCanvas");
   drawPixelsToCanvas(canvas, resultPixels, settings.width, settings.height, 320);
+  renderConvertResultInfo();
+}
+
+// 使用色数・使用マス数・作業量の目安を表示する
+// （実際の所要時間は算出できないため、マス数に応じた相対的な目安のみを示す）
+function renderConvertResultInfo(){
+  const el = document.getElementById("artConvertResultInfo");
+  if(!el || !resultPixels) return;
+
+  const counts = {};
+  let cellCount = 0;
+  resultPixels.forEach(c => {
+    if(!c) return;
+    cellCount++;
+    counts[c] = (counts[c] || 0) + 1;
+  });
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const colorCount = entries.length;
+
+  let workTier, workLabel;
+  if(cellCount < 300){
+    workTier = "low";
+    workLabel = T("art_work_estimate_low", "少なめ");
+  }else if(cellCount < 1000){
+    workTier = "mid";
+    workLabel = T("art_work_estimate_mid", "普通");
+  }else{
+    workTier = "high";
+    workLabel = T("art_work_estimate_high", "多め");
+  }
+
+  const colorListHtml = entries.length
+    ? entries.map(([c, n]) => `
+        <div class="art-result-color-row">
+          <span class="art-result-color-swatch" style="background:${c}"></span>
+          <span class="art-result-color-code">${gamePaletteCode(c)}</span>
+          <span class="art-result-color-count">${n}${T("art_unit_cells","マス")}</span>
+        </div>
+      `).join("")
+    : "";
+
+  el.innerHTML = `
+    <div class="art-result-stats">
+      <div class="art-result-stat">
+        <span class="art-result-stat-label">${T("art_used_colors_label","使用色数")}</span>
+        <span class="art-result-stat-value">${colorCount}${T("art_unit_colors","色")}</span>
+      </div>
+      <div class="art-result-stat">
+        <span class="art-result-stat-label">${T("art_used_cells_label","使用マス数")}</span>
+        <span class="art-result-stat-value">${cellCount.toLocaleString()}${T("art_unit_cells","マス")}</span>
+      </div>
+      <div class="art-result-stat">
+        <span class="art-result-stat-label">${T("art_work_estimate_label","推定作業量")}</span>
+        <span class="art-result-stat-value art-work-tier-${workTier}">${workLabel}</span>
+      </div>
+    </div>
+    <details class="art-result-color-list">
+      <summary>${T("art_used_colors_list_label","使われる色一覧")}</summary>
+      <div class="art-result-color-rows">${colorListHtml}</div>
+    </details>
+  `;
+}
+
+// 変換結果の拡大表示
+function openResultZoomModal(){
+  if(!resultPixels) return;
+  const canvas = document.getElementById("artResultZoomCanvas");
+  const maxBox = Math.min(window.innerWidth, window.innerHeight) * 0.7;
+  drawPixelsToCanvas(canvas, resultPixels, settings.width, settings.height, maxBox);
+  document.getElementById("artResultZoomModal").style.display = "block";
+}
+
+function closeResultZoomModal(){
+  document.getElementById("artResultZoomModal").style.display = "none";
 }
 
 // ── エディターへ渡す ──

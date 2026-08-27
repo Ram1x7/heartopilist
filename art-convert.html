@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=11">
-<link rel="stylesheet" href="./css/art.css?v=49">
+<link rel="stylesheet" href="./css/art.css?v=50">
 <link rel="stylesheet" href="./css/design-system.css?v=1">
 
 <link rel="prefetch" href="./art-create.html">
@@ -83,13 +83,35 @@
 </div>
 
 <div class="art-notice" data-i18n="art_coming_soon">
-  現在開発中の機能です。今後のアップデートで順次使えるようになります。
+  一部の機能は試験公開中です。より使いやすくなるよう順次改善していきます。
 </div>
 
 <a href="./art-create.html" class="art-back-link">
   <span id="artBackIcon"></span>
   <span data-i18n="art_back_to_editor">エディターに戻る</span>
 </a>
+
+<div class="art-convert-progress" id="artConvertProgress">
+  <button type="button" class="art-convert-progress-step" data-stage="upload">
+    <span class="art-convert-progress-num">1</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_upload">画像</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="size">
+    <span class="art-convert-progress-num">2</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_size">サイズ</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="crop">
+    <span class="art-convert-progress-num">3</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_crop">位置</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="finish">
+    <span class="art-convert-progress-num">4</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_finish">仕上げ</span>
+  </button>
+</div>
 
 <div class="art-convert-layout">
   <div class="art-convert-upload" id="artUploadArea">
@@ -121,7 +143,7 @@
       <div class="art-gridsize-options art-frame-grid art-part-grid" id="artConvertFramePartOptions"></div>
     </div>
     <div class="art-panel-btn-row">
-      <button class="art-header-btn" id="artSizeConfirmBtn" data-i18n="art_size_confirm">この内容で次へ</button>
+      <button class="art-header-btn" id="artSizeConfirmBtn" data-i18n="art_size_confirm">この内容で次へ（位置を調整する）</button>
     </div>
   </div>
 
@@ -144,7 +166,7 @@
     </a>
     <div class="art-panel-btn-row art-crop-actions">
       <button class="art-crop-reset-btn" id="artCropResetBtn" data-i18n="art_crop_reset">位置をリセット</button>
-      <button class="art-header-btn" id="artCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定</button>
+      <button class="art-header-btn" id="artCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定して変換結果を確認する</button>
     </div>
   </div>
 
@@ -160,9 +182,15 @@
         <div class="art-preview-label" data-i18n="art_result_label">ドット絵</div>
         <div class="art-preview-frame">
           <canvas id="artResultCanvas"></canvas>
+          <button type="button" class="art-preview-zoom-btn" id="artResultZoomBtn" aria-label="拡大表示">
+            <span id="artResultZoomIcon"></span>
+          </button>
         </div>
       </div>
     </div>
+
+    <div class="art-convert-result-info" id="artConvertResultInfo"></div>
+
     <div class="art-panel-btn-row art-preview-actions">
       <button class="art-crop-reset-btn" id="artChangeSizeBtn" data-i18n="art_change_size">サイズを変更する</button>
       <button class="art-crop-reset-btn" id="artAdjustCropBtn" data-i18n="art_adjust_crop">位置を調整する</button>
@@ -242,6 +270,16 @@
   <div class="art-tutorial-actions">
     <button class="art-tutorial-skip" id="artTutorialSkipBtn">スキップ</button>
     <button class="art-tutorial-next" id="artTutorialNextBtn">次へ</button>
+  </div>
+</div>
+
+<div id="artResultZoomModal" onclick="if(event.target.id==='artResultZoomModal') closeResultZoomModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:2000;">
+  <div class="modal-box art-result-zoom-box">
+    <div class="art-preview-label" data-i18n="art_result_label">ドット絵</div>
+    <div class="art-result-zoom-frame">
+      <canvas id="artResultZoomCanvas"></canvas>
+    </div>
+    <button class="modal-close-btn" onclick="closeResultZoomModal()" data-i18n="modal_close">閉じる</button>
   </div>
 </div>
 
