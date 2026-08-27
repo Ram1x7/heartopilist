@@ -644,6 +644,7 @@
   "music_unsaved_indicator": "未保存の変更があります",
   "music_aria_undo": "元に戻す",
   "music_aria_redo": "やり直す",
+  "music_key_label_toggle": "PCキーボードでも演奏できます（対応キーを表示）",
   "music_note_count_suffix": "音",
   "music_preset_kirakiraboshi": "きらきら星",
   "music_preset_kaeru": "かえるの合唱",

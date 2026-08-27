@@ -620,6 +620,7 @@
   "music_unsaved_indicator": "有未儲存的變更",
   "music_aria_undo": "復原",
   "music_aria_redo": "重做",
+  "music_key_label_toggle": "也可以用電腦鍵盤演奏（顯示對應按鍵）",
   "music_note_count_suffix": "音",
   "music_preset_kirakiraboshi": "小星星",
   "music_preset_kaeru": "青蛙合唱",

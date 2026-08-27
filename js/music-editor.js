@@ -43,6 +43,11 @@ let soundEnabled = true;
 let audioCtx = null;
 let sustainedTones = new Map(); // pointerId -> {osc, gain}（和音対応：同時に複数鳴らせる）
 
+// ── キーボード演奏入力 ──
+const KEY_LABEL_VISIBLE_KEY = "hatopiMusic_keyLabelVisible";
+let keyLabelsVisible = true; // 演奏ボタンに対応キーを表示するかどうか（既定はON）
+let activeKeyboardKeys = new Set(); // 今押下中の物理キー（小文字）。キーリピートの二重処理防止用
+
 let isPlaying = false;
 let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
@@ -177,11 +182,24 @@ function updateUndoRedoUI() {
   if (unsavedEl) unsavedEl.style.display = scoreHistoryIndex !== historySavedIndex ? "" : "none";
 }
 
+// テキスト入力欄・textarea・select・contenteditableにフォーカスがある間は、
+// Undo/Redo・演奏キーボード入力のどちらも「通常の文字入力」を優先して発火しない
+// ようにする（Ctrl+Z等のブラウザ標準の編集操作、IME入力等と衝突させないため）
+// チェックボックス・range(スライダー)等は文字を「打つ」対象ではなく、
+// クリック後もフォーカスが残るだけで演奏キー入力まで塞いでしまうと不便なため、
+// 実際に文字入力を伴うinput種別だけをテキスト入力欄として扱う
+const NON_TEXT_INPUT_TYPES = new Set(["checkbox", "radio", "range", "button", "submit", "reset", "color", "file", "image"]);
+function isEditableFocusTarget(target) {
+  if (!target) return false;
+  const tag = target.tagName;
+  if (tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) return true;
+  if (tag === "INPUT") return !NON_TEXT_INPUT_TYPES.has((target.type || "text").toLowerCase());
+  return false;
+}
+
 function handleHistoryKeydown(e) {
   if (pageMode !== "edit") return;
-  const tag = e.target && e.target.tagName;
-  const isEditableField = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || (e.target && e.target.isContentEditable);
-  if (isEditableField) return;
+  if (isEditableFocusTarget(e.target)) return;
   const mod = e.ctrlKey || e.metaKey;
   if (!mod) return;
   const key = e.key.toLowerCase();
@@ -192,6 +210,34 @@ function handleHistoryKeydown(e) {
     e.preventDefault();
     redoEdit();
   }
+}
+
+// ── キーボードでの演奏入力（keydown/keyup） ──
+// Pointer Eventsと同じpressNote/releaseNoteを、pointerIdの代わりに
+// "kbd:"+キー という文字列IDで呼ぶことで、和音判定・正解/ミス判定・
+// 音声再生・譜面への追加(finalizeGroup)を完全に共有する
+function handleMusicKeydown(e) {
+  if (pageMode !== "edit" && pageMode !== "practice") return;
+  if (isEditableFocusTarget(e.target)) return;
+  // Ctrl/Cmd/Alt併用時は演奏キーとして扱わない（Undo/Redo・ブラウザショートカットを優先）
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.isComposing) return; // IME変換中の誤入力を防ぐ
+  const key = e.key.toLowerCase();
+  if (!activeKeymap.has(key)) return; // 割り当てが無いキー（Tab/Escape/矢印キー等も含む）は素通りする
+  if (e.repeat || activeKeyboardKeys.has(key)) return; // OSのキーリピート・二重keydownを防ぐ
+  const note = activeKeymap.get(key);
+  const btn = noteButtonMap.get(noteKey(note));
+  if (!btn) return; // 現在描画されているボタンに該当が無ければ何もしない
+  e.preventDefault();
+  activeKeyboardKeys.add(key);
+  pressNote("kbd:" + key, note, btn);
+}
+
+function handleMusicKeyup(e) {
+  const key = e.key.toLowerCase();
+  if (!activeKeyboardKeys.has(key)) return;
+  activeKeyboardKeys.delete(key);
+  releaseNote("kbd:" + key);
 }
 
 // 個別の音の手直し：編集モードで譜面の音を1つタップすると選択状態になり、
@@ -259,6 +305,9 @@ function initMusicEditor() {
 
   const savedSound = localStorage.getItem("hatopiMusic_soundEnabled");
   if (savedSound !== null) soundEnabled = savedSound === "1";
+  const savedKeyLabelVisible = localStorage.getItem(KEY_LABEL_VISIBLE_KEY);
+  if (savedKeyLabelVisible !== null) keyLabelsVisible = savedKeyLabelVisible === "1";
+  document.getElementById("musicKeyLabelToggle").checked = keyLabelsVisible;
 
   calib = loadCalibration();
   updateCalibIndicator();
@@ -289,6 +338,14 @@ function initMusicEditor() {
   maybeShowOnboarding();
   resetHistory();
   document.addEventListener("keydown", handleHistoryKeydown);
+  document.addEventListener("keydown", handleMusicKeydown);
+  document.addEventListener("keyup", handleMusicKeyup);
+  // タブ切替・ウィンドウ非アクティブ化で押しっぱなしのキーが残ると、音が鳴り
+  // 続けたり和音状態が壊れたりするため、そのタイミングで強制的に解除する
+  window.addEventListener("blur", releaseAllHolds);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) releaseAllHolds();
+  });
 }
 
 // ── はじめての案内（①楽器を選ぶ→②テンポを決める→③録音か手入力かを選ぶ） ──
@@ -484,7 +541,31 @@ function toggleSemitone() {
 // 編集モードは画面幅に合わせて伸縮するボタン行、練習モードは実機の座標を
 // そのまま絶対配置で再現する（指の感覚を実機と揃えるため）。表示方法が
 // 大きく異なるため、現在のページモードに応じてどちらかを描画する
+// ── キーボード演奏入力：キー⇔音の対応 ──
+// activeKeymap: 押されたキー(小文字)→音。noteToKeyLabel: 音→表示用キー文字列。
+// どちらも「現在の楽器・配置」だけに依存し、半音表示のON/OFFでは変わらない
+// （半音ボタンはキー割り当ての対象外のため）。noteButtonMapは逆に
+// 「今実際に描画されているボタンDOM」に依存するため、描画のたびに作り直す
+let activeKeymap = new Map();
+let noteToKeyLabel = new Map();
+let noteButtonMap = new Map();
+
+function rebuildActiveKeymap() {
+  activeKeymap = new Map();
+  noteToKeyLabel = new Map();
+  const inst = getInstrument(currentInstrumentId);
+  const layout = getLayout(inst, currentLayoutId);
+  const flatNotes = layout.grid.flat();
+  const keys = getKeymapForLayout(currentInstrumentId, currentLayoutId);
+  const n = Math.min(flatNotes.length, keys.length);
+  for (let i = 0; i < n; i++) {
+    activeKeymap.set(keys[i].toLowerCase(), flatNotes[i]);
+    noteToKeyLabel.set(noteKey(flatNotes[i]), keys[i].toUpperCase());
+  }
+}
+
 function renderInstrumentGrid() {
+  rebuildActiveKeymap();
   if (pageMode === "practice") {
     renderPracticeStageGrid();
   } else {
@@ -497,6 +578,7 @@ function renderEditGrid() {
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
   const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
+  const showKeyLabels = keyLabelsVisible;
   el.className = "music-instrument-grid";
   el.innerHTML = grid
     .map(
@@ -505,7 +587,10 @@ function renderEditGrid() {
         ${row
           .map((note) => {
             const label = noteDisplayDigit(note);
+            const keyLabel = showKeyLabels ? noteToKeyLabel.get(noteKey(note)) : null;
+            const keySpan = keyLabel ? `<span class="music-note-key">${keyLabel}</span>` : "";
             return `<button class="music-note-btn${note.accidental ? " accidental" : ""}" data-note='${JSON.stringify(note)}'>
+              ${keySpan}
               <span class="music-note-digit">${label}</span>
               <span class="music-note-kana">${DEGREE_LABELS[note.degree]}</span>
             </button>`;
@@ -515,8 +600,10 @@ function renderEditGrid() {
     `
     )
     .join("");
+  noteButtonMap = new Map();
   el.querySelectorAll(".music-note-btn").forEach((btn) => {
     const note = JSON.parse(btn.dataset.note);
+    noteButtonMap.set(noteKey(note), btn);
     bindNoteButtonHold(btn, note);
   });
 }
@@ -538,14 +625,19 @@ function renderPracticeStageGrid() {
       const note = { degree: p.degree, accidental: p.accidental, octave: p.octave };
       const label = noteDisplayDigit(note);
       const accidentalClass = p.size === "accidental" ? " accidental" : "";
+      const keyLabel = keyLabelsVisible ? noteToKeyLabel.get(noteKey(note)) : null;
+      const keySpan = keyLabel ? `<span class="music-note-key">${keyLabel}</span>` : "";
       return `<button class="music-note-btn music-stage-btn${accidentalClass}" style="left:${p.xPct}%; top:${p.yPct}%;" data-note='${JSON.stringify(note)}'>
+        ${keySpan}
         <span class="music-note-digit">${label}</span>
         <span class="music-note-kana">${DEGREE_LABELS[note.degree]}</span>
       </button>`;
     })
     .join("")}</div>`;
+  noteButtonMap = new Map();
   el.querySelectorAll(".music-stage-btn").forEach((btn) => {
     const note = JSON.parse(btn.dataset.note);
+    noteButtonMap.set(noteKey(note), btn);
     bindNoteButtonHold(btn, note);
   });
   applyCalibTransform();
@@ -760,46 +852,56 @@ function clearCalibBgImage() {
 
 // 演奏ボタンの「押す・離す」を扱う（和音対応）。最初の1本目が押されてから
 // 全ての指が離れるまでを1つの和音グループとして扱う
+// ボタンを押した時の共通処理（Pointer Events・キーボードのどちらから呼ばれても
+// 同じ判定・演奏処理になるよう、入力方式に依存する部分(pointerId等)は
+// 呼び出し側(bindNoteButtonHold／キーボードハンドラ)に残し、ここには
+// 「idという文字列で1本の指(または1つのキー)を識別する」という前提のみ持ち込む
+function pressNote(id, note, btn) {
+  btn.classList.add("pressed");
+  if (activeHolds.size === 0) {
+    currentGroupNotes = [];
+    groupStartTime = performance.now();
+  }
+  activeHolds.set(id, { note, btn, startTime: performance.now() });
+  currentGroupNotes.push(note);
+  startSustainedTone(id, noteFrequency(note));
+  if (pageMode === "practice") {
+    // 和音の途中経過（まだ他の指が揃っていないだけ）は不正解として数えない。
+    // 「そもそも次の音に含まれていない音」を押した場合だけミスとして数える
+    if (!isExpectedPracticeNote(note)) {
+      practiceMissCount++;
+      updatePracticeAccuracyBadge();
+      flashPracticeMissHighlight(btn);
+    }
+    const advancedIdx = tryAdvancePracticeChord();
+    // 正しく押せて先へ進んだ場合だけ、その和音の全ボタンを強く光らせる
+    // （先読みハイライトとは別クラス。押した瞬間の一時的なフィードバック）
+    if (advancedIdx !== null) {
+      practiceCorrectCount++;
+      updatePracticeAccuracyBadge();
+      flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
+    }
+  }
+}
+
+function releaseNote(id) {
+  const held = activeHolds.get(id);
+  if (!held) return;
+  held.btn.classList.remove("pressed");
+  activeHolds.delete(id);
+  stopSustainedTone(id);
+  if (activeHolds.size === 0) finalizeGroup();
+}
+
 function bindNoteButtonHold(btn, note) {
   const start = (e) => {
     e.preventDefault();
     try {
       btn.setPointerCapture(e.pointerId);
     } catch (err) {}
-    btn.classList.add("pressed");
-    if (activeHolds.size === 0) {
-      currentGroupNotes = [];
-      groupStartTime = performance.now();
-    }
-    activeHolds.set(e.pointerId, { note, btn, startTime: performance.now() });
-    currentGroupNotes.push(note);
-    startSustainedTone(e.pointerId, noteFrequency(note));
-    if (pageMode === "practice") {
-      // 和音の途中経過（まだ他の指が揃っていないだけ）は不正解として数えない。
-      // 「そもそも次の音に含まれていない音」を押した場合だけミスとして数える
-      if (!isExpectedPracticeNote(note)) {
-        practiceMissCount++;
-        updatePracticeAccuracyBadge();
-        flashPracticeMissHighlight(btn);
-      }
-      const advancedIdx = tryAdvancePracticeChord();
-      // 正しく押せて先へ進んだ場合だけ、その和音の全ボタンを強く光らせる
-      // （先読みハイライトとは別クラス。押した瞬間の一時的なフィードバック）
-      if (advancedIdx !== null) {
-        practiceCorrectCount++;
-        updatePracticeAccuracyBadge();
-        flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
-      }
-    }
+    pressNote(e.pointerId, note, btn);
   };
-  const end = (e) => {
-    const held = activeHolds.get(e.pointerId);
-    if (!held) return;
-    held.btn.classList.remove("pressed");
-    activeHolds.delete(e.pointerId);
-    stopSustainedTone(e.pointerId);
-    if (activeHolds.size === 0) finalizeGroup();
-  };
+  const end = (e) => releaseNote(e.pointerId);
   // pointerdown/up/cancelはpointerId単位で個別に管理しているため、複数指の
   // 同時押しもそれぞれ独立して処理される（マウス由来のtouchstart/touchend単一
   // 想定の問題は元々ない）。pointerdownはデフォルトでpassiveではないため
@@ -1369,6 +1471,7 @@ function releaseAllHolds() {
   activeHolds.clear();
   currentGroupNotes = [];
   stopAllSustainedTones();
+  activeKeyboardKeys.clear();
 }
 
 function updateModeUI() {
@@ -1905,6 +2008,14 @@ function toggleSound() {
   localStorage.setItem("hatopiMusic_soundEnabled", soundEnabled ? "1" : "0");
 }
 
+// 演奏ボタンに対応キーラベルを表示するかどうか（PCでの利便性のため既定はON）。
+// 半音ボタンにはそもそもキー割り当てが無いため、ラベル自体が出ない
+function toggleKeyLabels() {
+  keyLabelsVisible = document.getElementById("musicKeyLabelToggle").checked;
+  localStorage.setItem(KEY_LABEL_VISIBLE_KEY, keyLabelsVisible ? "1" : "0");
+  renderInstrumentGrid();
+}
+
 function updateSoundToggleUI() {
   ["musicSoundToggleBtn", "musicSoundToggleBtnStage", "musicSoundToggleBtnFollow"].forEach((id) => {
     const btn = document.getElementById(id);
@@ -2251,6 +2362,7 @@ function bindControls() {
 
   document.getElementById("musicRecordToggle").addEventListener("change", toggleRecording);
   document.getElementById("musicSemitoneToggle").addEventListener("change", toggleSemitone);
+  document.getElementById("musicKeyLabelToggle").addEventListener("change", toggleKeyLabels);
 
   document.getElementById("musicAddRestBtn").addEventListener("click", addRestToken);
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);

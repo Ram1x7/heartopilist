@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/music.css?v=41">
+<link rel="stylesheet" href="./css/music.css?v=42">
 <link rel="stylesheet" href="./css/design-system.css?v=1">
 
 <link rel="prefetch" href="./index.html">
@@ -101,6 +101,10 @@
     <div class="music-panel-section">
       <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
       <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
+      <label class="music-key-label-toggle-row" id="musicKeyLabelHint">
+        <span data-i18n="music_key_label_toggle">PCキーボードでも演奏できます（対応キーを表示）</span>
+        <input type="checkbox" id="musicKeyLabelToggle" checked>
+      </label>
       <details class="music-advanced-settings" id="musicAdvancedSettings">
         <summary data-i18n="music_advanced_settings_label">詳細設定（配置・半音表示）</summary>
         <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
@@ -451,6 +455,9 @@
 
     <p style="margin-top:10px;"><strong>練習モード</strong><br>
     「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列／22キーなど）がそのまま自動で使われます。ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。次に弾くべき音の演奏ボタンが薄く光るので、迷わず次の音を確認できます（和音の場合は該当するボタンすべてが光ります）。そのボタンを正しく押すと、一瞬強く光ってから譜面のハイライトが先へ進みます。この先読みの点灯は、再生を止めている間もそのまま表示され続けます。譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。休符（押すボタンが無い音）は自動的に読み飛ばされます。採点はありません。左上の×で編集モードに戻れます。</p>
+
+    <p style="margin-top:10px;"><strong>キーボードでの演奏</strong><br>
+    PCで開いている場合、キーボードでも演奏ボタンを操作できます（編集モード・練習モードのみ。追従モードは対象外です）。対応するキーは各演奏ボタンに小さく表示されます（「楽器」の下にあるチェックで表示・非表示を切り替えられます）。楽器・配置を変えると対応キーも変わります。半音（♯）ボタンにはキー割り当てがなく、タッチ操作のみです。複数のキーを同時に押すと和音として扱われ、譜面作成中の入力・保存内容もタッチ操作と同じです。Ctrl+Z（元に戻す）・Ctrl+Y（やり直す）などの既存のショートカットとは干渉しません。</p>
 
     <p style="margin-top:10px;"><strong>位置調整</strong><br>
     練習モード右上のレンチのアイコンで、演奏ボタンの大きさ・位置を自分の端末に合わせて微調整できます。1本指ドラッグで移動、2本指ピンチで拡大縮小でき、「実機画像を重ねる」で実際のゲーム画面のスクリーンショットを背景に薄く表示しながら位置合わせすることもできます（画像は保存されず、その場限りの参考表示です）。「ロックする」で調整を確定すると、この端末・ブラウザに記憶され、次回から自動で適用されます。「リセット」でいつでも初期値に戻せます。</p>
