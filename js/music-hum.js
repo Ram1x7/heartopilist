@@ -478,13 +478,23 @@ function quantizeMelodyRhythm(events, bpmValue, opts) {
 // 直前・直後の検出音との上がる/下がるの関係（輪郭）が食い違う候補にはわずかな
 // ペナルティを加えて選ぶ。距離がはっきり近い候補があればそれを優先し、僅差の
 // ときだけ輪郭を優先する（ゲームに存在しない音を、前後関係を無視した単純な
-// 最近傍だけで決めないようにするため）
+// 最近傍だけで決めないようにするため）。
+// 曲全体の音域が楽器の音域より広い場合、絶対距離だけで最も近いボタンを探すと
+// 音域外の別々の音がすべて同じ境界のボタンへ潰れてしまう（js/music-midi-import.jsの
+// pickNearestInstrumentNoteと同じ問題）。距離の判定にはオクターブ単位(12半音)で
+// 楽器の音域内へ折り返した値を使い、これを避ける（起伏の方向判定は輪郭の
+// 食い違いなので、実際に検出された生の音程(midi)のまま比較する＝折り返さない）
 function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
   const context = ctx || {};
+  const instMin = availableNotes[0].midi;
+  const instMax = availableNotes[availableNotes.length - 1].midi;
+  let folded = midi;
+  while (folded < instMin) folded += 12;
+  while (folded > instMax) folded -= 12;
   let best = null;
   let bestScore = Infinity;
   availableNotes.forEach((entry) => {
-    let score = Math.abs(entry.midi - midi);
+    let score = Math.abs(entry.midi - folded);
     if (context.prevMappedMidi != null && context.prevShiftedMidi != null) {
       const detectedDir = Math.sign(midi - context.prevShiftedMidi);
       const candidateDir = Math.sign(entry.midi - context.prevMappedMidi);

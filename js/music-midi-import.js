@@ -420,12 +420,26 @@ function quantizeChordRhythm(groups, bpmValue, opts) {
 // 指定MIDI番号に最も近い、楽器で実際に選べる音を返す（単純な最近傍。
 // 和音内の同時発音には「前後の輪郭」という概念が無いため、
 // js/music-hum.jsのpickClosestMelodyNoteWithContourのような文脈補正はせず、
-// 距離だけで機械的に決める）
+// 距離だけで機械的に決める）。
+// 曲全体の音域が楽器の音域より広い場合（オクターブシフトを1つに決めても
+// 全ての音は収まらない場合）や、手動のオクターブ調整で意図的に音域外へ
+// 出た場合、単純な絶対距離だけで最も近いボタンを探すと、音域から大きく
+// 外れた別々の音が全て同じ境界のボタンへ潰れてしまい、メロディの起伏が
+// 失われる（例：楽器の音域外まで大きく跳躍する音が続けて出てくると、
+// 本来は違う高さのはずの音がすべて同じボタンに変換されてしまう）。
+// これを避けるため、まず対象の音をオクターブ単位(12半音)で楽器の音域内へ
+// 折り返してから最も近いボタンを探す。音域内の音はそのまま(折り返し0回)
+// なので、この変更による挙動の変化は音域外の音にのみ生じる
 function pickNearestInstrumentNote(midi, availableNotes) {
+  const instMin = availableNotes[0].midi;
+  const instMax = availableNotes[availableNotes.length - 1].midi;
+  let folded = midi;
+  while (folded < instMin) folded += 12;
+  while (folded > instMax) folded -= 12;
   let best = availableNotes[0];
   let bestDist = Infinity;
   availableNotes.forEach((entry) => {
-    const dist = Math.abs(entry.midi - midi);
+    const dist = Math.abs(entry.midi - folded);
     if (dist < bestDist) {
       bestDist = dist;
       best = entry;
