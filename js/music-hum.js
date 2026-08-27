@@ -487,7 +487,11 @@ function quantizeMelodyRhythm(events, bpmValue, opts) {
 // 考え方はjs/music-midi-import.jsのbuildFreeTimingChordTimelineと完全に同じで、
 // 和音(midis配列)ではなく単音(midi)を扱う点だけが異なる）。
 // ハミング・音源・動画のいずれも、手入力（キーボード演奏入力）以外は全てこちらを使い、
-// 拍子ベースへの量子化(quantizeMelodyRhythm)は行わない
+// 拍子ベースへの量子化(quantizeMelodyRhythm)は行わない。
+// tokenの列は一列の並びでしか長さを表現できないため、この音の実際の長さが
+// 次の音の開始位置より後まで鳴っている場合でも、次の開始位置で必ず打ち切る
+// （buildFreeTimingChordTimeline側の詳しい理由を参照。単音でも検出誤差等で
+// 前の音が次の音の開始より後まで検出されることがあるため、同じ考え方を適用する）
 function buildFreeTimingMelodyTimeline(events, opts) {
   const options = opts || {};
   if (!events.length) return [];
@@ -500,7 +504,7 @@ function buildFreeTimingMelodyTimeline(events, opts) {
     const nextStart = i + 1 < events.length ? events[i + 1].startTimeSeconds : null;
     const gapAfter = nextStart == null ? null : nextStart - ownEnd;
     const isRestAfter = gapAfter != null && gapAfter >= restGapSec;
-    const lengthSec = !isRestAfter && nextStart != null ? Math.max(e.durationSeconds, nextStart - e.startTimeSeconds) : e.durationSeconds;
+    const lengthSec = !isRestAfter && nextStart != null ? nextStart - e.startTimeSeconds : e.durationSeconds;
 
     result.push({ midi: e.pitchMidi, durationMs: Math.max(minDurationMs, lengthSec * 1000) });
     if (isRestAfter) {
