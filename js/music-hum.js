@@ -117,6 +117,47 @@ function computeMelodyOctaveShift(detectedMidis, availableNotes) {
   return bestShift;
 }
 
+// ── メロディ変換パイプラインの調整値（Stage 9: 評価データに基づくチューニング） ──
+// 各処理段階の閾値を1箇所にまとめた設定値。数値そのものはこれまでの既定値を
+// そのまま引き継いでおり(echo関連の3項目のみ新規)、この整理自体による挙動変化は無い。
+// 将来的にプレビューUIで一部だけ公開する場合も、まずここを見れば全体を把握できる
+const MELODY_PIPELINE_SETTINGS = {
+  // collapseSimultaneousNoteEvents: ほぼ同時刻の重複検出とみなす時間差の許容幅(秒)
+  simultaneousEpsilonSec: 0.03,
+  // mergeMelodyNoteEvents: 同一音の断片統合（隙間・音程差の許容幅）
+  mergeMaxGapSec: 0.04,
+  mergeSemitoneTolerance: 0.6,
+  // consolidateUnstablePitchClusters: 不安定な音程クラスターの統合条件
+  clusterShortFragmentSec: 0.15,
+  clusterMaxGapSec: 0.06,
+  clusterMaxRangeSemitones: 3,
+  clusterMinSize: 3,
+  // suppressPitchWobbleEvents: ビブラート等の一瞬の音程の揺れの吸収条件
+  wobbleMaxDurationSec: 0.12,
+  wobbleRelativeFactor: 0.35,
+  wobbleSemitoneTolerance: 2,
+  // suppressTrailingEchoEvents（新規）: 統合閾値(mergeMaxGapSec)よりは隙間が大きいが、
+  // 直前の同じ音の余韻・残響と考えられる短い"尾"を消す。統合よりも隙間の許容幅を
+  // 広く取る一方、「直前の音よりずっと短い」ことも条件にすることで、長さが同程度の
+  // 意図的な同音連打（tremolo・スタッカート等）までは消さないようにする
+  echoMaxGapSec: 0.12,
+  echoSemitoneTolerance: 1,
+  echoMaxDurationRatio: 0.35,
+  // correctIsolatedOctaveOutliers（新規）: 単旋律のピッチ推定でよくある
+  // 「一瞬だけオクターブを誤検出する」失敗パターンの補正条件
+  octaveOutlierToleranceSemitones: 0.75,
+  octaveOutlierRelativeFactor: 0.6,
+  // filterMelodyNoiseEvents: 極端に短い誤検出とみなす長さの下限(拍基準、上下限つき)
+  noiseMinDurationFloorSec: 0.035,
+  noiseMinDurationCeilSec: 0.09,
+  noiseMinDurationBeatFraction: 0.12,
+  // quantizeMelodyRhythm: 発音開始位置を揃える拍グリッド・休符とみなす間隔
+  quantizeGridUnit: 0.25,
+  quantizeRestGapBeats: 0.3,
+  // groupNoteEventsIntoChords: 音源/動画（和音対応パイプライン）での同時発音とみなす時間差
+  chordSimultaneousEpsilonSec: 0.05,
+};
+
 // ほぼ同時刻に鳴っている複数の検出のうち、1つだけを残す。
 // ハミング（本来単旋律）の場合は「倍音・ハモりの誤検出」の可能性が高いため、
 // 最も長く鳴っている音を主音とみなす(preferHigherPitch:false、既定)。
@@ -127,7 +168,7 @@ function computeMelodyOctaveShift(detectedMidis, availableNotes) {
 // がsourceTypeに応じてこのオプションを渡す
 function collapseSimultaneousNoteEvents(sortedEvents, opts) {
   const options = opts || {};
-  const simulEpsilonSec = options.simulEpsilonSec != null ? options.simulEpsilonSec : 0.03;
+  const simulEpsilonSec = options.simulEpsilonSec != null ? options.simulEpsilonSec : MELODY_PIPELINE_SETTINGS.simultaneousEpsilonSec;
   const preferHigherPitch = !!options.preferHigherPitch;
   const result = [];
   sortedEvents.forEach((ev) => {
@@ -151,8 +192,8 @@ function collapseSimultaneousNoteEvents(sortedEvents, opts) {
 // （音と音の間に実際の無音・区切りがある）とは区別する
 function mergeMelodyNoteEvents(sortedEvents, opts) {
   const options = opts || {};
-  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : 0.6;
-  const maxGapSec = options.maxGapSec != null ? options.maxGapSec : 0.04;
+  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : MELODY_PIPELINE_SETTINGS.mergeSemitoneTolerance;
+  const maxGapSec = options.maxGapSec != null ? options.maxGapSec : MELODY_PIPELINE_SETTINGS.mergeMaxGapSec;
 
   const merged = [];
   sortedEvents.forEach((ev) => {
@@ -187,10 +228,10 @@ function mergeMelodyNoteEvents(sortedEvents, opts) {
 //     進行なので、音程帯の広さだけでは正しく区別できない）
 function consolidateUnstablePitchClusters(events, opts) {
   const options = opts || {};
-  const shortFragmentSec = options.shortFragmentSec != null ? options.shortFragmentSec : 0.15;
-  const maxClusterGapSec = options.maxClusterGapSec != null ? options.maxClusterGapSec : 0.06;
-  const maxClusterRangeSemitones = options.maxClusterRangeSemitones != null ? options.maxClusterRangeSemitones : 3;
-  const minClusterSize = options.minClusterSize != null ? options.minClusterSize : 3;
+  const shortFragmentSec = options.shortFragmentSec != null ? options.shortFragmentSec : MELODY_PIPELINE_SETTINGS.clusterShortFragmentSec;
+  const maxClusterGapSec = options.maxClusterGapSec != null ? options.maxClusterGapSec : MELODY_PIPELINE_SETTINGS.clusterMaxGapSec;
+  const maxClusterRangeSemitones = options.maxClusterRangeSemitones != null ? options.maxClusterRangeSemitones : MELODY_PIPELINE_SETTINGS.clusterMaxRangeSemitones;
+  const minClusterSize = options.minClusterSize != null ? options.minClusterSize : MELODY_PIPELINE_SETTINGS.clusterMinSize;
 
   // 隣接する断片同士の音程差の符号に、上昇と下降の両方が含まれるかどうかを見る。
   // 一方向にしか進まない(単調増加/単調減少)場合は、速いスケール走句等の正当な
@@ -261,9 +302,9 @@ function consolidateUnstablePitchClusters(events, opts) {
 // 同音程の音が2つ並んで残ってしまうのを避けるため）
 function suppressPitchWobbleEvents(events, opts) {
   const options = opts || {};
-  const maxWobbleDurationSec = options.maxWobbleDurationSec != null ? options.maxWobbleDurationSec : 0.12;
-  const relativeFactor = options.relativeFactor != null ? options.relativeFactor : 0.35;
-  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : 2;
+  const maxWobbleDurationSec = options.maxWobbleDurationSec != null ? options.maxWobbleDurationSec : MELODY_PIPELINE_SETTINGS.wobbleMaxDurationSec;
+  const relativeFactor = options.relativeFactor != null ? options.relativeFactor : MELODY_PIPELINE_SETTINGS.wobbleRelativeFactor;
+  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : MELODY_PIPELINE_SETTINGS.wobbleSemitoneTolerance;
 
   if (events.length < 3) return events.map((e) => ({ ...e }));
 
@@ -291,22 +332,95 @@ function suppressPitchWobbleEvents(events, opts) {
   return result;
 }
 
+// 単旋律のピッチ推定でよく起こる「一瞬だけオクターブを誤検出する」失敗パターンを
+// 補正する（Stage 9で評価データから見つけた課題：孤立した外れ値が前後の音と
+// 音程が離れていても"ちょうど1オクターブ違い"の場合、削除ではなく前後どちらかの
+// オクターブに揃えて訂正した方が、実際に鳴っていたであろう音に近くなる）。
+// 前後どちらの音とも音程が離れているため suppressPitchWobbleEvents（前後とほぼ同じ
+// 音程に戻る揺れ）では検出できない、別種の外れ値を対象にする。
+// 前後どちらか一方の音とだけ"オクターブ違い"の関係にあり、かつ前後の音より
+// 明らかに短い場合のみ対象にする（両方と無関係な孤立音・前後と長さが同程度の音は、
+// 実際に意図されたオクターブ跳躍である可能性を排除できないため補正しない＝
+// 安全側に倒す。誤って補正してしまっても、既存の「金色の枠＝未確認」の仕組みで
+// 手直しできる）
+function correctIsolatedOctaveOutliers(events, opts) {
+  const options = opts || {};
+  const tolerance = options.octaveToleranceSemitones != null ? options.octaveToleranceSemitones : MELODY_PIPELINE_SETTINGS.octaveOutlierToleranceSemitones;
+  const relativeFactor = options.relativeFactor != null ? options.relativeFactor : MELODY_PIPELINE_SETTINGS.octaveOutlierRelativeFactor;
+
+  const isOctaveMatch = (candidateMidi, neighborMidi) => {
+    const diffOctaves = Math.round((candidateMidi - neighborMidi) / 12);
+    if (diffOctaves === 0) return null;
+    const residual = Math.abs(candidateMidi - (neighborMidi + diffOctaves * 12));
+    return residual <= tolerance ? diffOctaves : null;
+  };
+
+  return events.map((ev, i) => {
+    const prev = i > 0 ? events[i - 1] : null;
+    const next = i + 1 < events.length ? events[i + 1] : null;
+    if (!prev || !next) return { ...ev };
+    const isShort = ev.durationSeconds <= relativeFactor * Math.min(prev.durationSeconds, next.durationSeconds);
+    if (!isShort) return { ...ev };
+
+    const prevOctaveDiff = isOctaveMatch(ev.pitchMidi, prev.pitchMidi);
+    const nextOctaveDiff = isOctaveMatch(ev.pitchMidi, next.pitchMidi);
+    if (prevOctaveDiff == null && nextOctaveDiff == null) return { ...ev };
+
+    // 前後どちらか時間的に近い方を優先し、そちらがオクターブ一致していればそれを使う。
+    // 近い方が一致しなければ、もう一方の一致を使う
+    const preferPrev = ev.startTimeSeconds - prev.startTimeSeconds <= next.startTimeSeconds - ev.startTimeSeconds;
+    const diffOctaves = preferPrev ? prevOctaveDiff ?? nextOctaveDiff : nextOctaveDiff ?? prevOctaveDiff;
+    return { ...ev, pitchMidi: ev.pitchMidi - diffOctaves * 12 };
+  });
+}
+
+// 残響（リバーブ）のある音源で、本来の音の少し後ろに、同じ音程で音量が減衰した
+// "尾"がもう1つの音として検出されてしまうケースを吸収する（Stage 9で評価データ
+// から見つけた既存の隙間: mergeMelodyNoteEvents（隙間0.04秒以内）にもノイズ除去
+// （拍基準の長さ下限）にも引っかからない「隙間はやや広いが、直前の音よりずっと
+// 短い」中間的な長さの尾が、消えずに残ってしまっていた）。
+// 「直前の音とほぼ同じ音程」「隙間が一定以内」に加えて、必ず「直前の音より
+// 十分に短い（echoMaxDurationRatio以下）」ことも条件にすることで、長さがほぼ
+// 同じ意図的な同音連打（スタッカート・トレモロ等）まで誤って消さないようにする
+function suppressTrailingEchoEvents(events, opts) {
+  const options = opts || {};
+  const maxGapSec = options.maxGapSec != null ? options.maxGapSec : MELODY_PIPELINE_SETTINGS.echoMaxGapSec;
+  const semitoneTolerance = options.semitoneTolerance != null ? options.semitoneTolerance : MELODY_PIPELINE_SETTINGS.echoSemitoneTolerance;
+  const maxDurationRatio = options.maxDurationRatio != null ? options.maxDurationRatio : MELODY_PIPELINE_SETTINGS.echoMaxDurationRatio;
+
+  const result = [];
+  events.forEach((ev) => {
+    const prev = result[result.length - 1];
+    if (prev) {
+      const gap = ev.startTimeSeconds - (prev.startTimeSeconds + prev.durationSeconds);
+      const closeInPitch = Math.abs(ev.pitchMidi - prev.pitchMidi) <= semitoneTolerance;
+      const muchShorterThanPrev = ev.durationSeconds <= prev.durationSeconds * maxDurationRatio;
+      if (gap >= 0 && gap <= maxGapSec && closeInPitch && muchShorterThanPrev) {
+        return; // 残響の尾とみなして破棄する（直前の音はそのまま変更しない）
+      }
+    }
+    result.push({ ...ev });
+  });
+  return result;
+}
+
 // 曲のテンポ（BPM）から見て極端に短すぎる検出はノイズとみなして除外する。
 // 固定値ではなく1拍の長さに対する割合で決めることで、速い曲の短い正規音符まで
 // 消してしまわないようにする（ただし極端な値にならないよう上下限を設ける）
 function filterMelodyNoiseEvents(events, bpmValue, opts) {
   const options = opts || {};
   const beatSec = 60 / bpmValue;
-  const floorSec = options.minDurationFloorSec != null ? options.minDurationFloorSec : 0.035;
-  const ceilSec = options.minDurationCeilSec != null ? options.minDurationCeilSec : 0.09;
-  const beatFraction = options.minDurationBeatFraction != null ? options.minDurationBeatFraction : 0.12;
+  const floorSec = options.minDurationFloorSec != null ? options.minDurationFloorSec : MELODY_PIPELINE_SETTINGS.noiseMinDurationFloorSec;
+  const ceilSec = options.minDurationCeilSec != null ? options.minDurationCeilSec : MELODY_PIPELINE_SETTINGS.noiseMinDurationCeilSec;
+  const beatFraction = options.minDurationBeatFraction != null ? options.minDurationBeatFraction : MELODY_PIPELINE_SETTINGS.noiseMinDurationBeatFraction;
   const minDurationSec = Math.min(ceilSec, Math.max(floorSec, beatSec * beatFraction));
   return events.filter((e) => e.durationSeconds >= minDurationSec);
 }
 
 // Basic Pitchの生ノート列[{pitchMidi, startTimeSeconds, durationSeconds}, ...]を、
 // 上記の各段階（同時発音の統合→同一音の断片統合→不安定クラスターの統合→
-// ビブラート吸収→ノイズ除去）にかけて整える。
+// ビブラート吸収→孤立したオクターブ誤検出の補正→残響の尾の吸収(いずれもStage 9で追加)
+// →ノイズ除去）にかけて整える。
 // sourceType（"humming"｜"audio"｜"video"｜"midi"）は、同時発音の統合方法
 // （collapseSimultaneousNoteEventsのpreferHigherPitch）にのみ影響する。
 // それ以外の段階は入力元によらず共通の処理のままにしてある（分岐を増やしすぎない）
@@ -319,7 +433,9 @@ function normalizeMelodyNoteEvents(rawEvents, bpmValue, opts) {
   const merged = mergeMelodyNoteEvents(collapsed, options.merge);
   const clustered = consolidateUnstablePitchClusters(merged, options.cluster);
   const wobbleSuppressed = suppressPitchWobbleEvents(clustered, options.wobble);
-  return filterMelodyNoiseEvents(wobbleSuppressed, bpmValue, options.noise);
+  const octaveCorrected = correctIsolatedOctaveOutliers(wobbleSuppressed, options.octaveOutlier);
+  const echoSuppressed = suppressTrailingEchoEvents(octaveCorrected, options.echo);
+  return filterMelodyNoiseEvents(echoSuppressed, bpmValue, options.noise);
 }
 
 // 整えたノート列の発音開始位置を、曲全体で共有する1つの拍グリッド（既定では
@@ -334,8 +450,8 @@ function quantizeMelodyRhythm(events, bpmValue, opts) {
   const options = opts || {};
   if (!events.length) return [];
   const beatSec = 60 / bpmValue;
-  const gridUnit = options.gridUnit != null ? options.gridUnit : 0.25;
-  const restGapBeats = options.restGapBeats != null ? options.restGapBeats : 0.3;
+  const gridUnit = options.gridUnit != null ? options.gridUnit : MELODY_PIPELINE_SETTINGS.quantizeGridUnit;
+  const restGapBeats = options.restGapBeats != null ? options.restGapBeats : MELODY_PIPELINE_SETTINGS.quantizeRestGapBeats;
 
   const toBeat = (sec) => sec / beatSec;
   const snapToGrid = (beat) => Math.round(beat / gridUnit) * gridUnit;
@@ -1642,7 +1758,7 @@ function recomputeMelodyPreview() {
         semitoneEnabled: melodyPreviewState.semitoneEnabled,
         maxSimultaneousNotes: melodyPreviewState.maxSimultaneousNotes,
         octaveShiftOverride: melodyPreviewState.octaveOffset,
-        chord: { simulEpsilonSec: 0.05 },
+        chord: { simulEpsilonSec: MELODY_PIPELINE_SETTINGS.chordSimultaneousEpsilonSec },
       })
     : convertMelodyWithPreviewStats(melodyPreviewState.noteEvents, layout, melodyPreviewState.bpm, {
         semitoneEnabled: melodyPreviewState.semitoneEnabled,
