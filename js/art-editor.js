@@ -125,6 +125,10 @@ function initArtEditor(){
   bindModeWizardControls();
   if(showModeWizardOnInit) showModeWizard();
   maybeStartTutorial();
+
+  bindMobileCanvasAreaResize();
+  // レイアウトが確定してから測る（フォント読み込み等での高さのズレを避けるため）
+  requestAnimationFrame(adjustMobileCanvasAreaHeight);
 }
 
 // ── 編集モード・固定（ロック）ボタンの結線 ──
@@ -229,6 +233,76 @@ function setupArtEntryOptions(){
 
 function refreshArtEntryOptionsVisibility(){
   document.getElementById("artEntryOpenSavedBtn").style.display = savedDesigns.length > 0 ? "flex" : "none";
+}
+
+// ── モバイル（767px以下）：固定ツールバーがキャンバス表示領域を覆わないよう、
+// 実際に画面上で使われている高さから逆算してキャンバス表示領域の高さを都度設定する ──
+//
+// オフラインバナーの有無・言語による見出しの長さ・ダークモードでの見え方の違いなど、
+// ヘッダー側の実際の高さはCSSだけでは正確に把握できない（推測値だと二重見積もりや
+// ズレの原因になる）ため、getBoundingClientRect()による実測に基づいて計算する。
+// 「初期スクロール位置でキャンバス表示領域自体の高さが、固定ツールバーの手前で
+// 収まる」ことを保証するのが目的で、ここで求めた値がそのまま.art-canvas-areaの
+// 高さになる（座標計算はgetBoundingClientRect()ベースのため、この高さ変更が
+// タップ位置と描画位置のずれを生むことはない）。
+const ART_MOBILE_CANVAS_AREA_MAX_HEIGHT = 460;
+const ART_MOBILE_CANVAS_AREA_GAP = 8; // ツールバーとの間に最低限残す隙間
+// ヘッダー等の実測高さを引いた「残りの高さ」がこの値を下回るのは、オフラインバナー等の
+// 分を差し引いても画面自体が極端に低い場合のみ（例:700x360の横向き）。このケースだけは
+// 初期スクロール位置での重なりを許容し、その代わりスクロールすれば必ずツールバーの
+// 手前に収まるサイズ（下記MIN_HEIGHT）にしておく。それ以外のケースでは重なりを
+// 避けることを最優先し、たとえ狭くてもavailableをそのまま使う（下限に切り上げない）
+const ART_MOBILE_CANVAS_AREA_ABSOLUTE_FLOOR = 100;
+const ART_MOBILE_CANVAS_AREA_MIN_HEIGHT = 180; // スクロール前提の場合に使う、操作しやすい高さ
+
+function adjustMobileCanvasAreaHeight(){
+  if(!window.matchMedia("(max-width:767px)").matches) return;
+  const canvasArea = document.querySelector(".art-canvas-area");
+  const toolbar = document.getElementById("artToolbar");
+  if(!canvasArea || !toolbar) return;
+
+  // rect.top + scrollYで「ページ先頭からの絶対位置」を求める。これは現在のスクロール量に
+  // 依存しない値になるため、リサイズ時など任意のスクロール位置で呼び出しても、
+  // 「初期スクロール位置（scrollY=0）で見た場合にキャンバス表示領域がどこから
+  // 始まるか」を正しく表す
+  const canvasAreaAbsoluteTop = canvasArea.getBoundingClientRect().top + window.scrollY;
+  const toolbarHeight = toolbar.getBoundingClientRect().height;
+
+  // 画面の高さそのものから固定ツールバー分を引いた「構造上どうしても超えられない上限」。
+  // 極端に低い横向き画面でヘッダー等がその画面高さを超えてしまう場合でも、
+  // キャンバス表示領域自身の高さだけは必ずこの上限以下に収め、スクロールすれば
+  // ツールバーと重ならずに全体が見える状態を保証する
+  const hardCeiling = Math.max(0, window.innerHeight - toolbarHeight - ART_MOBILE_CANVAS_AREA_GAP);
+  const available = window.innerHeight - canvasAreaAbsoluteTop - toolbarHeight - ART_MOBILE_CANVAS_AREA_GAP;
+
+  // 「初回訪問時のオフラインバナー表示中」など、通常より上部の実高さが増えるケースでも、
+  // 重なりを避けることを優先してavailableをそのまま使う（180px等の下限に切り上げない）。
+  // ヘッダー等だけで画面のほとんどを占めてしまう極端なケースに限り、
+  // スクロール前提のMIN_HEIGHTにフォールバックする
+  const height = available >= ART_MOBILE_CANVAS_AREA_ABSOLUTE_FLOOR
+    ? Math.min(available, ART_MOBILE_CANVAS_AREA_MAX_HEIGHT)
+    : Math.min(ART_MOBILE_CANVAS_AREA_MIN_HEIGHT, hardCeiling);
+  const heightPx = Math.round(height) + "px";
+
+  // 高さが実際に変わった場合のみキャンバスを再描画する。fitCellSize()は
+  // .art-canvas-areaの「その時点の」実寸を都度参照するため、ここで高さを
+  // 変更したままrenderCanvas()を呼ばずにいると、次にたまたま描画が発生する
+  // （例:最初にペンで塗った瞬間）までキャンバスの見た目のサイズがズレたままになり、
+  // その間はタップ位置と描画位置もズレてしまう。ここで即座に再描画することで防ぐ
+  if(canvasArea.style.getPropertyValue("--art-canvas-area-mobile-height") !== heightPx){
+    canvasArea.style.setProperty("--art-canvas-area-mobile-height", heightPx);
+    if(typeof renderCanvas === "function" && typeof pixels !== "undefined" && pixels.length) renderCanvas();
+  }
+}
+
+function bindMobileCanvasAreaResize(){
+  let resizeTimer = null;
+  const scheduleAdjust = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(adjustMobileCanvasAreaHeight, 100);
+  };
+  window.addEventListener("resize", scheduleAdjust);
+  window.addEventListener("orientationchange", scheduleAdjust);
 }
 
 // デザイン枠のパーツ選択は、元サイトと同様に「戻る」付きの別画面へ切り替える方式
@@ -2413,6 +2487,9 @@ document.addEventListener("langchange", () => {
   if(document.getElementById("myDesignsModal").style.display !== "none"){
     renderMyDesignsList();
   }
+  // 言語によって見出し等の文言の長さが変わり、キャンバス表示領域より上の高さも
+  // 変わり得るため、レイアウトの再描画後に測り直す
+  requestAnimationFrame(adjustMobileCanvasAreaHeight);
 });
 
 initArtEditor();

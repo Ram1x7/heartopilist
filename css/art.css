@@ -277,18 +277,17 @@ body.dark #artCanvas{
     box-shadow:0 -4px 14px rgba(52,48,43,0.1);
   }
 
-  /* キャンバス表示領域自体の高さを固定ツールバーの分だけ縮め、初期スクロール位置でも
-     キャンバス下端がツールバーの裏に隠れないようにする。box-sizing:border-boxにして
-     height指定値＝実際の見た目の高さ（padding/border込み）に揃え、計算を単純化する。
-     100vhは一部モバイルブラウザでアドレスバー表示中の高さを含まず実際より大きく
-     計算されることがあるため、対応ブラウザではdvh（動的ビューポート高さ）を優先して使う。
-     下限(min)を低くしているのは、横向き・低い高さの画面でツールバーと重ならないことを
-     優先するため（内部はoverflow:autoでスクロール可能。この場合は画面をスクロールして
-     全体を確認する想定） */
+  /* キャンバス表示領域の高さは、js/art-editor.jsのadjustMobileCanvasAreaHeight()が
+     「実際に画面上でヘッダー・オフラインバナー・編集モードバー等が占めている高さ」と
+     「固定ツールバーの実測高さ」を都度getBoundingClientRect()で測り、
+     --art-canvas-area-mobile-heightとして動的に設定する。バナーの有無や言語切替による
+     文言の長さの違いなど、CSSだけでは正確に把握できない要素を実測するのが目的で、
+     推測値で二重に見積もることを避けている。
+     以下のclamp(...)は、JS実行前の一瞬・JS無効時にのみ使われるフォールバック値 */
   .art-canvas-area{
     box-sizing:border-box;
     height:clamp(110px, calc(34vh - var(--art-mobile-toolbar-total-height)), 380px);
-    height:clamp(110px, calc(34dvh - var(--art-mobile-toolbar-total-height)), 380px);
+    height:var(--art-canvas-area-mobile-height, clamp(110px, calc(34dvh - var(--art-mobile-toolbar-total-height)), 380px));
     scroll-margin-bottom:var(--art-mobile-toolbar-total-height);
   }
 }

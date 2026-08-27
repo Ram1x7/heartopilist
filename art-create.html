@@ -574,6 +574,8 @@ if(!localStorage.getItem(OFFLINE_BANNER_SEEN_KEY)){
 document.getElementById("artOfflineBannerCloseBtn").addEventListener("click", () => {
   localStorage.setItem(OFFLINE_BANNER_SEEN_KEY, "1");
   document.getElementById("artOfflineBanner").style.display = "none";
+  // バナーが消えてキャンバス表示領域より上の高さが変わるため測り直す
+  if(typeof adjustMobileCanvasAreaHeight === "function") adjustMobileCanvasAreaHeight();
 });
 
 // ダークモード
