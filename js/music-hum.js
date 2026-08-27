@@ -94,6 +94,7 @@ function computeMelodyOctaveShift(detectedMidis, availableNotes) {
   const candidateShifts = new Set([centerShift - 24, centerShift - 12, centerShift, centerShift + 12, centerShift + 24]);
   let bestShift = centerShift;
   let bestScore = Infinity;
+  let bestAbsShift = Infinity;
   candidateShifts.forEach((shift) => {
     let inRangeCount = 0;
     let totalDistance = 0;
@@ -107,11 +108,18 @@ function computeMelodyOctaveShift(detectedMidis, availableNotes) {
       });
       totalDistance += nearest;
     });
-    // 音域に収まる音の数を最優先し、同数なら実音への距離の合計が小さい方を選ぶ
+    // 音域に収まる音の数を最優先し、同数なら実音への距離の合計が小さい方を選ぶ。
+    // それでも同点の場合（楽器の音域に対して曲の音域が十分狭く、複数のオクターブが
+    // 同じように収まる場合）、移調量(|shift|)がより小さい方を優先する。優先しないと
+    // Setの列挙順（centerShiftより低い候補が先）に左右され、入力の音域がわずかに
+    // 変わっただけで（例：半音の移調前後で検出音域の端が1音ずれるだけ）採用される
+    // オクターブが不安定に入れ替わってしまう
     const score = (detectedMidis.length - inRangeCount) * 100 + totalDistance;
-    if (score < bestScore) {
+    const absShift = Math.abs(shift);
+    if (score < bestScore || (score === bestScore && absShift < bestAbsShift)) {
       bestScore = score;
       bestShift = shift;
+      bestAbsShift = absShift;
     }
   });
   return bestShift;
@@ -474,25 +482,57 @@ function quantizeMelodyRhythm(events, bpmValue, opts) {
   return result;
 }
 
-// 指定したMIDI番号に対して、楽器で実際に選べる音の中から「距離の近さ」を主軸に、
-// 直前・直後の検出音との上がる/下がるの関係（輪郭）が食い違う候補にはわずかな
-// ペナルティを加えて選ぶ。距離がはっきり近い候補があればそれを優先し、僅差の
-// ときだけ輪郭を優先する（ゲームに存在しない音を、前後関係を無視した単純な
-// 最近傍だけで決めないようにするため）
-function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
+// 指定したMIDI番号に対して、楽器で実際に選べる音の中から最も適切な候補を選ぶ
+// （MIDI/音源/動画の和音対応パイプライン(js/music-midi-import.jsのpickNearestInstrumentNote)、
+// ハミング/音源/動画の単旋律パイプライン(このすぐ下のpickClosestMelodyNoteWithContour)の
+// 両方から共有して使う共通実装）。
+//
+// 半音ボタンがある楽器（22キーの半音表示ON等）では、対象の音にちょうど一致する
+// 候補が必ず存在するため、距離0の候補が下記のどの補正項の合計よりも必ず小さくなり
+// （補正項は合計してもたかだか1.35程度で1を超えない設計）、常にその厳密な一致が
+// そのまま選ばれる＝この関数を導入する前と完全に同じ結果になる。
+//
+// 半音ボタンが無い楽器（黒鍵に相当する候補が存在しない）や、そもそも楽器の音域に
+// ちょうど収まる候補が無い場合は、複数の候補が同じ絶対距離になり得る。その場合に
+// 前後関係を考慮せず距離だけで機械的に決めると、メロディの上行・下降が崩れたり、
+// 本来別々の高さの音が不必要に同じボタンへ集中したりする。これを避けるため、
+// 距離を主軸としつつ以下を加味する：
+//   ・前の変換後の音との音程差が、元の音程差からかけ離れていないか（跳躍しすぎ・
+//     動かなさすぎの両方を防ぐ）
+//   ・前後の音との上がる/下がるの向きが入れ替わっていないか
+//   ・入力音は実際には変化しているのに、前の変換後と同じボタンへ不必要に
+//     収束していないか（入力が本当に同じ音の場合はこの限りではない）
+//
+// 曲全体の音域が楽器の音域より広い場合、絶対距離だけで最も近いボタンを探すと
+// 音域外の別々の音がすべて同じ境界のボタンへ潰れてしまう問題も、最近傍探索の
+// 前段でオクターブ単位(12半音)に折り返すことで併せて解消する（音域内の音は
+// 折り返し0回のまま＝挙動不変）。
+function pickInstrumentNoteCandidate(midi, availableNotes, ctx) {
   const context = ctx || {};
-  let best = null;
+  const instMin = availableNotes[0].midi;
+  const instMax = availableNotes[availableNotes.length - 1].midi;
+  let folded = midi;
+  while (folded < instMin) folded += 12;
+  while (folded > instMax) folded -= 12;
+
+  let best = availableNotes[0];
   let bestScore = Infinity;
   availableNotes.forEach((entry) => {
-    let score = Math.abs(entry.midi - midi);
-    if (context.prevMappedMidi != null && context.prevShiftedMidi != null) {
-      const detectedDir = Math.sign(midi - context.prevShiftedMidi);
-      const candidateDir = Math.sign(entry.midi - context.prevMappedMidi);
+    let score = Math.abs(entry.midi - folded);
+    if (context.prevInputMidi != null && context.prevOutputMidi != null) {
+      const inputInterval = midi - context.prevInputMidi;
+      const candidateInterval = entry.midi - context.prevOutputMidi;
+      const detectedDir = Math.sign(inputInterval);
+      const candidateDir = Math.sign(candidateInterval);
       if (detectedDir !== 0 && candidateDir !== 0 && detectedDir !== candidateDir) score += 0.9;
+      // 元の音程差からかけ離れた音程になっていないか（跳躍しすぎ・動かなさすぎを防ぐ）
+      score += Math.abs(Math.abs(candidateInterval) - Math.abs(inputInterval)) * 0.05;
+      // 入力音は実際には変化しているのに、前の変換後と同じボタンへ収束する場合のペナルティ
+      if (entry.midi === context.prevOutputMidi && midi !== context.prevInputMidi) score += 0.5;
     }
-    if (context.nextShiftedMidi != null) {
-      const detectedDirNext = Math.sign(context.nextShiftedMidi - midi);
-      const candidateDirNext = Math.sign(context.nextShiftedMidi - entry.midi);
+    if (context.nextInputMidi != null) {
+      const detectedDirNext = Math.sign(context.nextInputMidi - midi);
+      const candidateDirNext = Math.sign(context.nextInputMidi - entry.midi);
       if (detectedDirNext !== 0 && candidateDirNext !== 0 && detectedDirNext !== candidateDirNext) score += 0.4;
     }
     if (score < bestScore) {
@@ -500,7 +540,20 @@ function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
       best = entry;
     }
   });
-  return best.note;
+  return best;
+}
+
+// pickInstrumentNoteCandidateの薄いラッパー（呼び出し元(mapMelodyToInstrument)の
+// 既存のctxフィールド名(prevShiftedMidi/prevMappedMidi/nextShiftedMidi)をそのまま
+// 維持するため、共有関数側の汎用的なフィールド名(prevInputMidi/prevOutputMidi/
+// nextInputMidi)へ読み替えるだけの役割）
+function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
+  const context = ctx || {};
+  return pickInstrumentNoteCandidate(midi, availableNotes, {
+    prevInputMidi: context.prevShiftedMidi,
+    prevOutputMidi: context.prevMappedMidi,
+    nextInputMidi: context.nextShiftedMidi,
+  }).note;
 }
 
 // quantizeMelodyRhythmが返した[{midi, beats}, ...]（休符はmidi:null）を、
