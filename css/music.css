@@ -1628,6 +1628,20 @@ body.dark .music-note-btn.accidental.pressed{
   background:var(--indigo);
 }
 
+/* 黒鍵（半音ボタン）が先読みガイド(.practice-guide)の対象になった時も、
+   白鍵と同じ色でしっかり光らせる。ライトモードでは.music-note-btn.accidentalの
+   方が先に定義されているため.practice-guideの背景でそのまま上書きできるが、
+   ダークモードは逆順（body.dark .music-note-btn.accidentalの方が後）で
+   詳細度も同じため、このままだと黒鍵だけガイドの背景色が点かない。
+   :active/.pressedと同じ要領で詳細度を上げて明示的に上書きする */
+.music-note-btn.accidental.practice-guide{
+  background:rgba(var(--practice-guide-rgb), var(--practice-guide-bg-opacity));
+}
+
+body.dark .music-note-btn.accidental.practice-guide{
+  background:rgba(var(--practice-guide-rgb-dark), calc(var(--practice-guide-bg-opacity) + 0.05));
+}
+
 /* 練習モード：全画面の専用ステージ。実機の指の感覚に合わせて練習できるよう、
    通常のページ（ナビ・楽器選択などの編集用パネル）を覆い隠し、譜面と演奏ボタンだけの
    画面にする。端末が縦向きの場合はCSSで画面全体を90度回転させ、実機同様の横画面表示を
@@ -1873,6 +1887,17 @@ body.dark .music-practice-stage .music-score-display{
   background:rgba(0,0,0,0.35);
 }
 
+/* 10個のブロックを弾き終えて次のブロックへ自動的に切り替わった瞬間、
+   新しい音符たちがふわっと流れ込んできたことが分かるようにする軽い演出 */
+@keyframes music-score-block-enter{
+  0%{ opacity:0; transform:translateX(10px); }
+  100%{ opacity:1; transform:translateX(0); }
+}
+
+.music-score-display.block-enter{
+  animation:music-score-block-enter 0.3s ease-out;
+}
+
 .music-practice-stage .music-chip{
   width:auto;
   height:auto;
@@ -2093,6 +2118,10 @@ body.dark .music-follow-empty{
   font-size:13px;
 }
 
+body.dark .music-saved-empty{
+  color:#b3a89a;
+}
+
 .music-saved-badge{
   display:inline-block;
   padding:1px 8px;
@@ -2228,9 +2257,17 @@ body.dark .music-midi-preview-warnings{
   white-space:nowrap;
 }
 
+body.dark .music-saved-name{
+  color:#ece4d4;
+}
+
 .music-saved-meta{
   font-size:11px;
   color:var(--text-sub);
+}
+
+body.dark .music-saved-meta{
+  color:#b3a89a;
 }
 
 .music-saved-actions{
@@ -2686,7 +2723,8 @@ body.dark .music-onboard-choice-btn span{
   .music-note-btn.practice-correct,
   .music-note-btn.practice-miss,
   .music-rotate-prompt-icon,
-  .music-hum-rec-dot{
+  .music-hum-rec-dot,
+  .music-score-display.block-enter{
     animation:none !important;
   }
 }

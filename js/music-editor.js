@@ -53,6 +53,12 @@ let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
 let playTimer = null;
 
+// 練習モードの「流れる譜面」欄：一度に表示するのは10個ずつのブロック単位とし、
+// 今いるブロックの先頭インデックスを覚えておく（ブロックが変わった瞬間だけ
+// 切り替わりアニメーションを付けるため。-1は「まだ練習モードで一度も描画していない」印）
+const PRACTICE_SCORE_BLOCK_SIZE = 10;
+let practiceScoreBlockStart = -1;
+
 // ── 再生シークバー：曲全体を実時間の連続バーとして扱うためのタイムライン ──
 // playbackTimeline[i] = token iの再生開始時刻（曲の先頭からの秒数、tokenDurationSec basis）。
 // tokens・bpm・scoreReferenceBpmが変わるたびrebuildPlaybackTimeline()で作り直す
@@ -1247,11 +1253,19 @@ function renderScoreDisplay() {
     return;
   }
   const beatsPerBar = getTimeSignature(timeSignatureId).beatsPerBar;
+  // 練習モードの「流れる譜面」欄は、曲が長いと全部並べると見づらいため
+  // 10個ずつのブロックに区切り、今のブロックだけを表示する。ブロックの終わりまで
+  // 弾き終えたら次のブロックへ自動的に切り替わる（＝自動スクロール）
+  const isPracticeBlockView = pageMode === "practice";
+  const activeIdx = Math.max(cursor, 0);
+  const blockStart = isPracticeBlockView ? Math.floor(activeIdx / PRACTICE_SCORE_BLOCK_SIZE) * PRACTICE_SCORE_BLOCK_SIZE : 0;
+  const blockEnd = isPracticeBlockView ? Math.min(blockStart + PRACTICE_SCORE_BLOCK_SIZE, tokens.length) : tokens.length;
   let html = "";
   let beatsSinceBar = 0;
   tokens.forEach((tok, i) => {
+    const inBlock = !isPracticeBlockView || (i >= blockStart && i < blockEnd);
     if (i > 0 && beatsSinceBar >= beatsPerBar) {
-      html += `<span class="music-chip music-chip-bar"></span>`;
+      if (inBlock) html += `<span class="music-chip music-chip-bar"></span>`;
       beatsSinceBar = 0;
     }
     const current = pageMode === "practice" && i === cursor;
@@ -1264,12 +1278,27 @@ function renderScoreDisplay() {
     const pendingLoopStart = loopSelecting && loopStart !== null && loopEnd === null && i === loopStart;
     const isSelected = pageMode === "edit" && i === selectedTokenIndex;
     const needsReview = humReviewIndexes.has(i);
-    const gridHtml = buildChipGridHTML(tok);
-    const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending", isSelected && "selected", needsReview && "hum-review"].filter(Boolean).join(" ");
-    html += `<span class="${cls}" data-index="${i}" aria-label="${isRest ? T("music_note_rest_label", "休符") : tok.notes.map((n) => noteDisplayDigit(n)).join("・")}">${gridHtml}</span>`;
+    if (inBlock) {
+      const gridHtml = buildChipGridHTML(tok);
+      const cls = ["music-chip", isRest && "rest", isChord && "chord", current && "current", inLoop && "in-loop", outOfLoop && "out-of-loop", pendingLoopStart && "loop-pending", isSelected && "selected", needsReview && "hum-review"].filter(Boolean).join(" ");
+      html += `<span class="${cls}" data-index="${i}" aria-label="${isRest ? T("music_note_rest_label", "休符") : tok.notes.map((n) => noteDisplayDigit(n)).join("・")}">${gridHtml}</span>`;
+    }
     beatsSinceBar += tokenApproxBeats(tok);
   });
   el.innerHTML = html;
+
+  if (isPracticeBlockView) {
+    // 前回描画時と違うブロックへ切り替わった瞬間だけ、次のブロックへ
+    // 自動的に流れ込んだことが分かるよう軽い演出を付ける（練習モードに
+    // 入り直した直後の最初の描画では演出しない）
+    if (practiceScoreBlockStart !== -1 && practiceScoreBlockStart !== blockStart) {
+      el.classList.remove("block-enter");
+      void el.offsetWidth; // reflowでアニメーションを再始動させる
+      el.classList.add("block-enter");
+      el.addEventListener("animationend", () => el.classList.remove("block-enter"), { once: true });
+    }
+    practiceScoreBlockStart = blockStart;
+  }
 
   if (pageMode === "practice" && cursor >= 0) {
     const cur = el.querySelector(".music-chip.current");
@@ -1439,6 +1468,7 @@ function setPageMode(mode) {
   // 練習モードの冒頭が休符の場合、対応するボタン操作が存在しないため自動で読み飛ばす。
   // 正解/ミス回数は保存対象ではないため、練習モードに入り直すたびに0へ戻す
   if (pageMode === "practice") {
+    practiceScoreBlockStart = -1;
     skipLeadingRests();
     resetPracticeAccuracy();
     maybeShowCalibHint();
