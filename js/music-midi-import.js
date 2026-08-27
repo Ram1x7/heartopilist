@@ -208,6 +208,39 @@ function buildMidiTickToSecondsConverter(tempoEvents, ticksPerQuarter, secondsPe
   };
 }
 
+// テンポ変化イベント列(tick順)から、曲全体で最も長く使われているテンポ(BPM)を求める。
+// 単純に最初のテンポイベントを採用すると、先頭のカウントインや導入部だけごく短く
+// 別のテンポを挟んでから本編のテンポに切り替わるMIDIファイル（例：先頭1小節だけ
+// 200BPM→以降ずっと113BPM）で、曲のほとんどの部分と大きく食い違うBPMが採用されて
+// しまう。buildMidiTickToSecondsConverterと同じ区分線形の考え方でテンポ区間
+// (segments)を組み立て、各区間が実際に(次のテンポ変化まで、最後は曲の終端まで)
+// 何tickぶん続くかを比べ、最も長く続く区間のテンポを採用する
+function computeDominantBpm(tempoEvents, contentEndTick) {
+  if (!tempoEvents.length) return 120; // 既定=500000マイクロ秒(MIDI仕様の既定値)
+  const segments = [{ startTick: 0, microsPerQuarter: 500000 }];
+  const sorted = tempoEvents.slice().sort((a, b) => a.tick - b.tick);
+  sorted.forEach((te) => {
+    const prev = segments[segments.length - 1];
+    if (te.tick === prev.startTick) {
+      prev.microsPerQuarter = te.microsPerQuarter;
+      return;
+    }
+    segments.push({ startTick: te.tick, microsPerQuarter: te.microsPerQuarter });
+  });
+
+  let bestMicrosPerQuarter = segments[0].microsPerQuarter;
+  let bestDurationTicks = -1;
+  segments.forEach((seg, i) => {
+    const endTick = i + 1 < segments.length ? segments[i + 1].startTick : Math.max(contentEndTick, seg.startTick);
+    const durationTicks = endTick - seg.startTick;
+    if (durationTicks > bestDurationTicks) {
+      bestDurationTicks = durationTicks;
+      bestMicrosPerQuarter = seg.microsPerQuarter;
+    }
+  });
+  return Math.round(60000000 / bestMicrosPerQuarter);
+}
+
 // (channel,note)ごとにノートオンのtickを待ち行列として持ち、ノートオフで
 // 先入れ先出しにペアリングする（同じ音高の重なり・連打にも対応）。
 // 対応するノートオンが無いノートオフは無視する（壊れたファイル対策）
@@ -277,16 +310,22 @@ function parseMidiFile(arrayBuffer) {
   // 対応できるよう全トラックを走査する）
   const tempoEvents = [];
   const timeSignatureEvents = [];
+  let contentEndTick = 0;
   rawTracks.forEach((t) => {
     t.events.forEach((e) => {
       if (e.type === "tempo") tempoEvents.push({ tick: e.tick, microsPerQuarter: e.microsPerQuarter });
       else if (e.type === "timeSignature") timeSignatureEvents.push({ tick: e.tick, numerator: e.numerator, denominator: e.denominator });
+      if (e.tick > contentEndTick) contentEndTick = e.tick;
     });
   });
-  const initialMicrosPerQuarter = tempoEvents.length
-    ? tempoEvents.slice().sort((a, b) => a.tick - b.tick)[0].microsPerQuarter
-    : 500000; // 既定=120BPM
-  const initialBpm = Math.round(60000000 / initialMicrosPerQuarter);
+  // 曲の代表テンポ（表示・拍子ベース変換時の基準テンポの両方に使う）は、
+  // 単純に最初のテンポイベントではなく、曲中で最も長く使われているテンポを採用する。
+  // 一部のMIDIファイルは、カウントインや導入部だけごく短く別のテンポを挟んでから
+  // 本編のテンポに切り替わることがあり（例：先頭1小節だけ200BPM→以降ずっと113BPM）、
+  // 最初のテンポをそのまま採用すると、曲のほとんどの部分の実際のテンポと大きく
+  // 食い違ったbpmが設定され、その基準テンポを使うtokenApproxBeats（小節線の目安表示・
+  // 「拍子ベースの譜面に変換する」時の拍数換算）が実際のリズム感と大きくずれてしまう
+  const initialBpm = computeDominantBpm(tempoEvents, contentEndTick);
 
   // 検出した拍子が既存のTIME_SIGNATURESプリセットに完全一致する場合のみ採用する。
   // 一致しない拍子（5/4等、対応プリセットが無いもの）は推測で近いものに丸めず、
