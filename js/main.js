@@ -1716,7 +1716,6 @@ if(dataSyncModal){
 
 // 初期化
 updateTime();
-if(typeof renderBottomNav === "function") renderBottomNav("home");
 // 保存データ読込
 searchInput.value =
   localStorage.getItem("searchKeyword") || "";
@@ -2076,8 +2075,6 @@ function renderDashShortcuts(){
     </a>
   `).join("");
 }
-
-initTodayDashboard();
 
 // ══════════════════════════════════════
 // 今日やることリスト ダッシュボード
