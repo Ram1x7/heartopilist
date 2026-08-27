@@ -341,9 +341,35 @@ function parseMidiFile(arrayBuffer) {
 
   const tickToSeconds = buildMidiTickToSecondsConverter(tempoEvents, ticksPerQuarter, secondsPerTick);
 
-  const tracks = rawTracks
-    .map((t) => ({ index: t.index, name: t.name, noteEvents: pairMidiNoteEvents(t.events, tickToSeconds) }))
-    .filter((t) => t.noteEvents.length > 0);
+  // Format 0（1トラックのみ）のMIDIファイルでは、メロディ・伴奏・ベース等の
+  // 別パートが、別のトラックチャンクにではなく同じトラック内の別チャンネルに
+  // 分かれて格納されていることが多い。1トラックに複数チャンネルが混在する場合は、
+  // チャンネルごとに個別のtracksエントリへ分ける。これにより、既存の
+  // トラック選択モーダル（tracks.length>1で自動的に表示される）がそのまま
+  // チャンネル選択にも使えるようになり、ユーザーが伴奏やベースを含めず
+  // メロディのチャンネルだけを選んで変換できる（既存の「全トラックをまとめて
+  // 変換」は、このチャンネル分割後も全チャンネルを結合した状態を変わらず再現する）。
+  // 1トラックにチャンネルが1つしか無い場合（Format 1の通常の構成）は、
+  // 従来通りトラック単位のまま分割しない
+  const tracks = [];
+  rawTracks.forEach((t) => {
+    const channelsInTrack = new Set();
+    t.events.forEach((e) => {
+      if (e.type === "noteOn" || e.type === "noteOff") channelsInTrack.add(e.channel);
+    });
+    if (channelsInTrack.size <= 1) {
+      const noteEvents = pairMidiNoteEvents(t.events, tickToSeconds);
+      if (noteEvents.length > 0) tracks.push({ index: t.index, name: t.name, noteEvents });
+      return;
+    }
+    [...channelsInTrack]
+      .sort((a, b) => a - b)
+      .forEach((ch) => {
+        const chEvents = t.events.filter((e) => (e.type !== "noteOn" && e.type !== "noteOff") || e.channel === ch);
+        const noteEvents = pairMidiNoteEvents(chEvents, tickToSeconds);
+        if (noteEvents.length > 0) tracks.push({ index: t.index, channel: ch, name: t.name, noteEvents });
+      });
+  });
 
   return { format, ticksPerQuarter, initialBpm, initialTimeSignatureId, detectedTimeSignatureLabel, tracks };
 }
@@ -628,6 +654,19 @@ function isMidiFile(file) {
   return type === "audio/midi" || type === "audio/x-midi" || type === "audio/mid";
 }
 
+// トラック選択モーダル・自動選択（トラックが1つだけの場合）で共通して使う表示名を
+//組み立てる。t.channelがある場合（1トラックに複数チャンネルが混在していたため
+// チャンネル単位に分割されたエントリ）は、トラック名だけでは選択肢同士の区別が
+// 付かないため、チャンネル番号も併記する
+function midiTrackDisplayLabel(t, i) {
+  if (t.channel != null) {
+    return t.name
+      ? T("music_midi_channel_with_track_name", `${t.name}（チャンネル${t.channel + 1}）`, { name: t.name, n: t.channel + 1 })
+      : T("music_midi_channel_unnamed", `チャンネル${t.channel + 1}`, { n: t.channel + 1 });
+  }
+  return t.name || T("music_midi_track_unnamed", `トラック${i + 1}`, { n: i + 1 });
+}
+
 let midiParsedResult = null; // トラック選択モーダルを開いている間、parseMidiFileの結果を保持する
 
 // 音符数の上限（全トラック合計）。極端に音符数の多いMIDI（数万音以上）で
@@ -684,13 +723,14 @@ async function onMidiFileAnalyze(blob, ctx) {
   openMidiTrackPickerModal(parsed);
 }
 
-// トラック選択モーダル：複数トラックが見つかった場合のみ表示する。
-// 「全トラックをまとめて変換」または、いずれか1トラックだけを選んで変換できる
+// トラック選択モーダル：複数トラック、または1トラックに複数チャンネルが
+// 混在していてチャンネル単位に分割された場合（parsed.tracks.length>1）にのみ表示する。
+// 「全トラックをまとめて変換」または、いずれか1つだけを選んで変換できる
 function openMidiTrackPickerModal(parsed) {
   const listEl = document.getElementById("musicMidiTrackList");
   listEl.innerHTML = parsed.tracks
     .map((t, i) => {
-      const name = t.name || T("music_midi_track_unnamed", `トラック${i + 1}`, { n: i + 1 });
+      const name = midiTrackDisplayLabel(t, i);
       return `
     <div class="music-saved-item">
       <div class="music-saved-info">
@@ -707,7 +747,7 @@ function openMidiTrackPickerModal(parsed) {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.trackIndex);
       const t = parsed.tracks[idx];
-      const label = t.name || T("music_midi_track_unnamed", `トラック${idx + 1}`, { n: idx + 1 });
+      const label = midiTrackDisplayLabel(t, idx);
       finishMidiConversion(parsed, t.noteEvents, parsed.initialBpm, label);
     });
   });

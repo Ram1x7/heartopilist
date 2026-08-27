@@ -713,6 +713,8 @@
   "music_midi_merge_all_btn": "Combine all tracks",
   "music_midi_use_track_btn": "Convert this track only",
   "music_midi_track_unnamed": "Track {n}",
+  "music_midi_channel_unnamed": "Channel {n}",
+  "music_midi_channel_with_track_name": "{name} (Channel {n})",
   "music_midi_too_many_notes": "Too many notes (detected: about {count} / limit: {limit}). Try a MIDI file that covers only part of the song, or narrow down the track",
   "music_midi_all_tracks_label": "All tracks",
   "music_midi_preview_title": "Preview conversion result",

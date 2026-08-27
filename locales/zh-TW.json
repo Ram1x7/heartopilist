@@ -689,6 +689,8 @@
   "music_midi_merge_all_btn": "合併所有音軌並轉換",
   "music_midi_use_track_btn": "僅轉換此音軌",
   "music_midi_track_unnamed": "音軌{n}",
+  "music_midi_channel_unnamed": "通道{n}",
+  "music_midi_channel_with_track_name": "{name}（通道{n}）",
   "music_midi_too_many_notes": "音符數量過多（偵測到約{count}個 / 上限{limit}個）。請使用僅包含歌曲一部分的MIDI檔案，或縮小音軌範圍後再試",
   "music_midi_all_tracks_label": "全部音軌",
   "music_midi_preview_title": "轉換結果預覽",

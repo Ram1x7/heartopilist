@@ -689,6 +689,8 @@
   "music_midi_merge_all_btn": "รวมทุกแทร็กแล้วแปลง",
   "music_midi_use_track_btn": "แปลงเฉพาะแทร็กนี้",
   "music_midi_track_unnamed": "แทร็ก {n}",
+  "music_midi_channel_unnamed": "แชนเนล {n}",
+  "music_midi_channel_with_track_name": "{name} (แชนเนล {n})",
   "music_midi_too_many_notes": "จำนวนโน้ตมากเกินไป (ตรวจพบ: ประมาณ {count} / จำกัดที่: {limit}) ลองใช้ไฟล์ MIDI ที่มีเพียงบางส่วนของเพลง หรือเลือกแทร็กให้แคบลง",
   "music_midi_all_tracks_label": "ทุกแทร็ก",
   "music_midi_preview_title": "ดูตัวอย่างผลการแปลง",
