@@ -2106,6 +2106,50 @@ body.dark .music-saved-item{
   background:#383329;
 }
 
+.music-midi-preview-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px 12px;
+  margin:10px 0;
+  padding:10px 12px;
+  border-radius:12px;
+  background:var(--card-sub);
+}
+
+body.dark .music-midi-preview-stats{
+  background:#383329;
+}
+
+.music-midi-stat-row{
+  display:flex;
+  justify-content:space-between;
+  gap:6px;
+  font-size:12px;
+}
+
+.music-midi-stat-row span{
+  color:var(--text-sub);
+}
+
+body.dark .music-midi-stat-row span{
+  color:#b3a89a;
+}
+
+.music-midi-preview-warnings{
+  margin:0 0 10px;
+  padding-left:18px;
+  font-size:11px;
+  color:var(--vermillion);
+}
+
+body.dark .music-midi-preview-warnings{
+  color:var(--dark-highlight);
+}
+
+.music-midi-preview-warnings:empty{
+  display:none;
+}
+
 .music-saved-info{
   flex:1;
   min-width:0;
