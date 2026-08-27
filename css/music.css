@@ -2118,6 +2118,10 @@ body.dark .music-follow-empty{
   font-size:13px;
 }
 
+body.dark .music-saved-empty{
+  color:#b3a89a;
+}
+
 .music-saved-badge{
   display:inline-block;
   padding:1px 8px;
@@ -2253,9 +2257,17 @@ body.dark .music-midi-preview-warnings{
   white-space:nowrap;
 }
 
+body.dark .music-saved-name{
+  color:#ece4d4;
+}
+
 .music-saved-meta{
   font-size:11px;
   color:var(--text-sub);
+}
+
+body.dark .music-saved-meta{
+  color:#b3a89a;
 }
 
 .music-saved-actions{
