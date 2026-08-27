@@ -310,6 +310,44 @@
   <div id="list" class="grid"></div>
   <div id="endedList"></div>
 
+<!-- 今日のハートピア ダッシュボード -->
+<div class="section-label" data-i18n="dash_section_title">今日のハートピア</div>
+<div id="todayDashboard">
+
+  <div class="card dash-card" id="dashTodayTasksCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashTodayTasksIcon"></span><span data-i18n="dash_section_today_tasks">今日やること</span></span>
+      <button type="button" class="dash-see-all" onclick="document.getElementById('dailyTasksBtn').click()" data-i18n="dash_see_all">すべて見る</button>
+    </div>
+    <div class="dash-card-body" id="dashTodayTasksBody"></div>
+  </div>
+
+  <div class="card dash-card" id="dashAvailableNowCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashAvailableNowIcon"></span><span data-i18n="dash_section_available_now">今できること</span></span>
+    </div>
+    <div class="dash-card-body" id="dashAvailableNowBody"></div>
+  </div>
+
+  <div class="card dash-card" id="dashEndingSoonCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashEndingSoonIcon"></span><span data-i18n="dash_section_ending_soon">もうすぐ</span></span>
+      <button type="button" class="dash-see-all" onclick="document.getElementById('dailyTasksBtn').click()" data-i18n="dash_see_all">すべて見る</button>
+    </div>
+    <div class="dash-card-body" id="dashEndingSoonBody"></div>
+  </div>
+
+  <div class="card dash-card" id="dashCompletionCard">
+    <div class="dash-card-header">
+      <span class="dash-card-title"><span id="dashCompletionIcon"></span><span data-i18n="dash_section_completion">コンプ状況</span></span>
+    </div>
+    <div class="dash-card-body" id="dashCompletionBody"></div>
+  </div>
+
+  <div class="dash-shortcuts" id="dashShortcuts"></div>
+
+</div>
+
 <!-- モーダル -->
 <div id="modal" onclick="if(event.target.id==='modal')closeModal()">
   <div class="modal-box">
@@ -602,6 +640,7 @@ text-align:left;
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/bottom-nav.js"></script>
 <script src="js/main.js?v=15"></script>
 
 <script src="js/sw-register.js"></script>
