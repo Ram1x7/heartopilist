@@ -79,6 +79,11 @@ let selectedTokenIndex = null; // 選択中の音のtokensインデックス（n
 // 手直しした音から順にマークが消えていく
 let humReviewIndexes = new Set();
 
+// 練習モードの正解/ミス回数（メモリ内のみ。譜面データやlocalStorageには保存しない。
+// 練習モードに入り直すたびに0にリセットする） ──
+let practiceCorrectCount = 0;
+let practiceMissCount = 0;
+
 // 演奏ボタンの「押す・離す」（和音対応）。同時に押されている指をactiveHoldsで管理し、
 // 最初の1本目が押された時点から全ての指が離れるまでを「1つの和音グループ」とする
 let activeHolds = new Map(); // pointerId -> {note, btn, startTime}
@@ -599,10 +604,21 @@ function bindNoteButtonHold(btn, note) {
     currentGroupNotes.push(note);
     startSustainedTone(e.pointerId, noteFrequency(note));
     if (pageMode === "practice") {
+      // 和音の途中経過（まだ他の指が揃っていないだけ）は不正解として数えない。
+      // 「そもそも次の音に含まれていない音」を押した場合だけミスとして数える
+      if (!isExpectedPracticeNote(note)) {
+        practiceMissCount++;
+        updatePracticeAccuracyBadge();
+        flashPracticeMissHighlight(btn);
+      }
       const advancedIdx = tryAdvancePracticeChord();
       // 正しく押せて先へ進んだ場合だけ、その和音の全ボタンを強く光らせる
       // （先読みハイライトとは別クラス。押した瞬間の一時的なフィードバック）
-      if (advancedIdx !== null) flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
+      if (advancedIdx !== null) {
+        practiceCorrectCount++;
+        updatePracticeAccuracyBadge();
+        flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
+      }
     }
   };
   const end = (e) => {
@@ -1114,8 +1130,12 @@ function setPageMode(mode) {
   stopPlayback();
   pageMode = mode;
   cursor = -1;
-  // 練習モードの冒頭が休符の場合、対応するボタン操作が存在しないため自動で読み飛ばす
-  if (pageMode === "practice") skipLeadingRests();
+  // 練習モードの冒頭が休符の場合、対応するボタン操作が存在しないため自動で読み飛ばす。
+  // 正解/ミス回数は保存対象ではないため、練習モードに入り直すたびに0へ戻す
+  if (pageMode === "practice") {
+    skipLeadingRests();
+    resetPracticeAccuracy();
+  }
   updateModeUI();
   renderScoreDisplay();
 }
@@ -1348,6 +1368,46 @@ function notesSetEqual(a, b) {
   const bKeys = dedupeNotes(b).map(noteKey).sort();
   if (aKeys.length !== bKeys.length) return false;
   return aKeys.every((k, i) => k === bKeys[i]);
+}
+
+// 押した瞬間のボタンだけを短く光らせる、不正解フィードバック
+// （flashPracticeCorrectHighlightとは別に、押した1つのボタンにだけ適用する）
+function flashPracticeMissHighlight(btn) {
+  btn.classList.remove("practice-miss");
+  void btn.offsetWidth; // reflowでアニメーションを再始動させる
+  btn.classList.add("practice-miss");
+  btn.addEventListener("animationend", () => btn.classList.remove("practice-miss"), { once: true });
+}
+
+// 次に押すべき音（休符はスキップ済みの前提）にnoteが含まれているかどうか。
+// 和音の場合、まだ他の指が揃っていないだけの「正しい途中経過」と、
+// そもそも期待されていない音を区別するために使う（tryAdvancePracticeChordは
+// 和音全体が揃わないと成立しないため、これだけでは判定できない）
+function isExpectedPracticeNote(note) {
+  const idx = nextNoteIndex(cursor);
+  if (idx === null) return true; // 曲の終端では判定しない
+  const tok = tokens[idx];
+  if (!tok || !tok.notes.length) return true; // 休符は対象外（自動スキップ済みのはず）
+  const key = noteKey(note);
+  return tok.notes.some((n) => noteKey(n) === key);
+}
+
+// 練習モードに入り直すたびに正解/ミス回数を0に戻す（保存はしない、セッション限りの値）
+function resetPracticeAccuracy() {
+  practiceCorrectCount = 0;
+  practiceMissCount = 0;
+  updatePracticeAccuracyBadge();
+}
+
+function updatePracticeAccuracyBadge() {
+  const el = document.getElementById("musicPracticeAccuracy");
+  if (!el) return;
+  const correctLabel = T("music_practice_correct_label", "正解");
+  const missLabel = T("music_practice_miss_label", "ミス");
+  el.innerHTML =
+    `<span class="music-practice-accuracy-correct">✓ ${practiceCorrectCount}</span>` +
+    `<span class="music-practice-accuracy-miss">✗ ${practiceMissCount}</span>`;
+  el.setAttribute("aria-label", `${correctLabel} ${practiceCorrectCount}、${missLabel} ${practiceMissCount}`);
 }
 
 function togglePlayback() {

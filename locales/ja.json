@@ -602,6 +602,8 @@
   "music_playback_label": "再生",
   "music_speed_suffix": "倍",
   "music_practice_hint": "ボタンを押している間だけ音が鳴ります。停止中でも、次に弾く音を正しく押すと先へ進みます。",
+  "music_practice_correct_label": "正解",
+  "music_practice_miss_label": "ミス",
   "music_follow_next": "つぎ",
   "music_follow_hint": "実機の画面と並べて表示し、実際に演奏しながら次の音を確認できます。効果音はミュートすることをおすすめします。",
   "music_rotate_hint": "端末を横向きにすると、実機と同じ大きさで演奏ボタンが表示されます",

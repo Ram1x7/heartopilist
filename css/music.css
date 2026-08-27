@@ -1397,6 +1397,54 @@ body.dark .music-note-btn.practice-correct{
   animation-name:music-practice-correct-flash-dark;
 }
 
+/* ミスフィードバック：期待していない音を押した瞬間、押したボタンだけを
+   赤茶色で短く光らせつつ小さく左右に揺らす（正解フィードバックとは色・
+   動きの両方で区別し、色だけに頼らないようにする）。translate(-50%, -50%)の
+   再指定が必要な理由は正解フィードバックと同じ */
+@keyframes music-practice-miss-flash{
+  0%{
+    transform:translate(-50%, -50%) translateX(0);
+    box-shadow:0 0 0 4px rgb(var(--music-practice-miss-rgb)), 0 0 18px 4px rgba(var(--music-practice-miss-rgb), 0.9);
+  }
+  30%{
+    transform:translate(-50%, -50%) translateX(-3px);
+  }
+  60%{
+    transform:translate(-50%, -50%) translateX(3px);
+  }
+  100%{
+    transform:translate(-50%, -50%) translateX(0);
+    box-shadow:0 0 0 4px rgba(var(--music-practice-miss-rgb), 0), 0 0 0 0 rgba(var(--music-practice-miss-rgb), 0);
+  }
+}
+
+@keyframes music-practice-miss-flash-dark{
+  0%{
+    transform:translate(-50%, -50%) translateX(0);
+    box-shadow:0 0 0 4px rgb(var(--music-practice-miss-rgb-dark)), 0 0 18px 4px rgba(var(--music-practice-miss-rgb-dark), 0.9);
+  }
+  30%{
+    transform:translate(-50%, -50%) translateX(-3px);
+  }
+  60%{
+    transform:translate(-50%, -50%) translateX(3px);
+  }
+  100%{
+    transform:translate(-50%, -50%) translateX(0);
+    box-shadow:0 0 0 4px rgba(var(--music-practice-miss-rgb-dark), 0), 0 0 0 0 rgba(var(--music-practice-miss-rgb-dark), 0);
+  }
+}
+
+.music-note-btn.practice-miss{
+  --music-practice-miss-rgb:139, 74, 61;
+  animation:music-practice-miss-flash 0.4s ease-out;
+}
+
+body.dark .music-note-btn.practice-miss{
+  --music-practice-miss-rgb-dark:196, 122, 108;
+  animation-name:music-practice-miss-flash-dark;
+}
+
 /* シークバーをドラッグ中、その時点で鳴る予定の音を無音のままプレビュー表示する。
    先読みガイド(indigo)・正解フィードバック(vermillion)と見分けやすいよう--goldを使う */
 .music-note-btn.seek-preview{
@@ -1466,8 +1514,17 @@ body.dark .music-practice-stage{
 
 /* 上部バー・譜面プレビューは演奏ボタン領域の上に重ねて表示する固定オーバーレイ。
    実際に使っている高さぶんだけ pointer-events を戻し、それ以外(下の余白)は
-   クリックをすり抜けさせてボタンを押せるようにする */
+   クリックをすり抜けさせてボタンを押せるようにする。
+   演奏ボタンの絶対座標はjs/music-config.jsの基準フレーム(1600×1118px)に対する
+   %で決まる。全レイアウト中で最も上にある演奏ボタン（22キー・半音ON時の
+   最上段、半音ボタン中心y=755px・直径はメインボタンの72%）の上端は、
+   おおよそ (755 - 1118*0.0556*0.72/2) / 1118 ≈ 64.7% の位置になる。
+   このオーバーレイの高さをそれより確実に低い値に制限し、内容が収まらない
+   場合は内部（譜面プレビュー側）でスクロールさせることで、譜面プレビューが
+   伸びても演奏ボタンと重ならないことを保証する（従来は「ボタンは上部2/3には
+   出ない」という前提のみに依存しており、実測では余裕が1〜2%しかなかった） */
 .music-practice-stage-overlay-top{
+  --music-practice-topbar-safe-max:60%;
   position:absolute;
   top:0;
   left:0;
@@ -1477,6 +1534,8 @@ body.dark .music-practice-stage{
   flex-direction:column;
   gap:6px;
   padding:6px 10px 0;
+  max-height:var(--music-practice-topbar-safe-max);
+  overflow:hidden;
   box-sizing:border-box;
   pointer-events:none;
   /* 演奏ボタンの長押し中に、この上に重なっているテキストがiOSの選択候補と
@@ -1547,6 +1606,42 @@ body.dark .music-practice-stage #musicPlaybackAnchorPractice .music-seek-time{
 /* 曲名は表示せず、詳しい情報は下部の曲情報パネル(.music-practice-song-info)にまとめる */
 .music-practice-stage-name{
   display:none;
+}
+
+/* 練習モードの正解/ミス回数バッジ。色だけに頼らず✓/✗の記号でも区別する。
+   現在位置・次の音・演奏パッドより目立たないよう、小さく控えめに表示する */
+.music-practice-accuracy{
+  --music-practice-miss-rgb:139, 74, 61;       /* 落ち着いた赤茶（vermillionの正解表示とは別トーン） */
+  --music-practice-miss-rgb-dark:196, 122, 108;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:11px;
+  font-weight:700;
+  flex-shrink:0;
+}
+
+.music-practice-accuracy-correct,
+.music-practice-accuracy-miss{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+}
+
+.music-practice-accuracy-correct{
+  color:var(--vermillion);
+}
+
+.music-practice-accuracy-miss{
+  color:rgb(var(--music-practice-miss-rgb));
+}
+
+body.dark .music-practice-accuracy-correct{
+  color:var(--vermillion-soft);
+}
+
+body.dark .music-practice-accuracy-miss{
+  color:rgb(var(--music-practice-miss-rgb-dark));
 }
 
 /* 位置調整・音量・閉じるは、参考画像のように右上に小さくまとめて重ねる */

@@ -578,6 +578,8 @@
   "music_playback_label": "播放",
   "music_speed_suffix": "倍",
   "music_practice_hint": "僅在按住按鈕時發聲。即使在停止狀態下，正確按下下一個音也會使高亮前進。",
+  "music_practice_correct_label": "正確",
+  "music_practice_miss_label": "失誤",
   "music_follow_next": "下一個",
   "music_follow_hint": "將其與實際遊戲畫面並排顯示，即可在實際演奏時確認下一個音符。建議將音效靜音。",
   "music_rotate_hint": "將裝置橫向放置後，演奏按鈕會以與遊戲內相同的大小顯示",
