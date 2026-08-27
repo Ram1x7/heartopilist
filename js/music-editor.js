@@ -43,6 +43,11 @@ let soundEnabled = true;
 let audioCtx = null;
 let sustainedTones = new Map(); // pointerId -> {osc, gain}（和音対応：同時に複数鳴らせる）
 
+// ── キーボード演奏入力 ──
+const KEY_LABEL_VISIBLE_KEY = "hatopiMusic_keyLabelVisible";
+let keyLabelsVisible = true; // 演奏ボタンに対応キーを表示するかどうか（既定はON）
+let activeKeyboardKeys = new Set(); // 今押下中の物理キー（小文字）。キーリピートの二重処理防止用
+
 let isPlaying = false;
 let playSpeed = 1.0;
 let cursor = -1; // tokens内のインデックス。-1=未開始
@@ -70,6 +75,171 @@ let loopEnd = null; // ループ区間の終了インデックス
 let loopEnabled = false; // ループ再生のON/OFF（区間は選んだままON/OFFだけ切り替えられる）
 let loopSelecting = false; // 譜面をタップして区間を選んでいる最中かどうか
 
+// ── Undo/Redo：譜面編集の履歴管理 ──
+// コマンドパターン（操作ごとに逆操作を持つ）ではなく、編集が完了するたびに
+// 譜面データ全体をスナップショットとして積む方式を採る。対象operationの種類が多く
+// （音符追加・削除・置換・BPM・拍子・楽器変更・ループ範囲変更など）、どれも
+// 「以下のフィールド群のうちどれかを書き換える」という共通の形をしているため。
+// 曲名(scoreName)・currentScoreIdは対象操作の一覧に含まれておらず、曲名は
+// input（1文字ごとに発火）のため含めると打鍵のたびに履歴が積まれてしまうので
+// 意図的に対象外とする
+const UNDO_MAX_HISTORY = 50;
+let scoreHistory = [];
+let scoreHistoryIndex = -1;
+let historySavedIndex = -1; // 直近でsaveCurrentAsScore()が成功した時点のscoreHistoryIndex
+let isApplyingHistory = false; // 巻き戻し適用中に誤って新しい履歴を積まないためのガード
+
+function captureScoreSnapshot() {
+  return {
+    tokens: JSON.parse(JSON.stringify(tokens)),
+    bpm,
+    timeSignatureId,
+    scoreFreeTiming,
+    scoreReferenceBpm,
+    currentInstrumentId,
+    currentLayoutId,
+    semitoneEnabled,
+    loopStart,
+    loopEnd,
+    loopEnabled,
+  };
+}
+
+// 新しい譜面を開いた・作った・変換ツールで生成した直後など、「ここより前には
+// 戻れない基準点」を作る。以後の編集はここからのUndo/Redo対象になる
+function resetHistory() {
+  scoreHistory = [captureScoreSnapshot()];
+  scoreHistoryIndex = 0;
+  historySavedIndex = 0;
+  updateUndoRedoUI();
+}
+
+// 1つの編集操作が完了するたびに呼ぶ。以降のRedo履歴は破棄する
+function commitHistory() {
+  if (isApplyingHistory) return;
+  scoreHistory = scoreHistory.slice(0, scoreHistoryIndex + 1);
+  scoreHistory.push(captureScoreSnapshot());
+  scoreHistoryIndex++;
+  if (scoreHistory.length > UNDO_MAX_HISTORY) {
+    const overflow = scoreHistory.length - UNDO_MAX_HISTORY;
+    scoreHistory.splice(0, overflow);
+    scoreHistoryIndex -= overflow;
+    historySavedIndex -= overflow;
+  }
+  updateUndoRedoUI();
+}
+
+function applyScoreSnapshot(snap) {
+  isApplyingHistory = true;
+  stopPlayback();
+  cursor = -1;
+  tokens = JSON.parse(JSON.stringify(snap.tokens));
+  bpm = snap.bpm;
+  timeSignatureId = snap.timeSignatureId;
+  scoreFreeTiming = snap.scoreFreeTiming;
+  scoreReferenceBpm = snap.scoreReferenceBpm;
+  currentInstrumentId = snap.currentInstrumentId;
+  currentLayoutId = snap.currentLayoutId;
+  semitoneEnabled = snap.semitoneEnabled;
+  loopStart = snap.loopStart;
+  loopEnd = snap.loopEnd;
+  loopEnabled = snap.loopEnabled;
+  loopSelecting = false;
+  // Undo/Redoでインデックスがずれる可能性があるため、選択中の音・未確認マークは
+  // 巻き戻り後に持ち越さず解除する（不整合な参照を避ける安全側の選択）
+  selectedTokenIndex = null;
+  humReviewIndexes = new Set();
+  renderInstrumentSelector();
+  renderLayoutSelector();
+  renderInstrumentGrid();
+  renderScoreMeta();
+  renderFreeTimingUI();
+  updateLoopUI();
+  renderScoreDisplay();
+  saveDraftDebounced();
+  isApplyingHistory = false;
+  updateUndoRedoUI();
+}
+
+function undoEdit() {
+  if (scoreHistoryIndex <= 0) return;
+  scoreHistoryIndex--;
+  applyScoreSnapshot(scoreHistory[scoreHistoryIndex]);
+}
+
+function redoEdit() {
+  if (scoreHistoryIndex >= scoreHistory.length - 1) return;
+  scoreHistoryIndex++;
+  applyScoreSnapshot(scoreHistory[scoreHistoryIndex]);
+}
+
+function updateUndoRedoUI() {
+  const undoBtn = document.getElementById("musicUndoBtn");
+  const redoBtn = document.getElementById("musicRedoBtn");
+  if (undoBtn) undoBtn.disabled = scoreHistoryIndex <= 0;
+  if (redoBtn) redoBtn.disabled = scoreHistoryIndex >= scoreHistory.length - 1;
+  const unsavedEl = document.getElementById("musicUnsavedIndicator");
+  if (unsavedEl) unsavedEl.style.display = scoreHistoryIndex !== historySavedIndex ? "" : "none";
+}
+
+// テキスト入力欄・textarea・select・contenteditableにフォーカスがある間は、
+// Undo/Redo・演奏キーボード入力のどちらも「通常の文字入力」を優先して発火しない
+// ようにする（Ctrl+Z等のブラウザ標準の編集操作、IME入力等と衝突させないため）
+// チェックボックス・range(スライダー)等は文字を「打つ」対象ではなく、
+// クリック後もフォーカスが残るだけで演奏キー入力まで塞いでしまうと不便なため、
+// 実際に文字入力を伴うinput種別だけをテキスト入力欄として扱う
+const NON_TEXT_INPUT_TYPES = new Set(["checkbox", "radio", "range", "button", "submit", "reset", "color", "file", "image"]);
+function isEditableFocusTarget(target) {
+  if (!target) return false;
+  const tag = target.tagName;
+  if (tag === "TEXTAREA" || tag === "SELECT" || target.isContentEditable) return true;
+  if (tag === "INPUT") return !NON_TEXT_INPUT_TYPES.has((target.type || "text").toLowerCase());
+  return false;
+}
+
+function handleHistoryKeydown(e) {
+  if (pageMode !== "edit") return;
+  if (isEditableFocusTarget(e.target)) return;
+  const mod = e.ctrlKey || e.metaKey;
+  if (!mod) return;
+  const key = e.key.toLowerCase();
+  if (key === "z" && !e.shiftKey) {
+    e.preventDefault();
+    undoEdit();
+  } else if (key === "y" || (key === "z" && e.shiftKey)) {
+    e.preventDefault();
+    redoEdit();
+  }
+}
+
+// ── キーボードでの演奏入力（keydown/keyup） ──
+// Pointer Eventsと同じpressNote/releaseNoteを、pointerIdの代わりに
+// "kbd:"+キー という文字列IDで呼ぶことで、和音判定・正解/ミス判定・
+// 音声再生・譜面への追加(finalizeGroup)を完全に共有する
+function handleMusicKeydown(e) {
+  if (pageMode !== "edit" && pageMode !== "practice") return;
+  if (isEditableFocusTarget(e.target)) return;
+  // Ctrl/Cmd/Alt併用時は演奏キーとして扱わない（Undo/Redo・ブラウザショートカットを優先）
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.isComposing) return; // IME変換中の誤入力を防ぐ
+  const key = e.key.toLowerCase();
+  if (!activeKeymap.has(key)) return; // 割り当てが無いキー（Tab/Escape/矢印キー等も含む）は素通りする
+  if (e.repeat || activeKeyboardKeys.has(key)) return; // OSのキーリピート・二重keydownを防ぐ
+  const note = activeKeymap.get(key);
+  const btn = noteButtonMap.get(noteKey(note));
+  if (!btn) return; // 現在描画されているボタンに該当が無ければ何もしない
+  e.preventDefault();
+  activeKeyboardKeys.add(key);
+  pressNote("kbd:" + key, note, btn);
+}
+
+function handleMusicKeyup(e) {
+  const key = e.key.toLowerCase();
+  if (!activeKeyboardKeys.has(key)) return;
+  activeKeyboardKeys.delete(key);
+  releaseNote("kbd:" + key);
+}
+
 // 個別の音の手直し：編集モードで譜面の音を1つタップすると選択状態になり、
 // 次に演奏ボタンを弾くとその音が置き換わる（末尾からの「最後を削除」しかなかった
 // 操作を、途中の音1つだけの修正でも使えるようにする）
@@ -78,6 +248,11 @@ let selectedTokenIndex = null; // 選択中の音のtokensインデックス（n
 // 認識精度が完璧ではないため、どれが自動検出かひと目で分かるようにし、
 // 手直しした音から順にマークが消えていく
 let humReviewIndexes = new Set();
+
+// 練習モードの正解/ミス回数（メモリ内のみ。譜面データやlocalStorageには保存しない。
+// 練習モードに入り直すたびに0にリセットする） ──
+let practiceCorrectCount = 0;
+let practiceMissCount = 0;
 
 // 演奏ボタンの「押す・離す」（和音対応）。同時に押されている指をactiveHoldsで管理し、
 // 最初の1本目が押された時点から全ての指が離れるまでを「1つの和音グループ」とする
@@ -121,19 +296,28 @@ function initMusicEditor() {
     scoreReferenceBpm = draft.referenceBpm != null ? draft.referenceBpm : bpm;
     scoreName = draft.name || "";
     currentScoreId = draft.scoreId || null;
+    // 保存済み譜面の読込(loadScore)と同じ正規化を使う。古い形式の下書き（ループ情報が
+    // 無い）・音符数が減って範囲が不正になった下書きのどちらも安全にフォールバックする
+    restoreLoopFromScore(draft, tokens.length);
   } else {
     currentLayoutId = defaultLayoutIdFor(currentInstrumentId);
   }
 
   const savedSound = localStorage.getItem("hatopiMusic_soundEnabled");
   if (savedSound !== null) soundEnabled = savedSound === "1";
+  const savedKeyLabelVisible = localStorage.getItem(KEY_LABEL_VISIBLE_KEY);
+  if (savedKeyLabelVisible !== null) keyLabelsVisible = savedKeyLabelVisible === "1";
+  document.getElementById("musicKeyLabelToggle").checked = keyLabelsVisible;
 
   calib = loadCalibration();
+  updateCalibIndicator();
 
   document.getElementById("musicPracticeExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicFollowExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicRotatePromptIcon").innerHTML = icon("rotateDevice", { size: 32 });
   document.getElementById("musicCalibToggleBtn").innerHTML = icon("wrench", { size: 15 });
+  document.getElementById("musicUndoBtn").innerHTML = icon("undo", { size: 16 });
+  document.getElementById("musicRedoBtn").innerHTML = icon("redo", { size: 16 });
 
   renderInstrumentSelector();
   renderDurationOptions();
@@ -152,6 +336,16 @@ function initMusicEditor() {
   bindHumControls();
   bindMidiImportControls();
   maybeShowOnboarding();
+  resetHistory();
+  document.addEventListener("keydown", handleHistoryKeydown);
+  document.addEventListener("keydown", handleMusicKeydown);
+  document.addEventListener("keyup", handleMusicKeyup);
+  // タブ切替・ウィンドウ非アクティブ化で押しっぱなしのキーが残ると、音が鳴り
+  // 続けたり和音状態が壊れたりするため、そのタイミングで強制的に解除する
+  window.addEventListener("blur", releaseAllHolds);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) releaseAllHolds();
+  });
 }
 
 // ── はじめての案内（①楽器を選ぶ→②テンポを決める→③録音か手入力かを選ぶ） ──
@@ -245,6 +439,7 @@ function finishOnboarding(startRecording) {
   // （①楽器→②テンポは「準備」タブ、③録音/手入力の選択は「作る」タブの内容に対応するため）
   setEditTab("create");
   saveDraftDebounced();
+  resetHistory();
   closeOnboarding(true);
 }
 
@@ -261,7 +456,7 @@ function renderInstrumentSelector() {
   const el = document.getElementById("musicInstrumentButtons");
   el.innerHTML = INSTRUMENTS.map(
     (inst) => `
-    <button class="music-instrument-btn${inst.id === currentInstrumentId ? " active" : ""}" data-instrument="${inst.id}">
+    <button class="music-instrument-btn${inst.id === currentInstrumentId ? " active" : ""}" data-instrument="${inst.id}" aria-pressed="${inst.id === currentInstrumentId}">
       ${T(inst.nameKey, inst.nameFallback)}
     </button>
   `
@@ -279,6 +474,7 @@ function selectInstrument(id) {
   renderLayoutSelector();
   renderInstrumentGrid();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // 楽器ごとの初期配置（ピアノは実機の初期選択に合わせ「22キー」、それ以外は先頭の配置）
@@ -306,7 +502,7 @@ function renderLayoutSelector() {
   el.style.display = "";
   el.innerHTML = inst.layouts
     .map(
-      (l) => `<button class="music-layout-btn${l.id === currentLayoutId ? " active" : ""}" data-layout="${l.id}">${T(l.labelKey, l.labelFallback)}</button>`
+      (l) => `<button class="music-layout-btn${l.id === currentLayoutId ? " active" : ""}" data-layout="${l.id}" aria-pressed="${l.id === currentLayoutId}">${T(l.labelKey, l.labelFallback)}</button>`
     )
     .join("");
   el.querySelectorAll("button").forEach((btn) => {
@@ -320,6 +516,7 @@ function selectLayout(id) {
   renderLayoutSelector();
   renderInstrumentGrid();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // ピアノの「22キー」配置の時だけ、半音(♯)表示のON/OFFトグルを見せる
@@ -336,13 +533,39 @@ function updateSemitoneToggleVisibility() {
 function toggleSemitone() {
   semitoneEnabled = !semitoneEnabled;
   renderInstrumentGrid();
+  saveDraftDebounced();
+  commitHistory();
 }
 
 // ── 楽器の演奏ボタン（実機の配置を再現。押している間だけ音が鳴る） ──
 // 編集モードは画面幅に合わせて伸縮するボタン行、練習モードは実機の座標を
 // そのまま絶対配置で再現する（指の感覚を実機と揃えるため）。表示方法が
 // 大きく異なるため、現在のページモードに応じてどちらかを描画する
+// ── キーボード演奏入力：キー⇔音の対応 ──
+// activeKeymap: 押されたキー(小文字)→音。noteToKeyLabel: 音→表示用キー文字列。
+// どちらも「現在の楽器・配置」だけに依存し、半音表示のON/OFFでは変わらない
+// （半音ボタンはキー割り当ての対象外のため）。noteButtonMapは逆に
+// 「今実際に描画されているボタンDOM」に依存するため、描画のたびに作り直す
+let activeKeymap = new Map();
+let noteToKeyLabel = new Map();
+let noteButtonMap = new Map();
+
+function rebuildActiveKeymap() {
+  activeKeymap = new Map();
+  noteToKeyLabel = new Map();
+  const inst = getInstrument(currentInstrumentId);
+  const layout = getLayout(inst, currentLayoutId);
+  const flatNotes = layout.grid.flat();
+  const keys = getKeymapForLayout(currentInstrumentId, currentLayoutId);
+  const n = Math.min(flatNotes.length, keys.length);
+  for (let i = 0; i < n; i++) {
+    activeKeymap.set(keys[i].toLowerCase(), flatNotes[i]);
+    noteToKeyLabel.set(noteKey(flatNotes[i]), keys[i].toUpperCase());
+  }
+}
+
 function renderInstrumentGrid() {
+  rebuildActiveKeymap();
   if (pageMode === "practice") {
     renderPracticeStageGrid();
   } else {
@@ -355,6 +578,7 @@ function renderEditGrid() {
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
   const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
+  const showKeyLabels = keyLabelsVisible;
   el.className = "music-instrument-grid";
   el.innerHTML = grid
     .map(
@@ -363,7 +587,10 @@ function renderEditGrid() {
         ${row
           .map((note) => {
             const label = noteDisplayDigit(note);
+            const keyLabel = showKeyLabels ? noteToKeyLabel.get(noteKey(note)) : null;
+            const keySpan = keyLabel ? `<span class="music-note-key">${keyLabel}</span>` : "";
             return `<button class="music-note-btn${note.accidental ? " accidental" : ""}" data-note='${JSON.stringify(note)}'>
+              ${keySpan}
               <span class="music-note-digit">${label}</span>
               <span class="music-note-kana">${DEGREE_LABELS[note.degree]}</span>
             </button>`;
@@ -373,8 +600,10 @@ function renderEditGrid() {
     `
     )
     .join("");
+  noteButtonMap = new Map();
   el.querySelectorAll(".music-note-btn").forEach((btn) => {
     const note = JSON.parse(btn.dataset.note);
+    noteButtonMap.set(noteKey(note), btn);
     bindNoteButtonHold(btn, note);
   });
 }
@@ -396,14 +625,19 @@ function renderPracticeStageGrid() {
       const note = { degree: p.degree, accidental: p.accidental, octave: p.octave };
       const label = noteDisplayDigit(note);
       const accidentalClass = p.size === "accidental" ? " accidental" : "";
+      const keyLabel = keyLabelsVisible ? noteToKeyLabel.get(noteKey(note)) : null;
+      const keySpan = keyLabel ? `<span class="music-note-key">${keyLabel}</span>` : "";
       return `<button class="music-note-btn music-stage-btn${accidentalClass}" style="left:${p.xPct}%; top:${p.yPct}%;" data-note='${JSON.stringify(note)}'>
+        ${keySpan}
         <span class="music-note-digit">${label}</span>
         <span class="music-note-kana">${DEGREE_LABELS[note.degree]}</span>
       </button>`;
     })
     .join("")}</div>`;
+  noteButtonMap = new Map();
   el.querySelectorAll(".music-stage-btn").forEach((btn) => {
     const note = JSON.parse(btn.dataset.note);
+    noteButtonMap.set(noteKey(note), btn);
     bindNoteButtonHold(btn, note);
   });
   applyCalibTransform();
@@ -432,6 +666,35 @@ function saveCalibration() {
   localStorage.setItem(MUSIC_CALIB_KEY, JSON.stringify(calib));
 }
 
+// ボタンにデフォルト値と異なる調整値が保存されているかどうかを、小さな印で常時示す
+// （「調整モード中」を示す.activeとは別に、「既に調整済み」を示す状態）
+function updateCalibIndicator() {
+  const isDefault = calib.scale === MUSIC_CALIB_DEFAULT.scale && calib.offsetX === MUSIC_CALIB_DEFAULT.offsetX && calib.offsetY === MUSIC_CALIB_DEFAULT.offsetY;
+  const btn = document.getElementById("musicCalibToggleBtn");
+  if (btn) btn.classList.toggle("has-custom", !isDefault);
+}
+
+const MUSIC_CALIB_HINT_SEEN_KEY = "hatopiMusic_calibHintSeen";
+let calibHintTimer = null;
+
+// 練習モードに初めて入った時だけ、ボタン調整機能の存在を一度だけ吹き出しで知らせる
+function maybeShowCalibHint() {
+  if (localStorage.getItem(MUSIC_CALIB_HINT_SEEN_KEY)) return;
+  const bubble = document.getElementById("musicCalibHintBubble");
+  if (!bubble) return;
+  bubble.classList.add("show");
+  clearTimeout(calibHintTimer);
+  calibHintTimer = setTimeout(dismissCalibHint, 5000);
+}
+
+function dismissCalibHint() {
+  clearTimeout(calibHintTimer);
+  calibHintTimer = null;
+  const bubble = document.getElementById("musicCalibHintBubble");
+  if (bubble) bubble.classList.remove("show");
+  localStorage.setItem(MUSIC_CALIB_HINT_SEEN_KEY, "1");
+}
+
 function applyCalibTransform() {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
@@ -439,6 +702,7 @@ function applyCalibTransform() {
 }
 
 function toggleCalibMode() {
+  dismissCalibHint();
   if (calibActive) {
     cancelCalibMode();
   } else {
@@ -451,6 +715,7 @@ function enterCalibMode() {
   calibBackup = { ...calib };
   document.getElementById("musicPracticeStage").classList.add("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.add("active");
+  document.getElementById("musicCalibToggleBtn").setAttribute("aria-pressed", "true");
   const catcher = document.getElementById("musicCalibCatcher");
   catcher.addEventListener("pointerdown", onCalibPointerDown);
   catcher.addEventListener("pointermove", onCalibPointerMove);
@@ -466,6 +731,7 @@ function exitCalibModeUI() {
   clearCalibGuides();
   document.getElementById("musicPracticeStage").classList.remove("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.remove("active");
+  document.getElementById("musicCalibToggleBtn").setAttribute("aria-pressed", "false");
   const catcher = document.getElementById("musicCalibCatcher");
   catcher.removeEventListener("pointerdown", onCalibPointerDown);
   catcher.removeEventListener("pointermove", onCalibPointerMove);
@@ -487,12 +753,14 @@ function cancelCalibMode() {
 function lockCalibration() {
   saveCalibration();
   calibBackup = null;
+  updateCalibIndicator();
   exitCalibModeUI();
 }
 
 function resetCalibration() {
   calib = { ...MUSIC_CALIB_DEFAULT };
   applyCalibTransform();
+  showToast(T("music_toast_calib_reset", "リセットしました"));
 }
 
 function calibDistance(a, b) {
@@ -584,35 +852,56 @@ function clearCalibBgImage() {
 
 // 演奏ボタンの「押す・離す」を扱う（和音対応）。最初の1本目が押されてから
 // 全ての指が離れるまでを1つの和音グループとして扱う
+// ボタンを押した時の共通処理（Pointer Events・キーボードのどちらから呼ばれても
+// 同じ判定・演奏処理になるよう、入力方式に依存する部分(pointerId等)は
+// 呼び出し側(bindNoteButtonHold／キーボードハンドラ)に残し、ここには
+// 「idという文字列で1本の指(または1つのキー)を識別する」という前提のみ持ち込む
+function pressNote(id, note, btn) {
+  btn.classList.add("pressed");
+  if (activeHolds.size === 0) {
+    currentGroupNotes = [];
+    groupStartTime = performance.now();
+  }
+  activeHolds.set(id, { note, btn, startTime: performance.now() });
+  currentGroupNotes.push(note);
+  startSustainedTone(id, noteFrequency(note));
+  if (pageMode === "practice") {
+    // 和音の途中経過（まだ他の指が揃っていないだけ）は不正解として数えない。
+    // 「そもそも次の音に含まれていない音」を押した場合だけミスとして数える
+    if (!isExpectedPracticeNote(note)) {
+      practiceMissCount++;
+      updatePracticeAccuracyBadge();
+      flashPracticeMissHighlight(btn);
+    }
+    const advancedIdx = tryAdvancePracticeChord();
+    // 正しく押せて先へ進んだ場合だけ、その和音の全ボタンを強く光らせる
+    // （先読みハイライトとは別クラス。押した瞬間の一時的なフィードバック）
+    if (advancedIdx !== null) {
+      practiceCorrectCount++;
+      updatePracticeAccuracyBadge();
+      flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
+    }
+  }
+}
+
+function releaseNote(id) {
+  const held = activeHolds.get(id);
+  if (!held) return;
+  held.btn.classList.remove("pressed");
+  activeHolds.delete(id);
+  stopSustainedTone(id);
+  if (activeHolds.size === 0) finalizeGroup();
+}
+
 function bindNoteButtonHold(btn, note) {
   const start = (e) => {
     e.preventDefault();
     try {
       btn.setPointerCapture(e.pointerId);
     } catch (err) {}
-    btn.classList.add("pressed");
-    if (activeHolds.size === 0) {
-      currentGroupNotes = [];
-      groupStartTime = performance.now();
-    }
-    activeHolds.set(e.pointerId, { note, btn, startTime: performance.now() });
-    currentGroupNotes.push(note);
-    startSustainedTone(e.pointerId, noteFrequency(note));
-    if (pageMode === "practice") {
-      const advancedIdx = tryAdvancePracticeChord();
-      // 正しく押せて先へ進んだ場合だけ、その和音の全ボタンを強く光らせる
-      // （先読みハイライトとは別クラス。押した瞬間の一時的なフィードバック）
-      if (advancedIdx !== null) flashPracticeCorrectHighlight(tokens[advancedIdx].notes);
-    }
+    pressNote(e.pointerId, note, btn);
   };
-  const end = (e) => {
-    const held = activeHolds.get(e.pointerId);
-    if (!held) return;
-    held.btn.classList.remove("pressed");
-    activeHolds.delete(e.pointerId);
-    stopSustainedTone(e.pointerId);
-    if (activeHolds.size === 0) finalizeGroup();
-  };
+  const end = (e) => releaseNote(e.pointerId);
   // pointerdown/up/cancelはpointerId単位で個別に管理しているため、複数指の
   // 同時押しもそれぞれ独立して処理される（マウス由来のtouchstart/touchend単一
   // 想定の問題は元々ない）。pointerdownはデフォルトでpassiveではないため
@@ -783,7 +1072,7 @@ function getCurrentElapsedSec() {
 function renderDurationOptions() {
   const el = document.getElementById("musicDurationOptions");
   el.innerHTML = DURATION_PRESETS.map(
-    (d) => `<button class="music-duration-btn${d.id === selectedDurationId ? " active" : ""}" data-duration="${d.id}">${T(d.labelKey, d.labelFallback)}</button>`
+    (d) => `<button class="music-duration-btn${d.id === selectedDurationId ? " active" : ""}" data-duration="${d.id}" aria-pressed="${d.id === selectedDurationId}">${T(d.labelKey, d.labelFallback)}</button>`
   ).join("");
   el.querySelectorAll("button").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -840,6 +1129,7 @@ function addChordToken(notes, durationValue) {
   });
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // 休符（notes:[]の音）を、選んでいる長さで譜面の最後に追加する
@@ -853,6 +1143,7 @@ function deleteLastToken() {
   forgetTokenIndexesFrom(tokens.length);
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 function clearScore() {
@@ -864,6 +1155,7 @@ function clearScore() {
   humReviewIndexes = new Set();
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // 譜面の途中の音を1つだけタップして選び、置き換え・削除できるようにする
@@ -891,6 +1183,7 @@ function replaceTokenAt(index, notes, durationValue) {
   selectedTokenIndex = null;
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 function deleteSelectedToken() {
@@ -909,6 +1202,7 @@ function deleteSelectedToken() {
   selectedTokenIndex = null;
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
 }
 
 // index以降を指すインデックスの記録(自動検出マークなど)を取り除く。
@@ -1052,6 +1346,11 @@ function handleScoreChipTap(index) {
       if (loopEnd < loopStart) [loopStart, loopEnd] = [loopEnd, loopStart];
       loopSelecting = false;
       loopEnabled = true;
+      updateLoopUI();
+      renderScoreDisplay();
+      saveDraftDebounced();
+      commitHistory();
+      return;
     }
     updateLoopUI();
     renderScoreDisplay();
@@ -1064,6 +1363,8 @@ function toggleLoopEnabled() {
   loopEnabled = !loopEnabled;
   updateLoopUI();
   renderScoreDisplay();
+  saveDraftDebounced();
+  commitHistory();
 }
 
 function clearLoop() {
@@ -1073,6 +1374,8 @@ function clearLoop() {
   loopSelecting = false;
   updateLoopUI();
   renderScoreDisplay();
+  saveDraftDebounced();
+  commitHistory();
 }
 
 function updateLoopUI() {
@@ -1106,6 +1409,25 @@ function resetLoop() {
   updateLoopUI();
 }
 
+// 保存された譜面からループ区間を復元する。古い形式（フィールド自体が無い）・
+// 譜面編集後に音符数が変わって範囲外になったデータのどちらも、値が不正なら
+// resetLoop()と同じ「丸ごと初期化」で安全側に倒す（部分的な補正はしない。
+// deleteLastToken()が範囲外になった時に採る既存の方針と揃える）
+function restoreLoopFromScore(score, tokenCount) {
+  const start = score.loopStart;
+  const end = score.loopEnd;
+  const isValidRange = Number.isInteger(start) && Number.isInteger(end) && start >= 0 && start <= end && end < tokenCount;
+  if (!isValidRange) {
+    resetLoop();
+    return;
+  }
+  loopStart = start;
+  loopEnd = end;
+  loopEnabled = !!score.loopEnabled;
+  loopSelecting = false;
+  updateLoopUI();
+}
+
 // ── モード切り替え(編集/練習) ──
 function setPageMode(mode) {
   if (pageMode === mode) return;
@@ -1114,8 +1436,13 @@ function setPageMode(mode) {
   stopPlayback();
   pageMode = mode;
   cursor = -1;
-  // 練習モードの冒頭が休符の場合、対応するボタン操作が存在しないため自動で読み飛ばす
-  if (pageMode === "practice") skipLeadingRests();
+  // 練習モードの冒頭が休符の場合、対応するボタン操作が存在しないため自動で読み飛ばす。
+  // 正解/ミス回数は保存対象ではないため、練習モードに入り直すたびに0へ戻す
+  if (pageMode === "practice") {
+    skipLeadingRests();
+    resetPracticeAccuracy();
+    maybeShowCalibHint();
+  }
   updateModeUI();
   renderScoreDisplay();
 }
@@ -1128,8 +1455,12 @@ let editTab = "prepare"; // "prepare" | "create"
 
 function setEditTab(tab) {
   editTab = tab;
-  document.getElementById("musicEditTabPrepareBtn").classList.toggle("active", tab === "prepare");
-  document.getElementById("musicEditTabCreateBtn").classList.toggle("active", tab === "create");
+  const prepareBtn = document.getElementById("musicEditTabPrepareBtn");
+  const createBtn = document.getElementById("musicEditTabCreateBtn");
+  prepareBtn.classList.toggle("active", tab === "prepare");
+  createBtn.classList.toggle("active", tab === "create");
+  prepareBtn.setAttribute("aria-selected", String(tab === "prepare"));
+  createBtn.setAttribute("aria-selected", String(tab === "create"));
   document.getElementById("musicTabPanelPrepare").style.display = tab === "prepare" ? "" : "none";
   document.getElementById("musicTabPanelCreate").style.display = tab === "create" ? "" : "none";
 }
@@ -1140,12 +1471,16 @@ function releaseAllHolds() {
   activeHolds.clear();
   currentGroupNotes = [];
   stopAllSustainedTones();
+  activeKeyboardKeys.clear();
 }
 
 function updateModeUI() {
   document.getElementById("musicModeEditBtn").classList.toggle("active", pageMode === "edit");
   document.getElementById("musicModePracticeBtn").classList.toggle("active", pageMode === "practice");
   document.getElementById("musicModeFollowBtn").classList.toggle("active", pageMode === "follow");
+  document.getElementById("musicModeEditBtn").setAttribute("aria-selected", String(pageMode === "edit"));
+  document.getElementById("musicModePracticeBtn").setAttribute("aria-selected", String(pageMode === "practice"));
+  document.getElementById("musicModeFollowBtn").setAttribute("aria-selected", String(pageMode === "follow"));
   document.getElementById("musicEditControls").style.display = pageMode === "edit" ? "" : "none";
   document.getElementById("musicScoreEditRow").style.display = pageMode === "edit" ? "" : "none";
 
@@ -1348,6 +1683,46 @@ function notesSetEqual(a, b) {
   const bKeys = dedupeNotes(b).map(noteKey).sort();
   if (aKeys.length !== bKeys.length) return false;
   return aKeys.every((k, i) => k === bKeys[i]);
+}
+
+// 押した瞬間のボタンだけを短く光らせる、不正解フィードバック
+// （flashPracticeCorrectHighlightとは別に、押した1つのボタンにだけ適用する）
+function flashPracticeMissHighlight(btn) {
+  btn.classList.remove("practice-miss");
+  void btn.offsetWidth; // reflowでアニメーションを再始動させる
+  btn.classList.add("practice-miss");
+  btn.addEventListener("animationend", () => btn.classList.remove("practice-miss"), { once: true });
+}
+
+// 次に押すべき音（休符はスキップ済みの前提）にnoteが含まれているかどうか。
+// 和音の場合、まだ他の指が揃っていないだけの「正しい途中経過」と、
+// そもそも期待されていない音を区別するために使う（tryAdvancePracticeChordは
+// 和音全体が揃わないと成立しないため、これだけでは判定できない）
+function isExpectedPracticeNote(note) {
+  const idx = nextNoteIndex(cursor);
+  if (idx === null) return true; // 曲の終端では判定しない
+  const tok = tokens[idx];
+  if (!tok || !tok.notes.length) return true; // 休符は対象外（自動スキップ済みのはず）
+  const key = noteKey(note);
+  return tok.notes.some((n) => noteKey(n) === key);
+}
+
+// 練習モードに入り直すたびに正解/ミス回数を0に戻す（保存はしない、セッション限りの値）
+function resetPracticeAccuracy() {
+  practiceCorrectCount = 0;
+  practiceMissCount = 0;
+  updatePracticeAccuracyBadge();
+}
+
+function updatePracticeAccuracyBadge() {
+  const el = document.getElementById("musicPracticeAccuracy");
+  if (!el) return;
+  const correctLabel = T("music_practice_correct_label", "正解");
+  const missLabel = T("music_practice_miss_label", "ミス");
+  el.innerHTML =
+    `<span class="music-practice-accuracy-correct">✓ ${practiceCorrectCount}</span>` +
+    `<span class="music-practice-accuracy-miss">✗ ${practiceMissCount}</span>`;
+  el.setAttribute("aria-label", `${correctLabel} ${practiceCorrectCount}、${missLabel} ${practiceMissCount}`);
 }
 
 function togglePlayback() {
@@ -1633,12 +2008,21 @@ function toggleSound() {
   localStorage.setItem("hatopiMusic_soundEnabled", soundEnabled ? "1" : "0");
 }
 
+// 演奏ボタンに対応キーラベルを表示するかどうか（PCでの利便性のため既定はON）。
+// 半音ボタンにはそもそもキー割り当てが無いため、ラベル自体が出ない
+function toggleKeyLabels() {
+  keyLabelsVisible = document.getElementById("musicKeyLabelToggle").checked;
+  localStorage.setItem(KEY_LABEL_VISIBLE_KEY, keyLabelsVisible ? "1" : "0");
+  renderInstrumentGrid();
+}
+
 function updateSoundToggleUI() {
   ["musicSoundToggleBtn", "musicSoundToggleBtnStage", "musicSoundToggleBtnFollow"].forEach((id) => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.innerHTML = icon(soundEnabled ? "volumeOn" : "volumeOff", { size: 18 });
     btn.classList.toggle("muted", !soundEnabled);
+    btn.setAttribute("aria-pressed", String(!soundEnabled));
   });
 }
 
@@ -1655,6 +2039,9 @@ function saveDraft() {
       timeSignatureId,
       freeTiming: scoreFreeTiming,
       referenceBpm: scoreReferenceBpm,
+      loopStart,
+      loopEnd,
+      loopEnabled,
       name: scoreName,
       scoreId: currentScoreId,
     })
@@ -1676,7 +2063,14 @@ function loadDraft() {
   }
 }
 
-// ── 名前を付けて保存した譜面の一覧管理 ──
+// ── 名前を付けて保存した譜面の一覧管理（譜面ライブラリ） ──
+// 一意なIDを新規発行する。saveCurrentAsScore（初回保存）・duplicateScore（複製）・
+// saveTokensAsNewScore（MIDI/音源/動画/ハミングのプレビューから新規保存）の
+// すべてがこの1箇所を通ることで、同一IDの発行を防ぐ
+function generateScoreId() {
+  return "score-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+}
+
 function loadSavedScores() {
   try {
     const raw = localStorage.getItem(SAVED_SCORES_KEY);
@@ -1685,16 +2079,66 @@ function loadSavedScores() {
   } catch (e) {
     savedScores = [];
   }
+  // createdAt・idが無い旧形式の保存譜面（この機能を追加する前に保存されたもの）を
+  // メモリ上でだけ補完する。localStorageへの書き戻しはユーザーが実際に何か
+  // 操作した時（保存・複製・名前変更・削除）だけ行い、読み込んだだけで
+  // 既存データを一括して書き換えることはしない
+  savedScores.forEach((s) => {
+    if (!s.id) s.id = generateScoreId();
+    if (s.createdAt == null) s.createdAt = s.updatedAt != null ? s.updatedAt : Date.now();
+    if (s.updatedAt == null) s.updatedAt = s.createdAt;
+  });
 }
 
+// 失敗しうる操作（localStorageの容量超過等）として扱い、成功したかどうかを返す。
+// 呼び出し側は戻り値を見て、失敗時はユーザーに分かるメッセージを表示する
 function persistSavedScores() {
-  localStorage.setItem(SAVED_SCORES_KEY, JSON.stringify(savedScores));
+  try {
+    localStorage.setItem(SAVED_SCORES_KEY, JSON.stringify(savedScores));
+    return true;
+  } catch (e) {
+    console.error("failed to persist saved scores", e);
+    return false;
+  }
+}
+
+// MIDI変換・音源/動画/ハミング変換のプレビューから、現在編集中の譜面(tokens)には
+// 一切触れずに新しい譜面として保存済み一覧に追加する共通処理。
+// 各プレビュー機能はこの関数を呼ぶだけでよく、保存済み譜面の形（フィールド構成）は
+// ここに1箇所だけ定義される
+function saveTokensAsNewScore(fields) {
+  const now = Date.now();
+  const score = {
+    id: generateScoreId(),
+    name: fields.name,
+    instrumentId: fields.instrumentId,
+    layoutId: fields.layoutId,
+    semitoneEnabled: !!fields.semitoneEnabled,
+    bpm: fields.bpm,
+    timeSignatureId: fields.timeSignatureId,
+    freeTiming: !!fields.freeTiming,
+    referenceBpm: fields.referenceBpm,
+    loopStart: null,
+    loopEnd: null,
+    loopEnabled: false,
+    tokens: fields.tokens.slice(),
+    createdAt: now,
+    updatedAt: now,
+  };
+  savedScores.push(score);
+  if (!persistSavedScores()) {
+    savedScores.pop();
+    return null;
+  }
+  return score;
 }
 
 function saveCurrentAsScore() {
   scoreName = document.getElementById("musicScoreNameInput").value.trim();
   const existing = savedScores.find((s) => s.id === currentScoreId);
   if (existing) {
+    // 保存に失敗した場合に元へ戻せるよう、書き換える前の状態を控えておく
+    const backup = { ...existing };
     existing.name = scoreName || T("music_default_score_name", "譜面");
     // サンプル譜面を上書き保存したら、以後はユーザー自身の名前として固定する
     // （nameKeyが残ったままだと、次回表示時に翻訳し直されて上の行の名前が
@@ -1707,14 +2151,24 @@ function saveCurrentAsScore() {
     existing.timeSignatureId = timeSignatureId;
     existing.freeTiming = scoreFreeTiming;
     existing.referenceBpm = scoreReferenceBpm;
+    existing.loopStart = loopStart;
+    existing.loopEnd = loopEnd;
+    existing.loopEnabled = loopEnabled;
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
-    persistSavedScores();
+    if (!persistSavedScores()) {
+      Object.assign(existing, backup);
+      showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+      return;
+    }
+    historySavedIndex = scoreHistoryIndex;
+    updateUndoRedoUI();
     showToast(T("music_toast_updated", "更新しました"));
     return;
   }
+  const now = Date.now();
   const score = {
-    id: "score-" + Date.now(),
+    id: generateScoreId(),
     name: scoreName || T("music_default_score_name", "譜面"),
     instrumentId: currentInstrumentId,
     layoutId: currentLayoutId,
@@ -1723,20 +2177,94 @@ function saveCurrentAsScore() {
     timeSignatureId,
     freeTiming: scoreFreeTiming,
     referenceBpm: scoreReferenceBpm,
+    loopStart,
+    loopEnd,
+    loopEnabled,
     tokens: tokens.slice(),
-    updatedAt: Date.now(),
+    createdAt: now,
+    updatedAt: now,
   };
   savedScores.push(score);
-  persistSavedScores();
+  if (!persistSavedScores()) {
+    savedScores.pop();
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
   currentScoreId = score.id;
   saveDraft();
+  historySavedIndex = scoreHistoryIndex;
+  updateUndoRedoUI();
   showToast(T("music_toast_saved", "保存しました"));
+}
+
+// 現在の譜面(tokens)を変更せず、指定した保存済み譜面を複製する。
+// 複製先は「元の名前 - コピー」で区別し、作成/更新日時は複製した時点にする
+function duplicateScore(id) {
+  const source = savedScores.find((s) => s.id === id);
+  if (!source) return;
+  const now = Date.now();
+  const sourceName = source.nameKey ? T(source.nameKey, source.name) : source.name;
+  const copy = {
+    ...source,
+    id: generateScoreId(),
+    name: T("music_duplicate_name_format", "{name} - コピー", { name: sourceName }),
+    createdAt: now,
+    updatedAt: now,
+    tokens: source.tokens.slice(),
+  };
+  delete copy.nameKey;
+  savedScores.push(copy);
+  if (!persistSavedScores()) {
+    savedScores.pop();
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
+  renderSavedList();
+  showToast(T("music_toast_duplicated", "複製しました"));
+}
+
+const MUSIC_SCORE_NAME_MAX_LENGTH = 60;
+
+// 譜面名の変更。前後の空白を取り除き、空文字・文字数上限超過を弾く。
+// 保存に失敗した場合は元の名前のまま変更しない
+function renameScore(id, rawName) {
+  const trimmed = (rawName || "").trim();
+  if (!trimmed) {
+    showToast(T("music_toast_name_required", "譜面名を入力してください"));
+    return false;
+  }
+  if (trimmed.length > MUSIC_SCORE_NAME_MAX_LENGTH) {
+    showToast(T("music_toast_name_too_long", "譜面名が長すぎます（{max}文字まで）", { max: MUSIC_SCORE_NAME_MAX_LENGTH }));
+    return false;
+  }
+  const score = savedScores.find((s) => s.id === id);
+  if (!score) return false;
+  const backupName = score.name;
+  const backupNameKey = score.nameKey;
+  score.name = trimmed;
+  delete score.nameKey;
+  score.updatedAt = Date.now();
+  if (!persistSavedScores()) {
+    score.name = backupName;
+    if (backupNameKey) score.nameKey = backupNameKey;
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return false;
+  }
+  if (id === currentScoreId) scoreName = trimmed;
+  return true;
+}
+
+// 直近の保存（saveCurrentAsScore成功時）以降に、Undo履歴が進んでいるかどうか。
+// 譜面ライブラリでの「新規作成」「別の譜面を開く」時に、未保存の変更を
+// 誤って破棄してしまわないかの判定に使う（Undo/Redoの追跡をそのまま流用する）
+function hasUnsavedChanges() {
+  return scoreHistoryIndex !== historySavedIndex;
 }
 
 // 新規作成：譜面の種類（拍子あり／フリーテンポ）を選ぶモーダルを開く。
 // 実際のリセット処理はchooseNewScoreTypeで行う（キャンセルした場合は何もしない）
 function newScore() {
-  if (tokens.length && !confirm(T("music_confirm_new", "編集中の譜面を破棄して新規作成しますか？"))) return;
+  if (hasUnsavedChanges() && !confirm(T("music_confirm_new", "編集中の譜面を破棄して新規作成しますか？"))) return;
   document.getElementById("musicNewScoreTypeModal").style.display = "block";
 }
 
@@ -1761,6 +2289,7 @@ function chooseNewScoreType(freeTiming) {
   renderFreeTimingUI();
   renderScoreDisplay();
   saveDraft();
+  resetHistory();
   closeNewScoreTypeModal();
 }
 
@@ -1792,84 +2321,205 @@ function convertFreeTimingScoreToBarBased() {
   renderFreeTimingUI();
   renderScoreDisplay();
   saveDraftDebounced();
+  commitHistory();
   showToast(T("music_toast_converted_to_bar", "拍子ベースの譜面に変換しました"));
 }
 
 function openSavedListModal() {
+  renamingScoreId = null;
   renderSavedList();
   document.getElementById("musicSavedListModal").style.display = "block";
 }
 
 function closeSavedListModal() {
+  renamingScoreId = null;
   document.getElementById("musicSavedListModal").style.display = "none";
+}
+
+// 譜面ライブラリ：名前変更中の譜面ID（1件のみ。他の項目を開く・削除する等の
+// 操作をすると解除される）
+let renamingScoreId = null;
+
+// 作成/更新日時の表示（言語横断でi18n化の必要が無いよう、閲覧者のブラウザの
+// ロケール・タイムゾーンにそのまま従うIntl.DateTimeFormatを使う）
+function formatScoreLibraryDate(ts) {
+  if (!ts) return "";
+  try {
+    return new Intl.DateTimeFormat(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(ts));
+  } catch (e) {
+    return new Date(ts).toLocaleString();
+  }
 }
 
 function renderSavedList() {
   const el = document.getElementById("musicSavedList");
-  if (!savedScores.length) {
-    el.innerHTML = `<div class="music-saved-empty">${T("music_saved_empty", "保存した譜面はまだありません")}</div>`;
-    return;
-  }
-  const sorted = savedScores.slice().sort((a, b) => b.updatedAt - a.updatedAt);
-  el.innerHTML = sorted
-    .map((s) => {
-      const inst = getInstrument(s.instrumentId);
-      // 楽器に配置が複数ある場合（ピアノ・ギター等）は、同じ楽器名の項目が並んでも
-      // どの配置(2列/3列/22キー等)の譜面か一覧だけで見分けられるよう配置名も添える
-      const layoutLabel = inst.layouts.length > 1 ? ` ・ ${T(getLayout(inst, s.layoutId).labelKey, getLayout(inst, s.layoutId).labelFallback)}` : "";
-      return `
-    <div class="music-saved-item${s.id === currentScoreId ? " current" : ""}">
+  const hasDraft = currentScoreId === null && tokens.length > 0;
+  const draftHtml = hasDraft
+    ? `
+    <div class="music-saved-item music-saved-item-draft">
       <div class="music-saved-info">
-        <div class="music-saved-name">${escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name)}</div>
-        <div class="music-saved-meta">${T(inst.nameKey, inst.nameFallback)}${layoutLabel} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")}</div>
+        <div class="music-saved-name">${escapeHtml(scoreName || T("music_default_score_name", "譜面"))} <span class="music-saved-badge music-saved-badge-draft">${T("music_status_draft", "下書き")}</span></div>
+        <div class="music-saved-meta">${tokens.length}${T("music_note_count_suffix", "音")}</div>
       </div>
       <div class="music-saved-actions">
-        <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
-        <button class="music-btn-danger" onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
+        <button onclick="openLibrarySaveDraftShortcut()">${T("music_save", "保存する")}</button>
+      </div>
+    </div>
+  `
+    : "";
+
+  if (!savedScores.length && !hasDraft) {
+    el.innerHTML = `<div class="music-saved-empty">${T("music_saved_empty", "保存した譜面はまだありません")}<button class="music-header-btn" id="musicSavedEmptyNewBtn">${T("music_saved_empty_new", "新しい譜面を作成")}</button></div>`;
+    const btn = document.getElementById("musicSavedEmptyNewBtn");
+    if (btn) btn.addEventListener("click", () => { closeSavedListModal(); newScore(); });
+    return;
+  }
+
+  const sorted = savedScores.slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  el.innerHTML =
+    draftHtml +
+    sorted
+      .map((s) => {
+        const inst = getInstrument(s.instrumentId);
+        // 楽器に配置が複数ある場合（ピアノ・ギター等）は、同じ楽器名の項目が並んでも
+        // どの配置(2列/3列/22キー等)の譜面か一覧だけで見分けられるよう配置名も添える
+        const layoutLabel = inst.layouts.length > 1 ? ` ・ ${T(getLayout(inst, s.layoutId).labelKey, getLayout(inst, s.layoutId).labelFallback)}` : "";
+        const tempoLabel = s.freeTiming ? T("music_freetiming_badge_label", "フリーテンポ") : `${s.bpm || DEFAULT_BPM}BPM ・ ${getTimeSignature(s.timeSignatureId).label}`;
+        const displayName = escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name);
+        const nameOrRenameHtml =
+          s.id === renamingScoreId
+            ? `<input type="text" class="music-saved-rename-input" id="musicSavedRenameInput-${s.id}" value="${escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name)}" maxlength="${MUSIC_SCORE_NAME_MAX_LENGTH}">`
+            : `<div class="music-saved-name">${displayName}</div>`;
+        const actionsHtml =
+          s.id === renamingScoreId
+            ? `
+          <button onclick="submitRenameScore('${s.id}')">${T("music_rename_confirm", "確認")}</button>
+          <button class="music-btn-secondary" onclick="cancelRenameScore()">${T("music_rename_cancel", "キャンセル")}</button>
+        `
+            : `
+          <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
+          <button class="music-btn-secondary" onclick="duplicateScore('${s.id}')">${T("music_duplicate", "複製")}</button>
+          <button class="music-btn-secondary" onclick="startRenameScore('${s.id}')">${T("music_rename", "名前を変更")}</button>
+          <button class="music-btn-danger" onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
+        `;
+        return `
+    <div class="music-saved-item${s.id === currentScoreId ? " current" : ""}">
+      <div class="music-saved-info">
+        ${nameOrRenameHtml}
+        <div class="music-saved-meta">${T("music_status_saved", "保存済み")} ・ ${T(inst.nameKey, inst.nameFallback)}${layoutLabel} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")} ・ ${tempoLabel}</div>
+        <div class="music-saved-meta music-saved-dates">${T("music_created_at", "作成")}: ${formatScoreLibraryDate(s.createdAt)} ・ ${T("music_updated_at", "更新")}: ${formatScoreLibraryDate(s.updatedAt)}</div>
+      </div>
+      <div class="music-saved-actions">
+        ${actionsHtml}
       </div>
     </div>
   `;
-    })
-    .join("");
+      })
+      .join("");
+}
+
+function startRenameScore(id) {
+  renamingScoreId = id;
+  renderSavedList();
+  const input = document.getElementById(`musicSavedRenameInput-${id}`);
+  if (input) {
+    input.focus();
+    input.select();
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitRenameScore(id);
+      if (e.key === "Escape") cancelRenameScore();
+    });
+  }
+}
+
+function cancelRenameScore() {
+  renamingScoreId = null;
+  renderSavedList();
+}
+
+function submitRenameScore(id) {
+  const input = document.getElementById(`musicSavedRenameInput-${id}`);
+  if (!input) return;
+  if (renameScore(id, input.value)) {
+    renamingScoreId = null;
+  }
+  renderSavedList();
+}
+
+// ライブラリの下書きカードから「保存する」を押した時のショートカット：
+// モーダルを閉じ、曲名を入力する「準備」タブへ移動してから入力欄へフォーカスする
+// （実際の保存操作自体はsaveCurrentAsScoreへの通常の導線をそのまま使う）
+function openLibrarySaveDraftShortcut() {
+  closeSavedListModal();
+  setEditTab("prepare");
+  const input = document.getElementById("musicScoreNameInput");
+  if (input) input.focus();
 }
 
 function loadScore(id) {
   const score = savedScores.find((s) => s.id === id);
   if (!score) return;
-  tokens = normalizeTokens(score.tokens);
-  currentInstrumentId = score.instrumentId;
-  // 保存時の配置(15鍵2列/22キーなど)・半音表示をそのまま復元する
-  currentLayoutId = score.layoutId || defaultLayoutIdFor(currentInstrumentId);
-  semitoneEnabled = !!score.semitoneEnabled;
-  bpm = score.bpm || DEFAULT_BPM;
-  timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
-  scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
-  scoreReferenceBpm = score.referenceBpm != null ? score.referenceBpm : bpm;
-  // サンプル譜面(nameKey付き)は表示言語に合わせてその都度翻訳し直す。
-  // ユーザー自身が付けた名前(nameKeyなし)はそのまま使う
-  scoreName = score.nameKey ? T(score.nameKey, score.name) : score.name;
-  currentScoreId = score.id;
-  cursor = -1;
-  stopPlayback();
-  resetLoop();
-  selectedTokenIndex = null;
-  humReviewIndexes = new Set();
-  renderInstrumentSelector();
-  renderLayoutSelector();
-  renderInstrumentGrid();
-  renderScoreMeta();
-  renderFreeTimingUI();
-  renderScoreDisplay();
-  saveDraft();
-  closeSavedListModal();
+  if (hasUnsavedChanges() && !confirm(T("music_confirm_open_discard", "編集中の譜面には保存していない変更があります。破棄して開きますか？"))) return;
+  try {
+    // 壊れたデータで現在編集中の譜面を巻き込まないよう、いったんローカル変数に
+    // 組み立ててから検証し、問題なければまとめて現在の状態へ反映する
+    const normalized = normalizeTokens(score.tokens);
+    // 「元データに何らかの音符情報があったはずなのに、正規化後は1つも残らなかった」
+    // 場合だけをエラー扱いにする。tokensが最初から空配列([])の譜面は、
+    // 単に空の譜面として正常に読み込む（エラーではない）
+    const hadSomeTokenData = score.tokens != null && (!Array.isArray(score.tokens) || score.tokens.length > 0);
+    if (hadSomeTokenData && normalized.length === 0) {
+      showToast(T("music_toast_load_failed", "読み込みに失敗しました。データが壊れている可能性があります"));
+      return;
+    }
+    tokens = normalized;
+    currentInstrumentId = score.instrumentId;
+    // 保存時の配置(15鍵2列/22キーなど)・半音表示をそのまま復元する
+    currentLayoutId = score.layoutId || defaultLayoutIdFor(currentInstrumentId);
+    semitoneEnabled = !!score.semitoneEnabled;
+    bpm = score.bpm || DEFAULT_BPM;
+    timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
+    scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
+    scoreReferenceBpm = score.referenceBpm != null ? score.referenceBpm : bpm;
+    // サンプル譜面(nameKey付き)は表示言語に合わせてその都度翻訳し直す。
+    // ユーザー自身が付けた名前(nameKeyなし)はそのまま使う
+    scoreName = score.nameKey ? T(score.nameKey, score.name) : score.name;
+    currentScoreId = score.id;
+    cursor = -1;
+    stopPlayback();
+    restoreLoopFromScore(score, tokens.length);
+    selectedTokenIndex = null;
+    humReviewIndexes = new Set();
+    renderInstrumentSelector();
+    renderLayoutSelector();
+    renderInstrumentGrid();
+    renderScoreMeta();
+    renderFreeTimingUI();
+    renderScoreDisplay();
+    saveDraft();
+    resetHistory();
+    closeSavedListModal();
+  } catch (e) {
+    console.error("failed to load score", e);
+    showToast(T("music_toast_load_failed", "読み込みに失敗しました。データが壊れている可能性があります"));
+  }
 }
 
 function deleteScore(id) {
-  if (!confirm(T("music_confirm_delete", "この譜面を削除しますか？"))) return;
+  const score = savedScores.find((s) => s.id === id);
+  if (!score) return;
+  const label = score.nameKey ? T(score.nameKey, score.name) : score.name;
+  if (!confirm(T("music_confirm_delete_named", "「{name}」を削除しますか？", { name: label }))) return;
+  const backup = savedScores;
   savedScores = savedScores.filter((s) => s.id !== id);
-  persistSavedScores();
+  if (!persistSavedScores()) {
+    savedScores = backup;
+    showToast(T("music_toast_delete_failed", "削除に失敗しました。もう一度お試しください"));
+    return;
+  }
   if (currentScoreId === id) currentScoreId = null;
   renderSavedList();
+  showToast(T("music_toast_deleted", "削除しました"));
 }
 
 // ── ヘルプモーダル ──
@@ -1889,10 +2539,26 @@ function closeHelpModal() {
 // 対してbeatsを強制することはない
 function normalizeTokens(rawTokens) {
   if (!Array.isArray(rawTokens)) return [];
-  return rawTokens.map((t) => {
-    if (Array.isArray(t.notes)) return t;
-    return { notes: [{ degree: t.degree, accidental: t.accidental || null, octave: t.octave }], beats: t.beats };
+  const result = [];
+  rawTokens.forEach((t) => {
+    // 壊れたデータ（null・オブジェクトでない要素等）はページをクラッシュさせず読み飛ばす
+    if (!t || typeof t !== "object") return;
+    if (Array.isArray(t.notes)) {
+      const notes = t.notes
+        .filter((n) => n && typeof n.degree === "number")
+        .map((n) => ({ degree: n.degree, accidental: n.accidental || null, octave: typeof n.octave === "number" ? n.octave : 0 }));
+      if (typeof t.durationMs === "number") {
+        result.push({ notes, durationMs: t.durationMs });
+      } else {
+        result.push({ notes, beats: typeof t.beats === "number" ? t.beats : 1 });
+      }
+      return;
+    }
+    if (typeof t.degree === "number") {
+      result.push({ notes: [{ degree: t.degree, accidental: t.accidental || null, octave: typeof t.octave === "number" ? t.octave : 0 }], beats: typeof t.beats === "number" ? t.beats : 1 });
+    }
   });
+  return result;
 }
 
 function escapeHtml(s) {
@@ -1926,6 +2592,8 @@ function bindControls() {
 
   document.getElementById("musicNewBtn").addEventListener("click", newScore);
   document.getElementById("musicSaveBtn").addEventListener("click", saveCurrentAsScore);
+  document.getElementById("musicUndoBtn").addEventListener("click", undoEdit);
+  document.getElementById("musicRedoBtn").addEventListener("click", redoEdit);
   document.getElementById("musicOpenListBtn").addEventListener("click", openSavedListModal);
 
   document.getElementById("musicNewScoreTypeBarBtn").addEventListener("click", () => chooseNewScoreType(false));
@@ -1948,16 +2616,19 @@ function bindControls() {
     // シークバーのタイムラインだけは作り直す
     rebuildPlaybackTimeline();
     saveDraftDebounced();
+    commitHistory();
   });
   document.getElementById("musicTimeSigSelect").addEventListener("change", (e) => {
     timeSignatureId = e.target.value;
     tempoWarningDismissed = true;
     renderScoreDisplay();
     saveDraftDebounced();
+    commitHistory();
   });
 
   document.getElementById("musicRecordToggle").addEventListener("change", toggleRecording);
   document.getElementById("musicSemitoneToggle").addEventListener("change", toggleSemitone);
+  document.getElementById("musicKeyLabelToggle").addEventListener("change", toggleKeyLabels);
 
   document.getElementById("musicAddRestBtn").addEventListener("click", addRestToken);
   document.getElementById("musicDeleteLastBtn").addEventListener("click", deleteLastToken);

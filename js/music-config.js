@@ -168,11 +168,27 @@ function build8Key2RowPositions() {
   return [...withPositions(OCARINA_TOP_NOTES, POS_8KEY_TOP_X, 896, "main"), ...withPositions(OCARINA_BOT_NOTES, POS_8KEY_BOT_X, 1027, "main")];
 }
 
+// ── キーボード演奏入力：QWERTY配列の3段（上段Q〜I／中段A〜J／下段Z〜M）を
+// 「高い方の段＝画面上段」の順に機械的に割り当てる。楽器が変わっても
+// 「その楽器の並び順における同じ位置」を表すため覚えやすい。
+// 半音(♯)ボタンは物理キーボードに十分な余りキーが無いため、今回は
+// キー割り当ての対象外（タッチ操作のみ）＝layoutにkeysが無い音は
+// キーボードから弾けないだけで、エラーにはならない
+const KEY_ROW_TOP8 = ["q", "w", "e", "r", "t", "y", "u", "i"];
+const KEY_ROW_TOP5 = ["q", "w", "e", "r", "t"];
+const KEY_ROW_TOP4 = ["q", "w", "e", "r"];
+const KEY_ROW_MID7 = ["a", "s", "d", "f", "g", "h", "j"];
+const KEY_ROW_MID5 = ["a", "s", "d", "f", "g"];
+const KEY_ROW_MID4 = ["a", "s", "d", "f"];
+const KEY_ROW_BOT7 = ["z", "x", "c", "v", "b", "n", "m"];
+const KEY_ROW_BOT5 = ["z", "x", "c", "v", "b"];
+
 // 楽器プロファイル（実機の演奏画面・設定画面で確認したボタン配置を再現）。
 // ピアノ／ギター・ベースは複数の配置(layouts)を切り替えられる。
 // ピアノの「22キー」のみ、半音(♯)あり/なしを切り替えるchromaticGridを持つ。
 // gridは編集モードの数字譜入力用（画面幅に合わせて伸縮するボタン行）、
-// positions/accidentalPositionsは練習モード用の実機座標（絶対配置）
+// positions/accidentalPositionsは練習モード用の実機座標（絶対配置）。
+// keysはgridと同じ順序（1行ずつ結合）のキーボード割り当て
 const INSTRUMENTS = [
   {
     id: "ocarina",
@@ -185,6 +201,7 @@ const INSTRUMENTS = [
         labelFallback: "標準",
         grid: [OCARINA_TOP_NOTES, OCARINA_BOT_NOTES],
         positions: build8Key2RowPositions(),
+        keys: [...KEY_ROW_TOP4, ...KEY_ROW_MID4],
       },
     ],
   },
@@ -199,6 +216,7 @@ const INSTRUMENTS = [
         labelFallback: "15鍵（2列）",
         grid: [highRowWithExtra(1), plainRow(0, 7)],
         positions: build15Key2RowPositions(),
+        keys: [...KEY_ROW_TOP8, ...KEY_ROW_MID7],
       },
       {
         id: "3row",
@@ -207,6 +225,7 @@ const INSTRUMENTS = [
         // 22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）
         grid: continuousGrid(1, 15, 5),
         positions: build15Key3RowPositions(),
+        keys: [...KEY_ROW_TOP5, ...KEY_ROW_MID5, ...KEY_ROW_BOT5],
       },
     ],
   },
@@ -221,6 +240,7 @@ const INSTRUMENTS = [
         labelFallback: "15鍵（2列）",
         grid: [highRowWithExtra(1), plainRow(0, 7)],
         positions: build15Key2RowPositions(),
+        keys: [...KEY_ROW_TOP8, ...KEY_ROW_MID7],
       },
       {
         id: "3row",
@@ -229,6 +249,7 @@ const INSTRUMENTS = [
         // 22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）
         grid: continuousGrid(1, 15, 5),
         positions: build15Key3RowPositions(),
+        keys: [...KEY_ROW_TOP5, ...KEY_ROW_MID5, ...KEY_ROW_BOT5],
       },
       {
         id: "22key",
@@ -238,6 +259,7 @@ const INSTRUMENTS = [
         chromaticGrid: [buildPianoOctaveRow(1), buildPianoOctaveRow(0), buildPianoOctaveRow(-1)],
         positions: build22KeyMainPositions(),
         accidentalPositions: build22KeySemitonePositions(),
+        keys: [...KEY_ROW_TOP8, ...KEY_ROW_MID7, ...KEY_ROW_BOT7],
       },
     ],
   },
@@ -249,6 +271,16 @@ function getInstrument(id) {
 
 function getLayout(instrument, layoutId) {
   return instrument.layouts.find((l) => l.id === layoutId) || instrument.layouts[0];
+}
+
+// キーボード割り当ての取得口を1つに集約しておく（今は既定値(layout.keys)を
+// そのまま返すだけだが、将来ユーザーが再割り当てできるようにする場合、
+// ここでlocalStorageの上書き設定を先にチェックしてからフォールバックする
+// 形に拡張できる）
+function getKeymapForLayout(instrumentId, layoutId) {
+  const inst = getInstrument(instrumentId);
+  const layout = getLayout(inst, layoutId);
+  return layout.keys || [];
 }
 
 // 音の長さプリセット（4分音符=1拍として計算する）

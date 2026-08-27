@@ -129,6 +129,11 @@ function parseMidiTrackEvents(bytes, start, length) {
       if (metaType === 0x51 && lenInfo.value === 3) {
         const microsPerQuarter = (bytes[dataStart] << 16) | (bytes[dataStart + 1] << 8) | bytes[dataStart + 2];
         events.push({ tick, type: "tempo", microsPerQuarter });
+      } else if (metaType === 0x58 && lenInfo.value >= 2) {
+        // 拍子(Time Signature)：分子はそのまま、分母は2の指数(2^n)で表される
+        const numerator = bytes[dataStart];
+        const denominator = Math.pow(2, bytes[dataStart + 1]);
+        events.push({ tick, type: "timeSignature", numerator, denominator });
       } else if ((metaType === 0x03 || metaType === 0x04) && trackName == null) {
         // 0x03=トラック名 0x04=楽器名（トラック名が無い場合の代替表示に使う）
         let name = "";
@@ -271,9 +276,11 @@ function parseMidiFile(arrayBuffer) {
   // 通常トラック0=コンダクタートラックにまとまるが、フォーマット0や非標準ファイルにも
   // 対応できるよう全トラックを走査する）
   const tempoEvents = [];
+  const timeSignatureEvents = [];
   rawTracks.forEach((t) => {
     t.events.forEach((e) => {
       if (e.type === "tempo") tempoEvents.push({ tick: e.tick, microsPerQuarter: e.microsPerQuarter });
+      else if (e.type === "timeSignature") timeSignatureEvents.push({ tick: e.tick, numerator: e.numerator, denominator: e.denominator });
     });
   });
   const initialMicrosPerQuarter = tempoEvents.length
@@ -281,13 +288,25 @@ function parseMidiFile(arrayBuffer) {
     : 500000; // 既定=120BPM
   const initialBpm = Math.round(60000000 / initialMicrosPerQuarter);
 
+  // 検出した拍子が既存のTIME_SIGNATURESプリセットに完全一致する場合のみ採用する。
+  // 一致しない拍子（5/4等、対応プリセットが無いもの）は推測で近いものに丸めず、
+  // nullのまま返し、呼び出し側で「検出できたが対応できない」と明示する
+  let initialTimeSignatureId = null;
+  let detectedTimeSignatureLabel = null;
+  if (timeSignatureEvents.length) {
+    const first = timeSignatureEvents.slice().sort((a, b) => a.tick - b.tick)[0];
+    detectedTimeSignatureLabel = `${first.numerator}/${first.denominator}`;
+    const preset = TIME_SIGNATURES.find((t) => t.id === detectedTimeSignatureLabel);
+    if (preset) initialTimeSignatureId = preset.id;
+  }
+
   const tickToSeconds = buildMidiTickToSecondsConverter(tempoEvents, ticksPerQuarter, secondsPerTick);
 
   const tracks = rawTracks
     .map((t) => ({ index: t.index, name: t.name, noteEvents: pairMidiNoteEvents(t.events, tickToSeconds) }))
     .filter((t) => t.noteEvents.length > 0);
 
-  return { format, ticksPerQuarter, initialBpm, tracks };
+  return { format, ticksPerQuarter, initialBpm, initialTimeSignatureId, detectedTimeSignatureLabel, tracks };
 }
 
 // ── ノートイベント → 和音対応tokensへの変換（MIDI・音源/動画ファイル共通） ──
@@ -428,8 +447,12 @@ function chordGroupDurationValue(g) {
 // （[{notes:[{degree,accidental,octave}], beats|durationMs}, ...]）にする。
 // オクターブシフトは曲全体のすべての音をまとめて1回だけ計算する（和音の一部だけを
 // 別のオクターブへ動かすと和音の音程関係が崩れるため）。和音内で複数の音が
-// 同じ使用可能音へスナップした場合は、dedupeNotesで重複を取り除く
-function mapChordsToInstrument(chordTimeline, availableNotes) {
+// 同じ使用可能音へスナップした場合は、dedupeNotesで重複を取り除く。
+// opts.octaveShiftOverrideは省略可能（既定0）：MIDI変換プレビューで、自動算出
+// オクターブに対しユーザーが手動で±1オクターブ調整したい場合にのみ使う
+// （半音単位。既存の呼び出し元は省略するため挙動は変わらない）
+function mapChordsToInstrument(chordTimeline, availableNotes, opts) {
+  const octaveShiftOverride = (opts && opts.octaveShiftOverride) || 0;
   if (!availableNotes.length) {
     return chordTimeline.map((g) => ({ notes: [], ...chordGroupDurationValue(g) }));
   }
@@ -437,7 +460,7 @@ function mapChordsToInstrument(chordTimeline, availableNotes) {
   chordTimeline.forEach((g) => {
     if (g.midis) g.midis.forEach((m) => allMidis.push(m));
   });
-  const shift = computeMelodyOctaveShift(allMidis, availableNotes);
+  const shift = computeMelodyOctaveShift(allMidis, availableNotes) + octaveShiftOverride;
 
   return chordTimeline.map((g) => {
     if (!g.midis) return { notes: [], ...chordGroupDurationValue(g) };
@@ -470,6 +493,70 @@ function convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, bpmValue, 
   return mapChordsToInstrument(timeline, availableNotes);
 }
 
+// MIDIプレビュー専用：convertPolyphonicNoteEventsToScoreTokensと全く同じ変換段階
+// （groupNoteEventsIntoChords → limitChordPolyphony →
+// buildFreeTimingChordTimeline/quantizeChordRhythm → mapChordsToInstrument）を
+// 実行しつつ、変換結果と一緒に統計情報も返す。音源/動画パイプラインが直接使う
+// convertPolyphonicNoteEventsToScoreTokens自体は変更していない（呼び出しの
+// 組み立て方だけがこちらにもう1つある形で、個々の変換ロジックは完全に共有）
+function convertMidiWithPreviewStats(noteEvents, layout, bpmValue, opts) {
+  const options = opts || {};
+  const resolvedSemitoneEnabled = options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
+  const availableNotes = buildInstrumentNoteMap(layout, resolvedSemitoneEnabled);
+  const groups = groupNoteEventsIntoChords(noteEvents, options.chord);
+  const limitedGroups = limitChordPolyphony(groups, options.maxSimultaneousNotes);
+  const freeTiming = options.freeTiming !== false;
+  const timeline = freeTiming
+    ? buildFreeTimingChordTimeline(limitedGroups, options.freeTimingRhythm)
+    : quantizeChordRhythm(limitedGroups, bpmValue, options.rhythm);
+  const tokens = mapChordsToInstrument(timeline, availableNotes, { octaveShiftOverride: options.octaveShiftOverride });
+
+  const allMidis = [];
+  timeline.forEach((g) => {
+    if (g.midis) g.midis.forEach((m) => allMidis.push(m));
+  });
+  const autoOctaveShift = computeMelodyOctaveShift(allMidis, availableNotes);
+  const manualOctaveOffset = options.octaveShiftOverride || 0;
+  const totalShift = autoOctaveShift + manualOctaveOffset;
+
+  let truncatedNoteCount = 0;
+  groups.forEach((g, i) => {
+    truncatedNoteCount += g.midis.length - limitedGroups[i].midis.length;
+  });
+
+  let outOfRangeCount = 0;
+  if (availableNotes.length) {
+    const instMin = availableNotes[0].midi;
+    const instMax = availableNotes[availableNotes.length - 1].midi;
+    allMidis.forEach((m) => {
+      const shifted = m + totalShift;
+      if (shifted < instMin || shifted > instMax) outOfRangeCount++;
+    });
+  }
+
+  const noteCount = tokens.reduce((sum, t) => sum + t.notes.length, 0);
+  const chordCount = tokens.filter((t) => t.notes.length > 1).length;
+  const restCount = tokens.filter((t) => t.notes.length === 0).length;
+  const totalDurationSec = freeTiming
+    ? tokens.reduce((sum, t) => sum + (t.durationMs || 0), 0) / 1000
+    : tokens.reduce((sum, t) => sum + (t.beats || 0), 0) * (60 / bpmValue);
+
+  return {
+    tokens,
+    stats: {
+      tokenCount: tokens.length,
+      noteCount,
+      chordCount,
+      restCount,
+      outOfRangeCount,
+      truncatedNoteCount,
+      autoOctaveShift,
+      manualOctaveOffset,
+      totalDurationSec,
+    },
+  };
+}
+
 // ── ここから下はブラウザAPI（DOM・ファイル選択・モーダル）に依存する部分 ──
 
 // 拡張子(.mid/.midi)またはMIMEタイプでMIDIファイルかどうかを判定する
@@ -482,6 +569,12 @@ function isMidiFile(file) {
 
 let midiParsedResult = null; // トラック選択モーダルを開いている間、parseMidiFileの結果を保持する
 
+// 音符数の上限（全トラック合計）。極端に音符数の多いMIDI（数万音以上）で
+// メインスレッドが長時間ブロックするのを避けるための安全弁。以降の変換
+// パイプライン自体はO(n)〜O(n×楽器音数)で軽いため、この値は「現実的な曲の
+// 長さを大きく超える」水準に余裕を持たせて設定してある
+const MIDI_MAX_NOTE_EVENTS = 20000;
+
 // 「解析して譜面にする」から呼ばれるMIDI専用の処理。js/music-hum.jsの
 // onHumAnalyzeClickが、選択ファイルがMIDIと判定した場合にこの関数へ委譲する
 async function onMidiFileAnalyze(blob, ctx) {
@@ -489,6 +582,9 @@ async function onMidiFileAnalyze(blob, ctx) {
   let parsed;
   try {
     setProgress(0.3, T("music_midi_progress_parsing", "MIDIファイルを解析中…"));
+    // 進捗表示が実際に描画されてから重い解析処理に入るよう、1フレーム分待つ
+    // （Web Workerは導入せず、体感の応答性だけをこの程度の軽い対応で確保する）
+    await new Promise((resolve) => requestAnimationFrame(resolve));
     const buffer = await blob.arrayBuffer();
     parsed = parseMidiFile(buffer);
   } catch (e) {
@@ -502,10 +598,24 @@ async function onMidiFileAnalyze(blob, ctx) {
     return;
   }
 
+  const totalNoteEvents = parsed.tracks.reduce((sum, t) => sum + t.noteEvents.length, 0);
+  if (totalNoteEvents > MIDI_MAX_NOTE_EVENTS) {
+    fail(
+      T(
+        "music_midi_too_many_notes",
+        `音符数が多すぎます（検出数:約${totalNoteEvents}音 / 上限:${MIDI_MAX_NOTE_EVENTS}音）。曲の一部だけを含むMIDIファイルにするか、トラックを絞ってからお試しください`,
+        { count: totalNoteEvents, limit: MIDI_MAX_NOTE_EVENTS }
+      )
+    );
+    return;
+  }
+
   document.getElementById("musicHumProgressRow").style.display = "none";
+  parsed.fileName = blob.name || "";
 
   if (parsed.tracks.length === 1) {
-    finishMidiConversion(parsed, parsed.tracks[0].noteEvents, parsed.initialBpm);
+    const label = parsed.tracks[0].name || stripFileExtension(parsed.fileName) || T("music_default_score_name", "譜面");
+    finishMidiConversion(parsed, parsed.tracks[0].noteEvents, parsed.initialBpm, label);
     return;
   }
 
@@ -535,14 +645,24 @@ function openMidiTrackPickerModal(parsed) {
   listEl.querySelectorAll("button[data-track-index]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const idx = Number(btn.dataset.trackIndex);
-      finishMidiConversion(parsed, parsed.tracks[idx].noteEvents, parsed.initialBpm);
+      const t = parsed.tracks[idx];
+      const label = t.name || T("music_midi_track_unnamed", `トラック${idx + 1}`, { n: idx + 1 });
+      finishMidiConversion(parsed, t.noteEvents, parsed.initialBpm, label);
     });
   });
   document.getElementById("musicMidiMergeAllBtn").onclick = () => {
     const merged = parsed.tracks.flatMap((t) => t.noteEvents);
-    finishMidiConversion(parsed, merged, parsed.initialBpm);
+    const label = stripFileExtension(parsed.fileName) || T("music_midi_all_tracks_label", "全トラック");
+    finishMidiConversion(parsed, merged, parsed.initialBpm, label);
   };
   document.getElementById("musicMidiTrackModal").style.display = "block";
+}
+
+// "song.mid" → "song"（拡張子が無ければそのまま返す）
+function stripFileExtension(name) {
+  if (!name) return "";
+  const idx = name.lastIndexOf(".");
+  return idx > 0 ? name.slice(0, idx) : name;
 }
 
 function closeMidiTrackPickerModal() {
@@ -550,48 +670,363 @@ function closeMidiTrackPickerModal() {
   midiParsedResult = null;
 }
 
-// 選んだノートイベント（単一トラック or 全トラック結合）を実際にtokensへ変換し、
-// 譜面へ反映する。テンポはMIDIファイル自身が持つ値をそのまま採用する
-// （タイミング計算に使ったテンポと譜面のBPM表示を一致させるため。エディタ側で
-// 既に設定していたBPMに合わせてしまうと、音の長さ(beats)の比率が原曲と変わってしまう）
-function finishMidiConversion(parsed, noteEvents, sourceBpm) {
-  const clampedBpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Math.round(sourceBpm || DEFAULT_BPM)));
-  const inst = getInstrument(currentInstrumentId);
-  const layout = getLayout(inst, currentLayoutId);
-  // 既定でフリーテンポ譜面として生成する（量子化なし。実際の音の長さをそのまま
-  // durationMsに入れる）。テンポ表示・基準テンポ(scoreReferenceBpm)ともに
-  // MIDIファイル自身が持つ値をそのまま採用する（エディタ側で既に設定していた
-  // BPMに合わせてしまうと、原曲のテンポ感と表示がずれてしまう）。
-  // scoreReferenceBpmを基準テンポとして記録しておくことで、生成後にユーザーが
-  // テンポを変更すると、その比率で練習/追従モードの再生速度が実際に変わる
-  // （bpm===scoreReferenceBpmの間は原曲通りの速さのまま）。
-  // 同時に押す指の本数の上限は、変換モーダル(#musicHumMaxNotesInput)で
-  // 解析開始前にユーザーが指定した値をそのまま使う（readMaxSimultaneousNotesは
-  // js/music-hum.js側で定義、同じモーダルを使う音源/動画パスと共通）
-  const maxSimultaneousNotes = readMaxSimultaneousNotes();
-  const newTokens = convertPolyphonicNoteEventsToScoreTokens(noteEvents, layout, clampedBpm, { semitoneEnabled, maxSimultaneousNotes });
+// 選んだノートイベント（単一トラック or 全トラック結合）から、即座に譜面へ
+// 反映するのではなく、まずプレビューを開く。テンポ・拍子はMIDIファイル
+// 自身が持つ値をそのまま初期値として使う（タイミング計算に使ったテンポと
+// 譜面のBPM表示を一致させるため）
+function finishMidiConversion(parsed, noteEvents, sourceBpm, sourceLabel) {
+  closeMidiTrackPickerModal();
+  openMidiPreviewModal(noteEvents, sourceLabel, sourceBpm, parsed.initialTimeSignatureId, parsed.detectedTimeSignatureLabel);
+}
 
-  if (!newTokens.length) {
-    document.getElementById("musicHumError").textContent = T("music_midi_no_notes", "このMIDIファイルには音が含まれていませんでした");
-    document.getElementById("musicHumAnalyzeBtn").disabled = false;
+// ── 変換結果プレビュー ──
+// トラック選択後、即座にtokensを反映せず、楽器/配置・同時押し本数・オクターブ調整を
+// その場で変えながら統計を確認し、「現在の譜面へ反映」「新しい譜面として保存」
+// 「キャンセル」のいずれかを選べるようにする
+let midiPreviewState = null;
+
+function openMidiPreviewModal(noteEvents, sourceLabel, sourceBpm, timeSignatureId, detectedTimeSignatureLabel) {
+  const clampedBpm = Math.max(MIN_BPM, Math.min(MAX_BPM, Math.round(sourceBpm || DEFAULT_BPM)));
+  midiPreviewState = {
+    noteEvents,
+    sourceLabel: sourceLabel || T("music_default_score_name", "譜面"),
+    clampedBpm,
+    timeSignatureId: timeSignatureId || DEFAULT_TIME_SIGNATURE_ID,
+    timeSignatureDetectedButUnsupported: !timeSignatureId && !!detectedTimeSignatureLabel,
+    detectedTimeSignatureLabel,
+    instrumentId: currentInstrumentId,
+    layoutId: currentLayoutId,
+    semitoneEnabled,
+    maxSimultaneousNotes: readMaxSimultaneousNotes(),
+    octaveOffset: 0,
+    latestTokens: [],
+  };
+  document.getElementById("musicMidiPreviewSourceLabel").textContent = T(
+    "music_midi_preview_source",
+    `曲名（トラック）: ${midiPreviewState.sourceLabel} ／ 検出テンポ: ${clampedBpm}BPM`,
+    { name: midiPreviewState.sourceLabel, bpm: clampedBpm }
+  );
+  document.getElementById("musicMidiPreviewMaxNotesInput").value = midiPreviewState.maxSimultaneousNotes;
+  renderMidiPreviewInstrumentButtons();
+  renderMidiPreviewLayoutButtons();
+  recomputeMidiPreview();
+  document.getElementById("musicMidiPreviewModal").style.display = "block";
+}
+
+function closeMidiPreviewModal() {
+  document.getElementById("musicMidiPreviewModal").style.display = "none";
+  midiPreviewState = null;
+  document.getElementById("musicHumAnalyzeBtn").disabled = false;
+  document.getElementById("musicHumProgressRow").style.display = "none";
+}
+
+function renderMidiPreviewInstrumentButtons() {
+  const el = document.getElementById("musicMidiPreviewInstrumentButtons");
+  el.innerHTML = INSTRUMENTS.map(
+    (inst) =>
+      `<button class="music-instrument-btn${inst.id === midiPreviewState.instrumentId ? " active" : ""}" data-instrument="${inst.id}" aria-pressed="${inst.id === midiPreviewState.instrumentId}">${T(inst.nameKey, inst.nameFallback)}</button>`
+  ).join("");
+  el.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      midiPreviewState.instrumentId = btn.dataset.instrument;
+      midiPreviewState.layoutId = defaultLayoutIdFor(midiPreviewState.instrumentId);
+      midiPreviewState.semitoneEnabled = false;
+      renderMidiPreviewInstrumentButtons();
+      renderMidiPreviewLayoutButtons();
+      recomputeMidiPreview();
+    });
+  });
+}
+
+function renderMidiPreviewLayoutButtons() {
+  const el = document.getElementById("musicMidiPreviewLayoutButtons");
+  const inst = getInstrument(midiPreviewState.instrumentId);
+  if (inst.layouts.length <= 1) {
+    el.innerHTML = "";
+    el.style.display = "none";
+    updateMidiPreviewSemitoneVisibility();
     return;
   }
+  el.style.display = "";
+  el.innerHTML = inst.layouts
+    .map(
+      (l) =>
+        `<button class="music-layout-btn${l.id === midiPreviewState.layoutId ? " active" : ""}" data-layout="${l.id}" aria-pressed="${l.id === midiPreviewState.layoutId}">${T(l.labelKey, l.labelFallback)}</button>`
+    )
+    .join("");
+  el.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      midiPreviewState.layoutId = btn.dataset.layout;
+      renderMidiPreviewLayoutButtons();
+      recomputeMidiPreview();
+    });
+  });
+  updateMidiPreviewSemitoneVisibility();
+}
 
-  bpm = clampedBpm;
-  scoreReferenceBpm = clampedBpm;
+function updateMidiPreviewSemitoneVisibility() {
+  const inst = getInstrument(midiPreviewState.instrumentId);
+  const layout = getLayout(inst, midiPreviewState.layoutId);
+  const row = document.getElementById("musicMidiPreviewSemitoneRow");
+  row.style.display = layout.chromaticGrid ? "" : "none";
+  document.getElementById("musicMidiPreviewSemitoneToggle").checked = midiPreviewState.semitoneEnabled;
+}
+
+function updateMidiPreviewOctaveLabel() {
+  const n = midiPreviewState.octaveOffset / 12;
+  const el = document.getElementById("musicMidiPreviewOctaveValue");
+  if (n === 0) el.textContent = T("music_midi_octave_auto", "自動");
+  else {
+    const signedN = n > 0 ? `+${n}` : `${n}`;
+    el.textContent = T("music_midi_octave_auto_offset", `自動${signedN}`, { n: signedN });
+  }
+}
+
+function recomputeMidiPreview() {
+  if (!midiPreviewState) return;
+  const inst = getInstrument(midiPreviewState.instrumentId);
+  const layout = getLayout(inst, midiPreviewState.layoutId);
+  const { tokens: previewTokens, stats } = convertMidiWithPreviewStats(midiPreviewState.noteEvents, layout, midiPreviewState.clampedBpm, {
+    semitoneEnabled: midiPreviewState.semitoneEnabled,
+    maxSimultaneousNotes: midiPreviewState.maxSimultaneousNotes,
+    octaveShiftOverride: midiPreviewState.octaveOffset,
+  });
+  midiPreviewState.latestTokens = previewTokens;
+  updateMidiPreviewOctaveLabel();
+  renderMidiPreviewStats(stats);
+}
+
+function renderMidiPreviewStats(stats) {
+  const statsEl = document.getElementById("musicMidiPreviewStats");
+  const rows = [
+    [T("music_midi_stat_notes", "音符数"), stats.noteCount],
+    [T("music_midi_stat_chords", "和音数"), stats.chordCount],
+    [T("music_midi_stat_rests", "休符数"), stats.restCount],
+    [T("music_midi_stat_duration", "推定の長さ"), formatSeekTime(stats.totalDurationSec)],
+  ];
+  statsEl.innerHTML = rows
+    .map(([label, value]) => `<div class="music-midi-stat-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(String(value))}</strong></div>`)
+    .join("");
+
+  const warnings = [];
+  if (stats.outOfRangeCount > 0) {
+    warnings.push(
+      T("music_midi_warn_outofrange", `音域外の音: ${stats.outOfRangeCount}件（自動でオクターブ調整・最も近い音に置き換え済みです）`, {
+        n: stats.outOfRangeCount,
+      })
+    );
+  }
+  if (stats.truncatedNoteCount > 0) {
+    warnings.push(
+      T("music_midi_warn_truncated", `同時押し本数の上限を超えたため間引いた音: ${stats.truncatedNoteCount}件`, { n: stats.truncatedNoteCount })
+    );
+  }
+  if (midiPreviewState.timeSignatureDetectedButUnsupported) {
+    warnings.push(
+      T(
+        "music_midi_warn_timesig_unsupported",
+        `拍子 ${midiPreviewState.detectedTimeSignatureLabel} を検出しましたが対応するプリセットが無いため、4/4を仮に使用します（小節線の目安表示のみに影響し、演奏には影響しません）`,
+        { sig: midiPreviewState.detectedTimeSignatureLabel }
+      )
+    );
+  }
+  if (!stats.noteCount) {
+    warnings.push(T("music_midi_warn_empty_result", "変換結果に音がありません。別のトラック・楽器を選び直してください"));
+  }
+  const warnEl = document.getElementById("musicMidiPreviewWarnings");
+  warnEl.innerHTML = warnings.map((w) => `<li>${escapeHtml(w)}</li>`).join("");
+
+  const applyBtn = document.getElementById("musicMidiPreviewApplyBtn");
+  const saveBtn = document.getElementById("musicMidiPreviewSaveNewBtn");
+  applyBtn.disabled = !stats.noteCount;
+  saveBtn.disabled = !stats.noteCount;
+}
+
+// 現在編集中の譜面をプレビュー内容で上書きする（既存のapplyGeneratedMelodyTokens経由。
+// resetHistory()が呼ばれるため、この操作自体はUndoで戻せない＝プレビュー内の
+// 案内文の通り）
+function applyMidiPreviewToCurrentScore() {
+  if (!midiPreviewState || !midiPreviewState.latestTokens.length) return;
+  currentInstrumentId = midiPreviewState.instrumentId;
+  currentLayoutId = midiPreviewState.layoutId;
+  semitoneEnabled = midiPreviewState.semitoneEnabled;
+  bpm = midiPreviewState.clampedBpm;
+  scoreReferenceBpm = midiPreviewState.clampedBpm;
   scoreFreeTiming = true;
+  timeSignatureId = midiPreviewState.timeSignatureId;
+  renderInstrumentSelector();
+  renderLayoutSelector();
   renderScoreMeta();
-  closeMidiTrackPickerModal();
+  const tokensToApply = midiPreviewState.latestTokens;
+  closeMidiPreviewModal();
   applyGeneratedMelodyTokens(
-    newTokens,
+    tokensToApply,
     T("music_midi_done_toast", "MIDIファイルから譜面を作成しました。金色の枠の音は自動変換です。タップして手直しできます")
   );
 }
 
+// 現在編集中の譜面(tokens)には一切触れず、新しい譜面として保存済み一覧に追加する
+// （js/music-editor.jsのsaveTokensAsNewScoreへ委譲。同じ処理は音源/動画/ハミングの
+// 変換プレビューでも使う共通処理のため、ここに個別実装を持たない）
+function saveMidiPreviewAsNewScore() {
+  if (!midiPreviewState || !midiPreviewState.latestTokens.length) return;
+  const score = saveTokensAsNewScore({
+    name: midiPreviewState.sourceLabel,
+    instrumentId: midiPreviewState.instrumentId,
+    layoutId: midiPreviewState.layoutId,
+    semitoneEnabled: midiPreviewState.semitoneEnabled,
+    bpm: midiPreviewState.clampedBpm,
+    timeSignatureId: midiPreviewState.timeSignatureId,
+    freeTiming: true,
+    referenceBpm: midiPreviewState.clampedBpm,
+    tokens: midiPreviewState.latestTokens,
+  });
+  if (!score) {
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
+  closeMidiPreviewModal();
+  showToast(T("music_midi_saved_new_toast", "新しい譜面として保存しました"));
+}
+
+// ── MIDIエクスポート（tokens → SMF Format 0 のバイト列） ──
+const MIDI_EXPORT_TICKS_PER_QUARTER = 480;
+
+// 可変長数値(VLQ)のバイト列を組み立てる（readMidiVarLengthの逆変換）
+function writeMidiVarLength(value) {
+  const bytes = [];
+  let v = Math.max(0, Math.round(value));
+  bytes.unshift(v & 0x7f);
+  v = Math.floor(v / 128);
+  while (v > 0) {
+    bytes.unshift((v & 0x7f) | 0x80);
+    v = Math.floor(v / 128);
+  }
+  return bytes;
+}
+
+function midiUint32Bytes(n) {
+  return [(n >>> 24) & 0xff, (n >>> 16) & 0xff, (n >>> 8) & 0xff, n & 0xff];
+}
+function midiUint16Bytes(n) {
+  return [(n >>> 8) & 0xff, n & 0xff];
+}
+
+// tokens(度数/臨時記号/オクターブ形式)をSMF(Format 0、1トラック)のバイト列へ変換する。
+// 度数→MIDI番号の変換は既存のmelodyNoteToMidi(js/music-hum.js)をそのまま使い、
+// 二重実装しない。テンポは曲全体を通して単一(exportBpm固定)とし、フリーテンポ譜面の
+// durationMsもこのテンポを基準にtickへ変換する（テンポ変化そのものの再現はしない。
+// 音符数・和音・相対的な長さの比率が読み戻し時に保たれることを優先する設計判断）
+function encodeScoreAsMidiBytes(exportTokens, exportBpm, exportTimeSignatureId, exportScoreName) {
+  const ticksPerQuarter = MIDI_EXPORT_TICKS_PER_QUARTER;
+  const microsPerQuarter = Math.round(60000000 / exportBpm);
+
+  const rawEvents = []; // {tick, type:"on"|"off", midi}
+  let tickCursor = 0;
+  exportTokens.forEach((tok) => {
+    const beats = tok.durationMs != null ? (tok.durationMs / 1000) * (exportBpm / 60) : tok.beats || 0;
+    const tickLength = Math.max(1, Math.round(beats * ticksPerQuarter));
+    if (tok.notes && tok.notes.length) {
+      const midis = dedupeNotes(tok.notes).map(melodyNoteToMidi);
+      midis.forEach((m) => rawEvents.push({ tick: tickCursor, type: "on", midi: m }));
+      midis.forEach((m) => rawEvents.push({ tick: tickCursor + tickLength, type: "off", midi: m }));
+    }
+    tickCursor += tickLength;
+  });
+  // 同じtickでは常にノートオフをノートオンより先に処理する（同じ音高が隙間なく
+  // 連続する場合に、新しい発音より前に古い発音を確実に止めるため）
+  rawEvents.sort((a, b) => (a.tick !== b.tick ? a.tick - b.tick : a.type === b.type ? 0 : a.type === "off" ? -1 : 1));
+
+  const trackBytes = [];
+  const pushMetaAtStart = (metaType, dataBytes) => {
+    trackBytes.push(...writeMidiVarLength(0), 0xff, metaType, ...writeMidiVarLength(dataBytes.length), ...dataBytes);
+  };
+  if (exportScoreName) {
+    pushMetaAtStart(0x03, Array.from(exportScoreName).map((c) => c.charCodeAt(0) & 0xff));
+  }
+  pushMetaAtStart(0x51, [(microsPerQuarter >> 16) & 0xff, (microsPerQuarter >> 8) & 0xff, microsPerQuarter & 0xff]);
+  const sig = getTimeSignature(exportTimeSignatureId);
+  const [sigNum, sigDenomStr] = sig.label.split("/");
+  const sigDenomPow = Math.round(Math.log2(Number(sigDenomStr)));
+  pushMetaAtStart(0x58, [Number(sigNum), sigDenomPow, 24, 8]);
+
+  let lastTick = 0;
+  rawEvents.forEach((e) => {
+    const delta = e.tick - lastTick;
+    lastTick = e.tick;
+    const statusByte = e.type === "on" ? 0x90 : 0x80;
+    const velocity = e.type === "on" ? 100 : 0;
+    trackBytes.push(...writeMidiVarLength(delta), statusByte, e.midi & 0x7f, velocity & 0x7f);
+  });
+  trackBytes.push(...writeMidiVarLength(0), 0xff, 0x2f, 0x00); // End of Track
+
+  const bytes = [
+    0x4d, 0x54, 0x68, 0x64, // "MThd"
+    ...midiUint32Bytes(6),
+    ...midiUint16Bytes(0), // Format 0
+    ...midiUint16Bytes(1), // 1トラック
+    ...midiUint16Bytes(ticksPerQuarter),
+    0x4d, 0x54, 0x72, 0x6b, // "MTrk"
+    ...midiUint32Bytes(trackBytes.length),
+    ...trackBytes,
+  ];
+  return new Uint8Array(bytes);
+}
+
+// ファイル名として安全な文字列にする（パス区切り文字・制御文字を除去）
+function sanitizeMidiExportFileName(name) {
+  const cleaned = (name || "").replace(/[\\/:*?"<>| -]/g, "_").trim();
+  return cleaned || T("music_default_score_name", "譜面");
+}
+
+// 現在編集中の譜面をMIDIファイルとして書き出す。外部への送信は一切行わず、
+// ブラウザ内でBlobを組み立ててそのままダウンロードさせる
+function exportCurrentScoreAsMidi() {
+  if (!tokens.length) {
+    showToast(T("music_midi_export_empty", "書き出す音符がありません"));
+    return;
+  }
+  const bytes = encodeScoreAsMidiBytes(tokens, bpm, timeSignatureId, scoreName);
+  const blob = new Blob([bytes], { type: "audio/midi" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${sanitizeMidiExportFileName(scoreName)}.mid`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast(T("music_midi_export_done", "MIDIファイルを書き出しました"));
+}
+
 function bindMidiImportControls() {
+  document.getElementById("musicMidiExportBtn").addEventListener("click", exportCurrentScoreAsMidi);
   document.getElementById("musicMidiTrackCloseBtn").addEventListener("click", () => {
     closeMidiTrackPickerModal();
     document.getElementById("musicHumAnalyzeBtn").disabled = false;
     document.getElementById("musicHumProgressRow").style.display = "none";
   });
+
+  document.getElementById("musicMidiPreviewMaxNotesInput").addEventListener("change", (e) => {
+    const val = Math.round(Number(e.target.value));
+    const clamped = Number.isFinite(val) ? Math.max(MIN_CHORD_POLYPHONY, Math.min(MAX_CHORD_POLYPHONY, val)) : DEFAULT_CHORD_POLYPHONY;
+    e.target.value = clamped;
+    midiPreviewState.maxSimultaneousNotes = clamped;
+    recomputeMidiPreview();
+  });
+  document.getElementById("musicMidiPreviewSemitoneToggle").addEventListener("change", (e) => {
+    midiPreviewState.semitoneEnabled = e.target.checked;
+    recomputeMidiPreview();
+  });
+  document.getElementById("musicMidiPreviewOctaveDownBtn").addEventListener("click", () => {
+    midiPreviewState.octaveOffset = Math.max(-24, midiPreviewState.octaveOffset - 12);
+    recomputeMidiPreview();
+  });
+  document.getElementById("musicMidiPreviewOctaveUpBtn").addEventListener("click", () => {
+    midiPreviewState.octaveOffset = Math.min(24, midiPreviewState.octaveOffset + 12);
+    recomputeMidiPreview();
+  });
+  document.getElementById("musicMidiPreviewApplyBtn").addEventListener("click", applyMidiPreviewToCurrentScore);
+  document.getElementById("musicMidiPreviewSaveNewBtn").addEventListener("click", saveMidiPreviewAsNewScore);
+  document.getElementById("musicMidiPreviewCancelBtn").addEventListener("click", closeMidiPreviewModal);
 }
