@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/music.css?v=43">
+<link rel="stylesheet" href="./css/music.css?v=44">
 <link rel="stylesheet" href="./css/design-system.css?v=1">
 
 <link rel="prefetch" href="./index.html">
@@ -137,7 +137,7 @@
       <div class="music-panel-btn-row">
         <button class="music-header-btn music-btn-secondary" id="musicNewBtn" data-i18n="music_new">新規作成</button>
         <button class="music-header-btn" id="musicSaveBtn" data-i18n="music_save">保存する</button>
-        <button class="music-header-btn music-btn-secondary" id="musicOpenListBtn" data-i18n="music_open_list">一覧を見る</button>
+        <button class="music-header-btn music-btn-secondary" id="musicOpenListBtn" data-i18n="music_open_library">譜面ライブラリ</button>
         <button class="music-header-btn music-btn-secondary" id="musicMidiExportBtn" data-i18n="music_midi_export_btn">MIDIとして書き出す</button>
       </div>
     </div>
@@ -173,7 +173,7 @@
     </div>
   </div>
 
-  <div class="music-panel-section">
+  <div class="music-panel-section" id="musicScoreSection">
     <div class="music-score-header-row">
       <div class="music-panel-title" data-i18n="music_score_label">譜面</div>
       <div class="music-history-controls">
@@ -208,7 +208,7 @@
     <p class="music-record-hint" id="musicLoopHint" style="display:none">譜面の音をタップして、開始の音を選んでください</p>
   </div>
 
-  <div class="music-panel-section">
+  <div class="music-panel-section" id="musicPerformSection">
     <div class="music-panel-title" data-i18n="music_perform_label">演奏</div>
     <div id="musicInstrumentGridAnchorEdit">
       <div class="music-instrument-grid" id="musicInstrumentGrid"></div>
@@ -295,7 +295,7 @@
 
 <div id="musicSavedListModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='musicSavedListModal') closeSavedListModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box music-saved-box">
-    <h3 data-i18n="music_saved_title">保存した譜面</h3>
+    <h3 data-i18n="music_library_title">譜面ライブラリ</h3>
     <div class="music-saved-list" id="musicSavedList"></div>
     <button class="modal-close-btn" onclick="closeSavedListModal()" data-i18n="music_close">閉じる</button>
   </div>
@@ -400,6 +400,7 @@
     <div class="music-hum-progress-row" id="musicHumProgressRow" style="display:none">
       <div class="music-hum-progress-bar"><div class="music-hum-progress-fill" id="musicHumProgressFill"></div></div>
       <span class="music-hum-progress-label" id="musicHumProgressLabel"></span>
+      <button class="music-header-btn music-btn-secondary" id="musicHumCancelBtn" data-i18n="music_midi_preview_cancel">変換をキャンセル</button>
     </div>
     <p class="music-hum-error" id="musicHumError"></p>
 
@@ -458,6 +459,45 @@
       <button class="music-header-btn music-btn-secondary" id="musicMidiPreviewSaveNewBtn" data-i18n="music_midi_preview_save_new">新しい譜面として保存</button>
     </div>
     <button class="modal-close-btn" id="musicMidiPreviewCancelBtn" data-i18n="music_midi_preview_cancel">変換をキャンセル</button>
+  </div>
+</div>
+
+<div id="musicMelodyPreviewModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2002;">
+  <div class="modal-box music-hum-box">
+    <h3 data-i18n="music_midi_preview_title">変換結果のプレビュー</h3>
+    <p class="music-step-hint" id="musicMelodyPreviewSourceLabel"></p>
+
+    <div class="music-panel-title" data-i18n="music_midi_preview_instrument_label">使用楽器</div>
+    <div class="music-instrument-buttons" id="musicMelodyPreviewInstrumentButtons"></div>
+    <div class="music-layout-buttons" id="musicMelodyPreviewLayoutButtons"></div>
+    <label class="music-semitone-row" id="musicMelodyPreviewSemitoneRow" style="display:none">
+      <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+      <input type="checkbox" id="musicMelodyPreviewSemitoneToggle">
+    </label>
+
+    <div class="music-bpm-row" id="musicMelodyPreviewMaxNotesRow">
+      <span data-i18n="music_maxnotes_label">同時に押す指の本数</span>
+      <input type="number" id="musicMelodyPreviewMaxNotesInput" class="music-bpm-input" min="1" max="10" value="4">
+      <span data-i18n="music_maxnotes_unit">本</span>
+    </div>
+
+    <div class="music-bpm-row" id="musicMelodyPreviewOctaveRow">
+      <span data-i18n="music_midi_preview_octave_label">オクターブ調整</span>
+      <button class="music-header-btn music-btn-secondary" id="musicMelodyPreviewOctaveDownBtn" aria-label="Octave down" data-i18n-aria-label="music_midi_octave_down">－1</button>
+      <span id="musicMelodyPreviewOctaveValue">自動</span>
+      <button class="music-header-btn music-btn-secondary" id="musicMelodyPreviewOctaveUpBtn" aria-label="Octave up" data-i18n-aria-label="music_midi_octave_up">＋1</button>
+    </div>
+
+    <div class="music-midi-preview-stats" id="musicMelodyPreviewStats"></div>
+    <ul class="music-midi-preview-warnings" id="musicMelodyPreviewWarnings"></ul>
+
+    <p class="music-record-hint" data-i18n="music_midi_preview_apply_hint">「現在の譜面へ反映」を選ぶと、今編集中の譜面が上書きされます（この操作はUndoで戻せません）。譜面を残しておきたい場合は「新しい譜面として保存」をお使いください</p>
+
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicMelodyPreviewApplyBtn" data-i18n="music_midi_preview_apply">現在の譜面へ反映</button>
+      <button class="music-header-btn music-btn-secondary" id="musicMelodyPreviewSaveNewBtn" data-i18n="music_midi_preview_save_new">新しい譜面として保存</button>
+    </div>
+    <button class="modal-close-btn" id="musicMelodyPreviewCancelBtn" data-i18n="music_midi_preview_cancel">変換をキャンセル</button>
   </div>
 </div>
 

@@ -2083,16 +2083,80 @@ body.dark .music-follow-empty{
 }
 
 .music-saved-empty{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
   text-align:center;
   padding:24px 0;
   color:var(--text-sub);
   font-size:13px;
 }
 
+.music-saved-badge{
+  display:inline-block;
+  padding:1px 8px;
+  border-radius:999px;
+  font-size:10px;
+  font-weight:700;
+  vertical-align:middle;
+  background:var(--card);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+.music-saved-badge-draft{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
+}
+
+body.dark .music-saved-badge{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .music-saved-badge-draft{
+  background:var(--vermillion-soft);
+  border-color:var(--vermillion-soft);
+  color:#2c2823;
+}
+
+.music-saved-item-draft{
+  outline:2px dashed var(--vermillion);
+  outline-offset:-2px;
+}
+
+body.dark .music-saved-item-draft{
+  outline-color:var(--vermillion-soft);
+}
+
+.music-saved-dates{
+  opacity:0.8;
+}
+
+.music-saved-rename-input{
+  width:100%;
+  box-sizing:border-box;
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid var(--indigo);
+  background:var(--card);
+  color:var(--text);
+  font-size:13px;
+  font-family:inherit;
+}
+
+body.dark .music-saved-rename-input{
+  background:#2c2823;
+  color:#ece4d4;
+}
+
 .music-saved-item{
   display:flex;
-  align-items:center;
-  gap:10px;
+  flex-direction:column;
+  gap:8px;
   padding:10px 12px;
   border-radius:12px;
   background:var(--card-sub);
@@ -2172,6 +2236,7 @@ body.dark .music-midi-preview-warnings{
 .music-saved-actions{
   flex-shrink:0;
   display:flex;
+  flex-wrap:wrap;
   gap:6px;
 }
 
@@ -2538,12 +2603,78 @@ body.dark .music-onboard-choice-btn span{
   }
 }
 
-/* PC（1400px〜。iPad Pro 11/12.9インチの横画面（最大1366px程度）はここに含めない。
-   タブレット横画面でも練習モードのボタンが画面幅いっぱいに使えるようにするため） */
+/* タブレット横画面・PC（1024px〜）：編集画面を「操作パネル（左）｜譜面表示・演奏（右）」の
+   2カラムに分割する。practice-stage/follow-stageは.music-layoutの外側にある独立した
+   全画面オーバーレイのため、この変更の影響を受けない（実機と同じ絶対配置のまま）。
+   準備／作るの2つのタブパネル(#musicTabPanelPrepare/#musicTabPanelCreate)は同じ
+   grid-areaを共有し、どちらか一方だけがdisplay:noneでない状態で表示される
+   （タブ切替のJSは無変更） */
+@media (min-width:1024px){
+  .music-layout{
+    display:grid;
+    grid-template-columns:minmax(300px,380px) 1fr;
+    grid-template-areas:
+      "controls score"
+      "controls grid";
+    align-items:start;
+    gap:16px;
+  }
+
+  #musicTabPanelPrepare,
+  #musicTabPanelCreate{
+    grid-area:controls;
+    /* 左カラムの中身が右カラムより少ない時も、スクロール領域を分けて
+       常に画面内に収まるようにする */
+    max-height:calc(100vh - 160px);
+    overflow-y:auto;
+  }
+
+  #musicScoreSection{
+    grid-area:score;
+  }
+
+  #musicPerformSection{
+    grid-area:grid;
+  }
+
+  /* 演奏ボタン(編集モードの伸縮グリッド。練習モードの実機座標配置(.practice-size)は
+     対象外)は、右カラムの幅いっぱいに伸びるとボタンが不自然に巨大化するため、
+     押しやすい大きさで頭打ちにする。譜面表示側(#musicScoreSection)は逆に
+     幅を使うほど1行に多くの音符を表示できるため、ここでは制限しない */
+  #musicPerformSection .music-instrument-grid:not(.practice-size){
+    max-width:640px;
+  }
+
+  /* 譜面ライブラリ・MIDI/変換プレビューのモーダルも、この幅からは横に余裕を持たせる */
+  .music-saved-box{
+    max-width:560px;
+  }
+
+  .music-saved-item{
+    flex-direction:row;
+    align-items:center;
+  }
+
+  .music-hum-box{
+    max-width:480px;
+  }
+}
+
+/* PC（1400px〜） */
 @media (min-width:1400px){
   .music-layout{
-    max-width:640px;
+    max-width:1400px;
     margin:0 auto;
+    grid-template-columns:minmax(320px,420px) 1fr;
+    gap:24px;
+  }
+
+  .music-saved-box{
+    max-width:640px;
+  }
+
+  .music-hum-box{
+    max-width:520px;
   }
 }
 

@@ -401,8 +401,12 @@ function pickClosestMelodyNoteWithContour(midi, availableNotes, ctx) {
 function mapMelodyToInstrument(events, availableNotes, opts) {
   if (!availableNotes.length) return { tokens: events.map((e) => ({ notes: [], beats: e.beats })), changes: [], octaveShift: 0, rawShiftedMidis: events.map(() => null) };
 
+  // opts.octaveShiftOverrideは省略可能（既定0）：音源/動画/ハミングの変換プレビューで、
+  // 自動算出オクターブに対しユーザーが手動で±1オクターブ調整したい場合にのみ使う
+  // （js/music-midi-import.jsのmapChordsToInstrumentのoctaveShiftOverrideと同じ考え方）
+  const octaveShiftOverride = (opts && opts.octaveShiftOverride) || 0;
   const detectedMidis = events.filter((e) => e.midi != null).map((e) => Math.round(e.midi));
-  const shift = computeMelodyOctaveShift(detectedMidis, availableNotes);
+  const shift = computeMelodyOctaveShift(detectedMidis, availableNotes) + octaveShiftOverride;
 
   const tokens = [];
   const changes = [];
@@ -703,6 +707,48 @@ function convertHumNotesToTokens(noteEvents, layout, bpmValue, opts) {
   return convertMelodyToScoreTokens(noteEvents, layout, bpmValue, opts);
 }
 
+// ハミング（単旋律）変換プレビュー専用：convertMelodyToScoreTokensと全く同じ
+// 変換段階（normalizeMelodyNoteEvents → quantizeMelodyRhythm →
+// mapMelodyToInstrument → optimizeMelodyForHeartopia）を実行しつつ、変換結果と
+// 一緒に統計情報も返す。js/music-midi-import.jsのconvertMidiWithPreviewStats
+// （和音対応パイプライン側の同種の関数）と対になる、単旋律パイプライン側の
+// プレビュー専用関数。convertMelodyToScoreTokens自体は変更していない
+function convertMelodyWithPreviewStats(noteEvents, layout, bpmValue, opts) {
+  const options = opts || {};
+  const resolvedSemitoneEnabled = options.semitoneEnabled != null ? options.semitoneEnabled : typeof semitoneEnabled !== "undefined" && semitoneEnabled;
+  const availableNotes = buildInstrumentNoteMap(layout, resolvedSemitoneEnabled);
+  const normalized = normalizeMelodyNoteEvents(noteEvents, bpmValue, { sourceType: "humming", ...options.normalize });
+  if (!normalized.length) {
+    return { tokens: [], stats: { tokenCount: 0, noteCount: 0, restCount: 0, outOfRangeCount: 0, autoOctaveShift: 0, manualOctaveOffset: options.octaveShiftOverride || 0, totalDurationSec: 0 } };
+  }
+
+  const timeline = quantizeMelodyRhythm(normalized, bpmValue, options.rhythm);
+  const mappingOpts = { ...options.mapping, octaveShiftOverride: options.octaveShiftOverride };
+  const { tokens: mappedTokens, rawShiftedMidis } = mapMelodyToInstrument(timeline, availableNotes, mappingOpts);
+  const { tokens } = optimizeMelodyForHeartopia(mappedTokens, rawShiftedMidis, availableNotes, options.optimize);
+
+  const detectedMidis = timeline.filter((e) => e.midi != null).map((e) => Math.round(e.midi));
+  const autoOctaveShift = computeMelodyOctaveShift(detectedMidis, availableNotes);
+  const manualOctaveOffset = options.octaveShiftOverride || 0;
+
+  const noteCount = tokens.filter((t) => t.notes.length > 0).length;
+  const restCount = tokens.length - noteCount;
+  let outOfRangeCount = 0;
+  if (availableNotes.length) {
+    const instMin = availableNotes[0].midi;
+    const instMax = availableNotes[availableNotes.length - 1].midi;
+    rawShiftedMidis.forEach((m) => {
+      if (m != null && (m < instMin || m > instMax)) outOfRangeCount++;
+    });
+  }
+  const totalDurationSec = tokens.reduce((sum, t) => sum + (t.beats || 0), 0) * (60 / bpmValue);
+
+  return {
+    tokens,
+    stats: { tokenCount: tokens.length, noteCount, chordCount: 0, restCount, outOfRangeCount, truncatedNoteCount: 0, autoOctaveShift, manualOctaveOffset, totalDurationSec },
+  };
+}
+
 // ── ここから下はブラウザAPI（マイク・CDN読み込み・TensorFlow.js）に依存する部分 ──
 //
 // @spotify/basic-pitch（npm実パッケージを取得して仕様を確認済み）は<script>タグで
@@ -764,6 +810,14 @@ let humSourceMode = "humming";
 // 専用パーサーへ処理を委譲する（MIDIは正確なピッチ・タイミング情報を最初から
 // 持っているため、重い解析モデルの読み込み自体が不要になる）
 let humSourceIsMidi = false;
+// 解析処理の二重実行防止・キャンセル用の世代カウンタ。1回の解析開始ごとに
+// increment し、その時点の値(myRunId)を非同期処理の各区切りで比較する。
+// 途中でキャンセル、または別の解析が始まると値がずれるため、古い処理は
+// 結果を捨てて静かに終了する（重い解析処理自体を安全に中断する標準的な手段が
+// ブラウザに無いため、計算自体は最後まで走るが、その結果を反映しない
+// 「ソフトキャンセル」。UIには解析中である・キャンセル済みであることを明示する）
+let humAnalysisRunId = 0;
+let humAnalysisInProgress = false;
 
 async function ensureBasicPitchLoaded(onStatus) {
   if (basicPitchLoaded) return;
@@ -1203,7 +1257,7 @@ function openMelodySourceModal(mode) {
   document.getElementById("musicHumRecordingRow").style.display = "none";
   document.getElementById("musicHumFileRow").style.display = "none";
   document.getElementById("musicHumProgressRow").style.display = "none";
-  document.getElementById("musicHumRecordBtn").style.display = config.showRecordRow ? "" : "none";
+  document.getElementById("musicHumRecordBtn").style.display = config.showRecordRow && isMicRecordingSupported() ? "" : "none";
   document.getElementById("musicHumPitchRow").style.display = "none";
   document.getElementById("musicHumFileInput").value = "";
   document.getElementById("musicHumFileInput").accept = config.accept;
@@ -1232,17 +1286,42 @@ function openVideoSourceModal() {
 
 function closeHumModal() {
   if (humRecorder) stopHumRecording();
+  cancelHumAnalysis();
   document.getElementById("musicHumModal").style.display = "none";
 }
 
+// getUserMedia自体が無いブラウザ（対応していないブラウザ・非セキュアコンテキスト等）では
+// クラッシュさせず、録音ボタンを最初から無効化してファイルアップロードへ誘導する
+function isMicRecordingSupported() {
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+}
+
 async function onHumRecordClick() {
+  const errorEl = document.getElementById("musicHumError");
+  errorEl.textContent = "";
   try {
     await startHumRecording();
   } catch (e) {
-    document.getElementById("musicHumError").textContent = T(
-      "music_hum_mic_error",
-      "マイクを使用できませんでした。ブラウザの設定を確認するか、音声ファイルをアップロードしてください"
-    );
+    console.warn("hum recording failed", e);
+    // NotAllowedError/PermissionDeniedError：ユーザーがマイクの許可を拒否した場合
+    // NotFoundError：マイクデバイス自体が無い場合。それぞれ次にすべき行動が
+    // 分かるよう別の文言にする（両方ともブラウザのgetUserMedia仕様上のerror.name）
+    if (e && (e.name === "NotAllowedError" || e.name === "PermissionDeniedError")) {
+      errorEl.textContent = T(
+        "music_hum_mic_denied",
+        "マイクへのアクセスが拒否されました。ブラウザ・OSの設定でこのサイトのマイク使用を許可するか、音声ファイルをアップロードしてください"
+      );
+    } else if (e && e.name === "NotFoundError") {
+      errorEl.textContent = T(
+        "music_hum_mic_notfound",
+        "マイクが見つかりませんでした。マイクを接続するか、音声ファイルをアップロードしてください"
+      );
+    } else {
+      errorEl.textContent = T(
+        "music_hum_mic_error",
+        "マイクを使用できませんでした。ブラウザの設定を確認するか、音声ファイルをアップロードしてください"
+      );
+    }
   }
 }
 
@@ -1316,8 +1395,22 @@ function applyGeneratedMelodyTokens(newTokens, doneToastMessage) {
 // どこで失敗したかが利用者に分かるよう個別のメッセージを出す
 // （「メモリ不足」自体はJSから確実に検知できない＝ブラウザがタブごと
 // 落ちる形で失敗しうるため、事前のファイルサイズ・長さ上限で予防する方針にした）
+function cancelHumAnalysis() {
+  if (!humAnalysisInProgress) return;
+  humAnalysisRunId++; // 進行中の非同期処理はこの後の生存確認(isCancelled)で自ら止まる
+  humAnalysisInProgress = false;
+  document.getElementById("musicHumProgressRow").style.display = "none";
+  document.getElementById("musicHumAnalyzeBtn").disabled = false;
+  document.getElementById("musicHumError").textContent = "";
+}
+
 async function onHumAnalyzeClick() {
   if (!humSourceBlob) return;
+  if (humAnalysisInProgress) return; // 二重実行防止（解析ボタンはdisabled化されるが、念のための保険）
+  humAnalysisInProgress = true;
+  const myRunId = ++humAnalysisRunId;
+  const isCancelled = () => myRunId !== humAnalysisRunId;
+
   const errorEl = document.getElementById("musicHumError");
   const progressRow = document.getElementById("musicHumProgressRow");
   const progressFill = document.getElementById("musicHumProgressFill");
@@ -1329,10 +1422,13 @@ async function onHumAnalyzeClick() {
   analyzeBtn.disabled = true;
 
   const setProgress = (pct, label) => {
+    if (isCancelled()) return;
     if (typeof pct === "number") progressFill.style.width = `${Math.round(pct * 100)}%`;
     if (label) progressLabel.textContent = label;
   };
   const fail = (message) => {
+    humAnalysisInProgress = false;
+    if (isCancelled()) return; // キャンセル済みなら、後から失敗が分かってもUIには出さない
     errorEl.textContent = message;
     analyzeBtn.disabled = false;
     progressRow.style.display = "none";
@@ -1342,6 +1438,7 @@ async function onHumAnalyzeClick() {
   // Basic Pitch（重い解析モデル）を一切経由せず、専用パーサーへ完全に処理を委ねる
   if (humSourceIsMidi) {
     await onMidiFileAnalyze(humSourceBlob, { setProgress, fail });
+    humAnalysisInProgress = false;
     return;
   }
 
@@ -1352,6 +1449,7 @@ async function onHumAnalyzeClick() {
     fail(T("music_hum_model_load_error", "解析モデルの読み込みに失敗しました。通信環境を確認してからもう一度お試しください"));
     return;
   }
+  if (isCancelled()) return;
 
   let audioBuffer;
   try {
@@ -1359,14 +1457,22 @@ async function onHumAnalyzeClick() {
     audioBuffer = await humDecodeAudioToBuffer(humSourceBlob, (label) => setProgress(0.1, label));
   } catch (e) {
     console.error(e);
-    fail(
-      T(
-        "music_melody_unsupported_file",
-        "このファイルを読み込めませんでした。対応形式（MP3, WAV, M4A, AAC, OGG, WebM, MP4, MOV等）かご確認ください"
-      )
-    );
+    // humExtractAudioFromVideoBlob側が「音声トラックが無い（実際に1サンプルも
+    // 取得できなかった）」場合だけ、原因が明確に伝わる専用メッセージにする。
+    // それ以外（コンテナ自体が壊れている等）は従来通りの汎用メッセージのまま
+    if (e && e.message === "no audio captured from video") {
+      fail(T("music_melody_no_audio_track", "この動画から音声を取り出せませんでした。音声トラックが含まれているかご確認ください"));
+    } else {
+      fail(
+        T(
+          "music_melody_unsupported_file",
+          "このファイルを読み込めませんでした。対応形式（MP3, WAV, M4A, AAC, OGG, WebM, MP4, MOV等）かご確認ください"
+        )
+      );
+    }
     return;
   }
+  if (isCancelled()) return;
 
   if (audioBuffer.duration > MELODY_SOURCE_MAX_DURATION_SEC) {
     fail(T("music_melody_duration_too_long", "音声が長すぎます（上限6分）。ファイルを短く編集してからお試しください"));
@@ -1388,59 +1494,238 @@ async function onHumAnalyzeClick() {
     fail(T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください"));
     return;
   }
+  if (isCancelled()) return;
 
   try {
     setProgress(0.95, T("music_hum_progress_converting", "譜面に変換中…"));
-
-    const inst = getInstrument(currentInstrumentId);
-    const layout = getLayout(inst, currentLayoutId);
-    // 半音表示ON/OFFの現在の設定(music-editor.js側のトグル)をそのまま使う。
-    // 22キー＋半音ONならF#等も実際に演奏できる音として扱われる。
-    let newTokens;
-    if (humSourceMode === "humming") {
-      // ハミングは本来単旋律（1人の声）のため、これまで通り主旋律1本に絞り込む
-      // 変換パイプライン(sourceType="humming"固定)を使う。従来通り拍子ベースの
-      // 譜面として生成する（フリーテンポは対象外。単旋律はテンポに沿った
-      // 手直しがしやすいため、あえてフリーテンポ化しない）
-      newTokens = convertMelodyToScoreTokens(noteEvents, layout, bpm, { semitoneEnabled, sourceType: "humming" });
-    } else {
-      // 音源/動画は和音・複数パートを含みうるため、Basic Pitchのポリフォニック
-      // 検出結果を主旋律に絞り込まず、js/music-midi-import.jsのMIDIインポートと
-      // 共通の和音対応パイプラインへそのまま渡す（新しい変換ロジックを別途作らず、
-      // 既存のパイプラインを再利用する）。
-      // ノイズ除去（極端に短い誤検出の除外）はソース非依存の単純な長さフィルタ
-      // (filterMelodyNoiseEvents)のみ適用する。前後関係を前提にした
-      // 断片統合・ビブラート吸収等はハミング（単旋律前提）専用のまま残す
-      // （複数の声部が入り交じる和音データに対して行うと、別々の声部の音を
-      // 誤って1つに統合してしまう恐れがあるため）。
-      // 同時発音の判定は、実際の楽器音源では検出のわずかなタイミングのズレが
-      // MIDIファイルより大きくなりうるため、既定(30ms)より少し広い許容誤差を使う。
-      // 既定(opts.freeTiming省略=true)でフリーテンポ譜面として生成する
-      // （実際に検出した音の長さをテンポ・拍子の量子化に無理やり当てはめない）。
-      // 同時に押す指の本数の上限は、変換モーダルで解析開始前に指定した値をそのまま使う
-      const filtered = filterMelodyNoiseEvents(noteEvents, bpm);
-      const maxSimultaneousNotes = readMaxSimultaneousNotes();
-      newTokens = convertPolyphonicNoteEventsToScoreTokens(filtered, layout, bpm, { semitoneEnabled, chord: { simulEpsilonSec: 0.05 }, maxSimultaneousNotes });
-    }
-    if (!newTokens.length) {
-      fail(
-        humSourceMode === "humming"
-          ? T("music_hum_no_notes", "音を検出できませんでした。もう少しはっきり・ゆっくり歌ってみてください")
-          : T("music_melody_no_notes_file", "音を検出できませんでした。別のファイルでお試しください")
-      );
-      return;
-    }
-
-    scoreFreeTiming = humSourceMode !== "humming";
-    // 音源/動画は生成時にbpmを変更しない（既存のエディタのテンポのまま）ため、
-    // その時点のbpmをそのまま基準テンポとして記録する（MIDIインポートと異なり
-    // 音源自体にテンポ情報を持たないため、これが唯一の妥当な基準になる）
-    scoreReferenceBpm = bpm;
-    applyGeneratedMelodyTokens(newTokens, T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
+    // 音源/動画は、和音・複数パートを含みうるBasic Pitchのポリフォニック検出結果を
+    // 主旋律に絞り込まず、js/music-midi-import.jsのMIDIインポートと共通の
+    // プレビュー用パイプライン(convertMidiWithPreviewStats)へそのまま渡す
+    // （新しいロジックを別途作らず、既存のパイプラインを再利用する）。
+    // ノイズ除去（極端に短い誤検出の除外）はソース非依存の単純な長さフィルタのみ、
+    // ここで解析開始時のbpmを使って一度だけ適用する（プレビュー内で楽器・
+    // オクターブを選び直しても変わらない前処理のため、都度やり直す必要はない）。
+    // ハミングは単旋律専用パイプライン(convertMelodyWithPreviewStats)が内部で
+    // ノイズ除去も含めて行うため、ここでは未加工のまま渡す。
+    // 変換結果は（MIDIインポートと同様）即座に反映せず、プレビューで
+    // 使用楽器・オクターブ調整・統計情報を確認してから「現在の譜面へ反映」
+    // 「新しい譜面として保存」を選べるようにする
+    const previewNoteEvents = humSourceMode === "humming" ? noteEvents : filterMelodyNoiseEvents(noteEvents, bpm);
+    const modeConfig = MELODY_SOURCE_MODE_CONFIG[humSourceMode];
+    const sourceLabel = humSourceBlob.name || T(modeConfig.titleKey[0], modeConfig.titleKey[1]);
+    humAnalysisInProgress = false;
+    progressRow.style.display = "none";
+    analyzeBtn.disabled = false;
+    openMelodyPreviewModal(humSourceMode, previewNoteEvents, sourceLabel, bpm);
   } catch (e) {
     console.error(e);
     fail(T("music_hum_analyze_error", "解析に失敗しました。別の音声で試すか、しばらくしてからもう一度お試しください"));
   }
+}
+
+// ── 変換結果プレビュー（ハミング／音源／動画。js/music-midi-import.jsのMIDI変換
+// プレビューと同じ考え方：変換結果を即座に反映せず、使用楽器・配置・オクターブ調整を
+// その場で選び直しながら統計・警告を確認し、「現在の譜面へ反映」（既存通りUndo対象外）
+// 「新しい譜面として保存」（現在の譜面には触れない）「変換をキャンセル」を選べる。
+// MIDIプレビューとはモーダル・状態を分けている（対象がMIDIファイルではなく
+// Basic Pitchの検出結果であるため呼び出し方が異なる／既存のMIDI側を一切変更せずに
+// 済むため）が、和音対応の統計計算(convertMidiWithPreviewStats)と保存処理
+// (saveTokensAsNewScore)は共通の関数をそのまま再利用する ──
+let melodyPreviewState = null;
+
+function openMelodyPreviewModal(kind, noteEvents, sourceLabel, bpmValue) {
+  melodyPreviewState = {
+    kind, // "humming" | "audio" | "video"
+    noteEvents,
+    sourceLabel: sourceLabel || T("music_default_score_name", "譜面"),
+    bpm: bpmValue,
+    instrumentId: currentInstrumentId,
+    layoutId: currentLayoutId,
+    semitoneEnabled,
+    maxSimultaneousNotes: kind === "humming" ? null : readMaxSimultaneousNotes(),
+    octaveOffset: 0,
+    latestTokens: [],
+  };
+  document.getElementById("musicMelodyPreviewSourceLabel").textContent = T(
+    "music_melody_preview_source",
+    `入力元: ${melodyPreviewState.sourceLabel} ／ テンポ: ${bpmValue}BPM`,
+    { label: melodyPreviewState.sourceLabel, bpm: bpmValue }
+  );
+  const maxNotesRow = document.getElementById("musicMelodyPreviewMaxNotesRow");
+  maxNotesRow.style.display = kind === "humming" ? "none" : "";
+  if (kind !== "humming") document.getElementById("musicMelodyPreviewMaxNotesInput").value = melodyPreviewState.maxSimultaneousNotes;
+  renderMelodyPreviewInstrumentButtons();
+  renderMelodyPreviewLayoutButtons();
+  recomputeMelodyPreview();
+  document.getElementById("musicMelodyPreviewModal").style.display = "block";
+}
+
+function closeMelodyPreviewModal() {
+  document.getElementById("musicMelodyPreviewModal").style.display = "none";
+  melodyPreviewState = null;
+}
+
+function renderMelodyPreviewInstrumentButtons() {
+  const el = document.getElementById("musicMelodyPreviewInstrumentButtons");
+  el.innerHTML = INSTRUMENTS.map(
+    (inst) =>
+      `<button class="music-instrument-btn${inst.id === melodyPreviewState.instrumentId ? " active" : ""}" data-instrument="${inst.id}" aria-pressed="${inst.id === melodyPreviewState.instrumentId}">${T(inst.nameKey, inst.nameFallback)}</button>`
+  ).join("");
+  el.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      melodyPreviewState.instrumentId = btn.dataset.instrument;
+      melodyPreviewState.layoutId = defaultLayoutIdFor(melodyPreviewState.instrumentId);
+      melodyPreviewState.semitoneEnabled = false;
+      renderMelodyPreviewInstrumentButtons();
+      renderMelodyPreviewLayoutButtons();
+      recomputeMelodyPreview();
+    });
+  });
+}
+
+function renderMelodyPreviewLayoutButtons() {
+  const el = document.getElementById("musicMelodyPreviewLayoutButtons");
+  const inst = getInstrument(melodyPreviewState.instrumentId);
+  if (inst.layouts.length <= 1) {
+    el.innerHTML = "";
+    el.style.display = "none";
+    updateMelodyPreviewSemitoneVisibility();
+    return;
+  }
+  el.style.display = "";
+  el.innerHTML = inst.layouts
+    .map(
+      (l) =>
+        `<button class="music-layout-btn${l.id === melodyPreviewState.layoutId ? " active" : ""}" data-layout="${l.id}" aria-pressed="${l.id === melodyPreviewState.layoutId}">${T(l.labelKey, l.labelFallback)}</button>`
+    )
+    .join("");
+  el.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      melodyPreviewState.layoutId = btn.dataset.layout;
+      renderMelodyPreviewLayoutButtons();
+      recomputeMelodyPreview();
+    });
+  });
+  updateMelodyPreviewSemitoneVisibility();
+}
+
+function updateMelodyPreviewSemitoneVisibility() {
+  const inst = getInstrument(melodyPreviewState.instrumentId);
+  const layout = getLayout(inst, melodyPreviewState.layoutId);
+  const row = document.getElementById("musicMelodyPreviewSemitoneRow");
+  row.style.display = layout.chromaticGrid ? "" : "none";
+  document.getElementById("musicMelodyPreviewSemitoneToggle").checked = melodyPreviewState.semitoneEnabled;
+}
+
+function updateMelodyPreviewOctaveLabel() {
+  const n = melodyPreviewState.octaveOffset / 12;
+  const el = document.getElementById("musicMelodyPreviewOctaveValue");
+  if (n === 0) {
+    el.textContent = T("music_midi_octave_auto", "自動");
+  } else {
+    const signedN = n > 0 ? `+${n}` : `${n}`;
+    el.textContent = T("music_midi_octave_auto_offset", `自動${signedN}`, { n: signedN });
+  }
+}
+
+function recomputeMelodyPreview() {
+  if (!melodyPreviewState) return;
+  const inst = getInstrument(melodyPreviewState.instrumentId);
+  const layout = getLayout(inst, melodyPreviewState.layoutId);
+  const isPolyphonic = melodyPreviewState.kind !== "humming";
+  // 和音対応（音源/動画）はjs/music-midi-import.jsのMIDI変換プレビューと全く同じ
+  // convertMidiWithPreviewStatsを再利用する（呼び出しオプションも既存の
+  // onHumAnalyzeClickでの変換呼び出しと揃えてある）。単旋律（ハミング）専用の
+  // convertMelodyWithPreviewStatsだけがこのファイルの新規追加分
+  const result = isPolyphonic
+    ? convertMidiWithPreviewStats(melodyPreviewState.noteEvents, layout, melodyPreviewState.bpm, {
+        semitoneEnabled: melodyPreviewState.semitoneEnabled,
+        maxSimultaneousNotes: melodyPreviewState.maxSimultaneousNotes,
+        octaveShiftOverride: melodyPreviewState.octaveOffset,
+        chord: { simulEpsilonSec: 0.05 },
+      })
+    : convertMelodyWithPreviewStats(melodyPreviewState.noteEvents, layout, melodyPreviewState.bpm, {
+        semitoneEnabled: melodyPreviewState.semitoneEnabled,
+        octaveShiftOverride: melodyPreviewState.octaveOffset,
+      });
+  melodyPreviewState.latestTokens = result.tokens;
+  updateMelodyPreviewOctaveLabel();
+  renderMelodyPreviewStats(result.stats, isPolyphonic);
+}
+
+function renderMelodyPreviewStats(stats, isPolyphonic) {
+  const statsEl = document.getElementById("musicMelodyPreviewStats");
+  const rows = [[T("music_midi_stat_notes", "音符数"), stats.noteCount]];
+  if (isPolyphonic) rows.push([T("music_midi_stat_chords", "和音数"), stats.chordCount]);
+  rows.push([T("music_midi_stat_rests", "休符数"), stats.restCount]);
+  rows.push([T("music_midi_stat_duration", "推定の長さ"), formatSeekTime(stats.totalDurationSec)]);
+  statsEl.innerHTML = rows
+    .map(([label, value]) => `<div class="music-midi-stat-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(String(value))}</strong></div>`)
+    .join("");
+
+  const warnings = [];
+  if (stats.outOfRangeCount > 0) {
+    warnings.push(
+      T("music_midi_warn_outofrange", `音域外の音: ${stats.outOfRangeCount}件（自動でオクターブ調整・最も近い音に置き換え済みです）`, {
+        n: stats.outOfRangeCount,
+      })
+    );
+  }
+  if (isPolyphonic && stats.truncatedNoteCount > 0) {
+    warnings.push(
+      T("music_midi_warn_truncated", `同時押し本数の上限を超えたため間引いた音: ${stats.truncatedNoteCount}件`, { n: stats.truncatedNoteCount })
+    );
+  }
+  if (!stats.noteCount) {
+    warnings.push(T("music_melody_warn_empty_result", "変換結果に音がありません。別の音源・ハミングでもう一度お試しください"));
+  }
+  const warnEl = document.getElementById("musicMelodyPreviewWarnings");
+  warnEl.innerHTML = warnings.map((w) => `<li>${escapeHtml(w)}</li>`).join("");
+
+  const applyBtn = document.getElementById("musicMelodyPreviewApplyBtn");
+  const saveBtn = document.getElementById("musicMelodyPreviewSaveNewBtn");
+  applyBtn.disabled = !stats.noteCount;
+  saveBtn.disabled = !stats.noteCount;
+}
+
+// 現在編集中の譜面をプレビュー内容で上書きする（既存のapplyGeneratedMelodyTokens経由。
+// resetHistory()が呼ばれるため、この操作自体はUndoで戻せない＝MIDI変換と同じ既知の仕様）
+function applyMelodyPreviewToCurrentScore() {
+  if (!melodyPreviewState || !melodyPreviewState.latestTokens.length) return;
+  currentInstrumentId = melodyPreviewState.instrumentId;
+  currentLayoutId = melodyPreviewState.layoutId;
+  semitoneEnabled = melodyPreviewState.semitoneEnabled;
+  scoreFreeTiming = melodyPreviewState.kind !== "humming";
+  scoreReferenceBpm = melodyPreviewState.bpm;
+  renderInstrumentSelector();
+  renderLayoutSelector();
+  renderScoreMeta();
+  const tokensToApply = melodyPreviewState.latestTokens;
+  closeMelodyPreviewModal();
+  applyGeneratedMelodyTokens(tokensToApply, T("music_hum_done_toast", "譜面に変換しました。金色の枠の音は自動検出です。タップして手直しできます"));
+}
+
+// 現在編集中の譜面(tokens)には一切触れず、新しい譜面として保存済み一覧に追加する
+// （js/music-editor.jsのsaveTokensAsNewScoreへ委譲。MIDI変換プレビューと共通の処理）
+function saveMelodyPreviewAsNewScore() {
+  if (!melodyPreviewState || !melodyPreviewState.latestTokens.length) return;
+  const score = saveTokensAsNewScore({
+    name: melodyPreviewState.sourceLabel,
+    instrumentId: melodyPreviewState.instrumentId,
+    layoutId: melodyPreviewState.layoutId,
+    semitoneEnabled: melodyPreviewState.semitoneEnabled,
+    bpm,
+    timeSignatureId,
+    freeTiming: melodyPreviewState.kind !== "humming",
+    referenceBpm: melodyPreviewState.bpm,
+    tokens: melodyPreviewState.latestTokens,
+  });
+  if (!score) {
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
+  closeMelodyPreviewModal();
+  showToast(T("music_midi_saved_new_toast", "新しい譜面として保存しました"));
 }
 
 function bindHumControls() {
@@ -1452,7 +1737,37 @@ function bindHumControls() {
   document.getElementById("musicHumStopBtn").addEventListener("click", onHumStopClick);
   document.getElementById("musicHumFileInput").addEventListener("change", onHumFileChosen);
   document.getElementById("musicHumAnalyzeBtn").addEventListener("click", onHumAnalyzeClick);
+  document.getElementById("musicHumCancelBtn").addEventListener("click", cancelHumAnalysis);
   document.getElementById("musicHumMaxNotesInput").addEventListener("change", () => {
     localStorage.setItem(MUSIC_MAXNOTES_KEY, String(readMaxSimultaneousNotes()));
   });
+
+  document.getElementById("musicMelodyPreviewMaxNotesInput").addEventListener("change", (e) => {
+    const val = Math.round(Number(e.target.value));
+    const clamped = Number.isFinite(val) ? Math.max(MIN_CHORD_POLYPHONY, Math.min(MAX_CHORD_POLYPHONY, val)) : DEFAULT_CHORD_POLYPHONY;
+    e.target.value = clamped;
+    if (melodyPreviewState) {
+      melodyPreviewState.maxSimultaneousNotes = clamped;
+      recomputeMelodyPreview();
+    }
+  });
+  document.getElementById("musicMelodyPreviewSemitoneToggle").addEventListener("change", (e) => {
+    if (melodyPreviewState) {
+      melodyPreviewState.semitoneEnabled = e.target.checked;
+      recomputeMelodyPreview();
+    }
+  });
+  document.getElementById("musicMelodyPreviewOctaveDownBtn").addEventListener("click", () => {
+    if (!melodyPreviewState) return;
+    melodyPreviewState.octaveOffset = Math.max(-24, melodyPreviewState.octaveOffset - 12);
+    recomputeMelodyPreview();
+  });
+  document.getElementById("musicMelodyPreviewOctaveUpBtn").addEventListener("click", () => {
+    if (!melodyPreviewState) return;
+    melodyPreviewState.octaveOffset = Math.min(24, melodyPreviewState.octaveOffset + 12);
+    recomputeMelodyPreview();
+  });
+  document.getElementById("musicMelodyPreviewApplyBtn").addEventListener("click", applyMelodyPreviewToCurrentScore);
+  document.getElementById("musicMelodyPreviewSaveNewBtn").addEventListener("click", saveMelodyPreviewAsNewScore);
+  document.getElementById("musicMelodyPreviewCancelBtn").addEventListener("click", closeMelodyPreviewModal);
 }

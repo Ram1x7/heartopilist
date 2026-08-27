@@ -2063,7 +2063,14 @@ function loadDraft() {
   }
 }
 
-// ── 名前を付けて保存した譜面の一覧管理 ──
+// ── 名前を付けて保存した譜面の一覧管理（譜面ライブラリ） ──
+// 一意なIDを新規発行する。saveCurrentAsScore（初回保存）・duplicateScore（複製）・
+// saveTokensAsNewScore（MIDI/音源/動画/ハミングのプレビューから新規保存）の
+// すべてがこの1箇所を通ることで、同一IDの発行を防ぐ
+function generateScoreId() {
+  return "score-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+}
+
 function loadSavedScores() {
   try {
     const raw = localStorage.getItem(SAVED_SCORES_KEY);
@@ -2072,16 +2079,66 @@ function loadSavedScores() {
   } catch (e) {
     savedScores = [];
   }
+  // createdAt・idが無い旧形式の保存譜面（この機能を追加する前に保存されたもの）を
+  // メモリ上でだけ補完する。localStorageへの書き戻しはユーザーが実際に何か
+  // 操作した時（保存・複製・名前変更・削除）だけ行い、読み込んだだけで
+  // 既存データを一括して書き換えることはしない
+  savedScores.forEach((s) => {
+    if (!s.id) s.id = generateScoreId();
+    if (s.createdAt == null) s.createdAt = s.updatedAt != null ? s.updatedAt : Date.now();
+    if (s.updatedAt == null) s.updatedAt = s.createdAt;
+  });
 }
 
+// 失敗しうる操作（localStorageの容量超過等）として扱い、成功したかどうかを返す。
+// 呼び出し側は戻り値を見て、失敗時はユーザーに分かるメッセージを表示する
 function persistSavedScores() {
-  localStorage.setItem(SAVED_SCORES_KEY, JSON.stringify(savedScores));
+  try {
+    localStorage.setItem(SAVED_SCORES_KEY, JSON.stringify(savedScores));
+    return true;
+  } catch (e) {
+    console.error("failed to persist saved scores", e);
+    return false;
+  }
+}
+
+// MIDI変換・音源/動画/ハミング変換のプレビューから、現在編集中の譜面(tokens)には
+// 一切触れずに新しい譜面として保存済み一覧に追加する共通処理。
+// 各プレビュー機能はこの関数を呼ぶだけでよく、保存済み譜面の形（フィールド構成）は
+// ここに1箇所だけ定義される
+function saveTokensAsNewScore(fields) {
+  const now = Date.now();
+  const score = {
+    id: generateScoreId(),
+    name: fields.name,
+    instrumentId: fields.instrumentId,
+    layoutId: fields.layoutId,
+    semitoneEnabled: !!fields.semitoneEnabled,
+    bpm: fields.bpm,
+    timeSignatureId: fields.timeSignatureId,
+    freeTiming: !!fields.freeTiming,
+    referenceBpm: fields.referenceBpm,
+    loopStart: null,
+    loopEnd: null,
+    loopEnabled: false,
+    tokens: fields.tokens.slice(),
+    createdAt: now,
+    updatedAt: now,
+  };
+  savedScores.push(score);
+  if (!persistSavedScores()) {
+    savedScores.pop();
+    return null;
+  }
+  return score;
 }
 
 function saveCurrentAsScore() {
   scoreName = document.getElementById("musicScoreNameInput").value.trim();
   const existing = savedScores.find((s) => s.id === currentScoreId);
   if (existing) {
+    // 保存に失敗した場合に元へ戻せるよう、書き換える前の状態を控えておく
+    const backup = { ...existing };
     existing.name = scoreName || T("music_default_score_name", "譜面");
     // サンプル譜面を上書き保存したら、以後はユーザー自身の名前として固定する
     // （nameKeyが残ったままだと、次回表示時に翻訳し直されて上の行の名前が
@@ -2099,14 +2156,19 @@ function saveCurrentAsScore() {
     existing.loopEnabled = loopEnabled;
     existing.tokens = tokens.slice();
     existing.updatedAt = Date.now();
-    persistSavedScores();
+    if (!persistSavedScores()) {
+      Object.assign(existing, backup);
+      showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+      return;
+    }
     historySavedIndex = scoreHistoryIndex;
     updateUndoRedoUI();
     showToast(T("music_toast_updated", "更新しました"));
     return;
   }
+  const now = Date.now();
   const score = {
-    id: "score-" + Date.now(),
+    id: generateScoreId(),
     name: scoreName || T("music_default_score_name", "譜面"),
     instrumentId: currentInstrumentId,
     layoutId: currentLayoutId,
@@ -2119,10 +2181,15 @@ function saveCurrentAsScore() {
     loopEnd,
     loopEnabled,
     tokens: tokens.slice(),
-    updatedAt: Date.now(),
+    createdAt: now,
+    updatedAt: now,
   };
   savedScores.push(score);
-  persistSavedScores();
+  if (!persistSavedScores()) {
+    savedScores.pop();
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
   currentScoreId = score.id;
   saveDraft();
   historySavedIndex = scoreHistoryIndex;
@@ -2130,10 +2197,74 @@ function saveCurrentAsScore() {
   showToast(T("music_toast_saved", "保存しました"));
 }
 
+// 現在の譜面(tokens)を変更せず、指定した保存済み譜面を複製する。
+// 複製先は「元の名前 - コピー」で区別し、作成/更新日時は複製した時点にする
+function duplicateScore(id) {
+  const source = savedScores.find((s) => s.id === id);
+  if (!source) return;
+  const now = Date.now();
+  const sourceName = source.nameKey ? T(source.nameKey, source.name) : source.name;
+  const copy = {
+    ...source,
+    id: generateScoreId(),
+    name: T("music_duplicate_name_format", "{name} - コピー", { name: sourceName }),
+    createdAt: now,
+    updatedAt: now,
+    tokens: source.tokens.slice(),
+  };
+  delete copy.nameKey;
+  savedScores.push(copy);
+  if (!persistSavedScores()) {
+    savedScores.pop();
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
+  renderSavedList();
+  showToast(T("music_toast_duplicated", "複製しました"));
+}
+
+const MUSIC_SCORE_NAME_MAX_LENGTH = 60;
+
+// 譜面名の変更。前後の空白を取り除き、空文字・文字数上限超過を弾く。
+// 保存に失敗した場合は元の名前のまま変更しない
+function renameScore(id, rawName) {
+  const trimmed = (rawName || "").trim();
+  if (!trimmed) {
+    showToast(T("music_toast_name_required", "譜面名を入力してください"));
+    return false;
+  }
+  if (trimmed.length > MUSIC_SCORE_NAME_MAX_LENGTH) {
+    showToast(T("music_toast_name_too_long", "譜面名が長すぎます（{max}文字まで）", { max: MUSIC_SCORE_NAME_MAX_LENGTH }));
+    return false;
+  }
+  const score = savedScores.find((s) => s.id === id);
+  if (!score) return false;
+  const backupName = score.name;
+  const backupNameKey = score.nameKey;
+  score.name = trimmed;
+  delete score.nameKey;
+  score.updatedAt = Date.now();
+  if (!persistSavedScores()) {
+    score.name = backupName;
+    if (backupNameKey) score.nameKey = backupNameKey;
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return false;
+  }
+  if (id === currentScoreId) scoreName = trimmed;
+  return true;
+}
+
+// 直近の保存（saveCurrentAsScore成功時）以降に、Undo履歴が進んでいるかどうか。
+// 譜面ライブラリでの「新規作成」「別の譜面を開く」時に、未保存の変更を
+// 誤って破棄してしまわないかの判定に使う（Undo/Redoの追跡をそのまま流用する）
+function hasUnsavedChanges() {
+  return scoreHistoryIndex !== historySavedIndex;
+}
+
 // 新規作成：譜面の種類（拍子あり／フリーテンポ）を選ぶモーダルを開く。
 // 実際のリセット処理はchooseNewScoreTypeで行う（キャンセルした場合は何もしない）
 function newScore() {
-  if (tokens.length && !confirm(T("music_confirm_new", "編集中の譜面を破棄して新規作成しますか？"))) return;
+  if (hasUnsavedChanges() && !confirm(T("music_confirm_new", "編集中の譜面を破棄して新規作成しますか？"))) return;
   document.getElementById("musicNewScoreTypeModal").style.display = "block";
 }
 
@@ -2195,81 +2326,200 @@ function convertFreeTimingScoreToBarBased() {
 }
 
 function openSavedListModal() {
+  renamingScoreId = null;
   renderSavedList();
   document.getElementById("musicSavedListModal").style.display = "block";
 }
 
 function closeSavedListModal() {
+  renamingScoreId = null;
   document.getElementById("musicSavedListModal").style.display = "none";
+}
+
+// 譜面ライブラリ：名前変更中の譜面ID（1件のみ。他の項目を開く・削除する等の
+// 操作をすると解除される）
+let renamingScoreId = null;
+
+// 作成/更新日時の表示（言語横断でi18n化の必要が無いよう、閲覧者のブラウザの
+// ロケール・タイムゾーンにそのまま従うIntl.DateTimeFormatを使う）
+function formatScoreLibraryDate(ts) {
+  if (!ts) return "";
+  try {
+    return new Intl.DateTimeFormat(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(ts));
+  } catch (e) {
+    return new Date(ts).toLocaleString();
+  }
 }
 
 function renderSavedList() {
   const el = document.getElementById("musicSavedList");
-  if (!savedScores.length) {
-    el.innerHTML = `<div class="music-saved-empty">${T("music_saved_empty", "保存した譜面はまだありません")}</div>`;
-    return;
-  }
-  const sorted = savedScores.slice().sort((a, b) => b.updatedAt - a.updatedAt);
-  el.innerHTML = sorted
-    .map((s) => {
-      const inst = getInstrument(s.instrumentId);
-      // 楽器に配置が複数ある場合（ピアノ・ギター等）は、同じ楽器名の項目が並んでも
-      // どの配置(2列/3列/22キー等)の譜面か一覧だけで見分けられるよう配置名も添える
-      const layoutLabel = inst.layouts.length > 1 ? ` ・ ${T(getLayout(inst, s.layoutId).labelKey, getLayout(inst, s.layoutId).labelFallback)}` : "";
-      return `
-    <div class="music-saved-item${s.id === currentScoreId ? " current" : ""}">
+  const hasDraft = currentScoreId === null && tokens.length > 0;
+  const draftHtml = hasDraft
+    ? `
+    <div class="music-saved-item music-saved-item-draft">
       <div class="music-saved-info">
-        <div class="music-saved-name">${escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name)}</div>
-        <div class="music-saved-meta">${T(inst.nameKey, inst.nameFallback)}${layoutLabel} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")}</div>
+        <div class="music-saved-name">${escapeHtml(scoreName || T("music_default_score_name", "譜面"))} <span class="music-saved-badge music-saved-badge-draft">${T("music_status_draft", "下書き")}</span></div>
+        <div class="music-saved-meta">${tokens.length}${T("music_note_count_suffix", "音")}</div>
       </div>
       <div class="music-saved-actions">
-        <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
-        <button class="music-btn-danger" onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
+        <button onclick="openLibrarySaveDraftShortcut()">${T("music_save", "保存する")}</button>
+      </div>
+    </div>
+  `
+    : "";
+
+  if (!savedScores.length && !hasDraft) {
+    el.innerHTML = `<div class="music-saved-empty">${T("music_saved_empty", "保存した譜面はまだありません")}<button class="music-header-btn" id="musicSavedEmptyNewBtn">${T("music_saved_empty_new", "新しい譜面を作成")}</button></div>`;
+    const btn = document.getElementById("musicSavedEmptyNewBtn");
+    if (btn) btn.addEventListener("click", () => { closeSavedListModal(); newScore(); });
+    return;
+  }
+
+  const sorted = savedScores.slice().sort((a, b) => b.updatedAt - a.updatedAt);
+  el.innerHTML =
+    draftHtml +
+    sorted
+      .map((s) => {
+        const inst = getInstrument(s.instrumentId);
+        // 楽器に配置が複数ある場合（ピアノ・ギター等）は、同じ楽器名の項目が並んでも
+        // どの配置(2列/3列/22キー等)の譜面か一覧だけで見分けられるよう配置名も添える
+        const layoutLabel = inst.layouts.length > 1 ? ` ・ ${T(getLayout(inst, s.layoutId).labelKey, getLayout(inst, s.layoutId).labelFallback)}` : "";
+        const tempoLabel = s.freeTiming ? T("music_freetiming_badge_label", "フリーテンポ") : `${s.bpm || DEFAULT_BPM}BPM ・ ${getTimeSignature(s.timeSignatureId).label}`;
+        const displayName = escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name);
+        const nameOrRenameHtml =
+          s.id === renamingScoreId
+            ? `<input type="text" class="music-saved-rename-input" id="musicSavedRenameInput-${s.id}" value="${escapeHtml(s.nameKey ? T(s.nameKey, s.name) : s.name)}" maxlength="${MUSIC_SCORE_NAME_MAX_LENGTH}">`
+            : `<div class="music-saved-name">${displayName}</div>`;
+        const actionsHtml =
+          s.id === renamingScoreId
+            ? `
+          <button onclick="submitRenameScore('${s.id}')">${T("music_rename_confirm", "確認")}</button>
+          <button class="music-btn-secondary" onclick="cancelRenameScore()">${T("music_rename_cancel", "キャンセル")}</button>
+        `
+            : `
+          <button onclick="loadScore('${s.id}')">${T("music_open", "開く")}</button>
+          <button class="music-btn-secondary" onclick="duplicateScore('${s.id}')">${T("music_duplicate", "複製")}</button>
+          <button class="music-btn-secondary" onclick="startRenameScore('${s.id}')">${T("music_rename", "名前を変更")}</button>
+          <button class="music-btn-danger" onclick="deleteScore('${s.id}')">${T("music_delete", "削除")}</button>
+        `;
+        return `
+    <div class="music-saved-item${s.id === currentScoreId ? " current" : ""}">
+      <div class="music-saved-info">
+        ${nameOrRenameHtml}
+        <div class="music-saved-meta">${T("music_status_saved", "保存済み")} ・ ${T(inst.nameKey, inst.nameFallback)}${layoutLabel} ・ ${s.tokens.length}${T("music_note_count_suffix", "音")} ・ ${tempoLabel}</div>
+        <div class="music-saved-meta music-saved-dates">${T("music_created_at", "作成")}: ${formatScoreLibraryDate(s.createdAt)} ・ ${T("music_updated_at", "更新")}: ${formatScoreLibraryDate(s.updatedAt)}</div>
+      </div>
+      <div class="music-saved-actions">
+        ${actionsHtml}
       </div>
     </div>
   `;
-    })
-    .join("");
+      })
+      .join("");
+}
+
+function startRenameScore(id) {
+  renamingScoreId = id;
+  renderSavedList();
+  const input = document.getElementById(`musicSavedRenameInput-${id}`);
+  if (input) {
+    input.focus();
+    input.select();
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitRenameScore(id);
+      if (e.key === "Escape") cancelRenameScore();
+    });
+  }
+}
+
+function cancelRenameScore() {
+  renamingScoreId = null;
+  renderSavedList();
+}
+
+function submitRenameScore(id) {
+  const input = document.getElementById(`musicSavedRenameInput-${id}`);
+  if (!input) return;
+  if (renameScore(id, input.value)) {
+    renamingScoreId = null;
+  }
+  renderSavedList();
+}
+
+// ライブラリの下書きカードから「保存する」を押した時のショートカット：
+// モーダルを閉じ、曲名を入力する「準備」タブへ移動してから入力欄へフォーカスする
+// （実際の保存操作自体はsaveCurrentAsScoreへの通常の導線をそのまま使う）
+function openLibrarySaveDraftShortcut() {
+  closeSavedListModal();
+  setEditTab("prepare");
+  const input = document.getElementById("musicScoreNameInput");
+  if (input) input.focus();
 }
 
 function loadScore(id) {
   const score = savedScores.find((s) => s.id === id);
   if (!score) return;
-  tokens = normalizeTokens(score.tokens);
-  currentInstrumentId = score.instrumentId;
-  // 保存時の配置(15鍵2列/22キーなど)・半音表示をそのまま復元する
-  currentLayoutId = score.layoutId || defaultLayoutIdFor(currentInstrumentId);
-  semitoneEnabled = !!score.semitoneEnabled;
-  bpm = score.bpm || DEFAULT_BPM;
-  timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
-  scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
-  scoreReferenceBpm = score.referenceBpm != null ? score.referenceBpm : bpm;
-  // サンプル譜面(nameKey付き)は表示言語に合わせてその都度翻訳し直す。
-  // ユーザー自身が付けた名前(nameKeyなし)はそのまま使う
-  scoreName = score.nameKey ? T(score.nameKey, score.name) : score.name;
-  currentScoreId = score.id;
-  cursor = -1;
-  stopPlayback();
-  restoreLoopFromScore(score, tokens.length);
-  selectedTokenIndex = null;
-  humReviewIndexes = new Set();
-  renderInstrumentSelector();
-  renderLayoutSelector();
-  renderInstrumentGrid();
-  renderScoreMeta();
-  renderFreeTimingUI();
-  renderScoreDisplay();
-  saveDraft();
-  resetHistory();
-  closeSavedListModal();
+  if (hasUnsavedChanges() && !confirm(T("music_confirm_open_discard", "編集中の譜面には保存していない変更があります。破棄して開きますか？"))) return;
+  try {
+    // 壊れたデータで現在編集中の譜面を巻き込まないよう、いったんローカル変数に
+    // 組み立ててから検証し、問題なければまとめて現在の状態へ反映する
+    const normalized = normalizeTokens(score.tokens);
+    // 「元データに何らかの音符情報があったはずなのに、正規化後は1つも残らなかった」
+    // 場合だけをエラー扱いにする。tokensが最初から空配列([])の譜面は、
+    // 単に空の譜面として正常に読み込む（エラーではない）
+    const hadSomeTokenData = score.tokens != null && (!Array.isArray(score.tokens) || score.tokens.length > 0);
+    if (hadSomeTokenData && normalized.length === 0) {
+      showToast(T("music_toast_load_failed", "読み込みに失敗しました。データが壊れている可能性があります"));
+      return;
+    }
+    tokens = normalized;
+    currentInstrumentId = score.instrumentId;
+    // 保存時の配置(15鍵2列/22キーなど)・半音表示をそのまま復元する
+    currentLayoutId = score.layoutId || defaultLayoutIdFor(currentInstrumentId);
+    semitoneEnabled = !!score.semitoneEnabled;
+    bpm = score.bpm || DEFAULT_BPM;
+    timeSignatureId = score.timeSignatureId || DEFAULT_TIME_SIGNATURE_ID;
+    scoreFreeTiming = !!score.freeTiming; // 古い形式で保存された譜面にはfreeTimingが無いため、拍子ベース(false)として扱う
+    scoreReferenceBpm = score.referenceBpm != null ? score.referenceBpm : bpm;
+    // サンプル譜面(nameKey付き)は表示言語に合わせてその都度翻訳し直す。
+    // ユーザー自身が付けた名前(nameKeyなし)はそのまま使う
+    scoreName = score.nameKey ? T(score.nameKey, score.name) : score.name;
+    currentScoreId = score.id;
+    cursor = -1;
+    stopPlayback();
+    restoreLoopFromScore(score, tokens.length);
+    selectedTokenIndex = null;
+    humReviewIndexes = new Set();
+    renderInstrumentSelector();
+    renderLayoutSelector();
+    renderInstrumentGrid();
+    renderScoreMeta();
+    renderFreeTimingUI();
+    renderScoreDisplay();
+    saveDraft();
+    resetHistory();
+    closeSavedListModal();
+  } catch (e) {
+    console.error("failed to load score", e);
+    showToast(T("music_toast_load_failed", "読み込みに失敗しました。データが壊れている可能性があります"));
+  }
 }
 
 function deleteScore(id) {
-  if (!confirm(T("music_confirm_delete", "この譜面を削除しますか？"))) return;
+  const score = savedScores.find((s) => s.id === id);
+  if (!score) return;
+  const label = score.nameKey ? T(score.nameKey, score.name) : score.name;
+  if (!confirm(T("music_confirm_delete_named", "「{name}」を削除しますか？", { name: label }))) return;
+  const backup = savedScores;
   savedScores = savedScores.filter((s) => s.id !== id);
-  persistSavedScores();
+  if (!persistSavedScores()) {
+    savedScores = backup;
+    showToast(T("music_toast_delete_failed", "削除に失敗しました。もう一度お試しください"));
+    return;
+  }
   if (currentScoreId === id) currentScoreId = null;
   renderSavedList();
+  showToast(T("music_toast_deleted", "削除しました"));
 }
 
 // ── ヘルプモーダル ──
@@ -2289,10 +2539,26 @@ function closeHelpModal() {
 // 対してbeatsを強制することはない
 function normalizeTokens(rawTokens) {
   if (!Array.isArray(rawTokens)) return [];
-  return rawTokens.map((t) => {
-    if (Array.isArray(t.notes)) return t;
-    return { notes: [{ degree: t.degree, accidental: t.accidental || null, octave: t.octave }], beats: t.beats };
+  const result = [];
+  rawTokens.forEach((t) => {
+    // 壊れたデータ（null・オブジェクトでない要素等）はページをクラッシュさせず読み飛ばす
+    if (!t || typeof t !== "object") return;
+    if (Array.isArray(t.notes)) {
+      const notes = t.notes
+        .filter((n) => n && typeof n.degree === "number")
+        .map((n) => ({ degree: n.degree, accidental: n.accidental || null, octave: typeof n.octave === "number" ? n.octave : 0 }));
+      if (typeof t.durationMs === "number") {
+        result.push({ notes, durationMs: t.durationMs });
+      } else {
+        result.push({ notes, beats: typeof t.beats === "number" ? t.beats : 1 });
+      }
+      return;
+    }
+    if (typeof t.degree === "number") {
+      result.push({ notes: [{ degree: t.degree, accidental: t.accidental || null, octave: typeof t.octave === "number" ? t.octave : 0 }], beats: typeof t.beats === "number" ? t.beats : 1 });
+    }
   });
+  return result;
 }
 
 function escapeHtml(s) {

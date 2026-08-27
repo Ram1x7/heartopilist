@@ -866,10 +866,11 @@ function applyMidiPreviewToCurrentScore() {
 }
 
 // 現在編集中の譜面(tokens)には一切触れず、新しい譜面として保存済み一覧に追加する
+// （js/music-editor.jsのsaveTokensAsNewScoreへ委譲。同じ処理は音源/動画/ハミングの
+// 変換プレビューでも使う共通処理のため、ここに個別実装を持たない）
 function saveMidiPreviewAsNewScore() {
   if (!midiPreviewState || !midiPreviewState.latestTokens.length) return;
-  const score = {
-    id: "score-" + Date.now(),
+  const score = saveTokensAsNewScore({
     name: midiPreviewState.sourceLabel,
     instrumentId: midiPreviewState.instrumentId,
     layoutId: midiPreviewState.layoutId,
@@ -878,14 +879,12 @@ function saveMidiPreviewAsNewScore() {
     timeSignatureId: midiPreviewState.timeSignatureId,
     freeTiming: true,
     referenceBpm: midiPreviewState.clampedBpm,
-    loopStart: null,
-    loopEnd: null,
-    loopEnabled: false,
-    tokens: midiPreviewState.latestTokens.slice(),
-    updatedAt: Date.now(),
-  };
-  savedScores.push(score);
-  persistSavedScores();
+    tokens: midiPreviewState.latestTokens,
+  });
+  if (!score) {
+    showToast(T("music_toast_save_failed", "保存に失敗しました。空き容量を確認してもう一度お試しください"));
+    return;
+  }
   closeMidiPreviewModal();
   showToast(T("music_midi_saved_new_toast", "新しい譜面として保存しました"));
 }
