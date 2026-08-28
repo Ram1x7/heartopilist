@@ -138,8 +138,8 @@ const POS_2ROW_BOT_X = [268, 446, 625, 798, 979, 1155, 1333];
 
 function build15Key2RowPositions() {
   return [
-    ...withPositions(highRowWithExtra(1), POS_2ROW_TOP_X, 899, "main"),
-    ...withPositions(plainRow(0, 7), POS_2ROW_BOT_X, 1028, "main"),
+    ...withPositions(highRowWithExtra(0), POS_2ROW_TOP_X, 899, "main"),
+    ...withPositions(plainRow(-1, 7), POS_2ROW_BOT_X, 1028, "main"),
   ];
 }
 
@@ -149,7 +149,7 @@ const POS_3ROW_X = [444, 622, 799, 977, 1155];
 const POS_3ROW_Y = [781, 911, 1041];
 
 function build15Key3RowPositions() {
-  const rows = continuousGrid(1, 15, 5);
+  const rows = continuousGrid(0, 15, 5);
   return rows.flatMap((row, i) => withPositions(row, POS_3ROW_X, POS_3ROW_Y[i], "main"));
 }
 
@@ -214,7 +214,7 @@ const INSTRUMENTS = [
         id: "2row",
         labelKey: "music_layout_2row",
         labelFallback: "15鍵（2列）",
-        grid: [highRowWithExtra(1), plainRow(0, 7)],
+        grid: [highRowWithExtra(0), plainRow(-1, 7)],
         positions: build15Key2RowPositions(),
         keys: [...KEY_ROW_TOP8, ...KEY_ROW_MID7],
       },
@@ -223,7 +223,7 @@ const INSTRUMENTS = [
         labelKey: "music_layout_3row",
         labelFallback: "15鍵（3列）",
         // 22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）
-        grid: continuousGrid(1, 15, 5),
+        grid: continuousGrid(0, 15, 5),
         positions: build15Key3RowPositions(),
         keys: [...KEY_ROW_TOP5, ...KEY_ROW_MID5, ...KEY_ROW_BOT5],
       },
@@ -238,7 +238,7 @@ const INSTRUMENTS = [
         id: "2row",
         labelKey: "music_layout_2row",
         labelFallback: "15鍵（2列）",
-        grid: [highRowWithExtra(1), plainRow(0, 7)],
+        grid: [highRowWithExtra(0), plainRow(-1, 7)],
         positions: build15Key2RowPositions(),
         keys: [...KEY_ROW_TOP8, ...KEY_ROW_MID7],
       },
@@ -247,7 +247,7 @@ const INSTRUMENTS = [
         labelKey: "music_layout_3row",
         labelFallback: "15鍵（3列）",
         // 22キーとは独立した5列×3行の直線グリッド（千鳥配置ではない）
-        grid: continuousGrid(1, 15, 5),
+        grid: continuousGrid(0, 15, 5),
         positions: build15Key3RowPositions(),
         keys: [...KEY_ROW_TOP5, ...KEY_ROW_MID5, ...KEY_ROW_BOT5],
       },
