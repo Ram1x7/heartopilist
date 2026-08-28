@@ -59,13 +59,6 @@ const dailyQuests = [
     icon: "fish",
   },
   {
-    name: "ホエールシーズン週末音楽会（アタラ主催）",
-    nameI18n: {"ja":"ホエールシーズン週末音楽会（アタラ主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
-    times: ["19:00"],
-    weekdays: [0, 6], // 日・土のみ
-    icon: "clock",
-  },
-  {
     name: "虫コイコイ（浪花主催）",
     nameI18n: {"ja":"虫コイコイ（浪花主催）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     times: ["20:00"],
