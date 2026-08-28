@@ -146,6 +146,7 @@
   "garden_toast_notif_set": "通知をセットしました（{time}後）",
   "garden_toast_notif_set_failed": "通知のセットに失敗しました",
   "garden_toast_notif_canceled": "通知をキャンセルしました",
+  "garden_timer_finish_at": "（{time}完了）",
   "garden_help_title": "使い方",
   "garden_help_tabs_title": "作物・花の切替",
   "garden_help_tabs_body": "画面上部の「作物」「花」タブで表示を切り替えられます。成長時間・種の値段・売却額の一覧を確認できます。",

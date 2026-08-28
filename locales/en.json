@@ -146,6 +146,7 @@
   "garden_toast_notif_set": "Notification set (in {time})",
   "garden_toast_notif_set_failed": "Failed to set notification",
   "garden_toast_notif_canceled": "Notification canceled",
+  "garden_timer_finish_at": " (done at {time})",
   "garden_help_title": "How to Use",
   "garden_help_tabs_title": "Switching Crops / Flowers",
   "garden_help_tabs_body": "Use the \"Crops\" and \"Flowers\" tabs at the top to switch views. You can see growth time, seed price, and sell price for each.",
