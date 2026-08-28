@@ -993,6 +993,13 @@ function formatClock(sec){
   return `${h > 0 ? h + ":" : ""}${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
 }
 
+// 完成時刻（何時何分）表示用。端末のローカル時刻をそのまま使う
+// （タイマー自体がDate.now()基準の実時間カウントダウンのため、サーバー/JST変換は不要）
+function formatClockTime(ts){
+  const d = new Date(ts);
+  return `${d.getHours().toString().padStart(2,"0")}:${d.getMinutes().toString().padStart(2,"0")}`;
+}
+
 // ── タブ ──
 let currentTab = "crop";
 window.currentItem = null;
@@ -1295,7 +1302,7 @@ function updateTimers(){
     if(t){
       const ms = t.end - Date.now();
       const sec = Math.ceil(ms / 1000);
-      el.textContent = "⏱ " + formatClock(sec);
+      el.textContent = "⏱ " + formatClock(sec) + T("garden_timer_finish_at", "（{time}完了）", {time: formatClockTime(t.end)});
 
       const total = t.total || (item.growTime * 60 * 1000);
 
