@@ -77,10 +77,22 @@ function buildInstrumentNoteMap(layout, semitoneEnabled) {
     .sort((a, b) => a.midi - b.midi);
 }
 
-// 検出したメロディ全体が、楽器の音域になるべく多く・自然に収まるオクターブシフト量
-// （12半音刻み）を求める。音域の中心同士を合わせる案を基準に、その前後のオクターブも
-// 試して「音域に収まる音の数」→「楽器の実際の音への距離の合計」の順で最も良いものを選ぶ
-// （範囲の広い曲と狭い曲を同じ扱いにしない）
+// 検出したメロディ全体が、楽器の音域になるべく多く・自然に収まるシフト量を求める。
+// 音域の中心同士を合わせる案を基準に、その前後のオクターブも試して「音域に収まる音の
+// 数」→「楽器の実際の音への距離の合計」の順で最も良いものを選ぶ
+// （範囲の広い曲と狭い曲を同じ扱いにしない）。
+//
+// 半音ボタンが無い楽器（availableNotesの全てがaccidental無し＝ダイアトニック楽器）へ
+// 変換する場合のみ、12半音単位（オクターブ）だけでなく1半音単位のシフトも候補に含める。
+// ダイアトニック楽器は特定の調（このアプリでは度数1〜7＝ハ長調の音階）に固定されており、
+// 曲が別の調（例：変ホ長調）の場合、オクターブ単位のシフトだけでは調のズレを一切
+// 解消できず、音階に無い音（曲全体の半分近くにもなり得る）が毎回最寄りの音階上の音へ
+// 強制的に丸められ、メロディが大きく歪む（実際にユーザー報告の楽曲で確認：
+// 曲は変ホ長調だが、ハ長調固定の15鍵(3列)の楽器に合わせるオクターブ移動だけでは
+// 調のズレが直らなかった）。1半音単位の候補まで広げれば、既存の「実音への距離の
+// 合計が最小」という基準がそのまま「曲の調に最も近い移調」を自動的に選ぶ働きをする。
+// 半音ボタンがある楽器では、どの音もそのまま鳴らせるため探索を広げる意味が無く、
+// 曲本来の音域から不要にずらしてしまうだけなので、従来通りオクターブ単位のみとする
 function computeMelodyOctaveShift(detectedMidis, availableNotes) {
   if (!detectedMidis.length || !availableNotes.length) return 0;
   const melodyMin = Math.min(...detectedMidis);
@@ -91,7 +103,13 @@ function computeMelodyOctaveShift(detectedMidis, availableNotes) {
   const instCenter = (instMin + instMax) / 2;
   const centerShift = Math.round((instCenter - melodyCenter) / 12) * 12;
 
-  const candidateShifts = new Set([centerShift - 24, centerShift - 12, centerShift, centerShift + 12, centerShift + 24]);
+  const isDiatonic = availableNotes.every((entry) => !entry.note.accidental);
+  const candidateShifts = new Set();
+  if (isDiatonic) {
+    for (let s = centerShift - 24; s <= centerShift + 24; s++) candidateShifts.add(s);
+  } else {
+    [centerShift - 24, centerShift - 12, centerShift, centerShift + 12, centerShift + 24].forEach((s) => candidateShifts.add(s));
+  }
   let bestShift = centerShift;
   let bestScore = Infinity;
   let bestAbsShift = Infinity;
