@@ -1226,11 +1226,21 @@ function buildChipGridHTML(tok) {
   const inst = getInstrument(currentInstrumentId);
   const layout = getLayout(inst, currentLayoutId);
   const grid = semitoneEnabled && layout.chromaticGrid ? layout.chromaticGrid : layout.grid;
+  // ピアノ22キーの半音ありグリッドは、実機の鍵盤配置を再現するため、オクターブの
+  // 境目の「ド」が上下の行の両方に重複して登場する（js/music-config.jsの
+  // buildPianoOctaveRow参照）。ここを何もせず点灯させると、同じ1つの音なのに
+  // ドットが2つ点灯してしまい、和音の実際の音数より多く数えられて誤解を招く
+  // （実際に指定した本数より多く使う場面があるように見えるとユーザーから報告された
+  // 不具合）ため、1つの音につき最初に登場した位置のドットだけを点灯させる
+  const activatedKeys = new Set();
   const rows = grid
     .map((row) => {
       const dots = row
         .map((gridNote) => {
-          const isActive = tok.notes.some((n) => notesEqual(n, gridNote));
+          const gKey = noteKey(gridNote);
+          const matches = tok.notes.some((n) => notesEqual(n, gridNote));
+          const isActive = matches && !activatedKeys.has(gKey);
+          if (isActive) activatedKeys.add(gKey);
           return `<span class="chip-dot${isActive ? " active" : ""}"></span>`;
         })
         .join("");
