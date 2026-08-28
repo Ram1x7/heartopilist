@@ -31,7 +31,8 @@
 //   ポリフォニック検出結果がそのままこの形式になる）
 //   → groupNoteEventsIntoChords（同時刻に開始する複数ノートを1つの和音グループへ）
 //   → limitChordPolyphony（ユーザー指定の「同時に押す指の本数」を超える和音を、
-//                          主旋律(最高音)・低音(最低音)を優先して間引く）
+//                          主旋律(最高音)側から優先して間引く。本数が少ないほど
+//                          主旋律に近い音だけが残る）
 //   → buildFreeTimingChordTimeline（既定）／quantizeChordRhythm（量子化する場合のみ）
 //     （前者は実際の時間(durationMs)をそのまま使う「フリーテンポ譜面」を作る。
 //      後者は曲全体で共有する拍グリッドへ開始位置を揃えた「拍子ベース譜面」を作る）
@@ -398,18 +399,20 @@ function groupNoteEventsIntoChords(noteEvents, opts) {
 // 和音1つぶんのMIDI番号列(midis)が指定本数(maxNotes)を超える場合に、
 // 優先順位に沿って間引く。曲全体を通した「どれが主旋律か」は推定せず、
 // この和音グループ単独のピッチ位置だけで判断する。優先順位：
-//   1. 最も高いピッチ（主旋律とみなせる音）を最優先で残す
-//   2. 次に最も低いピッチ（低音・伴奏の土台）を残す
-//   3. 残り枠は、高い方から順に内側（2番目に高い→3番目に高い…）を埋めていく
-//      （外側の音＝旋律・低音を優先し、間に挟まれる内声から間引かれる）
+// 最も高いピッチ（主旋律とみなせる音）から順に、高い方から必要本数だけ残す
+// （＝同時に押す指の本数を減らすほど、主旋律に近い音だけが残っていく）。
+// 以前は最低音（低音・伴奏の土台）も常に確保していたが、複数トラック/チャンネルを
+// 結合した曲を音域の狭い楽器へ変換する際、低音は主旋律と別のオクターブへ収まらず
+// 大きくオクターブ折り返しされることが多く、その結果、本来の低音域という
+// 役割を失って主旋律の音域内に紛れ込む別の音になってしまい、かえって
+// 主旋律を聞き取りにくくしていた（実際にユーザー報告の楽曲で確認した不具合）。
+// そのため低音を優先的に残す扱いはやめ、常に主旋律側から順に残す
 function pickPriorityChordNotes(midis, maxNotes) {
   const sorted = midis.slice().sort((a, b) => a - b);
   const n = sorted.length;
   if (maxNotes >= n) return sorted;
-  if (maxNotes <= 1) return [sorted[n - 1]]; // 最高音（主旋律）だけ残す
-  const picked = [sorted[0]]; // 最低音を確保
-  const remaining = maxNotes - 1;
-  for (let i = 0; i < remaining; i++) picked.push(sorted[n - 1 - i]); // 最高音から順に内側へ
+  const picked = [];
+  for (let i = 0; i < maxNotes; i++) picked.push(sorted[n - 1 - i]); // 最高音から順に必要本数だけ
   return picked.sort((a, b) => a - b);
 }
 
