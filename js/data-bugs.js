@@ -886,7 +886,7 @@ const bugData = [
  nameI18n:{"ja":"グラスウィングバタフライ","en":"Glasswing Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:14,
  authCount:300,
- weather:["雨","虹"],
+ weather:["虹"],
  time:["12-18","18-0"],
  location:"花畑-クジラ山",
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
