@@ -24,6 +24,12 @@ let selectedItems = {};
 
 let currentZone="";
 let currentWeather="";
+// 天気の手動入力（運営者様のデータ入力が間に合わず「不明」になっている間だけ、
+// この端末上でユーザー自身が現在の天気を仮に選べるようにする。他のユーザーとは
+// 共有されず、この端末のlocalStorageにのみ保存する。運営者様の公式データが
+// 入力され次第、そちらを優先して自動的に手動入力は表示されなくなる
+let currentWeatherIsManual = false;
+let currentWeatherDateKey = "";
 
 let minLevel = 1;
 let maxLevel = 14;
@@ -50,6 +56,55 @@ function guardToggle(){
 
 const ALL_WEATHER = ["晴れ","雨","虹"];
 const ALL_TIME = ["6-12","12-18","18-0","0-6"];
+
+// ── 天気の手動入力（「不明」の間だけ使える、この端末限定の仮設定） ──
+const MANUAL_WEATHER_KEY = "manualWeatherOverrides";
+const MANUAL_WEATHER_OPTIONS = ["晴れ","雨","虹","流星雨"];
+
+function loadManualWeatherOverrides(){
+  try { return JSON.parse(localStorage.getItem(MANUAL_WEATHER_KEY) || "{}"); }
+  catch(e){ return {}; }
+}
+
+// 運営者様の公式データ(weatherData)が入っている間は、そちらを常に優先する
+// （officialWeatherがある場合はこの関数自体を呼ばない）ため、公式データが
+// 後から入力されると自動的に手動入力より優先される
+function getManualWeatherOverride(dateKey, zone){
+  const overrides = loadManualWeatherOverrides();
+  return overrides[`${dateKey}_${zone}`] || null;
+}
+
+function setManualWeatherOverride(dateKey, zone, value){
+  const overrides = loadManualWeatherOverrides();
+  if(value) overrides[`${dateKey}_${zone}`] = value;
+  else delete overrides[`${dateKey}_${zone}`];
+  localStorage.setItem(MANUAL_WEATHER_KEY, JSON.stringify(overrides));
+}
+
+// #weatherNowの下に、天気が「不明」（公式データ未入力）の間だけ選択欄を表示する。
+// 選択するとこの端末にだけ保存され、他のユーザーには共有されない
+function renderWeatherOverrideControl(officialWeather, dateKey, zone){
+  const wrap = document.getElementById("weatherOverrideWrap");
+  if(!wrap) return;
+
+  if(officialWeather){
+    wrap.style.display = "none";
+    wrap.innerHTML = "";
+    return;
+  }
+
+  const current = getManualWeatherOverride(dateKey, zone) || "";
+  const options = [`<option value="">${T("weather_manual_placeholder","天気を選択")}</option>`]
+    .concat(MANUAL_WEATHER_OPTIONS.map(w => `<option value="${w}"${w === current ? " selected" : ""}>${translateWeatherWord(w)}</option>`))
+    .join("");
+  wrap.innerHTML = `<select id="weatherOverrideSelect" class="weather-override-select" onchange="onWeatherOverrideChange(this.value)">${options}</select>`;
+  wrap.style.display = "";
+}
+
+function onWeatherOverrideChange(value){
+  setManualWeatherOverride(currentWeatherDateKey, currentZone, value);
+  updateTime();
+}
 
 // 最後にまとめる（超重要）
 const creatures = [
@@ -707,13 +762,19 @@ function updateTime(){
  const tomorrowKey = getDateKey(1);
 
  const todayWeather = weatherData[todayKey] || {};
- const weather = todayWeather[zone] || "不明";
+ const officialWeather = todayWeather[zone];
+ // 公式データが無い間だけ、この端末の手動入力（あれば）を使う。
+ // 公式データが入力されると、次にこの関数が呼ばれた時点で自動的にそちらへ切り替わる
+ const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
+ const weather = officialWeather || manualWeather || "不明";
 
  // ここで変化チェック
  const changed = (zone !== currentZone) || (weather !== currentWeather);
 
  currentZone = zone;
  currentWeather = weather;
+ currentWeatherIsManual = !officialWeather && !!manualWeather;
+ currentWeatherDateKey = todayKey;
 
  // 次の天気（そのままでOK）
  const zones = ["6-12","12-18","18-0","0-6"];
@@ -735,9 +796,10 @@ function updateTime(){
 
  document.getElementById("time").innerText = `${hh}:${mm}:${ss}`;
  document.getElementById("weatherNow").innerText =
-  `${T("weather_now_label","今：")}${translateWeatherWord(weather)}`;
+  `${T("weather_now_label","今：")}${translateWeatherWord(weather)}${currentWeatherIsManual ? T("weather_manual_suffix","（手動入力）") : ""}`;
  document.getElementById("weatherNext").innerText =
   `${T("weather_next_label","次：")}${translateWeatherWord(nextWeather)}`;
+ renderWeatherOverrideControl(officialWeather, todayKey, zone);
  document.getElementById("miniTime").innerText = `${hh}:${mm}`;
 
 document.getElementById("miniWeather").innerText =

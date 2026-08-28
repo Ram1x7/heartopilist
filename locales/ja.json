@@ -46,6 +46,8 @@
   "level_range_text": "Lv.{min}〜{max}",
   "weather_now_label": "今：",
   "weather_next_label": "次：",
+  "weather_manual_placeholder": "天気を選択",
+  "weather_manual_suffix": "（手動入力）",
   "no_results": "出現なし",
   "food_no_results": "該当なし",
   "food_section_season": "シーズン料理",

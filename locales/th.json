@@ -33,6 +33,8 @@
   "level_range_text": "Lv.{min}〜{max}",
   "weather_now_label": "ตอนนี้：",
   "weather_next_label": "ถัดไป：",
+  "weather_manual_placeholder": "เลือกสภาพอากาศ",
+  "weather_manual_suffix": " (ป้อนด้วยตนเอง)",
   "no_results": "ไม่มีสิ่งมีชีวิตปรากฏ",
   "modal_weather": "สภาพอากาศ：",
   "modal_time": "ช่วงเวลา：",

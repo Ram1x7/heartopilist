@@ -33,6 +33,8 @@
   "level_range_text": "Lv.{min}〜{max}",
   "weather_now_label": "当前：",
   "weather_next_label": "下一个：",
+  "weather_manual_placeholder": "选择天气",
+  "weather_manual_suffix": "（手动输入）",
   "no_results": "当前无出现生物",
   "modal_weather": "天气：",
   "modal_time": "时间：",

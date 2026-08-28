@@ -396,6 +396,22 @@ body.dark .weather-next{
   color:var(--dark-text-sub);
 }
 
+/* 天気の手動入力（公式データが「不明」の間だけ表示） */
+.weather-override-select{
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:8px;
+  border:1px solid var(--indigo);
+  background:#fff;
+  color:var(--indigo);
+}
+
+body.dark .weather-override-select{
+  border-color:var(--dark-accent);
+  background:#2a2a2e;
+  color:var(--dark-accent);
+}
+
 /* サーバー選択 */
 .server-select-wrap{
   display:flex;
