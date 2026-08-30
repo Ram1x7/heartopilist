@@ -323,6 +323,7 @@
   "shop_sub_pet_costume": "ชุดสัตว์เลี้ยง",
   "shop_limit_label": "จำกัด {n} ชิ้น",
   "shop_currency": "เทรนด์คอยน์",
+  "shop_currency_fes": "เฟสคอยน์",
   "shop_season_active_suffix": " กำลังจัดอยู่",
   "shop_season_ended_suffix": " สิ้นสุดแล้ว",
   "shop_ended_reveal_hint": "ไม่สามารถรับไอเทมของซีซันนี้ได้อีกต่อไป คุณยังสามารถดูรายการเป็นบันทึกย้อนหลังได้",

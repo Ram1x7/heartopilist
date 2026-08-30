@@ -358,6 +358,7 @@
   "shop_sub_pet_costume": "ペット衣装系",
   "shop_limit_label": "上限{n}個",
   "shop_currency": "トレンドコイン",
+  "shop_currency_fes": "フェスコイン",
   "shop_season_active_suffix": " 開催中",
   "shop_season_ended_suffix": " は終了しています",
   "shop_ended_reveal_hint": "このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます",
