@@ -797,6 +797,16 @@ function loadState() {
   }
 }
 
+// 一覧カード用の軽量サムネイル画像パスを返す
+function thumbSrc(path){
+  if(!path) return path;
+  const normalized = path.startsWith("./") ? path.slice(2) : path;
+  if(!normalized.startsWith("images/")) return path;
+  return normalized
+    .replace(/^images\//, "images/thumb/")
+    .replace(/\.[^./]+$/, ".jpg");
+}
+
 function saveState(i) {
   const pet = pets.find(p => p.id === currentPet);
   if (!pet) return;
@@ -890,7 +900,7 @@ function render() {
 
     card.innerHTML = `
       <div class="img-box">
-        <img src="${food.img}" loading="lazy" alt="${name}">
+        <img src="${thumbSrc(food.img)}" loading="lazy" alt="${name}">
         <div class="img-label">${name}</div>
       </div>
       <div class="card-btns">

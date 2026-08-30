@@ -628,6 +628,15 @@ function displayName(item){
   const lang = currentLang();
   return item.nameI18n[lang] || item.name;
 }
+// 一覧カード用の軽量サムネイル画像パスを返す（詳細モーダルは元画像のまま）
+function thumbSrc(path){
+  if(!path) return path;
+  const normalized = path.startsWith("./") ? path.slice(2) : path;
+  if(!normalized.startsWith("images/")) return path;
+  return normalized
+    .replace(/^images\//, "images/thumb/")
+    .replace(/\.[^./]+$/, ".jpg");
+}
 function translateEventName(name){
   return T("garden_event_" + name, name);
 }
@@ -1091,7 +1100,7 @@ function renderSection(label, items, eventStatus = null){
             ${icon(isAuthed ? "medal" : "medalOutline", {size:13})}
           </button>
         ` : ''}
-        <img src="${item.img}" alt="${displayName(item)}" loading="lazy">
+        <img src="${thumbSrc(item.img)}" alt="${displayName(item)}" loading="lazy">
       </div>
       <div class="item-name">${displayName(item)}</div>
       <div class="garden-item-sub">${formatTime(item.growTime)}</div>
