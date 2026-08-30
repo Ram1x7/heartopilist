@@ -201,9 +201,8 @@ function createShopCard(item){
   const currencyIconHTML = isFesCurrency && typeof currencyIcon === "function"
     ? currencyIcon("fescoin")
     : icon("coin",{size:11});
-  const currencyLabel = isFesCurrency
-    ? T("shop_currency_fes","フェスコイン")
-    : T("shop_currency","トレンドコイン");
+  // フェスコインはアイコンで通貨が分かるため、数字のみ表示する
+  const currencyLabel = isFesCurrency ? "" : T("shop_currency","トレンドコイン");
 
   div.innerHTML = `
     <div class="img-wrap">
@@ -214,7 +213,7 @@ function createShopCard(item){
       <img src="${item.img}" loading="lazy" decoding="async" alt="${displayName(item)}">
     </div>
     <div class="item-name shop-item-name">${displayName(item)}</div>
-    <div class="shop-item-price">${currencyIconHTML} ${item.price.toLocaleString()} ${currencyLabel}</div>
+    <div class="shop-item-price">${currencyIconHTML} ${item.price.toLocaleString()}${currencyLabel ? " " + currencyLabel : ""}</div>
     ${limitLabel}
   `;
 
