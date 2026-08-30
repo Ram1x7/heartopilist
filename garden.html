@@ -599,6 +599,7 @@ body.dark .garden-footer{
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/icon-size.js"></script>
+<script src="js/currency-icons.js"></script>
 <script src="js/price-calc.js"></script>
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
@@ -1145,10 +1146,17 @@ function renderModal(item){
 
   const stars = ["☆1","☆2","☆3","☆4","☆5"];
   const derivedPrices = derivePrices(item.prices[0], isFlower ? "flower" : "crop");
+
+  // 今回追加分（フェスコイン二重価格あり）はコインアイコンを試験表示する
+  const isNewFesItem = item.fesCoinPrice !== undefined;
+  const derivedFesPrices = item.fesCoinPrice != null ? derivePrices(item.fesCoinPrice, isFlower ? "flower" : "crop") : null;
+  const coinText = v => isNewFesItem ? injectCurrencyIcons(`${v.toLocaleString()}コイン`) : v.toLocaleString();
+
   const priceRows = stars.map((s,i) => `
     <tr>
       <td>${s}</td>
-      <td>${derivedPrices[i].toLocaleString()}</td>
+      <td>${coinText(derivedPrices[i])}</td>
+      ${isNewFesItem ? `<td>${derivedFesPrices && derivedFesPrices[i] != null ? injectCurrencyIcons(`${derivedFesPrices[i].toLocaleString()}フェスコイン`) : "-"}</td>` : ""}
     </tr>`).join("");
 
   let breedingHTML = "";
@@ -1239,7 +1247,7 @@ function renderModal(item){
       </div>
       <div class="g-info-row">
         <span class="g-info-label">${T("garden_seed_price","種の値段")}</span>
-        <span class="g-info-value">${item.seedPrice.toLocaleString()} ${T("garden_coin","コイン")}</span>
+        <span class="g-info-value">${isNewFesItem ? injectCurrencyIcons(`${item.seedPrice.toLocaleString()}コイン`) : `${item.seedPrice.toLocaleString()} ${T("garden_coin","コイン")}`}</span>
       </div>
       ${!isFlower ? `
       <div class="g-info-row">
@@ -1253,7 +1261,7 @@ function renderModal(item){
       </div>` : ""}
     </div>
     <table class="g-price-table">
-      <tr><th>${T("garden_rarity","レア度")}</th><th>${T("garden_price","売価")}</th></tr>
+      <tr><th>${T("garden_rarity","レア度")}</th><th>${T("garden_price","売価")}</th>${isNewFesItem ? `<th>${T("garden_fes_price","フェスコイン")}</th>` : ""}</tr>
       ${priceRows}
     </table>
     ${breedingHTML}

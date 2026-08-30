@@ -3483,4 +3483,445 @@ const foodsData = [
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:false
 },
+{
+  name:"サボテンフレッシュジュース",
+  nameI18n:{"ja":"サボテンフレッシュジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1070.PNG",
+  cost:60,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[220],
+  fesCoinPrice:40,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","果物ならなんでもOK","果物ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/all_fruit.jpg" },
+    { image:"./images/materials/all_fruit.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンリンゴジュース",
+  nameI18n:{"ja":"サボテンリンゴジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1071.PNG",
+  cost:60,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[270],
+  fesCoinPrice:50,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","リンゴ","リンゴ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/ringo.jpg" },
+    { image:"./images/materials/ringo.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンオレンジジュース",
+  nameI18n:{"ja":"サボテンオレンジジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1072.PNG",
+  cost:60,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[270],
+  fesCoinPrice:50,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","オレンジ","オレンジ"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/orange.jpg" },
+    { image:"./images/materials/orange.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンブルーベリージュース",
+  nameI18n:{"ja":"サボテンブルーベリージュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1073.PNG",
+  cost:60,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[220],
+  fesCoinPrice:40,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","ブルーベリー","ブルーベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/buruberi.jpg" },
+    { image:"./images/materials/buruberi.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンラズベリージュース",
+  nameI18n:{"ja":"サボテンラズベリージュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1074.PNG",
+  cost:60,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[260],
+  fesCoinPrice:50,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","ラズベリー","ラズベリー"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/razuberi.jpg" },
+    { image:"./images/materials/razuberi.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンイチゴジュース",
+  nameI18n:{"ja":"サボテンイチゴジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1075.PNG",
+  cost:310,
+  time:360,
+  rarity: [true,true,true,true,true],
+  prices:[910],
+  fesCoinPrice:160,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","いちご(種@125)","いちご(種@125)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/strawberry.jpg" },
+    { image:"./images/materials/strawberry.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンブドウジュース",
+  nameI18n:{"ja":"サボテンブドウジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1076.PNG",
+  cost:380,
+  time:600,
+  rarity: [true,true,true,true,true],
+  prices:[1120],
+  fesCoinPrice:200,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","ブドウ(種@160)","ブドウ(種@160)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/grape.jpg" },
+    { image:"./images/materials/grape.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンパイナップルジュース",
+  nameI18n:{"ja":"サボテンパイナップルジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1077.PNG",
+  cost:90,
+  time:30,
+  rarity: [true,true,true,true,true],
+  prices:[260],
+  fesCoinPrice:50,
+  materials:["ウチワサボテン(種@10)","牛乳(@50)","パイナップル(種@15)","パイナップル(種@15)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/pineapple.jpg" },
+    { image:"./images/materials/pineapple.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"野菜焼き肉",
+  nameI18n:{"ja":"野菜焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1078.PNG",
+  cost:450,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[580],
+  fesCoinPrice:105,
+  materials:["果樹の炭(@50)","肉(@200)","肉(@200)","野菜ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/sumi.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/all_vege.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"ジャガイモ焼き肉",
+  nameI18n:{"ja":"ジャガイモ焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1079.PNG",
+  cost:480,
+  time:60,
+  rarity: [true,true,true,true,true],
+  prices:[640],
+  fesCoinPrice:115,
+  materials:["果樹の炭(@50)","肉(@200)","肉(@200)","じゃがいも(種@30)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/sumi.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/potato.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"トウモロコシ焼き肉",
+  nameI18n:{"ja":"トウモロコシ焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1080.PNG",
+  cost:620,
+  time:720,
+  rarity: [true,true,true,true,true],
+  prices:[1070],
+  fesCoinPrice:450,
+  materials:["果樹の炭(@50)","肉(@200)","肉(@200)","トウモロコシ(種@170)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/sumi.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/corn.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"トマト焼き肉",
+  nameI18n:{"ja":"トマト焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1081.PNG",
+  cost:460,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[580],
+  fesCoinPrice:105,
+  materials:["果樹の炭(@50)","肉(@200)","肉(@200)","トマト(種@10)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/sumi.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/tomato.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"ニンジン焼き肉",
+  nameI18n:{"ja":"ニンジン焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1082.PNG",
+  cost:475,
+  time:120,
+  rarity: [true,true,true,true,true],
+  prices:[710],
+  fesCoinPrice:125,
+  materials:["果樹の炭(@50)","肉(@200)","肉(@200)","ニンジン(種@25)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/sumi.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/carrot.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"ナス焼き肉",
+  nameI18n:{"ja":"ナス焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1083.PNG",
+  cost:585,
+  time:420,
+  rarity: [true,true,true,true,true],
+  prices:[960],
+  fesCoinPrice:170,
+  materials:["果樹の炭(@50)","肉(@200)","肉(@200)","ナス(種@135)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/sumi.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/meat.jpg" },
+    { image:"./images/materials/eggplant.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンと魚のスープ",
+  nameI18n:{"ja":"サボテンと魚のスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1084.PNG",
+  cost:110,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[230],
+  fesCoinPrice:45,
+  materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","魚ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/all_fish.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンとペールゴールドガーのスープ",
+  nameI18n:{"ja":"サボテンとペールゴールドガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1085.PNG",
+  cost:110,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[400],
+  fesCoinPrice:70,
+  materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","ペールゴールドガーパイク"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/palegold.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンとブラウンブロッチガーのスープ",
+  nameI18n:{"ja":"サボテンとブラウンブロッチガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1086.PNG",
+  cost:110,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[400],
+  fesCoinPrice:70,
+  materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","ブラウンブロッチガーパイク"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/brown.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンとシルバーガーのスープ",
+  nameI18n:{"ja":"サボテンとシルバーガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1087.PNG",
+  cost:110,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[400],
+  fesCoinPrice:70,
+  materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","シルバーガーパイク"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/silver.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンとブラックスポットガーのスープ",
+  nameI18n:{"ja":"サボテンとブラックスポットガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1088.PNG",
+  cost:110,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[400],
+  fesCoinPrice:70,
+  materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","ブラックスポットガーパイク"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/black.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サボテンとゴールデンガーのスープ",
+  nameI18n:{"ja":"サボテンとゴールデンガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/000.PNG",
+  cost:110,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:null,
+  fesCoinPrice:null,
+  materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","ゴールデンガーパイク"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/saboten.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/000.PNG" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"原始風味セット",
+  nameI18n:{"ja":"原始風味セット","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  fes:true,
+  image:"./images/foods/1090.PNG",
+  cost:0,
+  time:15,
+  rarity: [true,true,true,true,true],
+  prices:[1300],
+  fesCoinPrice:240,
+  materials:["サボテンジュースならなんでもOK","サボテンジュースならなんでもOK","野菜焼き肉ならなんでもOK","サボテンと魚のスープならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/all_sabotenjuice.jpg" },
+    { image:"./images/materials/all_sabotenjuice.jpg" },
+    { image:"./images/materials/all_yasaiyakiniku.jpg" },
+    { image:"./images/materials/all_sabotensoup.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
 ];
