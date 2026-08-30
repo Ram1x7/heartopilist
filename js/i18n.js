@@ -72,9 +72,9 @@ const i18n = (() => {
   }
 
   /** 翻訳取得 */
-  function t(key, vars){
+  function t(key, vars, fallback){
 
-    let text = _translations[key] ?? key;
+    let text = _translations[key] ?? fallback ?? key;
 
     if(vars){
       Object.entries(vars).forEach(([k,v])=>{

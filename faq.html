@@ -536,7 +536,7 @@ function currentLang(){
 }
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
-    return window.i18n.t(key, vars);
+    return window.i18n.t(key, vars, fallback);
   }
   return fallback;
 }

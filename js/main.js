@@ -148,7 +148,7 @@ function getZone(){
 // i18n連携用ヘルパー（i18n未準備時は日本語フォールバックを返す）
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
-    return window.i18n.t(key, vars);
+    return window.i18n.t(key, vars, fallback);
   }
   return fallback;
 }
