@@ -125,26 +125,48 @@ function isSeasonEnded(season){
   return Date.now() > parseJstDateTimeStr(season.end).getTime();
 }
 
-// 現在表示中のシーズン情報を返す。複数シーズンのアイテムが混在する場合は
-// 開催中のシーズンを優先し、すべて終了済みなら直近に終了したシーズンを表示する
-function getCurrentShopSeason(){
-  if(typeof shopSeasons === "undefined") return { season: null, ended: false };
-  const seasonKeys = [...new Set(shopData.map(item => item.season).filter(Boolean))];
-  const seasons = seasonKeys.map(key => shopSeasons[key]).filter(Boolean);
-  if(seasons.length === 0) return { season: null, ended: false };
+// シーズンごとにアイテムをグループ化する（開催開始日が新しい順。season未設定の
+// アイテムは常時表示グループとして末尾にまとめる）
+function getSeasonGroups(){
+  const bySeasonKey = new Map();
+  const noSeasonItems = [];
 
-  const active = seasons.find(s => !isSeasonEnded(s));
-  if(active) return { season: active, ended: false };
+  shopData.forEach(item => {
+    if(!item.season){ noSeasonItems.push(item); return; }
+    if(!bySeasonKey.has(item.season)) bySeasonKey.set(item.season, []);
+    bySeasonKey.get(item.season).push(item);
+  });
 
-  const latestEnded = seasons.reduce((latest, s) =>
-    parseJstDateTimeStr(s.end).getTime() > parseJstDateTimeStr(latest.end).getTime() ? s : latest
-  );
-  return { season: latestEnded, ended: true };
+  const groups = [];
+  const keys = [...bySeasonKey.keys()];
+  if(typeof shopSeasons !== "undefined"){
+    keys.sort((a, b) => {
+      const seasonA = shopSeasons[a], seasonB = shopSeasons[b];
+      if(!seasonA || !seasonB) return 0;
+      return parseJstDateTimeStr(seasonB.start).getTime() - parseJstDateTimeStr(seasonA.start).getTime();
+    });
+  }
+  keys.forEach(key => {
+    const season = typeof shopSeasons !== "undefined" ? shopSeasons[key] : null;
+    groups.push({
+      key,
+      season: season || null,
+      ended: season ? isSeasonEnded(season) : false,
+      items: bySeasonKey.get(key),
+    });
+  });
+
+  if(noSeasonItems.length){
+    groups.push({ key: null, season: null, ended: false, items: noSeasonItems });
+  }
+
+  return groups;
 }
 
-// シーズン終了後は入手不可のアイテムが並ぶだけになるため、初回表示では一覧を畳んでおき、
-// ユーザーが明示的に開いた場合のみ表示する（開催中のシーズンは従来通り常に表示する）
-let shopItemsRevealed = false;
+// 終了済みシーズンは入手不可のアイテムが並ぶだけになるため、初回表示ではそのシーズンの
+// 一覧だけを畳んでおき、ユーザーが明示的に開いた場合のみ表示する（開催中のシーズンは
+// 従来通り常に表示する）。ページ再読み込みで再び畳んだ状態に戻る
+let revealedSeasons = new Set();
 
 // ── カテゴリ・サブカテゴリの表示順とラベル ──
 const SHOP_CATEGORIES = [
@@ -218,15 +240,6 @@ function buildSeasonBannerHtml(season, ended){
     : `${icon("pin",{size:13})} ${label}${T("shop_season_active_suffix"," 開催中")}（${startDate}〜${endDate}）`;
 }
 
-function renderSeasonBanner(season, ended){
-  const banner = document.getElementById("shopSeasonBanner");
-  if(!banner || typeof shopSeasons === "undefined") return;
-  if(!season){ banner.style.display = "none"; return; }
-
-  banner.classList.toggle("ended", ended);
-  banner.innerHTML = buildSeasonBannerHtml(season, ended);
-}
-
 function renderProgress(){
   const total = shopData.length;
   const done = shopData.filter(item => shopChecked[item.id]).length;
@@ -235,57 +248,19 @@ function renderProgress(){
   document.getElementById("shopProgressFill").style.width = pct + "%";
 }
 
-// シーズン終了後は、説明バナー・コンプ数ゲージ・検索/並び替え・一覧をまとめて畳んでおき、
-// 「アイテム一覧を表示」を押した場合のみ表示する。次のシーズン/フェスの商店が始まったら
-// （＝ended:falseになったら）通常通りすべて常時表示になる
-function renderRevealPrompt(season, ended){
-  const banner = document.getElementById("shopSeasonBanner");
-  const progress = document.querySelector(".shop-progress");
-  const wrap = document.getElementById("shopRevealWrap");
-  const controls = document.querySelector(".shop-controls");
-  const content = document.getElementById("shopContent");
-  const showPrompt = ended && !shopItemsRevealed;
-
-  wrap.style.display = showPrompt ? "" : "none";
-  banner.style.display = showPrompt ? "none" : "";
-  progress.style.display = showPrompt ? "none" : "";
-  controls.style.display = showPrompt ? "none" : "";
-  if(showPrompt) content.innerHTML = "";
-
-  if(!showPrompt) return false;
-  wrap.innerHTML = `
-    <p class="shop-reveal-title">${buildSeasonBannerHtml(season, ended)}</p>
-    <p>${T("shop_ended_reveal_hint","このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます")}</p>
-    <button class="shop-reveal-btn" id="shopRevealBtn">${T("shop_ended_reveal_btn","アイテム一覧を表示")}</button>
-  `;
-  document.getElementById("shopRevealBtn").onclick = () => {
-    shopItemsRevealed = true;
-    render();
-  };
-  return true;
-}
-
-function render(){
-  const { season, ended } = getCurrentShopSeason();
-  renderSeasonBanner(season, ended);
-  renderProgress();
-
-  if(renderRevealPrompt(season, ended)) return;
-
-  const content = document.getElementById("shopContent");
-  content.innerHTML = "";
-
-  const visibleData = shopData.filter(matchesShopSearch);
+// 1シーズン分のカテゴリ・サブカテゴリ別グリッドをcontainerに追加する。
+// 該当アイテムが1件でもあればtrueを返す
+function renderSeasonCategories(items, container){
   let anyResult = false;
 
   SHOP_CATEGORIES.forEach(catDef => {
-    const catItems = visibleData.filter(i => i.category === catDef.category);
+    const catItems = items.filter(i => i.category === catDef.category);
     if(catItems.length === 0) return;
 
     const catTitle = document.createElement("div");
     catTitle.className = "shop-category-title";
     catTitle.textContent = `【${T(catDef.labelKey, catDef.labelFallback)}】`;
-    content.appendChild(catTitle);
+    container.appendChild(catTitle);
 
     if(catDef.subcategories){
       catDef.subcategories.forEach(subDef => {
@@ -296,20 +271,73 @@ function render(){
         const subTitle = document.createElement("div");
         subTitle.className = "section-label";
         subTitle.textContent = T(subDef.labelKey, subDef.labelFallback);
-        content.appendChild(subTitle);
+        container.appendChild(subTitle);
 
         const grid = document.createElement("div");
         grid.className = "shop-grid";
         subItems.forEach(item => grid.appendChild(createShopCard(item)));
-        content.appendChild(grid);
+        container.appendChild(grid);
       });
     } else {
       anyResult = true;
       const grid = document.createElement("div");
       grid.className = "shop-grid";
       sortShopItems(catItems).forEach(item => grid.appendChild(createShopCard(item)));
-      content.appendChild(grid);
+      container.appendChild(grid);
     }
+  });
+
+  return anyResult;
+}
+
+// シーズン1つ分のブロック（バナー＋アイテム一覧、または終了済みなら畳んだ案内）を
+// contentに追加する。表示すべき内容があればtrueを返す
+function renderSeasonGroup(group, content){
+  const wrap = document.createElement("div");
+  wrap.className = "shop-season-block";
+
+  const showPrompt = !!(group.season && group.ended && group.key && !revealedSeasons.has(group.key));
+
+  if(showPrompt){
+    const promptDiv = document.createElement("div");
+    promptDiv.className = "shop-reveal-wrap";
+    promptDiv.innerHTML = `
+      <p class="shop-reveal-title">${buildSeasonBannerHtml(group.season, group.ended)}</p>
+      <p>${T("shop_ended_reveal_hint","このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます")}</p>
+      <button class="shop-reveal-btn">${T("shop_ended_reveal_btn","アイテム一覧を表示")}</button>
+    `;
+    promptDiv.querySelector(".shop-reveal-btn").onclick = () => {
+      revealedSeasons.add(group.key);
+      render();
+    };
+    wrap.appendChild(promptDiv);
+    content.appendChild(wrap);
+    return true;
+  }
+
+  if(group.season){
+    const bannerDiv = document.createElement("div");
+    bannerDiv.className = "shop-season-banner" + (group.ended ? " ended" : "");
+    bannerDiv.innerHTML = buildSeasonBannerHtml(group.season, group.ended);
+    wrap.appendChild(bannerDiv);
+  }
+
+  const visibleItems = group.items.filter(matchesShopSearch);
+  const anyResult = renderSeasonCategories(visibleItems, wrap);
+  content.appendChild(wrap);
+  return anyResult;
+}
+
+function render(){
+  renderProgress();
+
+  const content = document.getElementById("shopContent");
+  content.innerHTML = "";
+
+  const groups = getSeasonGroups();
+  let anyResult = false;
+  groups.forEach(group => {
+    if(renderSeasonGroup(group, content)) anyResult = true;
   });
 
   if(!anyResult){

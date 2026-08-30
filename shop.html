@@ -51,6 +51,12 @@
 
 <style>
 /* 商店ページ専用（他ページの.gridには影響しない） */
+.shop-season-block + .shop-season-block{
+  margin-top:24px;
+  padding-top:20px;
+  border-top:1px dashed var(--border);
+}
+
 .shop-season-banner{
   background:var(--card);
   border:1px solid var(--gold);
@@ -284,16 +290,12 @@ body.dark #shopClearBtn{
   <p class="page-subtitle" data-i18n="shop_page_subtitle">購入済みのアイテムをチェックできます</p>
 </div>
 
-<div id="shopSeasonBanner" class="shop-season-banner"></div>
-
 <div class="shop-progress">
   <span id="shopProgressLabel">0 / 0</span>
   <div class="shop-progress-track">
     <div class="shop-progress-fill" id="shopProgressFill" style="width:0%"></div>
   </div>
 </div>
-
-<div id="shopRevealWrap" class="shop-reveal-wrap" style="display:none;"></div>
 
 <div class="shop-controls">
   <div class="search-wrap">
@@ -322,6 +324,6 @@ body.dark #shopClearBtn{
 <script src="js/toast.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/data-shop.js"></script>
-<script src="js/shop.js?v=4"></script>
+<script src="js/shop.js?v=5"></script>
 </body>
 </html>
