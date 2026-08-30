@@ -1263,6 +1263,12 @@ function renderModal(){
   const profitText = profit == null ? T("food_unknown","不明") :
     (profit >= 0 ? `+${profit.toLocaleString()}` : `${profit.toLocaleString()}`);
 
+  // 今回追加分（フェスコイン二重価格あり）はコインアイコンを試験表示する
+  const isNewFesItem = f.fesCoinPrice !== undefined;
+  const fesPrices = f.fesCoinPrice != null ? derivePrices(f.fesCoinPrice, "food", f.rarity) : null;
+  const fesPrice = fesPrices && fesPrices[idx] != null ? fesPrices[idx] : null;
+  const coinText = v => isNewFesItem ? injectCurrencyIcons(`${v.toLocaleString()}コイン`) : `${v.toLocaleString()} ${T("food_coin","コイン")}`;
+
   const rarityTabs = [1,2,3,4,5].map(rv => {
     const available = f.rarity && f.rarity[rv-1];
     return `<button
@@ -1308,20 +1314,20 @@ function renderModal(){
     <div class="f-price-card">
       <div class="f-info-row">
         <span class="f-info-label">${T("food_price","売価")}</span>
-        <span class="f-info-value">${price != null ? price.toLocaleString() + " " + T("food_coin","コイン") : T("food_unknown","不明")}</span>
+        <span class="f-info-value">${price != null ? coinText(price) : T("food_unknown","不明")}</span>
       </div>
       <div class="f-info-row">
         <span class="f-info-label">${T("food_cost","材料費")}</span>
-        <span class="f-info-value">${(f.cost || 0).toLocaleString()} ${T("food_coin","コイン")}</span>
+        <span class="f-info-value">${coinText(f.cost || 0)}</span>
       </div>
       <div class="f-info-row">
         <span class="f-info-label">${T("food_profit","利益")}</span>
-        <span class="f-info-value ${profitClass}">${profitText} ${T("food_coin","コイン")}</span>
+        <span class="f-info-value ${profitClass}">${profit != null ? (profit >= 0 ? "+" : "") + coinText(profit) : profitText}</span>
       </div>
-      ${f.fesCoinPrice ? `
+      ${isNewFesItem ? `
       <div class="f-info-row">
-        <span class="f-info-label">${T("food_fes_price","★1｜フェスコイン売価")}</span>
-        <span class="f-info-value">${injectCurrencyIcons(`${f.fesCoinPrice.toLocaleString()}フェスコイン`)}</span>
+        <span class="f-info-label">${T("food_fes_price","フェスコイン売価")}</span>
+        <span class="f-info-value">${fesPrice != null ? injectCurrencyIcons(`${fesPrice.toLocaleString()}フェスコイン`) : T("food_unknown","不明")}</span>
       </div>` : ""}
     </div>
 

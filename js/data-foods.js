@@ -3664,7 +3664,7 @@ const foodsData = [
   materials:["果樹の炭(@50)","肉(@200)","肉(@200)","野菜ならなんでもOK"],
   level:1,
   materials_image:[
-    { image: null },
+    { image:"./images/materials/sumi.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/all_vege.jpg" }
@@ -3685,7 +3685,7 @@ const foodsData = [
   materials:["果樹の炭(@50)","肉(@200)","肉(@200)","じゃがいも(種@30)"],
   level:1,
   materials_image:[
-    { image: null },
+    { image:"./images/materials/sumi.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/potato.jpg" }
@@ -3706,7 +3706,7 @@ const foodsData = [
   materials:["果樹の炭(@50)","肉(@200)","肉(@200)","トウモロコシ(種@170)"],
   level:1,
   materials_image:[
-    { image: null },
+    { image:"./images/materials/sumi.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/corn.jpg" }
@@ -3727,7 +3727,7 @@ const foodsData = [
   materials:["果樹の炭(@50)","肉(@200)","肉(@200)","トマト(種@10)"],
   level:1,
   materials_image:[
-    { image: null },
+    { image:"./images/materials/sumi.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/tomato.jpg" }
@@ -3748,7 +3748,7 @@ const foodsData = [
   materials:["果樹の炭(@50)","肉(@200)","肉(@200)","ニンジン(種@25)"],
   level:1,
   materials_image:[
-    { image: null },
+    { image:"./images/materials/sumi.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/carrot.jpg" }
@@ -3769,7 +3769,7 @@ const foodsData = [
   materials:["果樹の炭(@50)","肉(@200)","肉(@200)","ナス(種@135)"],
   level:1,
   materials_image:[
-    { image: null },
+    { image:"./images/materials/sumi.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/meat.jpg" },
     { image:"./images/materials/eggplant.jpg" }
@@ -3791,8 +3791,8 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/saboten.jpg" },
-    { image: null },
-    { image: null },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
     { image:"./images/materials/all_fish.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3812,8 +3812,8 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/saboten.jpg" },
-    { image: null },
-    { image: null },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
     { image:"./images/materials/palegold.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3833,8 +3833,8 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/saboten.jpg" },
-    { image: null },
-    { image: null },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
     { image:"./images/materials/brown.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3854,8 +3854,8 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/saboten.jpg" },
-    { image: null },
-    { image: null },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
     { image:"./images/materials/silver.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3875,8 +3875,8 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/saboten.jpg" },
-    { image: null },
-    { image: null },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
     { image:"./images/materials/black.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3896,8 +3896,8 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/saboten.jpg" },
-    { image: null },
-    { image: null },
+    { image:"./images/materials/natsume.jpg" },
+    { image:"./images/materials/natsume.jpg" },
     { image:"./images/000.PNG" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
