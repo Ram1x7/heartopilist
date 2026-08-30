@@ -60,24 +60,26 @@
   margin:14px 0;
 }
 
-/* ゲーム内で壁に設置したイメージに近づけるための簡易的な壁面背景
+/* ゲーム内の建築は壁に貼るものではなく、支柱を積み上げて地面に自立させる
+   スタンディング彫刻のため、配置図は「芝生の上に立っている」見た目にする
    （実際のゲーム画面ではないため、あくまで見た目の目安） */
 .build-wall-preview{
   display:inline-block;
-  padding:16px;
-  border-radius:14px;
+  padding:10px 16px 0;
   max-width:100%;
-  background:
-    repeating-linear-gradient(180deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 34px),
-    linear-gradient(180deg, #caa06c, #b9895a);
-  box-shadow:0 6px 16px rgba(52,48,43,0.18), inset 0 0 0 3px rgba(255,255,255,0.18);
 }
 
-body.dark .build-wall-preview{
-  background:
-    repeating-linear-gradient(180deg, rgba(0,0,0,0.28) 0 2px, transparent 2px 34px),
-    linear-gradient(180deg, #6b5236, #543f27);
-  box-shadow:0 6px 16px rgba(0,0,0,0.35), inset 0 0 0 3px rgba(255,255,255,0.06);
+.build-ground{
+  width:calc(100% + 40px);
+  max-width:280px;
+  height:20px;
+  margin:-6px auto 0;
+  border-radius:50%;
+  background:radial-gradient(ellipse at center, #7ec25a 0%, #5fa348 55%, rgba(95,163,72,0) 78%);
+}
+
+body.dark .build-ground{
+  background:radial-gradient(ellipse at center, #4d7d3c 0%, #3c6430 55%, rgba(60,100,48,0) 78%);
 }
 
 .build-grid{
@@ -366,6 +368,7 @@ body.dark .build-library-item{
     <div class="build-grid-wrap">
       <div class="build-wall-preview">
         <div class="build-grid" id="buildGrid"></div>
+        <div class="build-ground"></div>
       </div>
     </div>
 
