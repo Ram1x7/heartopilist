@@ -1073,7 +1073,9 @@ function renderSection(label, items, eventStatus = null){
     div.className = "garden-item";
 
     const isEventItem = !!(item.season || item.fes);
-    const hasNotif = !isEventItem && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
+    // シーズン・フェス限定は開催中のみ通知・タイマー機能を利用可能（終了後は非表示）
+    const notifAllowed = !isEventItem || !item.ended;
+    const hasNotif = notifAllowed && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
     const isAuthed = item.auth !== false && !!authData[item.name];
     const isChecked = !!checkedData[item.name];
 
@@ -1199,9 +1201,9 @@ function renderModal(item){
     `;
   }
 
-  // 通知（作物のみ・イベント終了済みは除外）
+  // 通知（作物のみ・シーズン/フェス限定は開催中のみ、終了済みは除外）
   let notifHTML = "";
-  if(!isFlower && !isEventItem){
+  if(!isFlower && (!isEventItem || !item.ended)){
     const normalSet = isNotifSet(item,"normal");
     const weedSet   = isNotifSet(item,"weed");
 
