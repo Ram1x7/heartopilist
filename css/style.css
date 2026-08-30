@@ -1234,12 +1234,42 @@ body.dark #m_name{
 /* モーダル情報 */
 .modal-info{
   margin-top:10px;
-  color:var(--text-sub);
+  background:var(--card-sub);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:12px;
+  line-height:2;
   text-align:left;
 }
 
 body.dark .modal-info{
+  background:#383329;
+}
+
+.modal-info-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.modal-info-label{
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .modal-info-label{
   color:var(--dark-text-sub);
+}
+
+.modal-info-value{
+  color:var(--text);
+  font-weight:700;
+  text-align:right;
+}
+
+body.dark .modal-info-value{
+  color:#ece4d4;
 }
 
 #m_time{

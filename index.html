@@ -51,7 +51,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=14">
+<link rel="stylesheet" href="css/style.css?v=15">
 <link rel="stylesheet" href="css/design-system.css?v=2">
 
 <link rel="prefetch" href="./foods.html">
@@ -316,12 +316,27 @@
   <div class="modal-box">
     <h3 id="m_name"></h3>
     <img id="m_img" style="width:100%;height:100px;object-fit:contain;">
-    <p id="m_loc"></p>
     <div class="modal-info">
-     <p id="m_weather"></p>
-     <p id="m_time"></p>
-     <p id="m_star5"></p>
-     <p id="m_authCount"></p>
+     <div class="modal-info-row">
+       <span class="modal-info-label" data-i18n="modal_loc_label">場所</span>
+       <span class="modal-info-value" id="m_loc"></span>
+     </div>
+     <div class="modal-info-row">
+       <span class="modal-info-label" data-i18n="modal_weather_label">天気</span>
+       <span class="modal-info-value" id="m_weather"></span>
+     </div>
+     <div class="modal-info-row">
+       <span class="modal-info-label" data-i18n="modal_time_label">時間</span>
+       <span class="modal-info-value" id="m_time"></span>
+     </div>
+     <div class="modal-info-row" id="m_star5Row">
+       <span class="modal-info-label" data-i18n="modal_star5_col_label">★5条件</span>
+       <span class="modal-info-value" id="m_star5"></span>
+     </div>
+     <div class="modal-info-row" id="m_authCountRow">
+       <span class="modal-info-label" data-i18n="modal_auth_count_col_label">認証に必要な数</span>
+       <span class="modal-info-value" id="m_authCount"></span>
+     </div>
     </div>
     <table class="modal-price-table" id="m_priceTable">
       <tr>
@@ -606,7 +621,7 @@ text-align:left;
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
-<script src="js/main.js?v=20"></script>
+<script src="js/main.js?v=21"></script>
 
 <script src="js/sw-register.js"></script>
 </body>
