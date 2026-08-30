@@ -206,7 +206,6 @@ function createShopCard(item){
 
   div.innerHTML = `
     <div class="img-wrap">
-      <div class="level-badge">${item.price.toLocaleString()}</div>
       <button class="check-btn ${checked ? "checked" : ""}">
         ${icon(checked ? "check" : "checkSquare", {size:13})}
       </button>
