@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<meta name="robots" content="noindex, nofollow">
+<title data-i18n="page_title_build">建築サポート｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_build" content="Heartopia（ハートピアスローライフ）向けに、画像を建材の配置図に変換して壁画・ドット絵建築を支援するツールです。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | 建築サポート">
+<meta property="og:description" content="画像を建材の配置図に変換して壁画・ドット絵建築を支援します。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/build.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | 建築サポート">
+<meta name="twitter:description" content="画像を建材の配置図に変換して壁画・ドット絵建築を支援します。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=12">
+<link rel="stylesheet" href="./css/art.css?v=50">
+<link rel="stylesheet" href="./css/design-system.css?v=2">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./music.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* 建築ページ専用（他ページには影響しない） */
+.build-grid-wrap{
+  display:flex;
+  justify-content:center;
+  margin:14px 0;
+}
+
+.build-grid{
+  display:grid;
+  border:2px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  max-width:100%;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.build-cell{
+  width:18px;
+  height:18px;
+  border:none;
+  padding:0;
+  cursor:pointer;
+  outline:1px solid rgba(0,0,0,0.06);
+}
+
+.build-cell:hover{
+  outline:2px solid var(--indigo);
+  outline-offset:-2px;
+  z-index:1;
+  position:relative;
+}
+
+.build-size-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.build-size-row label{
+  font-size:12px;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.build-size-row input[type="number"]{
+  width:64px;
+  padding:6px 8px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+}
+
+body.dark .build-size-row input[type="number"]{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.build-material-picker-box{
+  width:90%;
+  max-width:360px;
+  max-height:80vh;
+  overflow-y:auto;
+}
+
+.build-material-group-title{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin:14px 0 6px;
+}
+
+.build-material-swatches{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(34px, 1fr));
+  gap:6px;
+}
+
+.build-material-swatch{
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:8px;
+  border:2px solid var(--border);
+  cursor:pointer;
+  padding:0;
+}
+
+.build-material-swatch.active{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 2px var(--indigo) inset;
+}
+
+.build-library-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:10px;
+}
+
+.build-library-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px 12px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:12px;
+}
+
+body.dark .build-library-item{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.build-library-item-name{
+  font-weight:700;
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.build-library-item-actions{
+  display:flex;
+  gap:6px;
+}
+
+.build-library-item-actions button{
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-radius:999px;
+  padding:5px 10px;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.build-io-row{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+</nav>
+
+<div class="page-header">
+  <h1 data-i18n="build_page_title">建築サポート</h1>
+  <p class="page-subtitle" data-i18n="build_page_subtitle">画像を建材の配置図に変換します（壁画モード）</p>
+</div>
+
+<div class="art-notice" data-i18n="build_notice">
+  現在は壁画モード（2D）のみ試験公開中です。立体モード（3D）は今後追加予定です。
+</div>
+
+<div class="art-convert-progress" id="buildProgress">
+  <button type="button" class="art-convert-progress-step" data-stage="upload">
+    <span class="art-convert-progress-num">1</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_upload">画像</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="size">
+    <span class="art-convert-progress-num">2</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_size">サイズ</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="crop">
+    <span class="art-convert-progress-num">3</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_crop">位置</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="finish">
+    <span class="art-convert-progress-num">4</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_finish">仕上げ</span>
+  </button>
+</div>
+
+<div class="art-convert-layout">
+  <div class="art-convert-upload" id="buildUploadArea">
+    <div class="art-step-title"><span class="art-step-num">1/4</span><span data-i18n="art_choose_image">画像を選ぶ</span></div>
+    <input type="file" id="buildFileInput" accept="image/jpeg,image/png,image/webp" hidden>
+    <button class="art-upload-btn" id="buildUploadBtn">
+      <span id="buildUploadIcon"></span>
+      <span data-i18n="art_choose_image">画像を選ぶ</span>
+    </button>
+    <p class="art-upload-hint" data-i18n="art_upload_hint">JPG・PNG・WebPに対応</p>
+  </div>
+
+  <div class="art-panel" id="buildSizeStage" style="display:none;">
+    <div class="art-panel-section">
+      <div class="art-step-title"><span class="art-step-num">2/4</span><span data-i18n="build_size_label">壁画サイズ</span></div>
+      <p class="art-step-hint" data-i18n="build_size_hint">横・縦のマス数を指定します（横は最大24、縦は最大17が目安です）</p>
+      <div class="build-size-row">
+        <label><span data-i18n="build_width_label">横</span>
+          <input type="number" id="buildWidthInput" min="1" max="24" value="16">
+        </label>
+        <label><span data-i18n="build_height_label">縦</span>
+          <input type="number" id="buildHeightInput" min="1" max="17" value="16">
+        </label>
+      </div>
+    </div>
+    <div class="art-panel-btn-row">
+      <button class="art-header-btn" id="buildSizeConfirmBtn" data-i18n="art_size_confirm">この内容で次へ（位置を調整する）</button>
+    </div>
+  </div>
+
+  <div class="art-crop-stage" id="buildCropStage" style="display:none;">
+    <div class="art-step-title"><span class="art-step-num">3/4</span><span data-i18n="art_crop_title">位置とサイズを調整</span></div>
+    <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
+    <div class="art-crop-viewport" id="buildCropViewport">
+      <img id="buildCropImg" alt="" draggable="false">
+    </div>
+    <div class="art-crop-zoom-row">
+      <span class="art-crop-zoom-icon">－</span>
+      <input type="range" id="buildCropZoomSlider" min="100" max="300" value="100">
+      <span class="art-crop-zoom-icon">＋</span>
+    </div>
+    <a class="art-back-link" href="javascript:void(0)" onclick="showBuildSizeStage()">
+      <span id="buildCropBackIcon"></span>
+      <span data-i18n="art_crop_back_to_size">キャンバスサイズを変更する</span>
+    </a>
+    <div class="art-panel-btn-row art-crop-actions">
+      <button class="art-crop-reset-btn" id="buildCropResetBtn" data-i18n="art_crop_reset">位置をリセット</button>
+      <button class="art-header-btn" id="buildCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定して変換結果を確認する</button>
+    </div>
+  </div>
+
+  <div class="art-convert-preview" id="buildResultStage" style="display:none;">
+    <div class="art-step-title"><span class="art-step-num">4/4</span><span data-i18n="build_result_label">配置図</span></div>
+    <p class="art-step-hint" data-i18n="build_result_hint">マスをタップすると建材を変更できます</p>
+    <a class="art-back-link" href="javascript:void(0)" id="buildNewImageBtn">
+      <span id="buildNewImageIcon"></span>
+      <span data-i18n="build_new_image">新しい画像から作り直す</span>
+    </a>
+
+    <div class="build-grid-wrap">
+      <div class="build-grid" id="buildGrid"></div>
+    </div>
+
+    <div class="art-convert-result-info" id="buildMaterialListWrap">
+      <div class="art-result-stats">
+        <div class="art-result-stat">
+          <span class="art-result-stat-label" data-i18n="build_used_materials_label">使用建材数</span>
+          <span class="art-result-stat-value" id="buildMaterialCount">0</span>
+        </div>
+        <div class="art-result-stat">
+          <span class="art-result-stat-label" data-i18n="art_used_cells_label">使用マス数</span>
+          <span class="art-result-stat-value" id="buildCellCount">0</span>
+        </div>
+      </div>
+      <details class="art-result-color-list" open>
+        <summary data-i18n="build_material_list_label">必要な建材一覧</summary>
+        <div class="art-result-color-rows" id="buildMaterialRows"></div>
+      </details>
+    </div>
+
+    <div class="art-panel-btn-row art-preview-actions">
+      <button class="art-crop-reset-btn" id="buildChangeSizeBtn" data-i18n="art_change_size">サイズを変更する</button>
+      <button class="art-crop-reset-btn" id="buildAdjustCropBtn" data-i18n="art_adjust_crop">位置を調整する</button>
+    </div>
+
+    <div class="art-panel-section" style="margin-top:16px;">
+      <div class="art-panel-title" data-i18n="build_save_label">設計図の保存</div>
+      <div class="build-size-row">
+        <input type="text" id="buildDesignNameInput" placeholder="設計図の名前" data-i18n-placeholder="build_design_name_placeholder" style="flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-family:'Zen Maru Gothic', sans-serif; font-size:13px;">
+        <button class="art-header-btn" id="buildSaveDesignBtn" data-i18n="build_save_btn">保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="art-panel" id="buildLibraryPanel">
+    <div class="art-panel-title" data-i18n="build_library_label">保存した設計図</div>
+    <div class="build-library-list" id="buildLibraryList"></div>
+    <div class="build-io-row">
+      <button class="art-crop-reset-btn" id="buildExportBtn" data-i18n="build_export_btn">書き出し（JSON）</button>
+      <button class="art-crop-reset-btn" id="buildImportBtn" data-i18n="build_import_btn">読み込み（JSON）</button>
+      <input type="file" id="buildImportInput" accept="application/json" hidden>
+    </div>
+  </div>
+</div>
+
+<div id="buildMaterialPickerModal" onclick="if(event.target.id==='buildMaterialPickerModal') closeMaterialPicker()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box build-material-picker-box">
+    <h3 style="text-align:center;" data-i18n="build_picker_title">建材を選ぶ</h3>
+    <div id="buildMaterialPickerBody"></div>
+    <button class="modal-close-btn" onclick="closeMaterialPicker()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-help-box">
+    <h3 style="text-align:center;" data-i18n="build_help_title">使い方</h3>
+
+    <p><strong data-i18n="build_help_1_title">① 画像を選ぶ</strong><br>
+    <span data-i18n="build_help_1_body">壁画にしたい画像をアップロードします。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② 壁画サイズ</strong><br>
+    <span data-i18n="build_help_2_body">横・縦のマス数を指定します。ゲーム内の敷地（横24マス）・建築高さ（17マス）が目安の上限です。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 位置とサイズを調整</strong><br>
+    <span data-i18n="build_help_3_body">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を決めます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">④ 配置図・建材一覧</strong><br>
+    <span data-i18n="build_help_4_body">色ごとに最も近い建材（支柱系）が自動で割り当てられます。マスをタップすると建材を選び直せます。必要な建材の種類・個数は一覧で確認できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_5_title">⑤ 保存・書き出し</strong><br>
+    <span data-i18n="build_help_5_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
+
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/toast.js"></script>
+<script>
+
+document.getElementById("buildUploadIcon").innerHTML = icon("upload", { size: 18 });
+document.getElementById("buildCropBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("buildNewImageIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("helpBtn").innerHTML = icon("help");
+
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+
+</script>
+<script src="js/data-materials.js"></script>
+<script src="js/art-pixelate.js"></script>
+<script src="js/build.js?v=1"></script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>
