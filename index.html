@@ -236,6 +236,13 @@
       </div>
 
       <div class="filter-group">
+        <div class="filter-group-label" data-i18n="group_limited">表示範囲</div>
+        <div class="filter">
+          <button onclick="setLimitedOnly(!limitedOnly)" id="limitedOnlyBtn"><span class="btn-icon" data-icon="calendar"></span><span data-i18n="filter_limited_only">シーズン・フェス限定のみ</span></button>
+        </div>
+      </div>
+
+      <div class="filter-group">
         <div class="filter-group-label" data-i18n="group_sort">並び替え</div>
         <div class="filter filter-4">
           <button onclick="setSort('book')" id="s_book"><span class="btn-icon" data-icon="sortBook"></span><span data-i18n="sort_book">図鑑順</span></button>
@@ -621,7 +628,7 @@ text-align:left;
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
-<script src="js/main.js?v=21"></script>
+<script src="js/main.js?v=22"></script>
 
 <script src="js/sw-register.js"></script>
 </body>
