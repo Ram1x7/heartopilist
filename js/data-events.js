@@ -409,7 +409,7 @@ const eventData = [
     name: "フェス「原始の鳴き声」",
     img: "./images/events/e035.jpg",
     start: "2026-08-29 06:00",
-    end: "2026-10-09 05:59",
+    end: "2026-10-10 05:59",
     exchangeEnd: null,
     detail: "参加条件：開拓者レベル7に到達し、チュートリアル「答えはここにある」冒険クエストを完了",
     link: "https://x.com/heartopia_jp/status/2088913666540208356?s=61",
