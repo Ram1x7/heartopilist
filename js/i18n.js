@@ -51,7 +51,7 @@ const i18n = (() => {
   /** 翻訳JSON読込 */
   async function loadTranslations(lang){
     try{
-      const url = `${BASE_URL}locales/${lang}.json?v=33`;
+      const url = `${BASE_URL}locales/${lang}.json?v=34`;
       const res = await fetch(url);
 
       if(!res.ok) throw new Error(res.status);
@@ -63,7 +63,7 @@ const i18n = (() => {
       console.warn(`[i18n] Failed to load ${lang}`,e);
 
       if(lang!==DEFAULT_LANG){
-        const res = await fetch(`${BASE_URL}locales/${DEFAULT_LANG}.json?v=33`);
+        const res = await fetch(`${BASE_URL}locales/${DEFAULT_LANG}.json?v=34`);
         return await res.json();
       }
 

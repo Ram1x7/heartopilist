@@ -29,33 +29,75 @@ const BUILD_DESIGNS_KEY = "hatopiBuild_designs";
 let savedDesigns = [];
 
 // ── 建材マッチング ──
+// RGBのユークリッド距離は人間の知覚とズレがあり（特に肌色・淡い色で不自然な
+// 色に飛びやすい）、Lab色空間に変換してから距離を測ることで知覚的に近い色を
+// 選びやすくする（CIE76：Lab空間での単純な二乗ユークリッド距離）
 function hexToRgb(hex){
   const v = hex.replace("#", "");
   return [parseInt(v.slice(0, 2), 16), parseInt(v.slice(2, 4), 16), parseInt(v.slice(4, 6), 16)];
 }
 
-// 支柱系（grid_cell配置）の全建材・全色から、対象RGBに最も近い色を持つものを選ぶ
-function nearestMaterial(rgb, materialItems){
-  let best = null;
-  let bestDist = Infinity;
+function srgbChannelToLinear(c){
+  c /= 255;
+  return c > 0.04045 ? ((c + 0.055) / 1.055) ** 2.4 : c / 12.92;
+}
+
+function labF(t){
+  return t > 0.008856 ? Math.cbrt(t) : (7.787 * t + 16 / 116);
+}
+
+function rgbToLab(rgb){
+  const r = srgbChannelToLinear(rgb[0]);
+  const g = srgbChannelToLinear(rgb[1]);
+  const b = srgbChannelToLinear(rgb[2]);
+  const x = labF((r * 0.4124564 + g * 0.3575761 + b * 0.1804375) / 0.95047);
+  const y = labF(r * 0.2126729 + g * 0.7151522 + b * 0.0721750);
+  const z = labF((r * 0.0193339 + g * 0.1191920 + b * 0.9503041) / 1.08883);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+
+function labDistSq(a, b){
+  return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+}
+
+// 建材の色は固定データのため、Lab変換は一度だけ行いキャッシュする
+const materialLabIndexCache = new WeakMap();
+function getMaterialLabIndex(materialItems){
+  let index = materialLabIndexCache.get(materialItems);
+  if(index) return index;
+  index = [];
   materialItems.forEach(material => {
     material.colors.forEach(hex => {
-      const c = hexToRgb(hex);
-      const dist = (rgb[0] - c[0]) ** 2 + (rgb[1] - c[1]) ** 2 + (rgb[2] - c[2]) ** 2;
-      if(dist < bestDist){
-        bestDist = dist;
-        best = { materialId: material.id, name: material.name, hex };
-      }
+      index.push({ materialId: material.id, name: material.name, hex, lab: rgbToLab(hexToRgb(hex)) });
     });
+  });
+  materialLabIndexCache.set(materialItems, index);
+  return index;
+}
+
+// 支柱系（grid_cell配置）の全建材・全色から、対象Labに最も近い色を持つものを選ぶ
+function nearestMaterialFromLab(lab, materialItems){
+  const index = getMaterialLabIndex(materialItems);
+  let best = null;
+  let bestDist = Infinity;
+  index.forEach(entry => {
+    const dist = labDistSq(lab, entry.lab);
+    if(dist < bestDist){
+      bestDist = dist;
+      best = { materialId: entry.materialId, name: entry.name, hex: entry.hex };
+    }
   });
   return best;
 }
 
+function nearestMaterial(rgb, materialItems){
+  return nearestMaterialFromLab(rgbToLab(rgb), materialItems);
+}
+
 // ── ステップ進捗表示 ──
-const BUILD_STAGE_ORDER = ["upload", "size", "crop", "finish"];
+const BUILD_STAGE_ORDER = ["upload", "adjust", "finish"];
 const BUILD_STAGE_JUMP_FN = {
-  size: () => showBuildSizeStage(),
-  crop: () => openBuildCropStage(false),
+  adjust: () => openBuildCropStage(false),
 };
 
 function updateBuildStepProgress(stage){
@@ -92,7 +134,9 @@ function handleBuildFileSelect(file){
       sourceImage = img;
       manualCropRect = null;
       cropTargetKey = null;
-      showBuildSizeStage();
+      document.getElementById("buildWidthInput").value = settings.width;
+      document.getElementById("buildHeightInput").value = settings.height;
+      openBuildCropStage(true);
     };
     img.onerror = () => alert(T("art_image_load_failed", "画像の読み込みに失敗しました"));
     img.src = e.target.result;
@@ -100,18 +144,8 @@ function handleBuildFileSelect(file){
   reader.readAsDataURL(file);
 }
 
-// ── 壁画サイズ選択 ──
-function showBuildSizeStage(){
-  if(!sourceImage) return;
-  document.getElementById("buildUploadArea").style.display = "none";
-  document.getElementById("buildCropStage").style.display = "none";
-  document.getElementById("buildResultStage").style.display = "none";
-  document.getElementById("buildSizeStage").style.display = "block";
-  document.getElementById("buildWidthInput").value = settings.width;
-  document.getElementById("buildHeightInput").value = settings.height;
-  updateBuildStepProgress("size");
-}
-
+// ── サイズ指定（位置調整ステージに統合。マス数を変えるたびに
+// handleBuildSizeInputChange()からライブでグリッド線を更新する） ──
 function readSizeInputs(){
   const w = Math.min(24, Math.max(1, Number(document.getElementById("buildWidthInput").value) || 1));
   const h = Math.min(17, Math.max(1, Number(document.getElementById("buildHeightInput").value) || 1));
@@ -120,10 +154,13 @@ function readSizeInputs(){
   settings.height = h;
 }
 
-function confirmBuildSizeStage(){
-  readSizeInputs();
-  document.getElementById("buildSizeStage").style.display = "none";
-  openBuildCropStage(false);
+let sizeInputDebounceTimer = null;
+function handleBuildSizeInputChange(){
+  clearTimeout(sizeInputDebounceTimer);
+  sizeInputDebounceTimer = setTimeout(() => {
+    readSizeInputs();
+    openBuildCropStage(true);
+  }, 200);
 }
 
 // ── 位置・拡大縮小の調整（js/art-converter.jsのopenCropStage/applyCropTransform/
@@ -131,10 +168,9 @@ function confirmBuildSizeStage(){
 function openBuildCropStage(reset){
   if(!sourceImage) return;
   document.getElementById("buildUploadArea").style.display = "none";
-  document.getElementById("buildSizeStage").style.display = "none";
   document.getElementById("buildResultStage").style.display = "none";
   document.getElementById("buildCropStage").style.display = "block";
-  updateBuildStepProgress("crop");
+  updateBuildStepProgress("adjust");
 
   const targetKey = `${settings.width}x${settings.height}`;
   const viewport = document.getElementById("buildCropViewport");
@@ -261,24 +297,105 @@ function confirmBuildCrop(){
 }
 
 // ── 画像→建材グリッド変換 ──
+// セルへの縮小は1段階で行わず、各セルにつき複数のサブピクセルをサンプリングしてから
+// 代表色を決める。これにより:
+// ・単純平均だと目・口などコントラストの強い細部がぼやけて消えてしまうため、
+//   セル内の明るさのばらつきが大きい（＝輪郭を含む）場合は平均ではなく
+//   最も暗いサブピクセルを代表色として優先する
+// ・そのうえでLab色空間の誤差拡散（Floyd–Steinberg）を行い、固定パレット内でも
+//   隣接セルとの組み合わせで中間的な色合いを近似できるようにする
+const CELL_SUPERSAMPLE = 8;
+const EDGE_LUMA_STDDEV_THRESHOLD = 28;
+
+function sampleCellColors(sourceImage, rect, w, h){
+  const sampleW = w * CELL_SUPERSAMPLE;
+  const sampleH = h * CELL_SUPERSAMPLE;
+  const off = document.createElement("canvas");
+  off.width = sampleW;
+  off.height = sampleH;
+  const octx = off.getContext("2d");
+  octx.drawImage(sourceImage, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, sampleW, sampleH);
+  const d = octx.getImageData(0, 0, sampleW, sampleH).data;
+
+  const colors = new Array(w * h);
+  const alphas = new Array(w * h);
+  const isEdgeCell = new Array(w * h);
+  for(let cy = 0; cy < h; cy++){
+    for(let cx = 0; cx < w; cx++){
+      let rSum = 0, gSum = 0, bSum = 0, aSum = 0;
+      let minLuma = Infinity;
+      let darkest = null;
+      const lumas = [];
+      for(let sy = 0; sy < CELL_SUPERSAMPLE; sy++){
+        for(let sx = 0; sx < CELL_SUPERSAMPLE; sx++){
+          const px = cx * CELL_SUPERSAMPLE + sx;
+          const py = cy * CELL_SUPERSAMPLE + sy;
+          const i = (py * sampleW + px) * 4;
+          const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+          rSum += r; gSum += g; bSum += b; aSum += a;
+          const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          lumas.push(luma);
+          if(luma < minLuma){ minLuma = luma; darkest = [r, g, b]; }
+        }
+      }
+      const n = CELL_SUPERSAMPLE * CELL_SUPERSAMPLE;
+      const avg = [rSum / n, gSum / n, bSum / n];
+      const meanLuma = lumas.reduce((s, v) => s + v, 0) / n;
+      const variance = lumas.reduce((s, v) => s + (v - meanLuma) ** 2, 0) / n;
+      const edge = Math.sqrt(variance) > EDGE_LUMA_STDDEV_THRESHOLD;
+      const idx = cy * w + cx;
+      colors[idx] = edge ? darkest : avg;
+      alphas[idx] = aSum / n;
+      isEdgeCell[idx] = edge;
+    }
+  }
+  return { colors, alphas, isEdgeCell };
+}
+
+// Floyd–Steinberg誤差拡散：確定したセルの量子化誤差を右・左下・下・右下へ配分する
+function diffuseLabError(errors, w, h, x, y, diff){
+  const spread = [[1, 0, 7 / 16], [-1, 1, 3 / 16], [0, 1, 5 / 16], [1, 1, 1 / 16]];
+  spread.forEach(([dx, dy, factor]) => {
+    const nx = x + dx, ny = y + dy;
+    if(nx < 0 || nx >= w || ny < 0 || ny >= h) return;
+    const nidx = ny * w + nx;
+    const add = [diff[0] * factor, diff[1] * factor, diff[2] * factor];
+    errors[nidx] = errors[nidx]
+      ? [errors[nidx][0] + add[0], errors[nidx][1] + add[1], errors[nidx][2] + add[2]]
+      : add;
+  });
+}
+
 function computeResultCells(){
   const w = settings.width, h = settings.height;
-  const off = document.createElement("canvas");
-  off.width = w;
-  off.height = h;
-  const octx = off.getContext("2d");
   const rect = manualCropRect || coverCropRect(sourceImage.naturalWidth, sourceImage.naturalHeight, w, h);
-  octx.drawImage(sourceImage, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, w, h);
-  const imgData = octx.getImageData(0, 0, w, h);
-  const d = imgData.data;
   const supportItems = MATERIALS.support_pillars.items;
+  const { colors, alphas, isEdgeCell } = sampleCellColors(sourceImage, rect, w, h);
+
+  const errors = new Array(w * h).fill(null);
   const cells = new Array(w * h);
-  for(let i = 0; i < w * h; i++){
-    if(d[i * 4 + 3] < 128){
-      cells[i] = null;
-      continue;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const idx = y * w + x;
+      if(alphas[idx] < 128){
+        cells[idx] = null;
+        continue;
+      }
+      const lab = rgbToLab(colors[idx]);
+      // 輪郭セル（目・口などのコントラストを保つために暗い色を優先選択したセル）は
+      // 意図的に選んだ極端な色であり、周辺セルとの平均的な誤差ではないため、
+      // 誤差拡散の入力にも出力にも参加させない（輪郭が滲むのを防ぐ）
+      if(isEdgeCell[idx]){
+        cells[idx] = nearestMaterialFromLab(lab, supportItems);
+        continue;
+      }
+      const err = errors[idx];
+      const dithered = err ? [lab[0] + err[0], lab[1] + err[1], lab[2] + err[2]] : lab;
+      const match = nearestMaterialFromLab(dithered, supportItems);
+      cells[idx] = match;
+      const matchLab = rgbToLab(hexToRgb(match.hex));
+      diffuseLabError(errors, w, h, x, y, [lab[0] - matchLab[0], lab[1] - matchLab[1], lab[2] - matchLab[2]]);
     }
-    cells[i] = nearestMaterial([d[i * 4], d[i * 4 + 1], d[i * 4 + 2]], supportItems);
   }
   return cells;
 }
@@ -402,7 +519,6 @@ function resetBuildToUpload(){
   manualCropRect = null;
   cropTargetKey = null;
   document.getElementById("buildResultStage").style.display = "none";
-  document.getElementById("buildSizeStage").style.display = "none";
   document.getElementById("buildCropStage").style.display = "none";
   document.getElementById("buildUploadArea").style.display = "block";
   updateBuildStepProgress("upload");
@@ -493,7 +609,6 @@ function loadDesign(id){
   settings.height = design.height;
   resultCells = design.cells.map(c => (c ? { ...c } : null));
   document.getElementById("buildUploadArea").style.display = "none";
-  document.getElementById("buildSizeStage").style.display = "none";
   document.getElementById("buildCropStage").style.display = "none";
   document.getElementById("buildResultStage").style.display = "block";
   document.getElementById("buildDesignNameInput").value = design.name;
@@ -571,9 +686,9 @@ function initBuildPage(){
     if(e.target.files && e.target.files[0]) handleBuildFileSelect(e.target.files[0]);
   });
 
-  document.getElementById("buildSizeConfirmBtn").addEventListener("click", confirmBuildSizeStage);
-  document.getElementById("buildChangeSizeBtn").addEventListener("click", showBuildSizeStage);
-  document.getElementById("buildAdjustCropBtn").addEventListener("click", () => openBuildCropStage(false));
+  document.getElementById("buildWidthInput").addEventListener("input", handleBuildSizeInputChange);
+  document.getElementById("buildHeightInput").addEventListener("input", handleBuildSizeInputChange);
+  document.getElementById("buildAdjustBtn").addEventListener("click", () => openBuildCropStage(false));
   document.getElementById("buildNewImageBtn").addEventListener("click", resetBuildToUpload);
   document.getElementById("buildSaveDesignBtn").addEventListener("click", saveBuildDesign);
   document.getElementById("buildExportBtn").addEventListener("click", exportBuildDesigns);

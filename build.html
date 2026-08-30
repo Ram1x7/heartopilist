@@ -289,18 +289,13 @@ body.dark .build-library-item{
     <span class="art-convert-progress-label" data-i18n="art_step_progress_upload">画像</span>
   </button>
   <span class="art-convert-progress-line"></span>
-  <button type="button" class="art-convert-progress-step" data-stage="size">
+  <button type="button" class="art-convert-progress-step" data-stage="adjust">
     <span class="art-convert-progress-num">2</span>
-    <span class="art-convert-progress-label" data-i18n="art_step_progress_size">サイズ</span>
-  </button>
-  <span class="art-convert-progress-line"></span>
-  <button type="button" class="art-convert-progress-step" data-stage="crop">
-    <span class="art-convert-progress-num">3</span>
-    <span class="art-convert-progress-label" data-i18n="art_step_progress_crop">位置</span>
+    <span class="art-convert-progress-label" data-i18n="build_step_progress_adjust">調整</span>
   </button>
   <span class="art-convert-progress-line"></span>
   <button type="button" class="art-convert-progress-step" data-stage="finish">
-    <span class="art-convert-progress-num">4</span>
+    <span class="art-convert-progress-num">3</span>
     <span class="art-convert-progress-label" data-i18n="art_step_progress_finish">仕上げ</span>
   </button>
 </div>
@@ -316,26 +311,20 @@ body.dark .build-library-item{
     <p class="art-upload-hint" data-i18n="art_upload_hint">JPG・PNG・WebPに対応</p>
   </div>
 
-  <div class="art-panel" id="buildSizeStage" style="display:none;">
-    <div class="art-panel-section">
-      <div class="art-step-title"><span class="art-step-num">2/4</span><span data-i18n="build_size_label">壁画サイズ</span></div>
-      <p class="art-step-hint" data-i18n="build_size_hint">横・縦のマス数を指定します（横は最大24、縦は最大17が目安です）</p>
-      <div class="build-size-row">
-        <label><span data-i18n="build_width_label">横</span>
-          <input type="number" id="buildWidthInput" min="1" max="24" value="16">
-        </label>
-        <label><span data-i18n="build_height_label">縦</span>
-          <input type="number" id="buildHeightInput" min="1" max="17" value="16">
-        </label>
-      </div>
-    </div>
-    <div class="art-panel-btn-row">
-      <button class="art-header-btn" id="buildSizeConfirmBtn" data-i18n="art_size_confirm">この内容で次へ（位置を調整する）</button>
-    </div>
-  </div>
-
   <div class="art-crop-stage" id="buildCropStage" style="display:none;">
-    <div class="art-step-title"><span class="art-step-num">3/4</span><span data-i18n="art_crop_title">位置とサイズを調整</span></div>
+    <div class="art-step-title"><span class="art-step-num">2/3</span><span data-i18n="build_size_crop_title">サイズと位置を調整</span></div>
+
+    <div class="build-size-row">
+      <label><span data-i18n="build_width_label">横</span>
+        <input type="number" id="buildWidthInput" min="1" max="24" value="16">
+      </label>
+      <label><span data-i18n="build_height_label">縦</span>
+        <input type="number" id="buildHeightInput" min="1" max="17" value="16">
+      </label>
+    </div>
+    <p class="art-step-hint" data-i18n="build_size_hint">横・縦のマス数を指定します（横は最大24、縦は最大17が目安です）</p>
+    <p class="art-step-hint" data-i18n="build_resolution_tip">高さ17マスはゲーム側の上限のため変更できません。輪郭がはっきりした単色に近いイラストほど再現しやすく、細かい顔立ちや淡いグラデーションは省略されやすい点にご注意ください。</p>
+
     <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
     <div class="art-crop-viewport" id="buildCropViewport">
       <img id="buildCropImg" alt="" draggable="false">
@@ -347,10 +336,6 @@ body.dark .build-library-item{
       <input type="range" id="buildCropZoomSlider" min="100" max="300" value="100">
       <span class="art-crop-zoom-icon">＋</span>
     </div>
-    <a class="art-back-link" href="javascript:void(0)" onclick="showBuildSizeStage()">
-      <span id="buildCropBackIcon"></span>
-      <span data-i18n="art_crop_back_to_size">キャンバスサイズを変更する</span>
-    </a>
     <div class="art-panel-btn-row art-crop-actions">
       <button class="art-crop-reset-btn" id="buildCropResetBtn" data-i18n="art_crop_reset">位置をリセット</button>
       <button class="art-header-btn" id="buildCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定して変換結果を確認する</button>
@@ -358,7 +343,7 @@ body.dark .build-library-item{
   </div>
 
   <div class="art-convert-preview" id="buildResultStage" style="display:none;">
-    <div class="art-step-title"><span class="art-step-num">4/4</span><span data-i18n="build_result_label">配置図</span></div>
+    <div class="art-step-title"><span class="art-step-num">3/3</span><span data-i18n="build_result_label">配置図</span></div>
     <p class="art-step-hint" data-i18n="build_result_hint">マスをタップすると建材を変更できます</p>
     <a class="art-back-link" href="javascript:void(0)" id="buildNewImageBtn">
       <span id="buildNewImageIcon"></span>
@@ -394,8 +379,7 @@ body.dark .build-library-item{
     </div>
 
     <div class="art-panel-btn-row art-preview-actions">
-      <button class="art-crop-reset-btn" id="buildChangeSizeBtn" data-i18n="art_change_size">サイズを変更する</button>
-      <button class="art-crop-reset-btn" id="buildAdjustCropBtn" data-i18n="art_adjust_crop">位置を調整する</button>
+      <button class="art-crop-reset-btn" id="buildAdjustBtn" data-i18n="build_adjust_btn">サイズ・位置を調整する</button>
     </div>
 
     <div class="art-panel-section" style="margin-top:16px;">
@@ -433,17 +417,14 @@ body.dark .build-library-item{
     <p><strong data-i18n="build_help_1_title">① 画像を選ぶ</strong><br>
     <span data-i18n="build_help_1_body">壁画にしたい画像をアップロードします。</span></p>
 
-    <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② 壁画サイズ</strong><br>
-    <span data-i18n="build_help_2_body">横・縦のマス数を指定します。ゲーム内の敷地（横24マス）・建築高さ（17マス）が目安の上限です。</span></p>
+    <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② サイズと位置を調整</strong><br>
+    <span data-i18n="build_help_2_body">横・縦のマス数を指定し、ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を決めます。ゲーム内の敷地（横24マス）・建築高さ（17マス）が目安の上限です。</span></p>
 
-    <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 位置とサイズを調整</strong><br>
-    <span data-i18n="build_help_3_body">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を決めます。</span></p>
+    <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 配置図・建材一覧</strong><br>
+    <span data-i18n="build_help_3_body">色ごとに最も近い建材（支柱系）が自動で割り当てられます。マスをタップすると建材を選び直せます。必要な建材の種類・個数は一覧で確認できます。</span></p>
 
-    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">④ 配置図・建材一覧</strong><br>
-    <span data-i18n="build_help_4_body">色ごとに最も近い建材（支柱系）が自動で割り当てられます。マスをタップすると建材を選び直せます。必要な建材の種類・個数は一覧で確認できます。</span></p>
-
-    <p style="margin-top:10px;"><strong data-i18n="build_help_5_title">⑤ 保存・書き出し</strong><br>
-    <span data-i18n="build_help_5_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
+    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">④ 保存・書き出し</strong><br>
+    <span data-i18n="build_help_4_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
 
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
   </div>
@@ -455,7 +436,6 @@ body.dark .build-library-item{
 <script>
 
 document.getElementById("buildUploadIcon").innerHTML = icon("upload", { size: 18 });
-document.getElementById("buildCropBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("buildNewImageIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
 document.getElementById("helpBtn").innerHTML = icon("help");
 
@@ -509,7 +489,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script src="js/build.js?v=3"></script>
+<script src="js/build.js?v=4"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
