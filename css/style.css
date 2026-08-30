@@ -1231,36 +1231,58 @@ body.dark #m_name{
   color:var(--dark-accent);
 }
 
-/* モーダル情報横並び */
-.modal-info-row{
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
+/* モーダル情報 */
+.modal-info{
   margin-top:10px;
   color:var(--text-sub);
-}
-
-body.dark .modal-info-row{
-  color:var(--dark-text-sub);
-}
-
-/* 左 */
-.modal-left{
-  width:130px;
   text-align:left;
+}
+
+body.dark .modal-info{
+  color:var(--dark-text-sub);
 }
 
 #m_time{
   white-space:nowrap;
 }
 
-/* 右 */
-.modal-right{
-  width:90px;
-  text-align:left;
+/* 売価テーブル（レア度・売価・フェスコイン） */
+.modal-price-table{
+  width:100%;
+  border-collapse:collapse;
   font-size:11px;
-  line-height:1.5;
-  margin-left:60px;
+  margin-top:10px;
+  margin-bottom:12px;
+}
+
+.modal-price-table th{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  padding:5px 6px;
+  text-align:center;
+  font-weight:500;
+}
+
+body.dark .modal-price-table th{ background:#383329; }
+
+.modal-price-table td{
+  text-align:center;
+  padding:5px 6px;
+  border-top:1px solid var(--border);
+  color:var(--text);
+}
+
+body.dark .modal-price-table td{ color:#ece4d4; border-color:#46423b; }
+
+/* フェスコイン列は該当データがある場合のみ表示 */
+.modal-price-table th:nth-child(3),
+.modal-price-table td:nth-child(3){
+  display:none;
+}
+
+.modal-price-table.has-fes th:nth-child(3),
+.modal-price-table.has-fes td:nth-child(3){
+  display:table-cell;
 }
 
 /* 最小化 */
