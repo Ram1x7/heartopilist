@@ -888,5 +888,8 @@
   "build_library_delete": "삭제",
   "build_delete_confirm": "이 설계도를 삭제하시겠습니까?",
   "build_import_confirm": "불러온 설계도를 추가하시겠습니까? (기존 설계도는 유지됩니다)",
-  "build_crop_grid_hint": "흰색 선은 실제로 칸이 나뉘는 위치의 기준입니다"
+  "build_crop_grid_hint": "흰색 선은 실제로 칸이 나뉘는 위치의 기준입니다",
+  "build_pillar_count_label": "필요한 지주 개수",
+  "build_pillar_height_suffix": "（높이 {n}칸）",
+  "build_unit_pillars": "개"
 }

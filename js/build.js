@@ -343,28 +343,54 @@ function closeMaterialPicker(){
   document.getElementById("buildMaterialPickerModal").style.display = "none";
 }
 
-// ── 必要な建材一覧（種類別個数） ──
+// 列（横位置）ごとに、縦方向へ同じ建材が続く区間を1本の支柱としてまとめる。
+// 支柱は1マス×1マスの設置面に対して高さ方向へ1×2単位で伸縮するため、
+// 1マスごとに独立した支柱を積むのではなく、同じ色が続く高さ分だけ
+// 1本を伸ばして配置するのが実際の建て方に近い
+function computeBuildPillarSegments(){
+  const w = settings.width, h = settings.height;
+  const segments = [];
+  for(let x = 0; x < w; x++){
+    let run = null;
+    for(let y = 0; y < h; y++){
+      const cell = resultCells[y * w + x];
+      const key = cell ? cell.materialId + "_" + cell.hex : null;
+      if(run && run.key === key){
+        run.height++;
+      }else{
+        if(run && run.key) segments.push(run);
+        run = key ? { key, name: cell.name, hex: cell.hex, height: 1 } : null;
+      }
+    }
+    if(run && run.key) segments.push(run);
+  }
+  return segments;
+}
+
+// ── 必要な建材一覧（建材・高さ別の支柱本数） ──
 function renderBuildMaterialList(){
   if(!resultCells) return;
+  const cellCount = resultCells.filter(c => !!c).length;
+  const segments = computeBuildPillarSegments();
+
   const counts = {};
-  let cellCount = 0;
-  resultCells.forEach(cell => {
-    if(!cell) return;
-    cellCount++;
-    const key = cell.materialId + "_" + cell.hex;
-    if(!counts[key]) counts[key] = { name: cell.name, hex: cell.hex, count: 0 };
+  segments.forEach(seg => {
+    const key = seg.key + "_" + seg.height;
+    if(!counts[key]) counts[key] = { name: seg.name, hex: seg.hex, height: seg.height, count: 0 };
     counts[key].count++;
   });
   const entries = Object.values(counts).sort((a, b) => b.count - a.count);
+  const materialTypeCount = new Set(segments.map(s => s.key)).size;
 
-  document.getElementById("buildMaterialCount").textContent = entries.length;
+  document.getElementById("buildMaterialCount").textContent = materialTypeCount;
   document.getElementById("buildCellCount").textContent = cellCount.toLocaleString();
+  document.getElementById("buildPillarCount").textContent = segments.length.toLocaleString();
 
   document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
     <div class="art-result-color-row">
       <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-      <span class="art-result-color-code">${e.name}</span>
-      <span class="art-result-color-count">${e.count}${T("art_unit_cells", "マス")}</span>
+      <span class="art-result-color-code">${e.name}${T("build_pillar_height_suffix","（高さ{n}マス）").replace("{n}", e.height)}</span>
+      <span class="art-result-color-count">${e.count}${T("build_unit_pillars", "本")}</span>
     </div>
   `).join("");
 }

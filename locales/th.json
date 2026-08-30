@@ -888,5 +888,8 @@
   "build_library_delete": "ลบ",
   "build_delete_confirm": "ต้องการลบแบบแปลนนี้หรือไม่?",
   "build_import_confirm": "ต้องการเพิ่มแบบแปลนที่นำเข้าหรือไม่? (แบบแปลนเดิมจะยังคงอยู่)",
-  "build_crop_grid_hint": "เส้นสีขาวคือแนวโดยประมาณที่จะถูกแบ่งเป็นช่องจริง"
+  "build_crop_grid_hint": "เส้นสีขาวคือแนวโดยประมาณที่จะถูกแบ่งเป็นช่องจริง",
+  "build_pillar_count_label": "จำนวนเสาที่ต้องใช้",
+  "build_pillar_height_suffix": "（สูง {n} ช่อง）",
+  "build_unit_pillars": " ต้น"
 }

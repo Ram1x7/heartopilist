@@ -914,5 +914,8 @@
   "build_library_delete": "Delete",
   "build_delete_confirm": "Delete this design?",
   "build_import_confirm": "Add the imported designs? (existing designs will be kept)",
-  "build_crop_grid_hint": "The white lines show roughly where each cell boundary will fall"
+  "build_crop_grid_hint": "The white lines show roughly where each cell boundary will fall",
+  "build_pillar_count_label": "Pillars needed",
+  "build_pillar_height_suffix": " (height {n})",
+  "build_unit_pillars": ""
 }
