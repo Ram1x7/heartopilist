@@ -934,13 +934,9 @@ function openModal(c){
  // 星1しか存在しないアイテム（失敗作・壊れ物など）は★2〜5を非表示にする
  const star1Only = c.star1Only === true;
 
- // 今回追加分（フェスコイン二重価格あり）はコインアイコンを試験表示する
- const isNewFesItem = c.fesCoinPrice !== undefined;
- function fmtPrice(star, value){
-   if(value == null) return `★${star}｜-`;
-   return isNewFesItem
-     ? `★${star}｜${injectCurrencyIcons(`${value}コイン`)}`
-     : `★${star}｜${value}`;
+ // 売価セルの表示（コイン/フェスコインどちらも文字は出さずアイコン＋数字のみ）
+ function fmtCell(value, currencyType){
+   return value != null ? `${currencyIcon(currencyType)}${value.toLocaleString()}` : "-";
  }
 
  // 野鳥だけ特殊計算
@@ -954,43 +950,29 @@ function openModal(c){
    return Math.ceil(value / 10) * 10;
  }
 
-if(c.type === "bird"){
-  const star2 = birdStar2(basePrice);
-  m_price1.innerHTML = fmtPrice(1, basePrice || null);
-  m_price2.innerHTML = fmtPrice(2, basePrice ? star2 : null);
-  m_price3.innerHTML = fmtPrice(3, basePrice ? star2 * 2 : null);
-  m_price4.innerHTML = fmtPrice(4, basePrice ? star2 * 4 : null);
-  m_price5.innerHTML = fmtPrice(5, basePrice ? star2 * 8 : null);
-}else{
-  // 魚・虫・砂像・雪像・貝殻
-  m_price1.innerHTML = fmtPrice(1, basePrice || null);
-  m_price2.innerHTML = fmtPrice(2, basePrice ? Math.floor(basePrice * 1.5) : null);
-  m_price3.innerHTML = fmtPrice(3, basePrice ? Math.floor(basePrice * 2) : null);
-  m_price4.innerHTML = fmtPrice(4, basePrice ? Math.floor(basePrice * 4) : null);
-  m_price5.innerHTML = fmtPrice(5, basePrice ? Math.floor(basePrice * 8) : null);
+ function calcStars(base, isBird){
+   if(!base) return [null,null,null,null,null];
+   if(isBird){
+     const star2 = birdStar2(base);
+     return [base, star2, star2 * 2, star2 * 4, star2 * 8];
+   }
+   return [base, Math.floor(base * 1.5), Math.floor(base * 2), Math.floor(base * 4), Math.floor(base * 8)];
  }
+
+ const isBird = c.type === "bird";
+ const prices = calcStars(basePrice, isBird);
+ const priceEls = [m_price1, m_price2, m_price3, m_price4, m_price5];
+ priceEls.forEach((el, i) => { el.innerHTML = fmtCell(prices[i], "coin"); });
 
  // フェス限定：フェスコインでの売却価格（通常コインと同じ計算方法で★1〜5を算出）
- const baseFesPrice = c.fesCoinPrice ?? 0;
- function fmtFesPrice(star, value){
-   return value ? `★${star}｜${injectCurrencyIcons(`${value}フェスコイン`)}` : "";
- }
- if(c.fesCoinPrice){
-   const fesStar2 = c.type === "bird" ? birdStar2(baseFesPrice) : Math.floor(baseFesPrice * 1.5);
-   m_fesPrice1.innerHTML = fmtFesPrice(1, baseFesPrice);
-   m_fesPrice2.innerHTML = fmtFesPrice(2, fesStar2);
-   m_fesPrice3.innerHTML = fmtFesPrice(3, c.type === "bird" ? fesStar2 * 2 : Math.floor(baseFesPrice * 2));
-   m_fesPrice4.innerHTML = fmtFesPrice(4, c.type === "bird" ? fesStar2 * 4 : Math.floor(baseFesPrice * 4));
-   m_fesPrice5.innerHTML = fmtFesPrice(5, c.type === "bird" ? fesStar2 * 8 : Math.floor(baseFesPrice * 8));
- }else{
-   [m_fesPrice1, m_fesPrice2, m_fesPrice3, m_fesPrice4, m_fesPrice5].forEach(el => { el.innerHTML = ""; });
- }
- [m_fesPrice2, m_fesPrice3, m_fesPrice4, m_fesPrice5].forEach(el=>{
-   el.style.display = star1Only ? "none" : "";
- });
+ const hasFesField = c.fesCoinPrice !== undefined;
+ m_priceTable.classList.toggle("has-fes", hasFesField);
+ const fesPrices = hasFesField ? calcStars(c.fesCoinPrice ?? 0, isBird) : [null,null,null,null,null];
+ const fesPriceEls = [m_fesPrice1, m_fesPrice2, m_fesPrice3, m_fesPrice4, m_fesPrice5];
+ fesPriceEls.forEach((el, i) => { el.innerHTML = hasFesField ? fmtCell(fesPrices[i], "fescoin") : ""; });
 
  // 星1しか存在しない場合は★2〜5の行を隠す
- [m_price2, m_price3, m_price4, m_price5].forEach(el=>{
+ [m_priceRow2, m_priceRow3, m_priceRow4, m_priceRow5].forEach(el=>{
    el.style.display = star1Only ? "none" : "";
  });
 
