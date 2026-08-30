@@ -147,7 +147,7 @@ function handleBuildFileSelect(file){
 // ── サイズ指定（位置調整ステージに統合。マス数を変えるたびに
 // handleBuildSizeInputChange()からライブでグリッド線を更新する） ──
 function readSizeInputs(){
-  const w = Math.min(24, Math.max(1, Number(document.getElementById("buildWidthInput").value) || 1));
+  const w = Math.min(96, Math.max(1, Number(document.getElementById("buildWidthInput").value) || 1));
   const h = Math.min(17, Math.max(1, Number(document.getElementById("buildHeightInput").value) || 1));
   if(w !== settings.width || h !== settings.height) manualCropRect = null;
   settings.width = w;
