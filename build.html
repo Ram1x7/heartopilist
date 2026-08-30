@@ -316,13 +316,13 @@ body.dark .build-library-item{
 
     <div class="build-size-row">
       <label><span data-i18n="build_width_label">横</span>
-        <input type="number" id="buildWidthInput" min="1" max="24" value="16">
+        <input type="number" id="buildWidthInput" min="1" max="96" value="16">
       </label>
       <label><span data-i18n="build_height_label">縦</span>
         <input type="number" id="buildHeightInput" min="1" max="17" value="16">
       </label>
     </div>
-    <p class="art-step-hint" data-i18n="build_size_hint">横・縦のマス数を指定します（横は最大24、縦は最大17が目安です）</p>
+    <p class="art-step-hint" data-i18n="build_size_hint">横・縦のマス数を指定します（横は最大96、縦は最大17が目安です）</p>
     <p class="art-step-hint" data-i18n="build_resolution_tip">高さ17マスはゲーム側の上限のため変更できません。輪郭がはっきりした単色に近いイラストほど再現しやすく、細かい顔立ちや淡いグラデーションは省略されやすい点にご注意ください。</p>
 
     <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
@@ -418,7 +418,7 @@ body.dark .build-library-item{
     <span data-i18n="build_help_1_body">壁画にしたい画像をアップロードします。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② サイズと位置を調整</strong><br>
-    <span data-i18n="build_help_2_body">横・縦のマス数を指定し、ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を決めます。ゲーム内の敷地（横24マス）・建築高さ（17マス）が目安の上限です。</span></p>
+    <span data-i18n="build_help_2_body">横・縦のマス数を指定し、ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を決めます。ゲーム内の敷地（横96マス）・建築高さ（17マス）が目安の上限です。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 配置図・建材一覧</strong><br>
     <span data-i18n="build_help_3_body">色ごとに最も近い建材（支柱系）が自動で割り当てられます。マスをタップすると建材を選び直せます。必要な建材の種類・個数は一覧で確認できます。</span></p>
@@ -489,7 +489,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script src="js/build.js?v=4"></script>
+<script src="js/build.js?v=5"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
