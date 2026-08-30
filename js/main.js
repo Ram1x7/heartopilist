@@ -510,6 +510,16 @@ function sortList(arr){
   return out;
 }
 
+// 一覧カード用の軽量サムネイル画像パスを返す（詳細モーダルは元画像のまま）
+function thumbSrc(path){
+  if(!path) return path;
+  const normalized = path.startsWith("./") ? path.slice(2) : path;
+  if(!normalized.startsWith("images/")) return path;
+  return normalized
+    .replace(/^images\//, "images/thumb/")
+    .replace(/\.[^./]+$/, ".jpg");
+}
+
 // カード生成
 function createCard(c){
   const div=document.createElement("div");
@@ -553,7 +563,7 @@ function createCard(c){
   </button>
 ` : ""}
 
-  <img src="${c.img}" alt="${displayName(c)}" loading="lazy" decoding="async">
+  <img src="${thumbSrc(c.img)}" alt="${displayName(c)}" loading="lazy" decoding="async">
 
 </div>
 

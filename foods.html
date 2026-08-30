@@ -1000,6 +1000,15 @@ function displayName(f){
   const lang = currentLang();
   return f.nameI18n[lang] || f.name;
 }
+// 一覧カード用の軽量サムネイル画像パスを返す（詳細モーダルは元画像のまま）
+function thumbSrc(path){
+  if(!path) return path;
+  const normalized = path.startsWith("./") ? path.slice(2) : path;
+  if(!normalized.startsWith("images/")) return path;
+  return normalized
+    .replace(/^images\//, "images/thumb/")
+    .replace(/\.[^./]+$/, ".jpg");
+}
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
     return window.i18n.t(key, vars, fallback);
@@ -1120,7 +1129,7 @@ function renderSection(items, type = "normal"){
             ${icon(authed ? "medal" : "medalOutline", {size:13})}
           </button>
         ` : ''}
-        <img src="${f.image}" alt="${displayName(f)}" loading="lazy">
+        <img src="${thumbSrc(f.image)}" alt="${displayName(f)}" loading="lazy">
       </div>
       <div class="item-name">${displayName(f)}</div>
     `;
