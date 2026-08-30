@@ -240,12 +240,19 @@ function buildSeasonBannerHtml(season, ended){
     : `${icon("pin",{size:13})} ${label}${T("shop_season_active_suffix"," 開催中")}（${startDate}〜${endDate}）`;
 }
 
-function renderProgress(){
-  const total = shopData.length;
-  const done = shopData.filter(item => shopChecked[item.id]).length;
-  document.getElementById("shopProgressLabel").textContent = `${done} / ${total}`;
+// シーズン（イベント）ごとのコンプ数ゲージを作る
+function buildProgressHtml(items){
+  const total = items.length;
+  const done = items.filter(item => shopChecked[item.id]).length;
   const pct = total ? Math.round((done / total) * 100) : 0;
-  document.getElementById("shopProgressFill").style.width = pct + "%";
+  return `
+    <div class="shop-progress">
+      <span>${done} / ${total}</span>
+      <div class="shop-progress-track">
+        <div class="shop-progress-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+  `;
 }
 
 // 1シーズン分のカテゴリ・サブカテゴリ別グリッドをcontainerに追加する。
@@ -298,11 +305,21 @@ function renderSeasonGroup(group, content){
 
   const showPrompt = !!(group.season && group.ended && group.key && !revealedSeasons.has(group.key));
 
+  if(group.season){
+    const bannerDiv = document.createElement("div");
+    bannerDiv.className = "shop-season-banner" + (group.ended ? " ended" : "");
+    bannerDiv.innerHTML = buildSeasonBannerHtml(group.season, group.ended);
+    wrap.appendChild(bannerDiv);
+  }
+
+  const progressDiv = document.createElement("div");
+  progressDiv.innerHTML = buildProgressHtml(group.items);
+  wrap.appendChild(progressDiv.firstElementChild);
+
   if(showPrompt){
     const promptDiv = document.createElement("div");
     promptDiv.className = "shop-reveal-wrap";
     promptDiv.innerHTML = `
-      <p class="shop-reveal-title">${buildSeasonBannerHtml(group.season, group.ended)}</p>
       <p>${T("shop_ended_reveal_hint","このシーズンのアイテムは入手できなくなりました。過去の記録として一覧を確認できます")}</p>
       <button class="shop-reveal-btn">${T("shop_ended_reveal_btn","アイテム一覧を表示")}</button>
     `;
@@ -315,13 +332,6 @@ function renderSeasonGroup(group, content){
     return true;
   }
 
-  if(group.season){
-    const bannerDiv = document.createElement("div");
-    bannerDiv.className = "shop-season-banner" + (group.ended ? " ended" : "");
-    bannerDiv.innerHTML = buildSeasonBannerHtml(group.season, group.ended);
-    wrap.appendChild(bannerDiv);
-  }
-
   const visibleItems = group.items.filter(matchesShopSearch);
   const anyResult = renderSeasonCategories(visibleItems, wrap);
   content.appendChild(wrap);
@@ -329,8 +339,6 @@ function renderSeasonGroup(group, content){
 }
 
 function render(){
-  renderProgress();
-
   const content = document.getElementById("shopContent");
   content.innerHTML = "";
 
