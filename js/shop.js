@@ -212,7 +212,7 @@ function createShopCard(item){
       <img src="${item.img}" loading="lazy" decoding="async" alt="${displayName(item)}">
     </div>
     <div class="item-name shop-item-name">${displayName(item)}</div>
-    <div class="shop-item-price">${currencyIconHTML} ${item.price.toLocaleString()}${currencyLabel ? " " + currencyLabel : ""}</div>
+    <div class="shop-item-price"><span class="shop-item-price-icon">${currencyIconHTML}</span>${item.price.toLocaleString()}${currencyLabel ? " " + currencyLabel : ""}</div>
     ${limitLabel}
   `;
 
