@@ -927,8 +927,8 @@ function openModal(c){
    locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
  }
  m_loc.innerHTML = locHtml;
- m_weather.innerText=T("modal_weather","天気：")+formatWeather(c.weather);
- m_time.innerText=T("modal_time","時間：")+formatTimeForServer(c.time);
+ m_weather.innerText = formatWeather(c.weather);
+ m_time.innerText = formatTimeForServer(c.time);
  const basePrice = c.price ?? 0;
 
  // 星1しか存在しないアイテム（失敗作・壊れ物など）は★2〜5を非表示にする
@@ -976,16 +976,12 @@ function openModal(c){
    el.style.display = star1Only ? "none" : "";
  });
 
- m_star5.innerHTML =
-  c.star5
-  ? `${T("modal_star5_label","★5条件：")}<br>${c.star5}`
-  : "";
+ m_star5.innerHTML = c.star5 || "";
+ m_star5Row.style.display = c.star5 ? "" : "none";
 
  // 認証マスターに必要な捕獲・発見数（対象外の生き物や、まだ判明していない数値は非表示にする）
- m_authCount.innerText =
-  c.authCount
-  ? T("modal_auth_count_label", `認証に必要な数：${c.authCount.toLocaleString()}`, { n: c.authCount.toLocaleString() })
-  : "";
+ m_authCount.innerText = c.authCount ? c.authCount.toLocaleString() : "";
+ m_authCountRow.style.display = c.authCount ? "" : "none";
 
  // 作り方情報（砂像のデザイン形状・三択回答など）
  const craftEl = document.getElementById("m_craftInfo");
