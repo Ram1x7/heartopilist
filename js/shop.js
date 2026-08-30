@@ -297,6 +297,17 @@ function renderSeasonCategories(items, container){
   return anyResult;
 }
 
+// カテゴリ分けせず、shopDataの並び順のまま1つのグリッドとして表示する
+// （season.categorized === false のシーズン用）
+function renderFlatGrid(items, container){
+  if(items.length === 0) return false;
+  const grid = document.createElement("div");
+  grid.className = "shop-grid";
+  sortShopItems(items).forEach(item => grid.appendChild(createShopCard(item)));
+  container.appendChild(grid);
+  return true;
+}
+
 // シーズン1つ分のブロック（バナー＋アイテム一覧、または終了済みなら畳んだ案内）を
 // contentに追加する。表示すべき内容があればtrueを返す
 function renderSeasonGroup(group, content){
@@ -333,7 +344,9 @@ function renderSeasonGroup(group, content){
   }
 
   const visibleItems = group.items.filter(matchesShopSearch);
-  const anyResult = renderSeasonCategories(visibleItems, wrap);
+  const anyResult = (group.season && group.season.categorized === false)
+    ? renderFlatGrid(visibleItems, wrap)
+    : renderSeasonCategories(visibleItems, wrap);
   content.appendChild(wrap);
   return anyResult;
 }
