@@ -60,13 +60,33 @@
   margin:14px 0;
 }
 
+/* ゲーム内で壁に設置したイメージに近づけるための簡易的な壁面背景
+   （実際のゲーム画面ではないため、あくまで見た目の目安） */
+.build-wall-preview{
+  display:inline-block;
+  padding:16px;
+  border-radius:14px;
+  max-width:100%;
+  background:
+    repeating-linear-gradient(180deg, rgba(0,0,0,0.07) 0 2px, transparent 2px 34px),
+    linear-gradient(180deg, #caa06c, #b9895a);
+  box-shadow:0 6px 16px rgba(52,48,43,0.18), inset 0 0 0 3px rgba(255,255,255,0.18);
+}
+
+body.dark .build-wall-preview{
+  background:
+    repeating-linear-gradient(180deg, rgba(0,0,0,0.28) 0 2px, transparent 2px 34px),
+    linear-gradient(180deg, #6b5236, #543f27);
+  box-shadow:0 6px 16px rgba(0,0,0,0.35), inset 0 0 0 3px rgba(255,255,255,0.06);
+}
+
 .build-grid{
   display:grid;
-  border:2px solid var(--border);
-  border-radius:10px;
+  border:2px solid rgba(0,0,0,0.25);
+  border-radius:6px;
   overflow:hidden;
   max-width:100%;
-  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
 }
 
 .build-cell{
@@ -344,7 +364,9 @@ body.dark .build-library-item{
     </a>
 
     <div class="build-grid-wrap">
-      <div class="build-grid" id="buildGrid"></div>
+      <div class="build-wall-preview">
+        <div class="build-grid" id="buildGrid"></div>
+      </div>
     </div>
 
     <div class="art-convert-result-info" id="buildMaterialListWrap">
