@@ -152,8 +152,42 @@ function openBuildCropStage(reset){
     }
     document.getElementById("buildCropZoomSlider").value = Math.round(cropZoom * 100);
     applyBuildCropTransform();
+    renderBuildCropGridOverlay();
     bindBuildCropInteractions();
   });
+}
+
+// 位置調整ステージに、確定する切り抜き範囲（＝ビューポートそのもの）を
+// settings.width×settings.heightのマス目で区切った目安線を重ねる。
+// 画像のドラッグ・ズームとは独立して、ビューポートに対して固定表示する
+function renderBuildCropGridOverlay(){
+  const canvas = document.getElementById("buildCropOverlay");
+  const viewport = document.getElementById("buildCropViewport");
+  if(!canvas || !viewport) return;
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  canvas.width = vw;
+  canvas.height = vh;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, vw, vh);
+
+  const cellW = vw / settings.width;
+  const cellH = vh / settings.height;
+  ctx.strokeStyle = "rgba(255,255,255,0.85)";
+  ctx.lineWidth = 1;
+  ctx.shadowColor = "rgba(0,0,0,0.55)";
+  ctx.shadowBlur = 1.5;
+  ctx.beginPath();
+  for(let x = 1; x < settings.width; x++){
+    const px = Math.round(x * cellW) + 0.5;
+    ctx.moveTo(px, 0);
+    ctx.lineTo(px, vh);
+  }
+  for(let y = 1; y < settings.height; y++){
+    const py = Math.round(y * cellH) + 0.5;
+    ctx.moveTo(0, py);
+    ctx.lineTo(vw, py);
+  }
+  ctx.stroke();
 }
 
 function applyBuildCropTransform(){

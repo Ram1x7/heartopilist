@@ -204,6 +204,27 @@ body.dark .build-library-item{
   margin-top:10px;
   flex-wrap:wrap;
 }
+
+/* 位置調整ステージの画像・グリッド線オーバーレイ
+   （css/art.cssの#artCropImg/#artCropOverlayと同じ役割。IDが異なるため
+   このページ側で個別に指定する必要がある） */
+#buildCropImg{
+  position:absolute;
+  top:0;
+  left:0;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+}
+
+#buildCropOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
 </style>
 </head>
 
@@ -296,7 +317,9 @@ body.dark .build-library-item{
     <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
     <div class="art-crop-viewport" id="buildCropViewport">
       <img id="buildCropImg" alt="" draggable="false">
+      <canvas id="buildCropOverlay"></canvas>
     </div>
+    <p class="art-crop-hint" data-i18n="build_crop_grid_hint">白い線は実際にマス目で区切られる位置の目安です</p>
     <div class="art-crop-zoom-row">
       <span class="art-crop-zoom-icon">－</span>
       <input type="range" id="buildCropZoomSlider" min="100" max="300" value="100">
@@ -457,7 +480,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script src="js/build.js?v=1"></script>
+<script src="js/build.js?v=2"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

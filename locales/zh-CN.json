@@ -887,5 +887,6 @@
   "build_library_load": "读取",
   "build_library_delete": "删除",
   "build_delete_confirm": "要删除该设计图吗？",
-  "build_import_confirm": "要添加导入的设计图吗？（现有的设计图将保留）"
+  "build_import_confirm": "要添加导入的设计图吗？（现有的设计图将保留）",
+  "build_crop_grid_hint": "白线为实际分格位置的大致参考"
 }

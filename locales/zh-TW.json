@@ -887,5 +887,6 @@
   "build_library_load": "讀取",
   "build_library_delete": "刪除",
   "build_delete_confirm": "要刪除該設計圖嗎？",
-  "build_import_confirm": "要新增匯入的設計圖嗎？（現有的設計圖將保留）"
+  "build_import_confirm": "要新增匯入的設計圖嗎？（現有的設計圖將保留）",
+  "build_crop_grid_hint": "白線為實際分格位置的大致參考"
 }

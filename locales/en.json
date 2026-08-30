@@ -913,5 +913,6 @@
   "build_library_load": "Load",
   "build_library_delete": "Delete",
   "build_delete_confirm": "Delete this design?",
-  "build_import_confirm": "Add the imported designs? (existing designs will be kept)"
+  "build_import_confirm": "Add the imported designs? (existing designs will be kept)",
+  "build_crop_grid_hint": "The white lines show roughly where each cell boundary will fall"
 }

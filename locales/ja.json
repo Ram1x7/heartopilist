@@ -913,5 +913,6 @@
   "build_library_load": "読込",
   "build_library_delete": "削除",
   "build_delete_confirm": "この設計図を削除しますか？",
-  "build_import_confirm": "読み込んだ設計図を追加しますか？（既存の設計図は残ります）"
+  "build_import_confirm": "読み込んだ設計図を追加しますか？（既存の設計図は残ります）",
+  "build_crop_grid_hint": "白い線は実際にマス目で区切られる位置の目安です"
 }
