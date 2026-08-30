@@ -125,12 +125,21 @@ function isSeasonEnded(season){
   return Date.now() > parseJstDateTimeStr(season.end).getTime();
 }
 
-// 現在表示中データのシーズン情報を返す（複数シーズン対応時は表示中データのseasonを見る）
+// 現在表示中のシーズン情報を返す。複数シーズンのアイテムが混在する場合は
+// 開催中のシーズンを優先し、すべて終了済みなら直近に終了したシーズンを表示する
 function getCurrentShopSeason(){
-  const seasonKey = shopData[0] ? shopData[0].season : null;
-  const season = seasonKey && typeof shopSeasons !== "undefined" ? shopSeasons[seasonKey] : null;
-  if(!season) return { season: null, ended: false };
-  return { season, ended: isSeasonEnded(season) };
+  if(typeof shopSeasons === "undefined") return { season: null, ended: false };
+  const seasonKeys = [...new Set(shopData.map(item => item.season).filter(Boolean))];
+  const seasons = seasonKeys.map(key => shopSeasons[key]).filter(Boolean);
+  if(seasons.length === 0) return { season: null, ended: false };
+
+  const active = seasons.find(s => !isSeasonEnded(s));
+  if(active) return { season: active, ended: false };
+
+  const latestEnded = seasons.reduce((latest, s) =>
+    parseJstDateTimeStr(s.end).getTime() > parseJstDateTimeStr(latest.end).getTime() ? s : latest
+  );
+  return { season: latestEnded, ended: true };
 }
 
 // シーズン終了後は入手不可のアイテムが並ぶだけになるため、初回表示では一覧を畳んでおき、
@@ -166,6 +175,14 @@ function createShopCard(item){
     ? ""
     : `<span class="shop-item-limit">${T("shop_limit_label","上限{n}個").replace("{n}", item.limit)}</span>`;
 
+  const isFesCurrency = item.currency === "フェスコイン";
+  const currencyIconHTML = isFesCurrency && typeof currencyIcon === "function"
+    ? currencyIcon("fescoin")
+    : icon("coin",{size:11});
+  const currencyLabel = isFesCurrency
+    ? T("shop_currency_fes","フェスコイン")
+    : T("shop_currency","トレンドコイン");
+
   div.innerHTML = `
     <div class="img-wrap">
       <div class="level-badge">${item.price.toLocaleString()}</div>
@@ -175,7 +192,7 @@ function createShopCard(item){
       <img src="${item.img}" loading="lazy" decoding="async" alt="${displayName(item)}">
     </div>
     <div class="item-name shop-item-name">${displayName(item)}</div>
-    <div class="shop-item-price">${icon("coin",{size:11})} ${item.price.toLocaleString()} ${T("shop_currency","トレンドコイン")}</div>
+    <div class="shop-item-price">${currencyIconHTML} ${item.price.toLocaleString()} ${currencyLabel}</div>
     ${limitLabel}
   `;
 
