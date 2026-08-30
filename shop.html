@@ -163,11 +163,22 @@ body[data-icon-size="large"] .shop-grid{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:3px;
+  gap:2px;
   font-size:11px;
   font-weight:700;
   color:var(--vermillion);
   margin-top:2px;
+}
+
+.shop-item-price-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.shop-item-price-icon img.currency-icon{
+  margin:0;
+  vertical-align:middle;
 }
 
 body.dark .shop-item-price{ color:#e07060; }
@@ -317,6 +328,6 @@ body.dark #shopClearBtn{
 <script src="js/toast.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/data-shop.js"></script>
-<script src="js/shop.js?v=9"></script>
+<script src="js/shop.js?v=10"></script>
 </body>
 </html>
