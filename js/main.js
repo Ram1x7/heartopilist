@@ -16,7 +16,8 @@ if(!SERVERS[currentServer]) currentServer = "asia";
 
 let currentFilter="all";
 let currentSort = "book";
-let weatherMode = "current"; 
+let limitedOnly = false;
+let weatherMode = "current";
 // "current" = 今の天気で出るやつ全部
 // "only" = 今の天気でしか出ないやつ
 let multiSelectMode = false;
@@ -413,6 +414,10 @@ function applyCommonFilters(arr){
 
   if(currentFilter !== "all"){
     out = out.filter(c => c.type === currentFilter);
+  }
+
+  if(limitedOnly){
+    out = out.filter(c => c.season || c.fes);
   }
 
   const keyword = document.getElementById("search").value;
@@ -849,6 +854,14 @@ function setSort(type){
     document.getElementById("s_"+x).classList.remove("active");
   });
   document.getElementById("s_"+type).classList.add("active");
+  render();
+}
+
+// シーズン・フェス限定のみ表示
+function setLimitedOnly(v){
+  limitedOnly = v;
+  localStorage.setItem("limitedOnly", v ? "1" : "");
+  document.getElementById("limitedOnlyBtn").classList.toggle("active", v);
   render();
 }
 
@@ -1802,6 +1815,9 @@ setSort(
 );
 setWeatherMode(
   localStorage.getItem("weatherMode") || "current"
+);
+setLimitedOnly(
+  localStorage.getItem("limitedOnly") === "1"
 );
 
 // サーバー選択の初期化

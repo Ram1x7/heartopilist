@@ -252,6 +252,8 @@
   "modal_craft_design_label": "รูปทรงดีไซน์",
   "modal_craft_answer_label": "คำตอบ",
   "group_weather_mode": "โหมดการปรากฏ",
+  "group_limited": "ขอบเขตการแสดงผล",
+  "filter_limited_only": "เฉพาะรายการจำกัดตามฤดูกาล/เทศกาล",
   "group_sort": "การเรียงลำดับ",
   "group_icon_size": "ขนาดการแสดงผล",
   "icon_size_small": "เล็ก",

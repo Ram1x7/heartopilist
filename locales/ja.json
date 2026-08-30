@@ -299,6 +299,8 @@
   "modal_craft_design_label": "デザイン形状",
   "modal_craft_answer_label": "三択回答",
   "group_weather_mode": "出現モード",
+  "group_limited": "表示範囲",
+  "filter_limited_only": "シーズン・フェス限定のみ",
   "group_sort": "並び替え",
   "group_icon_size": "表示サイズ",
   "icon_size_small": "小",

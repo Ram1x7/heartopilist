@@ -299,6 +299,8 @@
   "modal_craft_design_label": "Design shape",
   "modal_craft_answer_label": "Answer",
   "group_weather_mode": "Appearance mode",
+  "group_limited": "Display Range",
+  "filter_limited_only": "Season & Festival Limited Only",
   "group_sort": "Sort",
   "group_icon_size": "Icon size",
   "icon_size_small": "Small",

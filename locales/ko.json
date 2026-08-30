@@ -252,6 +252,8 @@
   "modal_craft_design_label": "디자인 형태",
   "modal_craft_answer_label": "선택 답변",
   "group_weather_mode": "출현 모드",
+  "group_limited": "표시 범위",
+  "filter_limited_only": "시즌・페스 한정만",
   "group_sort": "정렬",
   "group_icon_size": "표시 크기",
   "icon_size_small": "작게",

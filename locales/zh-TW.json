@@ -252,6 +252,8 @@
   "modal_craft_design_label": "設計形狀",
   "modal_craft_answer_label": "三選回答",
   "group_weather_mode": "出現模式",
+  "group_limited": "顯示範圍",
+  "filter_limited_only": "僅顯示季節・節日限定",
   "group_sort": "排序",
   "group_icon_size": "顯示大小",
   "icon_size_small": "小",
