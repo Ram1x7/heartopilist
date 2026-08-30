@@ -3,6 +3,8 @@
 // subcategory : fashionのみ使用（hat/top/bottom/setup/shoes/accessory/petCostume）
 // limit       : 購入上限数。null = 上限無し
 // season      : シーズンを識別するID。終了判定・表示グループ分けに使用
+//               （shopSeasonsのcategorized: falseで、そのシーズンはカテゴリ分けせず
+//               　shopDataの並び順のまま一覧表示する）
 
 const shopData = [
   {
@@ -2393,10 +2395,13 @@ const shopSeasons = {
     end: "2026-08-22 05:59",
   },
   // 「原始の呼び声」フェス（2026-08-29開始）
+  // categorized: false のシーズンは、カテゴリ見出しでまとめず
+  // shopDataの並び順（＝商店に並んでいる順）のまま一覧表示する
   primitive_2026: {
     label: "原始の呼び声",
     labelI18n: {"ja":"原始の呼び声","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     start: "2026-08-29 06:00",
     end: "2026-10-09 05:59",
+    categorized: false,
   },
 };
