@@ -5,6 +5,7 @@
 const CURRENCY_ICON_SRC = {
   coin: "images/currency/coin.png",
   negaiboshi: "images/currency/negaiboshi.png",
+  fescoin: "images/currency/fescoin.png",
 };
 
 function currencyIcon(type) {
@@ -16,7 +17,8 @@ function currencyIcon(type) {
 function injectCurrencyIcons(text) {
   if (!text) return text;
   return text
-    .replace(/(?<!トレンド)コイン/g, `${currencyIcon("coin")}コイン`)
+    .replace(/フェスコイン/g, `${currencyIcon("fescoin")}フェスコイン`)
+    .replace(/(?<!トレンド)(?<!フェス)コイン/g, `${currencyIcon("coin")}コイン`)
     .replace(/願い星/g, `${currencyIcon("negaiboshi")}願い星`);
 }
 

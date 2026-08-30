@@ -961,6 +961,11 @@ if(c.type === "bird"){
   m_price5.innerText =`★5｜${basePrice ? Math.floor(basePrice * 8) : "-"}`;
  }
 
+ // フェス限定：フェスコインでの売却価格（★1のみ）
+ m_fesPrice.innerHTML = c.fesCoinPrice
+  ? `★1｜${injectCurrencyIcons(`${c.fesCoinPrice}フェスコイン`)}`
+  : "";
+
  // 星1しか存在しない場合は★2〜5の行を隠す
  [m_price2, m_price3, m_price4, m_price5].forEach(el=>{
    el.style.display = star1Only ? "none" : "";

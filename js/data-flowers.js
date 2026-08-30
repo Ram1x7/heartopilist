@@ -277,6 +277,22 @@ const flowerData = [
     eventName: "ホエールシーズン",
     bookIndex: 17,
   },
+  {
+    name: "リュウカデンドロン・サマーサン",
+    nameI18n:{"ja":"リュウカデンドロン・サマーサン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    img: "./images/flowers/summer.PNG",
+    seedImg: "./images/flowers/seed_summer.jpg",
+    level: 1,
+    growTime: 1440,   // 24時間
+    seedPrice: 30,
+    prices: [125],
+    fesCoinPrice: 35,
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","輝く"],
+    auth: false,
+    fes: true,
+    eventName: "原始の呼び声",
+    bookIndex: 18,
+  },
 ];
 
 // 交配レア度マップ

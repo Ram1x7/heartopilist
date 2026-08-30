@@ -914,6 +914,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/icon-size.js"></script>
+<script src="js/currency-icons.js"></script>
 <script src="js/price-calc.js"></script>
 <script src="js/data-foods.js"></script>
 <script src="js/food-auth-calc.js"></script>
@@ -1317,6 +1318,11 @@ function renderModal(){
         <span class="f-info-label">${T("food_profit","利益")}</span>
         <span class="f-info-value ${profitClass}">${profitText} ${T("food_coin","コイン")}</span>
       </div>
+      ${f.fesCoinPrice ? `
+      <div class="f-info-row">
+        <span class="f-info-label">${T("food_fes_price","★1｜フェスコイン売価")}</span>
+        <span class="f-info-value">${injectCurrencyIcons(`${f.fesCoinPrice.toLocaleString()}フェスコイン`)}</span>
+      </div>` : ""}
     </div>
 
     <div class="f-info" style="margin-bottom:12px;">

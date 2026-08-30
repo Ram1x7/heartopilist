@@ -599,6 +599,7 @@ body.dark .garden-footer{
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/icon-size.js"></script>
+<script src="js/currency-icons.js"></script>
 <script src="js/price-calc.js"></script>
 <script src="js/data-crops.js"></script>
 <script src="js/data-flowers.js"></script>
@@ -1241,6 +1242,11 @@ function renderModal(item){
         <span class="g-info-label">${T("garden_seed_price","種の値段")}</span>
         <span class="g-info-value">${item.seedPrice.toLocaleString()} ${T("garden_coin","コイン")}</span>
       </div>
+      ${item.fesCoinPrice ? `
+      <div class="g-info-row">
+        <span class="g-info-label">${T("garden_fes_price","★1｜フェスコイン売価")}</span>
+        <span class="g-info-value">${injectCurrencyIcons(`${item.fesCoinPrice.toLocaleString()}フェスコイン`)}</span>
+      </div>` : ""}
       ${!isFlower ? `
       <div class="g-info-row">
         <span class="g-info-label">${T("garden_weeding","草抜き")}</span>
