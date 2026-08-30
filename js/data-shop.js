@@ -2347,13 +2347,11 @@ const shopData = [
     season: "primitive_2026",
   },
   {
-    // 送付リストで画像042のみ「上パーツ」表記が重複（上/中央/下×3の並びから外れる）。
-    // 名称は原文のまま登録。誤りであれば要修正。
     id: 196,
     category: "furniture",
     subcategory: null,
-    name: "ウォーキーの石版(上パーツ)",
-    nameI18n: {"ja":"ウォーキーの石版(上パーツ)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    name: "ウォーキーの石版(下パーツ)",
+    nameI18n: {"ja":"ウォーキーの石版(下パーツ)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/genshi/042.PNG",
     price: 2600,
     currency: "フェスコイン",
