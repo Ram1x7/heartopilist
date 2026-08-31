@@ -416,7 +416,7 @@ body.dark .footer{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="tutorialReplayBtn" aria-label="tutorial"></button>
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -470,6 +470,29 @@ body.dark .footer{
   </a>
 </div>
 
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 style="text-align:center;" data-i18n="faq_help_title">Q&Aの使い方</h3>
+
+    <p><strong data-i18n="faq_help_search_title">検索する</strong><br>
+    <span data-i18n="faq_help_search_body">キーワードで質問・要望・不具合を検索できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="faq_help_cat_title">種類で絞り込み</strong><br>
+    <span data-i18n="faq_help_cat_body">「質問」「要望」「不具合」で表示を切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="faq_help_list_title">タップして回答を確認</strong><br>
+    <span data-i18n="faq_help_list_body">項目をタップすると回答や対応状況が展開表示されます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="faq_help_contact_title">ここにない質問は匿名フォームへ</strong><br>
+    <span data-i18n="faq_help_contact_body">ここにない質問・新しい要望・不具合報告は、匿名フォームからお気軽にどうぞ。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(FAQ_TUTORIAL_DONE_KEY, FAQ_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="faq_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <div class="footer">
   ※本サイトは非公式のファンツールです
 </div>
@@ -517,10 +540,13 @@ const FAQ_TUTORIAL_STEPS = [
   { selector: "#faqList", titleKey: "tutorial_faq_step3_title", titleFallback: "③ タップして回答を確認", textKey: "tutorial_faq_step3_body", textFallback: "項目をタップすると回答や対応状況が展開表示されます。" },
   { selector: ".contact-box", titleKey: "tutorial_faq_step4_title", titleFallback: "④ ここにない質問は匿名フォームへ", textKey: "tutorial_faq_step4_body", textFallback: "ここにない質問・新しい要望・不具合報告は、匿名フォームからお気軽にどうぞ。" },
 ];
-document.getElementById("tutorialReplayBtn").innerHTML = icon("help");
-document.getElementById("tutorialReplayBtn").addEventListener("click", () => {
-  replayPageTutorial(FAQ_TUTORIAL_DONE_KEY, FAQ_TUTORIAL_STEPS);
-});
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
 
 function forceRepaint(){
   // Safari/iPad再描画バグ対策

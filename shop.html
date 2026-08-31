@@ -278,7 +278,7 @@ body.dark #shopClearBtn{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="tutorialReplayBtn" aria-label="tutorial"></button>
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -322,6 +322,29 @@ body.dark #shopClearBtn{
 </div>
 
 <div id="shopContent"></div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 style="text-align:center;" data-i18n="shop_help_title">トレンド商店の使い方</h3>
+
+    <p><strong data-i18n="shop_help_search_title">検索</strong><br>
+    <span data-i18n="shop_help_search_body">アイテム名で検索できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="shop_help_sort_title">並び替え</strong><br>
+    <span data-i18n="shop_help_sort_body">並び順・未所持順で並び替えできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="shop_help_check_title">所持チェック</strong><br>
+    <span data-i18n="shop_help_check_body">アイテムをタップすると購入済みとしてチェックできます。もう一度タップすると解除できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="shop_help_season_title">シーズン・フェス限定アイテム</strong><br>
+    <span data-i18n="shop_help_season_body">開催中のシーズン・フェス限定アイテムは、通常のアイテムとは別にまとめて表示され、コンプ数も個別に確認できます。終了済みのシーズンは折りたたまれた状態で表示され、「アイテム一覧を表示」で開けます。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(SHOP_TUTORIAL_DONE_KEY, SHOP_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="shop_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>

@@ -351,7 +351,7 @@ body.dark .receive-btn.received{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
-    <button id="tutorialReplayBtn" aria-label="tutorial"></button>
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -382,6 +382,23 @@ body.dark .receive-btn.received{
 </div>
 
 <div class="code-list" id="codeList"></div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 style="text-align:center;" data-i18n="codes_help_title">ギフトコードの使い方</h3>
+
+    <p><strong data-i18n="codes_help_tab_title">タブ切り替え</strong><br>
+    <span data-i18n="codes_help_tab_body">「有効なコード」「期限切れ」を切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="codes_help_copy_title">コードをコピー</strong><br>
+    <span data-i18n="codes_help_copy_body">コードをタップするとクリップボードにコピーされます。ゲーム内の交換画面に貼り付けてご利用ください。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(CODES_TUTORIAL_DONE_KEY, CODES_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="codes_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
 
 <div class="footer">
   ※本サイトは非公式のファンツールです<br>
@@ -432,10 +449,13 @@ const CODES_TUTORIAL_STEPS = [
   { selector: ".tabs", titleKey: "tutorial_codes_step1_title", titleFallback: "① タブを切り替え", textKey: "tutorial_codes_step1_body", textFallback: "「有効なコード」「期限切れ」を切り替えられます。" },
   { selector: "#codeList", titleKey: "tutorial_codes_step2_title", titleFallback: "② コードをタップしてコピー", textKey: "tutorial_codes_step2_body", textFallback: "コードをタップするとクリップボードにコピーされます。ゲーム内の交換画面に貼り付けてご利用ください。" },
 ];
-document.getElementById("tutorialReplayBtn").innerHTML = icon("help");
-document.getElementById("tutorialReplayBtn").addEventListener("click", () => {
-  replayPageTutorial(CODES_TUTORIAL_DONE_KEY, CODES_TUTORIAL_STEPS);
-});
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
 
 function forceRepaint(){
   // Safari/iPad再描画バグ対策
