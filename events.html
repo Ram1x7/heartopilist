@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/design-system.css?v=2">
+<link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -383,6 +383,7 @@ body.dark .footer{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -421,6 +422,26 @@ body.dark .footer{
 
 <div class="event-list" id="eventList"></div>
 
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 style="text-align:center;" data-i18n="events_help_title">イベント情報の使い方</h3>
+
+    <p><strong data-i18n="events_help_cat_title">種類で絞り込み</strong><br>
+    <span data-i18n="events_help_cat_body">「ガチャ」「イベント」で表示を絞り込めます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="events_help_status_title">開催状況で絞り込み</strong><br>
+    <span data-i18n="events_help_status_body">「開催中」「近日開催」「終了」で切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="events_help_card_title">カードで詳細を確認</strong><br>
+    <span data-i18n="events_help_card_body">開催期間・残り日数・詳細と公式リンクをカードごとにまとめて表示しています。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(EVENTS_TUTORIAL_DONE_KEY, EVENTS_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="events_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <div class="footer">
   ※本サイトは非公式のファンツールです<br>
   情報は変更される場合があります
@@ -429,6 +450,7 @@ body.dark .footer{
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/data-events.js"></script>
 <script>
@@ -461,6 +483,21 @@ darkToggle.onclick = ()=>{
   updateDarkBtn();
   forceRepaint();
 };
+
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const EVENTS_TUTORIAL_DONE_KEY = "hatopiEvents_tutorialDone";
+const EVENTS_TUTORIAL_STEPS = [
+  { selector: ".cat-tabs", titleKey: "tutorial_events_step1_title", titleFallback: "① 種類で絞り込み", textKey: "tutorial_events_step1_body", textFallback: "「ガチャ」「イベント」で表示を絞り込めます。" },
+  { selector: ".status-tabs", titleKey: "tutorial_events_step2_title", titleFallback: "② 開催状況で絞り込み", textKey: "tutorial_events_step2_body", textFallback: "「開催中」「近日開催」「終了」で切り替えられます。" },
+  { selector: "#eventList", titleKey: "tutorial_events_step3_title", titleFallback: "③ カードで詳細を確認", textKey: "tutorial_events_step3_body", textFallback: "開催期間・残り日数・詳細と公式リンクをカードごとにまとめて表示しています。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
 
 function forceRepaint(){
   // Safari/iPad再描画バグ対策
@@ -652,6 +689,7 @@ function renderEvents(){
 }
 
 renderEvents();
+maybeStartPageTutorial(EVENTS_TUTORIAL_DONE_KEY, EVENTS_TUTORIAL_STEPS);
 </script>
 <script src="js/sw-register.js"></script>
 </body>

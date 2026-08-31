@@ -28,6 +28,23 @@ function updateDarkButton(){
 }
 updateDarkButton();
 
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const SHOP_TUTORIAL_DONE_KEY = "hatopiShop_tutorialDone";
+const SHOP_TUTORIAL_STEPS = [
+  { selector: "#shopSearch", titleKey: "tutorial_shop_step1_title", titleFallback: "① 検索する", textKey: "tutorial_shop_step1_body", textFallback: "アイテム名のキーワードで検索できます。" },
+  { selector: "#shopSortRow", titleKey: "tutorial_shop_step2_title", titleFallback: "② 並び替え", textKey: "tutorial_shop_step2_body", textFallback: "並び順・未所持順で並び替えできます。" },
+  { selector: "#shopContent", titleKey: "tutorial_shop_step3_title", titleFallback: "③ 所持チェック", textKey: "tutorial_shop_step3_body", textFallback: "アイテムをタップすると購入済みとしてチェックできます。開催中のシーズン・フェスはここにまとめて表示されます。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
+
 function forceRepaint(){
   // Safari/iPad再描画バグ対策
   document.body.style.display = "none";
@@ -368,3 +385,4 @@ function render(){
 document.addEventListener("langchange", render);
 
 render();
+maybeStartPageTutorial(SHOP_TUTORIAL_DONE_KEY, SHOP_TUTORIAL_STEPS);

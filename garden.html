@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/design-system.css?v=2">
+<link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -574,7 +574,7 @@ body.dark .garden-footer{
 </div>
 
 
-<div class="tab-row">
+<div class="tab-row" id="gardenTabRow">
   <button class="g-tab active" id="tab-crop" onclick="setTab('crop')"><span class="btn-icon" data-icon="crop"></span><span data-i18n="garden_tab_crop">作物</span></button>
   <button class="g-tab" id="tab-flower" onclick="setTab('flower')"><span class="btn-icon" data-icon="flower"></span><span data-i18n="garden_tab_flower">花</span></button>
 </div>
@@ -598,6 +598,7 @@ body.dark .garden-footer{
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/price-calc.js"></script>
@@ -1383,15 +1384,25 @@ document.getElementById("helpBtn").onclick = () => {
       ${T("garden_help_notice_body","収穫通知は、ホーム画面に追加し、通知を許可した状態でのみ利用できます。<br>通知には最大1分程度の誤差があります。草抜きモードでは、1〜2回目は成長時間の3分の1ごとのタイミング前後、3回目は収穫時刻の1〜2分前に通知されます。<br>不具合が発生した場合、通知機能を予告なく一時停止する場合があります。あらかじめご了承ください。")}</p>
 
     </div>
+    <button class="g-close-btn modal-close-btn" onclick="closeModal(); replayPageTutorial(GARDEN_TUTORIAL_DONE_KEY, GARDEN_TUTORIAL_STEPS);">${T("tutorial_replay_btn","チュートリアルをもう一度見る")}</button>
     <button class="g-close-btn modal-close-btn" onclick="closeModal()">${T("garden_close","閉じる")}</button>
   `;
   document.getElementById("detailModal").style.display = "block";
 };
 
 
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const GARDEN_TUTORIAL_DONE_KEY = "hatopiGarden_tutorialDone";
+const GARDEN_TUTORIAL_STEPS = [
+  { selector: "#gardenTabRow", titleKey: "tutorial_garden_step1_title", titleFallback: "① 作物・花を切り替え", textKey: "tutorial_garden_step1_body", textFallback: "「作物」「花」タブで表示を切り替えられます。" },
+  { selector: "#gardenContent", titleKey: "tutorial_garden_step2_title", titleFallback: "② カードをタップ", textKey: "tutorial_garden_step2_body", textFallback: "タップするとレア度ごとの売却額や、花なら交配で作れる色の一覧が確認できます。" },
+  { selector: "#helpBtn", titleKey: "tutorial_garden_step3_title", titleFallback: "③ 使い方をもっと見る", textKey: "tutorial_garden_step3_body", textFallback: "収穫通知の設定方法など、詳しい使い方はこのボタンから見返せます。" },
+];
+
 // 初期化
 cleanExpiredTimers();
 renderContent();
+maybeStartPageTutorial(GARDEN_TUTORIAL_DONE_KEY, GARDEN_TUTORIAL_STEPS);
 
 // 言語切替時に再描画
 document.addEventListener("langchange", () => {

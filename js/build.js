@@ -674,11 +674,23 @@ async function importBuildDesigns(event){
 }
 
 // ── 初期化 ──
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+// build.html自体の変換ウィザード（画像→サイズ・位置→仕上げ）は既に
+// 段階的な進捗表示があるため、ここでは重複させず、ページ外側の操作
+// （アップロード・設計図ライブラリ・ヘルプ）だけを案内する
+const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone";
+const BUILD_TUTORIAL_STEPS = [
+  { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "壁画にしたい画像をアップロードすると、サイズ・位置の調整に進みます。" },
+  { selector: "#buildLibraryPanel", titleKey: "tutorial_build_step2_title", titleFallback: "② 設計図を保存・管理", textKey: "tutorial_build_step2_body", textFallback: "保存した設計図はここから呼び出せます。JSON形式での書き出し・読み込みも可能です。" },
+  { selector: "#helpBtn", titleKey: "tutorial_build_step3_title", titleFallback: "③ 使い方をもっと見る", textKey: "tutorial_build_step3_body", textFallback: "変換の流れなど、詳しい使い方はこのボタンから見返せます。" },
+];
+
 function initBuildPage(){
   loadSavedDesigns();
   renderBuildLibraryList();
   bindBuildStepProgress();
   updateBuildStepProgress("upload");
+  maybeStartPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);
 
   const fileInput = document.getElementById("buildFileInput");
   document.getElementById("buildUploadBtn").addEventListener("click", () => fileInput.click());

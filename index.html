@@ -52,7 +52,7 @@
 
 
 <link rel="stylesheet" href="css/style.css?v=15">
-<link rel="stylesheet" href="css/design-system.css?v=2">
+<link rel="stylesheet" href="css/design-system.css?v=3">
 
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -541,6 +541,7 @@ text-align:left;
 開き直した際には、前に開いていた時の状態が引き継がれます。</span></p>
   
 <div style="text-align:center; margin-top:20px;">
+<button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
 <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="help_close">
 閉じる
 </button>
@@ -628,7 +629,8 @@ text-align:left;
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
-<script src="js/main.js?v=26"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/main.js?v=27"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

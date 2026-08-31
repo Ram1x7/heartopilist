@@ -2401,7 +2401,7 @@ const shopSeasons = {
     label: "原始の呼び声",
     labelI18n: {"ja":"原始の呼び声","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     start: "2026-08-29 06:00",
-    end: "2026-10-09 05:59",
+    end: "2026-10-10 05:59",
     categorized: false,
   },
 };

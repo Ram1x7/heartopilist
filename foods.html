@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/design-system.css?v=2">
+<link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./garden.html">
@@ -847,6 +847,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -877,7 +878,7 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
   <button id="clearBtn"></button>
 </div>
 
-<div class="f-sort">
+<div class="f-sort" id="sortRow">
   <button class="f-sort-btn active" id="s_book" onclick="setSort('book')">図鑑順</button>
   <button class="f-sort-btn" id="s_level" onclick="setSort('level')">レベル順</button>
   <button class="f-sort-btn" id="s_unchecked" onclick="setSort('unchecked')">未コンプ順</button>
@@ -908,11 +909,35 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
   </div>
 </div>
 
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 style="text-align:center;" data-i18n="food_help_title">料理レシピ図鑑の使い方</h3>
+
+    <p><strong data-i18n="food_help_search_title">検索</strong><br>
+    <span data-i18n="food_help_search_body">料理名や素材名で検索できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="food_help_sort_title">並び替え</strong><br>
+    <span data-i18n="food_help_sort_body">図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="food_help_calc_title">認証マスター計算</strong><br>
+    <span data-i18n="food_help_calc_body">上部のボタンから、認証マスターに必要な素材の数を自動計算できます。手持ちの数を入力すると、不足している分だけ表示されます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="food_help_detail_title">詳しい情報を見る</strong><br>
+    <span data-i18n="food_help_detail_body">カードをタップすると、レシピ・必要な素材・レア度（☆1〜☆5）ごとの売却額を確認できます。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(FOODS_TUTORIAL_DONE_KEY, FOODS_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="food_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
 <div id="foodToast"></div>
 
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/price-calc.js"></script>
@@ -957,6 +982,24 @@ function updateDarkButton(){
     : icon("moon");
 }
 updateDarkButton();
+
+// ── チュートリアル再生ボタン ──
+const FOODS_TUTORIAL_DONE_KEY = "hatopiFoods_tutorialDone";
+const FOODS_TUTORIAL_STEPS = [
+  { selector: "#search", titleKey: "tutorial_foods_step1_title", titleFallback: "① 検索する", textKey: "tutorial_foods_step1_body", textFallback: "料理名や素材名のキーワードで検索できます。" },
+  { selector: "#sortRow", titleKey: "tutorial_foods_step2_title", titleFallback: "② 並び替え", textKey: "tutorial_foods_step2_body", textFallback: "図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。" },
+  { selector: "#calcOpenBtn", titleKey: "tutorial_foods_step3_title", titleFallback: "③ 認証マスター計算", textKey: "tutorial_foods_step3_body", textFallback: "必要な素材数を自動計算できます。手持ちの数を入力すれば不足分だけ表示されます。" },
+  { selector: "#list", titleKey: "tutorial_foods_step4_title", titleFallback: "④ 一覧をタップ", textKey: "tutorial_foods_step4_body", textFallback: "気になる料理をタップすると、レシピや必要な素材の詳細が確認できます。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
 
 // アイコン一括初期化（検索・クリア・btn-icon系）
 const foodsSearchIconEl = document.querySelector(".f-search-wrap .search-icon");
@@ -1683,6 +1726,7 @@ function bindShortageEvents(food, listEl){
 
 // 初期化
 render();
+maybeStartPageTutorial(FOODS_TUTORIAL_DONE_KEY, FOODS_TUTORIAL_STEPS);
 
 // 言語切替時に再描画
 document.addEventListener("langchange", ()=>{
