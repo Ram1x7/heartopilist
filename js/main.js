@@ -417,7 +417,12 @@ function applyCommonFilters(arr){
   }
 
   if(limitedOnly){
-    out = out.filter(c => c.season || c.fes);
+    // 「開催中のシーズン・フェス限定のみ」の絞り込みなので、
+    // ・season/fesが終了済み（ended:true）のものは除外する
+    // ・砂像・雪像はseason/fesフラグをバッジ表示用に持つが、過去シーズンの
+    //   ものでも常時入手可能でendedも付けない仕様のため（data-sand.js/
+    //   data-snow.js参照）、この絞り込みからは対象外にする
+    out = out.filter(c => (c.season || c.fes) && !c.ended && c.type !== "sand" && c.type !== "snow");
   }
 
   const keyword = document.getElementById("search").value;
