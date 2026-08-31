@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/design-system.css?v=2">
+<link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -351,6 +351,7 @@ body.dark .receive-btn.received{
 <div class="title-bar">
   <h1 data-i18n="site_title">はとぴ図鑑</h1>
   <div class="title-buttons">
+    <button id="tutorialReplayBtn" aria-label="tutorial"></button>
     <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
 </div>
@@ -392,6 +393,7 @@ body.dark .receive-btn.received{
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/currency-icons.js"></script>
 <script src="js/data-codes.js"></script>
 <script>
@@ -423,6 +425,17 @@ darkToggle.onclick = ()=>{
   updateDarkBtn();
   forceRepaint();
 };
+
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const CODES_TUTORIAL_DONE_KEY = "hatopiCodes_tutorialDone";
+const CODES_TUTORIAL_STEPS = [
+  { selector: ".tabs", titleKey: "tutorial_codes_step1_title", titleFallback: "① タブを切り替え", textKey: "tutorial_codes_step1_body", textFallback: "「有効なコード」「期限切れ」を切り替えられます。" },
+  { selector: "#codeList", titleKey: "tutorial_codes_step2_title", titleFallback: "② コードをタップしてコピー", textKey: "tutorial_codes_step2_body", textFallback: "コードをタップするとクリップボードにコピーされます。ゲーム内の交換画面に貼り付けてご利用ください。" },
+];
+document.getElementById("tutorialReplayBtn").innerHTML = icon("help");
+document.getElementById("tutorialReplayBtn").addEventListener("click", () => {
+  replayPageTutorial(CODES_TUTORIAL_DONE_KEY, CODES_TUTORIAL_STEPS);
+});
 
 function forceRepaint(){
   // Safari/iPad再描画バグ対策
@@ -583,6 +596,7 @@ function showToast(msg){
 }
 
 renderCodes();
+maybeStartPageTutorial(CODES_TUTORIAL_DONE_KEY, CODES_TUTORIAL_STEPS);
 
 // 言語切替時に再描画
 document.addEventListener("langchange", renderCodes);

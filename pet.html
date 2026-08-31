@@ -30,7 +30,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Zen+Maru+Gothic:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/design-system.css?v=2">
+<link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -602,7 +602,7 @@ body.dark .footer {
 <!-- コントロールカード -->
 <div class="card sticky">
   <div class="control-inner">
-    <div class="control-row">
+    <div class="control-row" id="petAddRow">
       <div class="pet-selector" id="petSelector"></div>
       <select id="petTypeSelect" class="type-select">
         <option value="dog">🐶 犬</option>
@@ -698,6 +698,7 @@ body.dark .footer {
     <p style="margin-top:10px;"><strong>リセット</strong><br>
     リセットボタンで、選択中のペットのエサ記録をすべて消去します。元に戻せないのでご注意ください。</p>
 
+    <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal'); replayPageTutorial(PET_TUTORIAL_DONE_KEY, PET_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal')">閉じる</button>
   </div>
 </div>
@@ -705,6 +706,7 @@ body.dark .footer {
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/icon-size.js"></script>
 <script src="js/data-dogs.js"></script>
 <script src="js/data-cats.js"></script>
@@ -1081,6 +1083,15 @@ document.addEventListener("langchange", () => {
   render();
 });
 
+/* ===================== 初回チュートリアル（スポットライト形式、js/tutorial.js） ===================== */
+const PET_TUTORIAL_DONE_KEY = "hatopiPet_tutorialDone";
+const PET_TUTORIAL_STEPS = [
+  { selector: "#petAddRow", titleKey: "tutorial_pet_step1_title", titleFallback: "① ペットを追加・切替", textKey: "tutorial_pet_step1_body", textFallback: "種類を選んで「追加」を押すと登録できます。タブをタップで切替、ダブルタップで名前変更、長押しで削除できます。" },
+  { selector: "#searchInput", titleKey: "tutorial_pet_step2_title", titleFallback: "② エサを検索", textKey: "tutorial_pet_step2_body", textFallback: "エサの名前を入力すると絞り込めます。" },
+  { selector: "#foodGrid", titleKey: "tutorial_pet_step3_title", titleFallback: "③ エサをタップして記録", textKey: "tutorial_pet_step3_body", textFallback: "タップするとあげた記録になります。好きなエサは緑枠、嫌いなエサは朱色枠で表示されます。" },
+  { selector: "#helpBtn", titleKey: "tutorial_pet_step4_title", titleFallback: "④ 使い方をもっと見る", textKey: "tutorial_pet_step4_body", textFallback: "データ管理やリセットなど、詳しい使い方はこのボタンから見返せます。" },
+];
+
 /* ===================== 初期化 ===================== */
 window.addEventListener("DOMContentLoaded", () => {
   if (localStorage.getItem("darkMode") === null) {
@@ -1107,6 +1118,7 @@ window.addEventListener("DOMContentLoaded", () => {
     el.innerHTML = icon(el.dataset.icon, {size:20});
   });
 
+  maybeStartPageTutorial(PET_TUTORIAL_DONE_KEY, PET_TUTORIAL_STEPS);
 });
 </script>
 <script src="js/sw-register.js"></script>

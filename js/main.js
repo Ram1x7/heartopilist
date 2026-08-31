@@ -1744,6 +1744,10 @@ function closeUpdatePopup(){
  document.getElementById(
    "updatePopup"
  ).style.display = "none";
+
+ // 更新通知を閉じた直後に、まだチュートリアル初回表示が済んでいなければ
+ // ここから開始する（更新通知とチュートリアルが同時に重なって表示されるのを防ぐ）
+ maybeStartPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);
 }
 
 const topPanel =
@@ -1810,6 +1814,16 @@ if(dataSyncModal){
   };
 }
 
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const INDEX_TUTORIAL_DONE_KEY = "hatopiIndex_tutorialDone";
+const INDEX_TUTORIAL_STEPS = [
+  { selector: "#search", titleKey: "tutorial_index_step1_title", titleFallback: "① 検索する", textKey: "tutorial_index_step1_body", textFallback: "名前や出現場所のキーワードで検索できます。" },
+  { selector: "#typeFilterRow", titleKey: "tutorial_index_step2_title", titleFallback: "② 種類を切り替え", textKey: "tutorial_index_step2_body", textFallback: "魚・虫・野鳥に加え、砂像・雪像・貝殻の表示にも切り替えられます。" },
+  { selector: "#filterAccordionToggle", titleKey: "tutorial_index_step3_title", titleFallback: "③ 絞り込み・並び替え", textKey: "tutorial_index_step3_body", textFallback: "出現モードやレベル範囲、並び順などをここで細かく設定できます。" },
+  { selector: "#list", titleKey: "tutorial_index_step4_title", titleFallback: "④ 一覧をタップ", textKey: "tutorial_index_step4_body", textFallback: "気になる生き物をタップすると、出現条件や売価などの詳細が確認できます。" },
+  { selector: "#helpBtn", titleKey: "tutorial_index_step5_title", titleFallback: "⑤ 使い方をもっと見る", textKey: "tutorial_index_step5_body", textFallback: "このボタンからいつでも詳しい使い方を見返せます。" },
+];
+
 // 初期化
 updateTime();
 // 保存データ読込
@@ -1854,6 +1868,11 @@ document.getElementById("disclaimer").textContent =
 
 document.getElementById("lastUpdate").textContent =
   T("last_update_label","最終更新") + " 2026/08/30";
+
+// 更新通知が表示中は、閉じた直後（closeUpdatePopup）にチュートリアルを開始する
+if(document.getElementById("updatePopup").style.display !== "block"){
+  maybeStartPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);
+}
 
 // 言語切替時に動的コンテンツを再描画
 document.addEventListener("langchange", ()=>{

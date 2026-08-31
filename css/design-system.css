@@ -149,6 +149,104 @@ body.dark .ds-toast{
 }
 
 /* ══════════════════════════════════════
+   スポットライト・チュートリアル（初回訪問時に主要ボタンを
+   順番に吹き出しで案内する。js/tutorial.jsから動的に生成される）
+   ══════════════════════════════════════ */
+.ds-tutorial-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(26,24,20,0.55);
+  z-index:2200;
+}
+
+.ds-tutorial-highlight{
+  position:fixed;
+  border-radius:14px;
+  box-shadow:0 0 0 4px var(--indigo);
+  z-index:2201;
+  pointer-events:none;
+}
+
+body.dark .ds-tutorial-highlight{
+  box-shadow:0 0 0 4px var(--indigo-soft);
+}
+
+.ds-tutorial-popup{
+  position:fixed;
+  width:240px;
+  max-width:calc(100vw - 24px);
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  z-index:2202;
+}
+
+body.dark .ds-tutorial-popup{
+  background:#2c2823;
+  border:1px solid #46423b;
+}
+
+.ds-tutorial-step{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:6px;
+}
+
+body.dark .ds-tutorial-step{
+  color:#e8d2a8;
+}
+
+.ds-tutorial-text{
+  font-size:12px;
+  line-height:1.6;
+  color:var(--text);
+  margin-bottom:12px;
+}
+
+body.dark .ds-tutorial-text{
+  color:#ece4d4;
+}
+
+.ds-tutorial-actions{
+  display:flex;
+  gap:8px;
+}
+
+.ds-tutorial-actions button{
+  flex:1;
+  padding:8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-size:12px;
+  cursor:pointer;
+}
+
+.ds-tutorial-skip{
+  background:var(--card-sub);
+  color:var(--text-sub);
+}
+
+.ds-tutorial-next{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .ds-tutorial-skip{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .ds-tutorial-next{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* ══════════════════════════════════════
    ボトムシート（モバイルでのモーダル代替）
    ══════════════════════════════════════ */
 .ds-sheet-overlay{

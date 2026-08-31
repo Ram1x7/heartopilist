@@ -30,7 +30,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
 <link rel="stylesheet" href="./css/art.css?v=50">
-<link rel="stylesheet" href="./css/design-system.css?v=2">
+<link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -426,6 +426,7 @@ body.dark .build-library-item{
     <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">④ 保存・書き出し</strong><br>
     <span data-i18n="build_help_4_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
 
+    <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
   </div>
 </div>
@@ -433,6 +434,7 @@ body.dark .build-library-item{
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
 <script>
 
 document.getElementById("buildUploadIcon").innerHTML = icon("upload", { size: 18 });
@@ -489,7 +491,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script src="js/build.js?v=5"></script>
+<script src="js/build.js?v=6"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
