@@ -752,6 +752,8 @@ function renderPalette(){
   // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
   // 該当なし（未着色マスや、そもそも調べていない）ならnull
   const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
+  // 参考ツールの「小石」を並べたパレットと同じく、白いカードで囲わずスウォッチ自体を
+  // タップ対象にする（.art-paper-chipは廃止し、.art-swatchに統一）
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
@@ -759,27 +761,21 @@ function renderPalette(){
     // （例：#FEFFFFは01の5番目のサブカラーであり、かつ02のメインカラーそのもの）ため、
     // 本来1つだけのはずのマークが同時に2箇所へついてしまう不具合になる。
     const isActive = entry.no === selectedMainNo;
-    const cls = ["art-paper-chip"];
+    const cls = ["art-swatch", "art-swatch-main"];
     if(isActive) cls.push("is-selected");
     if(inspectedGroup && entry.no === inspectedGroup.no) cls.push("is-inspected");
-    const swatchCls = ["art-paper-chip-swatch"];
-    if(isNone) swatchCls.push("art-swatch-none");
+    if(isNone) cls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
-    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}">
-      <span class="${swatchCls.join(" ")}"${style}></span>
-    </button>`;
+    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}></button>`;
   }).join("");
   mainsEl.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => selectPaletteMain(btn.dataset.main));
   });
-  renderPaletteSubs();
+  renderPaletteCurrent();
 }
 
 function selectPaletteMain(no){
   const entry = GAME_PALETTE.find(e => e.no === no);
-  // 04（透明/なし）・02・03（サブカラーなし）はメインカラーのタップだけで選択が確定するため、
-  // 別のメインカラーのサブカラー一覧が開いたままにならないよう、常にサブカラー欄を閉じる
-  // （例：#FEFFFFは01のサブカラーにも含まれるが、02をタップして01のサブ一覧が開くのは避ける）
   if(no === "04"){
     setCurrentColor(null, "04");
     return;
@@ -788,15 +784,9 @@ function selectPaletteMain(no){
     setCurrentColor(entry.hex, no);
     return;
   }
-  if(expandedPaletteMain === no){
-    // 展開中の同じメインカラーを再タップ → 閉じるだけ（選択色はそのまま）
-    expandedPaletteMain = null;
-    renderPalette();
-    return;
-  }
   // メインカラーをタップした時点で、選択中マークがすぐに追従するようそのメインの代表色
-  // （＝メインカラー自体のhex。サブカラーの1つと同じ値）を選択しつつサブカラー一覧を展開する。
-  // より具体的な色合いはサブカラーをタップして選び直せる。
+  // （＝メインカラー自体のhex。サブカラーの1つと同じ値）を選択しつつ、上部のプレビューに
+  // サブカラーのシェードストリップを表示する。より具体的な色合いはストリップから選び直せる。
   currentColor = entry.hex;
   selectedMainNo = no;
   expandedPaletteMain = no;
@@ -804,24 +794,33 @@ function selectPaletteMain(no){
   pushRecentColor(entry.hex);
 }
 
-function renderPaletteSubs(){
-  const wrap = document.getElementById("artPaletteSubs");
-  const entry = GAME_PALETTE.find(e => e.no === expandedPaletteMain);
-  if(!entry || entry.subs.length === 0){
-    wrap.style.display = "none";
-    wrap.innerHTML = "";
+// 参考ツールの「大きいプレビュー＋隙間のないシェードストリップ」を模した、選択中の
+// メインカラーのプレビュー欄。常にexpandedPaletteMain（タップ調べ中はそちらを優先）か
+// selectedMainNoのどちらかのグループを表示する
+function renderPaletteCurrent(){
+  const el = document.getElementById("artPaletteCurrent");
+  const entry = GAME_PALETTE.find(e => e.no === (expandedPaletteMain || selectedMainNo));
+  if(!entry){
+    el.innerHTML = "";
     return;
   }
-  wrap.style.display = "flex";
-  wrap.innerHTML = entry.subs.map((hex, i) => {
-    const cls = ["art-swatch", "art-swatch-sub"];
-    if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
-    if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
-    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
-  }).join("");
-  const inspectedSub = wrap.querySelector(".is-inspected");
-  if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });
-  wrap.querySelectorAll("button").forEach(btn => {
+  const isNone = entry.no === "04";
+  const bigCls = ["art-swatch", "art-swatch-big"];
+  if(isNone) bigCls.push("art-swatch-none");
+  const bigStyle = isNone ? "" : ` style="background:${entry.hex}"`;
+  let html = `<span class="${bigCls.join(" ")}"${bigStyle} aria-hidden="true"></span>`;
+  if(entry.subs.length > 0){
+    html += `<div class="art-palette-strip">` + entry.subs.map((hex, i) => {
+      const cls = ["art-strip-swatch"];
+      if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
+      if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
+      return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
+    }).join("") + `</div>`;
+  }
+  el.innerHTML = html;
+  const inspectedStrip = el.querySelector(".is-inspected");
+  if(inspectedStrip) inspectedStrip.scrollIntoView({ block: "nearest", inline: "nearest" });
+  el.querySelectorAll(".art-strip-swatch").forEach(btn => {
     btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex, entry.no));
   });
 }
@@ -2345,7 +2344,7 @@ const TUTORIAL_STEPS = [
   { selector: "#artEditModeBtn", title: "① 編集する", text: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
   { selector: "#artToolbar", title: "② ツール", text: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから。" },
   { selector: "#artBrushSizeSection", title: "③ 太さ", text: "ペン・消しゴムの太さを1〜4マスから選べます。" },
-  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。タップするとサブカラー（詳細な色合い）が展開します。" },
+  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。タップすると、上のプレビューにサブカラー（詳細な色合い）が表示されます。" },
   { selector: "#artZoomControls", title: "⑤ 拡大率", text: "スライダーで自由に拡大・縮小できます。スマホなら2本指のピンチ操作でも変更できます。" },
   { selector: "#artLockBtn", title: "⑥ 固定する", text: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
   { selector: "#artSaveBtn", title: "⑦ 保存する", text: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG保存・共有もできます。" },
