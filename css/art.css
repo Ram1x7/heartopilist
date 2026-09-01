@@ -203,6 +203,11 @@ body.dark .art-lock-btn.is-locked{
 
 .art-panel{
   grid-area:panel;
+  /* グリッドアイテムの自動最小幅（内容物のmax-content幅）を解除する。
+     これがないと、中の横スクロール一覧（.art-palette-mains-strip等）の
+     内容幅にパネル自体が引っ張られて広がり、横スクロールにならずページが
+     はみ出してしまう */
+  min-width:0;
   min-height:120px;
   padding:14px;
   background:var(--card);
@@ -501,116 +506,185 @@ body.dark .art-brush-size-options button.active{
 .art-palette{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:10px 9px;
   margin-bottom:10px;
 }
 
-.art-swatch{
-  width:28px;
-  height:28px;
-  border-radius:8px;
+/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す。
+   メインカラー一覧グリッドと、選択中メインの大きいプレビューの両方で使う */
+.art-chip{
+  position:relative;
   border:2px solid var(--border);
+  border-radius:10px;
+  background:var(--card);
+  box-shadow:0 1px 3px rgba(60,40,20,0.12);
   cursor:pointer;
   padding:0;
+}
+
+.art-chip-main{
+  width:32px;
+  height:32px;
+}
+
+.art-chip-big{
+  width:44px;
+  height:44px;
+  flex:0 0 auto;
 }
 
 /* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
-   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現） */
-.art-swatch.is-selected{
-  border-color:var(--indigo);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo);
+   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現）。
+   金色のリング＋小さなドットバッジで、キャンバス選択画面等と同じ選択状態の
+   見せ方に揃える（.art-tool-btn.activeのバッジと同じ意匠） */
+.art-chip.is-selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold), 0 1px 3px rgba(60,40,20,0.12);
 }
 
-body.dark .art-swatch{
-  border-color:#46423b;
-}
-
-body.dark .art-swatch.is-selected{
-  border-color:var(--indigo-soft);
-  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
-}
-
-/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
-   「今の描画色」を示すis-selected（藍色）と混同しないよう朱色にする */
-.art-swatch.is-inspected{
-  border-color:var(--vermillion);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion);
-}
-
-body.dark .art-swatch.is-inspected{
-  border-color:var(--vermillion-soft);
-  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
-}
-
-/* メインカラーパレット：ゲーム内に存在しない色名などは付け足さず、色番号だけで識別する。
-   角丸・薄い影の「紙のチップ」風の見た目は保ちつつ、名前ラベルを持たないぶん
-   スウォッチにぴったり寄せたサイズにして、一覧性・選択speedを優先する */
-.art-paper-chip{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:34px;
-  height:34px;
-  padding:0;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:var(--card);
-  box-shadow:0 1px 3px rgba(60,40,20,0.1);
-  cursor:pointer;
-}
-
-.art-paper-chip.is-selected{
-  border-color:var(--indigo);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo), 0 1px 3px rgba(60,40,20,0.1);
-}
-
-.art-paper-chip-swatch{
-  width:26px;
-  height:26px;
+.art-chip.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  width:11px;
+  height:11px;
   border-radius:50%;
-  border:1px solid rgba(0,0,0,0.1);
+  background:var(--gold);
+  border:1.5px solid var(--card);
 }
 
-body.dark .art-paper-chip{
+body.dark .art-chip{
   background:#2c2823;
   border-color:#46423b;
   box-shadow:0 1px 3px rgba(0,0,0,0.3);
 }
 
-body.dark .art-paper-chip.is-selected{
-  border-color:var(--indigo-soft);
-  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 1px 3px rgba(0,0,0,0.3);
+body.dark .art-chip.is-selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold), 0 1px 3px rgba(0,0,0,0.3);
 }
 
-.art-paper-chip.is-inspected{
+body.dark .art-chip.is-selected::after{
+  border-color:#2c2823;
+}
+
+/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
+   「今の描画色」を示すis-selected（金色）と混同しないよう朱色にする */
+.art-chip.is-inspected{
   border-color:var(--vermillion);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion), 0 1px 3px rgba(60,40,20,0.1);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion), 0 1px 3px rgba(60,40,20,0.12);
 }
 
-body.dark .art-paper-chip.is-inspected{
+body.dark .art-chip.is-inspected{
   border-color:var(--vermillion-soft);
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft), 0 1px 3px rgba(0,0,0,0.3);
 }
 
-body.dark .art-paper-chip-swatch{
-  border-color:rgba(255,255,255,0.12);
-}
-
-/* サブカラー展開エリア（メインカラーをタップすると下に表示される） */
-.art-palette-subs{
-  margin-top:8px;
-  padding-top:8px;
-  border-top:1px dashed var(--border);
-}
-
-body.dark .art-palette-subs{
-  border-top-color:#46423b;
-}
-
-.art-swatch-sub{
+/* サブカラー：参考ツールの「絵の具を垂らしたパレット」のような、有機的なブロブ形状＋
+   段差の影を持つ小石スウォッチ（.art-swatch）で表す。選択中メインの大きいプレビューの
+   右に並ぶ。スウォッチごとに角丸の値を少しずらし（nth-child）、手作りの小石が並んだ
+   ようなゆらぎを出す。影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
+   色データや配色ロジックには一切手を加えていない */
+.art-swatch{
+  position:relative;
   width:24px;
   height:24px;
-  border-radius:6px;
+  border-radius:60% 40% 55% 45% / 50% 45% 55% 50%;
+  border:none;
+  cursor:pointer;
+  padding:0;
+  z-index:1;
+}
+
+.art-swatch::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:rgba(60,40,20,0.3);
+  transform:translate(3px,4px);
+  z-index:-1;
+}
+
+.art-palette-subs-row .art-swatch:nth-child(3n+2){
+  border-radius:45% 55% 60% 40% / 55% 45% 65% 35%;
+}
+
+.art-palette-subs-row .art-swatch:nth-child(3n+3){
+  border-radius:55% 45% 40% 60% / 60% 40% 50% 55%;
+}
+
+.art-swatch.is-selected{
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold);
+}
+
+.art-swatch.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
+  z-index:2;
+}
+
+body.dark .art-swatch::before{
+  background:rgba(0,0,0,0.45);
+}
+
+body.dark .art-swatch.is-selected{
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold);
+}
+
+body.dark .art-swatch.is-selected::after{
+  border-color:#2c2823;
+}
+
+.art-swatch.is-inspected{
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion);
+}
+
+body.dark .art-swatch.is-inspected{
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
+}
+
+/* 選択中メインの大きいプレビュー（.art-chip-big）＋メインカラー一覧の横スクロール
+   一列（.art-palette-mains-strip）を横に並べるエリア */
+.art-palette-current{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+  min-height:44px;
+}
+
+/* メインカラーは16種と数が多いため、折り返さず横一列のまま横スクロールで選ぶ
+   （参考ツールと同じ配置。改行させないので.art-palette-current内で残りの幅を使う） */
+.art-palette-mains-strip{
+  display:flex;
+  gap:7px;
+  flex:1 1 auto;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:2px 2px 6px;
+}
+
+.art-palette-mains-strip .art-chip-main{
+  flex:0 0 auto;
+}
+
+/* 参考画像（実際のゲームの配色ツール）に合わせ、サブカラーは横一列ではなく
+   2列のグリッドで並べる（小石を積んだような見せ方） */
+.art-palette-subs-row{
+  display:grid;
+  grid-template-columns:repeat(2, 24px);
+  gap:8px 10px;
+  flex:0 0 auto;
 }
 
 /* 04：透明/なしスロット（市松模様で「色なし」を表す） */
@@ -1193,23 +1267,32 @@ body.dark .art-header-btn{
   border-color:var(--indigo-soft);
 }
 
-/* 変換フローの現在地表示（4段階：画像/サイズ/位置/仕上げ） */
+/* 変換フローの現在地表示（4段階：画像/サイズ/位置/仕上げ）。
+   参考ツールの「Select Size / Upload Image / Generate」のような、角丸の
+   セグメント型タブバーの見た目に合わせる（段階数・遷移ロジックは変更なし。
+   番号の丸と区切り線は使わず、選択中タブの背景と文字色だけで現在地を示す） */
 .art-convert-progress{
   display:flex;
   align-items:center;
+  gap:2px;
   margin-bottom:14px;
+  padding:3px;
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:999px;
 }
 
 .art-convert-progress-step{
+  flex:1;
   display:flex;
-  flex-direction:column;
   align-items:center;
-  gap:3px;
-  padding:2px 4px;
+  justify-content:center;
+  padding:7px 4px;
   border:none;
+  border-radius:999px;
   background:none;
   cursor:default;
-  flex-shrink:0;
+  transition:0.15s;
 }
 
 .art-convert-progress-step[data-clickable="true"]{
@@ -1217,29 +1300,23 @@ body.dark .art-header-btn{
 }
 
 .art-convert-progress-num{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  font-size:11px;
-  font-weight:700;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border:1px solid var(--border);
+  display:none;
 }
 
 .art-convert-progress-label{
-  font-size:9px;
+  font-size:10.5px;
+  font-weight:600;
   color:var(--text-sub);
   white-space:nowrap;
 }
 
-.art-convert-progress-step.active .art-convert-progress-num{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
+/* css/style.cssの汎用.activeルール（!important）を上書きする必要があるため、
+   ここでも!importantを使う */
+.art-convert-progress-step.active{
+  background:var(--card) !important;
+  color:var(--indigo) !important;
+  border-color:transparent !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.12);
 }
 
 .art-convert-progress-step.active .art-convert-progress-label{
@@ -1247,40 +1324,39 @@ body.dark .art-header-btn{
   font-weight:700;
 }
 
-.art-convert-progress-step.completed .art-convert-progress-num{
-  background:var(--gold);
-  border-color:var(--gold);
-  color:#5c4300;
+.art-convert-progress-step.completed .art-convert-progress-label{
+  color:var(--gold);
 }
 
-.art-convert-progress-step.completed .art-convert-progress-num::before{
-  content:"✓";
+.art-convert-progress-step.completed .art-convert-progress-label::before{
+  content:"✓ ";
 }
 
 .art-convert-progress-line{
-  flex:1;
-  height:2px;
-  background:var(--border);
-  margin:0 2px;
-  margin-bottom:14px;
+  display:none;
 }
 
-body.dark .art-convert-progress-num{
+body.dark .art-convert-progress{
   background:#383329;
   border-color:#46423b;
-  color:#b3a89a;
 }
 
 body.dark .art-convert-progress-label{
   color:#b3a89a;
 }
 
+body.dark .art-convert-progress-step.active{
+  background:#2c2823 !important;
+  color:#8fbdc9 !important;
+  border-color:transparent !important;
+}
+
 body.dark .art-convert-progress-step.active .art-convert-progress-label{
   color:#8fbdc9;
 }
 
-body.dark .art-convert-progress-line{
-  background:#46423b;
+body.dark .art-convert-progress-step.completed .art-convert-progress-label{
+  color:var(--gold);
 }
 
 .art-back-link{
