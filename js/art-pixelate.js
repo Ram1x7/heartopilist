@@ -163,10 +163,13 @@ function buildPalette(imgData, n, bgMask){
     .map(([hex]) => hexToRgb(hex));
 }
 
-function nearestPaletteIndex(rgb, palette){
+// labPaletteは事前に各パレット色をrgbToLab()で変換した配列（呼び出し側で1回だけ作る）。
+// パレット自体はピクセル数に対して小さく使い回されるため、ピクセルごとに毎回
+// Lab変換をやり直すのではなく、ここで一度だけ変換して渡すことで無駄な再計算を避ける。
+function nearestPaletteIndex(lab, labPalette){
   let best = 0, bestDist = Infinity;
-  palette.forEach((p, i) => {
-    const dist = (rgb[0] - p[0]) ** 2 + (rgb[1] - p[1]) ** 2 + (rgb[2] - p[2]) ** 2;
+  labPalette.forEach((p, i) => {
+    const dist = labDistSq(lab, p);
     if(dist < bestDist){ bestDist = dist; best = i; }
   });
   return best;
@@ -181,45 +184,54 @@ function rgbToHex(rgb){
 
 function mapToPalette(imgData, palette, bgMask){
   const w = imgData.width, h = imgData.height, d = imgData.data;
+  const labPalette = palette.map(rgbToLab);
   const out = new Array(w * h).fill(null);
   for(let i = 0; i < w * h; i++){
     if(bgMask[i]) continue;
     const rgb = [d[i * 4], d[i * 4 + 1], d[i * 4 + 2]];
-    out[i] = rgbToHex(palette[nearestPaletteIndex(rgb, palette)]);
+    out[i] = rgbToHex(palette[nearestPaletteIndex(rgbToLab(rgb), labPalette)]);
   }
   return out;
 }
 
+// Lab色空間でのFloyd–Steinberg誤差拡散（js/build.jsのdiffuseLabErrorと同じ方式）。
+// RGB空間で拡散すると量子化誤差が知覚的な色距離とズレるため、マッチングと同じ
+// Lab空間で誤差を計算・伝播させる。
 function ditherToPalette(imgData, palette, bgMask){
   const w = imgData.width, h = imgData.height;
-  const buf = [];
+  const labPalette = palette.map(rgbToLab);
+  const labBuf = [];
   for(let i = 0; i < w * h; i++){
-    buf.push([imgData.data[i * 4], imgData.data[i * 4 + 1], imgData.data[i * 4 + 2]]);
+    labBuf.push(rgbToLab([imgData.data[i * 4], imgData.data[i * 4 + 1], imgData.data[i * 4 + 2]]));
   }
   const out = new Array(w * h).fill(null);
+  const errors = new Array(w * h).fill(null);
   const spread = (x, y, err, dx, dy, factor) => {
     const nx = x + dx, ny = y + dy;
     if(nx < 0 || ny < 0 || nx >= w || ny >= h) return;
     const ni = ny * w + nx;
     if(bgMask[ni]) return;
-    buf[ni] = [
-      buf[ni][0] + err[0] * factor,
-      buf[ni][1] + err[1] * factor,
-      buf[ni][2] + err[2] * factor,
-    ];
+    const add = [err[0] * factor, err[1] * factor, err[2] * factor];
+    errors[ni] = errors[ni]
+      ? [errors[ni][0] + add[0], errors[ni][1] + add[1], errors[ni][2] + add[2]]
+      : add;
   };
   for(let y = 0; y < h; y++){
     for(let x = 0; x < w; x++){
       const i = y * w + x;
       if(bgMask[i]) continue;
-      const old = buf[i];
-      const nearest = palette[nearestPaletteIndex(old, palette)];
+      const lab = labBuf[i];
+      const err = errors[i];
+      const dithered = err ? [lab[0] + err[0], lab[1] + err[1], lab[2] + err[2]] : lab;
+      const idx = nearestPaletteIndex(dithered, labPalette);
+      const nearest = palette[idx];
       out[i] = rgbToHex(nearest);
-      const err = [old[0] - nearest[0], old[1] - nearest[1], old[2] - nearest[2]];
-      spread(x, y, err, 1, 0, 7 / 16);
-      spread(x, y, err, -1, 1, 3 / 16);
-      spread(x, y, err, 0, 1, 5 / 16);
-      spread(x, y, err, 1, 1, 1 / 16);
+      const matchLab = labPalette[idx];
+      const diff = [lab[0] - matchLab[0], lab[1] - matchLab[1], lab[2] - matchLab[2]];
+      spread(x, y, diff, 1, 0, 7 / 16);
+      spread(x, y, diff, -1, 1, 3 / 16);
+      spread(x, y, diff, 0, 1, 5 / 16);
+      spread(x, y, diff, 1, 1, 1 / 16);
     }
   }
   return out;

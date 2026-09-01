@@ -323,37 +323,64 @@ const GAME_PALETTE = [
   { no: "16", name: "ローズ", hex: "#D0698F", subs: ["#AD346E", "#D0698F", "#862658", "#DAA1B4", "#B47A8D", "#8B5367", "#60344B", "#E4D5D9", "#BCADB1", "#725E65"] },
 ];
 
-// GAME_PALETTEを平坦化した「選択可能な全色」一覧と、hex→パレット番号（例:"05-3"、
-// サブカラーを持たない02・03は"02"のように番号のみ）の逆引きマップ。
-// 04（透明/なし）はhexデータがないため含めない。
-const GAME_PALETTE_FLAT = [];
-const GAME_PALETTE_CODE_BY_HEX = {};
-GAME_PALETTE.forEach(entry => {
-  if(!entry.hex) return;
-  if(entry.subs.length === 0){
-    GAME_PALETTE_FLAT.push({ code: entry.no, hex: entry.hex });
-    GAME_PALETTE_CODE_BY_HEX[entry.hex.toUpperCase()] = entry.no;
-  }else{
-    entry.subs.forEach((hex, i) => {
-      const code = `${entry.no}-${i + 1}`;
-      GAME_PALETTE_FLAT.push({ code, hex });
-      GAME_PALETTE_CODE_BY_HEX[hex.toUpperCase()] = code;
-    });
-  }
-});
-
 function hexToRgb(hex){
   const h = hex.replace("#", "");
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 }
 
-// 任意のRGBに対して、固定パレット内で最も近い色（最近傍色マッチング）のhexを返す
+// RGBのユークリッド距離は人間の知覚とズレがあり（特に肌色・淡い色で不自然な
+// 色に飛びやすい）、Lab色空間に変換してから距離を測ることで知覚的に近い色を
+// 選びやすくする（CIE76：Lab空間での単純な二乗ユークリッド距離。js/build.jsと同じ方式）
+function srgbChannelToLinear(c){
+  c /= 255;
+  return c > 0.04045 ? ((c + 0.055) / 1.055) ** 2.4 : c / 12.92;
+}
+
+function labF(t){
+  return t > 0.008856 ? Math.cbrt(t) : (7.787 * t + 16 / 116);
+}
+
+function rgbToLab(rgb){
+  const r = srgbChannelToLinear(rgb[0]);
+  const g = srgbChannelToLinear(rgb[1]);
+  const b = srgbChannelToLinear(rgb[2]);
+  const x = labF((r * 0.4124564 + g * 0.3575761 + b * 0.1804375) / 0.95047);
+  const y = labF(r * 0.2126729 + g * 0.7151522 + b * 0.0721750);
+  const z = labF((r * 0.0193339 + g * 0.1191920 + b * 0.9503041) / 1.08883);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+
+function labDistSq(a, b){
+  return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+}
+
+// GAME_PALETTEを平坦化した「選択可能な全色」一覧と、hex→パレット番号（例:"05-3"、
+// サブカラーを持たない02・03は"02"のように番号のみ）の逆引きマップ。
+// 04（透明/なし）はhexデータがないため含めない。各エントリのLab値も一度だけ
+// 変換してキャッシュしておく（固定データのため、色ごとに毎回変換し直す必要がない）。
+const GAME_PALETTE_FLAT = [];
+const GAME_PALETTE_CODE_BY_HEX = {};
+GAME_PALETTE.forEach(entry => {
+  if(!entry.hex) return;
+  if(entry.subs.length === 0){
+    GAME_PALETTE_FLAT.push({ code: entry.no, hex: entry.hex, lab: rgbToLab(hexToRgb(entry.hex)) });
+    GAME_PALETTE_CODE_BY_HEX[entry.hex.toUpperCase()] = entry.no;
+  }else{
+    entry.subs.forEach((hex, i) => {
+      const code = `${entry.no}-${i + 1}`;
+      GAME_PALETTE_FLAT.push({ code, hex, lab: rgbToLab(hexToRgb(hex)) });
+      GAME_PALETTE_CODE_BY_HEX[hex.toUpperCase()] = code;
+    });
+  }
+});
+
+// 任意のRGBに対して、固定パレット内で最も近い色（Lab色空間での最近傍色マッチング）のhexを返す
 function nearestGamePaletteHex(rgb){
+  const lab = rgbToLab(rgb);
   let best = GAME_PALETTE_FLAT[0].hex, bestDist = Infinity;
-  GAME_PALETTE_FLAT.forEach(({ hex }) => {
-    const p = hexToRgb(hex);
-    const dist = (rgb[0] - p[0]) ** 2 + (rgb[1] - p[1]) ** 2 + (rgb[2] - p[2]) ** 2;
-    if(dist < bestDist){ bestDist = dist; best = hex; }
+  GAME_PALETTE_FLAT.forEach(entry => {
+    const dist = labDistSq(lab, entry.lab);
+    if(dist < bestDist){ bestDist = dist; best = entry.hex; }
   });
   return best;
 }
