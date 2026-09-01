@@ -1565,8 +1565,14 @@ function updatePinch(){
 }
 
 function bindCanvasEvents(){
-  canvas.addEventListener("pointerdown", (e) => {
-    canvas.setPointerCapture(e.pointerId);
+  // イベントの取得元はcanvas自体ではなく、周りの余白も含む.art-canvas-area側にする。
+  // これにより、2本指ジェスチャー（ピンチズーム・パン）はキャンバスの外の余白から
+  // 指を置いても始められる（1本指の描画はcellFromEvent()がキャンバス外でnullを返す
+  // ため、これまで通りキャンバスの上でしか発生しない）
+  const area = document.querySelector(".art-canvas-area");
+
+  area.addEventListener("pointerdown", (e) => {
+    area.setPointerCapture(e.pointerId);
     activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
 
     if(activePointers.size >= 2){
@@ -1660,7 +1666,7 @@ function bindCanvasEvents(){
     renderCanvas();
   });
 
-  canvas.addEventListener("pointermove", (e) => {
+  area.addEventListener("pointermove", (e) => {
     if(activePointers.has(e.pointerId)){
       activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY, type: e.pointerType });
     }
@@ -1808,15 +1814,15 @@ function bindCanvasEvents(){
     }
     finishStroke();
   };
-  canvas.addEventListener("pointerup", (e) => releasePointer(e, false));
-  canvas.addEventListener("pointercancel", (e) => releasePointer(e, true));
-  canvas.addEventListener("pointerleave", (e) => {
+  area.addEventListener("pointerup", (e) => releasePointer(e, false));
+  area.addEventListener("pointercancel", (e) => releasePointer(e, true));
+  area.addEventListener("pointerleave", (e) => {
     finishStroke();
     updateCoordReadout(null);
   });
 
   // Ctrl+ホイール（トラックパッドの2本指ピンチはブラウザがこの形で発火する）でもズームできる
-  canvas.addEventListener("wheel", (e) => {
+  area.addEventListener("wheel", (e) => {
     if(!e.ctrlKey) return;
     e.preventDefault();
     zoomAt(zoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
