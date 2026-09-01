@@ -1193,23 +1193,32 @@ body.dark .art-header-btn{
   border-color:var(--indigo-soft);
 }
 
-/* 変換フローの現在地表示（4段階：画像/サイズ/位置/仕上げ） */
+/* 変換フローの現在地表示（4段階：画像/サイズ/位置/仕上げ）。
+   参考ツールの「Select Size / Upload Image / Generate」のような、角丸の
+   セグメント型タブバーの見た目に合わせる（段階数・遷移ロジックは変更なし。
+   番号の丸と区切り線は使わず、選択中タブの背景と文字色だけで現在地を示す） */
 .art-convert-progress{
   display:flex;
   align-items:center;
+  gap:2px;
   margin-bottom:14px;
+  padding:3px;
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:999px;
 }
 
 .art-convert-progress-step{
+  flex:1;
   display:flex;
-  flex-direction:column;
   align-items:center;
-  gap:3px;
-  padding:2px 4px;
+  justify-content:center;
+  padding:7px 4px;
   border:none;
+  border-radius:999px;
   background:none;
   cursor:default;
-  flex-shrink:0;
+  transition:0.15s;
 }
 
 .art-convert-progress-step[data-clickable="true"]{
@@ -1217,29 +1226,23 @@ body.dark .art-header-btn{
 }
 
 .art-convert-progress-num{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  font-size:11px;
-  font-weight:700;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  border:1px solid var(--border);
+  display:none;
 }
 
 .art-convert-progress-label{
-  font-size:9px;
+  font-size:10.5px;
+  font-weight:600;
   color:var(--text-sub);
   white-space:nowrap;
 }
 
-.art-convert-progress-step.active .art-convert-progress-num{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
+/* css/style.cssの汎用.activeルール（!important）を上書きする必要があるため、
+   ここでも!importantを使う */
+.art-convert-progress-step.active{
+  background:var(--card) !important;
+  color:var(--indigo) !important;
+  border-color:transparent !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.12);
 }
 
 .art-convert-progress-step.active .art-convert-progress-label{
@@ -1247,40 +1250,39 @@ body.dark .art-header-btn{
   font-weight:700;
 }
 
-.art-convert-progress-step.completed .art-convert-progress-num{
-  background:var(--gold);
-  border-color:var(--gold);
-  color:#5c4300;
+.art-convert-progress-step.completed .art-convert-progress-label{
+  color:var(--gold);
 }
 
-.art-convert-progress-step.completed .art-convert-progress-num::before{
-  content:"✓";
+.art-convert-progress-step.completed .art-convert-progress-label::before{
+  content:"✓ ";
 }
 
 .art-convert-progress-line{
-  flex:1;
-  height:2px;
-  background:var(--border);
-  margin:0 2px;
-  margin-bottom:14px;
+  display:none;
 }
 
-body.dark .art-convert-progress-num{
+body.dark .art-convert-progress{
   background:#383329;
   border-color:#46423b;
-  color:#b3a89a;
 }
 
 body.dark .art-convert-progress-label{
   color:#b3a89a;
 }
 
+body.dark .art-convert-progress-step.active{
+  background:#2c2823 !important;
+  color:#8fbdc9 !important;
+  border-color:transparent !important;
+}
+
 body.dark .art-convert-progress-step.active .art-convert-progress-label{
   color:#8fbdc9;
 }
 
-body.dark .art-convert-progress-line{
-  background:#46423b;
+body.dark .art-convert-progress-step.completed .art-convert-progress-label{
+  color:var(--gold);
 }
 
 .art-back-link{
