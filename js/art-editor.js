@@ -358,12 +358,14 @@ function currentLang(){
   return window.i18n && typeof window.i18n.getCurrentLang === "function" ? window.i18n.getCurrentLang() : "ja";
 }
 
-// o.iconが指定されている場合（デザイン枠アイテムなど）は、アイコン画像をラベルの上に表示する
+// o.iconが指定されている場合（デザイン枠アイテムなど）は、アイコン画像をラベルの上に表示する。
+// o.iconSvg（サイズ選択の精細度アイコンなど）が指定されている場合は、画像の代わりにインラインSVGを表示する
 function renderOptionGroup(containerId, options, currentValue, onSelect){
   const el = document.getElementById(containerId);
   el.innerHTML = options.map(o => `
-    <button class="${String(o.id) === String(currentValue) ? "active" : ""}${o.icon ? " art-frame-btn" : ""}" data-value="${o.id}">
+    <button class="${String(o.id) === String(currentValue) ? "active" : ""}${(o.icon || o.iconSvg) ? " art-frame-btn" : ""}" data-value="${o.id}">
       ${o.icon ? `<img class="art-frame-icon" src="${o.icon}" alt="" width="29" height="29">` : ""}
+      ${o.iconSvg ? `<span class="art-frame-icon art-level-icon">${o.iconSvg}</span>` : ""}
       <span>${o.label}</span>
     </button>
   `).join("");
@@ -435,8 +437,11 @@ function createFrameCanvas(partId){
 function renderLevelOptions(){
   const ratio = FREE_CANVAS_RATIOS.find(r => r.id === selectedRatioId);
   const el = document.getElementById("artLevelOptions");
-  el.innerHTML = ratio.levels.map(lv => `
-    <button onclick="createCanvas(${lv.w}, ${lv.h})">${lv.w} × ${lv.h}</button>
+  el.innerHTML = ratio.levels.map((lv, i) => `
+    <button class="art-frame-btn" onclick="createCanvas(${lv.w}, ${lv.h})">
+      <span class="art-frame-icon art-level-icon">${levelDensitySvg(i, 29)}</span>
+      <span>${lv.w} × ${lv.h}</span>
+    </button>
   `).join("");
 }
 
