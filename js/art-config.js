@@ -43,6 +43,20 @@ function partOutlineThumbSvg(frameId, partId, maxSide){
   return `<svg class="art-part-thumb" width="${box.width}" height="${box.height}" viewBox="0 0 ${part.width} ${part.height}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${paths}</svg>`;
 }
 
+// サイズ（精細度）選択ボタン用：段階が上がるほどマス目が細かくなるアイコンを描く
+// （4段階固定。levelIndexは0〜3、値が大きいほど細かい＝解像度が高いレベル）
+function levelDensitySvg(levelIndex, size){
+  const cells = levelIndex + 1;
+  const pad = 2, box = 20, cell = box / cells;
+  let lines = `<rect x="${pad}" y="${pad}" width="${box}" height="${box}" fill="none" stroke="currentColor" stroke-width="1.4"/>`;
+  for(let i = 1; i < cells; i++){
+    const pos = pad + cell * i;
+    lines += `<line x1="${pos}" y1="${pad}" x2="${pos}" y2="${pad + box}" stroke="currentColor" stroke-width="1"/>`;
+    lines += `<line x1="${pad}" y1="${pos}" x2="${pad + box}" y2="${pos}" stroke="currentColor" stroke-width="1"/>`;
+  }
+  return `<svg class="art-level-icon-svg" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true">${lines}</svg>`;
+}
+
 const DESIGN_FRAME_PRESETS = [
   {
     id: "book",

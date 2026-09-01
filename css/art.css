@@ -823,8 +823,8 @@ body.dark .art-color-replace-banner-cancel{
 }
 
 .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
-  border-color:#fdf9ef;
-  background:rgba(253,249,239,0.3);
+  border-color:var(--gold);
+  background:rgba(200,168,107,0.18);
 }
 
 body.dark .art-ratio-shape{
@@ -833,8 +833,8 @@ body.dark .art-ratio-shape{
 }
 
 body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
-  border-color:#fdf9ef;
-  background:rgba(253,249,239,0.18);
+  border-color:var(--gold);
+  background:rgba(200,168,107,0.22);
 }
 
 /* デザイン枠アイテムのアイコン付き一覧（5列グリッド。比率選択と合わせてモーダル全体で一緒にスクロールする） */
@@ -888,7 +888,29 @@ body.dark .art-frame-btn .art-part-thumb{
 }
 
 .art-frame-btn.active .art-part-thumb{
-  color:#fdf9ef;
+  color:var(--gold);
+}
+
+/* サイズ（精細度）選択：常に4段階固定のため、5列の.art-frame-gridではなく
+   専用の4列グリッドを使い、比率選択の行と同じく列いっぱいに均等配置する */
+.art-level-grid{
+  grid-template-columns:repeat(4, 1fr);
+}
+
+/* サイズ（精細度）選択ボタンのアイコン（levelDensitySvg。実物写真アイコンと同じ29px枠を共有） */
+.art-frame-btn .art-level-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-sub);
+}
+
+body.dark .art-frame-btn .art-level-icon{
+  color:#b3a89a;
+}
+
+.art-frame-btn.active .art-level-icon{
+  color:var(--gold);
 }
 
 /* パーツ選択画面（フロント/バック/袖など）専用の大きめレイアウト。アイテム選択より
@@ -906,8 +928,9 @@ body.dark .art-frame-btn .art-part-thumb{
 }
 
 .art-gridsize-options button{
+  position:relative;
   flex:1 1 40%;
-  border:1px solid var(--border);
+  border:1.5px solid var(--border);
   border-radius:999px;
   padding:8px 10px;
   font-family:'Zen Maru Gothic', sans-serif;
@@ -918,11 +941,33 @@ body.dark .art-frame-btn .art-part-thumb{
   transition:0.15s;
 }
 
+/* 選択中はソリッド塗りつぶしではなく、金色のリング＋チェックバッジで強調する
+   （アイコン付きボタン内の写真・図形の視認性を保つため、地の色は明るいまま）。
+   css/style.cssの汎用.activeルール（!important）を上書きする必要があるため、
+   ここでも!importantを使う */
 .art-gridsize-options button.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
+  background:var(--card) !important;
+  border-color:var(--gold) !important;
+  color:var(--indigo) !important;
   font-weight:700;
+  box-shadow:0 0 0 3px rgba(200,168,107,0.28), 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.art-gridsize-options button.active::after{
+  content:"✓";
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  width:16px;
+  height:16px;
+  line-height:16px;
+  border-radius:50%;
+  background:var(--gold);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  text-align:center;
+  box-shadow:0 1px 3px rgba(0,0,0,0.25);
 }
 
 body.dark .art-gridsize-options button{
@@ -932,9 +977,10 @@ body.dark .art-gridsize-options button{
 }
 
 body.dark .art-gridsize-options button.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
+  background:#2c2823 !important;
+  border-color:var(--gold) !important;
+  color:#fdf9ef !important;
+  box-shadow:0 0 0 3px rgba(200,168,107,0.22), 0 3px 8px rgba(0,0,0,0.4);
 }
 
 /* 作業モード選択ウィザード（制作開始時の一度きりの導線） */
