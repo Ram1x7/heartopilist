@@ -744,18 +744,27 @@ function zoomReset(){
 // ── カラーパレット ──
 // ゲーム内で実際に選択できる色（js/art-config.jsのGAME_PALETTE）に完全一致させた
 // 階層UI（メインカラー→サブカラー）のみを通じて色を選ぶ。任意の色を自由入力する手段は持たない。
-// メインカラーは、ゲーム内に存在しない色名などを付け足さず、色番号だけで識別できる
-// 見本として並べる。角丸・薄い影の「紙のチップ」風の見た目にはしつつも、
-// 一覧性と選択speedを最優先にするため、サイズは名前ラベル追加前の密度に近い形を保つ
+// 参考ツール（実機の配色画面）と同じく、メインカラーは「四角」のスウォッチ（.art-chip）を
+// 横一列に並べ、数が多い（16種）ため横スクロールで選ぶ。サブカラーはその下に、
+// 「絵の具を垂らしたパレット」のような小石スウォッチ（.art-swatch）を2列グリッドで表示する
 function renderPalette(){
-  const mainsEl = document.getElementById("artPaletteMains");
+  renderPaletteCurrent();
+  renderPaletteSubs();
+}
+
+// 選択中メインカラーの大きいプレビュー（.art-chip-big）＋メインカラー一覧の
+// 横スクロール一列（#artPaletteMains、.art-chip-main）を表示する欄
+function renderPaletteCurrent(){
+  const el = document.getElementById("artPaletteCurrent");
   // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
   // 該当なし（未着色マスや、そもそも調べていない）ならnull
   const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
-  // 参考ツールでは、メインカラーは「四角」のスウォッチ（.art-chip）、サブカラーは
-  // 「絵の具を垂らしたパレット」のような小石スウォッチ（.art-swatch）で描き分けられている。
-  // ここではメインカラー一覧を.art-chipで表示する
-  mainsEl.innerHTML = GAME_PALETTE.map(entry => {
+  const currentEntry = GAME_PALETTE.find(e => e.no === selectedMainNo);
+  const bigIsNone = currentEntry && currentEntry.no === "04";
+  const bigCls = ["art-chip", "art-chip-big"];
+  if(bigIsNone) bigCls.push("art-swatch-none");
+  const bigStyle = (currentEntry && !bigIsNone) ? ` style="background:${currentEntry.hex}"` : "";
+  const stripHtml = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
     // hexの一致だけで判定すると、01のサブカラーと02・03のメインカラーが同じ値を共有している
@@ -769,10 +778,11 @@ function renderPalette(){
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
     return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}></button>`;
   }).join("");
-  mainsEl.querySelectorAll("button").forEach(btn => {
+  el.innerHTML = `<span class="${bigCls.join(" ")}"${bigStyle} aria-hidden="true"></span>` +
+    `<div class="art-palette-mains-strip" id="artPaletteMains">${stripHtml}</div>`;
+  el.querySelectorAll("#artPaletteMains button").forEach(btn => {
     btn.addEventListener("click", () => selectPaletteMain(btn.dataset.main));
   });
-  renderPaletteCurrent();
 }
 
 function selectPaletteMain(no){
@@ -786,8 +796,8 @@ function selectPaletteMain(no){
     return;
   }
   // メインカラーをタップした時点で、選択中マークがすぐに追従するようそのメインの代表色
-  // （＝メインカラー自体のhex。サブカラーの1つと同じ値）を選択しつつ、上部のプレビューに
-  // サブカラーのシェードストリップを表示する。より具体的な色合いはストリップから選び直せる。
+  // （＝メインカラー自体のhex。サブカラーの1つと同じ値）を選択しつつ、下部にサブカラーの
+  // 一覧を表示する。より具体的な色合いはサブカラーから選び直せる。
   currentColor = entry.hex;
   selectedMainNo = no;
   expandedPaletteMain = no;
@@ -795,33 +805,25 @@ function selectPaletteMain(no){
   pushRecentColor(entry.hex);
 }
 
-// 選択中のメインカラーの大きいプレビュー（.art-chip-big、四角）＋そのサブカラー一覧
-// （.art-swatch、絵の具を垂らしたような小石）を表示する欄。常にexpandedPaletteMain
-// （タップ調べ中はそちらを優先）かselectedMainNoのどちらかのグループを表示する
-function renderPaletteCurrent(){
-  const el = document.getElementById("artPaletteCurrent");
+// 選択中メインカラーのサブカラー一覧（.art-swatch、絵の具を垂らしたような小石）を
+// メインカラー行の下に表示する。常にexpandedPaletteMain（タップ調べ中はそちらを優先）か
+// selectedMainNoのどちらかのグループを表示する
+function renderPaletteSubs(){
+  const el = document.getElementById("artPaletteSubs");
   const entry = GAME_PALETTE.find(e => e.no === (expandedPaletteMain || selectedMainNo));
-  if(!entry){
+  if(!entry || entry.subs.length === 0){
     el.innerHTML = "";
     return;
   }
-  const isNone = entry.no === "04";
-  const bigCls = ["art-chip", "art-chip-big"];
-  if(isNone) bigCls.push("art-swatch-none");
-  const bigStyle = isNone ? "" : ` style="background:${entry.hex}"`;
-  let html = `<span class="${bigCls.join(" ")}"${bigStyle} aria-hidden="true"></span>`;
-  if(entry.subs.length > 0){
-    html += `<div class="art-palette-subs-row">` + entry.subs.map((hex, i) => {
-      const cls = ["art-swatch"];
-      if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
-      if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
-      return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
-    }).join("") + `</div>`;
-  }
-  el.innerHTML = html;
+  el.innerHTML = entry.subs.map((hex, i) => {
+    const cls = ["art-swatch"];
+    if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
+    if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
+    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
+  }).join("");
   const inspectedSub = el.querySelector(".is-inspected");
   if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });
-  el.querySelectorAll(".art-palette-subs-row .art-swatch").forEach(btn => {
+  el.querySelectorAll("button").forEach(btn => {
     btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex, entry.no));
   });
 }
@@ -2345,7 +2347,7 @@ const TUTORIAL_STEPS = [
   { selector: "#artEditModeBtn", title: "① 編集する", text: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
   { selector: "#artToolbar", title: "② ツール", text: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから。" },
   { selector: "#artBrushSizeSection", title: "③ 太さ", text: "ペン・消しゴムの太さを1〜4マスから選べます。" },
-  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。タップすると、上のプレビューにサブカラー（詳細な色合い）が表示されます。" },
+  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。横にスクロールできます。タップすると、下にサブカラー（詳細な色合い）が表示されます。" },
   { selector: "#artZoomControls", title: "⑤ 拡大率", text: "スライダーで自由に拡大・縮小できます。スマホなら2本指のピンチ操作でも変更できます。" },
   { selector: "#artLockBtn", title: "⑥ 固定する", text: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
   { selector: "#artSaveBtn", title: "⑦ 保存する", text: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG保存・共有もできます。" },

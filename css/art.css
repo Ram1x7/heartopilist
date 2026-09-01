@@ -203,6 +203,11 @@ body.dark .art-lock-btn.is-locked{
 
 .art-panel{
   grid-area:panel;
+  /* グリッドアイテムの自動最小幅（内容物のmax-content幅）を解除する。
+     これがないと、中の横スクロール一覧（.art-palette-mains-strip等）の
+     内容幅にパネル自体が引っ張られて広がり、横スクロールにならずページが
+     はみ出してしまう */
+  min-width:0;
   min-height:120px;
   padding:14px;
   background:var(--card);
@@ -647,15 +652,30 @@ body.dark .art-swatch.is-inspected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
 }
 
-/* 選択中メインの大きいプレビュー（.art-chip-big）＋サブカラーの小石一覧（.art-swatch群）
-   を横に並べるエリア */
+/* 選択中メインの大きいプレビュー（.art-chip-big）＋メインカラー一覧の横スクロール
+   一列（.art-palette-mains-strip）を横に並べるエリア */
 .art-palette-current{
   display:flex;
-  align-items:flex-start;
-  flex-wrap:wrap;
+  align-items:center;
   gap:10px;
   margin-bottom:10px;
   min-height:44px;
+}
+
+/* メインカラーは16種と数が多いため、折り返さず横一列のまま横スクロールで選ぶ
+   （参考ツールと同じ配置。改行させないので.art-palette-current内で残りの幅を使う） */
+.art-palette-mains-strip{
+  display:flex;
+  gap:7px;
+  flex:1 1 auto;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:2px 2px 6px;
+}
+
+.art-palette-mains-strip .art-chip-main{
+  flex:0 0 auto;
 }
 
 /* 参考画像（実際のゲームの配色ツール）に合わせ、サブカラーは横一列ではなく
@@ -665,7 +685,6 @@ body.dark .art-swatch.is-inspected{
   grid-template-columns:repeat(2, 24px);
   gap:8px 10px;
   flex:0 0 auto;
-  padding-top:4px;
 }
 
 /* 04：透明/なしスロット（市松模様で「色なし」を表す） */
