@@ -277,42 +277,36 @@ function refreshArtEntryOptionsVisibility(){
 // オフラインバナーの有無・言語による見出しの長さ・ダークモードでの見え方の違いなど、
 // ヘッダー側の実際の高さはCSSだけでは正確に把握できない（推測値だと二重見積もりや
 // ズレの原因になる）ため、getBoundingClientRect()による実測に基づいて計算する。
-// 「初期スクロール位置でキャンバス表示領域自体の高さが、固定ツールバーの手前で
-// 収まる」ことを保証するのが目的で、ここで求めた値がそのまま.art-canvas-areaの
-// 高さになる（座標計算はgetBoundingClientRect()ベースのため、この高さ変更が
+// ツールバーは（以前と異なり）画面下端に固定されておらず、キャンバスより上の通常の
+// 位置に流れる。そのためキャンバス表示領域の絶対位置（canvasAreaAbsoluteTop）には
+// ツールバーの高さが既に織り込まれており、ここで求めた値がそのまま.art-canvas-area
+// の高さになる（座標計算はgetBoundingClientRect()ベースのため、この高さ変更が
 // タップ位置と描画位置のずれを生むことはない）。
 const ART_MOBILE_CANVAS_AREA_MAX_HEIGHT = 460;
-const ART_MOBILE_CANVAS_AREA_GAP = 8; // ツールバーとの間に最低限残す隙間
-// ヘッダー等の実測高さを引いた「残りの高さ」がこの値を下回るのは、オフラインバナー等の
-// 分を差し引いても画面自体が極端に低い場合のみ（例:700x360の横向き）。このケースだけは
-// 初期スクロール位置での重なりを許容し、その代わりスクロールすれば必ずツールバーの
-// 手前に収まるサイズ（下記MIN_HEIGHT）にしておく。それ以外のケースでは重なりを
-// 避けることを最優先し、たとえ狭くてもavailableをそのまま使う（下限に切り上げない）
+const ART_MOBILE_CANVAS_AREA_GAP = 8; // 画面下端との間に最低限残す隙間
+// 実測高さを引いた「残りの高さ」がこの値を下回るのは、オフラインバナー等の分を
+// 差し引いても画面自体が極端に低い場合のみ（例:700x360の横向き）。このケースだけは
+// スクロール前提のサイズ（下記MIN_HEIGHT）にフォールバックし、それ以外のケースでは
+// たとえ狭くてもavailableをそのまま使う（下限に切り上げない）
 const ART_MOBILE_CANVAS_AREA_ABSOLUTE_FLOOR = 100;
 const ART_MOBILE_CANVAS_AREA_MIN_HEIGHT = 180; // スクロール前提の場合に使う、操作しやすい高さ
 
 function adjustMobileCanvasAreaHeight(){
   if(!window.matchMedia("(max-width:767px)").matches) return;
   const canvasArea = document.querySelector(".art-canvas-area");
-  const toolbar = document.getElementById("artToolbar");
-  if(!canvasArea || !toolbar) return;
+  if(!canvasArea) return;
 
   // rect.top + scrollYで「ページ先頭からの絶対位置」を求める。これは現在のスクロール量に
   // 依存しない値になるため、リサイズ時など任意のスクロール位置で呼び出しても、
   // 「初期スクロール位置（scrollY=0）で見た場合にキャンバス表示領域がどこから
-  // 始まるか」を正しく表す
+  // 始まるか」を正しく表す（ツールバーは通常のフローにあるため、この値には
+  // ツールバーの実測高さが既に含まれている）
   const canvasAreaAbsoluteTop = canvasArea.getBoundingClientRect().top + window.scrollY;
-  const toolbarHeight = toolbar.getBoundingClientRect().height;
 
-  // 画面の高さそのものから固定ツールバー分を引いた「構造上どうしても超えられない上限」。
-  // 極端に低い横向き画面でヘッダー等がその画面高さを超えてしまう場合でも、
-  // キャンバス表示領域自身の高さだけは必ずこの上限以下に収め、スクロールすれば
-  // ツールバーと重ならずに全体が見える状態を保証する
-  const hardCeiling = Math.max(0, window.innerHeight - toolbarHeight - ART_MOBILE_CANVAS_AREA_GAP);
-  const available = window.innerHeight - canvasAreaAbsoluteTop - toolbarHeight - ART_MOBILE_CANVAS_AREA_GAP;
+  // 画面の高さそのものから最低限の余白を引いた「構造上どうしても超えられない上限」
+  const hardCeiling = Math.max(0, window.innerHeight - ART_MOBILE_CANVAS_AREA_GAP);
+  const available = window.innerHeight - canvasAreaAbsoluteTop - ART_MOBILE_CANVAS_AREA_GAP;
 
-  // 「初回訪問時のオフラインバナー表示中」など、通常より上部の実高さが増えるケースでも、
-  // 重なりを避けることを優先してavailableをそのまま使う（180px等の下限に切り上げない）。
   // ヘッダー等だけで画面のほとんどを占めてしまう極端なケースに限り、
   // スクロール前提のMIN_HEIGHTにフォールバックする
   const height = available >= ART_MOBILE_CANVAS_AREA_ABSOLUTE_FLOOR
@@ -921,7 +915,9 @@ function renderPaletteSubs(){
     const cls = ["art-swatch"];
     if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
     if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
-    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
+    // サブカラーの番号（例:"05-3"の"3"）をスウォッチ内に表示し、見た目だけでなく
+    // 番号でも色を判別・選択できるようにする
+    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"><span class="art-swatch-code">${i + 1}</span></button>`;
   }).join("");
   const inspectedSub = el.querySelector(".is-inspected");
   if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });

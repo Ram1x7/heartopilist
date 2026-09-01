@@ -19,7 +19,7 @@ const CACHE_FILES = [
   "./faq.html",
   "./css/style.css?v=15",
   "./css/design-system.css?v=3",
-  "./css/art.css?v=60",
+  "./css/art.css?v=61",
   "./css/music.css?v=46",
   "./js/main.js?v=26",
   "./js/toast.js",
