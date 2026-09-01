@@ -55,7 +55,7 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
   // 同一フレーム内の複数回の呼び出しをrequestAnimationFrameで1回にまとめる
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
-let activeDisabledSet = null; // 現在のキャンバスの使用不可マス集合（Set<"x,y">）。輪郭線の外側1マス分までは塗れるようバッファ済み。マスクなしならnull
+let activeDisabledSet = null; // 現在のキャンバスの使用不可マス集合（Set<"x,y">）。輪郭線の外側1マス分だけは有効マスとして扱われる。マスクなしならnull
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
 let shapeStartCell = null; // 図形ツール（直線・四角・円）のドラッグ開始マス。ドラッグ中でなければnull
 let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するマス配列（[[x,y], ...]）。確定前のため未確定の色
@@ -148,37 +148,34 @@ function rebuildActiveMask(){
   const preset = activeFrameId && typeof PRESET_MASKS !== "undefined" ? PRESET_MASKS[activeFrameId] : null;
   const part = preset && activePartId ? preset[activePartId] : null;
   activeMaskLines = part ? part.maskLines : null;
-  activeDisabledSet = part ? buildBufferedDisabledSet(part.disabledRanges) : null;
+  activeDisabledSet = part ? buildDisabledSet(part.disabledRanges) : null;
+  clearPixelsOutsideMask();
 }
 
-// disabledRanges（輪郭線の外側＝本来の使用不可マス）をそのままブロック対象にすると、
-// 実データの輪郭線とマス目のわずかなズレを吸収できず、輪郭線ぎりぎりのマスまで
-// 塗れなくなってしまう。輪郭線の外側1マス分（8方向に隣接するマス）だけは引き続き
-// 塗れるようにし、そこからさらに外側のマスだけをブロック対象として返す
-function buildBufferedDisabledSet(disabledRanges){
+// 使用不可マス（デザイン枠の外側）は「無いもの」として扱うため、既に色が
+// 入っている場合でも消しておく。画像変換（「画像から作る」）はデザイン枠の
+// 形を考慮せず矩形全体を塗るため、変換直後の下書きを読み込んだ時にここを
+// 通すことで、枠の外側に残ってしまう余分な色を確実に取り除ける
+function clearPixelsOutsideMask(){
+  if(!activeDisabledSet || !pixels || pixels.length !== gridWidth * gridHeight) return;
+  activeDisabledSet.forEach(key => {
+    const [x, y] = key.split(",").map(Number);
+    pixels[y * gridWidth + x] = null;
+  });
+}
+
+// disabledRanges（輪郭線の外側＝本来の使用不可マス）は、輪郭線（ベクター）と
+// マス目（ラスター）のわずかなズレを吸収できるよう、データ生成時点で既に
+// 輪郭線から1マス分ほど外側まで有効マスとして作られている。そのため、ここで
+// さらにマスを広げる処理はせず、disabledRangesをそのままブロック対象として使う
+// （輪郭線の外側1マス分だけ塗れて、それより外側は無効マスとして扱われる）
+function buildDisabledSet(disabledRanges){
   if(!disabledRanges || disabledRanges.length === 0) return null;
   const disabled = new Set();
   disabledRanges.forEach(([y, x1, x2]) => {
     for(let x = x1; x <= x2; x++) disabled.add(x + "," + y);
   });
-  const buffered = new Set();
-  disabled.forEach(key => {
-    const [x, y] = key.split(",").map(Number);
-    let nearEnabledCell = false;
-    for(let dy = -1; dy <= 1 && !nearEnabledCell; dy++){
-      for(let dx = -1; dx <= 1; dx++){
-        if(dx === 0 && dy === 0) continue;
-        const nx = x + dx, ny = y + dy;
-        if(nx < 0 || ny < 0 || nx >= gridWidth || ny >= gridHeight) continue;
-        if(!disabled.has(nx + "," + ny)){
-          nearEnabledCell = true;
-          break;
-        }
-      }
-    }
-    if(!nearEnabledCell) buffered.add(key);
-  });
-  return buffered;
+  return disabled;
 }
 
 function isCellDisabled(cx, cy){
@@ -1968,6 +1965,7 @@ function nudgeCanvas(dir){
 function finishTransform(){
   highlightedColor = null;
   inspectedCell = null;
+  clearPixelsOutsideMask(); // 反転・移動でデザイン枠の外側に色が入ってしまった場合に取り除く
   renderCanvas();
   updateColorUsage();
   saveDraftDebounced();
