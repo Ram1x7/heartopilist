@@ -406,6 +406,10 @@ function renderPaintGuideCanvas(){
   const doneColors = new Set();
   for(let i = 0; i < paintGuideStepIndex; i++) doneColors.add(paintGuideOrder[i].color);
 
+  // 今のブロック（10×10）の実際の範囲（ビューポート座標）。ズーム時は周囲1マスの
+  // 余白込みで表示しているため、この範囲の外側だけ後で暗く重ねる
+  const blockVx0 = step.bx * BLOCK_SIZE - viewport.ox, blockVy0 = step.by * BLOCK_SIZE - viewport.oy;
+
   // 完了済みの色・現在の色はそのまま、まだのマスは薄く表示（参考図＋進捗）
   for(let vy = 0; vy < viewport.h; vy++){
     for(let vx = 0; vx < viewport.w; vx++){
@@ -443,18 +447,29 @@ function renderPaintGuideCanvas(){
     gctx.stroke(gridPath);
   }
 
+  // 今のブロック（10×10）の範囲外は暗く重ねて、今どこを塗るべきかを分かりやすくする
+  // （ズーム時はブロック周囲1マスの余白部分、全体表示のときは他の全ブロックが対象）
+  {
+    const left = Math.max(0, blockVx0 * cell), top = Math.max(0, blockVy0 * cell);
+    const right = Math.min(cvs.width, (blockVx0 + step.bw) * cell), bottom = Math.min(cvs.height, (blockVy0 + step.bh) * cell);
+    gctx.fillStyle = "rgba(0,0,0,0.4)";
+    gctx.fillRect(0, 0, cvs.width, top); // 上
+    gctx.fillRect(0, bottom, cvs.width, cvs.height - bottom); // 下
+    gctx.fillRect(0, top, left, bottom - top); // 左
+    gctx.fillRect(right, top, cvs.width - right, bottom - top); // 右
+  }
+
   // 今のブロック（10×10）の一番外側の枠だけ太く表示する（ズーム時はブロックの
   // 実際の境目を、全体表示のときは今どこを見ているかを分かりやすくする）。
   // こちらも縁取り線にして、周りのマスの色に関係なく見えるようにする
   {
-    const bx0 = step.bx * BLOCK_SIZE - viewport.ox, by0 = step.by * BLOCK_SIZE - viewport.oy;
     const frameWidth = Math.max(3, cell * 0.12);
     gctx.strokeStyle = "rgba(255,255,255,0.95)";
     gctx.lineWidth = frameWidth + 2.5;
-    gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
+    gctx.strokeRect(blockVx0 * cell, blockVy0 * cell, step.bw * cell, step.bh * cell);
     gctx.strokeStyle = "rgba(0,0,0,0.85)";
     gctx.lineWidth = frameWidth;
-    gctx.strokeRect(bx0 * cell, by0 * cell, step.bw * cell, step.bh * cell);
+    gctx.strokeRect(blockVx0 * cell, blockVy0 * cell, step.bw * cell, step.bh * cell);
   }
 
   // 内側マス（バケツ範囲）のかたまりごとに斜線を重ねて表示。
