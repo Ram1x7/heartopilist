@@ -44,6 +44,7 @@ let currentDesignId = null; // 保存済みデザインを読み込んで編集�
 let myDesignsFilter = "all"; // マイデザイン一覧の絞り込み（all/notStarted/inProgress/done）
 let newCanvasModalCancelable = false; // 新規キャンバス作成モーダルを「新規作成」ボタンから開いた場合のみキャンセル可能にする
 let editMode = false; // 編集モード（ONの間だけキャンバスタップでペン/消しゴム/塗りつぶしが発動する。誤タップ防止）
+let floatingPaletteOpen = false; // カラーパレット（自由に動かせるフローティングパネル）の開閉状態
 let isLocked = false; // キャンバスの固定（ロック）。ロック中は編集モードに関わらず描画系ツールを一切受け付けない
 let activeFrameId = null; // 現在のキャンバスが紐づくデザイン枠プリセットID（自由サイズならnull）。マスク表示・使用不可マス判定に使う
 let activePartId = null; // 現在のキャンバスが紐づくデザイン枠パーツID
@@ -121,6 +122,7 @@ function initArtEditor(){
   bindMyDesignsControls();
   bindTransformControls();
   bindLockControls();
+  bindFloatingPaletteDrag();
   bindTutorialControls();
   bindShareCodeControls();
   bindModeWizardControls();
@@ -147,9 +149,6 @@ function rebuildActiveMask(){
   const part = preset && activePartId ? preset[activePartId] : null;
   activeMaskLines = part ? part.maskLines : null;
   activeDisabledSet = part ? buildBufferedDisabledSet(part.disabledRanges) : null;
-  // 3Dプレビュー機能（js/art-3d.js、対応アイテムのみ）のボタン表示・非表示も、
-  // activeFrameIdが変わるこの関数の呼び出しにあわせて同期する
-  if(typeof update3DPreviewButton === "function") update3DPreviewButton();
 }
 
 // disabledRanges（輪郭線の外側＝本来の使用不可マス）をそのままブロック対象にすると、
@@ -278,42 +277,36 @@ function refreshArtEntryOptionsVisibility(){
 // オフラインバナーの有無・言語による見出しの長さ・ダークモードでの見え方の違いなど、
 // ヘッダー側の実際の高さはCSSだけでは正確に把握できない（推測値だと二重見積もりや
 // ズレの原因になる）ため、getBoundingClientRect()による実測に基づいて計算する。
-// 「初期スクロール位置でキャンバス表示領域自体の高さが、固定ツールバーの手前で
-// 収まる」ことを保証するのが目的で、ここで求めた値がそのまま.art-canvas-areaの
-// 高さになる（座標計算はgetBoundingClientRect()ベースのため、この高さ変更が
+// ツールバーは（以前と異なり）画面下端に固定されておらず、キャンバスより上の通常の
+// 位置に流れる。そのためキャンバス表示領域の絶対位置（canvasAreaAbsoluteTop）には
+// ツールバーの高さが既に織り込まれており、ここで求めた値がそのまま.art-canvas-area
+// の高さになる（座標計算はgetBoundingClientRect()ベースのため、この高さ変更が
 // タップ位置と描画位置のずれを生むことはない）。
 const ART_MOBILE_CANVAS_AREA_MAX_HEIGHT = 460;
-const ART_MOBILE_CANVAS_AREA_GAP = 8; // ツールバーとの間に最低限残す隙間
-// ヘッダー等の実測高さを引いた「残りの高さ」がこの値を下回るのは、オフラインバナー等の
-// 分を差し引いても画面自体が極端に低い場合のみ（例:700x360の横向き）。このケースだけは
-// 初期スクロール位置での重なりを許容し、その代わりスクロールすれば必ずツールバーの
-// 手前に収まるサイズ（下記MIN_HEIGHT）にしておく。それ以外のケースでは重なりを
-// 避けることを最優先し、たとえ狭くてもavailableをそのまま使う（下限に切り上げない）
+const ART_MOBILE_CANVAS_AREA_GAP = 8; // 画面下端との間に最低限残す隙間
+// 実測高さを引いた「残りの高さ」がこの値を下回るのは、オフラインバナー等の分を
+// 差し引いても画面自体が極端に低い場合のみ（例:700x360の横向き）。このケースだけは
+// スクロール前提のサイズ（下記MIN_HEIGHT）にフォールバックし、それ以外のケースでは
+// たとえ狭くてもavailableをそのまま使う（下限に切り上げない）
 const ART_MOBILE_CANVAS_AREA_ABSOLUTE_FLOOR = 100;
 const ART_MOBILE_CANVAS_AREA_MIN_HEIGHT = 180; // スクロール前提の場合に使う、操作しやすい高さ
 
 function adjustMobileCanvasAreaHeight(){
   if(!window.matchMedia("(max-width:767px)").matches) return;
   const canvasArea = document.querySelector(".art-canvas-area");
-  const toolbar = document.getElementById("artToolbar");
-  if(!canvasArea || !toolbar) return;
+  if(!canvasArea) return;
 
   // rect.top + scrollYで「ページ先頭からの絶対位置」を求める。これは現在のスクロール量に
   // 依存しない値になるため、リサイズ時など任意のスクロール位置で呼び出しても、
   // 「初期スクロール位置（scrollY=0）で見た場合にキャンバス表示領域がどこから
-  // 始まるか」を正しく表す
+  // 始まるか」を正しく表す（ツールバーは通常のフローにあるため、この値には
+  // ツールバーの実測高さが既に含まれている）
   const canvasAreaAbsoluteTop = canvasArea.getBoundingClientRect().top + window.scrollY;
-  const toolbarHeight = toolbar.getBoundingClientRect().height;
 
-  // 画面の高さそのものから固定ツールバー分を引いた「構造上どうしても超えられない上限」。
-  // 極端に低い横向き画面でヘッダー等がその画面高さを超えてしまう場合でも、
-  // キャンバス表示領域自身の高さだけは必ずこの上限以下に収め、スクロールすれば
-  // ツールバーと重ならずに全体が見える状態を保証する
-  const hardCeiling = Math.max(0, window.innerHeight - toolbarHeight - ART_MOBILE_CANVAS_AREA_GAP);
-  const available = window.innerHeight - canvasAreaAbsoluteTop - toolbarHeight - ART_MOBILE_CANVAS_AREA_GAP;
+  // 画面の高さそのものから最低限の余白を引いた「構造上どうしても超えられない上限」
+  const hardCeiling = Math.max(0, window.innerHeight - ART_MOBILE_CANVAS_AREA_GAP);
+  const available = window.innerHeight - canvasAreaAbsoluteTop - ART_MOBILE_CANVAS_AREA_GAP;
 
-  // 「初回訪問時のオフラインバナー表示中」など、通常より上部の実高さが増えるケースでも、
-  // 重なりを避けることを優先してavailableをそのまま使う（180px等の下限に切り上げない）。
   // ヘッダー等だけで画面のほとんどを占めてしまう極端なケースに限り、
   // スクロール前提のMIN_HEIGHTにフォールバックする
   const height = available >= ART_MOBILE_CANVAS_AREA_ABSOLUTE_FLOOR
@@ -540,11 +533,21 @@ function renderToolbar(){
   el.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
   const transformSection = document.getElementById("artTransformSection");
   if(transformSection) transformSection.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
-  const toolButtons = TOOLS.map(t => `
+  const renderToolButton = t => `
     <button class="art-tool-btn${currentTool === t.id ? " active" : ""}" onclick="setTool('${t.id}')" aria-label="${T(t.labelKey, t.labelFallback)}" aria-pressed="${currentTool === t.id}">
       ${icon(t.icon, { size: 18 })}
     </button>
-  `).join("");
+  `;
+  // ペン・消しゴム・バケツ・スポイトの直後に、カラーパレットの開閉ボタンを挟む
+  // （色を選ぶ操作をひとまとめにするため。図形ツール・ガイド線はその後ろ）
+  const coreToolButtons = TOOLS.slice(0, 4).map(renderToolButton).join("");
+  const paletteToggleButton = `
+    <button class="art-tool-btn${floatingPaletteOpen ? " active" : ""}" id="artPaletteToggleBtn" onclick="toggleFloatingPalette()" aria-label="${T('art_palette_toggle', 'カラーパレット')}" aria-pressed="${floatingPaletteOpen}">
+      ${icon("palette", { size: 18 })}
+    </button>
+  `;
+  const shapeToolButtons = TOOLS.slice(4).map(renderToolButton).join("");
+  const toolButtons = coreToolButtons + paletteToggleButton + shapeToolButtons;
   const undoRedoButtons = `
     <button class="art-tool-btn" id="artUndoBtn" onclick="undo()" aria-label="${T('art_undo', '元に戻す')}" ${undoStack.length === 0 ? "disabled" : ""}>
       ${icon("undo", { size: 18 })}
@@ -608,6 +611,62 @@ function renderLockUI(){
   editBtn.classList.toggle("is-active", editMode);
   lockBtn.textContent = isLocked ? T("art_unlock", "固定を解除") : T("art_lock", "固定する");
   lockBtn.classList.toggle("is-locked", isLocked);
+}
+
+// ── カラーパレット（自由に動かせるフローティングパネル） ──
+// ツールバーの他のボタン（ペン・消しゴム等）と同じ並びから開閉できるようにし、
+// 開いている間もキャンバスタップでの描画やパン・ズームを妨げない（モーダル化しない）。
+// ハンドル部分をドラッグすると画面内の好きな位置へ動かせる
+function toggleFloatingPalette(){
+  floatingPaletteOpen = !floatingPaletteOpen;
+  renderFloatingPaletteVisibility();
+  renderToolbar();
+}
+
+function renderFloatingPaletteVisibility(){
+  const panel = document.getElementById("artFloatingPalette");
+  if(!panel) return;
+  panel.style.display = floatingPaletteOpen ? "flex" : "none";
+}
+
+function bindFloatingPaletteDrag(){
+  const panel = document.getElementById("artFloatingPalette");
+  const handle = document.getElementById("artFloatingPaletteHandle");
+  const closeBtn = document.getElementById("artFloatingPaletteCloseBtn");
+  if(!panel || !handle) return;
+  closeBtn.addEventListener("click", () => {
+    floatingPaletteOpen = false;
+    renderFloatingPaletteVisibility();
+    renderToolbar();
+  });
+  let dragOffset = null;
+  handle.addEventListener("pointerdown", (e) => {
+    // 閉じるボタンはハンドルの子要素なので、そのタップでもpointerdownがここまで
+    // バブリングしてくる。ここでポインターを掴んでしまうとpointerCaptureにより
+    // 以降のpointerup/clickがすべてハンドル側に付け替わり、閉じるボタンのクリックが
+    // 発火しなくなるため、閉じるボタン上では掴まない
+    if(e.target.closest(".art-floating-palette-close")) return;
+    const rect = panel.getBoundingClientRect();
+    dragOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener("pointermove", (e) => {
+    if(!dragOffset) return;
+    const maxLeft = Math.max(4, window.innerWidth - panel.offsetWidth - 4);
+    const maxTop = Math.max(4, window.innerHeight - panel.offsetHeight - 4);
+    const left = Math.min(Math.max(4, e.clientX - dragOffset.x), maxLeft);
+    const top = Math.min(Math.max(4, e.clientY - dragOffset.y), maxTop);
+    panel.style.left = left + "px";
+    panel.style.top = top + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+  });
+  const endDrag = (e) => {
+    dragOffset = null;
+    if(handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
+  };
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
 }
 
 // ── Undo / Redo（スナップショット方式） ──
@@ -789,18 +848,14 @@ function renderPalette(){
   renderPaletteSubs();
 }
 
-// 選択中メインカラーの大きいプレビュー（.art-chip-big）＋メインカラー一覧の
-// 横スクロール一列（#artPaletteMains、.art-chip-main）を表示する欄
+// メインカラー一覧の横スクロール一列（#artPaletteMains、.art-chip-main）を表示する欄。
+// 以前は選択中メインの大きいプレビュー（.art-chip-big）も左に並べていたが、
+// 帯の中の選択マーク（is-selected）だけで十分わかるため廃止した
 function renderPaletteCurrent(){
   const el = document.getElementById("artPaletteCurrent");
   // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
   // 該当なし（未着色マスや、そもそも調べていない）ならnull
   const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
-  const currentEntry = GAME_PALETTE.find(e => e.no === selectedMainNo);
-  const bigIsNone = currentEntry && currentEntry.no === "04";
-  const bigCls = ["art-chip", "art-chip-big"];
-  if(bigIsNone) bigCls.push("art-swatch-none");
-  const bigStyle = (currentEntry && !bigIsNone) ? ` style="background:${currentEntry.hex}"` : "";
   const stripHtml = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
@@ -813,10 +868,11 @@ function renderPaletteCurrent(){
     if(inspectedGroup && entry.no === inspectedGroup.no) cls.push("is-inspected");
     if(isNone) cls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
-    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}></button>`;
+    // ドット絵変換・色番号表示（Display＞色番号）と同じ番号体系（メインカラー番号）を、
+    // 中央に薄く表示する
+    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}><span class="art-chip-main-code">${entry.no}</span></button>`;
   }).join("");
-  el.innerHTML = `<span class="${bigCls.join(" ")}"${bigStyle} aria-hidden="true"></span>` +
-    `<div class="art-palette-mains-strip" id="artPaletteMains">${stripHtml}</div>`;
+  el.innerHTML = `<div class="art-palette-mains-strip" id="artPaletteMains">${stripHtml}</div>`;
   el.querySelectorAll("#artPaletteMains button").forEach(btn => {
     btn.addEventListener("click", () => selectPaletteMain(btn.dataset.main));
   });
@@ -856,7 +912,9 @@ function renderPaletteSubs(){
     const cls = ["art-swatch"];
     if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
     if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
-    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
+    // サブカラーの番号（例:"05-3"の"3"）をスウォッチ内に表示し、見た目だけでなく
+    // 番号でも色を判別・選択できるようにする
+    return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"><span class="art-swatch-code">${i + 1}</span></button>`;
   }).join("");
   const inspectedSub = el.querySelector(".is-inspected");
   if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });
@@ -1065,7 +1123,8 @@ function renderCanvas(){
   // スケールを通じて自動的に追従する）
   if(activeMaskLines && activeMaskLines.length){
     ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.9)" : "rgba(26,24,20,0.85)";
-    ctx.lineWidth = Math.max(1.5, cell * 0.09);
+    // 画像変換後は輪郭線が塗り込んだ色に埋もれて見えにくくなりがちなため、太めにする
+    ctx.lineWidth = Math.max(2.5, cell * 0.15);
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     activeMaskLines.forEach(path => {
@@ -2396,7 +2455,7 @@ const TUTORIAL_STEPS = [
   { selector: "#artEditModeBtn", title: "① 編集する", text: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
   { selector: "#artToolbar", title: "② ツール", text: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから。" },
   { selector: "#artBrushSizeSection", title: "③ 太さ", text: "ペン・消しゴムの太さを1〜4マスから選べます。" },
-  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。横にスクロールできます。タップすると、下にサブカラー（詳細な色合い）が表示されます。" },
+  { selector: "#artPaletteToggleBtn", title: "④ カラー", text: "タップするとカラーパレットが開きます。上のバーをドラッグすると好きな位置に動かせるので、開いたままキャンバスを描き進められます。" },
   { selector: "#artZoomControls", title: "⑤ 拡大率", text: "スライダーで自由に拡大・縮小できます。スマホなら2本指のピンチ操作でも変更できます。" },
   { selector: "#artLockBtn", title: "⑥ 固定する", text: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
   { selector: "#artSaveBtn", title: "⑦ 保存する", text: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG保存・共有もできます。" },

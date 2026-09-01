@@ -255,45 +255,22 @@ body.dark #artCanvas{
     #2c2823;
 }
 
-/* スマートフォン（767px以下）：主要ツール（ペン/消しゴム/バケツ/スポイト/Undo/Redo等）を
-   画面下端に固定し、パネルを下までスクロールしなくても常に片手で届く位置に置く。
-   グリッド上の配置（DOM順・グリッドエリア）自体は変更せず、position:fixedで
-   ツールバーだけを画面に貼り付ける追加指定のみ（キャンバスの座標計算は
-   getBoundingClientRect()ベースで位置に依存しないため影響を受けない）。
-   固定ツールバーの高さは実測に基づく想定値をCSS変数で管理し、
-   .art-layout（末尾の余白）と.art-canvas-area（キャンバス表示領域の高さ）の
-   両方から参照することで、値の重複や食い違いを防ぐ */
+/* スマートフォン（767px以下）：主要ツール（ペン/消しゴム/バケツ/スポイト/Undo/Redo等）は
+   グリッド上の配置（DOM順・グリッドエリア）どおり、キャンバスより上の通常の位置に表示する
+   （以前は画面下端にposition:fixedで固定していたが、ドット絵より上に置いてほしいという
+   要望を受けて撤廃。通常のドキュメントフローに戻ったことで、キャンバス表示領域の高さ計算も
+   「固定ツールバーとの重なり回避」を考える必要がなくなった） */
 @media (max-width:767px){
-  .art-layout{
-    --art-mobile-toolbar-height:52px;
-    --art-mobile-toolbar-total-height:calc(var(--art-mobile-toolbar-height) + 20px + env(safe-area-inset-bottom));
-    padding-bottom:var(--art-mobile-toolbar-total-height);
-  }
-
-  .art-toolbar{
-    position:fixed;
-    left:0;
-    right:0;
-    bottom:0;
-    z-index:500;
-    border-radius:16px 16px 0 0;
-    border-bottom:none;
-    padding-bottom:calc(10px + env(safe-area-inset-bottom));
-    box-shadow:0 -4px 14px rgba(52,48,43,0.1);
-  }
-
   /* キャンバス表示領域の高さは、js/art-editor.jsのadjustMobileCanvasAreaHeight()が
-     「実際に画面上でヘッダー・オフラインバナー・編集モードバー等が占めている高さ」と
-     「固定ツールバーの実測高さ」を都度getBoundingClientRect()で測り、
-     --art-canvas-area-mobile-heightとして動的に設定する。バナーの有無や言語切替による
-     文言の長さの違いなど、CSSだけでは正確に把握できない要素を実測するのが目的で、
-     推測値で二重に見積もることを避けている。
+     「実際に画面上でヘッダー・オフラインバナー・編集モードバー・ツールバー等が占めている高さ」を
+     都度getBoundingClientRect()で測り、--art-canvas-area-mobile-heightとして動的に設定する。
+     バナーの有無や言語切替による文言の長さの違いなど、CSSだけでは正確に把握できない要素を
+     実測するのが目的で、推測値で二重に見積もることを避けている。
      以下のclamp(...)は、JS実行前の一瞬・JS無効時にのみ使われるフォールバック値 */
   .art-canvas-area{
     box-sizing:border-box;
-    height:clamp(110px, calc(34vh - var(--art-mobile-toolbar-total-height)), 380px);
-    height:var(--art-canvas-area-mobile-height, clamp(110px, calc(34dvh - var(--art-mobile-toolbar-total-height)), 380px));
-    scroll-margin-bottom:var(--art-mobile-toolbar-total-height);
+    height:clamp(110px, 34vh, 380px);
+    height:var(--art-canvas-area-mobile-height, clamp(110px, 34dvh, 380px));
   }
 }
 
@@ -510,10 +487,12 @@ body.dark .art-brush-size-options button.active{
   margin-bottom:10px;
 }
 
-/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す。
-   メインカラー一覧グリッドと、選択中メインの大きいプレビューの両方で使う */
+/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す */
 .art-chip{
   position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   border:2px solid var(--border);
   border-radius:10px;
   background:var(--card);
@@ -522,15 +501,54 @@ body.dark .art-brush-size-options button.active{
   padding:0;
 }
 
+/* ドット絵変換・色番号表示（Display＞色番号）と同じ色番号を、メインカラーの
+   中央に薄く表示する。「薄く」なので白フチはつけず、半透明の単色のみにする */
+.art-chip-main-code{
+  position:relative;
+  z-index:1;
+  font-size:8px;
+  font-weight:700;
+  line-height:1;
+  color:rgba(255,255,255,0.75);
+  mix-blend-mode:difference;
+  pointer-events:none;
+}
+
 .art-chip-main{
   width:32px;
   height:32px;
 }
 
-.art-chip-big{
-  width:44px;
-  height:44px;
-  flex:0 0 auto;
+/* 2列8個のグリッド（.art-palette-mains-strip）の中では、隙間なく並べられる
+   短冊状にする。枠・角丸・影は個々のチップではなく帯（ストリップ）側で
+   まとめて表現し、選択状態は外側にリングを置くスペースがないため内側の
+   金色の縁取りで示す（帯を跨いだドットバッジは省略） */
+.art-palette-mains-strip .art-chip-main{
+  width:auto;
+  height:26px;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+}
+
+.art-palette-mains-strip .art-chip-main.is-selected{
+  box-shadow:inset 0 0 0 2px var(--card), inset 0 0 0 4px var(--gold);
+}
+
+.art-palette-mains-strip .art-chip-main.is-selected::after{
+  display:none;
+}
+
+.art-palette-mains-strip .art-chip-main.is-inspected{
+  box-shadow:inset 0 0 0 2px var(--card), inset 0 0 0 4px var(--vermillion);
+}
+
+body.dark .art-palette-mains-strip .art-chip-main.is-selected{
+  box-shadow:inset 0 0 0 2px #2c2823, inset 0 0 0 4px var(--gold);
+}
+
+body.dark .art-palette-mains-strip .art-chip-main.is-inspected{
+  box-shadow:inset 0 0 0 2px #2c2823, inset 0 0 0 4px var(--vermillion-soft);
 }
 
 /* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
@@ -582,12 +600,15 @@ body.dark .art-chip.is-inspected{
 }
 
 /* サブカラー：参考ツールの「絵の具を垂らしたパレット」のような、有機的なブロブ形状＋
-   段差の影を持つ小石スウォッチ（.art-swatch）で表す。選択中メインの大きいプレビューの
-   右に並ぶ。スウォッチごとに角丸の値を少しずらし（nth-child）、手作りの小石が並んだ
-   ようなゆらぎを出す。影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
+   段差の影を持つ小石スウォッチ（.art-swatch）で表す。スウォッチごとに角丸の値を
+   少しずらし（nth-child）、手作りの小石が並んだようなゆらぎを出す。
+   影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
    色データや配色ロジックには一切手を加えていない */
 .art-swatch{
   position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   width:24px;
   height:24px;
   border-radius:60% 40% 55% 45% / 50% 45% 55% 50%;
@@ -595,6 +616,23 @@ body.dark .art-chip.is-inspected{
   cursor:pointer;
   padding:0;
   z-index:1;
+}
+
+/* サブカラー内の番号ラベル（例:"05-3"の"3"）。マス番号・色番号表示と同じ
+   「白フチ＋濃い文字」の組み合わせにすることで、スウォッチの色に関わらず判読できる */
+.art-swatch-code{
+  position:relative;
+  z-index:1;
+  font-size:9px;
+  font-weight:700;
+  line-height:1;
+  color:#1a1814;
+  text-shadow:
+    -1px -1px 0 rgba(255,255,255,0.9),
+    1px -1px 0 rgba(255,255,255,0.9),
+    -1px 1px 0 rgba(255,255,255,0.9),
+    1px 1px 0 rgba(255,255,255,0.9);
+  pointer-events:none;
 }
 
 .art-swatch::before{
@@ -652,30 +690,26 @@ body.dark .art-swatch.is-inspected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
 }
 
-/* 選択中メインの大きいプレビュー（.art-chip-big）＋メインカラー一覧の横スクロール
-   一列（.art-palette-mains-strip）を横に並べるエリア */
+/* メインカラー一覧のグリッド（.art-palette-mains-strip）を収めるエリア */
 .art-palette-current{
-  display:flex;
-  align-items:center;
-  gap:10px;
   margin-bottom:10px;
-  min-height:44px;
 }
 
-/* メインカラーは16種と数が多いため、折り返さず横一列のまま横スクロールで選ぶ
-   （参考ツールと同じ配置。改行させないので.art-palette-current内で残りの幅を使う） */
+/* メインカラーは16種と数が多いため、横スクロールではなく8列×2段の
+   グリッドに折り返して、パレット全体の横幅を抑える。各チップは隙間なく
+   詰めて並べ、帯全体をひとつの枠で囲む（枠・角丸は.art-chip-main側では
+   なくこちらでまとめて表現する） */
 .art-palette-mains-strip{
-  display:flex;
-  gap:7px;
-  flex:1 1 auto;
-  min-width:0;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  padding:2px 2px 6px;
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
+  gap:0;
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
 }
 
-.art-palette-mains-strip .art-chip-main{
-  flex:0 0 auto;
+body.dark .art-palette-mains-strip{
+  border-color:#46423b;
 }
 
 /* 参考画像（実際のゲームの配色ツール）に合わせ、サブカラーは横一列ではなく
@@ -685,6 +719,95 @@ body.dark .art-swatch.is-inspected{
   grid-template-columns:repeat(2, 24px);
   gap:8px 10px;
   flex:0 0 auto;
+}
+
+/* カラーパレット（ツールバーの専用ボタンから開閉する、自由に動かせるフローティングパネル）。
+   モーダルではないため背景の暗幕は敷かず、開いたままキャンバスのタップ・パン・ズームを
+   邪魔しない。ハンドル部分をドラッグして好きな位置へ動かせる */
+.art-floating-palette{
+  position:fixed;
+  top:90px;
+  right:10px;
+  z-index:1500;
+  display:flex;
+  flex-direction:column;
+  width:min(190px, calc(100vw - 20px));
+  max-height:min(70vh, 520px);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(52,48,43,0.22);
+  overflow:hidden;
+}
+
+.art-floating-palette-handle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px 8px 9px 14px;
+  background:var(--card-sub);
+  border-bottom:1px solid var(--border);
+  font-weight:700;
+  font-size:13px;
+  color:var(--indigo);
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+
+.art-floating-palette-handle:active{
+  cursor:grabbing;
+}
+
+.art-floating-palette-close{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  height:26px;
+  padding:0;
+  border:none;
+  border-radius:50%;
+  background:transparent;
+  color:var(--text-sub);
+  cursor:pointer;
+}
+
+/* fill="none"のアイコンSVGは、線の描かれていない部分（グリフの内側の余白）で
+   ヒットテストがボタン自身ではなくSVG要素側に取られてしまうことがあるため、
+   SVG自体はポインターイベントを無視させ、必ず親のボタンでクリックを拾わせる */
+.art-floating-palette-close svg{
+  pointer-events:none;
+}
+
+.art-floating-palette-close:hover{
+  background:rgba(60,90,110,0.1);
+}
+
+.art-floating-palette-body{
+  padding:12px;
+  overflow-y:auto;
+}
+
+.art-floating-palette-body .art-panel-section{
+  margin-bottom:10px;
+}
+
+body.dark .art-floating-palette{
+  background:#2c2823;
+  border-color:#46423b;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+
+body.dark .art-floating-palette-handle{
+  background:#383329;
+  border-bottom-color:#46423b;
+  color:#8fbdc9;
+}
+
+body.dark .art-floating-palette-close:hover{
+  background:rgba(255,255,255,0.08);
 }
 
 /* 04：透明/なしスロット（市松模様で「色なし」を表す） */
@@ -1139,56 +1262,6 @@ body.dark .art-mode-wizard-badge{
 }
 
 body.dark .art-mode-wizard-option-desc{
-  color:#b3a89a;
-}
-
-/* 3Dプレビュー（検証段階。maskLinesを押し出したペーパークラフト風の立体をthree.jsで表示） */
-.art-3d-box{
-  max-width:380px;
-  text-align:center;
-}
-
-.art-3d-host{
-  position:relative;
-  width:100%;
-  height:320px;
-  margin-top:10px;
-  border-radius:14px;
-  overflow:hidden;
-  background:linear-gradient(180deg, var(--card-sub) 0%, var(--card) 100%);
-  border:1px solid var(--border);
-  touch-action:none;
-}
-
-.art-3d-host canvas{
-  display:block;
-  width:100%;
-  height:100%;
-}
-
-.art-3d-loading{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  margin:0;
-  font-size:12px;
-  color:var(--text-sub);
-}
-
-.art-3d-note{
-  margin-top:10px;
-  font-size:10.5px;
-  line-height:1.6;
-  color:var(--text-sub);
-}
-
-body.dark .art-3d-host{
-  border-color:#46423b;
-}
-
-body.dark .art-3d-loading,
-body.dark .art-3d-note{
   color:#b3a89a;
 }
 

@@ -97,6 +97,8 @@ const ICONS = {
   sumiKeshi: `<path d="M6 20 4.7 15a2 2 0 0 1 .5-2L14 4.3a2 2 0 0 1 2.8 0l2.9 2.9a2 2 0 0 1 0 2.8L11 18.6a2 2 0 0 1-1.4.6H6Z"/><path d="M10.5 7.7 16.3 13.5"/>`,
   bucket: `<path d="M4.5 10.5 12 3l7.5 7.5a3 3 0 0 1 0 4.2l-3.3 3.3a3 3 0 0 1-4.2 0l-7.5-7.5Z"/><path d="M4 12l6 6"/><path d="M18.5 16.5c.8.8.8 2 0 2.8-.8.8-2 .8-2.8 0"/>`,
   eyedropper: `<path d="m7.5 16.5 8-8"/><path d="M14 5.5 18.5 10"/><path d="M15.8 3.7a2.3 2.3 0 0 1 3.2 0l1.3 1.3a2.3 2.3 0 0 1 0 3.2l-1.8 1.8-4.5-4.5Z"/><path d="M7.5 16.5 5 20l3.5-2.5"/>`,
+  // パレット（画家用パレットの形。親指を通す穴の位置に絵の具の玉を配置）
+  palette: `<path d="M12 3.5C7 3.5 3 7.3 3 12c0 2.9 2 5.3 4.6 5.3.8 0 1.1.9.6 1.5-.6.7-.2 1.7.7 1.7C15.2 20.5 21 16.6 21 11c0-4.1-4-7.5-9-7.5Z"/><circle cx="8" cy="10.3" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="7.8" r="1.2" fill="currentColor" stroke="none"/><circle cx="16" cy="9.3" r="1.2" fill="currentColor" stroke="none"/><circle cx="17" cy="13.3" r="1.2" fill="currentColor" stroke="none"/>`,
   undo: `<path d="M4 11h9a5.5 5.5 0 0 1 0 11h-3"/><path d="m8 6-4 5 4 5"/>`,
   redo: `<path d="M20 11h-9a5.5 5.5 0 0 0 0 11h3"/><path d="m16 6 4 5-4 5"/>`,
   shapeLine: `<path d="M6 18 18 6"/><circle cx="6" cy="18" r="1.7" fill="currentColor" stroke="none"/><circle cx="18" cy="6" r="1.7" fill="currentColor" stroke="none"/>`,

@@ -17,7 +17,7 @@ https://ram1x7.github.io/heartopilist/
 | コード（`codes.html`） | 有効なギフトコード一覧 |
 | イベント（`events.html`） | 開催中・開催予定のイベント／ガチャ情報 |
 | 場所動画（`videos.html`） | ピンクバブル・虹の日・流星雨の発生記録動画 |
-| アート（`art-create.html`） | ドット絵デザインの作成・変換・3Dプレビュー（`art-convert.html`は「画像から作る」単体ページ） |
+| アート（`art-create.html`） | ドット絵デザインの作成・変換（`art-convert.html`は「画像から作る」単体ページ） |
 | 楽譜（`music.html`） | 数字譜（簡譜）の作成・自動採譜・演奏練習 |
 | Q&A（`faq.html`） | よくある質問・要望・不具合の対応状況 |
 
@@ -90,7 +90,6 @@ https://ram1x7.github.io/heartopilist/
 - 画像から作る（写真・イラストをドット絵に自動変換。色数・ディザリング・背景処理などを調整可能）
 - スクショから取り込む（ゲーム内デザイン画面のスクリーンショットをアップロードすると、画面に写り込む補助線を照合してキャンバスと位置を自動判定。自動判定が難しい場合は候補一覧からの手動選択や、範囲のドラッグ移動・リサイズによる手動調整も可能）
 - ぬり方ガイド（10×10ブロックごとに効率のいい塗り順を自動ズームで案内、残り時間の目安、完了までの進捗記録）
-- 3Dプレビュー（試験公開。対応キャンバスをドラッグで回転させて立体的に確認）
 - マイデザイン一覧（未着手／作業中／完了のステータス管理、進捗％表示）
 - PNGエクスポート・画像共有
 - 共有コード（アカウント不要で、デザインを文字列・URL・QRコードとしてバックアップ・受け渡し。サーバー送信なし）
@@ -156,7 +155,7 @@ heartopilist/
 │   ├── art-editor.js / art-config.js / art-masks.js … アートページ本体・キャンバス定義・輪郭線データ
 │   ├── art-converter.js / art-pixelate.js            … 画像→ドット絵変換の共通処理
 │   ├── art-template-match.js / art-screenshot-import.js … スクショから取り込む機能（補助線照合）
-│   ├── art-paint-guide.js / art-3d.js / art-share-code.js … ぬり方ガイド・3Dプレビュー・共有コード
+│   ├── art-paint-guide.js / art-share-code.js … ぬり方ガイド・共有コード
 │   └── music-editor.js / music-config.js / music-hum.js … 楽譜エディタ本体・設定・自動採譜
 ├── locales/                  … 多言語翻訳ファイル（ja / en / ko / th / zh-CN / zh-TW）
 ├── images/ / fish/ / bugs/ / birds/ … 画像アセット
@@ -202,7 +201,7 @@ https://ram1x7.github.io/heartopilist/
 | Codes (`codes.html`) | List of active gift codes |
 | Events (`events.html`) | Ongoing and upcoming events/gacha info |
 | Location Videos (`videos.html`) | Pink Bubble / Rainbow Day / Meteor Shower footage archive |
-| Art (`art-create.html`) | Pixel art design creation, image conversion, and 3D preview (`art-convert.html` is a standalone "create from image" page) |
+| Art (`art-create.html`) | Pixel art design creation and image conversion (`art-convert.html` is a standalone "create from image" page) |
 | Sheet Music (`music.html`) | Numbered-notation sheet music editor, auto-transcription, and performance practice |
 | Q&A (`faq.html`) | FAQ, feature requests, and bug status |
 
@@ -275,7 +274,6 @@ https://ram1x7.github.io/heartopilist/
 - Create from image (auto-converts a photo or illustration into pixel art, with adjustable color count, dithering, and background handling)
 - Import from screenshot (upload a screenshot of the in-game design screen; the guide lines visible in the screenshot are matched against each canvas template to automatically detect the canvas and position. If auto-detection isn't confident, you can pick from a candidate list or manually drag-move/resize the crop area)
 - Paint order guide (walks through efficient painting order block-by-block with auto-zoom, an estimated time remaining, and progress tracking to completion)
-- 3D preview (experimental; drag to rotate supported canvases in 3D)
 - My Designs list (not-started / in-progress / complete status tracking with progress %)
 - PNG export and image sharing
 - Share codes (back up or hand off a design as a short code, URL, or QR code — no account needed, nothing sent to a server)
@@ -343,7 +341,7 @@ heartopilist/
 │   ├── art-editor.js / art-config.js / art-masks.js … Art editor core / canvas definitions / outline data
 │   ├── art-converter.js / art-pixelate.js            … Shared image → pixel art conversion logic
 │   ├── art-template-match.js / art-screenshot-import.js … Import-from-screenshot (guide-line matching)
-│   ├── art-paint-guide.js / art-3d.js / art-share-code.js … Paint order guide / 3D preview / share codes
+│   ├── art-paint-guide.js / art-share-code.js … Paint order guide / share codes
 │   └── music-editor.js / music-config.js / music-hum.js … Sheet music editor core / config / auto-transcription
 ├── locales/                  … Translation files (ja / en / ko / th / zh-CN / zh-TW)
 ├── images/ / fish/ / bugs/ / birds/ … Image assets

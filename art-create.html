@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/art.css?v=58">
+<link rel="stylesheet" href="./css/art.css?v=64">
 <link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
@@ -118,20 +118,6 @@
       <div class="art-panel-title" data-i18n="art_zoom_label">拡大率</div>
       <div class="art-zoom-controls" id="artZoomControls"></div>
     </div>
-    <div class="art-panel-section" id="artRecentColorsSection" style="display:none;">
-      <div class="art-panel-title" data-i18n="art_recent_colors_label">最近使った色</div>
-      <div class="art-palette" id="artRecentColors"></div>
-    </div>
-    <div class="art-panel-section">
-      <div class="art-color-replace-banner" id="artColorReplaceBanner" style="display:none;">
-        <span class="art-color-replace-banner-swatch" id="artColorReplaceBannerSwatch"></span>
-        <span class="art-color-replace-banner-text" data-i18n="art_color_replace_banner">この色をパレットから選んで置き換え先にしてください</span>
-        <button class="art-color-replace-banner-cancel" onclick="cancelColorReplace()" data-i18n="art_color_replace_cancel">やめる</button>
-      </div>
-      <div class="art-panel-title" data-i18n="art_palette_label">カラー</div>
-      <div class="art-palette-current" id="artPaletteCurrent"></div>
-      <div class="art-palette-subs-row" id="artPaletteSubs"></div>
-    </div>
     <div class="art-panel-section">
       <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
       <div class="art-color-usage" id="artColorUsage"></div>
@@ -153,13 +139,6 @@
       <div class="art-panel-title" data-i18n="art_paint_guide_label">ぬり方ガイド</div>
       <div class="art-panel-btn-row">
         <button class="art-header-btn" id="artPaintGuideBtn" data-i18n="art_paint_guide_btn">効率のいい順番を見る</button>
-      </div>
-    </div>
-    <div class="art-panel-section" id="art3DSection" style="display:none;">
-      <div class="art-panel-title" data-i18n="art_3d_preview_label">3Dプレビュー（試験公開）</div>
-      <p class="art-step-hint" data-i18n="art_3d_preview_hint">保存済みの他のパーツも合わせて、立体的な見た目を確認できます</p>
-      <div class="art-panel-btn-row">
-        <button class="art-header-btn" id="art3DPreviewBtn" data-i18n="art_3d_preview_btn">3Dプレビューを見る</button>
       </div>
     </div>
     <div class="art-panel-section">
@@ -201,6 +180,28 @@
       </label>
       <div class="art-block-list" id="artBlockList"></div>
     </div>
+  </div>
+</div>
+
+<div class="art-floating-palette" id="artFloatingPalette" style="display:none;">
+  <div class="art-floating-palette-handle" id="artFloatingPaletteHandle">
+    <span data-i18n="art_palette_label">カラー</span>
+    <button class="art-floating-palette-close" id="artFloatingPaletteCloseBtn" aria-label="close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="art-floating-palette-body">
+    <div class="art-color-replace-banner" id="artColorReplaceBanner" style="display:none;">
+      <span class="art-color-replace-banner-swatch" id="artColorReplaceBannerSwatch"></span>
+      <span class="art-color-replace-banner-text" data-i18n="art_color_replace_banner">この色をパレットから選んで置き換え先にしてください</span>
+      <button class="art-color-replace-banner-cancel" onclick="cancelColorReplace()" data-i18n="art_color_replace_cancel">やめる</button>
+    </div>
+    <div class="art-panel-section" id="artRecentColorsSection" style="display:none;">
+      <div class="art-panel-title" data-i18n="art_recent_colors_label">最近使った色</div>
+      <div class="art-palette" id="artRecentColors"></div>
+    </div>
+    <div class="art-palette-current" id="artPaletteCurrent"></div>
+    <div class="art-palette-subs-row" id="artPaletteSubs"></div>
   </div>
 </div>
 
@@ -357,27 +358,6 @@
         <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_normal_desc">キャンバス全体を見ながら、自由な順番で塗り進められます</span>
       </button>
     </div>
-  </div>
-</div>
-
-<div id="art3DModal" onclick="if(event.target.id==='art3DModal') close3DPreview()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
-  <div class="modal-box art-3d-box">
-    <h3 data-i18n="art_3d_preview_title">3Dプレビュー</h3>
-    <p class="art-step-hint" data-i18n="art_3d_preview_drag_hint">ドラッグして回転・ピンチしてズームできます</p>
-    <div class="art-3d-host" id="art3DHost">
-      <p class="art-3d-loading" id="art3DLoading" data-i18n="art_3d_preview_loading">読み込み中…</p>
-    </div>
-    <div class="art-panel-btn-row" id="art3DViewButtons">
-      <button class="art-header-btn" data-view="front" data-i18n="art_3d_preview_view_front">正面</button>
-      <button class="art-header-btn" data-view="back" data-i18n="art_3d_preview_view_back">背面</button>
-      <button class="art-header-btn" data-view="side" data-i18n="art_3d_preview_view_side">側面</button>
-      <button class="art-header-btn" data-view="top" data-i18n="art_3d_preview_view_top">上面</button>
-    </div>
-    <div class="art-panel-btn-row">
-      <button class="art-header-btn" id="art3DResetBtn" data-i18n="art_3d_preview_reset">視点をリセット</button>
-    </div>
-    <p class="art-3d-note" data-i18n="art_3d_preview_note">試験的な機能です。実際のゲーム内の見た目と多少異なる場合があります</p>
-    <button class="modal-close-btn" onclick="close3DPreview()" data-i18n="art_close">閉じる</button>
   </div>
 </div>
 
@@ -633,7 +613,6 @@ function T(key, fallback, vars){
 <script src="js/art-share-code.js"></script>
 <script src="js/art-editor.js"></script>
 <script src="js/art-paint-guide.js"></script>
-<script src="js/art-3d.js"></script>
 <script src="js/art-screenshot-import.js"></script>
 <script>
 </script>
