@@ -687,6 +687,95 @@ body.dark .art-swatch.is-inspected{
   flex:0 0 auto;
 }
 
+/* カラーパレット（ツールバーの専用ボタンから開閉する、自由に動かせるフローティングパネル）。
+   モーダルではないため背景の暗幕は敷かず、開いたままキャンバスのタップ・パン・ズームを
+   邪魔しない。ハンドル部分をドラッグして好きな位置へ動かせる */
+.art-floating-palette{
+  position:fixed;
+  top:90px;
+  right:10px;
+  z-index:1500;
+  display:flex;
+  flex-direction:column;
+  width:min(280px, calc(100vw - 20px));
+  max-height:min(70vh, 520px);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(52,48,43,0.22);
+  overflow:hidden;
+}
+
+.art-floating-palette-handle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px 8px 9px 14px;
+  background:var(--card-sub);
+  border-bottom:1px solid var(--border);
+  font-weight:700;
+  font-size:13px;
+  color:var(--indigo);
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+
+.art-floating-palette-handle:active{
+  cursor:grabbing;
+}
+
+.art-floating-palette-close{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  height:26px;
+  padding:0;
+  border:none;
+  border-radius:50%;
+  background:transparent;
+  color:var(--text-sub);
+  cursor:pointer;
+}
+
+/* fill="none"のアイコンSVGは、線の描かれていない部分（グリフの内側の余白）で
+   ヒットテストがボタン自身ではなくSVG要素側に取られてしまうことがあるため、
+   SVG自体はポインターイベントを無視させ、必ず親のボタンでクリックを拾わせる */
+.art-floating-palette-close svg{
+  pointer-events:none;
+}
+
+.art-floating-palette-close:hover{
+  background:rgba(60,90,110,0.1);
+}
+
+.art-floating-palette-body{
+  padding:12px;
+  overflow-y:auto;
+}
+
+.art-floating-palette-body .art-panel-section{
+  margin-bottom:10px;
+}
+
+body.dark .art-floating-palette{
+  background:#2c2823;
+  border-color:#46423b;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+
+body.dark .art-floating-palette-handle{
+  background:#383329;
+  border-bottom-color:#46423b;
+  color:#8fbdc9;
+}
+
+body.dark .art-floating-palette-close:hover{
+  background:rgba(255,255,255,0.08);
+}
+
 /* 04：透明/なしスロット（市松模様で「色なし」を表す） */
 .art-swatch-none{
   background-color:var(--card);
@@ -1139,56 +1228,6 @@ body.dark .art-mode-wizard-badge{
 }
 
 body.dark .art-mode-wizard-option-desc{
-  color:#b3a89a;
-}
-
-/* 3Dプレビュー（検証段階。maskLinesを押し出したペーパークラフト風の立体をthree.jsで表示） */
-.art-3d-box{
-  max-width:380px;
-  text-align:center;
-}
-
-.art-3d-host{
-  position:relative;
-  width:100%;
-  height:320px;
-  margin-top:10px;
-  border-radius:14px;
-  overflow:hidden;
-  background:linear-gradient(180deg, var(--card-sub) 0%, var(--card) 100%);
-  border:1px solid var(--border);
-  touch-action:none;
-}
-
-.art-3d-host canvas{
-  display:block;
-  width:100%;
-  height:100%;
-}
-
-.art-3d-loading{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  margin:0;
-  font-size:12px;
-  color:var(--text-sub);
-}
-
-.art-3d-note{
-  margin-top:10px;
-  font-size:10.5px;
-  line-height:1.6;
-  color:var(--text-sub);
-}
-
-body.dark .art-3d-host{
-  border-color:#46423b;
-}
-
-body.dark .art-3d-loading,
-body.dark .art-3d-note{
   color:#b3a89a;
 }
 

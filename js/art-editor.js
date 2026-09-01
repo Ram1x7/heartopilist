@@ -44,6 +44,7 @@ let currentDesignId = null; // 保存済みデザインを読み込んで編集�
 let myDesignsFilter = "all"; // マイデザイン一覧の絞り込み（all/notStarted/inProgress/done）
 let newCanvasModalCancelable = false; // 新規キャンバス作成モーダルを「新規作成」ボタンから開いた場合のみキャンセル可能にする
 let editMode = false; // 編集モード（ONの間だけキャンバスタップでペン/消しゴム/塗りつぶしが発動する。誤タップ防止）
+let floatingPaletteOpen = false; // カラーパレット（自由に動かせるフローティングパネル）の開閉状態
 let isLocked = false; // キャンバスの固定（ロック）。ロック中は編集モードに関わらず描画系ツールを一切受け付けない
 let activeFrameId = null; // 現在のキャンバスが紐づくデザイン枠プリセットID（自由サイズならnull）。マスク表示・使用不可マス判定に使う
 let activePartId = null; // 現在のキャンバスが紐づくデザイン枠パーツID
@@ -121,6 +122,7 @@ function initArtEditor(){
   bindMyDesignsControls();
   bindTransformControls();
   bindLockControls();
+  bindFloatingPaletteDrag();
   bindTutorialControls();
   bindShareCodeControls();
   bindModeWizardControls();
@@ -147,9 +149,6 @@ function rebuildActiveMask(){
   const part = preset && activePartId ? preset[activePartId] : null;
   activeMaskLines = part ? part.maskLines : null;
   activeDisabledSet = part ? buildBufferedDisabledSet(part.disabledRanges) : null;
-  // 3Dプレビュー機能（js/art-3d.js、対応アイテムのみ）のボタン表示・非表示も、
-  // activeFrameIdが変わるこの関数の呼び出しにあわせて同期する
-  if(typeof update3DPreviewButton === "function") update3DPreviewButton();
 }
 
 // disabledRanges（輪郭線の外側＝本来の使用不可マス）をそのままブロック対象にすると、
@@ -540,11 +539,21 @@ function renderToolbar(){
   el.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
   const transformSection = document.getElementById("artTransformSection");
   if(transformSection) transformSection.classList.toggle("art-toolbar-disabled", blockMode || isLocked);
-  const toolButtons = TOOLS.map(t => `
+  const renderToolButton = t => `
     <button class="art-tool-btn${currentTool === t.id ? " active" : ""}" onclick="setTool('${t.id}')" aria-label="${T(t.labelKey, t.labelFallback)}" aria-pressed="${currentTool === t.id}">
       ${icon(t.icon, { size: 18 })}
     </button>
-  `).join("");
+  `;
+  // ペン・消しゴム・バケツ・スポイトの直後に、カラーパレットの開閉ボタンを挟む
+  // （色を選ぶ操作をひとまとめにするため。図形ツール・ガイド線はその後ろ）
+  const coreToolButtons = TOOLS.slice(0, 4).map(renderToolButton).join("");
+  const paletteToggleButton = `
+    <button class="art-tool-btn${floatingPaletteOpen ? " active" : ""}" id="artPaletteToggleBtn" onclick="toggleFloatingPalette()" aria-label="${T('art_palette_toggle', 'カラーパレット')}" aria-pressed="${floatingPaletteOpen}">
+      ${icon("palette", { size: 18 })}
+    </button>
+  `;
+  const shapeToolButtons = TOOLS.slice(4).map(renderToolButton).join("");
+  const toolButtons = coreToolButtons + paletteToggleButton + shapeToolButtons;
   const undoRedoButtons = `
     <button class="art-tool-btn" id="artUndoBtn" onclick="undo()" aria-label="${T('art_undo', '元に戻す')}" ${undoStack.length === 0 ? "disabled" : ""}>
       ${icon("undo", { size: 18 })}
@@ -608,6 +617,62 @@ function renderLockUI(){
   editBtn.classList.toggle("is-active", editMode);
   lockBtn.textContent = isLocked ? T("art_unlock", "固定を解除") : T("art_lock", "固定する");
   lockBtn.classList.toggle("is-locked", isLocked);
+}
+
+// ── カラーパレット（自由に動かせるフローティングパネル） ──
+// ツールバーの他のボタン（ペン・消しゴム等）と同じ並びから開閉できるようにし、
+// 開いている間もキャンバスタップでの描画やパン・ズームを妨げない（モーダル化しない）。
+// ハンドル部分をドラッグすると画面内の好きな位置へ動かせる
+function toggleFloatingPalette(){
+  floatingPaletteOpen = !floatingPaletteOpen;
+  renderFloatingPaletteVisibility();
+  renderToolbar();
+}
+
+function renderFloatingPaletteVisibility(){
+  const panel = document.getElementById("artFloatingPalette");
+  if(!panel) return;
+  panel.style.display = floatingPaletteOpen ? "flex" : "none";
+}
+
+function bindFloatingPaletteDrag(){
+  const panel = document.getElementById("artFloatingPalette");
+  const handle = document.getElementById("artFloatingPaletteHandle");
+  const closeBtn = document.getElementById("artFloatingPaletteCloseBtn");
+  if(!panel || !handle) return;
+  closeBtn.addEventListener("click", () => {
+    floatingPaletteOpen = false;
+    renderFloatingPaletteVisibility();
+    renderToolbar();
+  });
+  let dragOffset = null;
+  handle.addEventListener("pointerdown", (e) => {
+    // 閉じるボタンはハンドルの子要素なので、そのタップでもpointerdownがここまで
+    // バブリングしてくる。ここでポインターを掴んでしまうとpointerCaptureにより
+    // 以降のpointerup/clickがすべてハンドル側に付け替わり、閉じるボタンのクリックが
+    // 発火しなくなるため、閉じるボタン上では掴まない
+    if(e.target.closest(".art-floating-palette-close")) return;
+    const rect = panel.getBoundingClientRect();
+    dragOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    handle.setPointerCapture(e.pointerId);
+  });
+  handle.addEventListener("pointermove", (e) => {
+    if(!dragOffset) return;
+    const maxLeft = Math.max(4, window.innerWidth - panel.offsetWidth - 4);
+    const maxTop = Math.max(4, window.innerHeight - panel.offsetHeight - 4);
+    const left = Math.min(Math.max(4, e.clientX - dragOffset.x), maxLeft);
+    const top = Math.min(Math.max(4, e.clientY - dragOffset.y), maxTop);
+    panel.style.left = left + "px";
+    panel.style.top = top + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+  });
+  const endDrag = (e) => {
+    dragOffset = null;
+    if(handle.hasPointerCapture(e.pointerId)) handle.releasePointerCapture(e.pointerId);
+  };
+  handle.addEventListener("pointerup", endDrag);
+  handle.addEventListener("pointercancel", endDrag);
 }
 
 // ── Undo / Redo（スナップショット方式） ──
@@ -1065,7 +1130,8 @@ function renderCanvas(){
   // スケールを通じて自動的に追従する）
   if(activeMaskLines && activeMaskLines.length){
     ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(255,255,255,0.9)" : "rgba(26,24,20,0.85)";
-    ctx.lineWidth = Math.max(1.5, cell * 0.09);
+    // 画像変換後は輪郭線が塗り込んだ色に埋もれて見えにくくなりがちなため、太めにする
+    ctx.lineWidth = Math.max(2.5, cell * 0.15);
     ctx.lineJoin = "round";
     ctx.lineCap = "round";
     activeMaskLines.forEach(path => {
@@ -2396,7 +2462,7 @@ const TUTORIAL_STEPS = [
   { selector: "#artEditModeBtn", title: "① 編集する", text: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
   { selector: "#artToolbar", title: "② ツール", text: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから。" },
   { selector: "#artBrushSizeSection", title: "③ 太さ", text: "ペン・消しゴムの太さを1〜4マスから選べます。" },
-  { selector: "#artPaletteMains", title: "④ カラー", text: "ゲーム内と同じ色から選びます。横にスクロールできます。タップすると、下にサブカラー（詳細な色合い）が表示されます。" },
+  { selector: "#artPaletteToggleBtn", title: "④ カラー", text: "タップするとカラーパレットが開きます。上のバーをドラッグすると好きな位置に動かせるので、開いたままキャンバスを描き進められます。" },
   { selector: "#artZoomControls", title: "⑤ 拡大率", text: "スライダーで自由に拡大・縮小できます。スマホなら2本指のピンチ操作でも変更できます。" },
   { selector: "#artLockBtn", title: "⑥ 固定する", text: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
   { selector: "#artSaveBtn", title: "⑦ 保存する", text: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG保存・共有もできます。" },
