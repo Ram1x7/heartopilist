@@ -848,18 +848,14 @@ function renderPalette(){
   renderPaletteSubs();
 }
 
-// 選択中メインカラーの大きいプレビュー（.art-chip-big）＋メインカラー一覧の
-// 横スクロール一列（#artPaletteMains、.art-chip-main）を表示する欄
+// メインカラー一覧の横スクロール一列（#artPaletteMains、.art-chip-main）を表示する欄。
+// 以前は選択中メインの大きいプレビュー（.art-chip-big）も左に並べていたが、
+// 帯の中の選択マーク（is-selected）だけで十分わかるため廃止した
 function renderPaletteCurrent(){
   const el = document.getElementById("artPaletteCurrent");
   // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
   // 該当なし（未着色マスや、そもそも調べていない）ならnull
   const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
-  const currentEntry = GAME_PALETTE.find(e => e.no === selectedMainNo);
-  const bigIsNone = currentEntry && currentEntry.no === "04";
-  const bigCls = ["art-chip", "art-chip-big"];
-  if(bigIsNone) bigCls.push("art-swatch-none");
-  const bigStyle = (currentEntry && !bigIsNone) ? ` style="background:${currentEntry.hex}"` : "";
   const stripHtml = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
@@ -874,8 +870,7 @@ function renderPaletteCurrent(){
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
     return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}></button>`;
   }).join("");
-  el.innerHTML = `<span class="${bigCls.join(" ")}"${bigStyle} aria-hidden="true"></span>` +
-    `<div class="art-palette-mains-strip" id="artPaletteMains">${stripHtml}</div>`;
+  el.innerHTML = `<div class="art-palette-mains-strip" id="artPaletteMains">${stripHtml}</div>`;
   el.querySelectorAll("#artPaletteMains button").forEach(btn => {
     btn.addEventListener("click", () => selectPaletteMain(btn.dataset.main));
   });

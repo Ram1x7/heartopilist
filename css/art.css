@@ -487,8 +487,7 @@ body.dark .art-brush-size-options button.active{
   margin-bottom:10px;
 }
 
-/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す。
-   メインカラー一覧グリッドと、選択中メインの大きいプレビューの両方で使う */
+/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す */
 .art-chip{
   position:relative;
   border:2px solid var(--border);
@@ -535,12 +534,6 @@ body.dark .art-palette-mains-strip .art-chip-main.is-selected{
 
 body.dark .art-palette-mains-strip .art-chip-main.is-inspected{
   box-shadow:inset 0 0 0 2px #2c2823, inset 0 0 0 4px var(--vermillion-soft);
-}
-
-.art-chip-big{
-  width:44px;
-  height:44px;
-  flex:0 0 auto;
 }
 
 /* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
@@ -592,9 +585,9 @@ body.dark .art-chip.is-inspected{
 }
 
 /* サブカラー：参考ツールの「絵の具を垂らしたパレット」のような、有機的なブロブ形状＋
-   段差の影を持つ小石スウォッチ（.art-swatch）で表す。選択中メインの大きいプレビューの
-   右に並ぶ。スウォッチごとに角丸の値を少しずらし（nth-child）、手作りの小石が並んだ
-   ようなゆらぎを出す。影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
+   段差の影を持つ小石スウォッチ（.art-swatch）で表す。スウォッチごとに角丸の値を
+   少しずらし（nth-child）、手作りの小石が並んだようなゆらぎを出す。
+   影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
    色データや配色ロジックには一切手を加えていない */
 .art-swatch{
   position:relative;
@@ -682,20 +675,14 @@ body.dark .art-swatch.is-inspected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
 }
 
-/* 選択中メインの大きいプレビュー（.art-chip-big）＋メインカラー一覧の横スクロール
-   一列（.art-palette-mains-strip）を横に並べるエリア */
+/* メインカラー一覧の横スクロール一列（.art-palette-mains-strip）を収めるエリア */
 .art-palette-current{
-  display:flex;
-  align-items:center;
-  gap:10px;
   margin-bottom:10px;
-  min-height:44px;
 }
 
 /* メインカラーは16種と数が多いため、折り返さず横一列のまま横スクロールで選ぶ
-   （参考ツールと同じ配置。改行させないので.art-palette-current内で残りの幅を使う）。
-   各チップは隙間なく詰めて並べ、帯全体をひとつの枠で囲む（枠・角丸は.art-chip-main側
-   ではなくこちらでまとめて表現する） */
+   （参考ツールと同じ配置）。各チップは隙間なく詰めて並べ、帯全体をひとつの枠で
+   囲む（枠・角丸は.art-chip-main側ではなくこちらでまとめて表現する） */
 .art-palette-mains-strip{
   display:flex;
   gap:0;
