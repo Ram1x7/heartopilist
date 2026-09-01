@@ -505,15 +505,86 @@ body.dark .art-brush-size-options button.active{
   margin-bottom:10px;
 }
 
-/* 参考ツールの「小石」風パレットに寄せた有機的なブロブ形状＋段差の影。
-   スウォッチごとに角丸の値を少しずらし（nth-child、JS側の変更は不要）、
-   手作りの小石が並んだようなゆらぎを出す。影はJSが設定する背景色に関わらず
-   常に一定の半透明色にすることで、材料マッチング等のロジックは一切変えずに
-   CSSだけで立体的な見た目を作っている */
+/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す。
+   メインカラー一覧グリッドと、選択中メインの大きいプレビューの両方で使う */
+.art-chip{
+  position:relative;
+  border:2px solid var(--border);
+  border-radius:10px;
+  background:var(--card);
+  box-shadow:0 1px 3px rgba(60,40,20,0.12);
+  cursor:pointer;
+  padding:0;
+}
+
+.art-chip-main{
+  width:32px;
+  height:32px;
+}
+
+.art-chip-big{
+  width:44px;
+  height:44px;
+  flex:0 0 auto;
+}
+
+/* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
+   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現）。
+   金色のリング＋小さなドットバッジで、キャンバス選択画面等と同じ選択状態の
+   見せ方に揃える（.art-tool-btn.activeのバッジと同じ意匠） */
+.art-chip.is-selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold), 0 1px 3px rgba(60,40,20,0.12);
+}
+
+.art-chip.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
+}
+
+body.dark .art-chip{
+  background:#2c2823;
+  border-color:#46423b;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark .art-chip.is-selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark .art-chip.is-selected::after{
+  border-color:#2c2823;
+}
+
+/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
+   「今の描画色」を示すis-selected（金色）と混同しないよう朱色にする */
+.art-chip.is-inspected{
+  border-color:var(--vermillion);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion), 0 1px 3px rgba(60,40,20,0.12);
+}
+
+body.dark .art-chip.is-inspected{
+  border-color:var(--vermillion-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* サブカラー：参考ツールの「絵の具を垂らしたパレット」のような、有機的なブロブ形状＋
+   段差の影を持つ小石スウォッチ（.art-swatch）で表す。選択中メインの大きいプレビューの
+   右に並ぶ。スウォッチごとに角丸の値を少しずらし（nth-child）、手作りの小石が並んだ
+   ようなゆらぎを出す。影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
+   色データや配色ロジックには一切手を加えていない */
 .art-swatch{
   position:relative;
-  width:28px;
-  height:28px;
+  width:24px;
+  height:24px;
   border-radius:60% 40% 55% 45% / 50% 45% 55% 50%;
   border:none;
   cursor:pointer;
@@ -531,18 +602,14 @@ body.dark .art-brush-size-options button.active{
   z-index:-1;
 }
 
-.art-palette .art-swatch:nth-child(3n+2){
+.art-palette-subs-row .art-swatch:nth-child(3n+2){
   border-radius:45% 55% 60% 40% / 55% 45% 65% 35%;
 }
 
-.art-palette .art-swatch:nth-child(3n+3){
+.art-palette-subs-row .art-swatch:nth-child(3n+3){
   border-radius:55% 45% 40% 60% / 60% 40% 50% 55%;
 }
 
-/* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
-   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現）。
-   金色のリング＋小さなドットバッジで、キャンバス選択画面等と同じ選択状態の
-   見せ方に揃える（.art-tool-btn.activeのバッジと同じ意匠） */
 .art-swatch.is-selected{
   box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold);
 }
@@ -572,8 +639,6 @@ body.dark .art-swatch.is-selected::after{
   border-color:#2c2823;
 }
 
-/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
-   「今の描画色」を示すis-selected（金色）と混同しないよう朱色にする */
 .art-swatch.is-inspected{
   box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion);
 }
@@ -582,73 +647,24 @@ body.dark .art-swatch.is-inspected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
 }
 
-/* メインカラーパレット：ゲーム内に存在しない色名などは付け足さず、色番号だけで識別する。
-   参考ツールの「小石を並べた」パレットに完全に寄せるため、白いカードで囲わずスウォッチ
-   自体をタップ対象にする（.art-swatchのブロブ形状・影・選択状態をそのまま流用） */
-.art-swatch-main{
-  width:32px;
-  height:32px;
-}
-
-/* 参考ツールの「大きいプレビュー＋隙間のないシェードストリップ」を再現したエリア。
-   選択中のメインカラーの代表色を大きく見せつつ、そのサブカラー（詳細な色合い）を
-   隙間なく連結した帯として並べる。帯の各マスは.art-swatchのブロブ形状ではなく、
-   実際の絵の具のグラデーション見本のようにまっすぐな短冊にしている */
+/* 選択中メインの大きいプレビュー（.art-chip-big）＋サブカラーの小石一覧（.art-swatch群）
+   を横に並べるエリア */
 .art-palette-current{
   display:flex;
-  align-items:center;
+  align-items:flex-start;
+  flex-wrap:wrap;
   gap:10px;
   margin-bottom:10px;
   min-height:44px;
 }
 
-.art-swatch-big{
-  width:44px;
-  height:44px;
-  flex:0 0 auto;
-}
-
-.art-palette-strip{
+.art-palette-subs-row{
   display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:9px 8px;
   flex:1 1 auto;
-  min-width:0;
-  height:36px;
-  border-radius:10px;
-  overflow:hidden;
-  border:1px solid var(--border);
-}
-
-body.dark .art-palette-strip{
-  border-color:#46423b;
-}
-
-.art-strip-swatch{
-  position:relative;
-  flex:1 1 0;
-  min-width:0;
-  height:100%;
-  border:none;
-  padding:0;
-  cursor:pointer;
-}
-
-/* 帯の中では外側にリングを置くスペースがないため、内側に金色の縁取りで選択状態を示す */
-.art-strip-swatch.is-selected{
-  box-shadow:inset 0 0 0 3px var(--card), inset 0 0 0 5px var(--gold);
-  z-index:1;
-}
-
-.art-strip-swatch.is-inspected{
-  box-shadow:inset 0 0 0 3px var(--card), inset 0 0 0 5px var(--vermillion);
-  z-index:1;
-}
-
-body.dark .art-strip-swatch.is-selected{
-  box-shadow:inset 0 0 0 3px #2c2823, inset 0 0 0 5px var(--gold);
-}
-
-body.dark .art-strip-swatch.is-inspected{
-  box-shadow:inset 0 0 0 3px #2c2823, inset 0 0 0 5px var(--vermillion-soft);
+  padding-top:4px;
 }
 
 /* 04：透明/なしスロット（市松模様で「色なし」を表す） */

@@ -752,8 +752,9 @@ function renderPalette(){
   // タップして調べたマスの色がどのメインカラーに属するか（パレット側ハイライト用）。
   // 該当なし（未着色マスや、そもそも調べていない）ならnull
   const inspectedGroup = inspectedPaletteHex ? gamePaletteGroupForHex(inspectedPaletteHex) : null;
-  // 参考ツールの「小石」を並べたパレットと同じく、白いカードで囲わずスウォッチ自体を
-  // タップ対象にする（.art-paper-chipは廃止し、.art-swatchに統一）
+  // 参考ツールでは、メインカラーは「四角」のスウォッチ（.art-chip）、サブカラーは
+  // 「絵の具を垂らしたパレット」のような小石スウォッチ（.art-swatch）で描き分けられている。
+  // ここではメインカラー一覧を.art-chipで表示する
   mainsEl.innerHTML = GAME_PALETTE.map(entry => {
     const isNone = entry.no === "04";
     // 選択中のマークは「実際に選んだメインカラー番号(selectedMainNo)」だけで判定する。
@@ -761,7 +762,7 @@ function renderPalette(){
     // （例：#FEFFFFは01の5番目のサブカラーであり、かつ02のメインカラーそのもの）ため、
     // 本来1つだけのはずのマークが同時に2箇所へついてしまう不具合になる。
     const isActive = entry.no === selectedMainNo;
-    const cls = ["art-swatch", "art-swatch-main"];
+    const cls = ["art-chip", "art-chip-main"];
     if(isActive) cls.push("is-selected");
     if(inspectedGroup && entry.no === inspectedGroup.no) cls.push("is-inspected");
     if(isNone) cls.push("art-swatch-none");
@@ -794,9 +795,9 @@ function selectPaletteMain(no){
   pushRecentColor(entry.hex);
 }
 
-// 参考ツールの「大きいプレビュー＋隙間のないシェードストリップ」を模した、選択中の
-// メインカラーのプレビュー欄。常にexpandedPaletteMain（タップ調べ中はそちらを優先）か
-// selectedMainNoのどちらかのグループを表示する
+// 選択中のメインカラーの大きいプレビュー（.art-chip-big、四角）＋そのサブカラー一覧
+// （.art-swatch、絵の具を垂らしたような小石）を表示する欄。常にexpandedPaletteMain
+// （タップ調べ中はそちらを優先）かselectedMainNoのどちらかのグループを表示する
 function renderPaletteCurrent(){
   const el = document.getElementById("artPaletteCurrent");
   const entry = GAME_PALETTE.find(e => e.no === (expandedPaletteMain || selectedMainNo));
@@ -805,22 +806,22 @@ function renderPaletteCurrent(){
     return;
   }
   const isNone = entry.no === "04";
-  const bigCls = ["art-swatch", "art-swatch-big"];
+  const bigCls = ["art-chip", "art-chip-big"];
   if(isNone) bigCls.push("art-swatch-none");
   const bigStyle = isNone ? "" : ` style="background:${entry.hex}"`;
   let html = `<span class="${bigCls.join(" ")}"${bigStyle} aria-hidden="true"></span>`;
   if(entry.subs.length > 0){
-    html += `<div class="art-palette-strip">` + entry.subs.map((hex, i) => {
-      const cls = ["art-strip-swatch"];
+    html += `<div class="art-palette-subs-row">` + entry.subs.map((hex, i) => {
+      const cls = ["art-swatch"];
       if(hex.toUpperCase() === String(currentColor).toUpperCase()) cls.push("is-selected");
       if(inspectedPaletteHex && hex.toUpperCase() === inspectedPaletteHex.toUpperCase()) cls.push("is-inspected");
       return `<button class="${cls.join(" ")}" style="background:${hex}" data-hex="${hex}" aria-label="${entry.no}-${i + 1}"></button>`;
     }).join("") + `</div>`;
   }
   el.innerHTML = html;
-  const inspectedStrip = el.querySelector(".is-inspected");
-  if(inspectedStrip) inspectedStrip.scrollIntoView({ block: "nearest", inline: "nearest" });
-  el.querySelectorAll(".art-strip-swatch").forEach(btn => {
+  const inspectedSub = el.querySelector(".is-inspected");
+  if(inspectedSub) inspectedSub.scrollIntoView({ block: "nearest", inline: "nearest" });
+  el.querySelectorAll(".art-palette-subs-row .art-swatch").forEach(btn => {
     btn.addEventListener("click", () => setCurrentColor(btn.dataset.hex, entry.no));
   });
 }
