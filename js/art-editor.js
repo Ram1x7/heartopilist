@@ -54,6 +54,7 @@ let pinchRafPending = false; // 2本指のpointermoveは指ごとに別々のイ
   // 同一フレーム内の複数回の呼び出しをrequestAnimationFrameで1回にまとめる
 let pendingTouchPaint = null; // タッチ開始直後、2本目の指が来るかを一定時間待つためのタイマー情報（{timer, cx, cy}）
 let activeMaskLines = null; // 現在のキャンバスの輪郭線パス配列（[[{x,y},...], ...]）。マスクなしならnull
+let activeDisabledSet = null; // 現在のキャンバスの使用不可マス集合（Set<"x,y">）。輪郭線の外側1マス分までは塗れるようバッファ済み。マスクなしならnull
 let inspectedCell = null; // タップして調べた（ハイライト表示中の）マスの座標（{cx, cy}）。編集モードに関わらず動作する
 let shapeStartCell = null; // 図形ツール（直線・四角・円）のドラッグ開始マス。ドラッグ中でなければnull
 let shapePreviewCells = null; // 図形ツールのドラッグ中に表示するマス配列（[[x,y], ...]）。確定前のため未確定の色
@@ -137,16 +138,52 @@ function bindLockControls(){
   document.getElementById("artLockBtn").addEventListener("click", toggleLock);
 }
 
-// ── デザイン枠のマスク（輪郭線）キャッシュ ──
+// ── デザイン枠のマスク（輪郭線・使用不可マス）キャッシュ ──
 // activeFrameId/activePartIdが変わるたびに呼び直す（js/art-masks.jsのPRESET_MASKS参照）。
-// 輪郭線より外のマスも、ゲーム内の実際の仕様に合わせて描画できる（使用不可扱いにはしない）。
+// ゲーム内の実際の仕様に合わせ、輪郭線のすぐ外側1マス分までは塗れるようにし、
+// それより外側だけを使用不可（ブロック対象）として扱う
 function rebuildActiveMask(){
   const preset = activeFrameId && typeof PRESET_MASKS !== "undefined" ? PRESET_MASKS[activeFrameId] : null;
   const part = preset && activePartId ? preset[activePartId] : null;
   activeMaskLines = part ? part.maskLines : null;
+  activeDisabledSet = part ? buildBufferedDisabledSet(part.disabledRanges) : null;
   // 3Dプレビュー機能（js/art-3d.js、対応アイテムのみ）のボタン表示・非表示も、
   // activeFrameIdが変わるこの関数の呼び出しにあわせて同期する
   if(typeof update3DPreviewButton === "function") update3DPreviewButton();
+}
+
+// disabledRanges（輪郭線の外側＝本来の使用不可マス）をそのままブロック対象にすると、
+// 実データの輪郭線とマス目のわずかなズレを吸収できず、輪郭線ぎりぎりのマスまで
+// 塗れなくなってしまう。輪郭線の外側1マス分（8方向に隣接するマス）だけは引き続き
+// 塗れるようにし、そこからさらに外側のマスだけをブロック対象として返す
+function buildBufferedDisabledSet(disabledRanges){
+  if(!disabledRanges || disabledRanges.length === 0) return null;
+  const disabled = new Set();
+  disabledRanges.forEach(([y, x1, x2]) => {
+    for(let x = x1; x <= x2; x++) disabled.add(x + "," + y);
+  });
+  const buffered = new Set();
+  disabled.forEach(key => {
+    const [x, y] = key.split(",").map(Number);
+    let nearEnabledCell = false;
+    for(let dy = -1; dy <= 1 && !nearEnabledCell; dy++){
+      for(let dx = -1; dx <= 1; dx++){
+        if(dx === 0 && dy === 0) continue;
+        const nx = x + dx, ny = y + dy;
+        if(nx < 0 || ny < 0 || nx >= gridWidth || ny >= gridHeight) continue;
+        if(!disabled.has(nx + "," + ny)){
+          nearEnabledCell = true;
+          break;
+        }
+      }
+    }
+    if(!nearEnabledCell) buffered.add(key);
+  });
+  return buffered;
+}
+
+function isCellDisabled(cx, cy){
+  return !!(activeDisabledSet && activeDisabledSet.has(cx + "," + cy));
 }
 
 // ── マイデザイン・エクスポート/共有ボタンの結線 ──
@@ -996,6 +1033,15 @@ function renderCanvas(){
     }
   }
 
+  // デザイン枠の使用不可マス（輪郭線の外側1マス分より、さらに外側）をグレーアウト表示する
+  if(activeDisabledSet){
+    ctx.fillStyle = document.body.classList.contains("dark") ? "rgba(0,0,0,0.4)" : "rgba(26,24,20,0.14)";
+    activeDisabledSet.forEach(key => {
+      const [dx, dy] = key.split(",").map(Number);
+      ctx.fillRect(dx * cell, dy * cell, cell, cell);
+    });
+  }
+
   if(cell >= 6){
     // 灰色・黒ではなく、サイト全体のテーマカラーである藍色をごく薄く使う
     ctx.strokeStyle = document.body.classList.contains("dark") ? "rgba(139,169,201,0.14)" : "rgba(60,90,110,0.16)";
@@ -1359,6 +1405,7 @@ function commitShapeCells(cells, color){
   if(!cells) return;
   cells.forEach(([x, y]) => {
     if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) return;
+    if(isCellDisabled(x, y)) return; // デザイン枠の使用不可マスには描けない
     pixels[y * gridWidth + x] = color;
   });
 }
@@ -1389,6 +1436,7 @@ function paintBrush(cx, cy, color){
       const x = cx - half + dx;
       const y = cy - half + dy;
       if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) continue;
+      if(isCellDisabled(x, y)) continue; // デザイン枠の使用不可マスには描けない
       pixels[y * gridWidth + x] = color;
     }
   }
@@ -1402,6 +1450,7 @@ function floodFill(cx, cy, color){
   while(stack.length){
     const [x, y] = stack.pop();
     if(x < 0 || y < 0 || x >= gridWidth || y >= gridHeight) continue;
+    if(isCellDisabled(x, y)) continue; // 使用不可マスへは塗りつぶしが広がらない
     const i = y * gridWidth + x;
     if(pixels[i] !== target) continue;
     pixels[i] = color;
