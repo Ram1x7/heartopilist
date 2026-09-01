@@ -2802,15 +2802,21 @@ body.dark .art-guide-close-btn{
   flex:1;
   min-height:0;
   display:flex;
-  align-items:center;
-  justify-content:center;
   padding:8px;
+  /* 2本指ズームでキャンバスが表示枠より大きくなった時にスクロールできるようにする。
+     align-items/justify-content:centerは使わない（.art-canvas-areaと同じ理由で、
+     overflow時に一部の領域へスクロールで到達できなくなるため）。中央寄せは
+     下のcanvas側のmargin:autoで行う */
+  overflow:auto;
+  touch-action:none;
 }
 
 .art-guide-canvas-wrap canvas{
+  margin:auto;
   border-radius:10px;
   box-shadow:0 4px 16px rgba(0,0,0,0.18);
   image-rendering:pixelated;
+  touch-action:none;
 }
 
 .art-guide-instruction{

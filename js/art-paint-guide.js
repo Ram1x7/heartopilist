@@ -27,6 +27,19 @@ let paintGuideStepIndex = 0;
 let paintGuideForceView = null; // null=現在のブロックへズーム / "full"=全体表示（ステップが変わるたびリセット）
 let paintGuideStartedAt = null; // ガイドを開始した時刻（実測ペースからの残り時間再計算に使う）
 
+// ── ガイドキャンバスの2本指ズーム/パン ──
+// 表示は常にブロック（または全体）にフィットする「固定」表示だったが、それだと
+// 全体表示中に特定のブロックを拡大して確認する、といったことができない。
+// 1本指＝キャンバス編集画面と同じ操作体系にするため2本指のピンチ操作でのみ
+// 自由にズーム/パンできるようにする（表示専用のガイドなので1本指は使わない）
+let guideZoom = 100; // 100 = 現在のビューポート（ブロック or 全体）がぴったり収まる表示
+let guideViewKey = null; // 直前に描画したビューポートの識別子。変わったらguideZoomを100へ戻す
+let guidePointers = new Map(); // 現在ガイドキャンバスに触れているポインター（pointerId → {x, y}）
+let guidePinchState = null; // 2本指ジェスチャー中の基準値
+let guidePinchRafPending = false;
+const MIN_GUIDE_ZOOM = 100; // フィット表示より縮小しても見える範囲は増えないため、下限はフィットそのもの
+const MAX_GUIDE_ZOOM = 600;
+
 // ── 所要時間の見積もり ──
 // 開始直後はまだ実測ペースがないため、1マスずつのタップとバケツひと押しに
 // それぞれ固定の目安秒数を割り当てて計算する。実際に「次へ」を押して手順を
@@ -247,6 +260,8 @@ function openPaintGuide(){
   paintGuideStepIndex = 0;
   paintGuideForceView = null;
   paintGuideStartedAt = Date.now();
+  guideZoom = 100;
+  guideViewKey = null;
   document.getElementById("artGuideOverlay").style.display = "flex";
   document.body.style.overflow = "hidden";
   renderPaintGuideStep();
@@ -389,11 +404,22 @@ function renderPaintGuideCanvas(){
   const zoomed = shouldZoomForStep();
   const viewport = zoomed ? computeBlockViewport(step) : { ox: 0, oy: 0, w: gridWidth, h: gridHeight };
 
-  const gctx = cvs.getContext("2d");
+  // 表示中のブロック（or 全体）が前回描画時と変わっていたら、ズーム/パンをリセットする
+  // （別のブロックに移ったのに、前のブロックで拡大していた位置がそのまま残るのを防ぐ）
   const wrap = cvs.parentElement;
+  const viewKey = zoomed ? `block:${step.bx}_${step.by}` : "full";
+  if(viewKey !== guideViewKey){
+    guideViewKey = viewKey;
+    guideZoom = 100;
+    wrap.scrollLeft = 0;
+    wrap.scrollTop = 0;
+  }
+
+  const gctx = cvs.getContext("2d");
   const maxW = Math.max(40, wrap.clientWidth - 16);
   const maxH = Math.max(40, wrap.clientHeight - 16);
-  const cell = Math.max(1, Math.floor(Math.min(maxW / viewport.w, maxH / viewport.h)));
+  const fitCell = Math.min(maxW / viewport.w, maxH / viewport.h);
+  const cell = Math.max(1, Math.floor(fitCell * guideZoom / 100));
   cvs.width = cell * viewport.w;
   cvs.height = cell * viewport.h;
 
@@ -531,6 +557,122 @@ function computeBlockViewport(step){
   return { ox: minX, oy: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
 }
 
+// ── ガイドキャンバスの2本指ズーム/パン（キャンバス編集画面js/art-editor.jsと同じ操作体系） ──
+function currentGuideViewport(){
+  const step = paintGuideOrder[paintGuideStepIndex];
+  return shouldZoomForStep() ? computeBlockViewport(step) : { ox: 0, oy: 0, w: gridWidth, h: gridHeight };
+}
+
+// 画面上の座標（clientX/Y）が指すグリッド座標（マス単位、小数可）を、現在の表示で求める
+function guideGridPointFromClient(clientX, clientY){
+  const cvs = document.getElementById("artGuideCanvas");
+  const rect = cvs.getBoundingClientRect();
+  const viewport = currentGuideViewport();
+  const cell = cvs.width / viewport.w;
+  const scaleX = cvs.width / rect.width, scaleY = cvs.height / rect.height;
+  return {
+    gx: viewport.ox + (clientX - rect.left) * scaleX / cell,
+    gy: viewport.oy + (clientY - rect.top) * scaleY / cell,
+  };
+}
+
+// グリッド座標が、現在の表示で画面上のどこに来るかを返す（gridPointFromClientの逆）
+function guideClientPointFromGrid(gx, gy){
+  const cvs = document.getElementById("artGuideCanvas");
+  const rect = cvs.getBoundingClientRect();
+  const viewport = currentGuideViewport();
+  const cell = cvs.width / viewport.w;
+  return {
+    clientX: rect.left + (gx - viewport.ox) * cell * (rect.width / cvs.width),
+    clientY: rect.top + (gy - viewport.oy) * cell * (rect.height / cvs.height),
+  };
+}
+
+// ズームを変更しつつ、画面上の指定位置（clientX/Y）が指していたグリッド座標が
+// ズーム後も同じ画面位置に留まるよう、ガイドキャンバス周りのスクロール位置を補正する
+function guideZoomAt(newZoomRaw, clientX, clientY){
+  const newZoom = Math.max(MIN_GUIDE_ZOOM, Math.min(MAX_GUIDE_ZOOM, newZoomRaw));
+  if(newZoom === guideZoom) return;
+  const wrap = document.querySelector(".art-guide-canvas-wrap");
+  const before = guideGridPointFromClient(clientX, clientY);
+  guideZoom = newZoom;
+  renderPaintGuideCanvas();
+  const after = guideClientPointFromGrid(before.gx, before.gy);
+  wrap.scrollLeft += after.clientX - clientX;
+  wrap.scrollTop += after.clientY - clientY;
+}
+
+function startGuidePinch(){
+  const pts = [...guidePointers.values()];
+  if(pts.length < 2) return;
+  const [p1, p2] = pts;
+  const wrap = document.querySelector(".art-guide-canvas-wrap");
+  guidePinchState = {
+    startDist: Math.hypot(p1.x - p2.x, p1.y - p2.y),
+    startZoom: guideZoom,
+    startMidX: (p1.x + p2.x) / 2,
+    startMidY: (p1.y + p2.y) / 2,
+    startScrollLeft: wrap.scrollLeft,
+    startScrollTop: wrap.scrollTop,
+  };
+}
+
+function updateGuidePinch(){
+  const pts = [...guidePointers.values()];
+  if(pts.length < 2 || !guidePinchState) return;
+  const [p1, p2] = pts;
+  const wrap = document.querySelector(".art-guide-canvas-wrap");
+  const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+  const midX = (p1.x + p2.x) / 2, midY = (p1.y + p2.y) / 2;
+
+  // 2本指の平行移動量をそのままパンとして反映する
+  wrap.scrollLeft = guidePinchState.startScrollLeft - (midX - guidePinchState.startMidX);
+  wrap.scrollTop = guidePinchState.startScrollTop - (midY - guidePinchState.startMidY);
+
+  // 指の間隔の変化に応じてズームし、中点の位置が画面上で動かないよう補正する
+  if(guidePinchState.startDist > 10){
+    const newZoom = guidePinchState.startZoom * (dist / guidePinchState.startDist);
+    guideZoomAt(newZoom, midX, midY);
+  }
+}
+
+// 1本指＝表示専用のガイドでは何もしない（誤操作防止）、2本指＝ピンチズーム/パンという、
+// キャンバス編集画面（js/art-editor.js）と同じ操作体系にする
+function bindGuidePinchControls(){
+  const wrap = document.querySelector(".art-guide-canvas-wrap");
+
+  wrap.addEventListener("pointerdown", (e) => {
+    wrap.setPointerCapture(e.pointerId);
+    guidePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if(guidePointers.size >= 2) startGuidePinch();
+  });
+
+  wrap.addEventListener("pointermove", (e) => {
+    if(!guidePointers.has(e.pointerId)) return;
+    guidePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if(!guidePinchState || guidePointers.size < 2 || guidePinchRafPending) return;
+    guidePinchRafPending = true;
+    requestAnimationFrame(() => {
+      guidePinchRafPending = false;
+      if(guidePinchState && guidePointers.size >= 2) updateGuidePinch();
+    });
+  });
+
+  const endGuidePointer = (e) => {
+    guidePointers.delete(e.pointerId);
+    if(guidePinchState && guidePointers.size < 2) guidePinchState = null;
+  };
+  wrap.addEventListener("pointerup", endGuidePointer);
+  wrap.addEventListener("pointercancel", endGuidePointer);
+
+  // Ctrl+ホイール（トラックパッドの2本指ピンチはブラウザがこの形で発火する）でもズームできる
+  wrap.addEventListener("wheel", (e) => {
+    if(!e.ctrlKey) return;
+    e.preventDefault();
+    guideZoomAt(guideZoom * Math.exp(-e.deltaY * 0.01), e.clientX, e.clientY);
+  }, { passive: false });
+}
+
 function bindPaintGuideControls(){
   document.getElementById("artPaintGuideBtn").addEventListener("click", openPaintGuide);
   document.getElementById("artGuideCloseBtn").addEventListener("click", closePaintGuide);
@@ -549,3 +691,4 @@ function bindPaintGuideControls(){
 }
 
 bindPaintGuideControls();
+bindGuidePinchControls();
