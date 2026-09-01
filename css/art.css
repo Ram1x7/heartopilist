@@ -658,12 +658,13 @@ body.dark .art-swatch.is-inspected{
   min-height:44px;
 }
 
+/* 参考画像（実際のゲームの配色ツール）に合わせ、サブカラーは横一列ではなく
+   2列のグリッドで並べる（小石を積んだような見せ方） */
 .art-palette-subs-row{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:9px 8px;
-  flex:1 1 auto;
+  display:grid;
+  grid-template-columns:repeat(2, 24px);
+  gap:8px 10px;
+  flex:0 0 auto;
   padding-top:4px;
 }
 
