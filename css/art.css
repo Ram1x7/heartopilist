@@ -506,6 +506,7 @@ body.dark .art-brush-size-options button.active{
 }
 
 .art-swatch{
+  position:relative;
   width:28px;
   height:28px;
   border-radius:8px;
@@ -515,10 +516,24 @@ body.dark .art-brush-size-options button.active{
 }
 
 /* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
-   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現） */
+   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現）。
+   金色のリング＋小さなドットバッジで、キャンバス選択画面等と同じ選択状態の
+   見せ方に揃える（.art-tool-btn.activeのバッジと同じ意匠） */
 .art-swatch.is-selected{
-  border-color:var(--indigo);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo);
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold);
+}
+
+.art-swatch.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
 }
 
 body.dark .art-swatch{
@@ -526,8 +541,12 @@ body.dark .art-swatch{
 }
 
 body.dark .art-swatch.is-selected{
-  border-color:var(--indigo-soft);
-  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft);
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold);
+}
+
+body.dark .art-swatch.is-selected::after{
+  border-color:#2c2823;
 }
 
 /* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
@@ -546,6 +565,7 @@ body.dark .art-swatch.is-inspected{
    角丸・薄い影の「紙のチップ」風の見た目は保ちつつ、名前ラベルを持たないぶん
    スウォッチにぴったり寄せたサイズにして、一覧性・選択speedを優先する */
 .art-paper-chip{
+  position:relative;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -559,9 +579,22 @@ body.dark .art-swatch.is-inspected{
   cursor:pointer;
 }
 
+/* 金色のリング＋小さなドットバッジで、キャンバス選択画面等と同じ選択状態の見せ方に揃える */
 .art-paper-chip.is-selected{
-  border-color:var(--indigo);
-  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo), 0 1px 3px rgba(60,40,20,0.1);
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold), 0 1px 3px rgba(60,40,20,0.1);
+}
+
+.art-paper-chip.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
 }
 
 .art-paper-chip-swatch{
@@ -578,8 +611,12 @@ body.dark .art-paper-chip{
 }
 
 body.dark .art-paper-chip.is-selected{
-  border-color:var(--indigo-soft);
-  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--indigo-soft), 0 1px 3px rgba(0,0,0,0.3);
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark .art-paper-chip.is-selected::after{
+  border-color:#2c2823;
 }
 
 .art-paper-chip.is-inspected{
