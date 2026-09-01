@@ -868,7 +868,9 @@ function renderPaletteCurrent(){
     if(inspectedGroup && entry.no === inspectedGroup.no) cls.push("is-inspected");
     if(isNone) cls.push("art-swatch-none");
     const style = isNone ? "" : ` style="background:${entry.hex}"`;
-    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}></button>`;
+    // ドット絵変換・色番号表示（Display＞色番号）と同じ番号体系（メインカラー番号）を、
+    // 中央に薄く表示する
+    return `<button class="${cls.join(" ")}" data-main="${entry.no}" aria-label="${entry.no}"${style}><span class="art-chip-main-code">${entry.no}</span></button>`;
   }).join("");
   el.innerHTML = `<div class="art-palette-mains-strip" id="artPaletteMains">${stripHtml}</div>`;
   el.querySelectorAll("#artPaletteMains button").forEach(btn => {

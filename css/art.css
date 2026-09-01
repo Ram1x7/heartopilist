@@ -490,12 +490,28 @@ body.dark .art-brush-size-options button.active{
 /* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す */
 .art-chip{
   position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   border:2px solid var(--border);
   border-radius:10px;
   background:var(--card);
   box-shadow:0 1px 3px rgba(60,40,20,0.12);
   cursor:pointer;
   padding:0;
+}
+
+/* ドット絵変換・色番号表示（Display＞色番号）と同じ色番号を、メインカラーの
+   中央に薄く表示する。「薄く」なので白フチはつけず、半透明の単色のみにする */
+.art-chip-main-code{
+  position:relative;
+  z-index:1;
+  font-size:8px;
+  font-weight:700;
+  line-height:1;
+  color:rgba(255,255,255,0.75);
+  mix-blend-mode:difference;
+  pointer-events:none;
 }
 
 .art-chip-main{
