@@ -50,6 +50,8 @@ let cropCoverScale = 1; // 等倍(cropZoom=1)の時の「元画像px→表示px�
 let cropTargetKey = null; // 調整済みのキャンバスサイズ（幅x高さ）。変わったら自動でリセットする
 let manualCropRect = null; // 確定した切り抜き範囲（元画像のpx座標）。null = 中央基準の自動クロップ
 let cropDragState = null;
+let cropPointers = new Map(); // 現在ビューポートに触れているポインター（pointerId → {x, y}）。2本指ピンチ判定に使う
+let cropPinchState = null; // 2本指ピンチ中の基準値（{startDist, startZoom, startMidClientX, startMidClientY, startLeft, startTop}）
 let selectedRatioId = "1-1"; // 「自由サイズ」で選択中の比率
 let selectedFrameId = null; // 選択中のデザイン枠アイテム
 let selectedFramePartId = null; // 選択中のデザイン枠アイテムのパーツ（複数パーツを持つ場合）
@@ -468,7 +470,61 @@ function applyCropTransform(){
   img.style.top = cropTop + "px";
 }
 
-// ドラッグ（パン）・スライダー（ズーム）・リセット・確定ボタンの結線（初回のみ）
+// ビューポート内の指定座標（cx, cy）が指す画像上の位置を変えないまま、指定のズーム値に
+// 拡大縮小する（スライダー操作・ピンチ操作の中心を軸にしたズームで共用）
+function zoomCropAt(newZoom, cx, cy){
+  const slider = document.getElementById("artCropZoomSlider");
+  const clampedZoom = Math.min(Number(slider.max) / 100, Math.max(Number(slider.min) / 100, newZoom));
+  const oldScale = cropCoverScale * cropZoom;
+  const newScale = cropCoverScale * clampedZoom;
+  const ix = (cx - cropLeft) / oldScale;
+  const iy = (cy - cropTop) / oldScale;
+  cropZoom = clampedZoom;
+  cropLeft = cx - ix * newScale;
+  cropTop = cy - iy * newScale;
+  slider.value = Math.round(cropZoom * 100);
+  applyCropTransform();
+}
+
+// 1本指＝ドラッグでパン、2本指＝ピンチでズーム/パンという、キャンバス編集画面
+// （js/art-editor.js）と同じ操作体系にする
+function startCropPinch(){
+  const pts = [...cropPointers.values()];
+  if(pts.length < 2) return;
+  const [p1, p2] = pts;
+  cropPinchState = {
+    startDist: Math.hypot(p1.x - p2.x, p1.y - p2.y),
+    startZoom: cropZoom,
+    startMidClientX: (p1.x + p2.x) / 2,
+    startMidClientY: (p1.y + p2.y) / 2,
+    startLeft: cropLeft,
+    startTop: cropTop,
+  };
+}
+
+function updateCropPinch(){
+  const pts = [...cropPointers.values()];
+  if(pts.length < 2 || !cropPinchState) return;
+  const [p1, p2] = pts;
+  const viewport = document.getElementById("artCropViewport");
+  const rect = viewport.getBoundingClientRect();
+  const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+  const midClientX = (p1.x + p2.x) / 2, midClientY = (p1.y + p2.y) / 2;
+
+  // 2本指の平行移動量をそのままパンとして反映する
+  cropLeft = cropPinchState.startLeft + (midClientX - cropPinchState.startMidClientX);
+  cropTop = cropPinchState.startTop + (midClientY - cropPinchState.startMidClientY);
+
+  // 指の間隔の変化に応じてズームし、中点の位置が画面上で動かないよう補正する
+  if(cropPinchState.startDist > 10){
+    const newZoom = cropPinchState.startZoom * (dist / cropPinchState.startDist);
+    zoomCropAt(newZoom, midClientX - rect.left, midClientY - rect.top);
+  }else{
+    applyCropTransform();
+  }
+}
+
+// ドラッグ（パン）・ピンチ（ズーム/パン）・スライダー（ズーム）・リセット・確定ボタンの結線（初回のみ）
 function bindCropInteractions(){
   const viewport = document.getElementById("artCropViewport");
   if(viewport.dataset.bound) return;
@@ -476,33 +532,42 @@ function bindCropInteractions(){
 
   viewport.addEventListener("pointerdown", (e) => {
     viewport.setPointerCapture(e.pointerId);
+    cropPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if(cropPointers.size >= 2){
+      // 2本目の指が触れた→ピンチ開始。進行中だった1本指ドラッグは打ち切る
+      cropDragState = null;
+      startCropPinch();
+      return;
+    }
+
     cropDragState = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, startLeft: cropLeft, startTop: cropTop };
   });
   viewport.addEventListener("pointermove", (e) => {
+    if(cropPointers.has(e.pointerId)) cropPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if(cropPinchState){
+      if(cropPointers.size >= 2) updateCropPinch();
+      return;
+    }
+
     if(!cropDragState || e.pointerId !== cropDragState.pointerId) return;
     cropLeft = cropDragState.startLeft + (e.clientX - cropDragState.startX);
     cropTop = cropDragState.startTop + (e.clientY - cropDragState.startY);
     applyCropTransform();
   });
   const endDrag = (e) => {
+    cropPointers.delete(e.pointerId);
     if(cropDragState && e.pointerId === cropDragState.pointerId) cropDragState = null;
+    if(cropPinchState && cropPointers.size < 2) cropPinchState = null;
   };
   viewport.addEventListener("pointerup", endDrag);
   viewport.addEventListener("pointercancel", endDrag);
 
   document.getElementById("artCropZoomSlider").addEventListener("input", (e) => {
     // ズーム中もビューポート中央が指す画像上の位置を変えない（中心を軸に拡大縮小する）
-    const newZoom = Number(e.target.value) / 100;
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
-    const oldScale = cropCoverScale * cropZoom;
-    const newScale = cropCoverScale * newZoom;
-    const cx = vw / 2, cy = vh / 2;
-    const ix = (cx - cropLeft) / oldScale;
-    const iy = (cy - cropTop) / oldScale;
-    cropZoom = newZoom;
-    cropLeft = cx - ix * newScale;
-    cropTop = cy - iy * newScale;
-    applyCropTransform();
+    zoomCropAt(Number(e.target.value) / 100, vw / 2, vh / 2);
   });
 
   document.getElementById("artCropResetBtn").addEventListener("click", () => openCropStage(true));
