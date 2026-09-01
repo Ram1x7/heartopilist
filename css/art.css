@@ -503,14 +503,13 @@ body.dark .art-brush-size-options button.active{
   height:32px;
 }
 
-/* 横スクロール一列（.art-palette-mains-strip）の中では、隙間なく並べられる
-   細い短冊状にする。枠・角丸・影は個々のチップではなく帯（ストリップ）側で
+/* 2列8個のグリッド（.art-palette-mains-strip）の中では、隙間なく並べられる
+   短冊状にする。枠・角丸・影は個々のチップではなく帯（ストリップ）側で
    まとめて表現し、選択状態は外側にリングを置くスペースがないため内側の
    金色の縁取りで示す（帯を跨いだドットバッジは省略） */
 .art-palette-mains-strip .art-chip-main{
-  flex:0 0 auto;
-  width:18px;
-  height:34px;
+  width:auto;
+  height:26px;
   border:none;
   border-radius:0;
   box-shadow:none;
@@ -675,23 +674,22 @@ body.dark .art-swatch.is-inspected{
   box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
 }
 
-/* メインカラー一覧の横スクロール一列（.art-palette-mains-strip）を収めるエリア */
+/* メインカラー一覧のグリッド（.art-palette-mains-strip）を収めるエリア */
 .art-palette-current{
   margin-bottom:10px;
 }
 
-/* メインカラーは16種と数が多いため、折り返さず横一列のまま横スクロールで選ぶ
-   （参考ツールと同じ配置）。各チップは隙間なく詰めて並べ、帯全体をひとつの枠で
-   囲む（枠・角丸は.art-chip-main側ではなくこちらでまとめて表現する） */
+/* メインカラーは16種と数が多いため、横スクロールではなく8列×2段の
+   グリッドに折り返して、パレット全体の横幅を抑える。各チップは隙間なく
+   詰めて並べ、帯全体をひとつの枠で囲む（枠・角丸は.art-chip-main側では
+   なくこちらでまとめて表現する） */
 .art-palette-mains-strip{
-  display:flex;
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
   gap:0;
-  flex:1 1 auto;
-  min-width:0;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
   border:1px solid var(--border);
   border-radius:8px;
+  overflow:hidden;
 }
 
 body.dark .art-palette-mains-strip{
@@ -717,7 +715,7 @@ body.dark .art-palette-mains-strip{
   z-index:1500;
   display:flex;
   flex-direction:column;
-  width:min(230px, calc(100vw - 20px));
+  width:min(190px, calc(100vw - 20px));
   max-height:min(70vh, 520px);
   background:var(--card);
   border:1px solid var(--border);
