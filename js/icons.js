@@ -123,6 +123,10 @@ const ICONS = {
   book: `<path d="M12 6.5c-1.6-1.3-3.8-2-6.5-2v13c2.7 0 4.9.7 6.5 2 1.6-1.3 3.8-2 6.5-2v-13c-2.7 0-4.9.7-6.5 2Z"/><path d="M12 6.5v13"/>`,
   menu: `<path d="M4 7h16M4 12h16M4 17h16"/>`,
   paw: `<circle cx="12" cy="15.3" r="3.6"/><circle cx="6" cy="10" r="2"/><circle cx="18" cy="10" r="2"/><circle cx="9" cy="6" r="1.8"/><circle cx="15" cy="6" r="1.8"/>`,
+
+  // 建築サポート：建築モード切替
+  build3dSolid: `<path d="M12 3 4 7v10l8 4 8-4V7Z"/><path d="M4 7l8 4 8-4M12 11v10"/>`,
+  build3dFlat: `<path d="M3 12 12 8l9 4-9 4Z"/><path d="M3 12v4l9 4 9-4v-4"/>`,
 };
 
 /**
