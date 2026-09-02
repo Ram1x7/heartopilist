@@ -97,7 +97,7 @@ function redoEdit(){
 }
 
 function refreshVoxelView(){
-  Build3D.setVoxels(resultVoxels, { fit: false });
+  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
   renderBuildMaterialList();
 }
 
@@ -105,9 +105,53 @@ function inBounds(x, y, z){
   return resultDims && x >= 0 && x < resultDims.w && y >= 0 && y < resultDims.h && z >= 0 && z < resultDims.d;
 }
 
+// ══════════════════════════════════════
+// 施工ステージ表示（下から積み上げた場合に何段目まで見えるかのスライダー）
+// ══════════════════════════════════════
+let progressLayer = 1; // 1〜resultDims.h。resultDims.h＝全て表示
+
+function isProgressFull(){
+  return !resultDims || progressLayer >= resultDims.h;
+}
+
+function getVisibleVoxels(){
+  if(!resultVoxels) return [];
+  if(isProgressFull()) return resultVoxels;
+  return resultVoxels.filter(v => v.y < progressLayer);
+}
+
+function setupProgressSlider(){
+  const slider = document.getElementById("buildProgressSlider");
+  if(!resultDims) return;
+  slider.max = String(Math.max(1, resultDims.h));
+  progressLayer = resultDims.h;
+  slider.value = String(progressLayer);
+  updateProgressUI();
+}
+
+function updateProgressUI(){
+  const output = document.getElementById("buildProgressOutput");
+  const hint = document.getElementById("buildProgressHint");
+  const full = isProgressFull();
+  output.textContent = full ? T("build_progress_all", "全て") : T("build_progress_layer", "{n}段目").replace("{n}", progressLayer);
+  hint.style.display = full ? "none" : "block";
+  // 施工ステージ表示中（全て以外）はペン/消しゴム/建材選択を無効化する
+  // （Undo/Redoは編集履歴の有無で別途制御するため、ここでは触らない）
+  ["buildToolPenBtn", "buildToolEraserBtn", "buildPaletteBtn"].forEach(id => {
+    document.getElementById(id).disabled = !full;
+  });
+}
+
+function handleProgressSliderChange(){
+  const slider = document.getElementById("buildProgressSlider");
+  progressLayer = Number(slider.value);
+  updateProgressUI();
+  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
+}
+
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
 function handleEditClick(hit){
-  if(!hit || !resultVoxels) return;
+  if(!hit || !resultVoxels || !isProgressFull()) return;
   if(editTool === "eraser"){
     if(!hit.voxel) return;
     pushHistory();
@@ -361,13 +405,25 @@ function handleOptionInputChange(){
 }
 
 // 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き）のマス数
+// 実際の支柱建材は1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの2倍の高さがある
+// （立方体の建材を前提にした換算ではない）。そのため立体モードで画像の縦横比
+// から高さのマス数を決めるときは、ボクセル1段＝実際の支柱2個ぶんの高さに
+// 相当することを踏まえ、単純な比率の半分のマス数にする。これにより、実際に
+// 支柱で建てた完成物が、1×1×1の立方体で作った場合と同じ見た目の比率になる
+// （平面モードのotherDimは奥行き軸で、この高さの特性とは無関係なので対象外）
+const SOLID_HEIGHT_ASPECT_COMPENSATION = 2;
+
 function computeOtherDim(){
   if(!frontImage) return settings.width;
-  const aspect = manualCropRect
-    ? manualCropRect.sw / manualCropRect.sh
-    : frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
+  // 常に元画像そのものの縦横比を使う（切り抜き範囲＝manualCropRectは、
+  // このwidth/otherDim比になるようcrop stageのビューポート自体を固定した上で
+  // 選ばれるため、manualCropRect.sw/shから逆算すると、確定後は
+  // 「width/otherDim」比そのものに一致してしまい、再度この関数を呼ぶたびに
+  // 補正が重ねがけされてしまう＝毎回さらに半分になっていくバグになる）
+  const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
   const maxOther = settings.mode === "solid" ? SITE_MAX_HEIGHT : SITE_MAX_DEPTH;
-  return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect)));
+  const compensation = settings.mode === "solid" ? SOLID_HEIGHT_ASPECT_COMPENSATION : 1;
+  return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect / compensation)));
 }
 
 // ══════════════════════════════════════
@@ -653,24 +709,83 @@ function lumaOf(rgb){
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
 
-// solid（立体・像）：正面グリッドの各セルを厚さ分だけ奥行き方向へ押し出す。
-// 背面画像がある場合は、最も奥のレイヤーだけ背面グリッドの色に置き換える。
+// シルエット内部の「奥行き」を距離変換で推定する：塗りセルそれぞれについて、
+// 最も近い「空セル、またはグリッドの外側」までの距離（4近傍のマンハッタン距離、
+// 多始点BFS）を求め、シルエット内での最大値で正規化した0〜1の値を返す。
+// 0＝輪郭のすぐ内側（薄い）、1＝シルエットの最も奥まった中心（厚い）。
+// これを使って押し出しに丸み（ドーム状の膨らみ）を持たせる
+function computeInteriorBulge(cells, w, h){
+  const n = w * h;
+  const distFromEmpty = new Array(n).fill(Infinity);
+  const queue = [];
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const i = y * w + x;
+      if(!cells[i]){ distFromEmpty[i] = 0; queue.push(i); }
+    }
+  }
+  let qi = 0;
+  while(qi < queue.length){
+    const i = queue[qi++];
+    const x = i % w, y = (i / w) | 0;
+    const d = distFromEmpty[i];
+    const neighbors = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+    for(const [nx, ny] of neighbors){
+      if(nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+      const ni = ny * w + nx;
+      if(distFromEmpty[ni] > d + 1){ distFromEmpty[ni] = d + 1; queue.push(ni); }
+    }
+  }
+  const dist = new Array(n).fill(0);
+  let maxDist = 1;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const i = y * w + x;
+      if(!cells[i]) continue;
+      // グリッドの端も「外側」とみなした距離（クロップ端で切れているシルエットも
+      // そこで薄くなるようにする）
+      const edgeDist = Math.min(x + 1, w - x, y + 1, h - y);
+      const d = Math.min(distFromEmpty[i], edgeDist);
+      dist[i] = d;
+      if(d > maxDist) maxDist = d;
+    }
+  }
+  const bulge = new Array(n).fill(0);
+  for(let i = 0; i < n; i++){
+    if(cells[i]) bulge[i] = dist[i] / maxDist;
+  }
+  return bulge;
+}
+
+// solid（立体・像）：正面グリッドの各セルを、シルエット内部の奥行き推定
+// （computeInteriorBulge）に応じた厚みぶんだけ奥行き方向へ押し出す。輪郭付近は
+// 薄く、シルエットの中心に近いほど厚くなり、丸み（ドーム状の膨らみ）が出る。
+// 背面画像がある場合は、各列の最も奥のボクセルだけ背面グリッドの色に置き換える。
+// 画像の行y=0（画像の上端）は立体の最上部（ワールドY最大）に対応させる
+// （そのまま使うと上下が反転してしまうため反転させる）。
 // 空洞化：全6方向の隣接ボクセルが埋まっている（＝外から絶対に見えない）
 // ボクセルだけを間引く
 function buildSolidVoxels(frontGrid, backGrid, w, h, thickness, hollow){
+  const bulge = computeInteriorBulge(frontGrid.cells, w, h);
+  const centerZ = (thickness - 1) / 2;
   const key = (x, y, z) => `${x},${y},${z}`;
   const map = new Map();
   for(let y = 0; y < h; y++){
     for(let x = 0; x < w; x++){
-      const front = frontGrid.cells[y * w + x];
+      const idx = y * w + x;
+      const front = frontGrid.cells[idx];
       if(!front) continue;
-      for(let z = 0; z < thickness; z++){
+      const worldY = h - 1 - y;
+      const halfDepth = Math.max(0.5, bulge[idx] * (thickness - 1) / 2);
+      const zFrom = Math.max(0, Math.round(centerZ - halfDepth));
+      const zTo = Math.min(thickness - 1, Math.round(centerZ + halfDepth));
+      for(let z = zFrom; z <= zTo; z++){
         let material = front;
-        if(z === thickness - 1 && backGrid){
-          const back = backGrid.cells[y * w + x];
+        if(z === zTo && backGrid){
+          const back = backGrid.cells[idx];
           if(back) material = back;
         }
-        map.set(key(x, y, z), material);
+        map.set(key(x, worldY, z), material);
       }
     }
   }
@@ -749,7 +864,8 @@ function runBuildGeneration(){
   }
 
   ensureSceneInitialized();
-  Build3D.setVoxels(resultVoxels);
+  setupProgressSlider();
+  Build3D.setVoxels(getVisibleVoxels());
   renderBuildMaterialList();
   clearHistory();
 }
@@ -946,7 +1062,8 @@ function loadDesign(id){
   document.getElementById("buildResultStage").style.display = "block";
   document.getElementById("buildDesignNameInput").value = design.name;
   ensureSceneInitialized();
-  Build3D.setVoxels(resultVoxels);
+  setupProgressSlider();
+  Build3D.setVoxels(getVisibleVoxels());
   renderBuildMaterialList();
   clearHistory();
   updateBuildStepProgress("finish");
@@ -1009,7 +1126,10 @@ async function importBuildDesigns(event){
 // ══════════════════════════════════════
 // 初期化
 // ══════════════════════════════════════
-const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone";
+// 旧・壁画モード時代のチュートリアル既読フラグとは別のキーにする（3Dツールへの
+// 全面刷新で内容が大きく変わったため、以前見たことがあるユーザーにも新しい
+// チュートリアルを一度表示したい）
+const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone_v2";
 const BUILD_TUTORIAL_STEPS = [
   { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "画像をアップロードし、立体(像)か平面(床)かを選んでサイズ・厚さを指定します。" },
   { selector: "#buildLibraryPanel", titleKey: "tutorial_build_step2_title", titleFallback: "② 設計図を保存・管理", textKey: "tutorial_build_step2_body", textFallback: "保存した設計図はここから呼び出せます。JSON形式での書き出し・読み込みも可能です。" },
@@ -1069,6 +1189,18 @@ function initBuildPage(){
   });
   document.getElementById("buildUndoBtn").addEventListener("click", undoEdit);
   document.getElementById("buildRedoBtn").addEventListener("click", redoEdit);
+  document.getElementById("buildProgressSlider").addEventListener("input", handleProgressSliderChange);
+
+  // ヘルプモーダル内の「チュートリアルをもう一度見る」ボタン。build.jsが
+  // ESモジュールになったことで、BUILD_TUTORIAL_DONE_KEY等のモジュール内定数は
+  // グローバルスコープのinline onclickからは参照できないため、ここで
+  // addEventListenerとして結線する（closeHelpModal/replayPageTutorial自体は
+  // 従来通りのクラシックスクリプトが定義するグローバル関数なのでモジュール側
+  // から呼び出すことは問題ない）
+  document.getElementById("buildTutorialReplayBtn").addEventListener("click", () => {
+    closeHelpModal();
+    replayPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);
+  });
 
   document.addEventListener("darkmodechange", () => {
     if(sceneInitialized){

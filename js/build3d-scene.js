@@ -6,6 +6,13 @@
 // 一切持たず、「渡されたボクセル配列を描画する」ことだけに責任を絞る。
 import * as THREE from "./three.module.min.js";
 
+// ハートピアの支柱建材は実際には1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの
+// 2倍の高さがある（参考にしたRibo's Game Labが前提とする1×1×1の立方体とは
+// 異なる）。ボクセル1段＝実際の支柱1個ぶんの高さとして扱うため、高さ(Y)軸
+// だけをこの倍率で描画することで、実際に建てたときと同じ縦横比になるように
+// する（データ上のy座標そのものは段数のまま、描画時にだけ2倍の間隔を空ける）
+const Y_UNIT_SCALE = 2;
+
 let canvasEl, stageEl, scene, camera, renderer, mesh;
 let bounds = { w: 24, h: 24, d: 24 };
 let camTheta = 0.9, camPhi = 1.05, camDist = 40;
@@ -53,7 +60,7 @@ function bindPointer(){
   });
   canvasEl.addEventListener("wheel", (e) => {
     e.preventDefault();
-    const span = Math.max(bounds.w, bounds.d, bounds.h, 8);
+    const span = Math.max(bounds.w, bounds.d, bounds.h * Y_UNIT_SCALE, 8);
     camDist = clampDist(camDist + e.deltaY * 0.05 * (span / 40));
     updateCamera();
   }, { passive: false });
@@ -82,7 +89,7 @@ function bindPointer(){
 }
 
 function clampDist(d){
-  const span = Math.max(bounds.w, bounds.d, bounds.h, 8);
+  const span = Math.max(bounds.w, bounds.d, bounds.h * Y_UNIT_SCALE, 8);
   return Math.min(Math.max(d, span * 0.15), span * 5);
 }
 
@@ -113,18 +120,19 @@ function init(canvas, dims){
 
   scene.add(new THREE.AmbientLight(0xffffff, 0.6));
   const dir = new THREE.DirectionalLight(0xffffff, 0.85);
-  dir.position.set(dims.w * 0.6, dims.h * 1.6, dims.d * 0.6);
+  dir.position.set(dims.w * 0.6, dims.h * Y_UNIT_SCALE * 1.6, dims.d * 0.6);
   scene.add(dir);
 
+  const renderedH = dims.h * Y_UNIT_SCALE;
   const boundBox = new THREE.LineSegments(
-    new THREE.EdgesGeometry(new THREE.BoxGeometry(dims.w, dims.h, dims.d)),
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(dims.w, renderedH, dims.d)),
     new THREE.LineBasicMaterial({ color: 0x9a9284, transparent: true, opacity: 0.35 })
   );
-  boundBox.position.set(0, dims.h / 2, 0);
+  boundBox.position.set(0, renderedH / 2, 0);
   scene.add(boundBox);
 
-  camTarget.set(0, dims.h * 0.35, 0);
-  camDist = Math.max(dims.w, dims.d, dims.h, 8) * 1.4;
+  camTarget.set(0, renderedH * 0.35, 0);
+  camDist = Math.max(dims.w, dims.d, renderedH, 8) * 1.4;
   updateCamera();
 
   bindPointer();
@@ -146,14 +154,14 @@ function setVoxels(voxels, opts = {}){
   currentVoxels = voxels;
   if(!voxels || voxels.length === 0) return;
 
-  const geometry = new THREE.BoxGeometry(0.96, 0.96, 0.96);
+  const geometry = new THREE.BoxGeometry(0.96, 0.96 * Y_UNIT_SCALE, 0.96);
   const material = new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0.05 });
   mesh = new THREE.InstancedMesh(geometry, material, voxels.length);
 
   const dummy = new THREE.Object3D();
   const color = new THREE.Color();
   voxels.forEach((v, i) => {
-    dummy.position.set(v.x - bounds.w / 2 + 0.5, v.y + 0.5, v.z - bounds.d / 2 + 0.5);
+    dummy.position.set(v.x - bounds.w / 2 + 0.5, v.y * Y_UNIT_SCALE + Y_UNIT_SCALE / 2, v.z - bounds.d / 2 + 0.5);
     dummy.updateMatrix();
     mesh.setMatrixAt(i, dummy.matrix);
     color.set(v.hex);
@@ -176,10 +184,10 @@ function fitToVoxels(voxels){
   });
   camTarget.set(
     (minX + maxX) / 2 - bounds.w / 2 + 0.5,
-    (minY + maxY) / 2 + 0.5,
+    ((minY + maxY) / 2) * Y_UNIT_SCALE + Y_UNIT_SCALE / 2,
     (minZ + maxZ) / 2 - bounds.d / 2 + 0.5
   );
-  const span = Math.max(maxX - minX, maxY - minY, maxZ - minZ, 4);
+  const span = Math.max(maxX - minX, maxZ - minZ, (maxY - minY) * Y_UNIT_SCALE, 4);
   camDist = clampDist(span * 1.7);
   updateCamera();
 }
