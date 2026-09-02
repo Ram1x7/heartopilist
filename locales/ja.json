@@ -964,7 +964,7 @@
   "tutorial_videos_step2_title": "② タップで動画再生",
   "tutorial_videos_step2_body": "日付をタップすると、その日の発生記録動画が展開表示されます。",
   "tutorial_build_step1_title": "① 画像を選ぶ",
-  "tutorial_build_step1_body": "壁画にしたい画像をアップロードすると、サイズ・位置の調整に進みます。",
+  "tutorial_build_step1_body": "画像をアップロードし、立体(像)か平面(床)かを選んでサイズ・厚さを指定します。",
   "tutorial_build_step2_title": "② 設計図を保存・管理",
   "tutorial_build_step2_body": "保存した設計図はここから呼び出せます。JSON形式での書き出し・読み込みも可能です。",
   "tutorial_build_step3_title": "③ 使い方をもっと見る",

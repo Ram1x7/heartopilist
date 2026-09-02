@@ -721,7 +721,7 @@ body.dark .build-library-item{
 
     <p style="margin-top:10px; font-size:11px; color:var(--text-sub);" data-i18n="build_help_note_wip">※ 範囲選択での一括編集・施工ステージの自動再生・共有リンク機能は現在準備中です。</p>
 
-    <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+    <button class="modal-close-btn" id="buildTutorialReplayBtn" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
   </div>
 </div>
@@ -790,7 +790,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=11"></script>
+<script type="module" src="js/build.js?v=13"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

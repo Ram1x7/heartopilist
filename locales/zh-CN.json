@@ -936,7 +936,7 @@
   "tutorial_videos_step2_title": "②点击播放视频",
   "tutorial_videos_step2_body": "点击日期即可展开查看当天的发生记录视频。",
   "tutorial_build_step1_title": "①选择图片",
-  "tutorial_build_step1_body": "上传想要制作成壁画的图片，即可进入尺寸与位置调整。",
+  "tutorial_build_step1_body": "上传图片后选择立体(雕像)或平面(地面)，并设置宽度・厚度。",
   "tutorial_build_step2_title": "②保存・管理设计图",
   "tutorial_build_step2_body": "已保存的设计图可在此处调用，也支持以JSON格式导出/导入。",
   "tutorial_build_step3_title": "③查看更多使用方法",

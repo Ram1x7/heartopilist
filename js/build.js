@@ -1126,7 +1126,10 @@ async function importBuildDesigns(event){
 // ══════════════════════════════════════
 // 初期化
 // ══════════════════════════════════════
-const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone";
+// 旧・壁画モード時代のチュートリアル既読フラグとは別のキーにする（3Dツールへの
+// 全面刷新で内容が大きく変わったため、以前見たことがあるユーザーにも新しい
+// チュートリアルを一度表示したい）
+const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone_v2";
 const BUILD_TUTORIAL_STEPS = [
   { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "画像をアップロードし、立体(像)か平面(床)かを選んでサイズ・厚さを指定します。" },
   { selector: "#buildLibraryPanel", titleKey: "tutorial_build_step2_title", titleFallback: "② 設計図を保存・管理", textKey: "tutorial_build_step2_body", textFallback: "保存した設計図はここから呼び出せます。JSON形式での書き出し・読み込みも可能です。" },
@@ -1187,6 +1190,17 @@ function initBuildPage(){
   document.getElementById("buildUndoBtn").addEventListener("click", undoEdit);
   document.getElementById("buildRedoBtn").addEventListener("click", redoEdit);
   document.getElementById("buildProgressSlider").addEventListener("input", handleProgressSliderChange);
+
+  // ヘルプモーダル内の「チュートリアルをもう一度見る」ボタン。build.jsが
+  // ESモジュールになったことで、BUILD_TUTORIAL_DONE_KEY等のモジュール内定数は
+  // グローバルスコープのinline onclickからは参照できないため、ここで
+  // addEventListenerとして結線する（closeHelpModal/replayPageTutorial自体は
+  // 従来通りのクラシックスクリプトが定義するグローバル関数なのでモジュール側
+  // から呼び出すことは問題ない）
+  document.getElementById("buildTutorialReplayBtn").addEventListener("click", () => {
+    closeHelpModal();
+    replayPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);
+  });
 
   document.addEventListener("darkmodechange", () => {
     if(sceneInitialized){

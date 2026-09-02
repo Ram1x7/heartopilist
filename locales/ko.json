@@ -936,7 +936,7 @@
   "tutorial_videos_step2_title": "② 탭하여 영상 재생",
   "tutorial_videos_step2_body": "날짜를 탭하면 그날의 발생 기록 영상이 펼쳐집니다.",
   "tutorial_build_step1_title": "① 이미지 선택",
-  "tutorial_build_step1_body": "벽화로 만들고 싶은 이미지를 업로드하면 크기・위치 조정으로 넘어갑니다.",
+  "tutorial_build_step1_body": "이미지를 업로드하고 입체(像) 또는 평면(바닥)을 선택하여 크기・두께를 지정합니다.",
   "tutorial_build_step2_title": "② 설계도 저장・관리",
   "tutorial_build_step2_body": "저장한 설계도는 여기서 불러올 수 있습니다. JSON 형식으로 내보내기・불러오기도 가능합니다.",
   "tutorial_build_step3_title": "③ 더 자세한 사용법 보기",
