@@ -108,25 +108,41 @@ function inBounds(x, y, z){
 }
 
 // ══════════════════════════════════════
-// 施工ステージ表示（下から積み上げた場合に何段目まで見えるかのスライダー）
+// 施工ステージ表示
+// 立体モード：下から積み上げた場合に何段目（Y軸）まで見えるかのスライダー
+// 平面モード：画像の上端の行から何列目（Z軸）まで見えるかのスライダー
+// （平面は高さの起伏がほぼ無い床パターンのため、Y軸で段階分けしても
+// 　ほとんど動きが無い＝実質スライダーが機能しない。行単位の方が
+// 　実際の設置順序（1列ずつ奥/手前へ敷いていく）に対応する）
 // ══════════════════════════════════════
-let progressLayer = 1; // 1〜resultDims.h。resultDims.h＝全て表示
+let progressLayer = 1; // 1〜progressMax()。progressMax()＝全て表示
+
+function progressAxis(){
+  return settings.mode === "flat" ? "z" : "y";
+}
+
+function progressMax(){
+  if(!resultDims) return 1;
+  return settings.mode === "flat" ? resultDims.d : resultDims.h;
+}
 
 function isProgressFull(){
-  return !resultDims || progressLayer >= resultDims.h;
+  return !resultDims || progressLayer >= progressMax();
 }
 
 function getVisibleVoxels(){
   if(!resultVoxels) return [];
   if(isProgressFull()) return resultVoxels;
-  return resultVoxels.filter(v => v.y < progressLayer);
+  const axis = progressAxis();
+  return resultVoxels.filter(v => v[axis] < progressLayer);
 }
 
 function setupProgressSlider(){
   const slider = document.getElementById("buildProgressSlider");
   if(!resultDims) return;
-  slider.max = String(Math.max(1, resultDims.h));
-  progressLayer = resultDims.h;
+  const max = progressMax();
+  slider.max = String(Math.max(1, max));
+  progressLayer = max;
   slider.value = String(progressLayer);
   updateProgressUI();
 }
@@ -135,7 +151,9 @@ function updateProgressUI(){
   const output = document.getElementById("buildProgressOutput");
   const hint = document.getElementById("buildProgressHint");
   const full = isProgressFull();
-  output.textContent = full ? T("build_progress_all", "全て") : T("build_progress_layer", "{n}段目").replace("{n}", progressLayer);
+  const label = settings.mode === "flat" ? "build_progress_row" : "build_progress_layer";
+  const fallback = settings.mode === "flat" ? "{n}列目" : "{n}段目";
+  output.textContent = full ? T("build_progress_all", "全て") : T(label, fallback).replace("{n}", progressLayer);
   hint.style.display = full ? "none" : "block";
   // 施工ステージ表示中（全て以外）はペン/消しゴム/建材選択を無効化する
   // （Undo/Redoは編集履歴の有無で別途制御するため、ここでは触らない）
@@ -143,7 +161,7 @@ function updateProgressUI(){
     document.getElementById(id).disabled = !full;
   });
   document.getElementById("buildProgressMinusBtn").disabled = progressLayer <= 1;
-  document.getElementById("buildProgressPlusBtn").disabled = !resultDims || progressLayer >= resultDims.h;
+  document.getElementById("buildProgressPlusBtn").disabled = !resultDims || progressLayer >= progressMax();
 }
 
 function applyProgressLayer(){
@@ -161,8 +179,33 @@ function handleProgressSliderChange(){
 
 function stepProgressLayer(delta){
   if(!resultDims) return;
-  progressLayer = Math.min(resultDims.h, Math.max(1, progressLayer + delta));
+  progressLayer = Math.min(progressMax(), Math.max(1, progressLayer + delta));
   applyProgressLayer();
+}
+
+// ══════════════════════════════════════
+// 配置ガイド（平面モード限定：4×4/8×8/16×16マスごとの罫線）
+// アートのドット絵変換にある「10×10ブロックごとに塗る」効率化と同じ発想で、
+// 建築を切りのいいブロック単位に分けて計画しやすくする。オフがデフォルト
+// ══════════════════════════════════════
+let blockGuideSize = 0; // 0＝オフ
+
+function updateGuideRow(){
+  const row = document.getElementById("buildGuideRow");
+  if(!row) return;
+  row.style.display = settings.mode === "flat" ? "flex" : "none";
+  row.querySelectorAll(".build-guide-size-btn").forEach(btn => {
+    btn.classList.toggle("active", Number(btn.dataset.size) === blockGuideSize);
+  });
+}
+
+function applyBlockGuide(){
+  const dark = document.body.classList.contains("dark");
+  if(!resultDims || settings.mode !== "flat" || blockGuideSize <= 0){
+    Build3D.setBlockGuide(0, null, dark);
+    return;
+  }
+  Build3D.setBlockGuide(blockGuideSize, { w: resultDims.w, d: resultDims.d }, dark);
 }
 
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
@@ -935,6 +978,9 @@ function runBuildGeneration(){
 
   ensureSceneInitialized();
   setupProgressSlider();
+  blockGuideSize = 0;
+  updateGuideRow();
+  applyBlockGuide();
   Build3D.setVoxels(getVisibleVoxels());
   renderBuildMaterialList();
   clearHistory();
@@ -1022,6 +1068,7 @@ function resetBuildToUpload(){
   resultDims = null;
   manualCropRect = null;
   cropTargetKey = null;
+  blockGuideSize = 0;
   renderBackPreview();
   document.getElementById("buildFrontPreviewWrap").style.display = "none";
   document.getElementById("buildProceedBtn").disabled = true;
@@ -1133,6 +1180,9 @@ function loadDesign(id){
   document.getElementById("buildDesignNameInput").value = design.name;
   ensureSceneInitialized();
   setupProgressSlider();
+  blockGuideSize = 0;
+  updateGuideRow();
+  applyBlockGuide();
   Build3D.setVoxels(getVisibleVoxels());
   renderBuildMaterialList();
   clearHistory();
@@ -1246,6 +1296,14 @@ function initBuildPage(){
   colorCountInput.max = String(totalColorCount);
   if(Number(colorCountInput.value) > totalColorCount) colorCountInput.value = String(totalColorCount);
 
+  document.querySelectorAll(".build-guide-size-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      blockGuideSize = Number(btn.dataset.size) || 0;
+      updateGuideRow();
+      applyBlockGuide();
+    });
+  });
+
   document.getElementById("buildAdjustBtn").addEventListener("click", () => openBuildCropStage(false));
   document.getElementById("buildNewImageBtn").addEventListener("click", resetBuildToUpload);
   document.getElementById("buildSaveDesignBtn").addEventListener("click", saveBuildDesign);
@@ -1284,6 +1342,7 @@ function initBuildPage(){
   document.addEventListener("darkmodechange", () => {
     if(sceneInitialized){
       Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+      applyBlockGuide();
     }
   });
 }

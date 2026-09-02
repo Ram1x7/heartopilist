@@ -1048,11 +1048,14 @@
   "build_progress_slider_label": "施工階段",
   "build_progress_all": "全部",
   "build_progress_layer": "第{n}層",
+  "build_progress_row": "第{n}行",
   "build_progress_edit_disabled_hint": "檢視施工階段時無法編輯。切換回「全部」即可繼續編輯",
   "build_help_progress_title": "⑤查看施工階段",
-  "build_help_progress_body": "拖曳「施工階段」滑桿，可以查看從底部往上建到第幾層的狀態。選擇「全部」以外的選項時無法編輯。",
+  "build_help_progress_body": "拖曳「施工階段」滑桿，立體模式下可以查看從底部往上建到第幾層的狀態，平面模式下可以查看從頂部往下鋪到第幾行的狀態。選擇「全部」以外的選項時無法編輯。平面模式下可以用「擺放參考線」顯示每4×4、8×8、16×16格的分隔線。",
   "build_limit_colors_label": "限制顏色數量",
   "build_color_count_label": "使用的顏色數",
   "build_color_count_hint": "會優先保留使用頻率較高的顏色。顏色越少配色越簡潔，所需建材種類也越少。",
-  "build_unit_colors": "色"
+  "build_unit_colors": "色",
+  "build_guide_label": "擺放參考線",
+  "build_guide_off": "關閉"
 }

@@ -680,6 +680,14 @@ body.dark .build-library-item{
     </div>
     <p class="art-step-hint" id="buildProgressHint" style="display:none;" data-i18n="build_progress_edit_disabled_hint">施工ステージ表示中は編集できません。「全て」に戻すと編集を再開できます</p>
 
+    <div class="build-edit-toolbar" id="buildGuideRow" style="display:none;">
+      <span class="build-progress-slider-label" data-i18n="build_guide_label">配置ガイド</span>
+      <button type="button" class="build-tool-btn build-guide-size-btn active" data-size="0" data-i18n="build_guide_off">オフ</button>
+      <button type="button" class="build-tool-btn build-guide-size-btn" data-size="4">4×4</button>
+      <button type="button" class="build-tool-btn build-guide-size-btn" data-size="8">8×8</button>
+      <button type="button" class="build-tool-btn build-guide-size-btn" data-size="16">16×16</button>
+    </div>
+
     <div class="build-stage-wrap">
       <div class="build-stage">
         <canvas id="buildCanvas"></canvas>
@@ -833,7 +841,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=15"></script>
+<script type="module" src="js/build.js?v=16"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

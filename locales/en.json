@@ -1076,11 +1076,14 @@
   "build_progress_slider_label": "Build stage",
   "build_progress_all": "All",
   "build_progress_layer": "Layer {n}",
+  "build_progress_row": "Row {n}",
   "build_progress_edit_disabled_hint": "Editing is disabled while viewing a build stage. Switch back to \"All\" to resume editing.",
   "build_help_progress_title": "⑤ Check the build stage",
-  "build_help_progress_body": "Move the \"Build stage\" slider to see how the structure looks built up to a given layer from the bottom. Editing is disabled while anything other than \"All\" is selected.",
+  "build_help_progress_body": "Move the \"Build stage\" slider to see how the structure looks built up to a given layer from the bottom (solid mode) or a given row from the top (flat mode). Editing is disabled while anything other than \"All\" is selected. In flat mode, the \"Placement guide\" can show gridlines every 4x4, 8x8, or 16x16 tiles.",
   "build_limit_colors_label": "Limit color count",
   "build_color_count_label": "Colors to use",
   "build_color_count_hint": "The most frequently used colors are kept first. Fewer colors means a simpler look and fewer material types.",
-  "build_unit_colors": ""
+  "build_unit_colors": "",
+  "build_guide_label": "Placement guide",
+  "build_guide_off": "Off"
 }

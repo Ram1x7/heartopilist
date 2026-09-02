@@ -1048,11 +1048,14 @@
   "build_progress_slider_label": "시공 단계",
   "build_progress_all": "전체",
   "build_progress_layer": "{n}단째",
+  "build_progress_row": "{n}열째",
   "build_progress_edit_disabled_hint": "시공 단계를 보는 동안에는 편집할 수 없습니다. \"전체\"로 돌아가면 편집을 다시 시작할 수 있습니다",
   "build_help_progress_title": "⑤ 시공 단계 확인하기",
-  "build_help_progress_body": "\"시공 단계\" 슬라이더를 움직이면 아래에서부터 몇 단째까지 쌓은 상태인지 확인할 수 있습니다. \"전체\" 이외를 선택한 동안에는 편집할 수 없습니다.",
+  "build_help_progress_body": "\"시공 단계\" 슬라이더를 움직이면 입체 모드에서는 아래에서부터 몇 단째까지 쌓은 상태인지, 평면 모드에서는 위에서부터 몇 열째까지 깐 상태인지 확인할 수 있습니다. \"전체\" 이외를 선택한 동안에는 편집할 수 없습니다. 평면 모드에서는 \"배치 가이드\"로 4×4·8×8·16×16칸 단위의 선을 표시할 수 있습니다.",
   "build_limit_colors_label": "색상 수 제한",
   "build_color_count_label": "사용할 색상 수",
   "build_color_count_hint": "많이 사용된 색상부터 우선적으로 남깁니다. 적을수록 배색이 단순해지고 건재 종류도 줄어듭니다.",
-  "build_unit_colors": "색"
+  "build_unit_colors": "색",
+  "build_guide_label": "배치 가이드",
+  "build_guide_off": "끄기"
 }

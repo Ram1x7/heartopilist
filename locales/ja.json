@@ -1076,11 +1076,14 @@
   "build_progress_slider_label": "施工ステージ",
   "build_progress_all": "全て",
   "build_progress_layer": "{n}段目",
+  "build_progress_row": "{n}列目",
   "build_progress_edit_disabled_hint": "施工ステージ表示中は編集できません。「全て」に戻すと編集を再開できます",
   "build_help_progress_title": "⑤ 施工ステージを確認する",
-  "build_help_progress_body": "「施工ステージ」のスライダーを動かすと、下から何段目まで積み上げた状態かを確認できます。「全て」以外を選んでいる間は編集できません。",
+  "build_help_progress_body": "「施工ステージ」のスライダーを動かすと、立体モードでは下から何段目まで積み上げた状態か、平面モードでは上端から何列目まで敷いた状態かを確認できます。「全て」以外を選んでいる間は編集できません。平面モードでは「配置ガイド」で4×4・8×8・16×16マスごとの罫線を表示できます。",
   "build_limit_colors_label": "色数を絞る",
   "build_color_count_label": "使用する色数",
   "build_color_count_hint": "よく使われている色から優先して残します。少ないほどシンプルな配色になり、建材の種類も減ります。",
-  "build_unit_colors": "色"
+  "build_unit_colors": "色",
+  "build_guide_label": "配置ガイド",
+  "build_guide_off": "オフ"
 }

@@ -14,6 +14,7 @@ import * as THREE from "./three.module.min.js";
 const Y_UNIT_SCALE = 2;
 
 let canvasEl, stageEl, scene, camera, renderer, mesh;
+let blockGuide = null;
 let bounds = { w: 24, h: 24, d: 24 };
 let camTheta = 0.9, camPhi = 1.05, camDist = 40;
 const camTarget = new THREE.Vector3();
@@ -226,10 +227,59 @@ function setBackgroundColor(hex){
   if(scene) scene.background = hex == null ? null : new THREE.Color(hex);
 }
 
+// 平面（床）モード向けの配置ガイド：床面（Y=0付近）にN マス区切りの
+// 罫線を描画する。アートページの「10×10ブロック表示」に相当する機能で、
+// 実際の建築を4×4/8×8/16×16等のブロック単位で計画しやすくする。
+// blockSize: 区切りのマス数（0以下でガイド非表示）
+// designDims: {w,d}（現在の設計の実サイズ。boundsは常にサイト最大値なので別途渡す）
+// dark: ダークテーマかどうか（線の色をテーマに合わせて切り替える）
+function setBlockGuide(blockSize, designDims, dark){
+  if(blockGuide){
+    scene.remove(blockGuide);
+    blockGuide.geometry.dispose();
+    blockGuide.material.dispose();
+    blockGuide = null;
+  }
+  if(!blockSize || blockSize <= 0 || !designDims || !designDims.w || !designDims.d) return;
+
+  const w = designDims.w, d = designDims.d;
+  const offX = bounds.w / 2, offZ = bounds.d / 2;
+  const y = 0.02; // 最下段ボクセルの底面よりわずかに下に描き、Zファイティングを避ける
+  const positions = [];
+
+  for(let x = 0; x <= w; x += blockSize){
+    const wx = Math.min(x, w) - offX;
+    positions.push(wx, y, -offZ, wx, y, d - offZ);
+  }
+  if(w % blockSize !== 0){
+    const wx = w - offX;
+    positions.push(wx, y, -offZ, wx, y, d - offZ);
+  }
+  for(let z = 0; z <= d; z += blockSize){
+    const wz = Math.min(z, d) - offZ;
+    positions.push(-offX, y, wz, w - offX, y, wz);
+  }
+  if(d % blockSize !== 0){
+    const wz = d - offZ;
+    positions.push(-offX, y, wz, w - offX, y, wz);
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  const material = new THREE.LineBasicMaterial({
+    color: dark ? 0xe8c93c : 0xb1503b,
+    transparent: true,
+    opacity: 0.8,
+  });
+  blockGuide = new THREE.LineSegments(geometry, material);
+  scene.add(blockGuide);
+}
+
 function dispose(){
   if(rafId != null){ cancelAnimationFrame(rafId); rafId = null; }
   if(mesh){ mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
+  if(blockGuide){ blockGuide.geometry.dispose(); blockGuide.material.dispose(); blockGuide = null; }
   if(renderer) renderer.dispose();
 }
 
-export { init, setVoxels, resize, raycastVoxelAt, setEditClickCallback, setBackgroundColor, dispose };
+export { init, setVoxels, resize, raycastVoxelAt, setEditClickCallback, setBackgroundColor, setBlockGuide, dispose };
