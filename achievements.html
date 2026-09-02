@@ -119,19 +119,6 @@ body.dark .ach-size-btn.active{ background:var(--indigo-soft); border-color:var(
   opacity:0.55;
 }
 
-.ach-progress-badge{
-  position:absolute;
-  bottom:6px;
-  left:6px;
-  z-index:5;
-  padding:2px 6px;
-  border-radius:999px;
-  font-size:8px;
-  color:#fdf9ef;
-  background:rgba(52,48,43,0.72);
-  backdrop-filter:blur(4px);
-}
-
 .achievements-footer{
   text-align:center;
   margin-top:24px;
@@ -322,49 +309,6 @@ body.dark .ach-info-card{ background:#383329; }
 
 body.dark .ach-info-value{ color:#ece4d4; }
 
-.ach-progress-bar-outer{
-  margin-top:8px;
-  height:10px;
-  border-radius:999px;
-  background:var(--card);
-  overflow:hidden;
-}
-
-body.dark .ach-progress-bar-outer{ background:#2c2823; }
-
-.ach-progress-bar-inner{
-  height:100%;
-  background:linear-gradient(90deg, var(--gold), var(--vermillion));
-  border-radius:999px;
-  transition:width 0.2s;
-}
-
-.ach-progress-input-row{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  margin-top:10px;
-}
-
-.ach-progress-input{
-  width:70px;
-  padding:6px 8px;
-  border:1px solid var(--border);
-  border-radius:8px;
-  background:var(--card);
-  color:var(--text);
-  font-size:13px;
-  text-align:center;
-}
-
-body.dark .ach-progress-input{ background:#2c2823; color:#ece4d4; border-color:#46423b; }
-
-.ach-progress-total{
-  font-size:12px;
-  color:var(--text-sub);
-}
-
 /* 獲得済みボタン */
 .ach-obtain-btn{
   width:100%;
@@ -458,9 +402,6 @@ body.dark .ach-obtain-date{ color:#b3a89a; }
     <p style="margin-top:10px;"><strong data-i18n="achievements_help_check_title">達成済みにする</strong><br>
     <span data-i18n="achievements_help_check_body">カード右上のボタン、または詳細画面のボタンから達成済みかどうかを記録できます。ゲーム内のデータと自動で連携する機能ではないため、手動で記録してください。</span></p>
 
-    <p style="margin-top:10px;"><strong data-i18n="achievements_help_progress_title">進捗を記録する</strong><br>
-    <span data-i18n="achievements_help_progress_body">回数などで達成する実績は、詳細画面で現在の進捗数を入力できます。</span></p>
-
     <div style="text-align:center; margin-top:20px;">
       <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(ACHIEVEMENTS_TUTORIAL_DONE_KEY, ACHIEVEMENTS_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
       <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="achievements_help_close">閉じる</button>
@@ -539,7 +480,6 @@ function T(key, fallback, vars){
 // ── データ（達成状況はローカル保存のみ。ゲーム内データとは連携していません） ──
 let obtainedData = JSON.parse(localStorage.getItem("achievement_obtained") || "{}");
 let obtainedDateData = JSON.parse(localStorage.getItem("achievement_obtained_date") || "{}");
-let progressData = JSON.parse(localStorage.getItem("achievement_progress") || "{}");
 
 let toggleGuard = false;
 function guardToggle(){
@@ -550,10 +490,6 @@ function guardToggle(){
 }
 
 function isObtained(a){ return !!obtainedData[a.id]; }
-function currentProgress(a){
-  const v = progressData[a.id];
-  return typeof v === "number" ? v : 0;
-}
 
 function setObtained(a, value){
   obtainedData[a.id] = value;
@@ -564,11 +500,6 @@ function setObtained(a, value){
   }
   localStorage.setItem("achievement_obtained", JSON.stringify(obtainedData));
   localStorage.setItem("achievement_obtained_date", JSON.stringify(obtainedDateData));
-}
-
-function setProgress(a, value){
-  progressData[a.id] = value;
-  localStorage.setItem("achievement_progress", JSON.stringify(progressData));
 }
 
 let currentModalAch = null;
@@ -588,7 +519,6 @@ function render(){
         <button class="check-btn ${obtained ? "checked" : ""}" aria-pressed="${obtained ? "true" : "false"}" aria-label="${displayField(a,"name")} ${T("aria_check_label","コンプ済みにする")}">
           ${icon(obtained ? "star" : "starOutline", {size:13})}
         </button>
-        ${!obtained && a.progressTotal ? `<div class="ach-progress-badge">${currentProgress(a)}/${a.progressTotal}</div>` : ''}
         <div class="ach-icon-wrap ${obtained ? "" : "ach-icon-locked"}" style="width:100%;aspect-ratio:1/1;background:var(--card-sub);border-radius:14px;padding:2px;box-sizing:border-box;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:var(--gold);">
           ${icon(a.icon || "trophy", {size:36})}
         </div>
@@ -652,32 +582,14 @@ function renderAchModal(){
   if(!a) return;
   const box = document.getElementById("achModalBox");
   const obtained = isObtained(a);
-  const hasProgress = a.progressTotal != null;
-  const progress = Math.min(currentProgress(a), a.progressTotal || 0);
 
   const subText = obtained
     ? T("achievements_obtained_sub","この実績を達成しました！")
-    : (hasProgress
-        ? T("achievements_locked_sub_progress","達成すると称号「{title}」を獲得できます", {title: displayField(a,"rewardTitle")})
-        : T("achievements_locked_sub","達成すると称号「{title}」を獲得できます", {title: displayField(a,"rewardTitle")}));
+    : T("achievements_locked_sub","達成すると称号「{title}」を獲得できます", {title: displayField(a,"rewardTitle")});
 
   const dateHTML = obtained && obtainedDateData[a.id]
     ? `<div class="ach-obtain-date">${T("achievements_obtained_date_label","達成日：")}${formatDate(obtainedDateData[a.id])}</div>`
     : "";
-
-  const progressHTML = hasProgress ? `
-    <div class="ach-info-row">
-      <span class="ach-info-label">${T("achievements_progress_label","進捗")}</span>
-      <span class="ach-info-value">${progress} / ${a.progressTotal}</span>
-    </div>
-    <div class="ach-progress-bar-outer">
-      <div class="ach-progress-bar-inner" style="width:${a.progressTotal ? Math.min(100, progress / a.progressTotal * 100) : 0}%;"></div>
-    </div>
-    <div class="ach-progress-input-row">
-      <input type="number" min="0" max="${a.progressTotal}" class="ach-progress-input" id="achProgressInput" value="${progress}">
-      <span class="ach-progress-total">/ ${a.progressTotal}</span>
-    </div>
-  ` : "";
 
   box.innerHTML = `
     <button class="ach-modal-close-x" onclick="closeAchModal()">${icon("close",{size:14})}</button>
@@ -704,7 +616,6 @@ function renderAchModal(){
         <span class="ach-info-label">${T("achievements_reward_label","獲得称号")}</span>
         <span class="ach-info-value">${displayField(a,"rewardTitle")}</span>
       </div>
-      ${progressHTML}
     </div>
 
     <button class="ach-obtain-btn ${obtained ? "obtained" : ""}" id="achObtainBtn">
@@ -713,18 +624,6 @@ function renderAchModal(){
     </button>
     ${dateHTML}
   `;
-
-  const progInput = document.getElementById("achProgressInput");
-  if(progInput){
-    progInput.addEventListener("input", (e)=>{
-      let v = parseInt(e.target.value, 10);
-      if(isNaN(v) || v < 0) v = 0;
-      if(a.progressTotal != null && v > a.progressTotal) v = a.progressTotal;
-      setProgress(a, v);
-      render();
-      renderAchModal();
-    });
-  }
 
   document.getElementById("achObtainBtn").onclick = ()=>{
     setObtained(a, !isObtained(a));
