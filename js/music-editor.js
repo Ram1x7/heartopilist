@@ -785,10 +785,21 @@ function toggleCalibMode() {
   }
 }
 
+// 「実機画像に重ねる」調整（.music-calib-*一式）は、練習モード・録音の全画面
+// ステージのどちらでも同じ調整値(calib)を使う。DOM要素は1つしか無く、今アクティブな
+// 方のステージへmoveCalibElementsToActiveStage()で都度付け替えているため、
+// 「.calibrating」の付け外しも常にそのステージ（今アクティブな方）に対して行う
+function activeStageEl() {
+  if (pageMode === "practice") return document.getElementById("musicPracticeStage");
+  if (isRecordStageActive()) return document.getElementById("musicRecordStage");
+  return null;
+}
+
 function enterCalibMode() {
   calibActive = true;
   calibBackup = { ...calib };
-  document.getElementById("musicPracticeStage").classList.add("calibrating");
+  const stage = activeStageEl();
+  if (stage) stage.classList.add("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.add("active");
   document.getElementById("musicCalibToggleBtn").setAttribute("aria-pressed", "true");
   const catcher = document.getElementById("musicCalibCatcher");
@@ -804,7 +815,8 @@ function exitCalibModeUI() {
   calibPanStart = null;
   calibPinchStart = null;
   clearCalibGuides();
-  document.getElementById("musicPracticeStage").classList.remove("calibrating");
+  const stage = activeStageEl();
+  if (stage) stage.classList.remove("calibrating");
   document.getElementById("musicCalibToggleBtn").classList.remove("active");
   document.getElementById("musicCalibToggleBtn").setAttribute("aria-pressed", "false");
   const catcher = document.getElementById("musicCalibCatcher");
@@ -864,8 +876,8 @@ function onCalibPointerMove(e) {
   if (!calibPointers.has(e.pointerId)) return;
   e.preventDefault();
   calibPointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  const stage = document.getElementById("musicPracticeStage");
-  const stageH = stage.getBoundingClientRect().height || 1;
+  const stage = activeStageEl();
+  const stageH = (stage && stage.getBoundingClientRect().height) || 1;
 
   if (calibPointers.size === 2 && calibPinchStart) {
     const pts = [...calibPointers.values()];
@@ -923,6 +935,29 @@ function clearCalibBgImage() {
     URL.revokeObjectURL(calibBgObjectUrl);
     calibBgObjectUrl = null;
   }
+}
+
+// 「実機画像に重ねる」調整機能一式（背景画像・ドラッグ/ピンチを受け止める透明
+// レイヤー・スナップ補助線・調整トグルボタン＋一度きりの案内吹き出し・下部の
+// 操作パネル）は要素が1つしか無いため、練習モード・録音の全画面ステージの
+// うち今アクティブな方へ都度付け替える。どちらでもない（通常の編集画面）間は
+// 付け替えず、直前の位置のまま残しておく（非表示のため実害はない）
+function moveCalibElementsToActiveStage() {
+  const isPractice = pageMode === "practice";
+  const isRecord = isRecordStageActive();
+  if (!isPractice && !isRecord) return;
+
+  const gridAnchor = document.getElementById(isPractice ? "musicInstrumentGridAnchorPractice" : "musicInstrumentGridAnchorRecord");
+  const stage = document.getElementById(isPractice ? "musicPracticeStage" : "musicRecordStage");
+  const topbarIcons = document.getElementById(isPractice ? "musicPracticeTopbarIcons" : "musicRecordTopbarIcons");
+
+  gridAnchor.prepend(document.getElementById("musicCalibBgImage"));
+  stage.appendChild(document.getElementById("musicCalibCatcher"));
+  stage.appendChild(document.getElementById("musicCalibGuideV"));
+  stage.appendChild(document.getElementById("musicCalibOverlay"));
+  // 元の並び（トグルボタン→吹き出し→サウンド→閉じる）を保つため、後ろから順にprependする
+  topbarIcons.prepend(document.getElementById("musicCalibHintBubble"));
+  topbarIcons.prepend(document.getElementById("musicCalibToggleBtn"));
 }
 
 // 演奏ボタンの「押す・離す」を扱う（和音対応）。最初の1本目が押されてから
@@ -1623,6 +1658,7 @@ function updateModeUI() {
   const gridAnchorId = isPractice ? "musicInstrumentGridAnchorPractice" : isRecordStage ? "musicInstrumentGridAnchorRecord" : "musicInstrumentGridAnchorEdit";
   document.getElementById(scoreAnchorId).appendChild(scoreDisplay);
   document.getElementById(gridAnchorId).appendChild(grid);
+  moveCalibElementsToActiveStage();
 
   if (isPractice) {
     document.getElementById("musicPlaybackAnchorPractice").appendChild(playbackRow);
@@ -1646,11 +1682,14 @@ function updateModeUI() {
 // isRecordStageActive()の結果が変わるため、そのたびにupdateModeUI()で
 // 全画面ステージの表示・アンカー移動・演奏ボタンの描画をまとめて更新し直す
 function openRecordStage() {
+  if (calibActive) cancelCalibMode();
   recordStageOpen = true;
   updateModeUI();
+  maybeShowCalibHint();
 }
 
 function closeRecordStage() {
+  if (calibActive) cancelCalibMode();
   recordStageOpen = false;
   updateModeUI();
 }

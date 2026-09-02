@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/music.css?v=48">
+<link rel="stylesheet" href="./css/music.css?v=49">
 <link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
@@ -217,17 +217,25 @@
   </div>
 </div>
 
-<!-- 「作る」タブの録音モード：任意で開ける全画面ステージ。練習モードと同じく
-     端末が縦向きでもCSSで横画面表示にし、実機と同じ大きさ・配置のボタンで
-     演奏しながら録音できるようにする（「全画面で演奏する」ボタンで開閉） -->
+<!-- 「作る」タブの録音モード：任意で開ける全画面ステージ。練習モードと同じ構成
+     （演奏ボタン領域を画面全体に敷き、上部バー・譜面プレビューをその上に重ねる）
+     にすることで、練習モードの「実機画像に重ねる」調整機能（musicCalibToggleBtn
+     以下、js/music-editor.jsが調整時にstageに応じて付け替える）もそのまま
+     録音の全画面ステージで使えるようにする。端末が縦向きでもCSSで横画面表示にし、
+     実機と同じ大きさ・配置のボタンで演奏しながら録音できる
+     （「全画面で演奏する」ボタンで開閉） -->
 <div class="music-record-stage" id="musicRecordStage">
-  <div class="music-practice-stage-topbar">
-    <div class="music-record-stage-title" id="musicRecordStageName"></div>
-    <button class="music-sound-btn" id="musicSoundToggleBtnRecord" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
-    <button class="music-practice-exit-btn" id="musicRecordExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
-  </div>
-  <div id="musicScoreDisplayAnchorRecord"></div>
   <div id="musicInstrumentGridAnchorRecord"></div>
+  <div class="music-practice-stage-overlay-top">
+    <div class="music-practice-stage-topbar">
+      <div class="music-record-stage-title" id="musicRecordStageName"></div>
+      <div class="music-practice-topbar-icons" id="musicRecordTopbarIcons">
+        <button class="music-sound-btn" id="musicSoundToggleBtnRecord" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+        <button class="music-practice-exit-btn" id="musicRecordExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
+      </div>
+    </div>
+    <div id="musicScoreDisplayAnchorRecord"></div>
+  </div>
 </div>
 
 <!-- 練習モード：全画面の専用ステージ。端末が縦向きでもCSSで横画面表示にする。
@@ -259,7 +267,7 @@
       </div>
       <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
       <div class="music-practice-accuracy" id="musicPracticeAccuracy"></div>
-      <div class="music-practice-topbar-icons">
+      <div class="music-practice-topbar-icons" id="musicPracticeTopbarIcons">
         <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="Match game screen" data-i18n-aria-label="music_calib_toggle_label" aria-pressed="false"></button>
         <div class="music-calib-hint-bubble" id="musicCalibHintBubble" data-i18n="music_calib_hint_once">画面がずれる場合は、ここで「ゲーム画面に合わせる」を調整できます</div>
         <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>

@@ -1652,8 +1652,13 @@ body.dark .music-note-btn.accidental.practice-guide{
 }
 
 /* 「作る」タブの録音中に「全画面で演奏する」で開ける全画面ステージ。練習モードと
-   同じくCSSで横画面表示にするが、実機写真への位置合わせは不要なため、上部バー・
-   譜面・演奏ボタンを重ねずに縦に並べるシンプルな構成にする */
+   同じ構成（演奏ボタン領域を画面全体に敷き、上部バー・譜面プレビューをその上に
+   重ねる）にすることで、練習モードの「実機画像に重ねる」調整機能一式
+   （.music-calib-*、js/music-editor.jsが調整時にstageへ付け替える）を
+   そのまま使えるようにする。#musicInstrumentGridAnchorRecord・
+   #musicScoreDisplayAnchorRecordそれぞれのサイズ・重ね順は、練習モード側の
+   同等ルール（.music-practice-stage #musicInstrumentGridAnchorPractice等）と
+   揃えてある */
 .music-record-stage{
   display:none;
   position:fixed;
@@ -1661,11 +1666,10 @@ body.dark .music-note-btn.accidental.practice-guide{
   z-index:1900;
   background:var(--card);
   overflow:hidden;
-  flex-direction:column;
 }
 
 .music-record-stage.active{
-  display:flex;
+  display:block;
 }
 
 body.dark .music-record-stage{
@@ -1680,14 +1684,6 @@ body.dark .music-record-stage{
     left:50%;
     transform:translate(-50%, -50%) rotate(90deg);
   }
-}
-
-.music-record-stage .music-practice-stage-topbar{
-  flex-shrink:0;
-  flex-direction:row;
-  align-items:center;
-  gap:8px;
-  padding:8px 10px;
 }
 
 .music-record-stage-title{
@@ -1705,27 +1701,33 @@ body.dark .music-record-stage-title{
   color:#ece4d4;
 }
 
-.music-record-stage .music-sound-btn,
-.music-record-stage .music-practice-exit-btn{
-  flex-shrink:0;
-}
-
-#musicScoreDisplayAnchorRecord{
+.music-practice-stage-overlay-top #musicScoreDisplayAnchorRecord{
   flex-shrink:1;
   min-height:0;
-  max-height:30%;
-  overflow-y:auto;
-  padding:0 10px;
+  overflow:hidden;
+  margin-top:8px;
 }
 
-#musicInstrumentGridAnchorRecord{
-  flex:1;
-  min-height:0;
+.music-record-stage #musicInstrumentGridAnchorRecord{
+  position:absolute;
+  inset:0;
+  padding:6px 10px;
+  box-sizing:border-box;
   display:flex;
   align-items:center;
   justify-content:center;
-  padding:6px 10px;
-  box-sizing:border-box;
+}
+
+.music-record-stage.calibrating .music-calib-catcher{
+  display:block;
+}
+
+.music-record-stage.calibrating .music-calib-guide{
+  display:block;
+}
+
+.music-record-stage.calibrating .music-calib-overlay{
+  display:flex;
 }
 
 /* 練習モード：全画面の専用ステージ。実機の指の感覚に合わせて練習できるよう、
@@ -1917,7 +1919,8 @@ body.dark .music-practice-accuracy-miss{
   cursor:pointer;
 }
 
-.music-practice-stage .music-sound-btn{
+.music-practice-stage .music-sound-btn,
+.music-record-stage .music-sound-btn{
   width:28px;
   height:28px;
 }
@@ -1955,7 +1958,8 @@ body.dark .music-practice-exit-btn{
 /* 練習ステージの譜面プレビューは、参考画像と同じくマスを折り返して複数行表示し、
    演奏ボタンの邪魔をしない範囲(画面上部)いっぱいに見せる。現在位置の行が
    常に見えるよう、縦方向にスクロールできるようにする */
-.music-practice-stage .music-score-display{
+.music-practice-stage .music-score-display,
+.music-record-stage .music-score-display{
   margin:0;
   min-height:0;
   max-height:100%;
@@ -1969,7 +1973,8 @@ body.dark .music-practice-exit-btn{
   align-content:flex-start;
 }
 
-body.dark .music-practice-stage .music-score-display{
+body.dark .music-practice-stage .music-score-display,
+body.dark .music-record-stage .music-score-display{
   background:rgba(0,0,0,0.35);
 }
 
@@ -1984,14 +1989,16 @@ body.dark .music-practice-stage .music-score-display{
   animation:music-score-block-enter 0.3s ease-out;
 }
 
-.music-practice-stage .music-chip{
+.music-practice-stage .music-chip,
+.music-record-stage .music-chip{
   width:auto;
   height:auto;
   padding:5px;
   border-radius:8px;
 }
 
-.music-practice-stage .music-chip-bar{
+.music-practice-stage .music-chip-bar,
+.music-record-stage .music-chip-bar{
   height:auto;
   align-self:stretch;
 }
