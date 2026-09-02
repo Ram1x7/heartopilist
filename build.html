@@ -591,6 +591,18 @@ body.dark .build-library-item{
         <input type="checkbox" id="buildAutoTransparentCheckbox">
         <span data-i18n="build_autotransparent_label">背景を自動で透明化する</span>
       </label>
+      <label class="build-checkbox-row">
+        <input type="checkbox" id="buildLimitColorsCheckbox">
+        <span data-i18n="build_limit_colors_label">色数を絞る</span>
+      </label>
+      <div class="build-slider-field" id="buildColorCountRow" style="display:none;">
+        <div class="build-slider-field-label">
+          <span data-i18n="build_color_count_label">使用する色数</span>
+          <output id="buildColorCountOutput">16色</output>
+        </div>
+        <input type="range" id="buildColorCountInput" min="2" max="74" value="16">
+        <p class="art-step-hint" data-i18n="build_color_count_hint">よく使われている色から優先して残します。少ないほどシンプルな配色になり、建材の種類も減ります。</p>
+      </div>
 
       <div class="build-back-image-row" id="buildBackImageRow">
         <div class="art-panel-title" data-i18n="build_back_image_title">背面画像（任意）</div>
@@ -733,7 +745,7 @@ body.dark .build-library-item{
     <h3 style="text-align:center;" data-i18n="build_help_title">使い方</h3>
 
     <p><strong data-i18n="build_help_1_title">① 画像を選ぶ・建築モードを決める</strong><br>
-    <span data-i18n="build_help_1_body">画像をアップロードし、「立体（像）」か「平面（床）」かを選びます。幅サイズ・厚さ、空洞化、背景の自動透明化もここで指定します。立体モードでは背面画像も指定できます（任意）。実際の支柱建材は幅・奥行きの2倍の高さがあるため、立体モードの高さは自動的に補正され、3Dプレビューも実際に建てたときと同じ縦横比で表示されます。</span></p>
+    <span data-i18n="build_help_1_body">画像をアップロードし、「立体（像）」か「平面（床）」かを選びます。幅サイズ・厚さ、空洞化、背景の自動透明化、色数を絞るオプションもここで指定します。立体モードでは背面画像も指定できます（任意）。実際の支柱建材は幅・奥行きの2倍の高さがあるため、立体モードの高さは自動的に補正され、3Dプレビューも実際に建てたときと同じ縦横比で表示されます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② 位置を調整</strong><br>
     <span data-i18n="build_help_2_body">ドラッグして位置を、スライダーで拡大縮小して正面画像の切り抜き範囲を決めます。</span></p>
@@ -821,7 +833,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=14"></script>
+<script type="module" src="js/build.js?v=15"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

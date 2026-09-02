@@ -38,6 +38,8 @@ let settings = {
   thickness: 6,        // solid: 奥行きの押し出し量 / flat: 起伏の最大高さ
   hollow: true,         // 空洞化（solidのみ有効）
   autoTransparentBg: false,
+  limitColors: false,  // 色数を絞る
+  colorCount: 16,       // 絞り込む色数の上限
 };
 
 let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]
@@ -266,8 +268,9 @@ function getMaterialLabIndex(materialItems){
   return index;
 }
 
-function nearestMaterialFromLab(lab, materialItems){
-  const index = getMaterialLabIndex(materialItems);
+// index: [{materialId,name,hex,lab}]の配列（getMaterialLabIndex()の戻り値、
+// または後述deriveRestrictedPaletteIndex()が返す絞り込み後の部分集合）
+function nearestFromIndex(lab, index){
   let best = null;
   let bestDist = Infinity;
   index.forEach(entry => {
@@ -278,6 +281,34 @@ function nearestMaterialFromLab(lab, materialItems){
     }
   });
   return best;
+}
+
+function nearestMaterialFromLab(lab, materialItems){
+  return nearestFromIndex(lab, getMaterialLabIndex(materialItems));
+}
+
+// ══════════════════════════════════════
+// 色数を絞る（js/art-pixelate.jsのbuildPalette()と同じ考え方：まず制限なしで
+// マッチングした結果の出現頻度を数え、上位n色だけを「この変換で使う色」として
+// 残す。以降のマッチングはこの絞り込んだ色の中からのみ選ぶ）
+// ══════════════════════════════════════
+function deriveRestrictedPaletteIndex(cellsList, maxColors){
+  const fullIndex = getMaterialLabIndex(MATERIALS.support_pillars.items);
+  const counts = new Map();
+  cellsList.forEach(cells => {
+    cells.forEach(c => {
+      if(!c) return;
+      const key = c.materialId + "_" + c.hex;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+  });
+  const byKey = new Map(fullIndex.map(e => [e.materialId + "_" + e.hex, e]));
+  const top = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, Math.max(1, maxColors))
+    .map(([key]) => byKey.get(key))
+    .filter(Boolean);
+  return top.length > 0 ? top : fullIndex.slice(0, Math.max(1, maxColors));
 }
 
 // ══════════════════════════════════════
@@ -405,8 +436,13 @@ function readOptionInputs(){
   settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
   settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
+  settings.limitColors = document.getElementById("buildLimitColorsCheckbox").checked;
+  const colorCountInput = document.getElementById("buildColorCountInput");
+  settings.colorCount = Math.min(Number(colorCountInput.max) || 74, Math.max(2, Number(colorCountInput.value) || 2));
   document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
   document.getElementById("buildThicknessOutput").textContent = `${settings.thickness}${T("build_unit_masu", "マス")}`;
+  document.getElementById("buildColorCountOutput").textContent = `${settings.colorCount}${T("build_unit_colors", "色")}`;
+  document.getElementById("buildColorCountRow").style.display = settings.limitColors ? "block" : "none";
 }
 
 let optionDebounceTimer = null;
@@ -674,9 +710,11 @@ function diffuseLabError(errors, w, h, x, y, diff){
 }
 
 // 画像1枚をw×hの2Dグリッドへ変換する（建材マッチング＋ディザリング＋輪郭保持）。
+// paletteIndex省略時は建材の全色から選ぶ。色数を絞る場合は
+// deriveRestrictedPaletteIndex()で作った部分集合を渡す
 // 戻り値: { cells: [{materialId,hex,name}|null], rawColors: [[r,g,b]|null] }
 // rawColorsは平面モードの起伏（高さ）算出に使う量子化前の色
-function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTransparentBg){
+function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTransparentBg, paletteIndex){
   const src = autoTransparentBg ? buildAutoTransparentCanvas(image) : image;
   const srcW = autoTransparentBg ? src.width : naturalW;
   const srcH = autoTransparentBg ? src.height : naturalH;
@@ -686,7 +724,7 @@ function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTranspare
     ? { sx: rect.sx * scaleX, sy: rect.sy * scaleY, sw: rect.sw * scaleX, sh: rect.sh * scaleY }
     : rect;
 
-  const supportItems = MATERIALS.support_pillars.items;
+  const index = paletteIndex || getMaterialLabIndex(MATERIALS.support_pillars.items);
   const { colors, alphas, isEdgeCell } = sampleCellColors(src, srcW, srcH, scaledRect, w, h);
 
   const errors = new Array(w * h).fill(null);
@@ -702,12 +740,12 @@ function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTranspare
       }
       const lab = rgbToLab(colors[idx]);
       if(isEdgeCell[idx]){
-        cells[idx] = nearestMaterialFromLab(lab, supportItems);
+        cells[idx] = nearestFromIndex(lab, index);
         continue;
       }
       const err = errors[idx];
       const dithered = err ? [lab[0] + err[0], lab[1] + err[1], lab[2] + err[2]] : lab;
-      const match = nearestMaterialFromLab(dithered, supportItems);
+      const match = nearestFromIndex(dithered, index);
       cells[idx] = match;
       const matchLab = rgbToLab(hexToRgb(match.hex));
       diffuseLabError(errors, w, h, x, y, [lab[0] - matchLab[0], lab[1] - matchLab[1], lab[2] - matchLab[2]]);
@@ -855,19 +893,37 @@ function runBuildGeneration(){
   if(!frontImage) return;
   const rect = manualCropRect || coverCropRect(frontImage.naturalWidth, frontImage.naturalHeight, settings.width, settings.width);
   const otherDim = computeOtherDim();
+  const backRect = backImage ? coverCropRect(backImage.naturalWidth, backImage.naturalHeight, settings.width, otherDim) : null;
+
+  let paletteIndex; // undefined＝全色から選ぶ（デフォルト）
+  if(settings.limitColors){
+    // 1回目：制限なしでマッチングし、実際によく使われる色の出現頻度を数える
+    const provisionalFront = computeMatchedGrid(
+      frontImage, frontImage.naturalWidth, frontImage.naturalHeight,
+      rect, settings.width, otherDim, settings.autoTransparentBg
+    );
+    const provisionalCellsList = [provisionalFront.cells];
+    if(settings.mode === "solid" && backImage){
+      const provisionalBack = computeMatchedGrid(
+        backImage, backImage.naturalWidth, backImage.naturalHeight,
+        backRect, settings.width, otherDim, settings.autoTransparentBg
+      );
+      provisionalCellsList.push(provisionalBack.cells);
+    }
+    paletteIndex = deriveRestrictedPaletteIndex(provisionalCellsList, settings.colorCount);
+  }
 
   const frontGrid = computeMatchedGrid(
     frontImage, frontImage.naturalWidth, frontImage.naturalHeight,
-    rect, settings.width, otherDim, settings.autoTransparentBg
+    rect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex
   );
 
   if(settings.mode === "solid"){
     let backGrid = null;
     if(backImage){
-      const backRect = coverCropRect(backImage.naturalWidth, backImage.naturalHeight, settings.width, otherDim);
       backGrid = computeMatchedGrid(
         backImage, backImage.naturalWidth, backImage.naturalHeight,
-        backRect, settings.width, otherDim, settings.autoTransparentBg
+        backRect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex
       );
     }
     resultVoxels = buildSolidVoxels(frontGrid, backGrid, settings.width, otherDim, settings.thickness, settings.hollow);
@@ -1182,6 +1238,13 @@ function initBuildPage(){
   document.getElementById("buildThicknessInput").addEventListener("input", handleOptionInputChange);
   document.getElementById("buildHollowCheckbox").addEventListener("change", readOptionInputs);
   document.getElementById("buildAutoTransparentCheckbox").addEventListener("change", readOptionInputs);
+  document.getElementById("buildLimitColorsCheckbox").addEventListener("change", readOptionInputs);
+  document.getElementById("buildColorCountInput").addEventListener("input", readOptionInputs);
+
+  const colorCountInput = document.getElementById("buildColorCountInput");
+  const totalColorCount = MATERIALS.support_pillars.items.reduce((sum, m) => sum + m.colors.length, 0);
+  colorCountInput.max = String(totalColorCount);
+  if(Number(colorCountInput.value) > totalColorCount) colorCountInput.value = String(totalColorCount);
 
   document.getElementById("buildAdjustBtn").addEventListener("click", () => openBuildCropStage(false));
   document.getElementById("buildNewImageBtn").addEventListener("click", resetBuildToUpload);
