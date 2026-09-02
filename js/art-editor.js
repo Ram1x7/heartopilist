@@ -1206,12 +1206,29 @@ function syncPaletteHighlightFromInspectedCell(){
 }
 
 // ── 色番号・マス番号ラベル ──
+// サブカラーの番号（例：06-2）はメインカラーの番号（例：01）より文字数が多く
+// 横幅が出るため、マスの大きさに対して単純な一律フォントサイズのままだと
+// マスからはみ出して隣のマスの数字と重なり、拡大してもどのマスの数字も
+// 読めない状態になってしまう。ラベルの文字列ごとに、マスの中に収まる最大の
+// フォントサイズを求めて使うことで、拡大時はマスそれぞれに読める数字が
+// 収まるようにする（同じ文字列はマス数に対して種類が少ないため、文字列
+// ごとにフォントサイズをキャッシュして毎マスの測定コストを抑える）
 function drawCellLabels(cell){
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  const fontSize = Math.max(6, Math.floor(cell * 0.38));
-  ctx.font = `${fontSize}px sans-serif`;
-  ctx.lineWidth = Math.max(1, fontSize * 0.22);
+  const baseFontSize = Math.max(6, Math.floor(cell * 0.38));
+  const maxTextWidth = cell * 0.9;
+  const fontSizeCache = new Map();
+  function fontSizeForLabel(label){
+    let size = fontSizeCache.get(label);
+    if(size !== undefined) return size;
+    ctx.font = `${baseFontSize}px sans-serif`;
+    const textWidth = ctx.measureText(label).width;
+    size = textWidth > maxTextWidth ? Math.max(4, Math.floor(baseFontSize * maxTextWidth / textWidth)) : baseFontSize;
+    fontSizeCache.set(label, size);
+    return size;
+  }
+
   for(let y = 0; y < gridHeight; y++){
     for(let x = 0; x < gridWidth; x++){
       const idx = y * gridWidth + x;
@@ -1222,6 +1239,11 @@ function drawCellLabels(cell){
         label = colorNumberMap[pixels[idx]] || "";
       }
       if(!label) continue;
+
+      const fontSize = fontSizeForLabel(label);
+      ctx.font = `${fontSize}px sans-serif`;
+      ctx.lineWidth = Math.max(1, fontSize * 0.22);
+
       const px = x * cell + cell / 2, py = y * cell + cell / 2;
       ctx.strokeStyle = "rgba(255,255,255,0.9)";
       ctx.strokeText(label, px, py);
