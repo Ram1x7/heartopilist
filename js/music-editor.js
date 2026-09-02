@@ -570,9 +570,13 @@ function rebuildActiveKeymap() {
   }
 }
 
+// 「作る」タブで録音中（実際にボタンを弾いて譜面を作る間）は、押し間違いを減らし
+// 練習モードとの操作感を揃えられるよう、編集用の伸縮グリッドではなく練習モードと
+// 同じ実機座標配置（renderPracticeStageGrid）を使う。録音中でなければ、精密な
+// 手入力に向いた編集用グリッドのまま
 function renderInstrumentGrid() {
   rebuildActiveKeymap();
-  if (pageMode === "practice") {
+  if (pageMode === "practice" || (pageMode === "edit" && isRecording)) {
     renderPracticeStageGrid();
   } else {
     renderEditGrid();
@@ -617,7 +621,13 @@ function renderEditGrid() {
 // 実機の演奏画面スクリーンショット(1600×1118px)を基準にした絶対座標で、
 // ボタンの位置・大きさを実機と同じ相対比になるよう再現する。
 // アスペクト比を保ったまま画面に収める(レターボックス)ため、
-// CSS側で aspect-ratio + コンテナクエリ(cqh)を使って自動的にフィットさせている
+// CSS側で aspect-ratio + コンテナクエリ(cqh)を使って自動的にフィットさせている。
+//
+// 練習モード（実機写真に重ねて位置合わせする）では画面全体(1600×1118)をそのまま
+// 使う必要があるが、「作る」タブの録音中はパネル内の小さな表示のため、実機全体の
+// 比率のままだとボタンが存在しない上部が大きな空白になってしまう。そのため
+// 練習モード以外では、ボタンが実際に集まっている範囲だけを切り出して敷き詰め直す
+// （computeStageCrop/cropPosition）
 function renderPracticeStageGrid() {
   const el = document.getElementById("musicInstrumentGrid");
   const inst = getInstrument(currentInstrumentId);
@@ -625,15 +635,22 @@ function renderPracticeStageGrid() {
   const mainPositions = layout.positions || [];
   const accidentalPositions = (semitoneEnabled && layout.accidentalPositions) || [];
   const allPositions = [...mainPositions, ...accidentalPositions];
+  const crop = pageMode === "practice" ? null : computeStageCrop(allPositions);
+  // 1cqh = コンテナ高さの1%のため、アスペクト比をcqh値に換算するには100倍する
+  // （静的CSSの143.113cqh = 1600/1118*100 と同じ考え方）
+  const frameStyle = crop ? ` style="aspect-ratio:${crop.wPx} / ${crop.hPx}; width:min(100%, ${((crop.wPx / crop.hPx) * 100).toFixed(4)}cqh);"` : "";
+
   el.className = "music-instrument-grid practice-size";
-  el.innerHTML = `<div class="music-stage-frame" id="musicStageFrame">${allPositions
+  el.innerHTML = `<div class="music-stage-frame" id="musicStageFrame"${frameStyle}>${allPositions
     .map((p) => {
       const note = { degree: p.degree, accidental: p.accidental, octave: p.octave };
       const label = noteDisplayDigit(note);
       const accidentalClass = p.size === "accidental" ? " accidental" : "";
       const keyLabel = keyLabelsVisible ? noteToKeyLabel.get(noteKey(note)) : null;
       const keySpan = keyLabel ? `<span class="music-note-key">${keyLabel}</span>` : "";
-      return `<button class="music-note-btn music-stage-btn${accidentalClass}" style="left:${p.xPct}%; top:${p.yPct}%;" data-note='${JSON.stringify(note)}'>
+      const pos = crop ? cropPosition(p, crop) : { xPct: p.xPct, yPct: p.yPct, wPct: null, hPct: null };
+      const sizeStyle = crop ? ` width:${pos.wPct}%; height:${pos.hPct}%;` : "";
+      return `<button class="music-note-btn music-stage-btn${accidentalClass}" style="left:${pos.xPct}%; top:${pos.yPct}%;${sizeStyle}" data-note='${JSON.stringify(note)}'>
         ${keySpan}
         <span class="music-note-digit">${label}</span>
         <span class="music-note-kana">${DEGREE_LABELS[note.degree]}</span>
@@ -647,6 +664,43 @@ function renderPracticeStageGrid() {
     bindNoteButtonHold(btn, note);
   });
   applyCalibTransform();
+}
+
+// ボタンが実際に配置されている範囲(+余白)だけを切り出すための矩形を求める。
+// xPct/yPctはそれぞれ実機画面の幅1600px・高さ1118px基準のパーセントのため、
+// 切り出し矩形の実ピクセルサイズ(wPx/hPx)も同じ基準で計算する
+function computeStageCrop(positions) {
+  const PAD_PCT = 4; // 切り出し範囲の周囲に残す余白（実機画面の幅に対する%。上下も同じ実寸になるよう縦横比で換算する）
+  const xs = positions.map((p) => p.xPct);
+  const ys = positions.map((p) => p.yPct);
+  const minX = Math.max(0, Math.min(...xs) - PAD_PCT);
+  const maxX = Math.min(100, Math.max(...xs) + PAD_PCT);
+  const padYPct = PAD_PCT * (STAGE_REF_W / STAGE_REF_H);
+  const minY = Math.max(0, Math.min(...ys) - padYPct);
+  const maxY = Math.min(100, Math.max(...ys) + padYPct);
+  return {
+    minX,
+    maxX,
+    minY,
+    maxY,
+    wPx: ((maxX - minX) / 100) * STAGE_REF_W,
+    hPx: ((maxY - minY) / 100) * STAGE_REF_H,
+  };
+}
+
+// 実機基準(xPct/yPct、実機画面幅/高さに対する%)の座標・大きさを、
+// computeStageCropで求めた切り出し矩形を0〜100%とする座標系に変換する
+function cropPosition(p, crop) {
+  const sizePct = p.size === "accidental" ? ACCIDENTAL_BTN_SIZE_PCT : MAIN_BTN_SIZE_PCT;
+  const scaleX = 100 / (crop.maxX - crop.minX);
+  const scaleY = 100 / (crop.maxY - crop.minY);
+  const wPct = sizePct * scaleX;
+  return {
+    xPct: (p.xPct - crop.minX) * scaleX,
+    yPct: (p.yPct - crop.minY) * scaleY,
+    wPct,
+    hPct: wPct * (crop.wPx / crop.hPx), // 元のheight:calc(5.56% * 1600/1118)と同じ考え方で、切り出し後のフレーム比率をもとに真円になる高さ%を求める
+  };
 }
 
 // ── 演奏ボタンの拡大率・位置調整（端末ごとにlocalStorageへ記憶） ──
@@ -704,7 +758,11 @@ function dismissCalibHint() {
 function applyCalibTransform() {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
-  frame.style.transform = `translate(${calib.offsetX}vh, ${calib.offsetY}vh) scale(${calib.scale})`;
+  // 端末ごとの調整値(vh基準)は、実機写真に重ねる全画面の練習ステージ向けの値のため、
+  // 「作る」タブの録音中（パネル内の小さな表示）にはそのまま適用しない
+  frame.style.transform = pageMode === "practice"
+    ? `translate(${calib.offsetX}vh, ${calib.offsetY}vh) scale(${calib.scale})`
+    : "";
 }
 
 function toggleCalibMode() {
@@ -1123,6 +1181,8 @@ function updateRecordingUI() {
   document.getElementById("musicDurationHint").style.display = isRecording ? "none" : "";
   // 録音中は長さの選択ができないのと同じ理由で、休符も追加できないようにする
   document.getElementById("musicAddRestBtn").disabled = isRecording;
+  // 録音のON/OFFで演奏ボタンの配置（練習モードと同じ実機配置／編集用の伸縮グリッド）を切り替える
+  renderInstrumentGrid();
 }
 
 // ── 譜面の編集 ──

@@ -1108,6 +1108,15 @@ body.dark .music-note-kana{
   container-type:size;
 }
 
+/* 「作る」タブで録音中は、通常のパネル内でも練習モードと同じ実機座標配置
+   （js/music-editor.jsのrenderInstrumentGrid）を使う。全画面の練習ステージ
+   （高さ=画面いっぱい）とは違い、ここは通常のドキュメントフロー内のため、
+   height:100%（親の高さ）だけでは高さが定まらない。明示的な高さを与えることで、
+   .music-stage-frameのアスペクト比計算(cqh)が機能するようにする */
+#musicInstrumentGridAnchorEdit .music-instrument-grid.practice-size{
+  height:clamp(240px, 48vh, 460px);
+}
+
 .music-stage-frame{
   position:relative;
   aspect-ratio:1600 / 1118;
