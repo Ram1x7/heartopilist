@@ -1,14 +1,29 @@
 // js/build.js
-// 建築サポートページ（build.html）：壁画モード（2D）
-// 画面の流れ: ①画像を選ぶ → ②壁画サイズ → ③位置とサイズを調整 → ④配置図・建材一覧・保存
-// 画像のピクセル化（切り抜き矩形の計算・キャンバス描画）は js/art-pixelate.js の
-// coverCropRect を再利用する。色→建材のマッチングは支柱系（grid_cell配置）のみを対象にし、
-// 二乗ユークリッドRGB距離で最も近い色を持つ建材を選ぶ（js/art-pixelate.jsの
-// nearestPaletteIndexと同じ考え方）。すべてブラウザ内で完結し、画像を外部に送信しない。
-// 立体モード（3D・AI奥行き推測）は今回のバージョンでは未実装。
+// 建築サポートページ（build.html）：統合3Dボクセル編集ツール（MVP・第2弾）
+// 画面の流れ: ①画像＋建築モード・オプションを選ぶ → ②位置調整（正面画像） →
+//            ③3D結果表示・手動編集（ペン/消しゴム・Undo/Redo）・建材一覧・保存
+// 色→建材のマッチングは支柱系（grid_cell配置）のみを対象にし、Lab色空間での
+// 誤差拡散ディザリング＋輪郭保持（旧・壁画モードから流用）を行う。3D描画・
+// クリック編集の当たり判定はjs/build3d-scene.js（Three.js・InstancedMesh）に
+// 委譲する。すべてブラウザ内で完結し、画像を外部に送信しない。
+//
+// 【このバージョンでの既知の未実装（次のフェーズ予定）】
+// ・範囲選択（ドラッグで囲んでの一括編集）
+// ・自動再生（下から積み上げるアニメーション）と「現在の層のみハイライト」
+// ・共有リンク(URL)機能
 
-let sourceImage = null;
-// 位置・拡大縮小の調整ステップ（js/art-converter.jsの同名変数と同じ役割）
+import * as Build3D from "./build3d-scene.js";
+
+// ── 敷地の座標上限（ボクセル換算、幅×奥行き×高さ） ──
+const SITE_MAX_WIDTH = 96;
+const SITE_MAX_DEPTH = 120;
+const SITE_MAX_HEIGHT = 68;
+
+let frontImage = null;
+let backImage = null;
+
+// 位置・拡大縮小の調整ステップ（front画像のみ手動調整。back画像は自動カバー
+// フィットのみ・調整UIなし＝スコープを絞ったMVPの割り切り）
 let cropZoom = 1;
 let cropLeft = 0;
 let cropTop = 0;
@@ -18,20 +33,139 @@ let manualCropRect = null;
 let cropDragState = null;
 
 let settings = {
-  width: 16,
-  height: 16,
+  mode: "solid",       // "solid"（立体・像） | "flat"（平面・床）
+  width: 24,           // 幅マス数（画像の横方向解像度）。もう一方の軸は画像比率から自動算出
+  thickness: 6,        // solid: 奥行きの押し出し量 / flat: 起伏の最大高さ
+  hollow: true,         // 空洞化（solidのみ有効）
+  autoTransparentBg: false,
 };
 
-let resultCells = null; // 長さwidth*height。各要素は {materialId, hex, name} または null
-let pickerCellIndex = null;
+let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]
+let resultDims = null;     // {w,h,d}
 
 const BUILD_DESIGNS_KEY = "hatopiBuild_designs";
 let savedDesigns = [];
 
-// ── 建材マッチング ──
-// RGBのユークリッド距離は人間の知覚とズレがあり（特に肌色・淡い色で不自然な
-// 色に飛びやすい）、Lab色空間に変換してから距離を測ることで知覚的に近い色を
-// 選びやすくする（CIE76：Lab空間での単純な二乗ユークリッド距離）
+// ══════════════════════════════════════
+// 手動編集（ペン/消しゴム・Undo/Redo）
+// ══════════════════════════════════════
+let editTool = "pen"; // "pen" | "eraser"
+let selectedMaterial = null; // {materialId, hex, name}（パレットから選んだ、ペンで使う建材）
+const EDIT_HISTORY_LIMIT = 50;
+let undoStack = [];
+let redoStack = [];
+
+function cloneVoxels(voxels){
+  return voxels.map(v => ({ ...v }));
+}
+
+function pushHistory(){
+  if(!resultVoxels) return;
+  undoStack.push(cloneVoxels(resultVoxels));
+  if(undoStack.length > EDIT_HISTORY_LIMIT) undoStack.shift();
+  redoStack = [];
+  updateUndoRedoButtons();
+}
+
+function clearHistory(){
+  undoStack = [];
+  redoStack = [];
+  updateUndoRedoButtons();
+}
+
+function updateUndoRedoButtons(){
+  const undoBtn = document.getElementById("buildUndoBtn");
+  const redoBtn = document.getElementById("buildRedoBtn");
+  if(undoBtn) undoBtn.disabled = undoStack.length === 0;
+  if(redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+function undoEdit(){
+  if(undoStack.length === 0) return;
+  redoStack.push(cloneVoxels(resultVoxels));
+  resultVoxels = undoStack.pop();
+  refreshVoxelView();
+  updateUndoRedoButtons();
+}
+
+function redoEdit(){
+  if(redoStack.length === 0) return;
+  undoStack.push(cloneVoxels(resultVoxels));
+  resultVoxels = redoStack.pop();
+  refreshVoxelView();
+  updateUndoRedoButtons();
+}
+
+function refreshVoxelView(){
+  Build3D.setVoxels(resultVoxels, { fit: false });
+  renderBuildMaterialList();
+}
+
+function inBounds(x, y, z){
+  return resultDims && x >= 0 && x < resultDims.w && y >= 0 && y < resultDims.h && z >= 0 && z < resultDims.d;
+}
+
+// build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
+function handleEditClick(hit){
+  if(!hit || !resultVoxels) return;
+  if(editTool === "eraser"){
+    if(!hit.voxel) return;
+    pushHistory();
+    resultVoxels = resultVoxels.filter(v => !(v.x === hit.voxel.x && v.y === hit.voxel.y && v.z === hit.voxel.z));
+    refreshVoxelView();
+    return;
+  }
+  // ペン：クリックした面の外側に隣接するマスへ、選択中の建材を1つ追加する
+  // （既存の面に接する形でのみ置ける。何もない空間に単独で置くことはできない）
+  if(!hit.adjacent || !selectedMaterial) return;
+  const { x, y, z } = hit.adjacent;
+  if(!inBounds(x, y, z)) return;
+  if(resultVoxels.some(v => v.x === x && v.y === y && v.z === z)) return;
+  pushHistory();
+  resultVoxels.push({ x, y, z, materialId: selectedMaterial.materialId, hex: selectedMaterial.hex, name: selectedMaterial.name });
+  refreshVoxelView();
+}
+
+function setEditTool(tool){
+  editTool = tool;
+  document.getElementById("buildToolPenBtn").classList.toggle("active", tool === "pen");
+  document.getElementById("buildToolEraserBtn").classList.toggle("active", tool === "eraser");
+}
+
+function updateSelectedSwatch(){
+  const el = document.getElementById("buildSelectedSwatch");
+  if(el && selectedMaterial) el.style.background = selectedMaterial.hex;
+}
+
+function openMaterialPickerModal(){
+  const body = document.getElementById("buildMaterialPickerBody");
+  body.innerHTML = MATERIALS.support_pillars.items.map(material => `
+    <div class="build-material-group-title">${material.name}</div>
+    <div class="build-material-swatches">
+      ${material.colors.map(hex => `
+        <button type="button" class="build-material-swatch${selectedMaterial && selectedMaterial.materialId === material.id && selectedMaterial.hex === hex ? " active" : ""}"
+          style="background:${hex}" data-material="${material.id}" data-hex="${hex}" data-name="${material.name}"
+          aria-label="${material.name} ${hex}"></button>
+      `).join("")}
+    </div>
+  `).join("");
+  body.querySelectorAll(".build-material-swatch").forEach(swatchBtn => {
+    swatchBtn.addEventListener("click", () => {
+      selectedMaterial = { materialId: swatchBtn.dataset.material, hex: swatchBtn.dataset.hex, name: swatchBtn.dataset.name };
+      updateSelectedSwatch();
+      closeMaterialPickerModal();
+    });
+  });
+  document.getElementById("buildMaterialPickerModal").style.display = "block";
+}
+
+function closeMaterialPickerModal(){
+  document.getElementById("buildMaterialPickerModal").style.display = "none";
+}
+
+// ══════════════════════════════════════
+// 色マッチング（Lab色空間、支柱系のみ対象）
+// ══════════════════════════════════════
 function hexToRgb(hex){
   const v = hex.replace("#", "");
   return [parseInt(v.slice(0, 2), 16), parseInt(v.slice(2, 4), 16), parseInt(v.slice(4, 6), 16)];
@@ -60,7 +194,6 @@ function labDistSq(a, b){
   return (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
 }
 
-// 建材の色は固定データのため、Lab変換は一度だけ行いキャッシュする
 const materialLabIndexCache = new WeakMap();
 function getMaterialLabIndex(materialItems){
   let index = materialLabIndexCache.get(materialItems);
@@ -75,7 +208,6 @@ function getMaterialLabIndex(materialItems){
   return index;
 }
 
-// 支柱系（grid_cell配置）の全建材・全色から、対象Labに最も近い色を持つものを選ぶ
 function nearestMaterialFromLab(lab, materialItems){
   const index = getMaterialLabIndex(materialItems);
   let best = null;
@@ -90,11 +222,9 @@ function nearestMaterialFromLab(lab, materialItems){
   return best;
 }
 
-function nearestMaterial(rgb, materialItems){
-  return nearestMaterialFromLab(rgbToLab(rgb), materialItems);
-}
-
-// ── ステップ進捗表示 ──
+// ══════════════════════════════════════
+// ステップ進捗表示
+// ══════════════════════════════════════
 const BUILD_STAGE_ORDER = ["upload", "adjust", "finish"];
 const BUILD_STAGE_JUMP_FN = {
   adjust: () => openBuildCropStage(false),
@@ -107,7 +237,7 @@ function updateBuildStepProgress(stage){
     const isPast = bIdx < idx;
     btn.classList.toggle("completed", isPast);
     btn.classList.toggle("active", bIdx === idx);
-    const canJump = isPast && !!BUILD_STAGE_JUMP_FN[btn.dataset.stage] && !!sourceImage;
+    const canJump = isPast && !!BUILD_STAGE_JUMP_FN[btn.dataset.stage] && !!frontImage;
     btn.disabled = !canJump;
   });
 }
@@ -121,69 +251,148 @@ function bindBuildStepProgress(){
   });
 }
 
-// ── 画像アップロード ──
-function handleBuildFileSelect(file){
-  if(!/^image\/(jpeg|png|webp)$/.test(file.type)){
-    alert(T("art_invalid_image", "対応していないファイル形式です（JPG・PNG・WebPのみ）"));
-    return;
-  }
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      sourceImage = img;
-      manualCropRect = null;
-      cropTargetKey = null;
-      document.getElementById("buildWidthInput").value = settings.width;
-      document.getElementById("buildHeightInput").value = settings.height;
-      openBuildCropStage(true);
+// ══════════════════════════════════════
+// 画像アップロード（正面・背面）
+// ══════════════════════════════════════
+function loadImageFile(file){
+  return new Promise((resolve, reject) => {
+    if(!/^image\/(jpeg|png|webp)$/.test(file.type)){
+      reject(new Error("invalid-type"));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("load-failed"));
+      img.src = e.target.result;
     };
-    img.onerror = () => alert(T("art_image_load_failed", "画像の読み込みに失敗しました"));
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    reader.onerror = () => reject(new Error("read-failed"));
+    reader.readAsDataURL(file);
+  });
 }
 
-// ── サイズ指定（位置調整ステージに統合。マス数を変えるたびに
-// handleBuildSizeInputChange()からライブでグリッド線を更新する） ──
-function readSizeInputs(){
-  const w = Math.min(96, Math.max(1, Number(document.getElementById("buildWidthInput").value) || 1));
-  const h = Math.min(17, Math.max(1, Number(document.getElementById("buildHeightInput").value) || 1));
-  if(w !== settings.width || h !== settings.height) manualCropRect = null;
-  settings.width = w;
-  settings.height = h;
+async function handleFrontFileSelect(file){
+  try{
+    frontImage = await loadImageFile(file);
+    manualCropRect = null;
+    cropTargetKey = null;
+    updateBackImageVisibility();
+    renderFrontPreview();
+    document.getElementById("buildProceedBtn").disabled = false;
+    document.getElementById("buildUploadBtnLabel").textContent = T("build_choose_again", "画像を選び直す");
+  }catch(e){
+    alert(T("art_invalid_image", "対応していないファイル形式です（JPG・PNG・WebPのみ）"));
+  }
 }
 
-let sizeInputDebounceTimer = null;
-function handleBuildSizeInputChange(){
-  clearTimeout(sizeInputDebounceTimer);
-  sizeInputDebounceTimer = setTimeout(() => {
-    readSizeInputs();
-    openBuildCropStage(true);
-  }, 200);
+function renderFrontPreview(){
+  const wrap = document.getElementById("buildFrontPreviewWrap");
+  const img = document.getElementById("buildFrontPreviewImg");
+  if(!wrap || !img || !frontImage) return;
+  img.src = frontImage.src;
+  wrap.style.display = "flex";
 }
 
-// ── 位置・拡大縮小の調整（js/art-converter.jsのopenCropStage/applyCropTransform/
-// bindCropInteractionsと同じロジック。デザイン枠・輪郭オーバーレイは無し） ──
+async function handleBackFileSelect(file){
+  try{
+    backImage = await loadImageFile(file);
+    renderBackPreview();
+  }catch(e){
+    alert(T("art_invalid_image", "対応していないファイル形式です（JPG・PNG・WebPのみ）"));
+  }
+}
+
+function renderBackPreview(){
+  const wrap = document.getElementById("buildBackPreviewWrap");
+  const img = document.getElementById("buildBackPreviewImg");
+  if(!wrap || !img) return;
+  if(backImage){
+    img.src = backImage.src;
+    wrap.style.display = "flex";
+  }else{
+    wrap.style.display = "none";
+  }
+}
+
+function clearBackImage(){
+  backImage = null;
+  renderBackPreview();
+}
+
+function updateBackImageVisibility(){
+  const backRow = document.getElementById("buildBackImageRow");
+  if(backRow) backRow.style.display = settings.mode === "solid" ? "block" : "none";
+}
+
+// ══════════════════════════════════════
+// モード・オプション（画像アップロード直後の設定ステップ）
+// ══════════════════════════════════════
+function setBuildMode(mode){
+  settings.mode = mode;
+  document.querySelectorAll(".build-mode-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === mode);
+  });
+  document.getElementById("buildThicknessLabel").textContent =
+    mode === "solid"
+      ? T("build_thickness_label_solid", "厚さ（奥行きの押し出し量）")
+      : T("build_thickness_label_flat", "厚さ（起伏の最大高さ）");
+  document.getElementById("buildHollowRow").style.display = mode === "solid" ? "flex" : "none";
+  updateBackImageVisibility();
+  if(frontImage) renderBuildCropGridOverlay();
+}
+
+function readOptionInputs(){
+  settings.width = Math.min(SITE_MAX_WIDTH, Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
+  settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
+  settings.hollow = document.getElementById("buildHollowCheckbox").checked;
+  settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
+  document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
+  document.getElementById("buildThicknessOutput").textContent = `${settings.thickness}${T("build_unit_masu", "マス")}`;
+}
+
+let optionDebounceTimer = null;
+function handleOptionInputChange(){
+  readOptionInputs();
+  clearTimeout(optionDebounceTimer);
+  optionDebounceTimer = setTimeout(() => {
+    if(frontImage) renderBuildCropGridOverlay();
+  }, 150);
+}
+
+// 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き）のマス数
+function computeOtherDim(){
+  if(!frontImage) return settings.width;
+  const aspect = manualCropRect
+    ? manualCropRect.sw / manualCropRect.sh
+    : frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
+  const maxOther = settings.mode === "solid" ? SITE_MAX_HEIGHT : SITE_MAX_DEPTH;
+  return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect)));
+}
+
+// ══════════════════════════════════════
+// 位置・拡大縮小の調整（正面画像のみ）
+// ══════════════════════════════════════
 function openBuildCropStage(reset){
-  if(!sourceImage) return;
+  if(!frontImage) return;
   document.getElementById("buildUploadArea").style.display = "none";
   document.getElementById("buildResultStage").style.display = "none";
   document.getElementById("buildCropStage").style.display = "block";
   updateBuildStepProgress("adjust");
 
-  const targetKey = `${settings.width}x${settings.height}`;
+  const otherDim = computeOtherDim();
+  const targetKey = `${settings.width}x${otherDim}`;
   const viewport = document.getElementById("buildCropViewport");
-  viewport.style.aspectRatio = `${settings.width} / ${settings.height}`;
-  document.getElementById("buildCropImg").src = sourceImage.src;
+  viewport.style.aspectRatio = `${settings.width} / ${otherDim}`;
+  document.getElementById("buildCropImg").src = frontImage.src;
 
   requestAnimationFrame(() => {
     const vw = viewport.clientWidth, vh = viewport.clientHeight;
-    cropCoverScale = Math.max(vw / sourceImage.naturalWidth, vh / sourceImage.naturalHeight);
+    cropCoverScale = Math.max(vw / frontImage.naturalWidth, vh / frontImage.naturalHeight);
     if(reset || cropTargetKey !== targetKey){
       cropZoom = 1;
-      cropLeft = (vw - sourceImage.naturalWidth * cropCoverScale) / 2;
-      cropTop = (vh - sourceImage.naturalHeight * cropCoverScale) / 2;
+      cropLeft = (vw - frontImage.naturalWidth * cropCoverScale) / 2;
+      cropTop = (vh - frontImage.naturalHeight * cropCoverScale) / 2;
       cropTargetKey = targetKey;
     }
     document.getElementById("buildCropZoomSlider").value = Math.round(cropZoom * 100);
@@ -193,13 +402,11 @@ function openBuildCropStage(reset){
   });
 }
 
-// 位置調整ステージに、確定する切り抜き範囲（＝ビューポートそのもの）を
-// settings.width×settings.heightのマス目で区切った目安線を重ねる。
-// 画像のドラッグ・ズームとは独立して、ビューポートに対して固定表示する
 function renderBuildCropGridOverlay(){
   const canvas = document.getElementById("buildCropOverlay");
   const viewport = document.getElementById("buildCropViewport");
-  if(!canvas || !viewport) return;
+  if(!canvas || !viewport || !frontImage) return;
+  const otherDim = computeOtherDim();
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
   canvas.width = vw;
   canvas.height = vh;
@@ -207,7 +414,7 @@ function renderBuildCropGridOverlay(){
   ctx.clearRect(0, 0, vw, vh);
 
   const cellW = vw / settings.width;
-  const cellH = vh / settings.height;
+  const cellH = vh / otherDim;
   ctx.strokeStyle = "rgba(255,255,255,0.85)";
   ctx.lineWidth = 1;
   ctx.shadowColor = "rgba(0,0,0,0.55)";
@@ -218,7 +425,7 @@ function renderBuildCropGridOverlay(){
     ctx.moveTo(px, 0);
     ctx.lineTo(px, vh);
   }
-  for(let y = 1; y < settings.height; y++){
+  for(let y = 1; y < otherDim; y++){
     const py = Math.round(y * cellH) + 0.5;
     ctx.moveTo(0, py);
     ctx.lineTo(vw, py);
@@ -231,8 +438,8 @@ function applyBuildCropTransform(){
   const img = document.getElementById("buildCropImg");
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
   const scale = cropCoverScale * cropZoom;
-  const dispW = sourceImage.naturalWidth * scale;
-  const dispH = sourceImage.naturalHeight * scale;
+  const dispW = frontImage.naturalWidth * scale;
+  const dispH = frontImage.naturalHeight * scale;
   cropLeft = Math.min(0, Math.max(vw - dispW, cropLeft));
   cropTop = Math.min(0, Math.max(vh - dispH, cropTop));
   img.style.width = dispW + "px";
@@ -287,34 +494,65 @@ function confirmBuildCrop(){
   manualCropRect = {
     sx: Math.max(0, -cropLeft / scale),
     sy: Math.max(0, -cropTop / scale),
-    sw: Math.min(sourceImage.naturalWidth, vw / scale),
-    sh: Math.min(sourceImage.naturalHeight, vh / scale),
+    sw: Math.min(frontImage.naturalWidth, vw / scale),
+    sh: Math.min(frontImage.naturalHeight, vh / scale),
   };
   document.getElementById("buildCropStage").style.display = "none";
   document.getElementById("buildResultStage").style.display = "block";
   updateBuildStepProgress("finish");
-  convertBuildImage();
+  runBuildGeneration();
 }
 
-// ── 画像→建材グリッド変換 ──
+// ══════════════════════════════════════
+// 画像→2D色グリッド（正面・背面共通で使う下請け関数）
 // セルへの縮小は1段階で行わず、各セルにつき複数のサブピクセルをサンプリングしてから
-// 代表色を決める。これにより:
-// ・単純平均だと目・口などコントラストの強い細部がぼやけて消えてしまうため、
-//   セル内の明るさのばらつきが大きい（＝輪郭を含む）場合は平均ではなく
-//   最も暗いサブピクセルを代表色として優先する
-// ・そのうえでLab色空間の誤差拡散（Floyd–Steinberg）を行い、固定パレット内でも
-//   隣接セルとの組み合わせで中間的な色合いを近似できるようにする
+// 代表色を決める。単純平均だと目・口などコントラストの強い細部がぼやけて消えて
+// しまうため、セル内の明るさのばらつきが大きい（＝輪郭を含む）場合は平均ではなく
+// 最も暗いサブピクセルを代表色として優先する
+// ══════════════════════════════════════
 const CELL_SUPERSAMPLE = 8;
 const EDGE_LUMA_STDDEV_THRESHOLD = 28;
 
-function sampleCellColors(sourceImage, rect, w, h){
+// 背景の自動透明化：4隅の平均色を背景色とみなし、近い色を透明化した作業用
+// canvasを返す（元のImageオブジェクトはUIでの表示用にそのまま保持する）
+function buildAutoTransparentCanvas(image){
+  const maxEdge = 512; // サンプリング用の作業解像度上限（パフォーマンスのため）
+  const scale = Math.min(1, maxEdge / Math.max(image.naturalWidth, image.naturalHeight));
+  const w = Math.max(1, Math.round(image.naturalWidth * scale));
+  const h = Math.max(1, Math.round(image.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(image, 0, 0, w, h);
+  const imgData = ctx.getImageData(0, 0, w, h);
+  const d = imgData.data;
+  const corners = [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1]];
+  let br = 0, bg = 0, bb = 0;
+  corners.forEach(([x, y]) => {
+    const i = (y * w + x) * 4;
+    br += d[i]; bg += d[i + 1]; bb += d[i + 2];
+  });
+  br /= 4; bg /= 4; bb /= 4;
+  const THRESH = 42;
+  for(let i = 0; i < d.length; i += 4){
+    const dist = Math.sqrt((d[i] - br) ** 2 + (d[i + 1] - bg) ** 2 + (d[i + 2] - bb) ** 2);
+    if(dist < THRESH) d[i + 3] = 0;
+  }
+  ctx.putImageData(imgData, 0, 0);
+  return canvas;
+}
+
+// image: HTMLImageElement または HTMLCanvasElement（drawImageに渡せるもの）
+// naturalW/naturalH: サンプリング元の実サイズ（rectはこの座標系）
+function sampleCellColors(image, naturalW, naturalH, rect, w, h){
   const sampleW = w * CELL_SUPERSAMPLE;
   const sampleH = h * CELL_SUPERSAMPLE;
   const off = document.createElement("canvas");
   off.width = sampleW;
   off.height = sampleH;
   const octx = off.getContext("2d");
-  octx.drawImage(sourceImage, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, sampleW, sampleH);
+  octx.drawImage(image, rect.sx, rect.sy, rect.sw, rect.sh, 0, 0, sampleW, sampleH);
   const d = octx.getImageData(0, 0, sampleW, sampleH).data;
 
   const colors = new Array(w * h);
@@ -352,7 +590,6 @@ function sampleCellColors(sourceImage, rect, w, h){
   return { colors, alphas, isEdgeCell };
 }
 
-// Floyd–Steinberg誤差拡散：確定したセルの量子化誤差を右・左下・下・右下へ配分する
 function diffuseLabError(errors, w, h, x, y, diff){
   const spread = [[1, 0, 7 / 16], [-1, 1, 3 / 16], [0, 1, 5 / 16], [1, 1, 1 / 16]];
   spread.forEach(([dx, dy, factor]) => {
@@ -366,25 +603,34 @@ function diffuseLabError(errors, w, h, x, y, diff){
   });
 }
 
-function computeResultCells(){
-  const w = settings.width, h = settings.height;
-  const rect = manualCropRect || coverCropRect(sourceImage.naturalWidth, sourceImage.naturalHeight, w, h);
+// 画像1枚をw×hの2Dグリッドへ変換する（建材マッチング＋ディザリング＋輪郭保持）。
+// 戻り値: { cells: [{materialId,hex,name}|null], rawColors: [[r,g,b]|null] }
+// rawColorsは平面モードの起伏（高さ）算出に使う量子化前の色
+function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTransparentBg){
+  const src = autoTransparentBg ? buildAutoTransparentCanvas(image) : image;
+  const srcW = autoTransparentBg ? src.width : naturalW;
+  const srcH = autoTransparentBg ? src.height : naturalH;
+  const scaleX = autoTransparentBg ? srcW / naturalW : 1;
+  const scaleY = autoTransparentBg ? srcH / naturalH : 1;
+  const scaledRect = autoTransparentBg
+    ? { sx: rect.sx * scaleX, sy: rect.sy * scaleY, sw: rect.sw * scaleX, sh: rect.sh * scaleY }
+    : rect;
+
   const supportItems = MATERIALS.support_pillars.items;
-  const { colors, alphas, isEdgeCell } = sampleCellColors(sourceImage, rect, w, h);
+  const { colors, alphas, isEdgeCell } = sampleCellColors(src, srcW, srcH, scaledRect, w, h);
 
   const errors = new Array(w * h).fill(null);
   const cells = new Array(w * h);
+  const rawColors = new Array(w * h);
   for(let y = 0; y < h; y++){
     for(let x = 0; x < w; x++){
       const idx = y * w + x;
+      rawColors[idx] = alphas[idx] < 128 ? null : colors[idx];
       if(alphas[idx] < 128){
         cells[idx] = null;
         continue;
       }
       const lab = rgbToLab(colors[idx]);
-      // 輪郭セル（目・口などのコントラストを保つために暗い色を優先選択したセル）は
-      // 意図的に選んだ極端な色であり、周辺セルとの平均的な誤差ではないため、
-      // 誤差拡散の入力にも出力にも参加させない（輪郭が滲むのを防ぐ）
       if(isEdgeCell[idx]){
         cells[idx] = nearestMaterialFromLab(lab, supportItems);
         continue;
@@ -397,97 +643,165 @@ function computeResultCells(){
       diffuseLabError(errors, w, h, x, y, [lab[0] - matchLab[0], lab[1] - matchLab[1], lab[2] - matchLab[2]]);
     }
   }
-  return cells;
+  return { cells, rawColors };
 }
 
-function convertBuildImage(){
-  if(!sourceImage) return;
-  resultCells = computeResultCells();
-  renderBuildGrid();
-  renderBuildMaterialList();
+// ══════════════════════════════════════
+// 2Dグリッド → 3Dボクセル配列
+// ══════════════════════════════════════
+function lumaOf(rgb){
+  return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
 
-// ── 配置図（グリッド）表示・手動修正 ──
-function renderBuildGrid(){
-  const grid = document.getElementById("buildGrid");
-  const w = settings.width, h = settings.height;
-  grid.style.gridTemplateColumns = `repeat(${w}, 1fr)`;
-  grid.innerHTML = "";
-  const frag = document.createDocumentFragment();
-  for(let i = 0; i < w * h; i++){
-    const cell = resultCells[i];
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "build-cell";
-    btn.style.background = cell ? cell.hex : "transparent";
-    btn.title = cell ? `${cell.name} (${cell.hex})` : "";
-    btn.addEventListener("click", () => openMaterialPicker(i));
-    frag.appendChild(btn);
-  }
-  grid.appendChild(frag);
-}
-
-function openMaterialPicker(index){
-  pickerCellIndex = index;
-  const current = resultCells[index];
-  const body = document.getElementById("buildMaterialPickerBody");
-  body.innerHTML = MATERIALS.support_pillars.items.map(material => `
-    <div class="build-material-group-title">${material.name}</div>
-    <div class="build-material-swatches">
-      ${material.colors.map(hex => `
-        <button type="button" class="build-material-swatch${current && current.materialId === material.id && current.hex === hex ? " active" : ""}"
-          style="background:${hex}" data-material="${material.id}" data-hex="${hex}" data-name="${material.name}"
-          aria-label="${material.name} ${hex}"></button>
-      `).join("")}
-    </div>
-  `).join("");
-  body.querySelectorAll(".build-material-swatch").forEach(swatchBtn => {
-    swatchBtn.addEventListener("click", () => {
-      resultCells[pickerCellIndex] = {
-        materialId: swatchBtn.dataset.material,
-        hex: swatchBtn.dataset.hex,
-        name: swatchBtn.dataset.name,
-      };
-      closeMaterialPicker();
-      renderBuildGrid();
-      renderBuildMaterialList();
-    });
-  });
-  document.getElementById("buildMaterialPickerModal").style.display = "block";
-}
-
-function closeMaterialPicker(){
-  document.getElementById("buildMaterialPickerModal").style.display = "none";
-}
-
-// 列（横位置）ごとに、縦方向へ同じ建材が続く区間を1本の支柱としてまとめる。
-// 支柱は1マス×1マスの設置面に対して高さ方向へ1×2単位で伸縮するため、
-// 1マスごとに独立した支柱を積むのではなく、同じ色が続く高さ分だけ
-// 1本を伸ばして配置するのが実際の建て方に近い
-function computeBuildPillarSegments(){
-  const w = settings.width, h = settings.height;
-  const segments = [];
-  for(let x = 0; x < w; x++){
-    let run = null;
-    for(let y = 0; y < h; y++){
-      const cell = resultCells[y * w + x];
-      const key = cell ? cell.materialId + "_" + cell.hex : null;
-      if(run && run.key === key){
-        run.height++;
-      }else{
-        if(run && run.key) segments.push(run);
-        run = key ? { key, name: cell.name, hex: cell.hex, height: 1 } : null;
+// solid（立体・像）：正面グリッドの各セルを厚さ分だけ奥行き方向へ押し出す。
+// 背面画像がある場合は、最も奥のレイヤーだけ背面グリッドの色に置き換える。
+// 空洞化：全6方向の隣接ボクセルが埋まっている（＝外から絶対に見えない）
+// ボクセルだけを間引く
+function buildSolidVoxels(frontGrid, backGrid, w, h, thickness, hollow){
+  const key = (x, y, z) => `${x},${y},${z}`;
+  const map = new Map();
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const front = frontGrid.cells[y * w + x];
+      if(!front) continue;
+      for(let z = 0; z < thickness; z++){
+        let material = front;
+        if(z === thickness - 1 && backGrid){
+          const back = backGrid.cells[y * w + x];
+          if(back) material = back;
+        }
+        map.set(key(x, y, z), material);
       }
     }
-    if(run && run.key) segments.push(run);
+  }
+  if(hollow){
+    const filled = (x, y, z) => map.has(key(x, y, z));
+    const toRemove = [];
+    map.forEach((_, k) => {
+      const [x, y, z] = k.split(",").map(Number);
+      const surrounded =
+        filled(x - 1, y, z) && filled(x + 1, y, z) &&
+        filled(x, y - 1, z) && filled(x, y + 1, z) &&
+        filled(x, y, z - 1) && filled(x, y, z + 1);
+      if(surrounded) toRemove.push(k);
+    });
+    toRemove.forEach(k => map.delete(k));
+  }
+  const voxels = [];
+  map.forEach((material, k) => {
+    const [x, y, z] = k.split(",").map(Number);
+    voxels.push({ x, y, z, materialId: material.materialId, hex: material.hex, name: material.name });
+  });
+  return voxels;
+}
+
+// flat（平面・床）：グリッドの各セルを、量子化前の明るさ（luma）に応じた
+// 高さ（1〜thickness）まで積み上げる。明るいほど高い、という単純なヒューリスティックで
+// AIによる高さ推測は行わない（3-4章のPhase 2対象）。空洞化は対象外（元々薄いため）
+function buildFlatVoxels(grid, w, d, thickness){
+  const voxels = [];
+  for(let z = 0; z < d; z++){
+    for(let x = 0; x < w; x++){
+      const idx = z * w + x;
+      const material = grid.cells[idx];
+      if(!material) continue;
+      let height = 1;
+      if(thickness > 1){
+        const raw = grid.rawColors[idx];
+        const norm = raw ? lumaOf(raw) / 255 : 0.5;
+        height = Math.max(1, Math.min(thickness, Math.round(1 + norm * (thickness - 1))));
+      }
+      for(let y = 0; y < height; y++){
+        voxels.push({ x, y, z, materialId: material.materialId, hex: material.hex, name: material.name });
+      }
+    }
+  }
+  return voxels;
+}
+
+// ══════════════════════════════════════
+// 生成の実行
+// ══════════════════════════════════════
+function runBuildGeneration(){
+  if(!frontImage) return;
+  const rect = manualCropRect || coverCropRect(frontImage.naturalWidth, frontImage.naturalHeight, settings.width, settings.width);
+  const otherDim = computeOtherDim();
+
+  const frontGrid = computeMatchedGrid(
+    frontImage, frontImage.naturalWidth, frontImage.naturalHeight,
+    rect, settings.width, otherDim, settings.autoTransparentBg
+  );
+
+  if(settings.mode === "solid"){
+    let backGrid = null;
+    if(backImage){
+      const backRect = coverCropRect(backImage.naturalWidth, backImage.naturalHeight, settings.width, otherDim);
+      backGrid = computeMatchedGrid(
+        backImage, backImage.naturalWidth, backImage.naturalHeight,
+        backRect, settings.width, otherDim, settings.autoTransparentBg
+      );
+    }
+    resultVoxels = buildSolidVoxels(frontGrid, backGrid, settings.width, otherDim, settings.thickness, settings.hollow);
+    resultDims = { w: settings.width, h: otherDim, d: settings.thickness };
+  }else{
+    resultVoxels = buildFlatVoxels(frontGrid, settings.width, otherDim, settings.thickness);
+    resultDims = { w: settings.width, h: settings.thickness, d: otherDim };
+  }
+
+  ensureSceneInitialized();
+  Build3D.setVoxels(resultVoxels);
+  renderBuildMaterialList();
+  clearHistory();
+}
+
+// ══════════════════════════════════════
+// 3Dビューア初期化
+// ══════════════════════════════════════
+let sceneInitialized = false;
+function ensureSceneInitialized(){
+  const canvas = document.getElementById("buildCanvas");
+  if(!canvas) return;
+  if(!sceneInitialized){
+    Build3D.init(canvas, { w: SITE_MAX_WIDTH, h: SITE_MAX_HEIGHT, d: SITE_MAX_DEPTH });
+    Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+    Build3D.setEditClickCallback(handleEditClick);
+    sceneInitialized = true;
+  }
+}
+
+// ══════════════════════════════════════
+// 建材一覧（列＝(x,z)ごとに、縦方向へ同じ建材が続く区間を1本の支柱として
+// まとめる。支柱は1マス×1マスの設置面に対して高さ方向へ伸縮するため、この
+// 数え方が実際の建て方に最も近い）
+// ══════════════════════════════════════
+function computeBuildPillarSegments(){
+  if(!resultVoxels || !resultDims) return [];
+  const map = new Map();
+  resultVoxels.forEach(v => map.set(`${v.x},${v.y},${v.z}`, v));
+
+  const segments = [];
+  for(let z = 0; z < resultDims.d; z++){
+    for(let x = 0; x < resultDims.w; x++){
+      let run = null;
+      for(let y = 0; y < resultDims.h; y++){
+        const v = map.get(`${x},${y},${z}`);
+        const key = v ? v.materialId + "_" + v.hex : null;
+        if(run && run.key === key){
+          run.height++;
+        }else{
+          if(run && run.key) segments.push(run);
+          run = key ? { key, name: v.name, hex: v.hex, height: 1 } : null;
+        }
+      }
+      if(run && run.key) segments.push(run);
+    }
   }
   return segments;
 }
 
-// ── 必要な建材一覧（建材・高さ別の支柱本数） ──
 function renderBuildMaterialList(){
-  if(!resultCells) return;
-  const cellCount = resultCells.filter(c => !!c).length;
+  if(!resultVoxels) return;
+  const cellCount = resultVoxels.length;
   const segments = computeBuildPillarSegments();
 
   const counts = {};
@@ -506,26 +820,37 @@ function renderBuildMaterialList(){
   document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
     <div class="art-result-color-row">
       <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-      <span class="art-result-color-code">${e.name}${T("build_pillar_height_suffix","（高さ{n}マス）").replace("{n}", e.height)}</span>
+      <span class="art-result-color-code">${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
       <span class="art-result-color-count">${e.count}${T("build_unit_pillars", "本")}</span>
     </div>
   `).join("");
 }
 
-// ── 最初からやり直す ──
+// ══════════════════════════════════════
+// 最初からやり直す
+// ══════════════════════════════════════
 function resetBuildToUpload(){
-  sourceImage = null;
-  resultCells = null;
+  frontImage = null;
+  backImage = null;
+  resultVoxels = null;
+  resultDims = null;
   manualCropRect = null;
   cropTargetKey = null;
+  renderBackPreview();
+  document.getElementById("buildFrontPreviewWrap").style.display = "none";
+  document.getElementById("buildProceedBtn").disabled = true;
+  document.getElementById("buildUploadBtnLabel").textContent = T("art_choose_image", "画像を選ぶ");
   document.getElementById("buildResultStage").style.display = "none";
   document.getElementById("buildCropStage").style.display = "none";
   document.getElementById("buildUploadArea").style.display = "block";
   updateBuildStepProgress("upload");
 }
 
-// ── 設計図の保存・一覧・読込・削除（js/music-editor.jsのSAVED_SCORES_KEY相当の
-// 配列localStorage永続化パターンを踏襲） ──
+// ══════════════════════════════════════
+// 設計図の保存・一覧・読込・削除・書き出し
+// ══════════════════════════════════════
+const BUILD_DESIGN_FORMAT_VERSION = 2; // v1=旧2D壁画形式（cells配列）。v2=3Dボクセル形式（voxels配列）
+
 function generateDesignId(){
   return "design-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
 }
@@ -560,15 +885,21 @@ function renderBuildLibraryList(){
     el.innerHTML = `<p style="font-size:12px; color:var(--text-sub);">${T("build_library_empty", "まだ保存した設計図がありません")}</p>`;
     return;
   }
-  el.innerHTML = savedDesigns.slice().reverse().map(d => `
+  el.innerHTML = savedDesigns.slice().reverse().map(d => {
+    const legacy = d.formatVersion !== BUILD_DESIGN_FORMAT_VERSION;
+    const dimsLabel = legacy
+      ? `${d.width}×${d.height}`
+      : `${d.dims.w}×${d.dims.h}×${d.dims.d}`;
+    return `
     <div class="build-library-item">
-      <span class="build-library-item-name">${escapeHtml(d.name)}（${d.width}×${d.height}）</span>
+      <span class="build-library-item-name">${escapeHtml(d.name)}（${dimsLabel}）${legacy ? `<br><span style="color:var(--vermillion);font-size:10px;">${T("build_legacy_design_note", "※旧バージョンの設計図（壁画モード）は読み込めません")}</span>` : ""}</span>
       <div class="build-library-item-actions">
-        <button type="button" data-action="load" data-id="${d.id}">${T("build_library_load", "読込")}</button>
+        <button type="button" data-action="load" data-id="${d.id}" ${legacy ? "disabled" : ""}>${T("build_library_load", "読込")}</button>
         <button type="button" data-action="delete" data-id="${d.id}">${T("build_library_delete", "削除")}</button>
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
   el.querySelectorAll("button[data-action]").forEach(btn => {
     btn.addEventListener("click", () => {
       const id = btn.dataset.id;
@@ -579,7 +910,7 @@ function renderBuildLibraryList(){
 }
 
 function saveBuildDesign(){
-  if(!resultCells){
+  if(!resultVoxels || !resultDims){
     alert(T("build_save_no_result", "先に画像を変換してください"));
     return;
   }
@@ -587,10 +918,11 @@ function saveBuildDesign(){
   const name = nameInput.value.trim() || T("build_design_default_name", "無題の設計図");
   savedDesigns.push({
     id: generateDesignId(),
+    formatVersion: BUILD_DESIGN_FORMAT_VERSION,
     name,
-    width: settings.width,
-    height: settings.height,
-    cells: resultCells,
+    mode: settings.mode,
+    dims: resultDims,
+    voxels: resultVoxels,
     createdAt: Date.now(),
   });
   if(persistSavedDesigns()){
@@ -602,18 +934,21 @@ function saveBuildDesign(){
 
 function loadDesign(id){
   const design = savedDesigns.find(d => d.id === id);
-  if(!design) return;
-  sourceImage = null;
+  if(!design || design.formatVersion !== BUILD_DESIGN_FORMAT_VERSION) return;
+  frontImage = null;
+  backImage = null;
   manualCropRect = null;
-  settings.width = design.width;
-  settings.height = design.height;
-  resultCells = design.cells.map(c => (c ? { ...c } : null));
+  settings.mode = design.mode;
+  resultDims = design.dims;
+  resultVoxels = design.voxels.map(v => ({ ...v }));
   document.getElementById("buildUploadArea").style.display = "none";
   document.getElementById("buildCropStage").style.display = "none";
   document.getElementById("buildResultStage").style.display = "block";
   document.getElementById("buildDesignNameInput").value = design.name;
-  renderBuildGrid();
+  ensureSceneInitialized();
+  Build3D.setVoxels(resultVoxels);
   renderBuildMaterialList();
+  clearHistory();
   updateBuildStepProgress("finish");
 }
 
@@ -624,11 +959,9 @@ function deleteDesign(id){
   renderBuildLibraryList();
 }
 
-// ── 書き出し・読み込み（js/data-sync.jsのexportAllData/importAllDataと同じ
-// Blob化＋<a download>、file.text()→JSON.parseのパターンを設計図一覧に限定して使う） ──
 function exportBuildDesigns(){
   const backup = {
-    version: 1,
+    version: BUILD_DESIGN_FORMAT_VERSION,
     exportedAt: new Date().toISOString(),
     designs: savedDesigns,
   };
@@ -673,14 +1006,12 @@ async function importBuildDesigns(event){
   }
 }
 
-// ── 初期化 ──
-// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
-// build.html自体の変換ウィザード（画像→サイズ・位置→仕上げ）は既に
-// 段階的な進捗表示があるため、ここでは重複させず、ページ外側の操作
-// （アップロード・設計図ライブラリ・ヘルプ）だけを案内する
+// ══════════════════════════════════════
+// 初期化
+// ══════════════════════════════════════
 const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone";
 const BUILD_TUTORIAL_STEPS = [
-  { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "壁画にしたい画像をアップロードすると、サイズ・位置の調整に進みます。" },
+  { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "画像をアップロードし、立体(像)か平面(床)かを選んでサイズ・厚さを指定します。" },
   { selector: "#buildLibraryPanel", titleKey: "tutorial_build_step2_title", titleFallback: "② 設計図を保存・管理", textKey: "tutorial_build_step2_body", textFallback: "保存した設計図はここから呼び出せます。JSON形式での書き出し・読み込みも可能です。" },
   { selector: "#helpBtn", titleKey: "tutorial_build_step3_title", titleFallback: "③ 使い方をもっと見る", textKey: "tutorial_build_step3_body", textFallback: "変換の流れなど、詳しい使い方はこのボタンから見返せます。" },
 ];
@@ -690,26 +1021,64 @@ function initBuildPage(){
   renderBuildLibraryList();
   bindBuildStepProgress();
   updateBuildStepProgress("upload");
+  updateBackImageVisibility();
   maybeStartPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);
 
   const fileInput = document.getElementById("buildFileInput");
   document.getElementById("buildUploadBtn").addEventListener("click", () => fileInput.click());
   fileInput.addEventListener("change", (e) => {
-    if(e.target.files && e.target.files[0]) handleBuildFileSelect(e.target.files[0]);
+    if(e.target.files && e.target.files[0]) handleFrontFileSelect(e.target.files[0]);
+  });
+  document.getElementById("buildProceedBtn").addEventListener("click", () => {
+    if(frontImage) openBuildCropStage(true);
   });
 
-  document.getElementById("buildWidthInput").addEventListener("input", handleBuildSizeInputChange);
-  document.getElementById("buildHeightInput").addEventListener("input", handleBuildSizeInputChange);
+  const backFileInput = document.getElementById("buildBackFileInput");
+  document.getElementById("buildBackUploadBtn").addEventListener("click", () => backFileInput.click());
+  backFileInput.addEventListener("change", (e) => {
+    if(e.target.files && e.target.files[0]) handleBackFileSelect(e.target.files[0]);
+  });
+  document.getElementById("buildBackRemoveBtn").addEventListener("click", clearBackImage);
+
+  document.querySelectorAll(".build-mode-btn").forEach(btn => {
+    btn.addEventListener("click", () => setBuildMode(btn.dataset.mode));
+  });
+
+  document.getElementById("buildWidthInput").addEventListener("input", handleOptionInputChange);
+  document.getElementById("buildThicknessInput").addEventListener("input", handleOptionInputChange);
+  document.getElementById("buildHollowCheckbox").addEventListener("change", readOptionInputs);
+  document.getElementById("buildAutoTransparentCheckbox").addEventListener("change", readOptionInputs);
+
   document.getElementById("buildAdjustBtn").addEventListener("click", () => openBuildCropStage(false));
   document.getElementById("buildNewImageBtn").addEventListener("click", resetBuildToUpload);
   document.getElementById("buildSaveDesignBtn").addEventListener("click", saveBuildDesign);
   document.getElementById("buildExportBtn").addEventListener("click", exportBuildDesigns);
   document.getElementById("buildImportBtn").addEventListener("click", () => document.getElementById("buildImportInput").click());
   document.getElementById("buildImportInput").addEventListener("change", importBuildDesigns);
+
+  // 手動編集ツールバー
+  const firstMaterial = MATERIALS.support_pillars.items[0];
+  selectedMaterial = { materialId: firstMaterial.id, hex: firstMaterial.colors[0], name: firstMaterial.name };
+  updateSelectedSwatch();
+  document.getElementById("buildToolPenBtn").addEventListener("click", () => setEditTool("pen"));
+  document.getElementById("buildToolEraserBtn").addEventListener("click", () => setEditTool("eraser"));
+  document.getElementById("buildPaletteBtn").addEventListener("click", openMaterialPickerModal);
+  document.getElementById("buildMaterialPickerCloseBtn").addEventListener("click", closeMaterialPickerModal);
+  document.getElementById("buildMaterialPickerModal").addEventListener("click", (e) => {
+    if(e.target.id === "buildMaterialPickerModal") closeMaterialPickerModal();
+  });
+  document.getElementById("buildUndoBtn").addEventListener("click", undoEdit);
+  document.getElementById("buildRedoBtn").addEventListener("click", redoEdit);
+
+  document.addEventListener("darkmodechange", () => {
+    if(sceneInitialized){
+      Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+    }
+  });
 }
 
 document.addEventListener("langchange", () => {
-  if(resultCells) renderBuildMaterialList();
+  if(resultVoxels) renderBuildMaterialList();
   renderBuildLibraryList();
 });
 
