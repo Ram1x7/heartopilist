@@ -857,7 +857,7 @@
   "build_import_btn": "导入（JSON）",
   "build_help_title": "使用方法",
   "build_help_1_title": "① 选择图片・确定建造模式",
-  "build_help_1_body": "上传图片后选择「立体（雕像）」或「平面（地面）」。宽度尺寸、厚度、空洞化、背景自动透明化也在此设置。立体模式下还可指定背面图片（可选）。实际支柱建材的高度是宽度/深度的2倍，因此立体模式的高度会自动补偿，3D预览也会显示与实际建造时相同的比例。",
+  "build_help_1_body": "上传图片后选择「立体（雕像）」或「平面（地面）」。宽度尺寸、厚度、空洞化、背景自动透明化、限制颜色数量选项也在此设置。立体模式下还可指定背面图片（可选）。实际支柱建材的高度是宽度/深度的2倍，因此立体模式的高度会自动补偿，3D预览也会显示与实际建造时相同的比例。",
   "build_help_2_title": "② 调整位置",
   "build_help_2_body": "拖动调整位置，用滑块缩放，确定正面图片的裁剪范围。",
   "build_help_3_title": "③ 3D设计图・建材列表",
@@ -1050,5 +1050,9 @@
   "build_progress_layer": "第{n}层",
   "build_progress_edit_disabled_hint": "查看施工阶段时无法编辑。切换回「全部」即可继续编辑",
   "build_help_progress_title": "⑤查看施工阶段",
-  "build_help_progress_body": "拖动「施工阶段」滑块，可以查看从底部往上建到第几层的状态。选择「全部」以外的选项时无法编辑。"
+  "build_help_progress_body": "拖动「施工阶段」滑块，可以查看从底部往上建到第几层的状态。选择「全部」以外的选项时无法编辑。",
+  "build_limit_colors_label": "限制颜色数量",
+  "build_color_count_label": "使用的颜色数",
+  "build_color_count_hint": "会优先保留使用频率较高的颜色。颜色越少配色越简洁，所需建材种类也越少。",
+  "build_unit_colors": "色"
 }

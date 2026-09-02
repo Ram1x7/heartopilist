@@ -885,7 +885,7 @@
   "build_import_btn": "Import (JSON)",
   "build_help_title": "How to use",
   "build_help_1_title": "① Choose an image & building mode",
-  "build_help_1_body": "Upload an image and choose \"Solid (statue)\" or \"Flat (ground)\". Set the width, thickness, hollowing, and auto-transparent background here too. In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built.",
+  "build_help_1_body": "Upload an image and choose \"Solid (statue)\" or \"Flat (ground)\". Set the width, thickness, hollowing, auto-transparent background, and color-limiting options here too. In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built.",
   "build_help_2_title": "② Adjust position",
   "build_help_2_body": "Drag to position and use the slider to zoom, setting the crop area for the front image.",
   "build_help_3_title": "③ 3D blueprint & material list",
@@ -1078,5 +1078,9 @@
   "build_progress_layer": "Layer {n}",
   "build_progress_edit_disabled_hint": "Editing is disabled while viewing a build stage. Switch back to \"All\" to resume editing.",
   "build_help_progress_title": "⑤ Check the build stage",
-  "build_help_progress_body": "Move the \"Build stage\" slider to see how the structure looks built up to a given layer from the bottom. Editing is disabled while anything other than \"All\" is selected."
+  "build_help_progress_body": "Move the \"Build stage\" slider to see how the structure looks built up to a given layer from the bottom. Editing is disabled while anything other than \"All\" is selected.",
+  "build_limit_colors_label": "Limit color count",
+  "build_color_count_label": "Colors to use",
+  "build_color_count_hint": "The most frequently used colors are kept first. Fewer colors means a simpler look and fewer material types.",
+  "build_unit_colors": ""
 }

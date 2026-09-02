@@ -317,6 +317,11 @@ body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:va
 .build-progress-slider-row input[type="range"]{
   flex:1;
   accent-color:var(--indigo);
+  /* body側で touch-action:pan-x pan-y を指定しており（ページ全体のピンチ/
+     ダブルタップズーム防止用）、touch-actionは祖先要素との積集合になるため、
+     このままだとiOS Safari等でスライダーのつまみをドラッグできなくなる。
+     このスライダー自身には通常のタップ・ドラッグ操作を許可する */
+  touch-action:manipulation;
 }
 
 .build-progress-slider-row output{
@@ -329,6 +334,30 @@ body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:va
 }
 
 body.dark .build-progress-slider-row output{ color:#e8d2a8; }
+
+.build-progress-step-btn{
+  flex-shrink:0;
+  width:26px;
+  height:26px;
+  border:1px solid var(--border);
+  border-radius:50%;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+
+.build-progress-step-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
+body.dark .build-progress-step-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
 
 .build-toolbar-divider{
   width:1px;
@@ -562,6 +591,18 @@ body.dark .build-library-item{
         <input type="checkbox" id="buildAutoTransparentCheckbox">
         <span data-i18n="build_autotransparent_label">背景を自動で透明化する</span>
       </label>
+      <label class="build-checkbox-row">
+        <input type="checkbox" id="buildLimitColorsCheckbox">
+        <span data-i18n="build_limit_colors_label">色数を絞る</span>
+      </label>
+      <div class="build-slider-field" id="buildColorCountRow" style="display:none;">
+        <div class="build-slider-field-label">
+          <span data-i18n="build_color_count_label">使用する色数</span>
+          <output id="buildColorCountOutput">16色</output>
+        </div>
+        <input type="range" id="buildColorCountInput" min="2" max="74" value="16">
+        <p class="art-step-hint" data-i18n="build_color_count_hint">よく使われている色から優先して残します。少ないほどシンプルな配色になり、建材の種類も減ります。</p>
+      </div>
 
       <div class="build-back-image-row" id="buildBackImageRow">
         <div class="art-panel-title" data-i18n="build_back_image_title">背面画像（任意）</div>
@@ -632,7 +673,9 @@ body.dark .build-library-item{
 
     <div class="build-progress-slider-row">
       <span class="build-progress-slider-label" data-i18n="build_progress_slider_label">施工ステージ</span>
+      <button type="button" class="build-progress-step-btn" id="buildProgressMinusBtn" aria-label="-1">－</button>
       <input type="range" id="buildProgressSlider" min="1" max="1" value="1">
+      <button type="button" class="build-progress-step-btn" id="buildProgressPlusBtn" aria-label="+1">＋</button>
       <output id="buildProgressOutput" data-i18n="build_progress_all">全て</output>
     </div>
     <p class="art-step-hint" id="buildProgressHint" style="display:none;" data-i18n="build_progress_edit_disabled_hint">施工ステージ表示中は編集できません。「全て」に戻すと編集を再開できます</p>
@@ -702,7 +745,7 @@ body.dark .build-library-item{
     <h3 style="text-align:center;" data-i18n="build_help_title">使い方</h3>
 
     <p><strong data-i18n="build_help_1_title">① 画像を選ぶ・建築モードを決める</strong><br>
-    <span data-i18n="build_help_1_body">画像をアップロードし、「立体（像）」か「平面（床）」かを選びます。幅サイズ・厚さ、空洞化、背景の自動透明化もここで指定します。立体モードでは背面画像も指定できます（任意）。実際の支柱建材は幅・奥行きの2倍の高さがあるため、立体モードの高さは自動的に補正され、3Dプレビューも実際に建てたときと同じ縦横比で表示されます。</span></p>
+    <span data-i18n="build_help_1_body">画像をアップロードし、「立体（像）」か「平面（床）」かを選びます。幅サイズ・厚さ、空洞化、背景の自動透明化、色数を絞るオプションもここで指定します。立体モードでは背面画像も指定できます（任意）。実際の支柱建材は幅・奥行きの2倍の高さがあるため、立体モードの高さは自動的に補正され、3Dプレビューも実際に建てたときと同じ縦横比で表示されます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② 位置を調整</strong><br>
     <span data-i18n="build_help_2_body">ドラッグして位置を、スライダーで拡大縮小して正面画像の切り抜き範囲を決めます。</span></p>
@@ -790,7 +833,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=13"></script>
+<script type="module" src="js/build.js?v=15"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
