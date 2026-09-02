@@ -11,9 +11,11 @@ let bounds = { w: 24, h: 24, d: 24 };
 let camTheta = 0.9, camPhi = 1.05, camDist = 40;
 const camTarget = new THREE.Vector3();
 let dragging = false, lastX = 0, lastY = 0;
+let downX = 0, downY = 0, downPointerId = null, movedDuringDrag = false;
 let pinchStartDist = null;
 let rafId = null;
 let currentVoxels = [];
+let editClickCallback = null;
 
 function updateCamera(){
   const x = camTarget.x + camDist * Math.sin(camPhi) * Math.sin(camTheta);
@@ -23,15 +25,27 @@ function updateCamera(){
   camera.lookAt(camTarget);
 }
 
+// クリック（ドラッグせずに指/マウスを離した）とドラッグ回転を区別するための
+// しきい値（px）。これ未満の移動量なら「編集クリック」とみなす
+const CLICK_MOVE_THRESHOLD = 6;
+
 function bindPointer(){
   canvasEl.addEventListener("pointerdown", (e) => {
     dragging = true; lastX = e.clientX; lastY = e.clientY;
+    downX = e.clientX; downY = e.clientY; downPointerId = e.pointerId; movedDuringDrag = false;
     canvasEl.setPointerCapture(e.pointerId);
   });
-  canvasEl.addEventListener("pointerup", () => { dragging = false; });
-  canvasEl.addEventListener("pointercancel", () => { dragging = false; });
+  canvasEl.addEventListener("pointerup", (e) => {
+    dragging = false;
+    if(editClickCallback && e.pointerId === downPointerId && !movedDuringDrag){
+      editClickCallback(raycastVoxelAt(e.clientX, e.clientY));
+    }
+    downPointerId = null;
+  });
+  canvasEl.addEventListener("pointercancel", () => { dragging = false; downPointerId = null; });
   canvasEl.addEventListener("pointermove", (e) => {
     if(!dragging) return;
+    if(Math.hypot(e.clientX - downX, e.clientY - downY) > CLICK_MOVE_THRESHOLD) movedDuringDrag = true;
     camTheta -= (e.clientX - lastX) * 0.006;
     camPhi = Math.min(Math.max(camPhi - (e.clientY - lastY) * 0.006, 0.15), Math.PI - 0.15);
     lastX = e.clientX; lastY = e.clientY;
@@ -120,7 +134,9 @@ function init(canvas, dims){
 }
 
 // voxels: [{x,y,z,hex}]（x:幅方向 0..bounds.w-1, y:高さ方向 0..bounds.h-1, z:奥行き方向 0..bounds.d-1）
-function setVoxels(voxels){
+// opts.fit: falseにすると外接範囲へのカメラ再フィットをスキップする
+// （手動編集のたびに視点が飛ぶのを防ぐため、編集後の再描画ではfalseを渡す）
+function setVoxels(voxels, opts = {}){
   if(mesh){
     scene.remove(mesh);
     mesh.geometry.dispose();
@@ -147,7 +163,7 @@ function setVoxels(voxels){
   if(mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   scene.add(mesh);
 
-  fitToVoxels(voxels);
+  if(opts.fit !== false) fitToVoxels(voxels);
 }
 
 // 生成結果の外接範囲にカメラの注視点・距離を合わせる
@@ -168,7 +184,11 @@ function fitToVoxels(voxels){
   updateCamera();
 }
 
-// 画面上のクリック/タップ座標から、当たったボクセルを返す（今後の編集機能用）
+// 画面上のクリック/タップ座標から、当たったボクセルを返す（編集機能用）。
+// adjacent: クリックされた面の外側に隣接する、まだ何もない位置のグリッド座標
+// （ペン工具で「既存の面に接する形で」新しいボクセルを置くために使う。
+// インスタンスは平行移動のみで回転させていないため、面のローカル法線
+// （BoxGeometryの軸に沿った±1ベクトル）がそのままワールド方向に一致する）
 function raycastVoxelAt(clientX, clientY){
   if(!mesh) return null;
   const rect = canvasEl.getBoundingClientRect();
@@ -180,7 +200,18 @@ function raycastVoxelAt(clientX, clientY){
   raycaster.setFromCamera(ndc, camera);
   const hit = raycaster.intersectObject(mesh);
   if(!hit.length) return null;
-  return { instanceId: hit[0].instanceId, voxel: currentVoxels[hit[0].instanceId] };
+  const voxel = currentVoxels[hit[0].instanceId];
+  const n = hit[0].face ? hit[0].face.normal : null;
+  const adjacent = n && voxel
+    ? { x: voxel.x + Math.round(n.x), y: voxel.y + Math.round(n.y), z: voxel.z + Math.round(n.z) }
+    : null;
+  return { instanceId: hit[0].instanceId, voxel, adjacent };
+}
+
+// キャンバス上での「ドラッグを伴わないクリック/タップ」1回ごとに呼ばれる
+// コールバックを登録する。引数はraycastVoxelAt()と同じ形（何にも当たらなければnull）
+function setEditClickCallback(fn){
+  editClickCallback = fn;
 }
 
 function setBackgroundColor(hex){
@@ -193,4 +224,4 @@ function dispose(){
   if(renderer) renderer.dispose();
 }
 
-export { init, setVoxels, resize, raycastVoxelAt, setBackgroundColor, dispose };
+export { init, setVoxels, resize, raycastVoxelAt, setEditClickCallback, setBackgroundColor, dispose };

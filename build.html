@@ -264,6 +264,95 @@ body.dark .build-stage-hint{ color:#ece4d4; background:rgba(255,255,255,0.08); }
   cursor:default;
 }
 
+/* 編集ツールバー（ペン/消しゴム・パレット・Undo/Redo） */
+.build-edit-toolbar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.build-tool-btn{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:8px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.build-tool-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.build-tool-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
+body.dark .build-tool-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
+body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
+
+.build-toolbar-divider{
+  width:1px;
+  height:20px;
+  background:var(--border);
+  margin:0 2px;
+}
+
+body.dark .build-toolbar-divider{ background:#46423b; }
+
+.build-selected-swatch{
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  border:1px solid rgba(0,0,0,0.2);
+}
+
+/* 建材パレットモーダル（ペンで使う建材を選ぶ） */
+.build-material-picker-box{
+  width:90%;
+  max-width:360px;
+  max-height:80vh;
+  overflow-y:auto;
+}
+
+.build-material-group-title{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin:14px 0 6px;
+}
+
+.build-material-swatches{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(34px, 1fr));
+  gap:6px;
+}
+
+.build-material-swatch{
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:8px;
+  border:2px solid var(--border);
+  cursor:pointer;
+  padding:0;
+}
+
+.build-material-swatch.active{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 2px var(--indigo) inset;
+}
+
 .build-library-list{
   display:flex;
   flex-direction:column;
@@ -372,7 +461,7 @@ body.dark .build-library-item{
 </div>
 
 <div class="art-notice" data-i18n="build_notice">
-  現在は試験公開中です。ボクセルの手動編集・建築ガイド・共有リンク機能は準備中です。
+  現在は試験公開中です。範囲選択での一括編集・建築ガイド・共有リンク機能は準備中です。
 </div>
 
 <div class="art-convert-progress" id="buildProgress">
@@ -488,10 +577,34 @@ body.dark .build-library-item{
       <span data-i18n="build_new_image">新しい画像から作り直す</span>
     </a>
 
+    <div class="build-edit-toolbar">
+      <button type="button" class="build-tool-btn active" id="buildToolPenBtn" data-tool="pen">
+        <span class="btn-icon" data-icon="pen"></span>
+        <span data-i18n="build_tool_pen">ペン</span>
+      </button>
+      <button type="button" class="build-tool-btn" id="buildToolEraserBtn" data-tool="eraser">
+        <span class="btn-icon" data-icon="eraser"></span>
+        <span data-i18n="build_tool_eraser">消しゴム</span>
+      </button>
+      <button type="button" class="build-tool-btn" id="buildPaletteBtn">
+        <span class="build-selected-swatch" id="buildSelectedSwatch"></span>
+        <span data-i18n="build_tool_palette">建材を選ぶ</span>
+      </button>
+      <span class="build-toolbar-divider"></span>
+      <button type="button" class="build-tool-btn" id="buildUndoBtn" disabled>
+        <span class="btn-icon" data-icon="undo"></span>
+        <span data-i18n="build_tool_undo">元に戻す</span>
+      </button>
+      <button type="button" class="build-tool-btn" id="buildRedoBtn" disabled>
+        <span class="btn-icon" data-icon="redo"></span>
+        <span data-i18n="build_tool_redo">やり直す</span>
+      </button>
+    </div>
+
     <div class="build-stage-wrap">
       <div class="build-stage">
         <canvas id="buildCanvas"></canvas>
-        <div class="build-stage-hint" data-i18n="build_stage_hint">ドラッグ：回転 / ホイール：ズーム</div>
+        <div class="build-stage-hint" id="buildStageHint" data-i18n="build_stage_hint">ドラッグ：回転 / ホイール：ズーム / タップ：ペンで追加・消しゴムで削除</div>
       </div>
     </div>
 
@@ -540,6 +653,13 @@ body.dark .build-library-item{
   </div>
 </div>
 
+<div id="buildMaterialPickerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box build-material-picker-box">
+    <h3 style="text-align:center;" data-i18n="build_picker_title">使う建材を選ぶ</h3>
+    <div id="buildMaterialPickerBody"></div>
+    <button class="modal-close-btn" id="buildMaterialPickerCloseBtn" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-help-box">
@@ -554,10 +674,13 @@ body.dark .build-library-item{
     <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 3D配置図・建材一覧</strong><br>
     <span data-i18n="build_help_3_body">色ごとに最も近い建材（支柱系）が自動で割り当てられ、その場でドラッグ回転・ズームして確認できます。必要な建材の種類・支柱の本数は一覧で確認できます。</span></p>
 
-    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">④ 保存・書き出し</strong><br>
+    <p style="margin-top:10px;"><strong data-i18n="build_help_edit_title">④ 手動で編集する</strong><br>
+    <span data-i18n="build_help_edit_body">「ペン」を選んで面をタップすると、その面に接する形で選択中の建材を1つ追加できます。「消しゴム」を選んでタップすると、そのボクセルを削除できます。「建材を選ぶ」でペンに使う建材を切り替えられます。「元に戻す」「やり直す」で編集を取り消し・再実行できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">⑤ 保存・書き出し</strong><br>
     <span data-i18n="build_help_4_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
 
-    <p style="margin-top:10px; font-size:11px; color:var(--text-sub);" data-i18n="build_help_note_wip">※ ボクセルの手動編集（ペン/消しゴム）・建築ガイドの自動再生・共有リンク機能は現在準備中です。</p>
+    <p style="margin-top:10px; font-size:11px; color:var(--text-sub);" data-i18n="build_help_note_wip">※ 範囲選択での一括編集・建築ガイドの自動再生・共有リンク機能は現在準備中です。</p>
 
     <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
@@ -628,7 +751,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=8"></script>
+<script type="module" src="js/build.js?v=9"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

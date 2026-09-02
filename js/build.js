@@ -1,18 +1,16 @@
 // js/build.js
-// 建築サポートページ（build.html）：統合3Dボクセル編集ツール（MVP・第1弾）
+// 建築サポートページ（build.html）：統合3Dボクセル編集ツール（MVP・第2弾）
 // 画面の流れ: ①画像＋建築モード・オプションを選ぶ → ②位置調整（正面画像） →
-//            ③3D結果表示・建材一覧・保存
+//            ③3D結果表示・手動編集（ペン/消しゴム・Undo/Redo）・建材一覧・保存
 // 色→建材のマッチングは支柱系（grid_cell配置）のみを対象にし、Lab色空間での
-// 誤差拡散ディザリング＋輪郭保持（旧・壁画モードから流用）を行う。3D描画は
-// js/build3d-scene.js（Three.js・InstancedMesh）に委譲する。すべてブラウザ内で
-// 完結し、画像を外部に送信しない。
+// 誤差拡散ディザリング＋輪郭保持（旧・壁画モードから流用）を行う。3D描画・
+// クリック編集の当たり判定はjs/build3d-scene.js（Three.js・InstancedMesh）に
+// 委譲する。すべてブラウザ内で完結し、画像を外部に送信しない。
 //
 // 【このバージョンでの既知の未実装（次のフェーズ予定）】
-// ・ペン/消しゴムでのボクセル手動編集、範囲選択、Undo/Redo
+// ・範囲選択（ドラッグで囲んでの一括編集）
 // ・自動再生（下から積み上げるアニメーション）と「現在の層のみハイライト」
 // ・共有リンク(URL)機能
-// build3d-scene.jsのraycastVoxelAt()は将来の編集機能向けに用意済みだが、
-// このバージョンではまだ呼び出していない。
 
 import * as Build3D from "./build3d-scene.js";
 
@@ -44,10 +42,126 @@ let settings = {
 
 let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]
 let resultDims = null;     // {w,h,d}
-let pickerVoxelIndex = null;
 
 const BUILD_DESIGNS_KEY = "hatopiBuild_designs";
 let savedDesigns = [];
+
+// ══════════════════════════════════════
+// 手動編集（ペン/消しゴム・Undo/Redo）
+// ══════════════════════════════════════
+let editTool = "pen"; // "pen" | "eraser"
+let selectedMaterial = null; // {materialId, hex, name}（パレットから選んだ、ペンで使う建材）
+const EDIT_HISTORY_LIMIT = 50;
+let undoStack = [];
+let redoStack = [];
+
+function cloneVoxels(voxels){
+  return voxels.map(v => ({ ...v }));
+}
+
+function pushHistory(){
+  if(!resultVoxels) return;
+  undoStack.push(cloneVoxels(resultVoxels));
+  if(undoStack.length > EDIT_HISTORY_LIMIT) undoStack.shift();
+  redoStack = [];
+  updateUndoRedoButtons();
+}
+
+function clearHistory(){
+  undoStack = [];
+  redoStack = [];
+  updateUndoRedoButtons();
+}
+
+function updateUndoRedoButtons(){
+  const undoBtn = document.getElementById("buildUndoBtn");
+  const redoBtn = document.getElementById("buildRedoBtn");
+  if(undoBtn) undoBtn.disabled = undoStack.length === 0;
+  if(redoBtn) redoBtn.disabled = redoStack.length === 0;
+}
+
+function undoEdit(){
+  if(undoStack.length === 0) return;
+  redoStack.push(cloneVoxels(resultVoxels));
+  resultVoxels = undoStack.pop();
+  refreshVoxelView();
+  updateUndoRedoButtons();
+}
+
+function redoEdit(){
+  if(redoStack.length === 0) return;
+  undoStack.push(cloneVoxels(resultVoxels));
+  resultVoxels = redoStack.pop();
+  refreshVoxelView();
+  updateUndoRedoButtons();
+}
+
+function refreshVoxelView(){
+  Build3D.setVoxels(resultVoxels, { fit: false });
+  renderBuildMaterialList();
+}
+
+function inBounds(x, y, z){
+  return resultDims && x >= 0 && x < resultDims.w && y >= 0 && y < resultDims.h && z >= 0 && z < resultDims.d;
+}
+
+// build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
+function handleEditClick(hit){
+  if(!hit || !resultVoxels) return;
+  if(editTool === "eraser"){
+    if(!hit.voxel) return;
+    pushHistory();
+    resultVoxels = resultVoxels.filter(v => !(v.x === hit.voxel.x && v.y === hit.voxel.y && v.z === hit.voxel.z));
+    refreshVoxelView();
+    return;
+  }
+  // ペン：クリックした面の外側に隣接するマスへ、選択中の建材を1つ追加する
+  // （既存の面に接する形でのみ置ける。何もない空間に単独で置くことはできない）
+  if(!hit.adjacent || !selectedMaterial) return;
+  const { x, y, z } = hit.adjacent;
+  if(!inBounds(x, y, z)) return;
+  if(resultVoxels.some(v => v.x === x && v.y === y && v.z === z)) return;
+  pushHistory();
+  resultVoxels.push({ x, y, z, materialId: selectedMaterial.materialId, hex: selectedMaterial.hex, name: selectedMaterial.name });
+  refreshVoxelView();
+}
+
+function setEditTool(tool){
+  editTool = tool;
+  document.getElementById("buildToolPenBtn").classList.toggle("active", tool === "pen");
+  document.getElementById("buildToolEraserBtn").classList.toggle("active", tool === "eraser");
+}
+
+function updateSelectedSwatch(){
+  const el = document.getElementById("buildSelectedSwatch");
+  if(el && selectedMaterial) el.style.background = selectedMaterial.hex;
+}
+
+function openMaterialPickerModal(){
+  const body = document.getElementById("buildMaterialPickerBody");
+  body.innerHTML = MATERIALS.support_pillars.items.map(material => `
+    <div class="build-material-group-title">${material.name}</div>
+    <div class="build-material-swatches">
+      ${material.colors.map(hex => `
+        <button type="button" class="build-material-swatch${selectedMaterial && selectedMaterial.materialId === material.id && selectedMaterial.hex === hex ? " active" : ""}"
+          style="background:${hex}" data-material="${material.id}" data-hex="${hex}" data-name="${material.name}"
+          aria-label="${material.name} ${hex}"></button>
+      `).join("")}
+    </div>
+  `).join("");
+  body.querySelectorAll(".build-material-swatch").forEach(swatchBtn => {
+    swatchBtn.addEventListener("click", () => {
+      selectedMaterial = { materialId: swatchBtn.dataset.material, hex: swatchBtn.dataset.hex, name: swatchBtn.dataset.name };
+      updateSelectedSwatch();
+      closeMaterialPickerModal();
+    });
+  });
+  document.getElementById("buildMaterialPickerModal").style.display = "block";
+}
+
+function closeMaterialPickerModal(){
+  document.getElementById("buildMaterialPickerModal").style.display = "none";
+}
 
 // ══════════════════════════════════════
 // 色マッチング（Lab色空間、支柱系のみ対象）
@@ -637,6 +751,7 @@ function runBuildGeneration(){
   ensureSceneInitialized();
   Build3D.setVoxels(resultVoxels);
   renderBuildMaterialList();
+  clearHistory();
 }
 
 // ══════════════════════════════════════
@@ -649,6 +764,7 @@ function ensureSceneInitialized(){
   if(!sceneInitialized){
     Build3D.init(canvas, { w: SITE_MAX_WIDTH, h: SITE_MAX_HEIGHT, d: SITE_MAX_DEPTH });
     Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+    Build3D.setEditClickCallback(handleEditClick);
     sceneInitialized = true;
   }
 }
@@ -832,6 +948,7 @@ function loadDesign(id){
   ensureSceneInitialized();
   Build3D.setVoxels(resultVoxels);
   renderBuildMaterialList();
+  clearHistory();
   updateBuildStepProgress("finish");
 }
 
@@ -938,6 +1055,20 @@ function initBuildPage(){
   document.getElementById("buildExportBtn").addEventListener("click", exportBuildDesigns);
   document.getElementById("buildImportBtn").addEventListener("click", () => document.getElementById("buildImportInput").click());
   document.getElementById("buildImportInput").addEventListener("change", importBuildDesigns);
+
+  // 手動編集ツールバー
+  const firstMaterial = MATERIALS.support_pillars.items[0];
+  selectedMaterial = { materialId: firstMaterial.id, hex: firstMaterial.colors[0], name: firstMaterial.name };
+  updateSelectedSwatch();
+  document.getElementById("buildToolPenBtn").addEventListener("click", () => setEditTool("pen"));
+  document.getElementById("buildToolEraserBtn").addEventListener("click", () => setEditTool("eraser"));
+  document.getElementById("buildPaletteBtn").addEventListener("click", openMaterialPickerModal);
+  document.getElementById("buildMaterialPickerCloseBtn").addEventListener("click", closeMaterialPickerModal);
+  document.getElementById("buildMaterialPickerModal").addEventListener("click", (e) => {
+    if(e.target.id === "buildMaterialPickerModal") closeMaterialPickerModal();
+  });
+  document.getElementById("buildUndoBtn").addEventListener("click", undoEdit);
+  document.getElementById("buildRedoBtn").addEventListener("click", redoEdit);
 
   document.addEventListener("darkmodechange", () => {
     if(sceneInitialized){
