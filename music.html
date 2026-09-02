@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/music.css?v=47">
+<link rel="stylesheet" href="./css/music.css?v=48">
 <link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
@@ -161,6 +161,7 @@
           <span data-i18n="music_record_toggle">録音する</span>
           <input type="checkbox" id="musicRecordToggle">
         </label>
+        <button class="music-header-btn music-btn-secondary" id="musicRecordFullscreenBtn" style="display:none" data-i18n="music_record_fullscreen_btn">全画面で演奏する</button>
         <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります</p>
         <div class="music-duration-options" id="musicDurationOptions"></div>
         <p class="music-record-hint" id="musicDurationHint" data-i18n="music_duration_hint">上で選んでいる長さが、演奏ボタンで入力する音符にも「休符を追加」の休符にも使われます</p>
@@ -214,6 +215,19 @@
       <div class="music-instrument-grid" id="musicInstrumentGrid"></div>
     </div>
   </div>
+</div>
+
+<!-- 「作る」タブの録音モード：任意で開ける全画面ステージ。練習モードと同じく
+     端末が縦向きでもCSSで横画面表示にし、実機と同じ大きさ・配置のボタンで
+     演奏しながら録音できるようにする（「全画面で演奏する」ボタンで開閉） -->
+<div class="music-record-stage" id="musicRecordStage">
+  <div class="music-practice-stage-topbar">
+    <div class="music-record-stage-title" id="musicRecordStageName"></div>
+    <button class="music-sound-btn" id="musicSoundToggleBtnRecord" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+    <button class="music-practice-exit-btn" id="musicRecordExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
+  </div>
+  <div id="musicScoreDisplayAnchorRecord"></div>
+  <div id="musicInstrumentGridAnchorRecord"></div>
 </div>
 
 <!-- 練習モード：全画面の専用ステージ。端末が縦向きでもCSSで横画面表示にする。

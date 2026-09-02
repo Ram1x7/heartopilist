@@ -643,6 +643,7 @@
   "music_preset_chocho": "蝴蝶",
   "music_timesig_label": "拍号",
   "music_record_toggle": "录制",
+  "music_record_fullscreen_btn": "全屏演奏",
   "music_record_hint": "按住的时长将直接成为该音的长度。同时按住多个按钮即可录制和弦",
   "music_layout_default": "标准",
   "music_layout_2row": "15键（2行）",

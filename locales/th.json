@@ -643,6 +643,7 @@
   "music_preset_chocho": "ผีเสื้อ",
   "music_timesig_label": "จังหวะเพลง",
   "music_record_toggle": "บันทึกเสียง",
+  "music_record_fullscreen_btn": "เล่นแบบเต็มหน้าจอ",
   "music_record_hint": "ระยะเวลาที่กดค้างจะกลายเป็นความยาวของโน้ตนั้น กดหลายปุ่มพร้อมกันเพื่อบันทึกเป็นคอร์ด",
   "music_layout_default": "มาตรฐาน",
   "music_layout_2row": "15 คีย์ (2 แถว)",

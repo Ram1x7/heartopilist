@@ -669,6 +669,7 @@
   "music_preset_chocho": "Butterfly",
   "music_timesig_label": "Time Sig.",
   "music_record_toggle": "Record",
+  "music_record_fullscreen_btn": "Perform fullscreen",
   "music_record_hint": "How long you hold the button becomes the note's length. Press multiple buttons at once to record a chord.",
   "music_layout_default": "Default",
   "music_layout_2row": "15 Keys (2 Rows)",

@@ -1651,6 +1651,83 @@ body.dark .music-note-btn.accidental.practice-guide{
   background:rgba(var(--practice-guide-rgb-dark), calc(var(--practice-guide-bg-opacity) + 0.05));
 }
 
+/* 「作る」タブの録音中に「全画面で演奏する」で開ける全画面ステージ。練習モードと
+   同じくCSSで横画面表示にするが、実機写真への位置合わせは不要なため、上部バー・
+   譜面・演奏ボタンを重ねずに縦に並べるシンプルな構成にする */
+.music-record-stage{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1900;
+  background:var(--card);
+  overflow:hidden;
+  flex-direction:column;
+}
+
+.music-record-stage.active{
+  display:flex;
+}
+
+body.dark .music-record-stage{
+  background:#211e19;
+}
+
+@media (orientation:portrait){
+  .music-record-stage.active{
+    width:100vh;
+    height:100vw;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%) rotate(90deg);
+  }
+}
+
+.music-record-stage .music-practice-stage-topbar{
+  flex-shrink:0;
+  flex-direction:row;
+  align-items:center;
+  gap:8px;
+  padding:8px 10px;
+}
+
+.music-record-stage-title{
+  flex:1;
+  min-width:0;
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+body.dark .music-record-stage-title{
+  color:#ece4d4;
+}
+
+.music-record-stage .music-sound-btn,
+.music-record-stage .music-practice-exit-btn{
+  flex-shrink:0;
+}
+
+#musicScoreDisplayAnchorRecord{
+  flex-shrink:1;
+  min-height:0;
+  max-height:30%;
+  overflow-y:auto;
+  padding:0 10px;
+}
+
+#musicInstrumentGridAnchorRecord{
+  flex:1;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  box-sizing:border-box;
+}
+
 /* 練習モード：全画面の専用ステージ。実機の指の感覚に合わせて練習できるよう、
    通常のページ（ナビ・楽器選択などの編集用パネル）を覆い隠し、譜面と演奏ボタンだけの
    画面にする。端末が縦向きの場合はCSSで画面全体を90度回転させ、実機同様の横画面表示を

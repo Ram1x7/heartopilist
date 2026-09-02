@@ -14,6 +14,7 @@ let semitoneEnabled = false; // ピアノの「22キー」配置のみ、半音(
 let tokens = []; // {notes:[{degree, accidental, octave}, ...], beats}  ※1音だけでもnotesは配列
 let selectedDurationId = "quarter";
 let isRecording = false; // 編集モード：ONの間はボタンを押した長さがそのまま音の長さになる
+let recordStageOpen = false; // 録音中、「全画面で演奏する」で開ける練習モードと同じ全画面ステージ（横画面対応）
 let bpm = DEFAULT_BPM;
 let timeSignatureId = DEFAULT_TIME_SIGNATURE_ID;
 // フリーテンポ譜面：拍子の量子化を持たず、各tokenが beats の代わりに
@@ -320,6 +321,7 @@ function initMusicEditor() {
 
   document.getElementById("musicPracticeExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicFollowExitBtn").innerHTML = icon("close", { size: 18 });
+  document.getElementById("musicRecordExitBtn").innerHTML = icon("close", { size: 18 });
   document.getElementById("musicRotatePromptIcon").innerHTML = icon("rotateDevice", { size: 32 });
   document.getElementById("musicCalibToggleBtn").innerHTML = icon("wrench", { size: 15 });
   document.getElementById("musicUndoBtn").innerHTML = icon("undo", { size: 16 });
@@ -570,6 +572,12 @@ function rebuildActiveKeymap() {
   }
 }
 
+// 「作る」タブの録音中に「全画面で演奏する」を開いているかどうか
+// （練習モードと同じ全画面ステージ。端末が縦向きでもCSSで横画面表示にする）
+function isRecordStageActive() {
+  return pageMode === "edit" && isRecording && recordStageOpen;
+}
+
 // 「作る」タブで録音中（実際にボタンを弾いて譜面を作る間）は、押し間違いを減らし
 // 練習モードとの操作感を揃えられるよう、編集用の伸縮グリッドではなく練習モードと
 // 同じ実機座標配置（renderPracticeStageGrid）を使う。録音中でなければ、精密な
@@ -623,10 +631,11 @@ function renderEditGrid() {
 // アスペクト比を保ったまま画面に収める(レターボックス)ため、
 // CSS側で aspect-ratio + コンテナクエリ(cqh)を使って自動的にフィットさせている。
 //
-// 練習モード（実機写真に重ねて位置合わせする）では画面全体(1600×1118)をそのまま
-// 使う必要があるが、「作る」タブの録音中はパネル内の小さな表示のため、実機全体の
+// 練習モード・録音中の全画面ステージ（実機写真に重ねて位置合わせする／画面全体を
+// 使える）では画面全体(1600×1118)をそのまま使う必要があるが、「作る」タブの
+// 録音中で全画面ステージを開いていない間はパネル内の小さな表示のため、実機全体の
 // 比率のままだとボタンが存在しない上部が大きな空白になってしまう。そのため
-// 練習モード以外では、ボタンが実際に集まっている範囲だけを切り出して敷き詰め直す
+// パネル内表示の間だけ、ボタンが実際に集まっている範囲を切り出して敷き詰め直す
 // （computeStageCrop/cropPosition）
 function renderPracticeStageGrid() {
   const el = document.getElementById("musicInstrumentGrid");
@@ -635,7 +644,8 @@ function renderPracticeStageGrid() {
   const mainPositions = layout.positions || [];
   const accidentalPositions = (semitoneEnabled && layout.accidentalPositions) || [];
   const allPositions = [...mainPositions, ...accidentalPositions];
-  const crop = pageMode === "practice" ? null : computeStageCrop(allPositions);
+  const isFullscreenStage = pageMode === "practice" || isRecordStageActive();
+  const crop = isFullscreenStage ? null : computeStageCrop(allPositions);
   // 1cqh = コンテナ高さの1%のため、アスペクト比をcqh値に換算するには100倍する
   // （静的CSSの143.113cqh = 1600/1118*100 と同じ考え方）
   const frameStyle = crop ? ` style="aspect-ratio:${crop.wPx} / ${crop.hPx}; width:min(100%, ${((crop.wPx / crop.hPx) * 100).toFixed(4)}cqh);"` : "";
@@ -758,9 +768,10 @@ function dismissCalibHint() {
 function applyCalibTransform() {
   const frame = document.getElementById("musicStageFrame");
   if (!frame) return;
-  // 端末ごとの調整値(vh基準)は、実機写真に重ねる全画面の練習ステージ向けの値のため、
-  // 「作る」タブの録音中（パネル内の小さな表示）にはそのまま適用しない
-  frame.style.transform = pageMode === "practice"
+  // 端末ごとの調整値(vh基準)は全画面表示向けの値のため、「作る」タブの録音中でも
+  // 「全画面で演奏する」を開いている間（同じ端末・同じ全画面表示）はそのまま適用し、
+  // パネル内の小さな表示の間だけ適用しない
+  frame.style.transform = (pageMode === "practice" || isRecordStageActive())
     ? `translate(${calib.offsetX}vh, ${calib.offsetY}vh) scale(${calib.scale})`
     : "";
 }
@@ -1181,8 +1192,12 @@ function updateRecordingUI() {
   document.getElementById("musicDurationHint").style.display = isRecording ? "none" : "";
   // 録音中は長さの選択ができないのと同じ理由で、休符も追加できないようにする
   document.getElementById("musicAddRestBtn").disabled = isRecording;
-  // 録音のON/OFFで演奏ボタンの配置（練習モードと同じ実機配置／編集用の伸縮グリッド）を切り替える
-  renderInstrumentGrid();
+  // 「全画面で演奏する」ボタンは録音中だけ表示する。録音を止めたら全画面ステージも閉じる
+  document.getElementById("musicRecordFullscreenBtn").style.display = isRecording ? "" : "none";
+  if (!isRecording) recordStageOpen = false;
+  // 録音のON/OFFで演奏ボタンの配置（練習モードと同じ実機配置／編集用の伸縮グリッド）・
+  // 全画面ステージの表示を切り替える
+  updateModeUI();
 }
 
 // ── 譜面の編集 ──
@@ -1591,19 +1606,23 @@ function updateModeUI() {
   // 練習モードは、譜面と演奏ボタンだけの全画面ステージに切り替える。編集用の楽器・配置選択は
   // 「保存している譜面のスタイル」をそのまま自動で使うため、練習中は表示しない。
   // 追従モードは、ボタンを出さず大きな数字譜だけの全画面ステージに切り替える
-  // （実機の画面と分割画面で並べて使う想定のため、横画面には固定しない）
+  // （実機の画面と分割画面で並べて使う想定のため、横画面には固定しない）。
+  // 「作る」タブの録音中に「全画面で演奏する」を開いている間も、練習モードと同じ
+  // 全画面ステージ（横画面対応）に切り替える（isRecordStageActive）
   const isPractice = pageMode === "practice";
   const isFollow = pageMode === "follow";
+  const isRecordStage = isRecordStageActive();
   document.getElementById("musicPracticeStage").classList.toggle("active", isPractice);
   document.getElementById("musicFollowStage").classList.toggle("active", isFollow);
+  document.getElementById("musicRecordStage").classList.toggle("active", isRecordStage);
 
   const scoreDisplay = document.getElementById("musicScoreDisplay");
   const grid = document.getElementById("musicInstrumentGrid");
   const playbackRow = document.getElementById("musicPlaybackRow");
-  const scoreAnchor = document.getElementById(isPractice ? "musicScoreDisplayAnchorPractice" : "musicScoreDisplayAnchorEdit");
-  const gridAnchor = document.getElementById(isPractice ? "musicInstrumentGridAnchorPractice" : "musicInstrumentGridAnchorEdit");
-  scoreAnchor.appendChild(scoreDisplay);
-  gridAnchor.appendChild(grid);
+  const scoreAnchorId = isPractice ? "musicScoreDisplayAnchorPractice" : isRecordStage ? "musicScoreDisplayAnchorRecord" : "musicScoreDisplayAnchorEdit";
+  const gridAnchorId = isPractice ? "musicInstrumentGridAnchorPractice" : isRecordStage ? "musicInstrumentGridAnchorRecord" : "musicInstrumentGridAnchorEdit";
+  document.getElementById(scoreAnchorId).appendChild(scoreDisplay);
+  document.getElementById(gridAnchorId).appendChild(grid);
 
   if (isPractice) {
     document.getElementById("musicPlaybackAnchorPractice").appendChild(playbackRow);
@@ -1615,11 +1634,37 @@ function updateModeUI() {
   } else {
     // 編集モードでも、入力した譜面をその場で再生して確認・微調整できるようにする
     document.getElementById("musicPlaybackAnchorEdit").appendChild(playbackRow);
+    if (isRecordStage) renderRecordStageName();
   }
 
   // モードによって演奏ボタンの描画方法が異なる（編集＝伸縮するボタン行、
-  // 練習＝実機座標の絶対配置）ため、モード切り替え時に描画し直す
+  // 練習・録音の全画面ステージ＝実機座標の絶対配置）ため、切り替え時に描画し直す
   renderInstrumentGrid();
+}
+
+// 「全画面で演奏する」を開閉する。録音のON/OFFやページモードの切り替えでも
+// isRecordStageActive()の結果が変わるため、そのたびにupdateModeUI()で
+// 全画面ステージの表示・アンカー移動・演奏ボタンの描画をまとめて更新し直す
+function openRecordStage() {
+  recordStageOpen = true;
+  updateModeUI();
+}
+
+function closeRecordStage() {
+  recordStageOpen = false;
+  updateModeUI();
+}
+
+// 録音ステージ上部に、今使っている楽器・配置と曲名を表示する
+// （練習モードのrenderPracticeStageNameと同じ考え方。正解/ミス集計や曲情報パネルは
+// 「まだ完成していない譜面を作っている最中」のため表示しない）
+function renderRecordStageName() {
+  const inst = getInstrument(currentInstrumentId);
+  const layout = getLayout(inst, currentLayoutId);
+  const instLabel = T(inst.nameKey, inst.nameFallback);
+  const layoutLabel = inst.layouts.length > 1 ? `・${T(layout.labelKey, layout.labelFallback)}` : "";
+  const name = scoreName || T("music_default_score_name", "譜面");
+  document.getElementById("musicRecordStageName").textContent = `${name}（${instLabel}${layoutLabel}）`;
 }
 
 // 練習ステージ上部に、今使っている楽器・配置と曲名を表示する
@@ -2121,7 +2166,7 @@ function toggleKeyLabels() {
 }
 
 function updateSoundToggleUI() {
-  ["musicSoundToggleBtn", "musicSoundToggleBtnStage", "musicSoundToggleBtnFollow"].forEach((id) => {
+  ["musicSoundToggleBtn", "musicSoundToggleBtnStage", "musicSoundToggleBtnFollow", "musicSoundToggleBtnRecord"].forEach((id) => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.innerHTML = icon(soundEnabled ? "volumeOn" : "volumeOff", { size: 18 });
@@ -2686,8 +2731,11 @@ function bindControls() {
   document.getElementById("musicEditTabCreateBtn").addEventListener("click", () => setEditTab("create"));
   document.getElementById("musicPracticeExitBtn").addEventListener("click", () => setPageMode("edit"));
   document.getElementById("musicFollowExitBtn").addEventListener("click", () => setPageMode("edit"));
+  document.getElementById("musicRecordFullscreenBtn").addEventListener("click", openRecordStage);
+  document.getElementById("musicRecordExitBtn").addEventListener("click", closeRecordStage);
   document.getElementById("musicSoundToggleBtnStage").addEventListener("click", toggleSound);
   document.getElementById("musicSoundToggleBtnFollow").addEventListener("click", toggleSound);
+  document.getElementById("musicSoundToggleBtnRecord").addEventListener("click", toggleSound);
 
   document.getElementById("musicCalibToggleBtn").addEventListener("click", toggleCalibMode);
   document.getElementById("musicCalibResetBtn").addEventListener("click", resetCalibration);
