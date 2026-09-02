@@ -405,13 +405,25 @@ function handleOptionInputChange(){
 }
 
 // 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き）のマス数
+// 実際の支柱建材は1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの2倍の高さがある
+// （立方体の建材を前提にした換算ではない）。そのため立体モードで画像の縦横比
+// から高さのマス数を決めるときは、ボクセル1段＝実際の支柱2個ぶんの高さに
+// 相当することを踏まえ、単純な比率の半分のマス数にする。これにより、実際に
+// 支柱で建てた完成物が、1×1×1の立方体で作った場合と同じ見た目の比率になる
+// （平面モードのotherDimは奥行き軸で、この高さの特性とは無関係なので対象外）
+const SOLID_HEIGHT_ASPECT_COMPENSATION = 2;
+
 function computeOtherDim(){
   if(!frontImage) return settings.width;
-  const aspect = manualCropRect
-    ? manualCropRect.sw / manualCropRect.sh
-    : frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
+  // 常に元画像そのものの縦横比を使う（切り抜き範囲＝manualCropRectは、
+  // このwidth/otherDim比になるようcrop stageのビューポート自体を固定した上で
+  // 選ばれるため、manualCropRect.sw/shから逆算すると、確定後は
+  // 「width/otherDim」比そのものに一致してしまい、再度この関数を呼ぶたびに
+  // 補正が重ねがけされてしまう＝毎回さらに半分になっていくバグになる）
+  const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
   const maxOther = settings.mode === "solid" ? SITE_MAX_HEIGHT : SITE_MAX_DEPTH;
-  return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect)));
+  const compensation = settings.mode === "solid" ? SOLID_HEIGHT_ASPECT_COMPENSATION : 1;
+  return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect / compensation)));
 }
 
 // ══════════════════════════════════════

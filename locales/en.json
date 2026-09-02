@@ -885,7 +885,7 @@
   "build_import_btn": "Import (JSON)",
   "build_help_title": "How to use",
   "build_help_1_title": "① Choose an image & building mode",
-  "build_help_1_body": "Upload an image and choose \"Solid (statue)\" or \"Flat (ground)\". Set the width, thickness, hollowing, and auto-transparent background here too. In solid mode you can also add an optional back image.",
+  "build_help_1_body": "Upload an image and choose \"Solid (statue)\" or \"Flat (ground)\". Set the width, thickness, hollowing, and auto-transparent background here too. In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built.",
   "build_help_2_title": "② Adjust position",
   "build_help_2_body": "Drag to position and use the slider to zoom, setting the crop area for the front image.",
   "build_help_3_title": "③ 3D blueprint & material list",
