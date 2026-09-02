@@ -317,6 +317,11 @@ body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:va
 .build-progress-slider-row input[type="range"]{
   flex:1;
   accent-color:var(--indigo);
+  /* body側で touch-action:pan-x pan-y を指定しており（ページ全体のピンチ/
+     ダブルタップズーム防止用）、touch-actionは祖先要素との積集合になるため、
+     このままだとiOS Safari等でスライダーのつまみをドラッグできなくなる。
+     このスライダー自身には通常のタップ・ドラッグ操作を許可する */
+  touch-action:manipulation;
 }
 
 .build-progress-slider-row output{
@@ -329,6 +334,30 @@ body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:va
 }
 
 body.dark .build-progress-slider-row output{ color:#e8d2a8; }
+
+.build-progress-step-btn{
+  flex-shrink:0;
+  width:26px;
+  height:26px;
+  border:1px solid var(--border);
+  border-radius:50%;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+
+.build-progress-step-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
+body.dark .build-progress-step-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
 
 .build-toolbar-divider{
   width:1px;
@@ -632,7 +661,9 @@ body.dark .build-library-item{
 
     <div class="build-progress-slider-row">
       <span class="build-progress-slider-label" data-i18n="build_progress_slider_label">施工ステージ</span>
+      <button type="button" class="build-progress-step-btn" id="buildProgressMinusBtn" aria-label="-1">－</button>
       <input type="range" id="buildProgressSlider" min="1" max="1" value="1">
+      <button type="button" class="build-progress-step-btn" id="buildProgressPlusBtn" aria-label="+1">＋</button>
       <output id="buildProgressOutput" data-i18n="build_progress_all">全て</output>
     </div>
     <p class="art-step-hint" id="buildProgressHint" style="display:none;" data-i18n="build_progress_edit_disabled_hint">施工ステージ表示中は編集できません。「全て」に戻すと編集を再開できます</p>
@@ -790,7 +821,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=13"></script>
+<script type="module" src="js/build.js?v=14"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

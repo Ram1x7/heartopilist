@@ -140,13 +140,27 @@ function updateProgressUI(){
   ["buildToolPenBtn", "buildToolEraserBtn", "buildPaletteBtn"].forEach(id => {
     document.getElementById(id).disabled = !full;
   });
+  document.getElementById("buildProgressMinusBtn").disabled = progressLayer <= 1;
+  document.getElementById("buildProgressPlusBtn").disabled = !resultDims || progressLayer >= resultDims.h;
+}
+
+function applyProgressLayer(){
+  const slider = document.getElementById("buildProgressSlider");
+  slider.value = String(progressLayer);
+  updateProgressUI();
+  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
 }
 
 function handleProgressSliderChange(){
   const slider = document.getElementById("buildProgressSlider");
   progressLayer = Number(slider.value);
-  updateProgressUI();
-  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
+  applyProgressLayer();
+}
+
+function stepProgressLayer(delta){
+  if(!resultDims) return;
+  progressLayer = Math.min(resultDims.h, Math.max(1, progressLayer + delta));
+  applyProgressLayer();
 }
 
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
@@ -1190,6 +1204,8 @@ function initBuildPage(){
   document.getElementById("buildUndoBtn").addEventListener("click", undoEdit);
   document.getElementById("buildRedoBtn").addEventListener("click", redoEdit);
   document.getElementById("buildProgressSlider").addEventListener("input", handleProgressSliderChange);
+  document.getElementById("buildProgressMinusBtn").addEventListener("click", () => stepProgressLayer(-1));
+  document.getElementById("buildProgressPlusBtn").addEventListener("click", () => stepProgressLayer(1));
 
   // ヘルプモーダル内の「チュートリアルをもう一度見る」ボタン。build.jsが
   // ESモジュールになったことで、BUILD_TUTORIAL_DONE_KEY等のモジュール内定数は
