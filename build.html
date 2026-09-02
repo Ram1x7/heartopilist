@@ -301,6 +301,35 @@ body.dark .build-stage-hint{ color:#ece4d4; background:rgba(255,255,255,0.08); }
 body.dark .build-tool-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
 body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
 
+.build-progress-slider-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
+}
+
+.build-progress-slider-label{
+  font-size:11px;
+  color:var(--text-sub);
+  white-space:nowrap;
+}
+
+.build-progress-slider-row input[type="range"]{
+  flex:1;
+  accent-color:var(--indigo);
+}
+
+.build-progress-slider-row output{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  font-family:'Zen Maru Gothic', sans-serif;
+  min-width:44px;
+  text-align:right;
+}
+
+body.dark .build-progress-slider-row output{ color:#e8d2a8; }
+
 .build-toolbar-divider{
   width:1px;
   height:20px;
@@ -461,7 +490,7 @@ body.dark .build-library-item{
 </div>
 
 <div class="art-notice" data-i18n="build_notice">
-  現在は試験公開中です。範囲選択での一括編集・建築ガイド・共有リンク機能は準備中です。
+  現在は試験公開中です。範囲選択での一括編集・施工ステージの自動再生・共有リンク機能は準備中です。
 </div>
 
 <div class="art-convert-progress" id="buildProgress">
@@ -601,6 +630,13 @@ body.dark .build-library-item{
       </button>
     </div>
 
+    <div class="build-progress-slider-row">
+      <span class="build-progress-slider-label" data-i18n="build_progress_slider_label">施工ステージ</span>
+      <input type="range" id="buildProgressSlider" min="1" max="1" value="1">
+      <output id="buildProgressOutput" data-i18n="build_progress_all">全て</output>
+    </div>
+    <p class="art-step-hint" id="buildProgressHint" style="display:none;" data-i18n="build_progress_edit_disabled_hint">施工ステージ表示中は編集できません。「全て」に戻すと編集を再開できます</p>
+
     <div class="build-stage-wrap">
       <div class="build-stage">
         <canvas id="buildCanvas"></canvas>
@@ -677,10 +713,13 @@ body.dark .build-library-item{
     <p style="margin-top:10px;"><strong data-i18n="build_help_edit_title">④ 手動で編集する</strong><br>
     <span data-i18n="build_help_edit_body">「ペン」を選んで面をタップすると、その面に接する形で選択中の建材を1つ追加できます。「消しゴム」を選んでタップすると、そのボクセルを削除できます。「建材を選ぶ」でペンに使う建材を切り替えられます。「元に戻す」「やり直す」で編集を取り消し・再実行できます。</span></p>
 
-    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">⑤ 保存・書き出し</strong><br>
+    <p style="margin-top:10px;"><strong data-i18n="build_help_progress_title">⑤ 施工ステージを確認する</strong><br>
+    <span data-i18n="build_help_progress_body">「施工ステージ」のスライダーを動かすと、下から何段目まで積み上げた状態かを確認できます。「全て」以外を選んでいる間は編集できません。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">⑥ 保存・書き出し</strong><br>
     <span data-i18n="build_help_4_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
 
-    <p style="margin-top:10px; font-size:11px; color:var(--text-sub);" data-i18n="build_help_note_wip">※ 範囲選択での一括編集・建築ガイドの自動再生・共有リンク機能は現在準備中です。</p>
+    <p style="margin-top:10px; font-size:11px; color:var(--text-sub);" data-i18n="build_help_note_wip">※ 範囲選択での一括編集・施工ステージの自動再生・共有リンク機能は現在準備中です。</p>
 
     <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(BUILD_TUTORIAL_DONE_KEY, BUILD_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
@@ -751,7 +790,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=9"></script>
+<script type="module" src="js/build.js?v=10"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

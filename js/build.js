@@ -97,7 +97,7 @@ function redoEdit(){
 }
 
 function refreshVoxelView(){
-  Build3D.setVoxels(resultVoxels, { fit: false });
+  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
   renderBuildMaterialList();
 }
 
@@ -105,9 +105,53 @@ function inBounds(x, y, z){
   return resultDims && x >= 0 && x < resultDims.w && y >= 0 && y < resultDims.h && z >= 0 && z < resultDims.d;
 }
 
+// ══════════════════════════════════════
+// 施工ステージ表示（下から積み上げた場合に何段目まで見えるかのスライダー）
+// ══════════════════════════════════════
+let progressLayer = 1; // 1〜resultDims.h。resultDims.h＝全て表示
+
+function isProgressFull(){
+  return !resultDims || progressLayer >= resultDims.h;
+}
+
+function getVisibleVoxels(){
+  if(!resultVoxels) return [];
+  if(isProgressFull()) return resultVoxels;
+  return resultVoxels.filter(v => v.y < progressLayer);
+}
+
+function setupProgressSlider(){
+  const slider = document.getElementById("buildProgressSlider");
+  if(!resultDims) return;
+  slider.max = String(Math.max(1, resultDims.h));
+  progressLayer = resultDims.h;
+  slider.value = String(progressLayer);
+  updateProgressUI();
+}
+
+function updateProgressUI(){
+  const output = document.getElementById("buildProgressOutput");
+  const hint = document.getElementById("buildProgressHint");
+  const full = isProgressFull();
+  output.textContent = full ? T("build_progress_all", "全て") : T("build_progress_layer", "{n}段目").replace("{n}", progressLayer);
+  hint.style.display = full ? "none" : "block";
+  // 施工ステージ表示中（全て以外）はペン/消しゴム/建材選択を無効化する
+  // （Undo/Redoは編集履歴の有無で別途制御するため、ここでは触らない）
+  ["buildToolPenBtn", "buildToolEraserBtn", "buildPaletteBtn"].forEach(id => {
+    document.getElementById(id).disabled = !full;
+  });
+}
+
+function handleProgressSliderChange(){
+  const slider = document.getElementById("buildProgressSlider");
+  progressLayer = Number(slider.value);
+  updateProgressUI();
+  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
+}
+
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
 function handleEditClick(hit){
-  if(!hit || !resultVoxels) return;
+  if(!hit || !resultVoxels || !isProgressFull()) return;
   if(editTool === "eraser"){
     if(!hit.voxel) return;
     pushHistory();
@@ -653,24 +697,83 @@ function lumaOf(rgb){
   return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
 }
 
-// solid（立体・像）：正面グリッドの各セルを厚さ分だけ奥行き方向へ押し出す。
-// 背面画像がある場合は、最も奥のレイヤーだけ背面グリッドの色に置き換える。
+// シルエット内部の「奥行き」を距離変換で推定する：塗りセルそれぞれについて、
+// 最も近い「空セル、またはグリッドの外側」までの距離（4近傍のマンハッタン距離、
+// 多始点BFS）を求め、シルエット内での最大値で正規化した0〜1の値を返す。
+// 0＝輪郭のすぐ内側（薄い）、1＝シルエットの最も奥まった中心（厚い）。
+// これを使って押し出しに丸み（ドーム状の膨らみ）を持たせる
+function computeInteriorBulge(cells, w, h){
+  const n = w * h;
+  const distFromEmpty = new Array(n).fill(Infinity);
+  const queue = [];
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const i = y * w + x;
+      if(!cells[i]){ distFromEmpty[i] = 0; queue.push(i); }
+    }
+  }
+  let qi = 0;
+  while(qi < queue.length){
+    const i = queue[qi++];
+    const x = i % w, y = (i / w) | 0;
+    const d = distFromEmpty[i];
+    const neighbors = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+    for(const [nx, ny] of neighbors){
+      if(nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+      const ni = ny * w + nx;
+      if(distFromEmpty[ni] > d + 1){ distFromEmpty[ni] = d + 1; queue.push(ni); }
+    }
+  }
+  const dist = new Array(n).fill(0);
+  let maxDist = 1;
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const i = y * w + x;
+      if(!cells[i]) continue;
+      // グリッドの端も「外側」とみなした距離（クロップ端で切れているシルエットも
+      // そこで薄くなるようにする）
+      const edgeDist = Math.min(x + 1, w - x, y + 1, h - y);
+      const d = Math.min(distFromEmpty[i], edgeDist);
+      dist[i] = d;
+      if(d > maxDist) maxDist = d;
+    }
+  }
+  const bulge = new Array(n).fill(0);
+  for(let i = 0; i < n; i++){
+    if(cells[i]) bulge[i] = dist[i] / maxDist;
+  }
+  return bulge;
+}
+
+// solid（立体・像）：正面グリッドの各セルを、シルエット内部の奥行き推定
+// （computeInteriorBulge）に応じた厚みぶんだけ奥行き方向へ押し出す。輪郭付近は
+// 薄く、シルエットの中心に近いほど厚くなり、丸み（ドーム状の膨らみ）が出る。
+// 背面画像がある場合は、各列の最も奥のボクセルだけ背面グリッドの色に置き換える。
+// 画像の行y=0（画像の上端）は立体の最上部（ワールドY最大）に対応させる
+// （そのまま使うと上下が反転してしまうため反転させる）。
 // 空洞化：全6方向の隣接ボクセルが埋まっている（＝外から絶対に見えない）
 // ボクセルだけを間引く
 function buildSolidVoxels(frontGrid, backGrid, w, h, thickness, hollow){
+  const bulge = computeInteriorBulge(frontGrid.cells, w, h);
+  const centerZ = (thickness - 1) / 2;
   const key = (x, y, z) => `${x},${y},${z}`;
   const map = new Map();
   for(let y = 0; y < h; y++){
     for(let x = 0; x < w; x++){
-      const front = frontGrid.cells[y * w + x];
+      const idx = y * w + x;
+      const front = frontGrid.cells[idx];
       if(!front) continue;
-      for(let z = 0; z < thickness; z++){
+      const worldY = h - 1 - y;
+      const halfDepth = Math.max(0.5, bulge[idx] * (thickness - 1) / 2);
+      const zFrom = Math.max(0, Math.round(centerZ - halfDepth));
+      const zTo = Math.min(thickness - 1, Math.round(centerZ + halfDepth));
+      for(let z = zFrom; z <= zTo; z++){
         let material = front;
-        if(z === thickness - 1 && backGrid){
-          const back = backGrid.cells[y * w + x];
+        if(z === zTo && backGrid){
+          const back = backGrid.cells[idx];
           if(back) material = back;
         }
-        map.set(key(x, y, z), material);
+        map.set(key(x, worldY, z), material);
       }
     }
   }
@@ -749,7 +852,8 @@ function runBuildGeneration(){
   }
 
   ensureSceneInitialized();
-  Build3D.setVoxels(resultVoxels);
+  setupProgressSlider();
+  Build3D.setVoxels(getVisibleVoxels());
   renderBuildMaterialList();
   clearHistory();
 }
@@ -946,7 +1050,8 @@ function loadDesign(id){
   document.getElementById("buildResultStage").style.display = "block";
   document.getElementById("buildDesignNameInput").value = design.name;
   ensureSceneInitialized();
-  Build3D.setVoxels(resultVoxels);
+  setupProgressSlider();
+  Build3D.setVoxels(getVisibleVoxels());
   renderBuildMaterialList();
   clearHistory();
   updateBuildStepProgress("finish");
@@ -1069,6 +1174,7 @@ function initBuildPage(){
   });
   document.getElementById("buildUndoBtn").addEventListener("click", undoEdit);
   document.getElementById("buildRedoBtn").addEventListener("click", redoEdit);
+  document.getElementById("buildProgressSlider").addEventListener("input", handleProgressSliderChange);
 
   document.addEventListener("darkmodechange", () => {
     if(sceneInitialized){
