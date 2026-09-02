@@ -669,6 +669,7 @@
   "music_preset_chocho": "ちょうちょ",
   "music_timesig_label": "拍子",
   "music_record_toggle": "録音する",
+  "music_record_fullscreen_btn": "全画面で演奏する",
   "music_record_hint": "押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります",
   "music_layout_default": "標準",
   "music_layout_2row": "15鍵（2列）",

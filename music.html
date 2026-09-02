@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/music.css?v=46">
+<link rel="stylesheet" href="./css/music.css?v=49">
 <link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
@@ -161,6 +161,7 @@
           <span data-i18n="music_record_toggle">録音する</span>
           <input type="checkbox" id="musicRecordToggle">
         </label>
+        <button class="music-header-btn music-btn-secondary" id="musicRecordFullscreenBtn" style="display:none" data-i18n="music_record_fullscreen_btn">全画面で演奏する</button>
         <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります</p>
         <div class="music-duration-options" id="musicDurationOptions"></div>
         <p class="music-record-hint" id="musicDurationHint" data-i18n="music_duration_hint">上で選んでいる長さが、演奏ボタンで入力する音符にも「休符を追加」の休符にも使われます</p>
@@ -216,6 +217,27 @@
   </div>
 </div>
 
+<!-- 「作る」タブの録音モード：任意で開ける全画面ステージ。練習モードと同じ構成
+     （演奏ボタン領域を画面全体に敷き、上部バー・譜面プレビューをその上に重ねる）
+     にすることで、練習モードの「実機画像に重ねる」調整機能（musicCalibToggleBtn
+     以下、js/music-editor.jsが調整時にstageに応じて付け替える）もそのまま
+     録音の全画面ステージで使えるようにする。端末が縦向きでもCSSで横画面表示にし、
+     実機と同じ大きさ・配置のボタンで演奏しながら録音できる
+     （「全画面で演奏する」ボタンで開閉） -->
+<div class="music-record-stage" id="musicRecordStage">
+  <div id="musicInstrumentGridAnchorRecord"></div>
+  <div class="music-practice-stage-overlay-top">
+    <div class="music-practice-stage-topbar">
+      <div class="music-record-stage-title" id="musicRecordStageName"></div>
+      <div class="music-practice-topbar-icons" id="musicRecordTopbarIcons">
+        <button class="music-sound-btn" id="musicSoundToggleBtnRecord" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+        <button class="music-practice-exit-btn" id="musicRecordExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
+      </div>
+    </div>
+    <div id="musicScoreDisplayAnchorRecord"></div>
+  </div>
+</div>
+
 <!-- 練習モード：全画面の専用ステージ。端末が縦向きでもCSSで横画面表示にする。
      演奏ボタンの領域は画面全体を基準に中央寄せし、上部バー・譜面プレビューは
      その上に重ねて表示する（どの配置でもボタンは画面上部約2/3には現れないため、
@@ -245,7 +267,7 @@
       </div>
       <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
       <div class="music-practice-accuracy" id="musicPracticeAccuracy"></div>
-      <div class="music-practice-topbar-icons">
+      <div class="music-practice-topbar-icons" id="musicPracticeTopbarIcons">
         <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="Match game screen" data-i18n-aria-label="music_calib_toggle_label" aria-pressed="false"></button>
         <div class="music-calib-hint-bubble" id="musicCalibHintBubble" data-i18n="music_calib_hint_once">画面がずれる場合は、ここで「ゲーム画面に合わせる」を調整できます</div>
         <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
@@ -525,7 +547,7 @@
     「音の長さ」を選んでから演奏ボタンを押すと、その音が譜面に追加されます。音を出さない「休符」を入れたいときは「休符を追加」を押すと、選んでいる長さの休符が譜面の最後に追加されます（数字譜では「0」で表示されます）。「最後を削除」で1つ前に戻せます。</p>
 
     <p style="margin-top:10px;"><strong>録音する</strong><br>
-    ONにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。複数のボタンを同時に押すと和音として記録されます。テンポ・拍子が初期値のまま一度も変更されていない状態で録音を始めようとすると、先に確認するかどうかの案内が出ます（音の長さの自動判定に影響するため）。</p>
+    ONにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。複数のボタンを同時に押すと和音として記録されます。録音中は演奏ボタンの配置も、押し間違いを減らせるよう練習モードと同じ実機の配置に切り替わります。「全画面で演奏する」を押すと、練習モードと同じ全画面表示（端末を横向きにすると画面いっぱいの実機サイズ）で演奏しながら録音でき、右上のレンチのアイコンでの位置調整（下記「位置調整」参照）も使えます。閉じても録音は続いたままで、いつでも開き直せます。テンポ・拍子が初期値のまま一度も変更されていない状態で録音を始めようとすると、先に確認するかどうかの案内が出ます（音の長さの自動判定に影響するため）。</p>
 
     <p style="margin-top:10px;"><strong>テンポ・拍子</strong><br>
     BPM（1分間の拍数）と拍子（4/4・3/4など）を設定できます。練習モードの再生速度はテンポを基準にした倍率です。小節線は拍子をもとに自動で表示されます。</p>
@@ -540,7 +562,7 @@
     PCで開いている場合、キーボードでも演奏ボタンを操作できます（編集モード・練習モードのみ。追従モードは対象外です）。対応するキーは各演奏ボタンに小さく表示されます（「楽器」の下にあるチェックで表示・非表示を切り替えられます）。楽器・配置を変えると対応キーも変わります。半音（♯）ボタンにはキー割り当てがなく、タッチ操作のみです。複数のキーを同時に押すと和音として扱われ、譜面作成中の入力・保存内容もタッチ操作と同じです。Ctrl+Z（元に戻す）・Ctrl+Y（やり直す）などの既存のショートカットとは干渉しません。</p>
 
     <p style="margin-top:10px;"><strong>位置調整</strong><br>
-    練習モード右上のレンチのアイコンで、演奏ボタンの大きさ・位置を自分の端末に合わせて微調整できます。1本指ドラッグで移動、2本指ピンチで拡大縮小でき、「実機画像を重ねる」で実際のゲーム画面のスクリーンショットを背景に薄く表示しながら位置合わせすることもできます（画像は保存されず、その場限りの参考表示です）。「ロックする」で調整を確定すると、この端末・ブラウザに記憶され、次回から自動で適用されます。「リセット」でいつでも初期値に戻せます。</p>
+    練習モード右上、または録音モードで「全画面で演奏する」を開いたときのレンチのアイコンで、演奏ボタンの大きさ・位置を自分の端末に合わせて微調整できます。1本指ドラッグで移動、2本指ピンチで拡大縮小でき、「実機画像を重ねる」で実際のゲーム画面のスクリーンショットを背景に薄く表示しながら位置合わせすることもできます（画像は保存されず、その場限りの参考表示です）。「ロックする」で調整を確定すると、この端末・ブラウザに記憶され、次回から自動で適用されます（練習モード・録音モードのどちらで調整しても、もう一方にも同じ調整が反映されます）。「リセット」でいつでも初期値に戻せます。</p>
 
     <p style="margin-top:10px;"><strong>追従モード</strong><br>
     「追従」をタップすると、演奏ボタンを出さず、今弾く音と次の音だけを大きく表示する全画面表示に切り替わります。実際のゲーム画面と、iPadの「Split View」などの分割画面で並べて表示し、実機で演奏しながら次の音を確認する使い方を想定しています。練習モードと違って横画面には固定されません。譜面を0.1〜1.0倍速で自動再生し、テンポに合わせて表示が進みます。効果音が実機の音と重ならないよう、ミュートしての利用をおすすめします。</p>
