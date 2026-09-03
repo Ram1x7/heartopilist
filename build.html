@@ -29,7 +29,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/art.css?v=66">
+<link rel="stylesheet" href="./css/art.css?v=67">
 <link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
@@ -271,6 +271,14 @@ body.dark .build-stage-hint{ color:#ece4d4; background:rgba(255,255,255,0.08); }
   gap:6px;
   flex-wrap:wrap;
   margin-bottom:10px;
+}
+
+.build-guide-picker{
+  margin:-4px 0 10px;
+}
+
+.build-guide-picker .art-step-hint{
+  margin:0 0 6px;
 }
 
 .build-tool-btn{
@@ -709,6 +717,11 @@ body.dark .build-library-item{
       <button type="button" class="build-tool-btn build-guide-size-btn" data-size="16">16×16</button>
     </div>
 
+    <div class="build-guide-picker" id="buildGuidePickerWrap" style="display:none;">
+      <p class="art-step-hint" data-i18n="build_guide_picker_hint">ブロックを選ぶと、そのマスに何を置くか手順で確認できます</p>
+      <div class="art-block-list" id="buildBlockList"></div>
+    </div>
+
     <div class="build-stage-wrap">
       <div class="build-stage">
         <canvas id="buildCanvas"></canvas>
@@ -758,6 +771,32 @@ body.dark .build-library-item{
       <button class="art-crop-reset-btn" id="buildImportBtn" data-i18n="build_import_btn">読み込み（JSON）</button>
       <input type="file" id="buildImportInput" accept="application/json" hidden>
     </div>
+  </div>
+</div>
+
+<div class="art-guide-overlay" id="buildGuideOverlay" style="display:none;">
+  <div class="art-guide-topbar">
+    <div class="art-guide-progress-wrap">
+      <div class="art-guide-progress-label" id="buildGuideProgressLabel"></div>
+      <div class="art-guide-progress-bar"><div class="art-guide-progress-fill" id="buildGuideProgressFill"></div></div>
+    </div>
+    <button type="button" class="art-guide-close-btn" id="buildGuideCloseBtn" aria-label="close">
+      <span class="btn-icon" data-icon="close"></span>
+    </button>
+  </div>
+  <div class="art-guide-canvas-wrap">
+    <canvas id="buildGuideCanvas"></canvas>
+  </div>
+  <div class="art-guide-instruction">
+    <div class="art-guide-color-chip" id="buildGuideColorChip"></div>
+    <div class="art-guide-info">
+      <div class="art-guide-method-badges" id="buildGuideMethodBadges"></div>
+      <div class="art-guide-detail" id="buildGuideDetail"></div>
+    </div>
+  </div>
+  <div class="art-guide-controls">
+    <button type="button" class="art-guide-nav-btn" id="buildGuidePrevBtn" data-i18n="build_guide_prev">戻る</button>
+    <button type="button" class="art-guide-nav-btn art-guide-nav-btn-primary" id="buildGuideNextBtn" data-i18n="build_guide_next">次へ</button>
   </div>
 </div>
 
@@ -862,7 +901,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=23"></script>
+<script type="module" src="js/build.js?v=24"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
