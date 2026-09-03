@@ -262,6 +262,18 @@ function applyBlockGuide(){
   Build3D.setBlockGuide(blockGuideSize, { w: resultDims.w, d: resultDims.d }, dark);
 }
 
+// 3Dビューの床に1×1マスごとの点線・2×2マスごとの太線を常時表示する
+// （トグルなし）。低い壁モードは支柱と実寸単位系が異なり、床という概念を
+// 持たないため対象外
+function applyFloorGrid(){
+  const dark = document.body.classList.contains("dark");
+  if(!resultDims || settings.mode === "wall"){
+    Build3D.setFloorGrid(null, dark);
+    return;
+  }
+  Build3D.setFloorGrid({ w: resultDims.w, d: resultDims.d }, dark);
+}
+
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
 function handleEditClick(hit){
   if(!hit || !resultVoxels || !isProgressFull()) return;
@@ -1110,6 +1122,7 @@ function runBuildGeneration(){
   blockGuideSize = 0;
   updateGuideRow();
   applyBlockGuide();
+  applyFloorGrid();
   updateEditToolbarVisibility();
   Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
   refreshResultView();
@@ -1360,6 +1373,7 @@ function loadDesign(id){
   blockGuideSize = 0;
   updateGuideRow();
   applyBlockGuide();
+  applyFloorGrid();
   updateEditToolbarVisibility();
   Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
   refreshResultView();
@@ -1520,6 +1534,7 @@ function initBuildPage(){
     if(sceneInitialized){
       Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
       applyBlockGuide();
+      applyFloorGrid();
     }
   });
 }

@@ -21,6 +21,7 @@ const WALL_PANEL_D = 0.5;
 
 let canvasEl, stageEl, scene, camera, renderer, mesh, wallMesh, boundBox;
 let blockGuide = null;
+let floorGridDotted = null, floorGridBold = null;
 let bounds = { w: 24, h: 24, d: 24 };
 let camTheta = 0.9, camPhi = 1.05, camDist = 40;
 // ズーム操作（ホイール・ピンチ）の許容範囲の基準値。表示中のコンテンツの
@@ -358,15 +359,90 @@ function setBlockGuide(blockSize, designDims, dark){
   scene.add(blockGuide);
 }
 
+function disposeFloorGrid(){
+  if(floorGridDotted){
+    scene.remove(floorGridDotted);
+    floorGridDotted.geometry.dispose();
+    floorGridDotted.material.dispose();
+    floorGridDotted = null;
+  }
+  if(floorGridBold){
+    scene.remove(floorGridBold);
+    floorGridBold.traverse((obj) => { if(obj.geometry) obj.geometry.dispose(); });
+    // グループ内の全メッシュが同じmaterialを共有しているので1回だけdisposeする
+    if(floorGridBold.children[0]) floorGridBold.children[0].material.dispose();
+    floorGridBold = null;
+  }
+}
+
+// 3Dビューの底面（Y≈0の床面）に、1×1マスごとの点線と2×2マスごとの太線で
+// マス目の目安を表示する（常時表示・トグルなし）。低い壁モードは実寸単位系が
+// 支柱と異なり床という概念を持たないため対象外（designDimsをnullで渡して隠す）。
+// designDims: {w,d}（現在の設計の外接サイズ。boundsは常にサイト最大値なので
+// 　配置ガイド同様に別途渡す）
+// dark: ダークテーマかどうか（線の色をテーマに合わせて切り替える）
+function setFloorGrid(designDims, dark){
+  disposeFloorGrid();
+  if(!designDims || !designDims.w || !designDims.d) return;
+
+  const w = designDims.w, d = designDims.d;
+  const offX = bounds.w / 2, offZ = bounds.d / 2;
+  const dottedColor = dark ? 0x9a9284 : 0xb0a795;
+  const boldColor = dark ? 0xd8cba6 : 0x8a7554;
+
+  // 1×1点線（2の倍数の位置は太線と重なるので除外する）
+  const dottedPositions = [];
+  for(let x = 0; x <= w; x++){
+    if(x % 2 === 0) continue;
+    const wx = x - offX;
+    dottedPositions.push(wx, 0.012, -offZ, wx, 0.012, d - offZ);
+  }
+  for(let z = 0; z <= d; z++){
+    if(z % 2 === 0) continue;
+    const wz = z - offZ;
+    dottedPositions.push(-offX, 0.012, wz, w - offX, 0.012, wz);
+  }
+  if(dottedPositions.length > 0){
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(dottedPositions, 3));
+    const material = new THREE.LineDashedMaterial({
+      color: dottedColor, dashSize: 0.22, gapSize: 0.18, transparent: true, opacity: 0.8,
+    });
+    floorGridDotted = new THREE.LineSegments(geometry, material);
+    floorGridDotted.computeLineDistances(); // ダッシュ表示にはセグメントごとの距離計算が必須
+    scene.add(floorGridDotted);
+  }
+
+  // 2×2太線：LineBasicMaterialのlinewidthは環境（ANGLE/OS）依存でほぼ効かない
+  // ため、確実に太く見えるよう薄い板（Box）で代用する
+  const BOLD_WIDTH = 0.07;
+  const boldMaterial = new THREE.MeshBasicMaterial({ color: boldColor, transparent: true, opacity: 0.85 });
+  floorGridBold = new THREE.Group();
+  for(let x = 0; x <= w; x += 2){
+    const wx = x - offX;
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(BOLD_WIDTH, 0.01, d), boldMaterial);
+    strip.position.set(wx, 0.018, d / 2 - offZ);
+    floorGridBold.add(strip);
+  }
+  for(let z = 0; z <= d; z += 2){
+    const wz = z - offZ;
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(w, 0.01, BOLD_WIDTH), boldMaterial);
+    strip.position.set(w / 2 - offX, 0.018, wz);
+    floorGridBold.add(strip);
+  }
+  scene.add(floorGridBold);
+}
+
 function dispose(){
   if(rafId != null){ cancelAnimationFrame(rafId); rafId = null; }
   if(mesh){ mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
   if(wallMesh){ wallMesh.geometry.dispose(); wallMesh.material.dispose(); wallMesh = null; }
   if(blockGuide){ blockGuide.geometry.dispose(); blockGuide.material.dispose(); blockGuide = null; }
+  disposeFloorGrid();
   if(renderer) renderer.dispose();
 }
 
 export {
   init, setVoxels, setWallSegments, resize, raycastVoxelAt, setEditClickCallback,
-  setBackgroundColor, setBlockGuide, setBoundaryBoxVisible, dispose,
+  setBackgroundColor, setBlockGuide, setFloorGrid, setBoundaryBoxVisible, dispose,
 };
