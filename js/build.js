@@ -19,6 +19,16 @@ const SITE_MAX_WIDTH = 96;
 const SITE_MAX_DEPTH = 120;
 const SITE_MAX_HEIGHT = 68;
 
+// 低い壁は幅4のパネルなので、支柱換算での敷地幅上限（SITE_MAX_WIDTH＝96マス分）
+// をそのまま「列数」の上限にすると、実際の物理幅は4倍（384マス分）になって
+// しまい敷地からはみ出す。横一列に敷き詰められる最大数は 96 ÷ 4 = 24枚
+const WALL_MAX_WIDTH = Math.floor(SITE_MAX_WIDTH / 4);
+
+// 現在のモードにおける「幅」スライダーの上限マス数
+function currentWidthMax(){
+  return settings.mode === "wall" ? WALL_MAX_WIDTH : SITE_MAX_WIDTH;
+}
+
 let frontImage = null;
 let backImage = null;
 
@@ -250,6 +260,21 @@ function applyBlockGuide(){
     return;
   }
   Build3D.setBlockGuide(blockGuideSize, { w: resultDims.w, d: resultDims.d }, dark);
+}
+
+// 3Dビューの床に1×1マスごとの点線・2×2マスごとの太線を常時表示する
+// （トグルなし・全モード共通）。低い壁モードは支柱と実寸単位系が異なるため、
+// build3d-scene.js側で低い壁専用の座標系を使う別関数（setWallFloorGrid）に
+// 振り分ける
+function applyFloorGrid(){
+  const dark = document.body.classList.contains("dark");
+  if(settings.mode === "wall"){
+    // setFloorGrid/setWallFloorGridはどちらも呼び出し時に既存のグリッドを
+    // 消してから描き直すため、直前が別モードの床グリッドでも問題なく切り替わる
+    Build3D.setWallFloorGrid(resultWallDims, dark);
+    return;
+  }
+  Build3D.setFloorGrid(resultDims ? { w: resultDims.w, d: resultDims.d } : null, dark);
 }
 
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
@@ -520,7 +545,20 @@ function setBuildMode(mode){
   document.getElementById("buildWallModeTip").style.display = mode === "wall" ? "block" : "none";
   updateBackImageVisibility();
   updateColorCountMax();
+  updateWidthMax();
+  readOptionInputs();
   if(frontImage) renderBuildCropGridOverlay();
+}
+
+// 「幅」スライダーの上限を、現在のモードの敷地幅上限に合わせる
+// （低い壁は幅4のパネルのため、支柱換算の上限96マスをそのまま使うと
+// 実際の物理幅が敷地をはみ出してしまう＝24マスが上限）
+function updateWidthMax(){
+  const widthInput = document.getElementById("buildWidthInput");
+  if(!widthInput) return;
+  const max = currentWidthMax();
+  widthInput.max = String(max);
+  if(Number(widthInput.value) > max) widthInput.value = String(max);
 }
 
 // 「色数を絞る」スライダーの上限を、現在のモードの建材パレットの総色数に
@@ -534,7 +572,7 @@ function updateColorCountMax(){
 }
 
 function readOptionInputs(){
-  settings.width = Math.min(SITE_MAX_WIDTH, Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
+  settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
   settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
   settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
@@ -1087,6 +1125,7 @@ function runBuildGeneration(){
   blockGuideSize = 0;
   updateGuideRow();
   applyBlockGuide();
+  applyFloorGrid();
   updateEditToolbarVisibility();
   Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
   refreshResultView();
@@ -1337,6 +1376,7 @@ function loadDesign(id){
   blockGuideSize = 0;
   updateGuideRow();
   applyBlockGuide();
+  applyFloorGrid();
   updateEditToolbarVisibility();
   Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
   refreshResultView();
@@ -1448,6 +1488,7 @@ function initBuildPage(){
   document.getElementById("buildColorCountInput").addEventListener("input", readOptionInputs);
 
   updateColorCountMax();
+  updateWidthMax();
 
   document.querySelectorAll(".build-guide-size-btn").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -1496,6 +1537,7 @@ function initBuildPage(){
     if(sceneInitialized){
       Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
       applyBlockGuide();
+      applyFloorGrid();
     }
   });
 }
