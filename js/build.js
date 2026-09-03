@@ -461,7 +461,7 @@ function renderFlatGuideStep(){
   document.getElementById("buildGuideProgressFill").style.width = `${(stepNum / total) * 100}%`;
 
   document.getElementById("buildGuideColorChip").style.background = step.hex;
-  document.getElementById("buildGuideDetail").textContent = step.name;
+  document.getElementById("buildGuideDetail").innerHTML = buildColorNumberLabel(step.materialId, step.hex) + step.name;
 
   const badges = document.getElementById("buildGuideMethodBadges");
   badges.innerHTML = "";
@@ -636,10 +636,10 @@ function openMaterialPickerModal(){
   body.innerHTML = MATERIALS.support_pillars.items.map(material => `
     <div class="build-material-group-title">${material.name}</div>
     <div class="build-material-swatches">
-      ${material.colors.map(hex => `
+      ${material.colors.map((hex, i) => `
         <button type="button" class="build-material-swatch${selectedMaterial && selectedMaterial.materialId === material.id && selectedMaterial.hex === hex ? " active" : ""}"
           style="background:${hex}" data-material="${material.id}" data-hex="${hex}" data-name="${material.name}"
-          aria-label="${material.name} ${hex}"></button>
+          aria-label="${material.name} #${i + 1}"><span class="art-swatch-code">${i + 1}</span></button>
       `).join("")}
     </div>
   `).join("");
@@ -1560,6 +1560,26 @@ function ensureSceneInitialized(){
 // まとめる。支柱は1マス×1マスの設置面に対して高さ方向へ伸縮するため、この
 // 数え方が実際の建て方に最も近い）
 // ══════════════════════════════════════
+// 建材ID＋色hexから、その建材内での色番号（1始まり）を求める。ゲーム内の
+// ペイント選択画面も同じ並び順で表示される想定のもと、data-materials.jsの
+// colors配列の並び＝ゲーム内パレットの並びをそのまま番号として使う
+function materialColorNumber(materialId, hex){
+  for(const category of Object.values(MATERIALS)){
+    const item = category.items.find(m => m.id === materialId);
+    if(item){
+      const idx = item.colors.indexOf(hex);
+      return idx >= 0 ? idx + 1 : null;
+    }
+  }
+  return null;
+}
+
+// 建材一覧・パレット選択などに差し込む色番号バッジのHTML
+function buildColorNumberLabel(materialId, hex){
+  const num = materialColorNumber(materialId, hex);
+  return num ? `<span class="art-usage-number">#${num}</span> ` : "";
+}
+
 function computeBuildPillarSegments(){
   if(!resultVoxels || !resultDims) return [];
   const map = new Map();
@@ -1576,7 +1596,7 @@ function computeBuildPillarSegments(){
           run.height++;
         }else{
           if(run && run.key) segments.push(run);
-          run = key ? { key, name: v.name, hex: v.hex, height: 1 } : null;
+          run = key ? { key, materialId: v.materialId, name: v.name, hex: v.hex, height: 1 } : null;
         }
       }
       if(run && run.key) segments.push(run);
@@ -1593,7 +1613,7 @@ function computeWallSegmentCounts(){
   const counts = {};
   resultWallSegments.forEach(v => {
     const key = v.materialId + "_" + v.hex;
-    if(!counts[key]) counts[key] = { name: v.name, hex: v.hex, count: 0 };
+    if(!counts[key]) counts[key] = { materialId: v.materialId, name: v.name, hex: v.hex, count: 0 };
     counts[key].count++;
   });
   return Object.values(counts).sort((a, b) => b.count - a.count);
@@ -1611,7 +1631,7 @@ function renderBuildMaterialList(){
     document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
       <div class="art-result-color-row">
         <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-        <span class="art-result-color-code">${e.name}</span>
+        <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}</span>
         <span class="art-result-color-count">${e.count}${T("build_unit_walls", "枚")}</span>
       </div>
     `).join("");
@@ -1626,7 +1646,7 @@ function renderBuildMaterialList(){
   const counts = {};
   segments.forEach(seg => {
     const key = seg.key + "_" + seg.height;
-    if(!counts[key]) counts[key] = { name: seg.name, hex: seg.hex, height: seg.height, count: 0 };
+    if(!counts[key]) counts[key] = { materialId: seg.materialId, name: seg.name, hex: seg.hex, height: seg.height, count: 0 };
     counts[key].count++;
   });
   const entries = Object.values(counts).sort((a, b) => b.count - a.count);
@@ -1639,7 +1659,7 @@ function renderBuildMaterialList(){
   document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
     <div class="art-result-color-row">
       <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-      <span class="art-result-color-code">${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
+      <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
       <span class="art-result-color-count">${e.count}${T("build_unit_pillars", "本")}</span>
     </div>
   `).join("");
