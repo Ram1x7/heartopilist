@@ -141,6 +141,7 @@ function refreshResultView(opts){
 function refreshVoxelView(){
   refreshResultView({ fit: false });
   renderBuildMaterialList();
+  renderBuildBlockList();
 }
 
 function inBounds(x, y, z){
@@ -265,6 +266,252 @@ function applyBlockGuide(){
     return;
   }
   Build3D.setBlockGuide(blockGuideSize, { w: resultDims.w, d: resultDims.d }, dark);
+}
+
+// ══════════════════════════════════════
+// 設置手順ガイド（平面モード限定）
+// アートのドット絵変換にある「ぬり方ガイド」と同じ発想で、上の「配置ガイド」で
+// 区切ったブロックを1つ選ぶと、そのブロックの中だけに絞って建材ごとに
+// どのマスへ置けばいいかを順番に確認できる。ゲーム内の建築にはバケツ
+// （まとめ塗り）のような機能がないため、アート版のような境目/内側マスの
+// 区別・バケツ手順は行わず、建材ごとに置くマスを個別に示すだけのシンプルな
+// 構成にしてある。積む段数（高さ）が2以上あるマスには、その場でスタックする
+// 個数を数字で表示する
+// ══════════════════════════════════════
+let flatGuideOrder = [];      // [{materialId, hex, name, cells:[{x,z,height}]}]（選んだブロック内、建材ごと）
+let flatGuideStepIndex = 0;
+let flatGuideBlock = null;    // {bx, bz, bw, bh}
+let flatGuideBlockLabel = 0;  // ブロック一覧と同じ番号
+
+// 完成図の全マス（列ごとにまとめる。厚さ方向へ積まれた同じ建材は1マス＝1本の
+// 支柱として数え、その本数をheightとして持つ）
+function computeFlatTopCells(){
+  if(!resultVoxels) return [];
+  const map = new Map();
+  resultVoxels.forEach(v => {
+    const key = `${v.x},${v.z}`;
+    const entry = map.get(key);
+    if(entry) entry.height++;
+    else map.set(key, { x: v.x, z: v.z, materialId: v.materialId, hex: v.hex, name: v.name, height: 1 });
+  });
+  return Array.from(map.values());
+}
+
+// 指定ブロック内のマスを建材ごとにまとめ、マス数が多い建材から手順化する
+function computeFlatBlockSteps(bx, bz, bw, bh){
+  const x0 = bx * blockGuideSize, z0 = bz * blockGuideSize;
+  const inBlock = computeFlatTopCells().filter(c => c.x >= x0 && c.x < x0 + bw && c.z >= z0 && c.z < z0 + bh);
+  const map = new Map();
+  inBlock.forEach(c => {
+    const key = c.materialId + "_" + c.hex;
+    if(!map.has(key)) map.set(key, { materialId: c.materialId, hex: c.hex, name: c.name, cells: [] });
+    map.get(key).cells.push({ x: c.x, z: c.z, height: c.height });
+  });
+  return Array.from(map.values()).sort((a, b) => b.cells.length - a.cells.length);
+}
+
+// ブロック選択一覧（配置ガイドのマス割りと同じ並び）。既にマスが置かれている
+// ブロックだけタップできるようにする
+function renderBuildBlockList(){
+  const wrap = document.getElementById("buildGuidePickerWrap");
+  const el = document.getElementById("buildBlockList");
+  if(!wrap || !el) return;
+  if(settings.mode !== "flat" || blockGuideSize <= 0 || !resultDims){
+    wrap.style.display = "none";
+    el.innerHTML = "";
+    return;
+  }
+  const blocksX = Math.ceil(resultDims.w / blockGuideSize);
+  const blocksZ = Math.ceil(resultDims.d / blockGuideSize);
+  const nonEmpty = new Set();
+  computeFlatTopCells().forEach(c => {
+    nonEmpty.add(`${Math.floor(c.x / blockGuideSize)}_${Math.floor(c.z / blockGuideSize)}`);
+  });
+  el.style.gridTemplateColumns = `repeat(${blocksX}, 1fr)`;
+  let html = "";
+  for(let bz = 0; bz < blocksZ; bz++){
+    for(let bx = 0; bx < blocksX; bx++){
+      const num = bz * blocksX + bx + 1;
+      const empty = !nonEmpty.has(`${bx}_${bz}`);
+      html += `<button type="button" class="art-block-btn" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}" data-num="${num}">${num}</button>`;
+    }
+  }
+  el.innerHTML = html;
+  el.querySelectorAll(".art-block-btn:not(:disabled)").forEach(btn => {
+    btn.addEventListener("click", () => openFlatGuide(Number(btn.dataset.bx), Number(btn.dataset.bz), Number(btn.dataset.num)));
+  });
+  wrap.style.display = "block";
+}
+
+function openFlatGuide(bx, bz, blockNum){
+  const bw = Math.min(blockGuideSize, resultDims.w - bx * blockGuideSize);
+  const bh = Math.min(blockGuideSize, resultDims.d - bz * blockGuideSize);
+  const steps = computeFlatBlockSteps(bx, bz, bw, bh);
+  if(steps.length === 0){
+    if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
+    return;
+  }
+  flatGuideBlock = { bx, bz, bw, bh };
+  flatGuideBlockLabel = blockNum;
+  flatGuideOrder = steps;
+  flatGuideStepIndex = 0;
+  document.getElementById("buildGuideOverlay").style.display = "flex";
+  document.body.style.overflow = "hidden";
+  renderFlatGuideStep();
+}
+
+function closeFlatGuide(){
+  const overlay = document.getElementById("buildGuideOverlay");
+  if(overlay) overlay.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+function flatGuideNext(){
+  if(flatGuideStepIndex >= flatGuideOrder.length - 1){
+    const label = flatGuideBlockLabel;
+    closeFlatGuide();
+    if(typeof showToast === "function") showToast(T("build_guide_block_done", `ブロック${label}の手順は以上です`, { block: label }));
+    return;
+  }
+  flatGuideStepIndex++;
+  renderFlatGuideStep();
+}
+
+function flatGuidePrev(){
+  if(flatGuideStepIndex <= 0) return;
+  flatGuideStepIndex--;
+  renderFlatGuideStep();
+}
+
+function renderFlatGuideStep(){
+  const total = flatGuideOrder.length;
+  const step = flatGuideOrder[flatGuideStepIndex];
+  const stepNum = flatGuideStepIndex + 1;
+
+  document.getElementById("buildGuideProgressLabel").textContent =
+    T("build_guide_step_of", `${stepNum} / ${total}（ブロック${flatGuideBlockLabel}）`, { current: stepNum, total, block: flatGuideBlockLabel });
+  document.getElementById("buildGuideProgressFill").style.width = `${(stepNum / total) * 100}%`;
+
+  document.getElementById("buildGuideColorChip").style.background = step.hex;
+  document.getElementById("buildGuideDetail").textContent = step.name;
+
+  const badges = document.getElementById("buildGuideMethodBadges");
+  badges.innerHTML = "";
+  const b = document.createElement("span");
+  b.className = "art-guide-method-badge is-tap";
+  b.textContent = T("build_guide_method_cells", `${step.cells.length}マスに設置`, { count: step.cells.length });
+  badges.appendChild(b);
+
+  document.getElementById("buildGuidePrevBtn").disabled = flatGuideStepIndex === 0;
+  document.getElementById("buildGuideNextBtn").textContent =
+    stepNum === total ? T("build_guide_finish", "完了") : T("build_guide_next", "次へ");
+
+  renderFlatGuideCanvas();
+}
+
+// 選んだブロック＋周囲1マスの余白ぶんだけを表示範囲にする（配置ガイドの
+// 罫線と同じブロック割りなので、実際の建築現場でも同じ単位で確認しやすい）
+function flatGuideViewport(){
+  const pad = 1;
+  const x0 = Math.max(0, flatGuideBlock.bx * blockGuideSize - pad);
+  const z0 = Math.max(0, flatGuideBlock.bz * blockGuideSize - pad);
+  const x1 = Math.min(resultDims.w - 1, flatGuideBlock.bx * blockGuideSize + flatGuideBlock.bw - 1 + pad);
+  const z1 = Math.min(resultDims.d - 1, flatGuideBlock.bz * blockGuideSize + flatGuideBlock.bh - 1 + pad);
+  return { ox: x0, oz: z0, w: x1 - x0 + 1, h: z1 - z0 + 1 };
+}
+
+function renderFlatGuideCanvas(){
+  const cvs = document.getElementById("buildGuideCanvas");
+  if(!cvs || !flatGuideBlock) return;
+  const wrap = cvs.parentElement;
+  const viewport = flatGuideViewport();
+  const gctx = cvs.getContext("2d");
+  const maxW = Math.max(40, wrap.clientWidth - 16);
+  const maxH = Math.max(40, wrap.clientHeight - 16);
+  const cell = Math.max(1, Math.floor(Math.min(maxW / viewport.w, maxH / viewport.h)));
+  cvs.width = cell * viewport.w;
+  cvs.height = cell * viewport.h;
+
+  const dark = document.body.classList.contains("dark");
+  gctx.clearRect(0, 0, cvs.width, cvs.height);
+  gctx.fillStyle = dark ? "#1c1a17" : "#efe8d8";
+  gctx.fillRect(0, 0, cvs.width, cvs.height);
+
+  const step = flatGuideOrder[flatGuideStepIndex];
+  const currentKey = step.materialId + "_" + step.hex;
+  const doneKeys = new Set();
+  for(let i = 0; i < flatGuideStepIndex; i++){
+    const s = flatGuideOrder[i];
+    doneKeys.add(s.materialId + "_" + s.hex);
+  }
+
+  const cellMap = new Map();
+  computeFlatTopCells().forEach(c => cellMap.set(`${c.x},${c.z}`, c));
+
+  for(let vz = 0; vz < viewport.h; vz++){
+    for(let vx = 0; vx < viewport.w; vx++){
+      const c = cellMap.get(`${viewport.ox + vx},${viewport.oz + vz}`);
+      if(!c) continue;
+      const key = c.materialId + "_" + c.hex;
+      const isCurrent = key === currentKey;
+      gctx.globalAlpha = isCurrent || doneKeys.has(key) ? 1 : 0.25;
+      gctx.fillStyle = c.hex;
+      gctx.fillRect(vx * cell, vz * cell, cell, cell);
+    }
+  }
+  gctx.globalAlpha = 1;
+
+  // マス目の境界線（アートの塗り方ガイドと同じ、周りの色に関係なく見える縁取り線）
+  if(cell >= 6){
+    const gridPath = new Path2D();
+    for(let vx = 0; vx <= viewport.w; vx++){ gridPath.moveTo(vx * cell, 0); gridPath.lineTo(vx * cell, cvs.height); }
+    for(let vz = 0; vz <= viewport.h; vz++){ gridPath.moveTo(0, vz * cell); gridPath.lineTo(cvs.width, vz * cell); }
+    gctx.strokeStyle = "rgba(255,255,255,0.9)";
+    gctx.lineWidth = 2.4;
+    gctx.stroke(gridPath);
+    gctx.strokeStyle = "rgba(0,0,0,0.55)";
+    gctx.lineWidth = 1;
+    gctx.stroke(gridPath);
+  }
+
+  // 選んだブロックの実際の範囲外は暗く重ね、外側の太枠で今のブロックをはっきり示す
+  {
+    const bvx0 = flatGuideBlock.bx * blockGuideSize - viewport.ox;
+    const bvz0 = flatGuideBlock.bz * blockGuideSize - viewport.oz;
+    const left = Math.max(0, bvx0 * cell), top = Math.max(0, bvz0 * cell);
+    const right = Math.min(cvs.width, (bvx0 + flatGuideBlock.bw) * cell), bottom = Math.min(cvs.height, (bvz0 + flatGuideBlock.bh) * cell);
+    gctx.fillStyle = "rgba(0,0,0,0.4)";
+    gctx.fillRect(0, 0, cvs.width, top);
+    gctx.fillRect(0, bottom, cvs.width, cvs.height - bottom);
+    gctx.fillRect(0, top, left, bottom - top);
+    gctx.fillRect(right, top, cvs.width - right, bottom - top);
+
+    const frameWidth = Math.max(3, cell * 0.12);
+    gctx.strokeStyle = "rgba(255,255,255,0.95)";
+    gctx.lineWidth = frameWidth + 2.5;
+    gctx.strokeRect(bvx0 * cell, bvz0 * cell, flatGuideBlock.bw * cell, flatGuideBlock.bh * cell);
+    gctx.strokeStyle = "rgba(0,0,0,0.85)";
+    gctx.lineWidth = frameWidth;
+    gctx.strokeRect(bvx0 * cell, bvz0 * cell, flatGuideBlock.bw * cell, flatGuideBlock.bh * cell);
+  }
+
+  // 今の建材を置くマスに印を付ける（積む段数が2以上ある場合は本数を数字で表示）
+  const dotColor = dark ? "#9ad0f0" : "#2373a8";
+  gctx.fillStyle = dotColor;
+  gctx.textAlign = "center";
+  gctx.textBaseline = "middle";
+  step.cells.forEach(({ x, z, height }) => {
+    if(x < viewport.ox || z < viewport.oz || x >= viewport.ox + viewport.w || z >= viewport.oz + viewport.h) return;
+    const vx = (x - viewport.ox) * cell, vz = (z - viewport.oz) * cell;
+    if(height > 1){
+      gctx.font = `bold ${Math.max(9, cell * 0.42)}px sans-serif`;
+      gctx.fillText(String(height), vx + cell / 2, vz + cell / 2);
+    }else{
+      gctx.beginPath();
+      gctx.arc(vx + cell / 2, vz + cell / 2, Math.max(1.2, cell * 0.2), 0, Math.PI * 2);
+      gctx.fill();
+    }
+  });
 }
 
 // 3Dビューの床に1×1マスごとの点線・2×2マスごとの太線を常時表示する
@@ -1212,6 +1459,7 @@ function runBuildGeneration(){
   blockGuideSize = 0;
   updateGuideRow();
   applyBlockGuide();
+  renderBuildBlockList();
   applyFloorGrid();
   updateEditToolbarVisibility();
   Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
@@ -1329,6 +1577,7 @@ function renderBuildMaterialList(){
 // 最初からやり直す
 // ══════════════════════════════════════
 function resetBuildToUpload(){
+  closeFlatGuide();
   frontImage = null;
   backImage = null;
   resultVoxels = null;
@@ -1463,6 +1712,7 @@ function loadDesign(id){
   blockGuideSize = 0;
   updateGuideRow();
   applyBlockGuide();
+  renderBuildBlockList();
   applyFloorGrid();
   updateEditToolbarVisibility();
   Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
@@ -1586,7 +1836,15 @@ function initBuildPage(){
       blockGuideSize = Number(btn.dataset.size) || 0;
       updateGuideRow();
       applyBlockGuide();
+      renderBuildBlockList();
     });
+  });
+
+  document.getElementById("buildGuideCloseBtn").addEventListener("click", closeFlatGuide);
+  document.getElementById("buildGuideNextBtn").addEventListener("click", flatGuideNext);
+  document.getElementById("buildGuidePrevBtn").addEventListener("click", flatGuidePrev);
+  window.addEventListener("resize", () => {
+    if(document.getElementById("buildGuideOverlay").style.display !== "none") renderFlatGuideCanvas();
   });
 
   document.getElementById("buildAdjustBtn").addEventListener("click", () => openBuildCropStage(false));
@@ -1630,12 +1888,14 @@ function initBuildPage(){
       applyBlockGuide();
       applyFloorGrid();
     }
+    if(document.getElementById("buildGuideOverlay").style.display !== "none") renderFlatGuideCanvas();
   });
 }
 
 document.addEventListener("langchange", () => {
   if(resultVoxels || resultWallSegments) renderBuildMaterialList();
   renderBuildLibraryList();
+  if(document.getElementById("buildGuideOverlay").style.display !== "none") renderFlatGuideStep();
 });
 
 initBuildPage();

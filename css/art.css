@@ -2282,6 +2282,11 @@ body.dark .art-block-btn{
   color:#b3a89a;
 }
 
+.art-block-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
 .art-block-status-1{
   background:rgba(232,201,60,0.25);
   border-color:#e8c93c;
