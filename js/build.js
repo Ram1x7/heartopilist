@@ -606,6 +606,14 @@ const SOLID_HEIGHT_ASPECT_COMPENSATION = 2;
 // グリッドを敷くと横に間延びして見える。1行あたりの物理的な高さが1列あたりの
 // 物理的な幅の半分しかない分、同じ縦横比に見せるには行数を2倍にする必要がある
 const WALL_ROW_ASPECT_COMPENSATION = 0.5;
+// 1マスあたりの実際の物理縦横比（幅÷高さ）。solid/flatは支柱1本分＝正方形
+// なので1:1だが、wallは低い壁1枚が幅4×高さ2で正方形ではない（2:1）ため、
+// 位置調整画面のプレビュー（切り抜きビューポート・マス目オーバーレイ）の
+// 縦横比をこの値で補正しないと、実際に建てたときと違う比率で表示されてしまう
+const WALL_CELL_ASPECT = 2; // 低い壁1枚の幅4 ÷ 高さ2
+function cellAspectRatio(){
+  return settings.mode === "wall" ? WALL_CELL_ASPECT : 1;
+}
 
 function computeOtherDim(){
   if(!frontImage) return settings.width;
@@ -635,7 +643,7 @@ function openBuildCropStage(reset){
   const otherDim = computeOtherDim();
   const targetKey = `${settings.width}x${otherDim}`;
   const viewport = document.getElementById("buildCropViewport");
-  viewport.style.aspectRatio = `${settings.width} / ${otherDim}`;
+  viewport.style.aspectRatio = `${settings.width * cellAspectRatio()} / ${otherDim}`;
   document.getElementById("buildCropImg").src = frontImage.src;
 
   requestAnimationFrame(() => {
