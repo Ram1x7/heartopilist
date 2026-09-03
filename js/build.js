@@ -19,6 +19,16 @@ const SITE_MAX_WIDTH = 96;
 const SITE_MAX_DEPTH = 120;
 const SITE_MAX_HEIGHT = 68;
 
+// 低い壁は幅4のパネルなので、支柱換算での敷地幅上限（SITE_MAX_WIDTH＝96マス分）
+// をそのまま「列数」の上限にすると、実際の物理幅は4倍（384マス分）になって
+// しまい敷地からはみ出す。横一列に敷き詰められる最大数は 96 ÷ 4 = 24枚
+const WALL_MAX_WIDTH = Math.floor(SITE_MAX_WIDTH / 4);
+
+// 現在のモードにおける「幅」スライダーの上限マス数
+function currentWidthMax(){
+  return settings.mode === "wall" ? WALL_MAX_WIDTH : SITE_MAX_WIDTH;
+}
+
 let frontImage = null;
 let backImage = null;
 
@@ -520,7 +530,20 @@ function setBuildMode(mode){
   document.getElementById("buildWallModeTip").style.display = mode === "wall" ? "block" : "none";
   updateBackImageVisibility();
   updateColorCountMax();
+  updateWidthMax();
+  readOptionInputs();
   if(frontImage) renderBuildCropGridOverlay();
+}
+
+// 「幅」スライダーの上限を、現在のモードの敷地幅上限に合わせる
+// （低い壁は幅4のパネルのため、支柱換算の上限96マスをそのまま使うと
+// 実際の物理幅が敷地をはみ出してしまう＝24マスが上限）
+function updateWidthMax(){
+  const widthInput = document.getElementById("buildWidthInput");
+  if(!widthInput) return;
+  const max = currentWidthMax();
+  widthInput.max = String(max);
+  if(Number(widthInput.value) > max) widthInput.value = String(max);
 }
 
 // 「色数を絞る」スライダーの上限を、現在のモードの建材パレットの総色数に
@@ -534,7 +557,7 @@ function updateColorCountMax(){
 }
 
 function readOptionInputs(){
-  settings.width = Math.min(SITE_MAX_WIDTH, Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
+  settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
   settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
   settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
@@ -1448,6 +1471,7 @@ function initBuildPage(){
   document.getElementById("buildColorCountInput").addEventListener("input", readOptionInputs);
 
   updateColorCountMax();
+  updateWidthMax();
 
   document.querySelectorAll(".build-guide-size-btn").forEach(btn => {
     btn.addEventListener("click", () => {
