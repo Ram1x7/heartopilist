@@ -127,7 +127,7 @@ const ICONS = {
   // 建築サポート：建築モード切替
   build3dSolid: `<path d="M12 3 4 7v10l8 4 8-4V7Z"/><path d="M4 7l8 4 8-4M12 11v10"/>`,
   build3dFlat: `<path d="M3 12 12 8l9 4-9 4Z"/><path d="M3 12v4l9 4 9-4v-4"/>`,
-  build3dWall: `<rect x="3" y="9" width="18" height="8" rx="1.2"/><path d="M8 9v8M13 9v8M18 9v8"/>`,
+  build3dWall: `<rect x="4" y="6" width="16" height="13" rx="1.3"/><circle cx="8" cy="10" r="1.3"/><path d="M5 17 9 12l3 3 4-5.5 4 7.5"/>`,
 };
 
 /**
