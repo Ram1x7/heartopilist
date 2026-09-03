@@ -24,6 +24,11 @@ const SITE_MAX_HEIGHT = 68;
 // しまい敷地からはみ出す。横一列に敷き詰められる最大数は 96 ÷ 4 = 24枚
 const WALL_MAX_WIDTH = Math.floor(SITE_MAX_WIDTH / 4);
 
+// 低い壁は高さ2のパネルで、ゲーム内では地面から16枚分（実際の高さ32マス分）
+// までしか積み上げられない。支柱用のSITE_MAX_HEIGHT（68）をそのまま流用すると
+// 実際には置けない段数まで指定できてしまうため、低い壁専用の上限を別に持つ
+const WALL_MAX_HEIGHT_TIERS = 16;
+
 // 現在のモードにおける「幅」スライダーの上限マス数
 function currentWidthMax(){
   return settings.mode === "wall" ? WALL_MAX_WIDTH : SITE_MAX_WIDTH;
@@ -54,7 +59,7 @@ let settings = {
   // "height"＝積む段数を指定して幅を自動算出）。どちらを選んでも画像の縦横比に
   // 合わせてもう一方の軸が自動計算される
   wallSizeBasis: "width",
-  wallHeight: 24,       // 高さ基準時に使う段数（低い壁を積む段数）
+  wallHeight: 16,       // 高さ基準時に使う段数（低い壁を積む段数）
 };
 
 let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]（solid/flat用）
@@ -270,18 +275,20 @@ function applyBlockGuide(){
 
 // ══════════════════════════════════════
 // 設置手順ガイド（平面モード限定）
-// アートのドット絵変換にある「ぬり方ガイド」と同じ発想で、上の「配置ガイド」で
-// 区切ったブロックを1つ選ぶと、そのブロックの中だけに絞って建材ごとに
-// どのマスへ置けばいいかを順番に確認できる。ゲーム内の建築にはバケツ
-// （まとめ塗り）のような機能がないため、アート版のような境目/内側マスの
-// 区別・バケツ手順は行わず、建材ごとに置くマスを個別に示すだけのシンプルな
-// 構成にしてある。積む段数（高さ）が2以上あるマスには、その場でスタックする
-// 個数を数字で表示する
+// アートのドット絵変換にある「ぬり方ガイド（効率のいい順番を見る）」と同じ
+// 発想で、上の「配置ガイド」で区切ったブロック単位に、建材ごとにどのマスへ
+// 置けばいいかを順番に確認できる。「効率のいい置き方を見る」ボタンは、置かれて
+// いる全ブロックを番号順に自動で通しで案内する（アート版のぬり方ガイドと同じ
+// 使い方）。ブロック一覧から番号を選ぶと、そのブロックだけに絞って同じ手順を
+// 確認することもできる。ゲーム内の建築にはバケツ（まとめ塗り）のような機能が
+// ないため、アート版のような境目/内側マスの区別・バケツ手順は行わず、建材ごとに
+// 置くマスを個別に示すだけのシンプルな構成にしてある。積む段数（高さ）が2以上
+// あるマスには、その場でスタックする個数を数字で表示する
 // ══════════════════════════════════════
-let flatGuideOrder = [];      // [{materialId, hex, name, cells:[{x,z,height}]}]（選んだブロック内、建材ごと）
+// [{bx, bz, bw, bh, blockNum, materialId, hex, name, cells:[{x,z,height}]}]
+let flatGuideOrder = [];
 let flatGuideStepIndex = 0;
-let flatGuideBlock = null;    // {bx, bz, bw, bh}
-let flatGuideBlockLabel = 0;  // ブロック一覧と同じ番号
+let flatGuideIsFull = false; // true＝「効率のいい置き方を見る」で全ブロック通し、false＝1ブロックのみ
 
 // 完成図の全マス（列ごとにまとめる。厚さ方向へ積まれた同じ建材は1マス＝1本の
 // 支柱として数え、その本数をheightとして持つ）
@@ -298,7 +305,11 @@ function computeFlatTopCells(){
 }
 
 // 指定ブロック内のマスを建材ごとにまとめ、マス数が多い建材から手順化する
-function computeFlatBlockSteps(bx, bz, bw, bh){
+// （ブロックの位置情報bx/bz/bw/bh・番号blockNumを各手順に持たせておくことで、
+// 単体ブロック表示・全ブロック通し表示のどちらも同じ描画コードで扱える）
+function computeFlatBlockSteps(bx, bz, blockNum){
+  const bw = Math.min(blockGuideSize, resultDims.w - bx * blockGuideSize);
+  const bh = Math.min(blockGuideSize, resultDims.d - bz * blockGuideSize);
   const x0 = bx * blockGuideSize, z0 = bz * blockGuideSize;
   const inBlock = computeFlatTopCells().filter(c => c.x >= x0 && c.x < x0 + bw && c.z >= z0 && c.z < z0 + bh);
   const map = new Map();
@@ -307,11 +318,30 @@ function computeFlatBlockSteps(bx, bz, bw, bh){
     if(!map.has(key)) map.set(key, { materialId: c.materialId, hex: c.hex, name: c.name, cells: [] });
     map.get(key).cells.push({ x: c.x, z: c.z, height: c.height });
   });
-  return Array.from(map.values()).sort((a, b) => b.cells.length - a.cells.length);
+  return Array.from(map.values())
+    .sort((a, b) => b.cells.length - a.cells.length)
+    .map(s => ({ bx, bz, bw, bh, blockNum, ...s }));
 }
 
-// ブロック選択一覧（配置ガイドのマス割りと同じ並び）。既にマスが置かれている
-// ブロックだけタップできるようにする
+// 置かれているブロックの番号一覧（配置ガイドのマス割り・ブロック一覧と同じ並び）
+function nonEmptyFlatBlocks(){
+  if(!resultDims || blockGuideSize <= 0) return [];
+  const blocksX = Math.ceil(resultDims.w / blockGuideSize);
+  const blocksZ = Math.ceil(resultDims.d / blockGuideSize);
+  const nonEmpty = new Set();
+  computeFlatTopCells().forEach(c => {
+    nonEmpty.add(`${Math.floor(c.x / blockGuideSize)}_${Math.floor(c.z / blockGuideSize)}`);
+  });
+  const blocks = [];
+  for(let bz = 0; bz < blocksZ; bz++){
+    for(let bx = 0; bx < blocksX; bx++){
+      if(nonEmpty.has(`${bx}_${bz}`)) blocks.push({ bx, bz, blockNum: bz * blocksX + bx + 1 });
+    }
+  }
+  return blocks;
+}
+
+// ブロック選択一覧。既にマスが置かれているブロックだけタップできるようにする
 function renderBuildBlockList(){
   const wrap = document.getElementById("buildGuidePickerWrap");
   const el = document.getElementById("buildBlockList");
@@ -323,36 +353,54 @@ function renderBuildBlockList(){
   }
   const blocksX = Math.ceil(resultDims.w / blockGuideSize);
   const blocksZ = Math.ceil(resultDims.d / blockGuideSize);
-  const nonEmpty = new Set();
-  computeFlatTopCells().forEach(c => {
-    nonEmpty.add(`${Math.floor(c.x / blockGuideSize)}_${Math.floor(c.z / blockGuideSize)}`);
-  });
+  const nonEmptyBlocks = nonEmptyFlatBlocks();
+  const hasAny = nonEmptyBlocks.length > 0;
+  document.getElementById("buildGuideAllBtn").style.display = hasAny ? "flex" : "none";
+  const nonEmptyKeys = new Set(nonEmptyBlocks.map(b => `${b.bx}_${b.bz}`));
   el.style.gridTemplateColumns = `repeat(${blocksX}, 1fr)`;
   let html = "";
   for(let bz = 0; bz < blocksZ; bz++){
     for(let bx = 0; bx < blocksX; bx++){
       const num = bz * blocksX + bx + 1;
-      const empty = !nonEmpty.has(`${bx}_${bz}`);
-      html += `<button type="button" class="art-block-btn" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}" data-num="${num}">${num}</button>`;
+      const empty = !nonEmptyKeys.has(`${bx}_${bz}`);
+      html += `<button type="button" class="art-block-btn" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}">${num}</button>`;
     }
   }
   el.innerHTML = html;
   el.querySelectorAll(".art-block-btn:not(:disabled)").forEach(btn => {
-    btn.addEventListener("click", () => openFlatGuide(Number(btn.dataset.bx), Number(btn.dataset.bz), Number(btn.dataset.num)));
+    btn.addEventListener("click", () => openFlatGuide(Number(btn.dataset.bx), Number(btn.dataset.bz)));
   });
   wrap.style.display = "block";
 }
 
-function openFlatGuide(bx, bz, blockNum){
-  const bw = Math.min(blockGuideSize, resultDims.w - bx * blockGuideSize);
-  const bh = Math.min(blockGuideSize, resultDims.d - bz * blockGuideSize);
-  const steps = computeFlatBlockSteps(bx, bz, bw, bh);
+// 1ブロックだけに絞ったガイド（ブロック一覧からの選択）
+function openFlatGuide(bx, bz){
+  const blocks = nonEmptyFlatBlocks();
+  const found = blocks.find(b => b.bx === bx && b.bz === bz);
+  if(!found) return;
+  const steps = computeFlatBlockSteps(bx, bz, found.blockNum);
   if(steps.length === 0){
     if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
     return;
   }
-  flatGuideBlock = { bx, bz, bw, bh };
-  flatGuideBlockLabel = blockNum;
+  flatGuideIsFull = false;
+  startFlatGuide(steps);
+}
+
+// 置かれている全ブロックをブロック番号順に自動で通しで案内する
+// （アートページの「効率のいい順番を見る」に相当）
+function openFlatGuideAll(){
+  const blocks = nonEmptyFlatBlocks();
+  const steps = blocks.flatMap(b => computeFlatBlockSteps(b.bx, b.bz, b.blockNum));
+  if(steps.length === 0){
+    if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
+    return;
+  }
+  flatGuideIsFull = true;
+  startFlatGuide(steps);
+}
+
+function startFlatGuide(steps){
   flatGuideOrder = steps;
   flatGuideStepIndex = 0;
   document.getElementById("buildGuideOverlay").style.display = "flex";
@@ -366,15 +414,35 @@ function closeFlatGuide(){
   document.body.style.overflow = "";
 }
 
+// ブロック完了の軽い通知（振動含む。アートのぬり方ガイドと同じ演出）
+function showGuideBlockCompleteFlash(blockNum){
+  const el = document.getElementById("buildGuideBlockFlash");
+  const textEl = document.getElementById("buildGuideBlockFlashText");
+  if(!el || !textEl) return;
+  textEl.textContent = T("build_guide_block_complete", `ブロック${blockNum} 完了！`, { block: blockNum });
+  el.classList.add("is-visible");
+  if(navigator.vibrate) navigator.vibrate(120);
+  clearTimeout(showGuideBlockCompleteFlash._timer);
+  showGuideBlockCompleteFlash._timer = setTimeout(() => el.classList.remove("is-visible"), 1100);
+}
+
 function flatGuideNext(){
   if(flatGuideStepIndex >= flatGuideOrder.length - 1){
-    const label = flatGuideBlockLabel;
+    const label = flatGuideOrder[flatGuideStepIndex].blockNum;
+    const wasFull = flatGuideIsFull;
     closeFlatGuide();
-    if(typeof showToast === "function") showToast(T("build_guide_block_done", `ブロック${label}の手順は以上です`, { block: label }));
+    if(typeof showToast === "function"){
+      showToast(wasFull
+        ? T("build_guide_all_done", "設置手順は以上です")
+        : T("build_guide_block_done", `ブロック${label}の手順は以上です`, { block: label }));
+    }
     return;
   }
+  const prevBlockNum = flatGuideOrder[flatGuideStepIndex].blockNum;
   flatGuideStepIndex++;
   renderFlatGuideStep();
+  const newBlockNum = flatGuideOrder[flatGuideStepIndex].blockNum;
+  if(flatGuideIsFull && newBlockNum !== prevBlockNum) showGuideBlockCompleteFlash(prevBlockNum);
 }
 
 function flatGuidePrev(){
@@ -389,7 +457,7 @@ function renderFlatGuideStep(){
   const stepNum = flatGuideStepIndex + 1;
 
   document.getElementById("buildGuideProgressLabel").textContent =
-    T("build_guide_step_of", `${stepNum} / ${total}（ブロック${flatGuideBlockLabel}）`, { current: stepNum, total, block: flatGuideBlockLabel });
+    T("build_guide_step_of", `${stepNum} / ${total}（ブロック${step.blockNum}）`, { current: stepNum, total, block: step.blockNum });
   document.getElementById("buildGuideProgressFill").style.width = `${(stepNum / total) * 100}%`;
 
   document.getElementById("buildGuideColorChip").style.background = step.hex;
@@ -409,22 +477,23 @@ function renderFlatGuideStep(){
   renderFlatGuideCanvas();
 }
 
-// 選んだブロック＋周囲1マスの余白ぶんだけを表示範囲にする（配置ガイドの
+// 今の手順のブロック＋周囲1マスの余白ぶんだけを表示範囲にする（配置ガイドの
 // 罫線と同じブロック割りなので、実際の建築現場でも同じ単位で確認しやすい）
-function flatGuideViewport(){
+function flatGuideViewport(step){
   const pad = 1;
-  const x0 = Math.max(0, flatGuideBlock.bx * blockGuideSize - pad);
-  const z0 = Math.max(0, flatGuideBlock.bz * blockGuideSize - pad);
-  const x1 = Math.min(resultDims.w - 1, flatGuideBlock.bx * blockGuideSize + flatGuideBlock.bw - 1 + pad);
-  const z1 = Math.min(resultDims.d - 1, flatGuideBlock.bz * blockGuideSize + flatGuideBlock.bh - 1 + pad);
+  const x0 = Math.max(0, step.bx * blockGuideSize - pad);
+  const z0 = Math.max(0, step.bz * blockGuideSize - pad);
+  const x1 = Math.min(resultDims.w - 1, step.bx * blockGuideSize + step.bw - 1 + pad);
+  const z1 = Math.min(resultDims.d - 1, step.bz * blockGuideSize + step.bh - 1 + pad);
   return { ox: x0, oz: z0, w: x1 - x0 + 1, h: z1 - z0 + 1 };
 }
 
 function renderFlatGuideCanvas(){
   const cvs = document.getElementById("buildGuideCanvas");
-  if(!cvs || !flatGuideBlock) return;
+  const step = flatGuideOrder[flatGuideStepIndex];
+  if(!cvs || !step) return;
   const wrap = cvs.parentElement;
-  const viewport = flatGuideViewport();
+  const viewport = flatGuideViewport(step);
   const gctx = cvs.getContext("2d");
   const maxW = Math.max(40, wrap.clientWidth - 16);
   const maxH = Math.max(40, wrap.clientHeight - 16);
@@ -437,12 +506,13 @@ function renderFlatGuideCanvas(){
   gctx.fillStyle = dark ? "#1c1a17" : "#efe8d8";
   gctx.fillRect(0, 0, cvs.width, cvs.height);
 
-  const step = flatGuideOrder[flatGuideStepIndex];
   const currentKey = step.materialId + "_" + step.hex;
   const doneKeys = new Set();
   for(let i = 0; i < flatGuideStepIndex; i++){
     const s = flatGuideOrder[i];
-    doneKeys.add(s.materialId + "_" + s.hex);
+    // 全ブロック通し表示では、後続ブロックにまだ手が付いていない同色マスまで
+    // 「完了済み」扱いで表示されると紛らわしいため、今のブロックの手順だけを対象にする
+    if(s.bx === step.bx && s.bz === step.bz) doneKeys.add(s.materialId + "_" + s.hex);
   }
 
   const cellMap = new Map();
@@ -474,12 +544,12 @@ function renderFlatGuideCanvas(){
     gctx.stroke(gridPath);
   }
 
-  // 選んだブロックの実際の範囲外は暗く重ね、外側の太枠で今のブロックをはっきり示す
+  // 今のブロックの実際の範囲外は暗く重ね、外側の太枠で今のブロックをはっきり示す
   {
-    const bvx0 = flatGuideBlock.bx * blockGuideSize - viewport.ox;
-    const bvz0 = flatGuideBlock.bz * blockGuideSize - viewport.oz;
+    const bvx0 = step.bx * blockGuideSize - viewport.ox;
+    const bvz0 = step.bz * blockGuideSize - viewport.oz;
     const left = Math.max(0, bvx0 * cell), top = Math.max(0, bvz0 * cell);
-    const right = Math.min(cvs.width, (bvx0 + flatGuideBlock.bw) * cell), bottom = Math.min(cvs.height, (bvz0 + flatGuideBlock.bh) * cell);
+    const right = Math.min(cvs.width, (bvx0 + step.bw) * cell), bottom = Math.min(cvs.height, (bvz0 + step.bh) * cell);
     gctx.fillStyle = "rgba(0,0,0,0.4)";
     gctx.fillRect(0, 0, cvs.width, top);
     gctx.fillRect(0, bottom, cvs.width, cvs.height - bottom);
@@ -489,10 +559,10 @@ function renderFlatGuideCanvas(){
     const frameWidth = Math.max(3, cell * 0.12);
     gctx.strokeStyle = "rgba(255,255,255,0.95)";
     gctx.lineWidth = frameWidth + 2.5;
-    gctx.strokeRect(bvx0 * cell, bvz0 * cell, flatGuideBlock.bw * cell, flatGuideBlock.bh * cell);
+    gctx.strokeRect(bvx0 * cell, bvz0 * cell, step.bw * cell, step.bh * cell);
     gctx.strokeStyle = "rgba(0,0,0,0.85)";
     gctx.lineWidth = frameWidth;
-    gctx.strokeRect(bvx0 * cell, bvz0 * cell, flatGuideBlock.bw * cell, flatGuideBlock.bh * cell);
+    gctx.strokeRect(bvx0 * cell, bvz0 * cell, step.bw * cell, step.bh * cell);
   }
 
   // 今の建材を置くマスに印を付ける（積む段数が2以上ある場合は本数を数字で表示）
@@ -852,7 +922,7 @@ function updateColorCountMax(){
 
 function readOptionInputs(){
   if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
-    settings.wallHeight = Math.min(SITE_MAX_HEIGHT, Math.max(2, Number(document.getElementById("buildWallHeightInput").value) || 2));
+    settings.wallHeight = Math.min(WALL_MAX_HEIGHT_TIERS, Math.max(2, Number(document.getElementById("buildWallHeightInput").value) || 2));
     document.getElementById("buildWallHeightOutput").textContent = `${settings.wallHeight}${T("build_unit_masu", "マス")}`;
     syncWallWidthFromHeight(); // 指定された段数から幅を逆算してsettings.widthへ書き戻す
   }else{
@@ -926,7 +996,7 @@ function computeOtherDim(){
   // 段数をそのまま使う（幅はsyncWallWidthFromHeight()で別途逆算してsettings.width
   // に書き戻し済みなので、他の全コードは従来通りsettings.widthを見るだけでよい）
   if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
-    return Math.min(SITE_MAX_HEIGHT, Math.max(2, settings.wallHeight));
+    return Math.min(WALL_MAX_HEIGHT_TIERS, Math.max(2, settings.wallHeight));
   }
   // 常に元画像そのものの縦横比を使う（切り抜き範囲＝manualCropRectは、
   // このwidth/otherDim比になるようcrop stageのビューポート自体を固定した上で
@@ -934,7 +1004,9 @@ function computeOtherDim(){
   // 「width/otherDim」比そのものに一致してしまい、再度この関数を呼ぶたびに
   // 補正が重ねがけされてしまう＝毎回さらに半分になっていくバグになる）
   const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
-  const maxOther = settings.mode === "flat" ? SITE_MAX_DEPTH : SITE_MAX_HEIGHT;
+  const maxOther = settings.mode === "flat" ? SITE_MAX_DEPTH
+    : settings.mode === "wall" ? WALL_MAX_HEIGHT_TIERS
+    : SITE_MAX_HEIGHT;
   const compensation = settings.mode === "solid" ? SOLID_HEIGHT_ASPECT_COMPENSATION
     : settings.mode === "wall" ? WALL_ROW_ASPECT_COMPENSATION
     : 1;
@@ -1843,6 +1915,7 @@ function initBuildPage(){
   document.getElementById("buildGuideCloseBtn").addEventListener("click", closeFlatGuide);
   document.getElementById("buildGuideNextBtn").addEventListener("click", flatGuideNext);
   document.getElementById("buildGuidePrevBtn").addEventListener("click", flatGuidePrev);
+  document.getElementById("buildGuideAllBtn").addEventListener("click", openFlatGuideAll);
   window.addEventListener("resize", () => {
     if(document.getElementById("buildGuideOverlay").style.display !== "none") renderFlatGuideCanvas();
   });
