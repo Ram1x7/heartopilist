@@ -175,6 +175,9 @@ body.dark .art-lock-btn.is-locked{
   border:1px solid var(--border);
   border-radius:16px;
   box-shadow:0 4px 12px rgba(52,48,43,0.06);
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
 }
 
 .art-canvas-area{

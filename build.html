@@ -28,8 +28,8 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=12">
-<link rel="stylesheet" href="./css/art.css?v=67">
+<link rel="stylesheet" href="./css/style.css?v=16">
+<link rel="stylesheet" href="./css/art.css?v=68">
 <link rel="stylesheet" href="./css/design-system.css?v=3">
 
 <link rel="prefetch" href="./index.html">
@@ -331,11 +331,6 @@ body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:va
 .build-progress-slider-row input[type="range"]{
   flex:1;
   accent-color:var(--indigo);
-  /* body側で touch-action:pan-x pan-y を指定しており（ページ全体のピンチ/
-     ダブルタップズーム防止用）、touch-actionは祖先要素との積集合になるため、
-     このままだとiOS Safari等でスライダーのつまみをドラッグできなくなる。
-     このスライダー自身には通常のタップ・ドラッグ操作を許可する */
-  touch-action:manipulation;
 }
 
 .build-progress-slider-row output{
