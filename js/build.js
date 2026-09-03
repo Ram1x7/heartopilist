@@ -845,9 +845,18 @@ function computeInteriorBulge(cells, w, h){
       if(d > maxDist) maxDist = d;
     }
   }
+  // dist/maxDistをそのまま使うと断面が円錐（ピラミッド型）になり、中心から
+  // 少し外れただけで急激に薄くなってしまう（輪郭からの距離はシルエット中心
+  // からの距離rに対してほぼ線形＝(R-r)/Rのため）。参考サイトのような
+  // ドーム（半球）型にするには、線形値t=(R-r)/Rを t=1-r/R とみなして
+  // sqrt(1-(1-t)^2) = sqrt(1-(r/R)^2) の球断面カーブに変換する
+  // （円形シルエットで検証済み：真の半球の理論値と完全に一致する）
   const bulge = new Array(n).fill(0);
   for(let i = 0; i < n; i++){
-    if(cells[i]) bulge[i] = dist[i] / maxDist;
+    if(cells[i]){
+      const t = dist[i] / maxDist;
+      bulge[i] = Math.sqrt(Math.max(0, 1 - (1 - t) * (1 - t)));
+    }
   }
   return bulge;
 }
