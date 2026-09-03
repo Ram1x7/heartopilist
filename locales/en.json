@@ -885,7 +885,7 @@
   "build_import_btn": "Import (JSON)",
   "build_help_title": "How to use",
   "build_help_1_title": "① Choose an image & building mode",
-  "build_help_1_body": "Upload an image and choose \"Solid (statue)\", \"Flat (ground)\", or \"Low wall (mural)\". Set the width, thickness, hollowing, auto-transparent background, and color-limiting options here too (low wall mode is a single layer, so it has no thickness or hollowing option). In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built. The low wall panel is 4 wide and 2 tall, so low wall mode auto-compensates its row count the same way.",
+  "build_help_1_body": "Upload an image and choose \"Solid (statue)\", \"Flat (ground)\", or \"Low wall (mural)\". Set the width, thickness, hollowing, auto-transparent background, and color-limiting options here too (low wall mode is a single layer, so it has no thickness or hollowing option). In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built. The low wall panel is 4 wide and 2 tall, so low wall mode auto-compensates the other axis the same way. In low wall mode you can also choose whether width or height drives the size — set the one you pick, and the other is calculated automatically to match the image's proportions.",
   "build_help_2_title": "② Adjust position",
   "build_help_2_body": "Drag to position and use the slider to zoom, setting the crop area for the front image.",
   "build_help_3_title": "③ 3D blueprint & material list",
@@ -1090,5 +1090,11 @@
   "build_guide_label": "Placement guide",
   "build_guide_off": "Off",
   "build_wall_count_label": "Walls needed",
-  "build_unit_walls": ""
+  "build_unit_walls": "",
+  "build_wall_size_basis_label": "Size basis",
+  "build_wall_basis_width": "Width",
+  "build_wall_basis_height": "Height",
+  "build_wall_height_label": "Height (rows to stack)",
+  "build_wall_auto_width_hint": "Width will be auto-adjusted to {n}",
+  "build_wall_auto_height_hint": "Height will be auto-adjusted to {n}"
 }

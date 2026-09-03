@@ -569,13 +569,29 @@ body.dark .build-library-item{
         </button>
       </div>
 
-      <div class="build-slider-field">
+      <div class="build-edit-toolbar" id="buildWallSizeBasisRow" style="display:none;">
+        <span class="build-progress-slider-label" data-i18n="build_wall_size_basis_label">サイズの基準</span>
+        <button type="button" class="build-tool-btn build-wall-basis-btn active" data-basis="width" data-i18n="build_wall_basis_width">幅</button>
+        <button type="button" class="build-tool-btn build-wall-basis-btn" data-basis="height" data-i18n="build_wall_basis_height">高さ</button>
+      </div>
+
+      <div class="build-slider-field" id="buildWidthRow">
         <div class="build-slider-field-label">
           <span data-i18n="build_width_label">幅サイズ</span>
           <output id="buildWidthOutput">24マス</output>
         </div>
         <input type="range" id="buildWidthInput" min="4" max="96" value="24">
       </div>
+
+      <div class="build-slider-field" id="buildWallHeightRow" style="display:none;">
+        <div class="build-slider-field-label">
+          <span data-i18n="build_wall_height_label">高さ（積む段数）</span>
+          <output id="buildWallHeightOutput">24マス</output>
+        </div>
+        <input type="range" id="buildWallHeightInput" min="2" max="68" value="24">
+      </div>
+
+      <p class="art-step-hint" id="buildWallAutoDimHint" style="display:none;"></p>
 
       <div class="build-slider-field" id="buildThicknessRow">
         <div class="build-slider-field-label">
@@ -846,7 +862,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=22"></script>
+<script type="module" src="js/build.js?v=23"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>
