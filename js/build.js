@@ -288,7 +288,10 @@ function applyBlockGuide(){
 // [{bx, bz, bw, bh, blockNum, materialId, hex, name, cells:[{x,z,height}]}]
 let flatGuideOrder = [];
 let flatGuideStepIndex = 0;
-let flatGuideIsFull = false; // true＝「効率のいい置き方を見る」で全ブロック通し、false＝1ブロックのみ
+
+// 手順を最後まで確認し終えたブロック（"bx_bz"のSet）。配置ガイドのサイズを
+// 変える・新しく生成し直すとブロック割り自体が変わるため、その都度リセットする
+let completedGuideBlocks = new Set();
 
 // 完成図の全マス（列ごとにまとめる。厚さ方向へ積まれた同じ建材は1マス＝1本の
 // 支柱として数え、その本数をheightとして持つ）
@@ -362,8 +365,10 @@ function renderBuildBlockList(){
   for(let bz = 0; bz < blocksZ; bz++){
     for(let bx = 0; bx < blocksX; bx++){
       const num = bz * blocksX + bx + 1;
-      const empty = !nonEmptyKeys.has(`${bx}_${bz}`);
-      html += `<button type="button" class="art-block-btn" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}">${num}</button>`;
+      const key = `${bx}_${bz}`;
+      const empty = !nonEmptyKeys.has(key);
+      const done = !empty && completedGuideBlocks.has(key);
+      html += `<button type="button" class="art-block-btn${done ? " art-block-status-2" : ""}" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}">${num}</button>`;
     }
   }
   el.innerHTML = html;
@@ -373,34 +378,28 @@ function renderBuildBlockList(){
   wrap.style.display = "block";
 }
 
-// 1ブロックだけに絞ったガイド（ブロック一覧からの選択）
+// 選んだブロックから始めて、以降のブロックへそのまま自動で続けて案内する
+// （完了のたびに毎回ブロック選択に戻る手間をなくすため、1ブロックだけを見る
+// モードは廃止し、常に「ここから最後のブロックまで」通しで進む）
 function openFlatGuide(bx, bz){
   const blocks = nonEmptyFlatBlocks();
-  const found = blocks.find(b => b.bx === bx && b.bz === bz);
-  if(!found) return;
-  const steps = computeFlatBlockSteps(bx, bz, found.blockNum);
-  if(steps.length === 0){
-    if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
-    return;
-  }
-  flatGuideIsFull = false;
-  startFlatGuide(steps);
+  const startIdx = blocks.findIndex(b => b.bx === bx && b.bz === bz);
+  if(startIdx < 0) return;
+  startFlatGuideFromBlocks(blocks.slice(startIdx));
 }
 
-// 置かれている全ブロックをブロック番号順に自動で通しで案内する
+// 置かれている全ブロックを最初から番号順に自動で通しで案内する
 // （アートページの「効率のいい順番を見る」に相当）
 function openFlatGuideAll(){
-  const blocks = nonEmptyFlatBlocks();
+  startFlatGuideFromBlocks(nonEmptyFlatBlocks());
+}
+
+function startFlatGuideFromBlocks(blocks){
   const steps = blocks.flatMap(b => computeFlatBlockSteps(b.bx, b.bz, b.blockNum));
   if(steps.length === 0){
     if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
     return;
   }
-  flatGuideIsFull = true;
-  startFlatGuide(steps);
-}
-
-function startFlatGuide(steps){
   flatGuideOrder = steps;
   flatGuideStepIndex = 0;
   document.getElementById("buildGuideOverlay").style.display = "flex";
@@ -412,6 +411,7 @@ function closeFlatGuide(){
   const overlay = document.getElementById("buildGuideOverlay");
   if(overlay) overlay.style.display = "none";
   document.body.style.overflow = "";
+  renderBuildBlockList();
 }
 
 // ブロック完了の軽い通知（振動含む。アートのぬり方ガイドと同じ演出）
@@ -427,22 +427,23 @@ function showGuideBlockCompleteFlash(blockNum){
 }
 
 function flatGuideNext(){
+  const cur = flatGuideOrder[flatGuideStepIndex];
   if(flatGuideStepIndex >= flatGuideOrder.length - 1){
-    const label = flatGuideOrder[flatGuideStepIndex].blockNum;
-    const wasFull = flatGuideIsFull;
+    completedGuideBlocks.add(`${cur.bx}_${cur.bz}`);
+    const label = cur.blockNum;
     closeFlatGuide();
     if(typeof showToast === "function"){
-      showToast(wasFull
-        ? T("build_guide_all_done", "設置手順は以上です")
-        : T("build_guide_block_done", `ブロック${label}の手順は以上です`, { block: label }));
+      showToast(T("build_guide_done_through", `ブロック${label}までの手順は以上です`, { block: label }));
     }
     return;
   }
-  const prevBlockNum = flatGuideOrder[flatGuideStepIndex].blockNum;
   flatGuideStepIndex++;
   renderFlatGuideStep();
-  const newBlockNum = flatGuideOrder[flatGuideStepIndex].blockNum;
-  if(flatGuideIsFull && newBlockNum !== prevBlockNum) showGuideBlockCompleteFlash(prevBlockNum);
+  const next = flatGuideOrder[flatGuideStepIndex];
+  if(next.blockNum !== cur.blockNum){
+    completedGuideBlocks.add(`${cur.bx}_${cur.bz}`);
+    showGuideBlockCompleteFlash(cur.blockNum);
+  }
 }
 
 function flatGuidePrev(){
@@ -1529,6 +1530,7 @@ function runBuildGeneration(){
   ensureSceneInitialized();
   setupProgressSlider();
   blockGuideSize = 0;
+  completedGuideBlocks = new Set();
   updateGuideRow();
   applyBlockGuide();
   renderBuildBlockList();
@@ -1679,6 +1681,7 @@ function resetBuildToUpload(){
   manualCropRect = null;
   cropTargetKey = null;
   blockGuideSize = 0;
+  completedGuideBlocks = new Set();
   renderBackPreview();
   document.getElementById("buildFrontPreviewWrap").style.display = "none";
   document.getElementById("buildProceedBtn").disabled = true;
@@ -1802,6 +1805,7 @@ function loadDesign(id){
   ensureSceneInitialized();
   setupProgressSlider();
   blockGuideSize = 0;
+  completedGuideBlocks = new Set();
   updateGuideRow();
   applyBlockGuide();
   renderBuildBlockList();
@@ -1926,6 +1930,7 @@ function initBuildPage(){
   document.querySelectorAll(".build-guide-size-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       blockGuideSize = Number(btn.dataset.size) || 0;
+      completedGuideBlocks = new Set();
       updateGuideRow();
       applyBlockGuide();
       renderBuildBlockList();
