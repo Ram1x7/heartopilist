@@ -33,17 +33,23 @@ let manualCropRect = null;
 let cropDragState = null;
 
 let settings = {
-  mode: "solid",       // "solid"（立体・像） | "flat"（平面・床）
+  mode: "solid",       // "solid"（立体・像） | "flat"（平面・床） | "wall"（低い壁・壁画）
   width: 24,           // 幅マス数（画像の横方向解像度）。もう一方の軸は画像比率から自動算出
-  thickness: 6,        // solid: 奥行きの押し出し量 / flat: 起伏の最大高さ
+  thickness: 6,        // solid: 奥行きの押し出し量 / flat: 起伏の最大高さ（wallでは未使用）
   hollow: true,         // 空洞化（solidのみ有効）
   autoTransparentBg: false,
   limitColors: false,  // 色数を絞る
   colorCount: 16,       // 絞り込む色数の上限
 };
 
-let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]
-let resultDims = null;     // {w,h,d}
+let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]（solid/flat用）
+let resultDims = null;     // {w,h,d}（solid/flat用）
+
+// 低い壁（壁画）モード専用の結果データ。低い壁は幅4×奥行き0.5×高さ2という
+// 支柱とは全く異なる実寸のパネルで、押し出し・起伏を持たない単層の壁画なので、
+// resultVoxels/resultDimsとは別に持つ（x:列, y:行。行y=0が壁画の最上段）
+let resultWallSegments = null; // [{x,y,materialId,hex,name}]
+let resultWallDims = null;     // {w,h}
 
 const BUILD_DESIGNS_KEY = "hatopiBuild_designs";
 let savedDesigns = [];
@@ -98,8 +104,27 @@ function redoEdit(){
   updateUndoRedoButtons();
 }
 
+// 現在のモードの結果データ（solid/flat=resultVoxels、wall=resultWallSegments）
+// と、その外枠サイズを返す。wallモードのdimsには奥行き(d)が無い（常に単層のため）
+function currentResultList(){
+  return settings.mode === "wall" ? resultWallSegments : resultVoxels;
+}
+function currentResultDims(){
+  return settings.mode === "wall" ? resultWallDims : resultDims;
+}
+
+// 3Dビューの再描画。wallモードは低い壁専用の描画関数（Build3D.setWallSegments）
+// を使う。それ以外（solid/flat）は従来通り支柱用のsetVoxelsを使う
+function refreshResultView(opts){
+  if(settings.mode === "wall"){
+    Build3D.setWallSegments(getVisibleVoxels(), resultWallDims, opts);
+  }else{
+    Build3D.setVoxels(getVisibleVoxels(), opts);
+  }
+}
+
 function refreshVoxelView(){
-  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
+  refreshResultView({ fit: false });
   renderBuildMaterialList();
 }
 
@@ -108,25 +133,43 @@ function inBounds(x, y, z){
 }
 
 // ══════════════════════════════════════
-// 施工ステージ表示（下から積み上げた場合に何段目まで見えるかのスライダー）
+// 施工ステージ表示
+// 立体・低い壁モード：下から積み上げた場合に何段目（Y軸）まで見えるかのスライダー
+// 平面モード：画像の上端の行から何列目（Z軸）まで見えるかのスライダー
+// （平面は高さの起伏がほぼ無い床パターンのため、Y軸で段階分けしても
+// 　ほとんど動きが無い＝実質スライダーが機能しない。行単位の方が
+// 　実際の設置順序（1列ずつ奥/手前へ敷いていく）に対応する）
 // ══════════════════════════════════════
-let progressLayer = 1; // 1〜resultDims.h。resultDims.h＝全て表示
+let progressLayer = 1; // 1〜progressMax()。progressMax()＝全て表示
+
+function progressAxis(){
+  return settings.mode === "flat" ? "z" : "y";
+}
+
+function progressMax(){
+  const dims = currentResultDims();
+  if(!dims) return 1;
+  return settings.mode === "flat" ? dims.d : dims.h;
+}
 
 function isProgressFull(){
-  return !resultDims || progressLayer >= resultDims.h;
+  return !currentResultDims() || progressLayer >= progressMax();
 }
 
 function getVisibleVoxels(){
-  if(!resultVoxels) return [];
-  if(isProgressFull()) return resultVoxels;
-  return resultVoxels.filter(v => v.y < progressLayer);
+  const list = currentResultList();
+  if(!list) return [];
+  if(isProgressFull()) return list;
+  const axis = progressAxis();
+  return list.filter(v => v[axis] < progressLayer);
 }
 
 function setupProgressSlider(){
   const slider = document.getElementById("buildProgressSlider");
-  if(!resultDims) return;
-  slider.max = String(Math.max(1, resultDims.h));
-  progressLayer = resultDims.h;
+  if(!currentResultDims()) return;
+  const max = progressMax();
+  slider.max = String(Math.max(1, max));
+  progressLayer = max;
   slider.value = String(progressLayer);
   updateProgressUI();
 }
@@ -135,22 +178,25 @@ function updateProgressUI(){
   const output = document.getElementById("buildProgressOutput");
   const hint = document.getElementById("buildProgressHint");
   const full = isProgressFull();
-  output.textContent = full ? T("build_progress_all", "全て") : T("build_progress_layer", "{n}段目").replace("{n}", progressLayer);
+  const label = settings.mode === "flat" ? "build_progress_row" : "build_progress_layer";
+  const fallback = settings.mode === "flat" ? "{n}列目" : "{n}段目";
+  output.textContent = full ? T("build_progress_all", "全て") : T(label, fallback).replace("{n}", progressLayer);
   hint.style.display = full ? "none" : "block";
   // 施工ステージ表示中（全て以外）はペン/消しゴム/建材選択を無効化する
-  // （Undo/Redoは編集履歴の有無で別途制御するため、ここでは触らない）
+  // （Undo/Redoは編集履歴の有無で別途制御するため、ここでは触らない。
+  // 　低い壁モードはそもそも編集ツールバー自体を非表示にしている）
   ["buildToolPenBtn", "buildToolEraserBtn", "buildPaletteBtn"].forEach(id => {
     document.getElementById(id).disabled = !full;
   });
   document.getElementById("buildProgressMinusBtn").disabled = progressLayer <= 1;
-  document.getElementById("buildProgressPlusBtn").disabled = !resultDims || progressLayer >= resultDims.h;
+  document.getElementById("buildProgressPlusBtn").disabled = !currentResultDims() || progressLayer >= progressMax();
 }
 
 function applyProgressLayer(){
   const slider = document.getElementById("buildProgressSlider");
   slider.value = String(progressLayer);
   updateProgressUI();
-  Build3D.setVoxels(getVisibleVoxels(), { fit: false });
+  refreshResultView({ fit: false });
 }
 
 function handleProgressSliderChange(){
@@ -160,9 +206,50 @@ function handleProgressSliderChange(){
 }
 
 function stepProgressLayer(delta){
-  if(!resultDims) return;
-  progressLayer = Math.min(resultDims.h, Math.max(1, progressLayer + delta));
+  if(!currentResultDims()) return;
+  progressLayer = Math.min(progressMax(), Math.max(1, progressLayer + delta));
   applyProgressLayer();
+}
+
+// ══════════════════════════════════════
+// 配置ガイド（平面モード限定：4×4/8×8/16×16マスごとの罫線）
+// アートのドット絵変換にある「10×10ブロックごとに塗る」効率化と同じ発想で、
+// 建築を切りのいいブロック単位に分けて計画しやすくする。オフがデフォルト
+// ══════════════════════════════════════
+let blockGuideSize = 0; // 0＝オフ
+
+// 低い壁（壁画）モードは手動でのペン/消しゴム編集に対応していない
+// （壁パネルは支柱と実寸・グリッド単位が異なり、当たり判定を別途実装する必要が
+// あるため、このバージョンでは配置図の自動生成のみ対応する）ので、
+// 編集ツールバー自体を隠す
+function updateEditToolbarVisibility(){
+  const toolbar = document.getElementById("buildEditToolbar");
+  if(toolbar) toolbar.style.display = settings.mode === "wall" ? "none" : "flex";
+  // 低い壁モードはペン/消しゴム編集に対応していないため、案内文からも触れない
+  const hint = document.getElementById("buildStageHint");
+  if(hint){
+    hint.textContent = settings.mode === "wall"
+      ? T("build_stage_hint_wall", "ドラッグ：回転 / ホイール：ズーム")
+      : T("build_stage_hint", "ドラッグ：回転 / ホイール：ズーム / タップ：ペンで追加・消しゴムで削除");
+  }
+}
+
+function updateGuideRow(){
+  const row = document.getElementById("buildGuideRow");
+  if(!row) return;
+  row.style.display = settings.mode === "flat" ? "flex" : "none";
+  row.querySelectorAll(".build-guide-size-btn").forEach(btn => {
+    btn.classList.toggle("active", Number(btn.dataset.size) === blockGuideSize);
+  });
+}
+
+function applyBlockGuide(){
+  const dark = document.body.classList.contains("dark");
+  if(!resultDims || settings.mode !== "flat" || blockGuideSize <= 0){
+    Build3D.setBlockGuide(0, null, dark);
+    return;
+  }
+  Build3D.setBlockGuide(blockGuideSize, { w: resultDims.w, d: resultDims.d }, dark);
 }
 
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
@@ -292,8 +379,8 @@ function nearestMaterialFromLab(lab, materialItems){
 // マッチングした結果の出現頻度を数え、上位n色だけを「この変換で使う色」として
 // 残す。以降のマッチングはこの絞り込んだ色の中からのみ選ぶ）
 // ══════════════════════════════════════
-function deriveRestrictedPaletteIndex(cellsList, maxColors){
-  const fullIndex = getMaterialLabIndex(MATERIALS.support_pillars.items);
+function deriveRestrictedPaletteIndex(cellsList, maxColors, materialItems){
+  const fullIndex = getMaterialLabIndex(materialItems || MATERIALS.support_pillars.items);
   const counts = new Map();
   cellsList.forEach(cells => {
     cells.forEach(c => {
@@ -427,8 +514,23 @@ function setBuildMode(mode){
       ? T("build_thickness_label_solid", "厚さ（奥行きの押し出し量）")
       : T("build_thickness_label_flat", "厚さ（起伏の最大高さ）");
   document.getElementById("buildHollowRow").style.display = mode === "solid" ? "flex" : "none";
+  // 低い壁モードは常に1層の壁画のため、厚さ（押し出し・起伏）の概念がない
+  document.getElementById("buildThicknessRow").style.display = mode === "wall" ? "none" : "block";
+  document.getElementById("buildResolutionTip").style.display = mode === "wall" ? "none" : "block";
+  document.getElementById("buildWallModeTip").style.display = mode === "wall" ? "block" : "none";
   updateBackImageVisibility();
+  updateColorCountMax();
   if(frontImage) renderBuildCropGridOverlay();
+}
+
+// 「色数を絞る」スライダーの上限を、現在のモードの建材パレットの総色数に
+// 合わせる（支柱系78色 / 低い壁の板張り49色、など）
+function updateColorCountMax(){
+  const colorCountInput = document.getElementById("buildColorCountInput");
+  if(!colorCountInput) return;
+  const totalColorCount = currentModeMaterialItems().reduce((sum, m) => sum + m.colors.length, 0);
+  colorCountInput.max = String(totalColorCount);
+  if(Number(colorCountInput.value) > totalColorCount) colorCountInput.value = String(totalColorCount);
 }
 
 function readOptionInputs(){
@@ -454,7 +556,7 @@ function handleOptionInputChange(){
   }, 150);
 }
 
-// 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き）のマス数
+// 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き / wall:行数）のマス数
 // 実際の支柱建材は1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの2倍の高さがある
 // （立方体の建材を前提にした換算ではない）。そのため立体モードで画像の縦横比
 // から高さのマス数を決めるときは、ボクセル1段＝実際の支柱2個ぶんの高さに
@@ -462,6 +564,10 @@ function handleOptionInputChange(){
 // 支柱で建てた完成物が、1×1×1の立方体で作った場合と同じ見た目の比率になる
 // （平面モードのotherDimは奥行き軸で、この高さの特性とは無関係なので対象外）
 const SOLID_HEIGHT_ASPECT_COMPENSATION = 2;
+// 低い壁は幅4×高さ2（幅が高さの2倍）なので、壁1枚を1マスとして単純に正方形の
+// グリッドを敷くと横に間延びして見える。1行あたりの物理的な高さが1列あたりの
+// 物理的な幅の半分しかない分、同じ縦横比に見せるには行数を2倍にする必要がある
+const WALL_ROW_ASPECT_COMPENSATION = 0.5;
 
 function computeOtherDim(){
   if(!frontImage) return settings.width;
@@ -471,8 +577,10 @@ function computeOtherDim(){
   // 「width/otherDim」比そのものに一致してしまい、再度この関数を呼ぶたびに
   // 補正が重ねがけされてしまう＝毎回さらに半分になっていくバグになる）
   const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
-  const maxOther = settings.mode === "solid" ? SITE_MAX_HEIGHT : SITE_MAX_DEPTH;
-  const compensation = settings.mode === "solid" ? SOLID_HEIGHT_ASPECT_COMPENSATION : 1;
+  const maxOther = settings.mode === "flat" ? SITE_MAX_DEPTH : SITE_MAX_HEIGHT;
+  const compensation = settings.mode === "solid" ? SOLID_HEIGHT_ASPECT_COMPENSATION
+    : settings.mode === "wall" ? WALL_ROW_ASPECT_COMPENSATION
+    : 1;
   return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect / compensation)));
 }
 
@@ -709,12 +817,17 @@ function diffuseLabError(errors, w, h, x, y, diff){
   });
 }
 
+// 現在のモードでマッチングに使う建材リスト（solid/flat=支柱系、wall=低い壁系）
+function currentModeMaterialItems(){
+  return settings.mode === "wall" ? MATERIALS.low_walls.items : MATERIALS.support_pillars.items;
+}
+
 // 画像1枚をw×hの2Dグリッドへ変換する（建材マッチング＋ディザリング＋輪郭保持）。
-// paletteIndex省略時は建材の全色から選ぶ。色数を絞る場合は
-// deriveRestrictedPaletteIndex()で作った部分集合を渡す
+// paletteIndex省略時はmaterialItems（省略時は支柱系）の全色から選ぶ。
+// 色数を絞る場合はderiveRestrictedPaletteIndex()で作った部分集合を渡す
 // 戻り値: { cells: [{materialId,hex,name}|null], rawColors: [[r,g,b]|null] }
 // rawColorsは平面モードの起伏（高さ）算出に使う量子化前の色
-function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTransparentBg, paletteIndex){
+function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTransparentBg, paletteIndex, materialItems){
   const src = autoTransparentBg ? buildAutoTransparentCanvas(image) : image;
   const srcW = autoTransparentBg ? src.width : naturalW;
   const srcH = autoTransparentBg ? src.height : naturalH;
@@ -724,7 +837,7 @@ function computeMatchedGrid(image, naturalW, naturalH, rect, w, h, autoTranspare
     ? { sx: rect.sx * scaleX, sy: rect.sy * scaleY, sw: rect.sw * scaleX, sh: rect.sh * scaleY }
     : rect;
 
-  const index = paletteIndex || getMaterialLabIndex(MATERIALS.support_pillars.items);
+  const index = paletteIndex || getMaterialLabIndex(materialItems || MATERIALS.support_pillars.items);
   const { colors, alphas, isEdgeCell } = sampleCellColors(src, srcW, srcH, scaledRect, w, h);
 
   const errors = new Array(w * h).fill(null);
@@ -802,9 +915,18 @@ function computeInteriorBulge(cells, w, h){
       if(d > maxDist) maxDist = d;
     }
   }
+  // dist/maxDistをそのまま使うと断面が円錐（ピラミッド型）になり、中心から
+  // 少し外れただけで急激に薄くなってしまう（輪郭からの距離はシルエット中心
+  // からの距離rに対してほぼ線形＝(R-r)/Rのため）。参考サイトのような
+  // ドーム（半球）型にするには、線形値t=(R-r)/Rを t=1-r/R とみなして
+  // sqrt(1-(1-t)^2) = sqrt(1-(r/R)^2) の球断面カーブに変換する
+  // （円形シルエットで検証済み：真の半球の理論値と完全に一致する）
   const bulge = new Array(n).fill(0);
   for(let i = 0; i < n; i++){
-    if(cells[i]) bulge[i] = dist[i] / maxDist;
+    if(cells[i]){
+      const t = dist[i] / maxDist;
+      bulge[i] = Math.sqrt(Math.max(0, 1 - (1 - t) * (1 - t)));
+    }
   }
   return bulge;
 }
@@ -886,6 +1008,23 @@ function buildFlatVoxels(grid, w, d, thickness){
   return voxels;
 }
 
+// wall（低い壁・壁画）：正面グリッドの各マスを、そのまま低い壁パネル1枚に
+// 変換する。押し出し・起伏なし（低い壁は常に単層の壁画として配置する）。
+// 画像の行y=0（画像の上端）は壁画の最上段（ワールドY最大）に対応させるため
+// 反転させる（立体モードの上下反転と同じ理由）
+function buildWallMuralSegments(grid, w, h){
+  const segments = [];
+  for(let y = 0; y < h; y++){
+    for(let x = 0; x < w; x++){
+      const idx = y * w + x;
+      const material = grid.cells[idx];
+      if(!material) continue;
+      segments.push({ x, y: h - 1 - y, materialId: material.materialId, hex: material.hex, name: material.name });
+    }
+  }
+  return segments;
+}
+
 // ══════════════════════════════════════
 // 生成の実行
 // ══════════════════════════════════════
@@ -894,28 +1033,29 @@ function runBuildGeneration(){
   const rect = manualCropRect || coverCropRect(frontImage.naturalWidth, frontImage.naturalHeight, settings.width, settings.width);
   const otherDim = computeOtherDim();
   const backRect = backImage ? coverCropRect(backImage.naturalWidth, backImage.naturalHeight, settings.width, otherDim) : null;
+  const materialItems = currentModeMaterialItems();
 
   let paletteIndex; // undefined＝全色から選ぶ（デフォルト）
   if(settings.limitColors){
     // 1回目：制限なしでマッチングし、実際によく使われる色の出現頻度を数える
     const provisionalFront = computeMatchedGrid(
       frontImage, frontImage.naturalWidth, frontImage.naturalHeight,
-      rect, settings.width, otherDim, settings.autoTransparentBg
+      rect, settings.width, otherDim, settings.autoTransparentBg, undefined, materialItems
     );
     const provisionalCellsList = [provisionalFront.cells];
     if(settings.mode === "solid" && backImage){
       const provisionalBack = computeMatchedGrid(
         backImage, backImage.naturalWidth, backImage.naturalHeight,
-        backRect, settings.width, otherDim, settings.autoTransparentBg
+        backRect, settings.width, otherDim, settings.autoTransparentBg, undefined, materialItems
       );
       provisionalCellsList.push(provisionalBack.cells);
     }
-    paletteIndex = deriveRestrictedPaletteIndex(provisionalCellsList, settings.colorCount);
+    paletteIndex = deriveRestrictedPaletteIndex(provisionalCellsList, settings.colorCount, materialItems);
   }
 
   const frontGrid = computeMatchedGrid(
     frontImage, frontImage.naturalWidth, frontImage.naturalHeight,
-    rect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex
+    rect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex, materialItems
   );
 
   if(settings.mode === "solid"){
@@ -923,19 +1063,33 @@ function runBuildGeneration(){
     if(backImage){
       backGrid = computeMatchedGrid(
         backImage, backImage.naturalWidth, backImage.naturalHeight,
-        backRect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex
+        backRect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex, materialItems
       );
     }
     resultVoxels = buildSolidVoxels(frontGrid, backGrid, settings.width, otherDim, settings.thickness, settings.hollow);
     resultDims = { w: settings.width, h: otherDim, d: settings.thickness };
+    resultWallSegments = null;
+    resultWallDims = null;
+  }else if(settings.mode === "wall"){
+    resultWallSegments = buildWallMuralSegments(frontGrid, settings.width, otherDim);
+    resultWallDims = { w: settings.width, h: otherDim };
+    resultVoxels = null;
+    resultDims = null;
   }else{
     resultVoxels = buildFlatVoxels(frontGrid, settings.width, otherDim, settings.thickness);
     resultDims = { w: settings.width, h: settings.thickness, d: otherDim };
+    resultWallSegments = null;
+    resultWallDims = null;
   }
 
   ensureSceneInitialized();
   setupProgressSlider();
-  Build3D.setVoxels(getVisibleVoxels());
+  blockGuideSize = 0;
+  updateGuideRow();
+  applyBlockGuide();
+  updateEditToolbarVisibility();
+  Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
+  refreshResultView();
   renderBuildMaterialList();
   clearHistory();
 }
@@ -985,7 +1139,40 @@ function computeBuildPillarSegments(){
   return segments;
 }
 
+// 低い壁は支柱と違って高さ方向に伸縮する単位ではなく、1マス＝1枚の
+// 固定サイズパネルなので、支柱のような縦方向の連続区間まとめ（高さNマス）は
+// 行わず、色ごとの必要枚数を単純に数える
+function computeWallSegmentCounts(){
+  if(!resultWallSegments) return [];
+  const counts = {};
+  resultWallSegments.forEach(v => {
+    const key = v.materialId + "_" + v.hex;
+    if(!counts[key]) counts[key] = { name: v.name, hex: v.hex, count: 0 };
+    counts[key].count++;
+  });
+  return Object.values(counts).sort((a, b) => b.count - a.count);
+}
+
 function renderBuildMaterialList(){
+  const pillarCountLabel = document.getElementById("buildPillarCountLabel");
+  if(settings.mode === "wall"){
+    if(pillarCountLabel) pillarCountLabel.textContent = T("build_wall_count_label", "必要な壁の枚数");
+    if(!resultWallSegments) return;
+    const entries = computeWallSegmentCounts();
+    document.getElementById("buildMaterialCount").textContent = entries.length;
+    document.getElementById("buildCellCount").textContent = resultWallSegments.length.toLocaleString();
+    document.getElementById("buildPillarCount").textContent = resultWallSegments.length.toLocaleString();
+    document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
+      <div class="art-result-color-row">
+        <span class="art-result-color-swatch" style="background:${e.hex}"></span>
+        <span class="art-result-color-code">${e.name}</span>
+        <span class="art-result-color-count">${e.count}${T("build_unit_walls", "枚")}</span>
+      </div>
+    `).join("");
+    return;
+  }
+
+  if(pillarCountLabel) pillarCountLabel.textContent = T("build_pillar_count_label", "必要な支柱の本数");
   if(!resultVoxels) return;
   const cellCount = resultVoxels.length;
   const segments = computeBuildPillarSegments();
@@ -1020,8 +1207,11 @@ function resetBuildToUpload(){
   backImage = null;
   resultVoxels = null;
   resultDims = null;
+  resultWallSegments = null;
+  resultWallDims = null;
   manualCropRect = null;
   cropTargetKey = null;
+  blockGuideSize = 0;
   renderBackPreview();
   document.getElementById("buildFrontPreviewWrap").style.display = "none";
   document.getElementById("buildProceedBtn").disabled = true;
@@ -1075,7 +1265,7 @@ function renderBuildLibraryList(){
     const legacy = d.formatVersion !== BUILD_DESIGN_FORMAT_VERSION;
     const dimsLabel = legacy
       ? `${d.width}×${d.height}`
-      : `${d.dims.w}×${d.dims.h}×${d.dims.d}`;
+      : d.mode === "wall" ? `${d.dims.w}×${d.dims.h}` : `${d.dims.w}×${d.dims.h}×${d.dims.d}`;
     return `
     <div class="build-library-item">
       <span class="build-library-item-name">${escapeHtml(d.name)}（${dimsLabel}）${legacy ? `<br><span style="color:var(--vermillion);font-size:10px;">${T("build_legacy_design_note", "※旧バージョンの設計図（壁画モード）は読み込めません")}</span>` : ""}</span>
@@ -1096,7 +1286,8 @@ function renderBuildLibraryList(){
 }
 
 function saveBuildDesign(){
-  if(!resultVoxels || !resultDims){
+  const isWall = settings.mode === "wall";
+  if(isWall ? (!resultWallSegments || !resultWallDims) : (!resultVoxels || !resultDims)){
     alert(T("build_save_no_result", "先に画像を変換してください"));
     return;
   }
@@ -1107,8 +1298,9 @@ function saveBuildDesign(){
     formatVersion: BUILD_DESIGN_FORMAT_VERSION,
     name,
     mode: settings.mode,
-    dims: resultDims,
-    voxels: resultVoxels,
+    // 低い壁モードはdims={w,h}・voxelsは{x,y,materialId,hex,name}の配列（z無し）
+    dims: isWall ? resultWallDims : resultDims,
+    voxels: isWall ? resultWallSegments : resultVoxels,
     createdAt: Date.now(),
   });
   if(persistSavedDesigns()){
@@ -1125,15 +1317,29 @@ function loadDesign(id){
   backImage = null;
   manualCropRect = null;
   settings.mode = design.mode;
-  resultDims = design.dims;
-  resultVoxels = design.voxels.map(v => ({ ...v }));
+  if(design.mode === "wall"){
+    resultWallDims = design.dims;
+    resultWallSegments = design.voxels.map(v => ({ ...v }));
+    resultDims = null;
+    resultVoxels = null;
+  }else{
+    resultDims = design.dims;
+    resultVoxels = design.voxels.map(v => ({ ...v }));
+    resultWallDims = null;
+    resultWallSegments = null;
+  }
   document.getElementById("buildUploadArea").style.display = "none";
   document.getElementById("buildCropStage").style.display = "none";
   document.getElementById("buildResultStage").style.display = "block";
   document.getElementById("buildDesignNameInput").value = design.name;
   ensureSceneInitialized();
   setupProgressSlider();
-  Build3D.setVoxels(getVisibleVoxels());
+  blockGuideSize = 0;
+  updateGuideRow();
+  applyBlockGuide();
+  updateEditToolbarVisibility();
+  Build3D.setBoundaryBoxVisible(settings.mode !== "wall");
+  refreshResultView();
   renderBuildMaterialList();
   clearHistory();
   updateBuildStepProgress("finish");
@@ -1241,10 +1447,15 @@ function initBuildPage(){
   document.getElementById("buildLimitColorsCheckbox").addEventListener("change", readOptionInputs);
   document.getElementById("buildColorCountInput").addEventListener("input", readOptionInputs);
 
-  const colorCountInput = document.getElementById("buildColorCountInput");
-  const totalColorCount = MATERIALS.support_pillars.items.reduce((sum, m) => sum + m.colors.length, 0);
-  colorCountInput.max = String(totalColorCount);
-  if(Number(colorCountInput.value) > totalColorCount) colorCountInput.value = String(totalColorCount);
+  updateColorCountMax();
+
+  document.querySelectorAll(".build-guide-size-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      blockGuideSize = Number(btn.dataset.size) || 0;
+      updateGuideRow();
+      applyBlockGuide();
+    });
+  });
 
   document.getElementById("buildAdjustBtn").addEventListener("click", () => openBuildCropStage(false));
   document.getElementById("buildNewImageBtn").addEventListener("click", resetBuildToUpload);
@@ -1284,12 +1495,13 @@ function initBuildPage(){
   document.addEventListener("darkmodechange", () => {
     if(sceneInitialized){
       Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+      applyBlockGuide();
     }
   });
 }
 
 document.addEventListener("langchange", () => {
-  if(resultVoxels) renderBuildMaterialList();
+  if(resultVoxels || resultWallSegments) renderBuildMaterialList();
   renderBuildLibraryList();
 });
 
