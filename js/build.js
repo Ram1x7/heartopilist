@@ -288,7 +288,10 @@ function applyBlockGuide(){
 // [{bx, bz, bw, bh, blockNum, materialId, hex, name, cells:[{x,z,height}]}]
 let flatGuideOrder = [];
 let flatGuideStepIndex = 0;
-let flatGuideIsFull = false; // true＝「効率のいい置き方を見る」で全ブロック通し、false＝1ブロックのみ
+
+// 手順を最後まで確認し終えたブロック（"bx_bz"のSet）。配置ガイドのサイズを
+// 変える・新しく生成し直すとブロック割り自体が変わるため、その都度リセットする
+let completedGuideBlocks = new Set();
 
 // 完成図の全マス（列ごとにまとめる。厚さ方向へ積まれた同じ建材は1マス＝1本の
 // 支柱として数え、その本数をheightとして持つ）
@@ -362,8 +365,10 @@ function renderBuildBlockList(){
   for(let bz = 0; bz < blocksZ; bz++){
     for(let bx = 0; bx < blocksX; bx++){
       const num = bz * blocksX + bx + 1;
-      const empty = !nonEmptyKeys.has(`${bx}_${bz}`);
-      html += `<button type="button" class="art-block-btn" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}">${num}</button>`;
+      const key = `${bx}_${bz}`;
+      const empty = !nonEmptyKeys.has(key);
+      const done = !empty && completedGuideBlocks.has(key);
+      html += `<button type="button" class="art-block-btn${done ? " art-block-status-2" : ""}" ${empty ? "disabled" : ""} data-bx="${bx}" data-bz="${bz}">${num}</button>`;
     }
   }
   el.innerHTML = html;
@@ -373,34 +378,28 @@ function renderBuildBlockList(){
   wrap.style.display = "block";
 }
 
-// 1ブロックだけに絞ったガイド（ブロック一覧からの選択）
+// 選んだブロックから始めて、以降のブロックへそのまま自動で続けて案内する
+// （完了のたびに毎回ブロック選択に戻る手間をなくすため、1ブロックだけを見る
+// モードは廃止し、常に「ここから最後のブロックまで」通しで進む）
 function openFlatGuide(bx, bz){
   const blocks = nonEmptyFlatBlocks();
-  const found = blocks.find(b => b.bx === bx && b.bz === bz);
-  if(!found) return;
-  const steps = computeFlatBlockSteps(bx, bz, found.blockNum);
-  if(steps.length === 0){
-    if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
-    return;
-  }
-  flatGuideIsFull = false;
-  startFlatGuide(steps);
+  const startIdx = blocks.findIndex(b => b.bx === bx && b.bz === bz);
+  if(startIdx < 0) return;
+  startFlatGuideFromBlocks(blocks.slice(startIdx));
 }
 
-// 置かれている全ブロックをブロック番号順に自動で通しで案内する
+// 置かれている全ブロックを最初から番号順に自動で通しで案内する
 // （アートページの「効率のいい順番を見る」に相当）
 function openFlatGuideAll(){
-  const blocks = nonEmptyFlatBlocks();
+  startFlatGuideFromBlocks(nonEmptyFlatBlocks());
+}
+
+function startFlatGuideFromBlocks(blocks){
   const steps = blocks.flatMap(b => computeFlatBlockSteps(b.bx, b.bz, b.blockNum));
   if(steps.length === 0){
     if(typeof showToast === "function") showToast(T("build_guide_empty", "このブロックにはまだ何も配置されていません"));
     return;
   }
-  flatGuideIsFull = true;
-  startFlatGuide(steps);
-}
-
-function startFlatGuide(steps){
   flatGuideOrder = steps;
   flatGuideStepIndex = 0;
   document.getElementById("buildGuideOverlay").style.display = "flex";
@@ -412,6 +411,7 @@ function closeFlatGuide(){
   const overlay = document.getElementById("buildGuideOverlay");
   if(overlay) overlay.style.display = "none";
   document.body.style.overflow = "";
+  renderBuildBlockList();
 }
 
 // ブロック完了の軽い通知（振動含む。アートのぬり方ガイドと同じ演出）
@@ -427,22 +427,23 @@ function showGuideBlockCompleteFlash(blockNum){
 }
 
 function flatGuideNext(){
+  const cur = flatGuideOrder[flatGuideStepIndex];
   if(flatGuideStepIndex >= flatGuideOrder.length - 1){
-    const label = flatGuideOrder[flatGuideStepIndex].blockNum;
-    const wasFull = flatGuideIsFull;
+    completedGuideBlocks.add(`${cur.bx}_${cur.bz}`);
+    const label = cur.blockNum;
     closeFlatGuide();
     if(typeof showToast === "function"){
-      showToast(wasFull
-        ? T("build_guide_all_done", "設置手順は以上です")
-        : T("build_guide_block_done", `ブロック${label}の手順は以上です`, { block: label }));
+      showToast(T("build_guide_done_through", `ブロック${label}までの手順は以上です`, { block: label }));
     }
     return;
   }
-  const prevBlockNum = flatGuideOrder[flatGuideStepIndex].blockNum;
   flatGuideStepIndex++;
   renderFlatGuideStep();
-  const newBlockNum = flatGuideOrder[flatGuideStepIndex].blockNum;
-  if(flatGuideIsFull && newBlockNum !== prevBlockNum) showGuideBlockCompleteFlash(prevBlockNum);
+  const next = flatGuideOrder[flatGuideStepIndex];
+  if(next.blockNum !== cur.blockNum){
+    completedGuideBlocks.add(`${cur.bx}_${cur.bz}`);
+    showGuideBlockCompleteFlash(cur.blockNum);
+  }
 }
 
 function flatGuidePrev(){
@@ -461,7 +462,7 @@ function renderFlatGuideStep(){
   document.getElementById("buildGuideProgressFill").style.width = `${(stepNum / total) * 100}%`;
 
   document.getElementById("buildGuideColorChip").style.background = step.hex;
-  document.getElementById("buildGuideDetail").textContent = step.name;
+  document.getElementById("buildGuideDetail").innerHTML = buildColorNumberLabel(step.materialId, step.hex) + step.name;
 
   const badges = document.getElementById("buildGuideMethodBadges");
   badges.innerHTML = "";
@@ -636,10 +637,10 @@ function openMaterialPickerModal(){
   body.innerHTML = MATERIALS.support_pillars.items.map(material => `
     <div class="build-material-group-title">${material.name}</div>
     <div class="build-material-swatches">
-      ${material.colors.map(hex => `
+      ${material.colors.map((hex, i) => `
         <button type="button" class="build-material-swatch${selectedMaterial && selectedMaterial.materialId === material.id && selectedMaterial.hex === hex ? " active" : ""}"
           style="background:${hex}" data-material="${material.id}" data-hex="${hex}" data-name="${material.name}"
-          aria-label="${material.name} ${hex}"></button>
+          aria-label="${material.name} #${i + 1}"><span class="art-swatch-code">${i + 1}</span></button>
       `).join("")}
     </div>
   `).join("");
@@ -1529,6 +1530,7 @@ function runBuildGeneration(){
   ensureSceneInitialized();
   setupProgressSlider();
   blockGuideSize = 0;
+  completedGuideBlocks = new Set();
   updateGuideRow();
   applyBlockGuide();
   renderBuildBlockList();
@@ -1560,6 +1562,26 @@ function ensureSceneInitialized(){
 // まとめる。支柱は1マス×1マスの設置面に対して高さ方向へ伸縮するため、この
 // 数え方が実際の建て方に最も近い）
 // ══════════════════════════════════════
+// 建材ID＋色hexから、その建材内での色番号（1始まり）を求める。ゲーム内の
+// ペイント選択画面も同じ並び順で表示される想定のもと、data-materials.jsの
+// colors配列の並び＝ゲーム内パレットの並びをそのまま番号として使う
+function materialColorNumber(materialId, hex){
+  for(const category of Object.values(MATERIALS)){
+    const item = category.items.find(m => m.id === materialId);
+    if(item){
+      const idx = item.colors.indexOf(hex);
+      return idx >= 0 ? idx + 1 : null;
+    }
+  }
+  return null;
+}
+
+// 建材一覧・パレット選択などに差し込む色番号バッジのHTML
+function buildColorNumberLabel(materialId, hex){
+  const num = materialColorNumber(materialId, hex);
+  return num ? `<span class="art-usage-number">#${num}</span> ` : "";
+}
+
 function computeBuildPillarSegments(){
   if(!resultVoxels || !resultDims) return [];
   const map = new Map();
@@ -1576,7 +1598,7 @@ function computeBuildPillarSegments(){
           run.height++;
         }else{
           if(run && run.key) segments.push(run);
-          run = key ? { key, name: v.name, hex: v.hex, height: 1 } : null;
+          run = key ? { key, materialId: v.materialId, name: v.name, hex: v.hex, height: 1 } : null;
         }
       }
       if(run && run.key) segments.push(run);
@@ -1593,7 +1615,7 @@ function computeWallSegmentCounts(){
   const counts = {};
   resultWallSegments.forEach(v => {
     const key = v.materialId + "_" + v.hex;
-    if(!counts[key]) counts[key] = { name: v.name, hex: v.hex, count: 0 };
+    if(!counts[key]) counts[key] = { materialId: v.materialId, name: v.name, hex: v.hex, count: 0 };
     counts[key].count++;
   });
   return Object.values(counts).sort((a, b) => b.count - a.count);
@@ -1611,7 +1633,7 @@ function renderBuildMaterialList(){
     document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
       <div class="art-result-color-row">
         <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-        <span class="art-result-color-code">${e.name}</span>
+        <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}</span>
         <span class="art-result-color-count">${e.count}${T("build_unit_walls", "枚")}</span>
       </div>
     `).join("");
@@ -1626,7 +1648,7 @@ function renderBuildMaterialList(){
   const counts = {};
   segments.forEach(seg => {
     const key = seg.key + "_" + seg.height;
-    if(!counts[key]) counts[key] = { name: seg.name, hex: seg.hex, height: seg.height, count: 0 };
+    if(!counts[key]) counts[key] = { materialId: seg.materialId, name: seg.name, hex: seg.hex, height: seg.height, count: 0 };
     counts[key].count++;
   });
   const entries = Object.values(counts).sort((a, b) => b.count - a.count);
@@ -1639,7 +1661,7 @@ function renderBuildMaterialList(){
   document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
     <div class="art-result-color-row">
       <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-      <span class="art-result-color-code">${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
+      <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
       <span class="art-result-color-count">${e.count}${T("build_unit_pillars", "本")}</span>
     </div>
   `).join("");
@@ -1659,6 +1681,7 @@ function resetBuildToUpload(){
   manualCropRect = null;
   cropTargetKey = null;
   blockGuideSize = 0;
+  completedGuideBlocks = new Set();
   renderBackPreview();
   document.getElementById("buildFrontPreviewWrap").style.display = "none";
   document.getElementById("buildProceedBtn").disabled = true;
@@ -1782,6 +1805,7 @@ function loadDesign(id){
   ensureSceneInitialized();
   setupProgressSlider();
   blockGuideSize = 0;
+  completedGuideBlocks = new Set();
   updateGuideRow();
   applyBlockGuide();
   renderBuildBlockList();
@@ -1906,6 +1930,7 @@ function initBuildPage(){
   document.querySelectorAll(".build-guide-size-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       blockGuideSize = Number(btn.dataset.size) || 0;
+      completedGuideBlocks = new Set();
       updateGuideRow();
       applyBlockGuide();
       renderBuildBlockList();
