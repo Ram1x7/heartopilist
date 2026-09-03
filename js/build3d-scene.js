@@ -375,18 +375,11 @@ function disposeFloorGrid(){
   }
 }
 
-// 3Dビューの底面（Y≈0の床面）に、1×1マスごとの点線と2×2マスごとの太線で
-// マス目の目安を表示する（常時表示・トグルなし）。低い壁モードは実寸単位系が
-// 支柱と異なり床という概念を持たないため対象外（designDimsをnullで渡して隠す）。
-// designDims: {w,d}（現在の設計の外接サイズ。boundsは常にサイト最大値なので
-// 　配置ガイド同様に別途渡す）
-// dark: ダークテーマかどうか（線の色をテーマに合わせて切り替える）
-function setFloorGrid(designDims, dark){
-  disposeFloorGrid();
-  if(!designDims || !designDims.w || !designDims.d) return;
-
-  const w = designDims.w, d = designDims.d;
-  const offX = bounds.w / 2, offZ = bounds.d / 2;
+// 底面のマス目（1×1点線・2×2太線）の実体を組み立てる共通処理。
+// w,d: ワールド単位での床の幅・奥行き／offX,offZ: 中心を合わせるためのオフセット
+// （呼び出し側のモードごとの座標系に応じて渡す。詳細はsetFloorGrid/
+// setWallFloorGridのコメントを参照）
+function buildFloorGridMeshes(w, d, offX, offZ, dark){
   const dottedColor = dark ? 0x9a9284 : 0xb0a795;
   const boldColor = dark ? 0xd8cba6 : 0x8a7554;
 
@@ -433,6 +426,35 @@ function setFloorGrid(designDims, dark){
   scene.add(floorGridBold);
 }
 
+// 3Dビューの底面（Y≈0の床面）に、1×1マスごとの点線と2×2マスごとの太線で
+// マス目の目安を表示する（常時表示・トグルなし）。立体・平面モード用
+// （支柱と同じ、サイト最大幅を中心とする座標系＝boundsを使う）。
+// 低い壁モードは実寸単位系が異なるためsetWallFloorGrid()を使う
+// designDims: {w,d}（現在の設計の外接サイズ。boundsは常にサイト最大値なので
+// 　配置ガイド同様に別途渡す）
+// dark: ダークテーマかどうか（線の色をテーマに合わせて切り替える）
+function setFloorGrid(designDims, dark){
+  disposeFloorGrid();
+  if(!designDims || !designDims.w || !designDims.d) return;
+  buildFloorGridMeshes(designDims.w, designDims.d, bounds.w / 2, bounds.d / 2, dark);
+}
+
+// 低い壁は実寸奥行きが0.5しかなく、そのままだと床マス目のZ方向がほぼ
+// 潰れて見えなくなってしまうため、手前に少し伸ばした目安の奥行きを使う
+// （壁の実寸ではなく、あくまで足元の位置確認用の参考グリッド）
+const WALL_FLOOR_GRID_DEPTH = 4;
+
+// 低い壁（壁画）モード用の床マス目。低い壁は幅4×奥行き0.5の実寸パネルで、
+// setWallSegments()と同じ座標系（bounds非依存・低い壁自身の幅を中心にする）
+// を使う必要があるため、setFloorGrid()とは別の入口にしている
+// dims: {w}（低い壁モードの結果グリッドの列数）
+function setWallFloorGrid(dims, dark){
+  disposeFloorGrid();
+  if(!dims || !dims.w) return;
+  const worldW = dims.w * WALL_PANEL_W;
+  buildFloorGridMeshes(worldW, WALL_FLOOR_GRID_DEPTH, worldW / 2, WALL_FLOOR_GRID_DEPTH / 2, dark);
+}
+
 function dispose(){
   if(rafId != null){ cancelAnimationFrame(rafId); rafId = null; }
   if(mesh){ mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
@@ -444,5 +466,5 @@ function dispose(){
 
 export {
   init, setVoxels, setWallSegments, resize, raycastVoxelAt, setEditClickCallback,
-  setBackgroundColor, setBlockGuide, setFloorGrid, setBoundaryBoxVisible, dispose,
+  setBackgroundColor, setBlockGuide, setFloorGrid, setWallFloorGrid, setBoundaryBoxVisible, dispose,
 };
