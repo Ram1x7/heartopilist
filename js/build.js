@@ -50,6 +50,11 @@ let settings = {
   autoTransparentBg: false,
   limitColors: false,  // 色数を絞る
   colorCount: 16,       // 絞り込む色数の上限
+  // 低い壁モード専用：サイズの基準（"width"＝幅を指定して積む段数を自動算出／
+  // "height"＝積む段数を指定して幅を自動算出）。どちらを選んでも画像の縦横比に
+  // 合わせてもう一方の軸が自動計算される
+  wallSizeBasis: "width",
+  wallHeight: 24,       // 高さ基準時に使う段数（低い壁を積む段数）
 };
 
 let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]（solid/flat用）
@@ -482,6 +487,8 @@ async function handleFrontFileSelect(file){
     renderFrontPreview();
     document.getElementById("buildProceedBtn").disabled = false;
     document.getElementById("buildUploadBtnLabel").textContent = T("build_choose_again", "画像を選び直す");
+    syncWallWidthFromHeight(); // 新しい画像の縦横比に合わせて幅（高さ基準時）を再計算
+    updateWallAutoDimHint();
   }catch(e){
     alert(T("art_invalid_image", "対応していないファイル形式です（JPG・PNG・WebPのみ）"));
   }
@@ -546,6 +553,31 @@ function setBuildMode(mode){
   updateBackImageVisibility();
   updateColorCountMax();
   updateWidthMax();
+  updateWallSizeBasisUI();
+  readOptionInputs();
+  if(frontImage) renderBuildCropGridOverlay();
+}
+
+// 低い壁モード専用：「幅を指定」／「高さを指定」の切り替えに応じて、
+// 幅スライダー・高さスライダーの表示と、切替ボタンのactive状態を揃える
+function updateWallSizeBasisUI(){
+  const basisRow = document.getElementById("buildWallSizeBasisRow");
+  const widthRow = document.getElementById("buildWidthRow");
+  const heightRow = document.getElementById("buildWallHeightRow");
+  if(!basisRow || !widthRow || !heightRow) return;
+  const isWall = settings.mode === "wall";
+  basisRow.style.display = isWall ? "flex" : "none";
+  const heightBasis = isWall && settings.wallSizeBasis === "height";
+  widthRow.style.display = heightBasis ? "none" : "block";
+  heightRow.style.display = heightBasis ? "block" : "none";
+  document.querySelectorAll(".build-wall-basis-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.basis === settings.wallSizeBasis);
+  });
+}
+
+function setWallSizeBasis(basis){
+  settings.wallSizeBasis = basis;
+  updateWallSizeBasisUI();
   readOptionInputs();
   if(frontImage) renderBuildCropGridOverlay();
 }
@@ -572,17 +604,43 @@ function updateColorCountMax(){
 }
 
 function readOptionInputs(){
-  settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
+  if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
+    settings.wallHeight = Math.min(SITE_MAX_HEIGHT, Math.max(2, Number(document.getElementById("buildWallHeightInput").value) || 2));
+    document.getElementById("buildWallHeightOutput").textContent = `${settings.wallHeight}${T("build_unit_masu", "マス")}`;
+    syncWallWidthFromHeight(); // 指定された段数から幅を逆算してsettings.widthへ書き戻す
+  }else{
+    settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
+    document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
+  }
   settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
   settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
   settings.limitColors = document.getElementById("buildLimitColorsCheckbox").checked;
   const colorCountInput = document.getElementById("buildColorCountInput");
   settings.colorCount = Math.min(Number(colorCountInput.max) || 74, Math.max(2, Number(colorCountInput.value) || 2));
-  document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
   document.getElementById("buildThicknessOutput").textContent = `${settings.thickness}${T("build_unit_masu", "マス")}`;
   document.getElementById("buildColorCountOutput").textContent = `${settings.colorCount}${T("build_unit_colors", "色")}`;
   document.getElementById("buildColorCountRow").style.display = settings.limitColors ? "block" : "none";
+  updateWallAutoDimHint();
+}
+
+// 低い壁モードで、選んだ基準（幅／高さ）に応じて、自動計算されたもう一方の
+// 軸の値を案内する（幅基準なら「高さは何マスになるか」、高さ基準なら
+// 「幅は何マスになるか」）
+function updateWallAutoDimHint(){
+  const hint = document.getElementById("buildWallAutoDimHint");
+  if(!hint) return;
+  if(settings.mode !== "wall" || !frontImage){
+    hint.style.display = "none";
+    return;
+  }
+  const unit = T("build_unit_masu", "マス");
+  if(settings.wallSizeBasis === "height"){
+    hint.textContent = T("build_wall_auto_width_hint", "横：{n}に自動調整されます").replace("{n}", `${settings.width}${unit}`);
+  }else{
+    hint.textContent = T("build_wall_auto_height_hint", "高さ：{n}に自動調整されます").replace("{n}", `${computeOtherDim()}${unit}`);
+  }
+  hint.style.display = "block";
 }
 
 let optionDebounceTimer = null;
@@ -617,6 +675,12 @@ function cellAspectRatio(){
 
 function computeOtherDim(){
   if(!frontImage) return settings.width;
+  // 低い壁モードで「高さを基準にする」を選んでいる場合は、ユーザーが指定した
+  // 段数をそのまま使う（幅はsyncWallWidthFromHeight()で別途逆算してsettings.width
+  // に書き戻し済みなので、他の全コードは従来通りsettings.widthを見るだけでよい）
+  if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
+    return Math.min(SITE_MAX_HEIGHT, Math.max(2, settings.wallHeight));
+  }
   // 常に元画像そのものの縦横比を使う（切り抜き範囲＝manualCropRectは、
   // このwidth/otherDim比になるようcrop stageのビューポート自体を固定した上で
   // 選ばれるため、manualCropRect.sw/shから逆算すると、確定後は
@@ -630,6 +694,18 @@ function computeOtherDim(){
   return Math.min(maxOther, Math.max(2, Math.round(settings.width / aspect / compensation)));
 }
 
+// computeOtherDim()の逆算版：低い壁モードで「高さを基準にする」場合、指定された
+// 段数（settings.wallHeight）と画像の縦横比から幅（列数）を求め、settings.width
+// に書き戻す。生成・切り抜き・グリッド表示など既存のコードは全てsettings.width
+// を直接参照しているため、こうして同期しておけば他のコードを一切変更せずに
+// 「高さ基準」の指定方法をそのまま使い回せる
+function syncWallWidthFromHeight(){
+  if(!frontImage || settings.mode !== "wall" || settings.wallSizeBasis !== "height") return;
+  const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
+  const derivedWidth = Math.round(settings.wallHeight * aspect * WALL_ROW_ASPECT_COMPENSATION);
+  settings.width = Math.min(WALL_MAX_WIDTH, Math.max(2, derivedWidth));
+}
+
 // ══════════════════════════════════════
 // 位置・拡大縮小の調整（正面画像のみ）
 // ══════════════════════════════════════
@@ -640,6 +716,9 @@ function openBuildCropStage(reset){
   document.getElementById("buildCropStage").style.display = "block";
   updateBuildStepProgress("adjust");
 
+  // 高さ基準の場合、settings.widthは前回の画像から逆算した値のままの
+  // 可能性があるため、切り抜き画面を開くたびに現在の画像で必ず再同期する
+  syncWallWidthFromHeight();
   const otherDim = computeOtherDim();
   const targetKey = `${settings.width}x${otherDim}`;
   const viewport = document.getElementById("buildCropViewport");
@@ -1489,7 +1568,11 @@ function initBuildPage(){
   });
 
   document.getElementById("buildWidthInput").addEventListener("input", handleOptionInputChange);
+  document.getElementById("buildWallHeightInput").addEventListener("input", handleOptionInputChange);
   document.getElementById("buildThicknessInput").addEventListener("input", handleOptionInputChange);
+  document.querySelectorAll(".build-wall-basis-btn").forEach(btn => {
+    btn.addEventListener("click", () => setWallSizeBasis(btn.dataset.basis));
+  });
   document.getElementById("buildHollowCheckbox").addEventListener("change", readOptionInputs);
   document.getElementById("buildAutoTransparentCheckbox").addEventListener("change", readOptionInputs);
   document.getElementById("buildLimitColorsCheckbox").addEventListener("change", readOptionInputs);
