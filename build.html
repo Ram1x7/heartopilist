@@ -563,6 +563,10 @@ body.dark .build-library-item{
           <span class="btn-icon" data-icon="build3dFlat"></span>
           <span data-i18n="build_mode_flat">平面（床）</span>
         </button>
+        <button type="button" class="build-mode-btn" data-mode="wall">
+          <span class="btn-icon" data-icon="build3dWall"></span>
+          <span data-i18n="build_mode_wall">低い壁（壁画）</span>
+        </button>
       </div>
 
       <div class="build-slider-field">
@@ -573,7 +577,7 @@ body.dark .build-library-item{
         <input type="range" id="buildWidthInput" min="4" max="96" value="24">
       </div>
 
-      <div class="build-slider-field">
+      <div class="build-slider-field" id="buildThicknessRow">
         <div class="build-slider-field-label">
           <span id="buildThicknessLabel" data-i18n="build_thickness_label_solid">厚さ（奥行きの押し出し量）</span>
           <output id="buildThicknessOutput">6マス</output>
@@ -581,7 +585,8 @@ body.dark .build-library-item{
         <input type="range" id="buildThicknessInput" min="1" max="40" value="6">
       </div>
 
-      <p class="art-step-hint" data-i18n="build_resolution_tip">輪郭がはっきりした単色に近いイラストほど再現しやすく、細かい顔立ちや淡いグラデーションは省略されやすい点にご注意ください。</p>
+      <p class="art-step-hint" id="buildResolutionTip" data-i18n="build_resolution_tip">輪郭がはっきりした単色に近いイラストほど再現しやすく、細かい顔立ちや淡いグラデーションは省略されやすい点にご注意ください。</p>
+      <p class="art-step-hint" id="buildWallModeTip" style="display:none;" data-i18n="build_wall_mode_tip">低い壁を敷き詰めた壁画として配置します（実際の板目模様はゲーム内でこの建材のペイント機能から選んでください）。</p>
 
       <label class="build-checkbox-row" id="buildHollowRow">
         <input type="checkbox" id="buildHollowCheckbox" checked>
@@ -647,7 +652,7 @@ body.dark .build-library-item{
       <span data-i18n="build_new_image">新しい画像から作り直す</span>
     </a>
 
-    <div class="build-edit-toolbar">
+    <div class="build-edit-toolbar" id="buildEditToolbar">
       <button type="button" class="build-tool-btn active" id="buildToolPenBtn" data-tool="pen">
         <span class="btn-icon" data-icon="pen"></span>
         <span data-i18n="build_tool_pen">ペン</span>
@@ -706,7 +711,7 @@ body.dark .build-library-item{
           <span class="art-result-stat-value" id="buildCellCount">0</span>
         </div>
         <div class="art-result-stat">
-          <span class="art-result-stat-label" data-i18n="build_pillar_count_label">必要な支柱の本数</span>
+          <span class="art-result-stat-label" id="buildPillarCountLabel" data-i18n="build_pillar_count_label">必要な支柱の本数</span>
           <span class="art-result-stat-value" id="buildPillarCount">0</span>
         </div>
       </div>
@@ -841,7 +846,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=17"></script>
+<script type="module" src="js/build.js?v=18"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

@@ -13,10 +13,22 @@ import * as THREE from "./three.module.min.js";
 // する（データ上のy座標そのものは段数のまま、描画時にだけ2倍の間隔を空ける）
 const Y_UNIT_SCALE = 2;
 
-let canvasEl, stageEl, scene, camera, renderer, mesh;
+// 低い壁は実寸で幅4×奥行き0.5×高さ2（支柱のような換算不要で、そのまま
+// ワールド座標の単位として使う）
+const WALL_PANEL_W = 4;
+const WALL_PANEL_H = 2;
+const WALL_PANEL_D = 0.5;
+
+let canvasEl, stageEl, scene, camera, renderer, mesh, wallMesh, boundBox;
 let blockGuide = null;
 let bounds = { w: 24, h: 24, d: 24 };
 let camTheta = 0.9, camPhi = 1.05, camDist = 40;
+// ズーム操作（ホイール・ピンチ）の許容範囲の基準値。表示中のコンテンツの
+// 規模（支柱ボクセルの外接範囲 or 低い壁パネルの外接範囲）に合わせて
+// fitToVoxels()/fitToWallSegments()の中で更新する（boundsは常にサイト最大値の
+// ままなので、低い壁のようにboundsと無関係な実寸単位を使う描画にはそのまま
+// 使えないため）
+let cameraSpanBasis = 40;
 const camTarget = new THREE.Vector3();
 let dragging = false, lastX = 0, lastY = 0;
 let downX = 0, downY = 0, downPointerId = null, movedDuringDrag = false;
@@ -61,8 +73,7 @@ function bindPointer(){
   });
   canvasEl.addEventListener("wheel", (e) => {
     e.preventDefault();
-    const span = Math.max(bounds.w, bounds.d, bounds.h * Y_UNIT_SCALE, 8);
-    camDist = clampDist(camDist + e.deltaY * 0.05 * (span / 40));
+    camDist = clampDist(camDist + e.deltaY * 0.05 * (cameraSpanBasis / 40));
     updateCamera();
   }, { passive: false });
 
@@ -90,8 +101,7 @@ function bindPointer(){
 }
 
 function clampDist(d){
-  const span = Math.max(bounds.w, bounds.d, bounds.h * Y_UNIT_SCALE, 8);
-  return Math.min(Math.max(d, span * 0.15), span * 5);
+  return Math.min(Math.max(d, cameraSpanBasis * 0.15), cameraSpanBasis * 5);
 }
 
 function resize(){
@@ -125,7 +135,7 @@ function init(canvas, dims){
   scene.add(dir);
 
   const renderedH = dims.h * Y_UNIT_SCALE;
-  const boundBox = new THREE.LineSegments(
+  boundBox = new THREE.LineSegments(
     new THREE.EdgesGeometry(new THREE.BoxGeometry(dims.w, renderedH, dims.d)),
     new THREE.LineBasicMaterial({ color: 0x9a9284, transparent: true, opacity: 0.35 })
   );
@@ -133,7 +143,8 @@ function init(canvas, dims){
   scene.add(boundBox);
 
   camTarget.set(0, renderedH * 0.35, 0);
-  camDist = Math.max(dims.w, dims.d, renderedH, 8) * 1.4;
+  cameraSpanBasis = Math.max(dims.w, dims.d, renderedH, 8);
+  camDist = cameraSpanBasis * 1.4;
   updateCamera();
 
   bindPointer();
@@ -142,16 +153,22 @@ function init(canvas, dims){
   if(rafId == null) animate();
 }
 
+function disposeMesh(m){
+  if(!m) return;
+  scene.remove(m);
+  m.geometry.dispose();
+  m.material.dispose();
+}
+
 // voxels: [{x,y,z,hex}]（x:幅方向 0..bounds.w-1, y:高さ方向 0..bounds.h-1, z:奥行き方向 0..bounds.d-1）
 // opts.fit: falseにすると外接範囲へのカメラ再フィットをスキップする
 // （手動編集のたびに視点が飛ぶのを防ぐため、編集後の再描画ではfalseを渡す）
 function setVoxels(voxels, opts = {}){
-  if(mesh){
-    scene.remove(mesh);
-    mesh.geometry.dispose();
-    mesh.material.dispose();
-    mesh = null;
-  }
+  disposeMesh(mesh);
+  mesh = null;
+  // モード切替直後など、低い壁の描画が残っていれば消す（両方同時に表示することはない）
+  disposeMesh(wallMesh);
+  wallMesh = null;
   currentVoxels = voxels;
   if(!voxels || voxels.length === 0) return;
 
@@ -189,8 +206,74 @@ function fitToVoxels(voxels){
     (minZ + maxZ) / 2 - bounds.d / 2 + 0.5
   );
   const span = Math.max(maxX - minX, maxZ - minZ, (maxY - minY) * Y_UNIT_SCALE, 4);
+  cameraSpanBasis = span;
   camDist = clampDist(span * 1.7);
   updateCamera();
+}
+
+// 低い壁（壁画）モード専用の描画。低い壁は幅4×奥行き0.5×高さ2の実寸パネルで、
+// 支柱のようなbounds/Y_UNIT_SCALE換算は不要（そのままワールド座標の単位として
+// 使う）。手動編集・当たり判定（raycastVoxelAt）には未対応（このバージョンの
+// 低い壁モードはペン/消しゴム編集を提供しないため）
+// segments: [{x,y,hex}]（x:列 0..dims.w-1, y:行 0..dims.h-1、y=0が壁画の最下段）
+// dims: {w,h}（低い壁モードの結果グリッドサイズ）
+function setWallSegments(segments, dims, opts = {}){
+  disposeMesh(wallMesh);
+  wallMesh = null;
+  disposeMesh(mesh);
+  mesh = null;
+  currentVoxels = [];
+  if(!segments || segments.length === 0 || !dims) return;
+
+  const geometry = new THREE.BoxGeometry(WALL_PANEL_W * 0.96, WALL_PANEL_H * 0.96, WALL_PANEL_D * 0.96);
+  const material = new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0.05 });
+  wallMesh = new THREE.InstancedMesh(geometry, material, segments.length);
+
+  const offX = (dims.w * WALL_PANEL_W) / 2;
+  const dummy = new THREE.Object3D();
+  const color = new THREE.Color();
+  segments.forEach((v, i) => {
+    dummy.position.set(
+      v.x * WALL_PANEL_W - offX + WALL_PANEL_W / 2,
+      v.y * WALL_PANEL_H + WALL_PANEL_H / 2,
+      0
+    );
+    dummy.updateMatrix();
+    wallMesh.setMatrixAt(i, dummy.matrix);
+    color.set(v.hex);
+    wallMesh.setColorAt(i, color);
+  });
+  wallMesh.instanceMatrix.needsUpdate = true;
+  if(wallMesh.instanceColor) wallMesh.instanceColor.needsUpdate = true;
+  scene.add(wallMesh);
+
+  if(opts.fit !== false) fitToWallSegments(segments, dims);
+}
+
+// 生成結果（低い壁）の外接範囲にカメラの注視点・距離を合わせる
+function fitToWallSegments(segments, dims){
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  segments.forEach((v) => {
+    if(v.x < minX) minX = v.x; if(v.x > maxX) maxX = v.x;
+    if(v.y < minY) minY = v.y; if(v.y > maxY) maxY = v.y;
+  });
+  const offX = (dims.w * WALL_PANEL_W) / 2;
+  camTarget.set(
+    ((minX + maxX) / 2) * WALL_PANEL_W - offX + WALL_PANEL_W / 2,
+    ((minY + maxY) / 2) * WALL_PANEL_H + WALL_PANEL_H / 2,
+    0
+  );
+  const span = Math.max((maxX - minX + 1) * WALL_PANEL_W, (maxY - minY + 1) * WALL_PANEL_H, 4);
+  cameraSpanBasis = span;
+  camDist = clampDist(span * 1.4);
+  updateCamera();
+}
+
+// solid/flatモードの外枠ワイヤーフレーム（サイト最大の建築可能範囲の目安）の
+// 表示・非表示を切り替える。低い壁モードは単位系が全く異なる（ボクセル単位
+// ではなく実寸4×0.5×2）ため、この枠は意味を持たず邪魔になるので隠す
+function setBoundaryBoxVisible(visible){
+  if(boundBox) boundBox.visible = visible;
 }
 
 // 画面上のクリック/タップ座標から、当たったボクセルを返す（編集機能用）。
@@ -278,8 +361,12 @@ function setBlockGuide(blockSize, designDims, dark){
 function dispose(){
   if(rafId != null){ cancelAnimationFrame(rafId); rafId = null; }
   if(mesh){ mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
+  if(wallMesh){ wallMesh.geometry.dispose(); wallMesh.material.dispose(); wallMesh = null; }
   if(blockGuide){ blockGuide.geometry.dispose(); blockGuide.material.dispose(); blockGuide = null; }
   if(renderer) renderer.dispose();
 }
 
-export { init, setVoxels, resize, raycastVoxelAt, setEditClickCallback, setBackgroundColor, setBlockGuide, dispose };
+export {
+  init, setVoxels, setWallSegments, resize, raycastVoxelAt, setEditClickCallback,
+  setBackgroundColor, setBlockGuide, setBoundaryBoxVisible, dispose,
+};

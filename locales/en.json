@@ -885,7 +885,7 @@
   "build_import_btn": "Import (JSON)",
   "build_help_title": "How to use",
   "build_help_1_title": "① Choose an image & building mode",
-  "build_help_1_body": "Upload an image and choose \"Solid (statue)\" or \"Flat (ground)\". Set the width, thickness, hollowing, auto-transparent background, and color-limiting options here too. In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built.",
+  "build_help_1_body": "Upload an image and choose \"Solid (statue)\", \"Flat (ground)\", or \"Low wall (mural)\". Set the width, thickness, hollowing, auto-transparent background, and color-limiting options here too (low wall mode is a single layer, so it has no thickness or hollowing option). In solid mode you can also add an optional back image. The real support-pillar material is twice as tall as it is wide/deep, so solid mode's height is auto-compensated and the 3D preview shows the same proportions it will have when actually built. The low wall panel is 4 wide and 2 tall, so low wall mode auto-compensates its row count the same way.",
   "build_help_2_title": "② Adjust position",
   "build_help_2_body": "Drag to position and use the slider to zoom, setting the crop area for the front image.",
   "build_help_3_title": "③ 3D blueprint & material list",
@@ -1050,6 +1050,8 @@
   "build_mode_title": "Building mode",
   "build_mode_solid": "Solid (statue)",
   "build_mode_flat": "Flat (ground)",
+  "build_mode_wall": "Low wall (mural)",
+  "build_wall_mode_tip": "This lays out low walls as a mural (a flat mosaic). Pick the actual plank pattern for this material in-game using its paint feature.",
   "build_thickness_label_solid": "Thickness (depth extrusion)",
   "build_thickness_label_flat": "Thickness (max relief height)",
   "build_hollow_label": "Hollow out (remove hidden interior to save materials)",
@@ -1060,6 +1062,7 @@
   "build_back_image_remove": "Remove",
   "build_crop_title": "Adjust position",
   "build_stage_hint": "Drag: rotate / Scroll: zoom / Tap: pen to add, eraser to remove",
+  "build_stage_hint_wall": "Drag: rotate / Scroll: zoom",
   "build_help_note_wip": "Note: bulk editing via range-select, build-stage playback, and link sharing are still in progress.",
   "build_legacy_design_note": "This design was saved with the previous (2D mural) version and can't be loaded.",
   "build_unit_masu": "",
@@ -1085,5 +1088,7 @@
   "build_color_count_hint": "The most frequently used colors are kept first. Fewer colors means a simpler look and fewer material types.",
   "build_unit_colors": "",
   "build_guide_label": "Placement guide",
-  "build_guide_off": "Off"
+  "build_guide_off": "Off",
+  "build_wall_count_label": "Walls needed",
+  "build_unit_walls": ""
 }

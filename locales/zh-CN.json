@@ -857,7 +857,7 @@
   "build_import_btn": "导入（JSON）",
   "build_help_title": "使用方法",
   "build_help_1_title": "① 选择图片・确定建造模式",
-  "build_help_1_body": "上传图片后选择「立体（雕像）」或「平面（地面）」。宽度尺寸、厚度、空洞化、背景自动透明化、限制颜色数量选项也在此设置。立体模式下还可指定背面图片（可选）。实际支柱建材的高度是宽度/深度的2倍，因此立体模式的高度会自动补偿，3D预览也会显示与实际建造时相同的比例。",
+  "build_help_1_body": "上传图片后选择「立体（雕像）」「平面（地面）」或「矮墙（壁画）」。宽度尺寸、厚度、空洞化、背景自动透明化、限制颜色数量选项也在此设置（矮墙模式是单层壁画，因此没有厚度和空洞化选项）。立体模式下还可指定背面图片（可选）。实际支柱建材的高度是宽度/深度的2倍，因此立体模式的高度会自动补偿，3D预览也会显示与实际建造时相同的比例。矮墙面板的实际尺寸是宽4×高2，因此矮墙模式下行数也会同样自动补偿。",
   "build_help_2_title": "② 调整位置",
   "build_help_2_body": "拖动调整位置，用滑块缩放，确定正面图片的裁剪范围。",
   "build_help_3_title": "③ 3D设计图・建材列表",
@@ -1022,6 +1022,8 @@
   "build_mode_title": "建造模式",
   "build_mode_solid": "立体（雕像）",
   "build_mode_flat": "平面（地面）",
+  "build_mode_wall": "矮墙（壁画）",
+  "build_wall_mode_tip": "将矮墙铺满排列成壁画（实际的木板花纹请在游戏内通过该建材的上色功能选择）。",
   "build_thickness_label_solid": "厚度（深度方向的挤出量）",
   "build_thickness_label_flat": "厚度（起伏的最大高度）",
   "build_hollow_label": "空洞化（去除外部看不见的内部以节省建材）",
@@ -1032,6 +1034,7 @@
   "build_back_image_remove": "删除",
   "build_crop_title": "调整位置",
   "build_stage_hint": "拖动：旋转 / 滚轮：缩放 / 点击：画笔添加・橡皮擦删除",
+  "build_stage_hint_wall": "拖动：旋转 / 滚轮：缩放",
   "build_help_note_wip": "※ 范围选择批量编辑、施工阶段自动播放、分享链接功能目前仍在开发中。",
   "build_legacy_design_note": "※ 使用旧版本（壁画模式）保存的设计图无法载入",
   "build_unit_masu": "格",
@@ -1057,5 +1060,7 @@
   "build_color_count_hint": "会优先保留使用频率较高的颜色。颜色越少配色越简洁，所需建材种类也越少。",
   "build_unit_colors": "色",
   "build_guide_label": "摆放参考线",
-  "build_guide_off": "关闭"
+  "build_guide_off": "关闭",
+  "build_wall_count_label": "所需矮墙数量",
+  "build_unit_walls": "块"
 }
