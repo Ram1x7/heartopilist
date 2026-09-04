@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=17">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -76,14 +76,14 @@
 }
 
 body.dark .shop-season-banner{
-  background:#2c2823;
-  border-color:#46423b;
-  color:#ece4d4;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-text);
 }
 
 body.dark .shop-season-banner.ended{
-  border-color:#46423b;
-  color:#b3a89a;
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
 }
 
 .shop-progress{
@@ -100,9 +100,9 @@ body.dark .shop-season-banner.ended{
 }
 
 body.dark .shop-progress{
-  background:#2c2823;
-  border-color:#46423b;
-  color:#ece4d4;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-text);
 }
 
 .shop-progress-track{
@@ -114,7 +114,7 @@ body.dark .shop-progress{
 }
 
 body.dark .shop-progress-track{
-  background:#383329;
+  background:var(--dark-card-alt);
 }
 
 .shop-progress-fill{
@@ -124,7 +124,7 @@ body.dark .shop-progress-track{
   transition:width 0.2s;
 }
 
-body.dark .shop-progress-fill{ background:#8fbdc9; }
+body.dark .shop-progress-fill{ background:var(--indigo-pale); }
 
 .shop-category-title{
   font-family:'Shippori Mincho', serif;
@@ -134,7 +134,7 @@ body.dark .shop-progress-fill{ background:#8fbdc9; }
   margin:22px 0 6px;
 }
 
-body.dark .shop-category-title{ color:#e8d2a8; }
+body.dark .shop-category-title{ color:var(--dark-accent); }
 
 .shop-grid{
   display:grid;
@@ -183,7 +183,7 @@ body[data-icon-size="large"] .shop-grid{
   vertical-align:middle;
 }
 
-body.dark .shop-item-price{ color:#e07060; }
+body.dark .shop-item-price{ color:var(--dark-highlight); }
 
 .shop-item-limit{
   display:block;
@@ -193,7 +193,7 @@ body.dark .shop-item-price{ color:#e07060; }
 }
 
 body.dark .shop-item-limit{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .shop-controls{
@@ -213,9 +213,9 @@ body.dark .shop-item-limit{
 }
 
 body.dark .shop-reveal-wrap{
-  background:#2c2823;
-  border-color:#46423b;
-  color:#b3a89a;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
 }
 
 .shop-reveal-title{
@@ -225,7 +225,7 @@ body.dark .shop-reveal-wrap{
 }
 
 body.dark .shop-reveal-title{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .shop-reveal-btn{
@@ -234,15 +234,15 @@ body.dark .shop-reveal-title{
   border:1px solid var(--indigo);
   border-radius:999px;
   background:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   font-size:12px;
   font-family:'Zen Maru Gothic', sans-serif;
   cursor:pointer;
 }
 
 body.dark .shop-reveal-btn{
-  border-color:#8fbdc9;
-  background:#8fbdc9;
+  border-color:var(--indigo-pale);
+  background:var(--indigo-pale);
   color:#22303a;
 }
 
@@ -268,9 +268,9 @@ body.dark .shop-reveal-btn{
 }
 
 body.dark #shopClearBtn{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 </style>
 </head>

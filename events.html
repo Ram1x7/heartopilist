@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=17">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -53,13 +53,6 @@
 
 <style>
 /* events.html 専用CSS（共通の見た目はcss/style.cssを参照） */
-:root{
-  --green:#4a7c59;
-  --green-soft:#dff0e5;
-  --urgent:#b1503b;
-  --urgent-soft:#fdf0ec;
-}
-
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
@@ -73,42 +66,10 @@ body{ min-height:100vh; }
 }
 
 body.dark .page-header h2{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
-/* タブ共通 */
-.tab{
-  flex:1;
-  padding:10px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:12px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
-  text-align:center;
-}
-
-.tab.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .tab{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
-}
-
-body.dark .tab.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
-}
+/* タブ（.ds-tab は css/design-system.css 参照） */
 
 /* カテゴリタブ（ガチャ/イベント） */
 .cat-tabs{
@@ -124,7 +85,7 @@ body.dark .tab.active{
   margin-bottom:16px;
 }
 
-.status-tabs .tab{
+.status-tabs .ds-tab{
   font-size:11px;
   padding:8px 6px;
 }
@@ -140,14 +101,14 @@ body.dark .tab.active{
 .event-card{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:18px;
+  border-radius:16px;
   overflow:hidden;
   box-shadow:0 4px 14px rgba(52,48,43,0.07);
 }
 
 body.dark .event-card{
-  background:#2c2823;
-  border-color:#46423b;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
 }
 
 /* バナー画像 */
@@ -160,7 +121,7 @@ body.dark .event-card{
 }
 
 body.dark .event-banner{
-  background:#383329;
+  background:var(--dark-card-alt);
 }
 
 .event-banner-placeholder{
@@ -175,8 +136,8 @@ body.dark .event-banner{
 }
 
 body.dark .event-banner-placeholder{
-  background:#383329;
-  color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-border);
 }
 
 /* カード本文 */
@@ -204,13 +165,13 @@ body.dark .event-banner-placeholder{
 }
 
 .days-badge.urgent{
-  background:var(--urgent-soft);
-  color:var(--urgent);
-  border:1px solid var(--urgent);
+  background:var(--vermillion-bg);
+  color:var(--vermillion);
+  border:1px solid var(--vermillion);
 }
 
 .days-badge.normal{
-  background:var(--green-soft);
+  background:var(--green-bg);
   color:var(--green);
   border:1px solid var(--green);
 }
@@ -235,20 +196,20 @@ body.dark .days-badge.urgent{
 
 body.dark .days-badge.normal{
   background:#1e3328;
-  color:#7ec89a;
-  border-color:#4a7c59;
+  color:var(--green-dark-text);
+  border-color:var(--green);
 }
 
 body.dark .days-badge.upcoming{
-  background:#383329;
+  background:var(--dark-card-alt);
   color:#8fb4c9;
   border-color:var(--indigo-soft);
 }
 
 body.dark .days-badge.ended{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 /* 交換期限バッジ */
@@ -269,9 +230,9 @@ body.dark .days-badge.ended{
 }
 
 .exchange-badge.urgent{
-  background:var(--urgent-soft);
-  color:var(--urgent);
-  border:1px solid var(--urgent);
+  background:var(--vermillion-bg);
+  color:var(--vermillion);
+  border:1px solid var(--vermillion);
 }
 
 .exchange-badge.ended{
@@ -293,9 +254,9 @@ body.dark .exchange-badge.urgent{
 }
 
 body.dark .exchange-badge.ended{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 /* イベント名 */
@@ -310,7 +271,7 @@ body.dark .exchange-badge.ended{
 }
 
 body.dark .event-name{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 /* 期間 */
@@ -324,7 +285,7 @@ body.dark .event-name{
 }
 
 body.dark .event-period{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* 詳細テキスト */
@@ -337,7 +298,7 @@ body.dark .event-period{
 }
 
 body.dark .event-detail{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 /* 公式リンク */
@@ -361,7 +322,7 @@ body.dark .event-detail{
 }
 
 body.dark .empty{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* フッター */
@@ -375,7 +336,7 @@ body.dark .empty{
 }
 
 body.dark .footer{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 </style>
 </head>
@@ -412,16 +373,16 @@ body.dark .footer{
 
 <!-- カテゴリタブ -->
 <div class="cat-tabs">
-  <button class="tab active" id="cat-all" onclick="setCat('all')">すべて</button>
-  <button class="tab" id="cat-gacha" onclick="setCat('gacha')">ガチャ</button>
-  <button class="tab" id="cat-event" onclick="setCat('event')">イベント</button>
+  <button class="ds-tab ds-tab-grow active" id="cat-all" onclick="setCat('all')">すべて</button>
+  <button class="ds-tab ds-tab-grow" id="cat-gacha" onclick="setCat('gacha')">ガチャ</button>
+  <button class="ds-tab ds-tab-grow" id="cat-event" onclick="setCat('event')">イベント</button>
 </div>
 
 <!-- ステータスタブ -->
 <div class="status-tabs">
-  <button class="tab active" id="status-active" onclick="setStatus('active')">開催中</button>
-  <button class="tab" id="status-upcoming" onclick="setStatus('upcoming')">近日開催</button>
-  <button class="tab" id="status-ended" onclick="setStatus('ended')">終了</button>
+  <button class="ds-tab ds-tab-grow active" id="status-active" onclick="setStatus('active')">開催中</button>
+  <button class="ds-tab ds-tab-grow" id="status-upcoming" onclick="setStatus('upcoming')">近日開催</button>
+  <button class="ds-tab ds-tab-grow" id="status-ended" onclick="setStatus('ended')">終了</button>
 </div>
 
 <div class="event-list" id="eventList"></div>

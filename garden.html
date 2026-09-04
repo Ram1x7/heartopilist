@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=17">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -53,14 +53,6 @@
 
 <style>
 /* garden.html 専用CSS */
-:root{
-  --green:#4a7c59;
-  --green-soft:#dff0e5;
-}
-body.dark{
-  --green-soft:#1e3328;
-}
-
 #notifBanner{
   display:none;
   background:rgba(200,168,107,0.15);
@@ -75,7 +67,7 @@ body.dark{
 }
 
 body.dark #notifBanner{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .notif-allow-btn{
@@ -84,7 +76,7 @@ body.dark #notifBanner{
   border:1px solid var(--indigo);
   border-radius:999px;
   background:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   font-size:12px;
   font-family:'Zen Maru Gothic', sans-serif;
   cursor:pointer;
@@ -102,7 +94,7 @@ body.dark #notifBanner{
   letter-spacing:0.12em;
 }
 
-body.dark .page-header h2{ color:#e8d2a8; }
+body.dark .page-header h2{ color:var(--dark-accent); }
 
 .tab-row{
   display:flex;
@@ -110,33 +102,12 @@ body.dark .page-header h2{ color:#e8d2a8; }
   margin-bottom:12px;
 }
 
-.g-tab{
-  flex:1;
-  padding:10px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:12px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
-  text-align:center;
+.tab-row .ds-tab{
   display:flex;
   align-items:center;
   justify-content:center;
   gap:5px;
 }
-
-.g-tab.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .g-tab{ background:#383329; color:#b3a89a; border-color:#46423b; }
-body.dark .g-tab.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
 
 .event-ended-banner{
   background:var(--card-sub);
@@ -154,9 +125,9 @@ body.dark .g-tab.active{ background:var(--indigo-soft); border-color:var(--indig
 }
 
 body.dark .event-ended-banner{
-  background:#383329;
-  border-color:#46423b;
-  color:#b3a89a;
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
 }
 
 .section-label{
@@ -169,7 +140,7 @@ body.dark .event-ended-banner{
   border-left:3px solid var(--gold);
 }
 
-body.dark .section-label{ color:#e8d2a8; }
+body.dark .section-label{ color:var(--dark-accent); }
 
 .garden-grid{
   display:grid;
@@ -181,7 +152,7 @@ body.dark .section-label{ color:#e8d2a8; }
 .garden-item{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:18px;
+  border-radius:16px;
   padding:10px;
   text-align:center;
   font-size:11px;
@@ -194,7 +165,7 @@ body.dark .section-label{ color:#e8d2a8; }
 
 .garden-item:hover{ transform:translateY(-2px); box-shadow:0 10px 20px rgba(52,48,43,0.1); }
 .garden-item:active{ transform:scale(0.96); }
-body.dark .garden-item{ background:#2c2823; border-color:#46423b; }
+body.dark .garden-item{ background:var(--dark-card); border-color:var(--dark-border); }
 
 /* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのまま */
 body[data-icon-size="small"] .garden-grid{
@@ -225,7 +196,7 @@ body[data-icon-size="large"] .garden-item{
   display:block;
 }
 
-body.dark .garden-item .img-wrap img{ background:#383329; }
+body.dark .garden-item .img-wrap img{ background:var(--dark-card-alt); }
 
 .notif-badge{
   position:absolute;
@@ -234,7 +205,7 @@ body.dark .garden-item .img-wrap img{ background:#383329; }
   z-index:5;
   padding:3px;
   border-radius:999px;
-  color:#fdf9ef;
+  color:var(--on-fill);
   background:var(--green);
   line-height:1;
   display:flex;
@@ -249,7 +220,7 @@ body.dark .garden-item .img-wrap img{ background:#383329; }
 }
 
 body.dark .garden-item-sub{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* ★ カード上のタイマー表示 */
@@ -261,7 +232,7 @@ body.dark .garden-item-sub{
   line-height:1.3;
 }
 
-body.dark .garden-item-timer{ color:#7ec89a; }
+body.dark .garden-item-timer{ color:var(--green-dark-text); }
 
 /* ★ 進行バー（v85風） */
 .garden-progress-track{
@@ -281,8 +252,8 @@ body.dark .garden-item-timer{ color:#7ec89a; }
   transition:width 1s linear;
 }
 
-body.dark .garden-progress-track{ background:#46423b; }
-body.dark .garden-progress-fill{ background:#7ec89a; }
+body.dark .garden-progress-track{ background:var(--dark-border); }
+body.dark .garden-progress-fill{ background:var(--green-dark-text); }
 
 /* ★ 草抜きマーカー */
 .weed-marker{
@@ -315,7 +286,7 @@ body.dark .garden-progress-fill{ background:#7ec89a; }
   box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
-body.dark .g-modal-box{ background:#2c2823; border-color:#46423b; }
+body.dark .g-modal-box{ background:var(--dark-card); border-color:var(--dark-border); }
 
 .g-modal-name{
   font-family:'Shippori Mincho', serif;
@@ -327,7 +298,7 @@ body.dark .g-modal-box{ background:#2c2823; border-color:#46423b; }
   margin-bottom:12px;
 }
 
-body.dark .g-modal-name{ color:#e8d2a8; }
+body.dark .g-modal-name{ color:var(--dark-accent); }
 
 .g-modal-imgs{
   display:flex;
@@ -348,7 +319,7 @@ body.dark .g-modal-name{ color:#e8d2a8; }
   display:block;
 }
 
-body.dark .g-modal-img-wrap img{ background:#383329; }
+body.dark .g-modal-img-wrap img{ background:var(--dark-card-alt); }
 .g-modal-img-label{ font-size:10px; color:var(--text-sub); margin-top:4px; }
 
 .g-info{
@@ -360,11 +331,11 @@ body.dark .g-modal-img-wrap img{ background:#383329; }
   line-height:2;
 }
 
-body.dark .g-info{ background:#383329; }
+body.dark .g-info{ background:var(--dark-card-alt); }
 .g-info-row{ display:flex; justify-content:space-between; }
 .g-info-label{ color:var(--text-sub); }
 .g-info-value{ font-weight:700; color:var(--text); }
-body.dark .g-info-value{ color:#ece4d4; }
+body.dark .g-info-value{ color:var(--dark-text); }
 
 .g-price-table{
   width:100%;
@@ -381,7 +352,7 @@ body.dark .g-info-value{ color:#ece4d4; }
   font-weight:500;
 }
 
-body.dark .g-price-table th{ background:#383329; }
+body.dark .g-price-table th{ background:var(--dark-card-alt); }
 
 .g-price-table td{
   text-align:center;
@@ -390,7 +361,7 @@ body.dark .g-price-table th{ background:#383329; }
   color:var(--text);
 }
 
-body.dark .g-price-table td{ color:#ece4d4; border-color:#46423b; }
+body.dark .g-price-table td{ color:var(--dark-text); border-color:var(--dark-border); }
 .g-price-null{ color:var(--border); font-size:10px; }
 
 .g-section-title{
@@ -405,7 +376,7 @@ body.dark .g-price-table td{ color:#ece4d4; border-color:#46423b; }
   gap:5px;
 }
 
-body.dark .g-section-title{ color:#e8d2a8; }
+body.dark .g-section-title{ color:var(--dark-accent); }
 
 .breeding-note{ font-size:10px; color:var(--text-sub); margin-bottom:8px; }
 .breeding-grid{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
@@ -444,7 +415,7 @@ body.dark .rarity-5{ background:#3a3010; color:#d4b000; border-color:#6a5800; }
   flex-wrap:wrap;
 }
 
-body.dark .breeding-combo{ background:#383329; }
+body.dark .breeding-combo{ background:var(--dark-card-alt); }
 .breeding-combo-arrow{ color:var(--text-sub); font-size:13px; }
 
 .notif-btns{ display:flex; gap:8px; margin-bottom:8px; }
@@ -470,17 +441,17 @@ body.dark .breeding-combo{ background:#383329; }
 .notif-btn.set{
   background:var(--green);
   border-color:var(--green);
-  color:#fdf9ef;
+  color:var(--on-fill);
   font-weight:700;
 }
 
-body.dark .notif-btn{ background:#383329; color:var(--text-sub); border-color:var(--border); }
-body.dark .notif-btn.set{ background:var(--green); border-color:var(--green); color:#fdf9ef; }
+body.dark .notif-btn{ background:var(--dark-card-alt); color:var(--text-sub); border-color:var(--border); }
+body.dark .notif-btn.set{ background:var(--green); border-color:var(--green); color:var(--on-fill); }
 
 .notif-desc{ font-size:10px; color:var(--text-sub); line-height:1.6; margin-bottom:8px; }
 
 .notif-active-banner{
-  background:var(--green-soft);
+  background:var(--green-bg);
   border:1px solid var(--green);
   border-radius:10px;
   padding:8px 12px;
@@ -490,7 +461,7 @@ body.dark .notif-btn.set{ background:var(--green); border-color:var(--green); co
   line-height:1.6;
 }
 
-body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:#4a7c59; }
+body.dark .notif-active-banner{ background:#1e3328; color:var(--green-dark-text); border-color:var(--green); }
 
 .g-close-btn{
   width:100%;
@@ -514,29 +485,7 @@ body.dark .notif-active-banner{ background:#1e3328; color:#7ec89a; border-color:
 }
 
 body.dark .garden-footer{
-  color:#b3a89a;
-}
-
-#gardenToast{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%) translateY(10px);
-  background:var(--indigo);
-  color:#fdf9ef;
-  padding:10px 22px;
-  border-radius:999px;
-  font-size:13px;
-  opacity:0;
-  transition:opacity 0.25s, transform 0.25s;
-  pointer-events:none;
-  z-index:2000;
-  white-space:nowrap;
-}
-
-#gardenToast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
+  color:var(--dark-text-sub);
 }
 </style>
 </head>
@@ -579,14 +528,14 @@ body.dark .garden-footer{
 
 
 <div class="tab-row" id="gardenTabRow">
-  <button class="g-tab active" id="tab-crop" onclick="setTab('crop')"><span class="btn-icon" data-icon="crop"></span><span data-i18n="garden_tab_crop">作物</span></button>
-  <button class="g-tab" id="tab-flower" onclick="setTab('flower')"><span class="btn-icon" data-icon="flower"></span><span data-i18n="garden_tab_flower">花</span></button>
+  <button class="ds-tab ds-tab-grow active" id="tab-crop" onclick="setTab('crop')"><span class="btn-icon" data-icon="crop"></span><span data-i18n="garden_tab_crop">作物</span></button>
+  <button class="ds-tab ds-tab-grow" id="tab-flower" onclick="setTab('flower')"><span class="btn-icon" data-icon="flower"></span><span data-i18n="garden_tab_flower">花</span></button>
 </div>
 
 <div class="tab-row">
-  <button class="g-tab" id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
-  <button class="g-tab" id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
-  <button class="g-tab" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+  <button class="ds-tab ds-tab-grow" id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+  <button class="ds-tab ds-tab-grow" id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+  <button class="ds-tab ds-tab-grow" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
 </div>
 
 <div id="gardenContent"></div>
@@ -596,8 +545,6 @@ body.dark .garden-footer{
 <div id="detailModal" onclick="if(event.target.id==='detailModal')closeModal()">
   <div class="g-modal-box" id="modalBox"></div>
 </div>
-
-<div id="gardenToast"></div>
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/i18n.js"></script>
@@ -1295,14 +1242,6 @@ function renderModal(item){
       if(action === "cancel")   cancelNotification(window.currentItem, mode);
     });
   });
-}
-
-// ── トースト ──
-function showToast(msg){
-  const t = document.getElementById("gardenToast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(()=> t.classList.remove("show"), 2500);
 }
 
 // ── ★ 1秒ごとにカード上のタイマー・進行バー・草抜きマーカーを更新 ──

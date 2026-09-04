@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=17">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -53,52 +53,15 @@
 
 <style>
 /* codes.html 専用CSS（共通の見た目はcss/style.cssを参照） */
-:root{
-  --green:#4a7c59;
-  --green-soft:#dff0e5;
-}
-
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
 
-/* タブ */
+/* タブ（.ds-tab は css/design-system.css 参照） */
 .tabs{
   display:flex;
   gap:8px;
   margin-bottom:14px;
-}
-
-.tab{
-  flex:1;
-  padding:10px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:12px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
-}
-
-.tab.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .tab{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
-}
-
-body.dark .tab.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
 }
 
 /* コードカード */
@@ -117,8 +80,8 @@ body.dark .tab.active{
 }
 
 body.dark .code-card{
-  background:#2c2823;
-  border-color:#46423b;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
 }
 
 .code-card.expired{
@@ -142,7 +105,7 @@ body.dark .code-card{
 }
 
 body.dark .code-value{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .code-badge{
@@ -154,15 +117,15 @@ body.dark .code-value{
 }
 
 .badge-active{
-  background:var(--green-soft);
+  background:var(--green-bg);
   color:var(--green);
   border:1px solid var(--green);
 }
 
 body.dark .badge-active{
   background:#1e3328;
-  color:#7ec89a;
-  border-color:#4a7c59;
+  color:var(--green-dark-text);
+  border-color:var(--green);
 }
 
 .badge-expired{
@@ -172,9 +135,9 @@ body.dark .badge-active{
 }
 
 body.dark .badge-expired{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 .code-reward{
@@ -188,7 +151,7 @@ body.dark .badge-expired{
 }
 
 body.dark .code-reward{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .code-meta{
@@ -204,7 +167,7 @@ body.dark .code-reward{
 }
 
 body.dark .code-expiry{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* コピーボタン */
@@ -215,7 +178,7 @@ body.dark .code-expiry{
   font-family:'Zen Maru Gothic', sans-serif;
   font-size:11px;
   background:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   cursor:pointer;
   transition:0.15s;
   white-space:nowrap;
@@ -224,6 +187,11 @@ body.dark .code-expiry{
 .copy-btn:active{
   opacity:0.75;
   transform:scale(0.97);
+}
+
+body.dark .copy-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
 }
 
 .copy-btn.copied{
@@ -239,9 +207,9 @@ body.dark .code-expiry{
 }
 
 body.dark .code-card.expired .copy-btn{
-  background:#383329;
-  border-color:#46423b;
-  color:#b3a89a;
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
 }
 
 /* 空表示 */
@@ -253,7 +221,7 @@ body.dark .code-card.expired .copy-btn{
 }
 
 body.dark .empty{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* フッター */
@@ -267,40 +235,17 @@ body.dark .empty{
 }
 
 body.dark .footer{
-  color:#b3a89a;
-}
-
-/* トースト */
-#toast{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%) translateY(10px);
-  background:var(--indigo);
-  color:#fdf9ef;
-  padding:10px 22px;
-  border-radius:999px;
-  font-size:13px;
-  opacity:0;
-  transition:opacity 0.25s, transform 0.25s;
-  pointer-events:none;
-  z-index:1000;
-  white-space:nowrap;
-}
-
-#toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
+  color:var(--dark-text-sub);
 }
 
 /* 受け取り済みカード */
 .code-card.received{
   border-color:var(--green);
-  background:var(--green-soft);
+  background:var(--green-bg);
 }
 
 body.dark .code-card.received{
-  border-color:#4a7c59;
+  border-color:var(--green);
   background:#1e3328;
 }
 
@@ -322,13 +267,13 @@ body.dark .code-card.received{
 }
 
 body.dark .receive-btn{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 .receive-btn.received{
-  background:var(--green-soft);
+  background:var(--green-bg);
   border-color:var(--green);
   color:var(--green);
   font-weight:700;
@@ -336,8 +281,8 @@ body.dark .receive-btn{
 
 body.dark .receive-btn.received{
   background:#1e3328;
-  border-color:#4a7c59;
-  color:#7ec89a;
+  border-color:var(--green);
+  color:var(--green-dark-text);
 }
 
 .receive-btn:active{
@@ -381,8 +326,8 @@ body.dark .receive-btn.received{
 </div>
 
 <div class="tabs">
-  <button class="tab active" id="tab-active" onclick="setTab('active')" data-i18n="codes_tab_active">有効なコード</button>
-  <button class="tab" id="tab-expired" onclick="setTab('expired')" data-i18n="codes_tab_expired">期限切れ</button>
+  <button class="ds-tab ds-tab-grow active" id="tab-active" onclick="setTab('active')" data-i18n="codes_tab_active">有効なコード</button>
+  <button class="ds-tab ds-tab-grow" id="tab-expired" onclick="setTab('expired')" data-i18n="codes_tab_expired">期限切れ</button>
 </div>
 
 <div class="code-list" id="codeList"></div>
@@ -408,8 +353,6 @@ body.dark .receive-btn.received{
   ※本サイトは非公式のファンツールです<br>
   コードに関する不具合はゲーム公式へお問い合わせください
 </div>
-
-<div id="toast">コピーしました！</div>
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/i18n.js"></script>
@@ -609,15 +552,6 @@ function formatExpiry(expiry){
   const min = String(d.getMinutes()).padStart(2, "0");
   const suffix = T("codes_expiry_until","まで");
   return suffix ? `${yyyy}/${mm}/${dd} ${hh}:${min}${suffix}` : `${yyyy}/${mm}/${dd} ${hh}:${min}`;
-}
-
-
-// トースト
-function showToast(msg){
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(()=> t.classList.remove("show"), 2000);
 }
 
 renderCodes();
