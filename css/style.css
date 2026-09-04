@@ -56,9 +56,20 @@ body{
   position:relative;
   animation:fadeIn 0.2s ease;
   /* PWA（ホーム画面追加）でピンチ操作すると画面全体が縮小され、周りに余白が
-     見えてしまうのを防ぐ（ページ全体のピンチズーム・ダブルタップズームを無効化。
-     縦横のスクロールは引き続き可能） */
-  touch-action:pan-x pan-y;
+     見えてしまうのを防ぐ（ページ全体のピンチズーム・ダブルタップズームを無効化）。
+     横方向のpanはここでは許可しない：pan-xを許可すると、画面左端からの横スワイプが
+     ブラウザ（特にiOS Safari）に「戻る」ジェスチャーとして扱われてしまうため。
+     縦スクロールはpan-yで引き続き可能。ナビバーなど、実際に横スクロールさせたい
+     要素側では個別にtouch-action:pan-x pan-yを指定して上書きする */
+  touch-action:pan-y;
+}
+
+/* bodyのtouch-action:pan-y（画面端スワイプでの「戻る」誤爆防止）により、
+   横方向のドラッグ操作が必要なスライダーのつまみが操作できなくなってしまう
+   （iOS Safari等）ため、レンジ入力には全ページ共通でタップ・ドラッグを
+   許可し直す。ページ側の個別ルールで上書きしている場合はそちらが優先される */
+input[type="range"]{
+  touch-action:manipulation;
 }
 
 @keyframes fadeIn{
@@ -675,6 +686,9 @@ body.dark .daily-spot-header{
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
 }
 
 .daily-spot-header-btns::-webkit-scrollbar{
@@ -1564,6 +1578,9 @@ body.dark #shareCanvas{
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
 }
 
 .site-nav::-webkit-scrollbar{
