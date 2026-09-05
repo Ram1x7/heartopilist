@@ -27,17 +27,21 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=16">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/style.css?v=17">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
 <link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
 <link rel="prefetch" href="./shop.html">
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./build.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./music.html">
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
 <script>
@@ -49,11 +53,6 @@
 
 <style>
 /* faq.html 専用CSS（共通の見た目はcss/style.cssを参照） */
-:root{
-  --green:#4a7c59;
-  --green-soft:#dff0e5;
-}
-
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
@@ -71,7 +70,7 @@ body{ min-height:100vh; }
 }
 
 body.dark .page-header h2{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .page-header p{
@@ -81,7 +80,7 @@ body.dark .page-header h2{
 }
 
 body.dark .page-header p{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* 検索 */
@@ -102,7 +101,7 @@ body.dark .page-header p{
 }
 
 body.dark .faq-search-wrap .search-icon{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .faq-search{
@@ -119,9 +118,9 @@ body.dark .faq-search-wrap .search-icon{
 }
 
 body.dark .faq-search{
-  background:#2c2823;
-  color:#ece4d4;
-  border-color:#46423b;
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border-color:var(--dark-border);
 }
 
 .faq-search:focus{
@@ -143,38 +142,6 @@ body.dark .faq-search{
 
 .cat-tabs::-webkit-scrollbar{ display:none; }
 
-.tab{
-  flex-shrink:0;
-  padding:8px 16px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:12px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
-}
-
-.tab.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .tab{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
-}
-
-body.dark .tab.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
-}
-
 /* リスト */
 .faq-list{
   display:flex;
@@ -192,8 +159,8 @@ body.dark .tab.active{
 }
 
 body.dark .faq-card{
-  background:#2c2823;
-  border-color:#46423b;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
 }
 
 .faq-question{
@@ -212,7 +179,7 @@ body.dark .faq-card{
   color:var(--indigo);
 }
 
-body.dark .faq-icon{ color:#e8d2a8; }
+body.dark .faq-icon{ color:var(--dark-accent); }
 
 .faq-title{
   flex:1;
@@ -223,7 +190,7 @@ body.dark .faq-icon{ color:#e8d2a8; }
 }
 
 body.dark .faq-title{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .faq-arrow{
@@ -235,7 +202,7 @@ body.dark .faq-title{
 }
 
 body.dark .faq-arrow{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .faq-card.open .faq-arrow{
@@ -261,7 +228,7 @@ body.dark .faq-arrow{
 }
 
 body.dark .faq-answer-inner{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* ステータスバッジ */
@@ -280,7 +247,7 @@ body.dark .faq-answer-inner{
 }
 
 .status-fixed{
-  background:var(--green-soft);
+  background:var(--green-bg);
   color:var(--green);
   border:1px solid var(--green);
 }
@@ -305,8 +272,8 @@ body.dark .faq-answer-inner{
 
 body.dark .status-fixed{
   background:#1e3328;
-  color:#7ec89a;
-  border-color:#4a7c59;
+  color:var(--green-dark-text);
+  border-color:var(--green);
 }
 
 body.dark .status-progress{
@@ -316,15 +283,15 @@ body.dark .status-progress{
 }
 
 body.dark .status-considering{
-  background:#383329;
+  background:var(--dark-card-alt);
   color:#8fb4c9;
   border-color:var(--indigo-soft);
 }
 
 body.dark .status-wontfix{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
 }
 
 /* カテゴリラベル(カード内) */
@@ -339,8 +306,8 @@ body.dark .status-wontfix{
 }
 
 body.dark .cat-label{
-  background:#383329;
-  color:#b3a89a;
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
 }
 
 /* 空表示 */
@@ -353,7 +320,7 @@ body.dark .cat-label{
 }
 
 body.dark .empty{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* お問い合わせ誘導 */
@@ -367,8 +334,8 @@ body.dark .empty{
 }
 
 body.dark .contact-box{
-  background:#2c2823;
-  border-color:#46423b;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
 }
 
 .contact-box p{
@@ -379,7 +346,7 @@ body.dark .contact-box{
 }
 
 body.dark .contact-box p{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .contact-btn{
@@ -391,11 +358,16 @@ body.dark .contact-box p{
   border:1px solid var(--indigo);
   border-radius:999px;
   background:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   font-size:12px;
   font-family:'Zen Maru Gothic', sans-serif;
   text-decoration:none;
   cursor:pointer;
+}
+
+body.dark .contact-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
 }
 
 /* フッター */
@@ -409,7 +381,7 @@ body.dark .contact-box p{
 }
 
 body.dark .footer{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 </style>
 </head>
@@ -457,10 +429,10 @@ body.dark .footer{
 </div>
 
 <div class="cat-tabs">
-  <button class="tab active" id="cat-all" onclick="setCat('all')" data-i18n="faq_tab_all">すべて</button>
-  <button class="tab" id="cat-question" onclick="setCat('question')" data-i18n="faq_tab_question">質問</button>
-  <button class="tab" id="cat-request" onclick="setCat('request')" data-i18n="faq_tab_request">要望</button>
-  <button class="tab" id="cat-bug" onclick="setCat('bug')" data-i18n="faq_tab_bug">不具合</button>
+  <button class="ds-tab active" id="cat-all" onclick="setCat('all')" data-i18n="faq_tab_all">すべて</button>
+  <button class="ds-tab" id="cat-question" onclick="setCat('question')" data-i18n="faq_tab_question">質問</button>
+  <button class="ds-tab" id="cat-request" onclick="setCat('request')" data-i18n="faq_tab_request">要望</button>
+  <button class="ds-tab" id="cat-bug" onclick="setCat('bug')" data-i18n="faq_tab_bug">不具合</button>
 </div>
 
 <div class="faq-list" id="faqList"></div>

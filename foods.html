@@ -27,16 +27,18 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=16">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/style.css?v=17">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./garden.html">
 <link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
 <link rel="prefetch" href="./shop.html">
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./build.html">
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./faq.html">
@@ -64,7 +66,7 @@
   letter-spacing:0.12em;
 }
 
-body.dark .page-header h2{ color:#e8d2a8; }
+body.dark .page-header h2{ color:var(--dark-accent); }
 
 .f-sort{
   display:flex;
@@ -72,29 +74,9 @@ body.dark .page-header h2{ color:#e8d2a8; }
   margin-bottom:12px;
 }
 
-.f-sort-btn{
-  flex:1;
-  padding:8px 4px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
+.f-sort .ds-tab{
   font-size:10px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
-  text-align:center;
 }
-
-.f-sort-btn.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .f-sort-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
-body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
 
 .f-search-wrap{
   position:relative;
@@ -129,7 +111,7 @@ body.dark .f-sort-btn.active{ background:var(--indigo-soft); border-color:var(--
   gap:5px;
 }
 
-body.dark .f-section-label{ color:#e8d2a8; }
+body.dark .f-section-label{ color:var(--dark-accent); }
 
 .f-event-banner{
   background:var(--card-sub);
@@ -147,9 +129,9 @@ body.dark .f-section-label{ color:#e8d2a8; }
 }
 
 body.dark .f-event-banner{
-  background:#383329;
-  border-color:#46423b;
-  color:#b3a89a;
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
 }
 
 #foodModal{
@@ -173,7 +155,7 @@ body.dark .f-event-banner{
   box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
-body.dark .f-modal-box{ background:#2c2823; border-color:#46423b; }
+body.dark .f-modal-box{ background:var(--dark-card); border-color:var(--dark-border); }
 
 .f-modal-name{
   font-family:'Shippori Mincho', serif;
@@ -185,7 +167,7 @@ body.dark .f-modal-box{ background:#2c2823; border-color:#46423b; }
   margin-bottom:12px;
 }
 
-body.dark .f-modal-name{ color:#e8d2a8; }
+body.dark .f-modal-name{ color:var(--dark-accent); }
 
 .f-modal-img{
   width:120px;
@@ -198,7 +180,7 @@ body.dark .f-modal-name{ color:#e8d2a8; }
   margin:0 auto 14px;
 }
 
-body.dark .f-modal-img{ background:#383329; }
+body.dark .f-modal-img{ background:var(--dark-card-alt); }
 
 .f-info{
   background:var(--card-sub);
@@ -209,19 +191,19 @@ body.dark .f-modal-img{ background:#383329; }
   line-height:2;
 }
 
-body.dark .f-info{ background:#383329; }
+body.dark .f-info{ background:var(--dark-card-alt); }
 
 .f-info-row{ display:flex; justify-content:space-between; }
 .f-info-label{ color:var(--text-sub); }
 
 .f-info-value{ font-weight:700; color:var(--text); }
-body.dark .f-info-value{ color:#ece4d4; }
+body.dark .f-info-value{ color:var(--dark-text); }
 
-.f-info-value.profit-plus{ color:#4a7c59; }
-body.dark .f-info-value.profit-plus{ color:#7ec89a; }
+.f-info-value.profit-plus{ color:var(--green); }
+body.dark .f-info-value.profit-plus{ color:var(--green-dark-text); }
 
 .f-info-value.profit-minus{ color:var(--vermillion); }
-body.dark .f-info-value.profit-minus{ color:#e07060; }
+body.dark .f-info-value.profit-minus{ color:var(--dark-highlight); }
 
 .f-rarity-tabs{
   display:flex;
@@ -245,7 +227,7 @@ body.dark .f-info-value.profit-minus{ color:#e07060; }
 .f-rarity-tab.active{
   background:var(--gold);
   border-color:var(--gold);
-  color:#fdf9ef;
+  color:var(--on-fill);
   font-weight:700;
 }
 
@@ -254,8 +236,8 @@ body.dark .f-info-value.profit-minus{ color:#e07060; }
   pointer-events:none;
 }
 
-body.dark .f-rarity-tab{ background:#383329; color:var(--text-sub); border-color:var(--border); }
-body.dark .f-rarity-tab.active{ background:var(--gold); border-color:var(--gold); color:#2c2823; }
+body.dark .f-rarity-tab{ background:var(--dark-card-alt); color:var(--text-sub); border-color:var(--border); }
+body.dark .f-rarity-tab.active{ background:var(--gold); border-color:var(--gold); color:var(--dark-card); }
 
 .f-price-card{
   background:var(--card-sub);
@@ -265,7 +247,7 @@ body.dark .f-rarity-tab.active{ background:var(--gold); border-color:var(--gold)
   font-size:12px;
 }
 
-body.dark .f-price-card{ background:#383329; }
+body.dark .f-price-card{ background:var(--dark-card-alt); }
 
 .f-section-title{
   font-family:'Shippori Mincho', serif;
@@ -279,7 +261,7 @@ body.dark .f-price-card{ background:#383329; }
   gap:5px;
 }
 
-body.dark .f-section-title{ color:#e8d2a8; }
+body.dark .f-section-title{ color:var(--dark-accent); }
 
 .f-materials{
   display:flex;
@@ -308,7 +290,7 @@ body.dark .f-section-title{ color:#e8d2a8; }
   border:1px solid var(--border);
 }
 
-body.dark .f-material-img{ background:#383329; border-color:#46423b; }
+body.dark .f-material-img{ background:var(--dark-card-alt); border-color:var(--dark-border); }
 
 .f-material-name{
   font-size:9px;
@@ -337,7 +319,7 @@ body.dark .f-material-img{ background:#383329; border-color:#46423b; }
   margin-top:4px;
 }
 
-body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b; }
+body.dark .f-close-btn{ background:var(--dark-card-alt); color:var(--dark-text); border-color:var(--dark-border); }
 
 .foods-footer{
   text-align:center;
@@ -348,29 +330,7 @@ body.dark .f-close-btn{ background:#383329; color:#ece4d4; border-color:#46423b;
 }
 
 body.dark .foods-footer{
-  color:#b3a89a;
-}
-
-#foodToast{
-  position:fixed;
-  bottom:24px;
-  left:50%;
-  transform:translateX(-50%) translateY(10px);
-  background:var(--indigo);
-  color:#fdf9ef;
-  padding:10px 22px;
-  border-radius:999px;
-  font-size:13px;
-  opacity:0;
-  transition:opacity 0.25s, transform 0.25s;
-  pointer-events:none;
-  z-index:2000;
-  white-space:nowrap;
-}
-
-#foodToast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
+  color:var(--dark-text-sub);
 }
 
 /* ── 認証マスター計算ツール ── */
@@ -392,7 +352,7 @@ body.dark .foods-footer{
   gap:6px;
 }
 
-body.dark .calc-toggle-btn{ background:#383329; color:#e8d2a8; border-color:#7a6030; }
+body.dark .calc-toggle-btn{ background:var(--dark-card-alt); color:var(--dark-accent); border-color:#7a6030; }
 
 #calcModal{
   display:none;
@@ -415,7 +375,7 @@ body.dark .calc-toggle-btn{ background:#383329; color:#e8d2a8; border-color:#7a6
   box-shadow:0 20px 40px rgba(52,48,43,0.15);
 }
 
-body.dark .calc-modal-box{ background:#2c2823; border-color:#46423b; }
+body.dark .calc-modal-box{ background:var(--dark-card); border-color:var(--dark-border); }
 
 .calc-header{
   display:flex;
@@ -432,7 +392,7 @@ body.dark .calc-modal-box{ background:#2c2823; border-color:#46423b; }
   letter-spacing:0.04em;
 }
 
-body.dark .calc-title{ color:#e8d2a8; }
+body.dark .calc-title{ color:var(--dark-accent); }
 
 .calc-close-x{
   border:none;
@@ -447,7 +407,7 @@ body.dark .calc-title{ color:#e8d2a8; }
 }
 
 body.dark .calc-close-x{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .calc-field-label{
@@ -468,7 +428,7 @@ body.dark .calc-close-x{
   margin-bottom:14px;
 }
 
-body.dark .calc-select{ background:#383329; color:#ece4d4; border-color:#46423b; }
+body.dark .calc-select{ background:var(--dark-card-alt); color:var(--dark-text); border-color:var(--dark-border); }
 
 .calc-input-row{
   margin-bottom:14px;
@@ -486,7 +446,7 @@ body.dark .calc-select{ background:#383329; color:#ece4d4; border-color:#46423b;
   box-sizing:border-box;
 }
 
-body.dark .calc-input{ background:#383329; color:#ece4d4; border-color:#46423b; }
+body.dark .calc-input{ background:var(--dark-card-alt); color:var(--dark-text); border-color:var(--dark-border); }
 
 .calc-divider{
   height:1px;
@@ -503,7 +463,7 @@ body.dark .calc-input{ background:#383329; color:#ece4d4; border-color:#46423b; 
   text-align:center;
 }
 
-body.dark .calc-progress-card{ background:#383329; }
+body.dark .calc-progress-card{ background:var(--dark-card-alt); }
 
 .calc-progress-row{
   display:flex;
@@ -525,10 +485,10 @@ body.dark .calc-progress-card{ background:#383329; }
   color:var(--indigo);
 }
 
-body.dark .calc-progress-value{ color:#e8d2a8; }
+body.dark .calc-progress-value{ color:var(--dark-accent); }
 
 .calc-progress-value.highlight{ color:var(--vermillion); }
-body.dark .calc-progress-value.highlight{ color:#e07060; }
+body.dark .calc-progress-value.highlight{ color:var(--dark-highlight); }
 
 .calc-progress-unit{
   font-size:10px;
@@ -545,7 +505,7 @@ body.dark .calc-progress-value.highlight{ color:#e07060; }
   border-left:3px solid var(--gold);
 }
 
-body.dark .calc-material-section-title{ color:#e8d2a8; }
+body.dark .calc-material-section-title{ color:var(--dark-accent); }
 
 .calc-material-item{
   display:flex;
@@ -555,7 +515,7 @@ body.dark .calc-material-section-title{ color:#e8d2a8; }
   border-bottom:1px solid var(--border);
 }
 
-body.dark .calc-material-item{ border-color:#46423b; }
+body.dark .calc-material-item{ border-color:var(--dark-border); }
 
 .calc-material-item:last-child{ border-bottom:none; }
 
@@ -570,7 +530,7 @@ body.dark .calc-material-item{ border-color:#46423b; }
   flex-shrink:0;
 }
 
-body.dark .calc-material-img{ background:#2c2823; border-color:#46423b; }
+body.dark .calc-material-img{ background:var(--dark-card); border-color:var(--dark-border); }
 
 .calc-material-info{ flex:1; min-width:0; }
 
@@ -583,7 +543,7 @@ body.dark .calc-material-img{ background:#2c2823; border-color:#46423b; }
   white-space:nowrap;
 }
 
-body.dark .calc-material-name{ color:#ece4d4; }
+body.dark .calc-material-name{ color:var(--dark-text); }
 
 .calc-material-input{
   width:70px;
@@ -597,7 +557,7 @@ body.dark .calc-material-name{ color:#ece4d4; }
   flex-shrink:0;
 }
 
-body.dark .calc-material-input{ background:#2c2823; color:#ece4d4; border-color:#46423b; }
+body.dark .calc-material-input{ background:var(--dark-card); color:var(--dark-text); border-color:var(--dark-border); }
 
 .calc-shortage-section{
   margin-top:16px;
@@ -613,7 +573,7 @@ body.dark .calc-material-input{ background:#2c2823; color:#ece4d4; border-color:
   gap:10px;
 }
 
-body.dark .calc-shortage-item{ background:#383329; }
+body.dark .calc-shortage-item{ background:var(--dark-card-alt); }
 
 .calc-shortage-item.enough{ opacity:0.55; }
 
@@ -627,7 +587,7 @@ body.dark .calc-shortage-item{ background:#383329; }
   flex-shrink:0;
 }
 
-body.dark .calc-shortage-img{ background:#2c2823; }
+body.dark .calc-shortage-img{ background:var(--dark-card); }
 
 .calc-shortage-info{ flex:1; min-width:0; }
 
@@ -640,7 +600,7 @@ body.dark .calc-shortage-img{ background:#2c2823; }
   white-space:nowrap;
 }
 
-body.dark .calc-shortage-name{ color:#ece4d4; }
+body.dark .calc-shortage-name{ color:var(--dark-text); }
 
 .calc-shortage-detail{
   font-size:10px;
@@ -650,16 +610,16 @@ body.dark .calc-shortage-name{ color:#ece4d4; }
 }
 
 .calc-shortage-need{ font-weight:700; color:var(--vermillion); }
-body.dark .calc-shortage-need{ color:#e07060; }
+body.dark .calc-shortage-need{ color:var(--dark-highlight); }
 
 .calc-shortage-enough-tag{
   font-size:10px;
   font-weight:700;
-  color:#4a7c59;
+  color:var(--green);
   white-space:nowrap;
 }
 
-body.dark .calc-shortage-enough-tag{ color:#7ec89a; }
+body.dark .calc-shortage-enough-tag{ color:var(--green-dark-text); }
 
 .calc-empty-note{
   font-size:11px;
@@ -712,7 +672,7 @@ body.dark .calc-shortage-enough-tag{ color:#7ec89a; }
   margin:4px 0 4px 14px;
 }
 
-body.dark .calc-breakdown-box{ background:#2c2823; border-color:#46423b; }
+body.dark .calc-breakdown-box{ background:var(--dark-card); border-color:var(--dark-border); }
 
 .calc-breakdown-item{
   display:flex;
@@ -722,7 +682,7 @@ body.dark .calc-breakdown-box{ background:#2c2823; border-color:#46423b; }
   border-bottom:1px solid var(--border);
 }
 
-body.dark .calc-breakdown-item{ border-color:#46423b; }
+body.dark .calc-breakdown-item{ border-color:var(--dark-border); }
 .calc-breakdown-item:last-child{ border-bottom:none; }
 .calc-breakdown-item.enough{ opacity:0.55; }
 
@@ -736,7 +696,7 @@ body.dark .calc-breakdown-item{ border-color:#46423b; }
   flex-shrink:0;
 }
 
-body.dark .calc-breakdown-img{ background:#383329; }
+body.dark .calc-breakdown-img{ background:var(--dark-card-alt); }
 
 .calc-breakdown-info{ flex:1; min-width:0; }
 
@@ -749,7 +709,7 @@ body.dark .calc-breakdown-img{ background:#383329; }
   white-space:nowrap;
 }
 
-body.dark .calc-breakdown-name{ color:#ece4d4; }
+body.dark .calc-breakdown-name{ color:var(--dark-text); }
 
 .calc-breakdown-detail{
   font-size:9px;
@@ -776,7 +736,7 @@ body.dark .calc-breakdown-name{ color:#ece4d4; }
   border-bottom:1px solid var(--border);
 }
 
-body.dark .calc-freeform-item{ border-color:#46423b; }
+body.dark .calc-freeform-item{ border-color:var(--dark-border); }
 .calc-freeform-item:last-child{ border-bottom:none; }
 
 .calc-freeform-name{
@@ -806,7 +766,7 @@ body.dark .calc-freeform-item{ border-color:#46423b; }
 
 body.dark .calc-freeform-name,
 body.dark .calc-freeform-qty,
-body.dark .calc-freeform-have{ background:#383329; color:#ece4d4; border-color:#46423b; }
+body.dark .calc-freeform-have{ background:var(--dark-card-alt); color:var(--dark-text); border-color:var(--dark-border); }
 
 .calc-freeform-remove{
   flex-shrink:0;
@@ -823,7 +783,7 @@ body.dark .calc-freeform-have{ background:#383329; color:#ece4d4; border-color:#
   justify-content:center;
 }
 
-body.dark .calc-freeform-remove{ background:#46423b; color:#ece4d4; }
+body.dark .calc-freeform-remove{ background:var(--dark-border); color:var(--dark-text); }
 
 .calc-freeform-add{
   width:100%;
@@ -838,7 +798,7 @@ body.dark .calc-freeform-remove{ background:#46423b; color:#ece4d4; }
   cursor:pointer;
 }
 
-body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
+body.dark .calc-freeform-add{ color:var(--dark-accent); border-color:#7a6030; }
 </style>
 </head>
 
@@ -881,16 +841,16 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
 </div>
 
 <div class="f-sort" id="sortRow">
-  <button class="f-sort-btn active" id="s_book" onclick="setSort('book')">図鑑順</button>
-  <button class="f-sort-btn" id="s_level" onclick="setSort('level')">レベル順</button>
-  <button class="f-sort-btn" id="s_unchecked" onclick="setSort('unchecked')">未コンプ順</button>
-  <button class="f-sort-btn" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
+  <button class="ds-tab ds-tab-grow active" id="s_book" onclick="setSort('book')">図鑑順</button>
+  <button class="ds-tab ds-tab-grow" id="s_level" onclick="setSort('level')">レベル順</button>
+  <button class="ds-tab ds-tab-grow" id="s_unchecked" onclick="setSort('unchecked')">未コンプ順</button>
+  <button class="ds-tab ds-tab-grow" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
 </div>
 
 <div class="f-sort">
-  <button class="f-sort-btn" id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
-  <button class="f-sort-btn" id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
-  <button class="f-sort-btn" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+  <button class="ds-tab ds-tab-grow" id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+  <button class="ds-tab ds-tab-grow" id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+  <button class="ds-tab ds-tab-grow" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
 </div>
 
 <div id="list"></div>
@@ -933,8 +893,6 @@ body.dark .calc-freeform-add{ color:#e8d2a8; border-color:#7a6030; }
     </div>
   </div>
 </div>
-
-<div id="foodToast"></div>
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/i18n.js"></script>
@@ -1417,14 +1375,6 @@ function formatTime(min){
   const m = min % 60;
   if(m === 0) return `${h}${sep}${hourLabel}`;
   return `${h}${sep}${hourLabel} ${m}${sep}${minLabel}`;
-}
-
-// ── トースト ──
-function showToast(msg){
-  const t = document.getElementById("foodToast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(()=> t.classList.remove("show"), 2500);
 }
 
 // ══════════════════════════════════════

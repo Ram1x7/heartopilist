@@ -24,6 +24,23 @@
   --space-3:12px;
   --space-4:16px;
   --space-5:24px;
+
+  /* ページごとに個別定義されていた色をここに集約する。
+     --on-fill：塗りつぶしボタン/トーストの文字色として複数ページで
+     使われていた#fdf9efの正式なトークン化（値そのものは変更しない） */
+  --on-fill:#fdf9ef;
+  /* --green：料理・コードなど複数ページで個別に再定義されていた「利益プラス」
+     等に使う緑（値は既存の#4a7c59のまま） */
+  --green:#4a7c59;
+  /* ダークモードでの緑文字色（料理・園芸の利益プラス表示用） */
+  --green-dark-text:#7ec89a;
+  /* 緑の薄い背景（コードページの有効/コピー済み表示用） */
+  --green-bg:#dff0e5;
+  /* 朱の薄い背景（イベントページの緊急/期間限定バッジ用） */
+  --vermillion-bg:#fdf0ec;
+  /* --indigo-pale：ペット・商店ページでダークモードのハイライト用に
+     個別のリテラルとして使われていた薄い藍色 */
+  --indigo-pale:#8fbdc9;
 }
 
 body.dark{
@@ -57,7 +74,7 @@ body.dark{
 
 .ds-btn-primary{
   background:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   box-shadow:var(--shadow-sm);
 }
 
@@ -75,7 +92,7 @@ body.dark{
 
 body.dark .ds-btn-primary{
   background:var(--indigo-soft);
-  color:#fdf9ef;
+  color:var(--on-fill);
 }
 
 body.dark .ds-btn-secondary{
@@ -87,6 +104,59 @@ body.dark .ds-btn-secondary{
 body.dark .ds-btn-danger{
   color:var(--dark-highlight);
   border-color:var(--dark-highlight);
+}
+
+/* ══════════════════════════════════════
+   タブ／ピルボタン（カテゴリ切替・絞り込みなどで、複数ページが
+   .tab, .g-tab, .pet-tab, .f-rarity-tab 等の名前で個別に再実装して
+   いた「選択中は藍色で塗りつぶされる横並びピル」を共通化したもの）
+   ══════════════════════════════════════ */
+.ds-tab{
+  flex-shrink:0;
+  padding:9px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  cursor:pointer;
+  text-align:center;
+  white-space:nowrap;
+  transition:0.15s;
+}
+
+/* 均等割りで並べたいタブ行（2〜3択の切り替えなど）にだけ付ける修飾クラス。
+   横スクロールする多数タブの一覧（カテゴリタブ等）では付けない */
+.ds-tab-grow{
+  flex:1;
+  flex-shrink:1;
+  white-space:normal;
+}
+
+.ds-tab.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:var(--on-fill);
+  font-weight:700;
+}
+
+.ds-tab:disabled,
+.ds-tab.disabled{
+  opacity:0.3;
+  pointer-events:none;
+}
+
+body.dark .ds-tab{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+body.dark .ds-tab.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:var(--on-fill);
 }
 
 /* ══════════════════════════════════════
@@ -127,7 +197,7 @@ body.dark .ds-card{
 
 .ds-toast{
   background:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   padding:10px 18px;
   border-radius:999px;
   font-size:var(--font-size-sm);
@@ -183,8 +253,8 @@ body.dark .ds-tutorial-highlight{
 }
 
 body.dark .ds-tutorial-popup{
-  background:#2c2823;
-  border:1px solid #46423b;
+  background:var(--dark-card);
+  border:1px solid var(--dark-border);
 }
 
 .ds-tutorial-step{
@@ -195,7 +265,7 @@ body.dark .ds-tutorial-popup{
 }
 
 body.dark .ds-tutorial-step{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .ds-tutorial-text{
@@ -206,7 +276,7 @@ body.dark .ds-tutorial-step{
 }
 
 body.dark .ds-tutorial-text{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .ds-tutorial-actions{
@@ -231,14 +301,14 @@ body.dark .ds-tutorial-text{
 .ds-tutorial-next{
   background:var(--indigo);
   border-color:var(--indigo);
-  color:#fdf9ef;
+  color:var(--on-fill);
   font-weight:700;
 }
 
 body.dark .ds-tutorial-skip{
-  background:#383329;
-  border-color:#46423b;
-  color:#b3a89a;
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
 }
 
 body.dark .ds-tutorial-next{

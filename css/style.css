@@ -30,6 +30,11 @@ html{
       var(--bg-top) 0%,
       var(--bg-bottom) 100%
     );
+  /* 画面左右端でのオーバースクロールを、ブラウザの「前/次のページへ戻る・進む」
+     ジェスチャーとして扱わせない（touch-actionだけでは抑止しきれない場合の
+     追加対策。overscroll-behaviorは「スクロール領域の端に達した時の挙動」
+     そのものを制御するプロパティで、body側でも同様に指定する） */
+  overscroll-behavior-x:none;
 }
 
 html.dark{
@@ -53,14 +58,17 @@ body{
     );
   color:var(--text);
   overflow-x:hidden;
+  overscroll-behavior-x:none;
   position:relative;
   animation:fadeIn 0.2s ease;
   /* PWA（ホーム画面追加）でピンチ操作すると画面全体が縮小され、周りに余白が
      見えてしまうのを防ぐ（ページ全体のピンチズーム・ダブルタップズームを無効化）。
-     横方向のpanはここでは許可しない：pan-xを許可すると、画面左端からの横スワイプが
-     ブラウザ（特にiOS Safari）に「戻る」ジェスチャーとして扱われてしまうため。
+     横方向のpanはここでは許可しない：pan-xを許可すると、画面左右端からの横スワイプが
+     ブラウザ（特にiOS Safari）に「戻る/進む」ジェスチャーとして扱われてしまうため。
      縦スクロールはpan-yで引き続き可能。ナビバーなど、実際に横スクロールさせたい
-     要素側では個別にtouch-action:pan-x pan-yを指定して上書きする */
+     要素側では個別にtouch-action:pan-x pan-yを指定して上書きする。
+     （touch-actionだけでは抑止しきれない場合に備え、overscroll-behavior-xと
+     js/edge-swipe-guard.jsでも重ねて対策している） */
   touch-action:pan-y;
 }
 

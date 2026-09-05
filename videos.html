@@ -27,16 +27,18 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=16">
-<link rel="stylesheet" href="./css/design-system.css?v=3">
+<link rel="stylesheet" href="./css/style.css?v=17">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
 <link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
 <link rel="prefetch" href="./shop.html">
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./build.html">
 <link rel="prefetch" href="./art-create.html">
 <link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./faq.html">
@@ -51,11 +53,6 @@
 
 <style>
 /* videos.html 専用CSS（共通の見た目はcss/style.cssを参照） */
-:root{
-  --green:#4a7c59;
-  --green-soft:#dff0e5;
-}
-
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
@@ -73,7 +70,7 @@ body{ min-height:100vh; }
 }
 
 body.dark .page-header h2{
-  color:#e8d2a8;
+  color:var(--dark-accent);
 }
 
 .page-header p{
@@ -83,7 +80,7 @@ body.dark .page-header h2{
 }
 
 body.dark .page-header p{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* カテゴリタブ */
@@ -101,39 +98,10 @@ body.dark .page-header p{
 
 .cat-tabs::-webkit-scrollbar{ display:none; }
 
-.tab{
-  flex-shrink:0;
-  padding:9px 16px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:12px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  cursor:pointer;
-  transition:0.15s;
+.cat-tabs .ds-tab{
   display:inline-flex;
   align-items:center;
   gap:5px;
-}
-
-.tab.active{
-  background:var(--indigo);
-  border-color:var(--indigo);
-  color:#fdf9ef;
-  font-weight:700;
-}
-
-body.dark .tab{
-  background:#383329;
-  color:#b3a89a;
-  border-color:#46423b;
-}
-
-body.dark .tab.active{
-  background:var(--indigo-soft);
-  border-color:var(--indigo-soft);
-  color:#fdf9ef;
 }
 
 /* リスト */
@@ -153,8 +121,8 @@ body.dark .tab.active{
 }
 
 body.dark .video-card{
-  background:#2c2823;
-  border-color:#46423b;
+  background:var(--dark-card);
+  border-color:var(--dark-border);
 }
 
 .video-question{
@@ -172,7 +140,7 @@ body.dark .video-card{
   color:var(--indigo);
 }
 
-body.dark .video-icon{ color:#e8d2a8; }
+body.dark .video-icon{ color:var(--dark-accent); }
 
 .video-title{
   flex:1;
@@ -183,7 +151,7 @@ body.dark .video-icon{ color:#e8d2a8; }
 }
 
 body.dark .video-title{
-  color:#ece4d4;
+  color:var(--dark-text);
 }
 
 .video-arrow{
@@ -194,7 +162,7 @@ body.dark .video-title{
 }
 
 body.dark .video-arrow{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 .video-card.open .video-arrow{
@@ -243,7 +211,7 @@ body.dark .video-arrow{
 }
 
 body.dark .video-note{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* 空表示 */
@@ -256,7 +224,7 @@ body.dark .video-note{
 }
 
 body.dark .empty{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 
 /* フッター */
@@ -270,7 +238,7 @@ body.dark .empty{
 }
 
 body.dark .footer{
-  color:#b3a89a;
+  color:var(--dark-text-sub);
 }
 </style>
 </head>
@@ -307,9 +275,9 @@ body.dark .footer{
 </div>
 
 <div class="cat-tabs">
-  <button class="tab active" id="cat-pink_bubble" onclick="setCat('pink_bubble')"></button>
-  <button class="tab" id="cat-rainbow_day" onclick="setCat('rainbow_day')"></button>
-  <button class="tab" id="cat-meteor_shower" onclick="setCat('meteor_shower')"></button>
+  <button class="ds-tab active" id="cat-pink_bubble" onclick="setCat('pink_bubble')"></button>
+  <button class="ds-tab" id="cat-rainbow_day" onclick="setCat('rainbow_day')"></button>
+  <button class="ds-tab" id="cat-meteor_shower" onclick="setCat('meteor_shower')"></button>
 </div>
 
 <div class="video-list" id="videoList"></div>

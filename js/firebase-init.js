@@ -23,7 +23,6 @@ export async function initFCM() {
   try {
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      console.log("通知が拒否されました");
       return null;
     }
 
@@ -36,7 +35,6 @@ export async function initFCM() {
 
     if (token) {
       localStorage.setItem("fcmToken", token);
-      console.log("FCMトークン取得成功:", token);
       return token;
     }
   } catch (err) {
