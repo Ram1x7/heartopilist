@@ -131,13 +131,13 @@ const ICONS = {
 };
 
 // 天気・認証マスターは、線画SVGではなくゲーム内アイコン風の画像に差し替える
-// （medalOutline＝未達成状態は対応画像がまだ無いため、線画SVGのまま）
 const ICON_IMAGE_SRC = {
   weatherSun: "images/currency/sunny.png",
   weatherRain: "images/currency/rainy.png",
   weatherRainbow: "images/currency/rainbow.png",
   weatherMeteor: "images/currency/starrain.png",
   medal: "images/currency/master.png",
+  medalOutline: "images/currency/beginner.png",
 };
 
 /**

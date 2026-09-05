@@ -1130,7 +1130,7 @@ function renderSection(items, type = "normal"){
         </button>
         ${f.auth !== false ? `
           <button class="auth-btn ${authed ? "checked" : ""}" aria-pressed="${authed ? "true" : "false"}" aria-label="${displayName(f)} ${T("aria_auth_label","認証マスターにする")}">
-            ${authed ? icon("medal", {size:16}) : icon("medalOutline", {size:13})}
+            ${icon(authed ? "medal" : "medalOutline", {size:16})}
           </button>
         ` : ''}
         <img src="${thumbSrc(f.image)}" alt="${displayName(f)}" loading="lazy">

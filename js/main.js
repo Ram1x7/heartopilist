@@ -575,7 +575,7 @@ function createCard(c){
     auth-btn
     ${authData[c.name] ? "checked" : ""}
   " aria-pressed="${authData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_auth_label","認証マスターにする")}">
-    ${authData[c.name] ? icon("medal", {size:16}) : icon("medalOutline", {size:13})}
+    ${icon(authData[c.name] ? "medal" : "medalOutline", {size:16})}
   </button>
 ` : ""}
 
