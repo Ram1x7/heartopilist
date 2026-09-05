@@ -130,17 +130,31 @@ const ICONS = {
   build3dWall: `<rect x="4" y="6" width="16" height="13" rx="1.3"/><circle cx="8" cy="10" r="1.3"/><path d="M5 17 9 12l3 3 4-5.5 4 7.5"/>`,
 };
 
+// 天気・認証マスターは、線画SVGではなくゲーム内アイコン風の画像に差し替える
+// （medalOutline＝未達成状態は対応画像がまだ無いため、線画SVGのまま）
+const ICON_IMAGE_SRC = {
+  weatherSun: "images/currency/sunny.png",
+  weatherRain: "images/currency/rainy.png",
+  weatherRainbow: "images/currency/rainbow.png",
+  weatherMeteor: "images/currency/starrain.png",
+  medal: "images/currency/master.png",
+};
+
 /**
- * icon(name, opts) : SVGアイコンのHTML文字列を返す
+ * icon(name, opts) : アイコンのHTML文字列を返す（画像差し替え済みのものはimg、それ以外はSVG）
  * opts.size : 幅高さ(px)。デフォルト18
  * opts.className : 追加クラス名
- * opts.strokeWidth : 線の太さ。デフォルト1.8
+ * opts.strokeWidth : 線の太さ。デフォルト1.8（SVGのみ）
  */
 function icon(name, opts = {}) {
-  const body = ICONS[name];
-  if (!body) return "";
   const size = opts.size || 18;
   const cls = opts.className ? ` ${opts.className}` : "";
+  const imgSrc = ICON_IMAGE_SRC[name];
+  if (imgSrc) {
+    return `<img class="icon${cls}" src="${imgSrc}" width="${size}" height="${size}" alt="" loading="lazy">`;
+  }
+  const body = ICONS[name];
+  if (!body) return "";
   const sw = opts.strokeWidth || 1.8;
   return `<svg class="icon${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${body}</svg>`;
 }

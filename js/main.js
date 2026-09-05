@@ -1008,7 +1008,7 @@ function openModal(c){
  m_star5Row.style.display = c.star5 ? "" : "none";
 
  // 認証マスターに必要な捕獲・発見数（対象外の生き物や、まだ判明していない数値は非表示にする）
- m_authCount.innerText = c.authCount ? c.authCount.toLocaleString() : "";
+ m_authCount.innerHTML = c.authCount ? `${icon("medal",{size:14})} ${c.authCount.toLocaleString()}` : "";
  m_authCountRow.style.display = c.authCount ? "" : "none";
 
  // 作り方情報（砂像のデザイン形状・三択回答など）

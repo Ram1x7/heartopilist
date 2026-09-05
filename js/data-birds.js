@@ -1380,8 +1380,8 @@ const birdData = [
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"温泉山-石海岸の崖",
- locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"ヤツガシラクエスト(追加段階)",
+ locationI18n:{"ja":"ヤツガシラクエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/000.PNG",
  auth:false
 }
