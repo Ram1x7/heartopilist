@@ -307,6 +307,17 @@ function translateWeatherWord(w){
  return map[w] ? T(map[w], w) : w;
 }
 
+// 天気の単語（晴れ/雨/虹/流星雨）に対応するアイコンHTMLを返す（不明などは非表示）
+function weatherIconHTML(w){
+  const map = {
+    "晴れ":"weatherSun",
+    "雨":"weatherRain",
+    "虹":"weatherRainbow",
+    "流星雨":"weatherMeteor",
+  };
+  return map[w] ? `${icon(map[w], {size:13})} ` : "";
+}
+
 const searchInput = document.getElementById("search");
 const miniSearch = document.getElementById("miniSearch");
 const clearBtn = document.getElementById("clearBtn");
@@ -564,7 +575,7 @@ function createCard(c){
     auth-btn
     ${authData[c.name] ? "checked" : ""}
   " aria-pressed="${authData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_auth_label","認証マスターにする")}">
-    ${icon(authData[c.name] ? "medal" : "medalOutline", {size:13})}
+    ${authData[c.name] ? icon("medal", {size:20}) : icon("medalOutline", {size:13})}
   </button>
 ` : ""}
 
@@ -2167,13 +2178,16 @@ function renderDailyTasks(){
       ["12-18", 12, 18],
       ["18-0", 18, 24],
     ];
-    const weatherRows = zones.map(([z, startH, endH]) => `
+    const weatherRows = zones.map(([z, startH, endH]) => {
+      const w = todayWeather[z] || "不明";
+      return `
       <div class="daily-task-row">
         <span class="daily-task-label">${formatServerZoneLabel(startH, endH)}</span>
-        <span class="daily-task-value">${translateWeatherWord(todayWeather[z] || "不明")}</span>
+        <span class="daily-task-value">${weatherIconHTML(w)}${translateWeatherWord(w)}</span>
       </div>
-    `).join("");
-    sectionWeather = sectionHTML("weatherSun", T("daily_tasks_section_weather","今日の天気"), weatherRows);
+    `;
+    }).join("");
+    sectionWeather = sectionHTML(null, T("daily_tasks_section_weather","今日の天気"), weatherRows);
   }
 
   // 場所動画への誘導（流星雨・虹の日は天気から、ピンクバブルは曜日から判定。タップでvideos.htmlの該当カテゴリへ）

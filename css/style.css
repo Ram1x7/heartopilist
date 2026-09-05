@@ -1490,8 +1490,11 @@ a{
 }
 
 .auth-btn.checked{
-  background:var(--gold);
-  border-color:var(--gold);
+  /* マスターバッジ画像自体がすでに独立した見た目のバッジのため、
+     アプリ側の丸背景・枠は重ねずに画像だけを見せる */
+  background:none;
+  border:none;
+  box-shadow:none;
 }
 
 /* シェアボタン */
@@ -1634,6 +1637,19 @@ body.dark .site-nav-item.active{
   display:inline-block;
   vertical-align:middle;
   flex-shrink:0;
+}
+
+/* 画像アイコン（天気・認証マスターなど）はSVGの線画と違い、
+   vertical-align:middleのままだとテキストと並べた時に浮いて見えるため
+   ベースラインに近づける。また.modal-box img（コンテンツ画像用の
+   背景・角丸・余白）が誤って効いてしまうのを打ち消す */
+img.icon{
+  vertical-align:-0.15em;
+  background:none;
+  border-radius:0;
+  padding:0;
+  margin:0;
+  box-shadow:none;
 }
 
 /* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン
