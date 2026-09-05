@@ -3890,8 +3890,8 @@ const foodsData = [
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
-  prices:null,
-  fesCoinPrice:null,
+  prices:[1500],
+  fesCoinPrice:190,
   materials:["ウチワサボテン(種@10)","凝縮ナツメペースト(@50)","凝縮ナツメペースト(@50)","ゴールデンガーパイク"],
   level:1,
   materials_image:[

@@ -1240,12 +1240,12 @@ const bugData = [
  auth:false
 },
 {
- name:"???",
- nameI18n:{"ja":"???","en":"???","zh-CN":"???","zh-TW":"???","ko":"???","th":"???"},
+ name:"レインボーカブト",
+ nameI18n:{"ja":"レインボーカブト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
- price:null,
- fesCoinPrice:null,
+ price:165,
+ fesCoinPrice:45,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"ニシキコウチュウクエスト(追加段階)",

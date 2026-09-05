@@ -90,5 +90,10 @@ const catFoods = [
 {id:"121",name:{jp:"茶色帽のディレクタコ",en:"Director Octopus (Brown)",zh_cn:"导演章鱼（棕帽）",zh_tw:"導演章魚（棕帽）",ko:"감독 문어(갈색)",th:"หมึกผู้กำกับ (หมวกน้ำตาล)",tl:"Director Octopus"},img:"./images/petfoods/121.PNG"},
 {id:"122",name:{jp:"青色帽のディレクタコ",en:"Director Octopus (Blue)",zh_cn:"导演章鱼（蓝帽）",zh_tw:"導演章魚（藍帽）",ko:"감독 문어(파랑)",th:"หมึกผู้กำกับ (หมวกฟ้า)",tl:"Director Octopus"},img:"./images/petfoods/122.PNG"},
 {id:"123",name:{jp:"褐色帽のディレクタマダコ",en:"Director Octopus (Brown V.)",zh_cn:"导演章鱼（褐色）",zh_tw:"導演章魚（褐色）",ko:"감독 문어(갈색 변형)",th:"หมึกผู้กำกับ (สีน้ำตาล)",tl:"Director Octopus"},img:"./images/petfoods/123.PNG"},
-{id:"124",name:{jp:"柄帽のディレクタマダコ",en:"Director Octopus (Pattern)",zh_cn:"导演章鱼（花纹帽）",zh_tw:"導演章魚（花紋帽）",ko:"감독 문어(무늬)",th:"หมึกผู้กำกับ (ลาย)",tl:"Director Octopus"},img:"./images/petfoods/124.PNG"}
+{id:"124",name:{jp:"柄帽のディレクタマダコ",en:"Director Octopus (Pattern)",zh_cn:"导演章鱼（花纹帽）",zh_tw:"導演章魚（花紋帽）",ko:"감독 문어(무늬)",th:"หมึกผู้กำกับ (ลาย)",tl:"Director Octopus"},img:"./images/petfoods/124.PNG"},
+{id:"138",name:{jp:"サボテンと魚のスープ",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/138.PNG"},
+{id:"139",name:{jp:"サボテンとブラックスポットガーのスープ",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/139.PNG"},
+{id:"140",name:{jp:"サボテンとシルバーガーのスープ",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/140.PNG"},
+{id:"141",name:{jp:"サボテンとブラウンブロッチガーのスープ",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/141.PNG"},
+{id:"142",name:{jp:"サボテンとペールゴールドガーのスープ",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/142.PNG"}
 ];

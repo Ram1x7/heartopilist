@@ -1168,7 +1168,7 @@ const fishData = [
  time:["18-0","0-6"],
  location:"郊外の湖",
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"images/fish/094.PNG"
 },
 {
  name:"ミズクラゲ",
@@ -1219,7 +1219,7 @@ const fishData = [
  time:["12-18","18-0","0-6"],
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"images/fish/095.PNG"
 },
 {
  name:"ミノカサゴ",
@@ -1231,7 +1231,7 @@ const fishData = [
  time:["6-12","0-6"],
  location:"クジラ海",
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"images/fish/096.PNG"
 },
 {
  name:"レナーズラス",
@@ -1243,7 +1243,7 @@ const fishData = [
  time:["6-12","12-18","18-0"],
  location:"東海",
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"images/fish/098.PNG"
 },
 {
  name:"シリキルリスズメダイ",
@@ -1255,7 +1255,7 @@ const fishData = [
  time:["12-18","18-0"],
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG"
+ img:"images/fish/097.PNG"
 },
 {
  name:"氷晶のタラバガニ",
@@ -1653,8 +1653,8 @@ const fishData = [
  fes:true,
  level:1,
  shadow:"大",
- price:null,
- fesCoinPrice:null,
+ price:320,
+ fesCoinPrice:60,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"ガーパイククエスト(追加段階)",
