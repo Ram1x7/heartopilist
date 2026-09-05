@@ -151,7 +151,9 @@ function icon(name, opts = {}) {
   const cls = opts.className ? ` ${opts.className}` : "";
   const imgSrc = ICON_IMAGE_SRC[name];
   if (imgSrc) {
-    return `<img class="icon${cls}" src="${imgSrc}" width="${size}" height="${size}" alt="" loading="lazy">`;
+    // width/height属性だけだと.item img等の既存スタイルに上書きされるため、
+    // インラインstyleで確実にサイズを固定する
+    return `<img class="icon${cls}" src="${imgSrc}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;" alt="" loading="lazy">`;
   }
   const body = ICONS[name];
   if (!body) return "";

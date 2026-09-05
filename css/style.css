@@ -1491,10 +1491,9 @@ a{
 
 .auth-btn.checked{
   /* マスターバッジ画像自体がすでに独立した見た目のバッジのため、
-     アプリ側の丸背景・枠は重ねずに画像だけを見せる */
-  background:none;
-  border:none;
-  box-shadow:none;
+     背景の塗りつぶしはやめて丸枠だけ残し、その中に画像を収める */
+  background:var(--card);
+  border-color:var(--gold);
 }
 
 /* シェアボタン */
@@ -1650,6 +1649,10 @@ img.icon{
   padding:0;
   margin:0;
   box-shadow:none;
+  /* サイズはicon()側のインラインstyleで固定するため、ここでは
+     .item img等の既存スタイルが上書きしていた分だけ打ち消す */
+  aspect-ratio:auto;
+  object-fit:initial;
 }
 
 /* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン
