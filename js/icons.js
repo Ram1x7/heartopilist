@@ -131,13 +131,13 @@ const ICONS = {
 };
 
 // 天気・認証マスターは、線画SVGではなくゲーム内アイコン風の画像に差し替える
-// （medalOutline＝未達成状態は対応画像がまだ無いため、線画SVGのまま）
 const ICON_IMAGE_SRC = {
   weatherSun: "images/currency/sunny.png",
   weatherRain: "images/currency/rainy.png",
   weatherRainbow: "images/currency/rainbow.png",
   weatherMeteor: "images/currency/starrain.png",
   medal: "images/currency/master.png",
+  medalOutline: "images/currency/beginner.png",
 };
 
 /**
@@ -151,7 +151,9 @@ function icon(name, opts = {}) {
   const cls = opts.className ? ` ${opts.className}` : "";
   const imgSrc = ICON_IMAGE_SRC[name];
   if (imgSrc) {
-    return `<img class="icon${cls}" src="${imgSrc}" width="${size}" height="${size}" alt="" loading="lazy">`;
+    // width/height属性だけだと.item img等の既存スタイルに上書きされるため、
+    // インラインstyleで確実にサイズを固定する
+    return `<img class="icon${cls}" src="${imgSrc}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;" alt="" loading="lazy">`;
   }
   const body = ICONS[name];
   if (!body) return "";
