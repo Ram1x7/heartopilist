@@ -844,8 +844,8 @@ const bugData = [
  authCount:300,
  weather:["雨","虹"],
  time:["6-12","12-18"],
- location:"温泉山",
- locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"温泉山-温泉",
+ locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain-Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/bugs/071.PNG"
 },
 {
