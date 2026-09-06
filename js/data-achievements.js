@@ -260,8 +260,8 @@ const achievementsData = [
     nameI18n: {"ja":"決定的瞬間", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の野鳥観察クエストで星5の情報カードを10枚獲得する。",
     conditionI18n: {"ja":"1回の野鳥観察クエストで星5の情報カードを10枚獲得する。", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
-    rewardTitle: null,
-    rewardTitleI18n: null,
+    rewardTitle: "瞬間",
+    rewardTitleI18n: {"ja":"瞬間", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
   },
   {
     id: 30,
