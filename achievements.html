@@ -290,14 +290,34 @@ body.dark .ach-info-card{ background:var(--dark-card-alt); }
 
 .ach-info-row{
   display:flex;
-  justify-content:space-between;
-  gap:8px;
+  flex-direction:column;
+  gap:2px;
 }
 
-.ach-info-label{ color:var(--text-sub); white-space:nowrap; }
-.ach-info-value{ font-weight:700; color:var(--text); text-align:right; }
+.ach-info-row + .ach-info-row{ margin-top:8px; }
+
+.ach-info-label{ color:var(--text-sub); }
+.ach-info-value{
+  font-weight:700;
+  color:var(--text);
+  text-align:left;
+  font-size:11.5px;
+  line-height:1.6;
+}
 
 body.dark .ach-info-value{ color:var(--dark-text); }
+
+/* 達成条件の補足事項（箇条書き） */
+.ach-condition-notes{
+  margin:4px 0 0;
+  padding-left:16px;
+  font-weight:400;
+  font-size:10.5px;
+  line-height:1.6;
+  color:var(--text-sub);
+}
+
+body.dark .ach-condition-notes{ color:var(--dark-text-sub); }
 
 /* 獲得済みボタン */
 .ach-obtain-btn{
@@ -459,6 +479,15 @@ function displayName(a){
   if(a.hidden && !isObtained(a)) return "???";
   return displayField(a,"name");
 }
+
+// 達成条件の補足（箇条書き）。無ければnull
+function displayConditionNotes(a){
+  if(!a.conditionNotes) return null;
+  const i18nField = a.conditionNotesI18n;
+  if(!i18nField) return a.conditionNotes;
+  const lang = currentLang();
+  return (i18nField[lang] && i18nField[lang].length) ? i18nField[lang] : a.conditionNotes;
+}
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
     return window.i18n.t(key, vars, fallback);
@@ -574,6 +603,12 @@ function renderAchModal(){
     ? `<div class="ach-flavor-text">${displayField(a,"flavorText")}</div>`
     : "";
 
+  // 達成条件の補足事項（箇条書き）
+  const conditionNotes = displayConditionNotes(a);
+  const conditionNotesHTML = conditionNotes && conditionNotes.length
+    ? `<ul class="ach-condition-notes">${conditionNotes.map(n=>`<li>${n}</li>`).join("")}</ul>`
+    : "";
+
   box.innerHTML = `
     <button class="ach-modal-close-x" onclick="closeAchModal()">${icon("close",{size:14})}</button>
 
@@ -596,6 +631,7 @@ function renderAchModal(){
       <div class="ach-info-row">
         <span class="ach-info-label">${T("achievements_condition_label","達成条件")}</span>
         <span class="ach-info-value">${displayField(a,"condition")}</span>
+        ${conditionNotesHTML}
       </div>
       <div class="ach-info-row">
         <span class="ach-info-label">${T("achievements_reward_label","獲得称号")}</span>
