@@ -263,6 +263,19 @@ body.dark .ach-modal-close-x{ background:var(--dark-card-alt); color:var(--dark-
 
 .ach-banner-flag.locked .ach-banner-sub{ color:#dcd6c8; }
 
+/* 隠し実績のフレーバーテキスト（未達成でも見えるヒント文） */
+.ach-flavor-text{
+  font-size:11px;
+  font-style:italic;
+  color:var(--text-sub);
+  text-align:center;
+  line-height:1.6;
+  margin-top:10px;
+  padding:0 8px;
+}
+
+body.dark .ach-flavor-text{ color:var(--dark-text-sub); }
+
 /* 情報カード */
 .ach-info-card{
   background:var(--card-sub);
@@ -436,9 +449,15 @@ function currentLang(){
 }
 function displayField(obj, field){
   const i18nField = obj[field + "I18n"];
-  if(!i18nField) return obj[field];
+  if(!i18nField) return obj[field] ?? T("achievements_field_pending","未定");
   const lang = currentLang();
   return i18nField[lang] || obj[field];
+}
+
+// 隠し実績は未達成の間、名前を???として表示する
+function displayName(a){
+  if(a.hidden && !isObtained(a)) return "???";
+  return displayField(a,"name");
 }
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
@@ -479,14 +498,14 @@ function render(){
     div.className = "item";
     div.innerHTML = `
       <div class="img-wrap">
-        <button class="check-btn ${obtained ? "checked" : ""}" aria-pressed="${obtained ? "true" : "false"}" aria-label="${displayField(a,"name")} ${T("aria_check_label","コンプ済みにする")}">
+        <button class="check-btn ${obtained ? "checked" : ""}" aria-pressed="${obtained ? "true" : "false"}" aria-label="${displayName(a)} ${T("aria_check_label","コンプ済みにする")}">
           ${icon(obtained ? "star" : "starOutline", {size:13})}
         </button>
         <div class="ach-icon-wrap ${obtained ? "" : "ach-icon-locked"}" style="width:100%;aspect-ratio:1/1;background:var(--card-sub);border-radius:14px;padding:2px;box-sizing:border-box;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:var(--gold);">
           ${icon(a.icon || "trophy", {size:36})}
         </div>
       </div>
-      <div class="item-name">${displayField(a,"name")}</div>
+      <div class="item-name">${displayName(a)}</div>
     `;
 
     div.onclick = () => openAchModal(a);
@@ -550,6 +569,11 @@ function renderAchModal(){
     ? T("achievements_obtained_sub","この実績を達成しました！")
     : T("achievements_locked_sub","達成すると称号「{title}」を獲得できます", {title: displayField(a,"rewardTitle")});
 
+  // 隠し実績は未達成の間、フレーバーテキスト（ヒント文）をヒントとして表示する
+  const flavorHTML = a.hidden
+    ? `<div class="ach-flavor-text">${displayField(a,"flavorText")}</div>`
+    : "";
+
   box.innerHTML = `
     <button class="ach-modal-close-x" onclick="closeAchModal()">${icon("close",{size:14})}</button>
 
@@ -560,11 +584,13 @@ function renderAchModal(){
         <div class="ach-banner-badge-frame">
           <div class="ach-banner-badge-icon">${icon(a.icon || "trophy", {size:34})}</div>
         </div>
-        <div class="ach-banner-name">${displayField(a,"name")}</div>
+        <div class="ach-banner-name">${displayName(a)}</div>
         <div class="ach-banner-sub">${subText}</div>
         ${laurelSvg("ach-laurel-right")}
       </div>
     </div>
+
+    ${flavorHTML}
 
     <div class="ach-info-card">
       <div class="ach-info-row">
