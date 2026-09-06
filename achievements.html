@@ -312,15 +312,6 @@ body.dark .ach-info-value{ color:var(--dark-text); }
 }
 
 body.dark .ach-obtain-btn.obtained{ background:var(--dark-card-alt); color:var(--dark-text-sub); border-color:var(--dark-border); }
-
-.ach-obtain-date{
-  text-align:center;
-  font-size:10px;
-  color:var(--text-sub);
-  margin-top:8px;
-}
-
-body.dark .ach-obtain-date{ color:var(--dark-text-sub); }
 </style>
 </head>
 
@@ -458,7 +449,6 @@ function T(key, fallback, vars){
 
 // ── データ（達成状況はローカル保存のみ。ゲーム内データとは連携していません） ──
 let obtainedData = JSON.parse(localStorage.getItem("achievement_obtained") || "{}");
-let obtainedDateData = JSON.parse(localStorage.getItem("achievement_obtained_date") || "{}");
 
 let toggleGuard = false;
 function guardToggle(){
@@ -472,13 +462,7 @@ function isObtained(a){ return !!obtainedData[a.id]; }
 
 function setObtained(a, value){
   obtainedData[a.id] = value;
-  if(value){
-    obtainedDateData[a.id] = obtainedDateData[a.id] || new Date().toISOString();
-  } else {
-    delete obtainedDateData[a.id];
-  }
   localStorage.setItem("achievement_obtained", JSON.stringify(obtainedData));
-  localStorage.setItem("achievement_obtained_date", JSON.stringify(obtainedDateData));
 }
 
 let currentModalAch = null;
@@ -566,10 +550,6 @@ function renderAchModal(){
     ? T("achievements_obtained_sub","この実績を達成しました！")
     : T("achievements_locked_sub","達成すると称号「{title}」を獲得できます", {title: displayField(a,"rewardTitle")});
 
-  const dateHTML = obtained && obtainedDateData[a.id]
-    ? `<div class="ach-obtain-date">${T("achievements_obtained_date_label","達成日：")}${formatDate(obtainedDateData[a.id])}</div>`
-    : "";
-
   box.innerHTML = `
     <button class="ach-modal-close-x" onclick="closeAchModal()">${icon("close",{size:14})}</button>
 
@@ -601,7 +581,6 @@ function renderAchModal(){
       ${icon(obtained ? "check" : "trophy", {size:14})}
       ${obtained ? T("achievements_obtained_btn","達成済み") : T("achievements_not_obtained_btn","達成済みにする")}
     </button>
-    ${dateHTML}
   `;
 
   document.getElementById("achObtainBtn").onclick = ()=>{
@@ -609,14 +588,6 @@ function renderAchModal(){
     render();
     renderAchModal();
   };
-}
-
-function formatDate(iso){
-  const d = new Date(iso);
-  const yyyy = d.getFullYear();
-  const mm = d.getMonth() + 1;
-  const dd = d.getDate();
-  return `${yyyy}/${mm}/${dd}`;
 }
 
 // 初期化
