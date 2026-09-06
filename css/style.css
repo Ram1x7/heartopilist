@@ -1655,6 +1655,13 @@ img.icon{
   object-fit:initial;
 }
 
+/* ダーク時「body.dark .item img」「body.dark .modal-box img」が
+   画像アイコンにも背景色を付けてしまう（認証バッジが黒い四角に
+   見える不具合）のを、同等の詳細度で個別に打ち消す */
+body.dark img.icon{
+  background:none;
+}
+
 /* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン
    フォントサイズに連動させ、テキストの行の中に馴染むようベースラインを調整
    （.modal-box img のpadding/背景/角丸がモーダル内で誤って効いてしまうため、
