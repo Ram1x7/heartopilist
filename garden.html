@@ -198,6 +198,21 @@ body[data-icon-size="large"] .garden-item{
 
 body.dark .garden-item .img-wrap img{ background:var(--dark-card-alt); }
 
+/* 認証マスターアイコン（画像）には上のコンテンツ画像用スタイル
+   （背景・角丸・余白・サイズ指定）を適用しない。特にmargin-bottomが
+   丸枠内でのアイコンの垂直中央揃えを崩し、位置・サイズがずれて
+   見える原因になっていたため打ち消す */
+.garden-item .img-wrap img.icon{
+  width:auto;
+  aspect-ratio:auto;
+  object-fit:initial;
+  background:none;
+  border-radius:0;
+  padding:0;
+  margin:0;
+}
+body.dark .garden-item .img-wrap img.icon{ background:none; }
+
 .notif-badge{
   position:absolute;
   bottom:6px;
