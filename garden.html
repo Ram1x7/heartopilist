@@ -198,6 +198,10 @@ body[data-icon-size="large"] .garden-item{
 
 body.dark .garden-item .img-wrap img{ background:var(--dark-card-alt); }
 
+/* 認証マスターアイコン（画像）には上の背景色を適用しない
+   （丸枠の中に黒い四角が浮いて見える不具合対策） */
+body.dark .garden-item .img-wrap img.icon{ background:none; }
+
 .notif-badge{
   position:absolute;
   bottom:6px;
