@@ -1298,6 +1298,22 @@ body.dark .modal-info-value{
   white-space:nowrap;
 }
 
+/* 図鑑モーダル「場所」欄のマップリンク */
+.modal-map-link{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--indigo);
+  text-decoration:none;
+  vertical-align:middle;
+}
+
+body.dark .modal-map-link{
+  color:var(--dark-accent);
+}
+
 /* 売価テーブル（レア度・売価・フェスコイン） */
 .modal-price-table{
   width:100%;

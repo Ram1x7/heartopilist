@@ -965,6 +965,10 @@ function openModal(c){
  if(c.seasonName){
    locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
  }
+ // マップ上に該当地点の座標が登録されている場合のみ「地図で見る」リンクを追加
+ if(typeof mapLocationLinks !== "undefined" && c.location && mapLocationLinks[c.location]){
+   locHtml += ` <a class="modal-map-link" href="map.html?loc=${encodeURIComponent(c.location)}" target="_blank">${icon("pin",{size:11})}${T("modal_view_on_map","地図で見る")}</a>`;
+ }
  m_loc.innerHTML = locHtml;
  m_weather.innerText = formatWeather(c.weather);
  m_time.innerText = formatTimeForServer(c.time);
