@@ -78,6 +78,6 @@ const mapLocationLinks = {
   "郊外の湖畔": { x:50.45, y:60.35 }, // landmarks:Suburban Lake
   "郊外の湖街": { x:50.45, y:60.35 }, // landmarks:Suburban Lake
   "郊外湖畔": { x:50.45, y:60.35 }, // landmarks:Suburban Lake
-  "霞川": null,
+  "霞川": { x:34.95, y:33.05 }, // landmarks:Rosy River
   "静川": { x:38.8, y:65.25 }, // landmarks:Tranquil River
 };
