@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<meta name="robots" content="noindex, nofollow">
+<title data-i18n="page_title_map">マップ｜はとぴ図鑑</title>
+<meta name="description" data-i18n-content="meta_description_map" content="Heartopia（ハートピアスローライフ）のワールドマップ。地名・NPC・ショップ・出現場所を確認できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | マップ">
+<meta property="og:description" content="Heartopiaのワールドマップ。地名・NPC・ショップ・出現場所を確認できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/map.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | マップ">
+<meta name="twitter:description" content="Heartopiaのワールドマップ。地名・NPC・ショップ・出現場所を確認できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=22">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./build.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./music.html">
+<link rel="prefetch" href="./faq.html">
+<link rel="prefetch" href="./updates.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* map.html 専用CSS（共通の見た目はcss/style.cssを参照） */
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{ min-height:100vh; }
+
+.page-header{ margin-bottom:6px; }
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{ color:var(--dark-accent); }
+
+.page-header p{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
+
+body.dark .page-header p{ color:var(--dark-text-sub); }
+
+/* カテゴリタブ */
+.map-cat-tabs{
+  display:flex;
+  gap:6px;
+  margin:12px 0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  touch-action:pan-x pan-y;
+}
+
+.map-cat-tabs::-webkit-scrollbar{ display:none; }
+
+/* マップビューポート */
+.map-viewport{
+  position:relative;
+  width:100%;
+  height:min(70vh, 560px);
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:#7fa8c9;
+  touch-action:none;
+  cursor:grab;
+}
+
+.map-viewport.dragging{ cursor:grabbing; }
+
+body.dark .map-viewport{ border-color:var(--dark-border); }
+
+.map-stage{
+  position:absolute;
+  top:0;
+  left:0;
+  transform-origin:0 0;
+  will-change:transform;
+}
+
+.map-stage img{
+  display:block;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+.map-pin{
+  position:absolute;
+  transform:translate(-50%,-100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:pointer;
+}
+
+.map-pin-dot{
+  width:22px;
+  height:22px;
+  border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid #fff;
+  box-shadow:0 2px 6px rgba(0,0,0,0.35);
+}
+
+.map-pin-dot span{
+  transform:rotate(45deg);
+  font-size:11px;
+  line-height:1;
+}
+
+.map-pin.cat-landmark .map-pin-dot{ background:var(--indigo); }
+.map-pin.cat-npc .map-pin-dot{ background:var(--gold); }
+.map-pin.cat-shop .map-pin-dot{ background:#4a8c5f; }
+.map-pin.cat-busstop .map-pin-dot{ background:#8a8a8a; }
+.map-pin.cat-animal .map-pin-dot{ background:#a97c50; }
+.map-pin.cat-event .map-pin-dot{ background:#c15a7a; }
+
+.map-pin.highlight .map-pin-dot{
+  box-shadow:0 0 0 5px rgba(193,90,122,0.35), 0 2px 6px rgba(0,0,0,0.35);
+  animation:mapPinBounce 1s ease-in-out infinite;
+}
+
+@keyframes mapPinBounce{
+  0%,100%{ transform:translate(-50%,-100%) scale(1); }
+  50%{ transform:translate(-50%,-110%) scale(1.08); }
+}
+
+.map-pin-label{
+  margin-top:2px;
+  font-size:9.5px;
+  font-weight:700;
+  color:var(--text);
+  background:rgba(255,255,255,0.88);
+  padding:1px 5px;
+  border-radius:6px;
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+body.dark .map-pin-label{
+  color:var(--dark-text);
+  background:rgba(30,26,22,0.82);
+}
+
+/* ズームボタン */
+.map-zoom-controls{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  z-index:5;
+}
+
+.map-zoom-btn{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+body.dark .map-zoom-btn{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-text);
+}
+
+/* タップしたピンの情報カード */
+.map-info-card{
+  margin-top:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px 16px;
+  display:none;
+  align-items:center;
+  gap:10px;
+}
+
+.map-info-card.show{ display:flex; }
+
+body.dark .map-info-card{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.map-info-card-name{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .map-info-card-name{ color:var(--dark-text); }
+
+.map-info-card-cat{
+  font-size:10.5px;
+  color:var(--text-sub);
+  margin-top:2px;
+}
+
+body.dark .map-info-card-cat{ color:var(--dark-text-sub); }
+
+/* 座標登録ツール（?edit=1 でのみ表示） */
+.map-edit-panel{
+  display:none;
+  margin-top:10px;
+  background:var(--card);
+  border:1px solid var(--gold);
+  border-radius:16px;
+  padding:14px 16px;
+  font-size:12px;
+  color:var(--text);
+}
+
+.map-edit-panel.show{ display:block; }
+
+body.dark .map-edit-panel{
+  background:var(--dark-card);
+  color:var(--dark-text);
+}
+
+.map-edit-panel select, .map-edit-panel textarea{
+  width:100%;
+  margin-top:8px;
+  padding:8px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark .map-edit-panel select, body.dark .map-edit-panel textarea{
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text);
+}
+
+.map-edit-panel textarea{ height:180px; resize:vertical; font-family:monospace; font-size:10.5px; }
+
+.map-edit-coord{
+  font-weight:700;
+  margin-top:8px;
+}
+
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+body.dark .footer{ color:var(--dark-text-sub); }
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./build.html" class="site-nav-item" data-i18n="nav_build">建築</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+
+<div class="page-header">
+  <h2 data-i18n="map_page_title">マップ</h2>
+  <p data-i18n="map_page_subtitle">ドラッグで移動・ピンチ／ホイールで拡大縮小できます</p>
+</div>
+
+<div class="map-cat-tabs">
+  <button class="ds-tab active" id="mapcat-landmark" onclick="toggleMapCat('landmark')" data-i18n="map_cat_landmark">地名</button>
+  <button class="ds-tab active" id="mapcat-npc" onclick="toggleMapCat('npc')" data-i18n="map_cat_npc">NPC</button>
+  <button class="ds-tab active" id="mapcat-shop" onclick="toggleMapCat('shop')" data-i18n="map_cat_shop">ショップ</button>
+  <button class="ds-tab" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
+  <button class="ds-tab" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
+  <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
+</div>
+
+<div class="map-viewport" id="mapViewport">
+  <div class="map-stage" id="mapStage">
+    <img id="mapImg" src="" alt="Heartopia map">
+    <div id="mapPinsLayer"></div>
+  </div>
+  <div class="map-zoom-controls">
+    <button class="map-zoom-btn" onclick="mapZoomStep(1.3)" aria-label="zoom in">＋</button>
+    <button class="map-zoom-btn" onclick="mapZoomStep(1/1.3)" aria-label="zoom out">－</button>
+  </div>
+</div>
+
+<div class="map-info-card" id="mapInfoCard">
+  <div>
+    <div class="map-info-card-name" id="mapInfoName"></div>
+    <div class="map-info-card-cat" id="mapInfoCat"></div>
+  </div>
+</div>
+
+<div class="map-edit-panel" id="mapEditPanel">
+  <strong>座標登録ツール（?edit=1 でのみ表示）</strong>
+  <p style="margin-top:6px;">生き物の出現場所（location文字列）を選んでからマップをタップすると、その座標がここに表示されます。全部選び終わったら下のテキストをコピーして送ってください。</p>
+  <select id="mapEditLocationSelect"></select>
+  <div class="map-edit-coord" id="mapEditCoord"></div>
+  <textarea id="mapEditOutput" readonly></textarea>
+</div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 style="text-align:center;" data-i18n="map_help_title">マップの使い方</h3>
+
+    <p><strong data-i18n="map_help_move_title">移動・拡大縮小</strong><br>
+    <span data-i18n="map_help_move_body">ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="map_help_cat_title">カテゴリで絞り込み</strong><br>
+    <span data-i18n="map_help_cat_body">地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="map_help_pin_title">ピンをタップ</strong><br>
+    <span data-i18n="map_help_pin_body">ピンをタップすると、その場所の名前が下に表示されます。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(MAP_TUTORIAL_DONE_KEY, MAP_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="map_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです<br>
+  マップデータ・画像はheartopia.guideより許可を得て使用しています
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/data-map.js"></script>
+<script src="js/data-map-locations.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// ── 初回チュートリアル ──
+const MAP_TUTORIAL_DONE_KEY = "hatopiMap_tutorialDone";
+const MAP_TUTORIAL_STEPS = [
+  { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。" },
+  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){ document.getElementById("helpModal").style.display = "block"; }
+function closeHelpModal(){ document.getElementById("helpModal").style.display = "none"; }
+
+// 多言語ヘルパー
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+function displayName(obj){
+  if(!obj.nameI18n) return obj.name;
+  const lang = currentLang();
+  return obj.nameI18n[lang] || obj.name;
+}
+
+// ── カテゴリ表示状態 ──
+let activeCats = new Set(["landmark","npc","shop","event"]);
+
+function toggleMapCat(cat){
+  if(activeCats.has(cat)) activeCats.delete(cat); else activeCats.add(cat);
+  document.getElementById("mapcat-"+cat).classList.toggle("active", activeCats.has(cat));
+  renderPins();
+}
+
+// ── ピン一覧の組み立て ──
+function buildAllPins(){
+  const list = [];
+  mapLandmarks.forEach(p => list.push({ cat:"landmark", icon:"📍", name:displayName(p), x:p.x, y:p.y }));
+  mapNpcs.forEach(p => list.push({ cat:"npc", icon:"🧑", name:p.name, x:p.x, y:p.y }));
+  mapShops.forEach(p => list.push({ cat:"shop", icon:"🛍️", name:p.name, x:p.x, y:p.y }));
+  mapBusStops.forEach(p => list.push({ cat:"busstop", icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
+  mapAnimals.forEach(p => list.push({ cat:"animal", icon:"🐾", name:p.name, x:p.x, y:p.y }));
+  mapEvents.forEach(p => list.push({ cat:"event", icon:"⭐", name:p.name, x:p.x, y:p.y }));
+  return list;
+}
+const allPins = buildAllPins();
+
+// クエリパラメータ ?loc= で指定された地点にハイライトピンを追加
+const urlParams = new URLSearchParams(location.search);
+const highlightLocKey = urlParams.get("loc");
+let highlightPin = null;
+if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
+  const coord = mapLocationLinks[highlightLocKey];
+  if(coord){
+    highlightPin = { cat:"landmark", icon:"📌", name:highlightLocKey, x:coord.x, y:coord.y, highlight:true };
+  }
+}
+
+function renderPins(){
+  const layer = document.getElementById("mapPinsLayer");
+  layer.innerHTML = "";
+  const list = allPins.filter(p => activeCats.has(p.cat));
+  const finalList = highlightPin ? [...list, highlightPin] : list;
+  finalList.forEach(p => {
+    const el = document.createElement("div");
+    el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "");
+    el.style.left = p.x + "%";
+    el.style.top = p.y + "%";
+    el.innerHTML = `<div class="map-pin-dot"><span>${p.icon}</span></div><div class="map-pin-label">${p.name}</div>`;
+    el._pinData = p;
+    el.onclick = (e) => { e.stopPropagation(); showPinInfo(p); };
+    layer.appendChild(el);
+  });
+}
+
+function showPinInfo(p){
+  const catLabelMap = {
+    landmark: T("map_cat_landmark","地名"), npc: T("map_cat_npc","NPC"), shop: T("map_cat_shop","ショップ"),
+    busstop: T("map_cat_busstop","バス停"), animal: T("map_cat_animal","動物"), event: T("map_cat_event","イベント"),
+  };
+  document.getElementById("mapInfoName").textContent = p.name;
+  document.getElementById("mapInfoCat").textContent = catLabelMap[p.cat] || "";
+  document.getElementById("mapInfoCard").classList.add("show");
+}
+
+// ── パン/ズーム ──
+const viewport = document.getElementById("mapViewport");
+const stage = document.getElementById("mapStage");
+const mapImg = document.getElementById("mapImg");
+mapImg.src = mapImage;
+
+let scale = 1, tx = 0, ty = 0;
+let naturalW = 1200, naturalH = 1200;
+const MIN_SCALE = 0.4, MAX_SCALE = 5;
+
+function applyTransform(){
+  stage.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+}
+
+function clampPan(){
+  // ある程度自由に動かせるが、画像が完全に画面外に消えないよう緩く制限
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const contentW = naturalW * scale, contentH = naturalH * scale;
+  const margin = 120;
+  const minTx = Math.min(vw - contentW - margin, 0);
+  const maxTx = margin;
+  const minTy = Math.min(vh - contentH - margin, 0);
+  const maxTy = margin;
+  tx = Math.min(maxTx, Math.max(minTx, tx));
+  ty = Math.min(maxTy, Math.max(minTy, ty));
+}
+
+function fitToViewport(){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  scale = Math.max(vw / naturalW, vh / naturalH) * 1.02;
+  tx = (vw - naturalW * scale) / 2;
+  ty = (vh - naturalH * scale) / 2;
+  applyTransform();
+}
+
+function centerOn(px, py, targetScale){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  scale = targetScale;
+  tx = vw / 2 - px * scale;
+  ty = vh / 2 - py * scale;
+  clampPan();
+  applyTransform();
+}
+
+mapImg.onload = () => {
+  naturalW = mapImg.naturalWidth;
+  naturalH = mapImg.naturalHeight;
+  stage.style.width = naturalW + "px";
+  stage.style.height = naturalH + "px";
+  fitToViewport();
+  if(highlightPin){
+    const px = highlightPin.x / 100 * naturalW;
+    const py = highlightPin.y / 100 * naturalH;
+    centerOn(px, py, 2.2);
+  }
+  renderPins();
+};
+
+function mapZoomStep(factor){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const cx = vw / 2, cy = vh / 2;
+  const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
+  scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  tx = cx - worldX * scale;
+  ty = cy - worldY * scale;
+  clampPan();
+  applyTransform();
+}
+
+// ポインターイベントで統一的にドラッグ・ピンチズームを処理
+const activePointers = new Map();
+let dragStart = null;
+let pinchStartDist = null;
+let pinchStartScale = 1;
+
+function distanceBetween(a, b){
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// タップ（ドラッグなしのクリック）判定用
+let tapCandidate = null; // { target, x, y }
+let gestureMoved = false;
+const TAP_MOVE_THRESHOLD = 6;
+// 座標登録ツール（?edit=1）が使う、タップ位置を受け取るコールバック
+let mapEditTapCallback = null;
+
+viewport.addEventListener("pointerdown", (e) => {
+  // ズームボタンはネイティブのボタン挙動に任せる（pan/captureの対象外）
+  if(e.target.closest(".map-zoom-btn")) return;
+
+  viewport.setPointerCapture(e.pointerId);
+  activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  if(activePointers.size === 1){
+    dragStart = { x:e.clientX, y:e.clientY, tx, ty };
+    viewport.classList.add("dragging");
+    tapCandidate = { target:e.target, x:e.clientX, y:e.clientY };
+    gestureMoved = false;
+  }else if(activePointers.size === 2){
+    const pts = [...activePointers.values()];
+    pinchStartDist = distanceBetween(pts[0], pts[1]);
+    pinchStartScale = scale;
+    tapCandidate = null;
+  }
+});
+
+viewport.addEventListener("pointermove", (e) => {
+  if(!activePointers.has(e.pointerId)) return;
+  activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+  if(tapCandidate && distanceBetween({x:e.clientX,y:e.clientY}, tapCandidate) > TAP_MOVE_THRESHOLD){
+    gestureMoved = true;
+  }
+
+  if(activePointers.size === 2){
+    const pts = [...activePointers.values()];
+    const dist = distanceBetween(pts[0], pts[1]);
+    if(pinchStartDist){
+      const midX = (pts[0].x + pts[1].x) / 2 - viewport.getBoundingClientRect().left;
+      const midY = (pts[0].y + pts[1].y) / 2 - viewport.getBoundingClientRect().top;
+      const worldX = (midX - tx) / scale, worldY = (midY - ty) / scale;
+      scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (dist / pinchStartDist)));
+      tx = midX - worldX * scale;
+      ty = midY - worldY * scale;
+      applyTransform();
+    }
+  }else if(activePointers.size === 1 && dragStart){
+    tx = dragStart.tx + (e.clientX - dragStart.x);
+    ty = dragStart.ty + (e.clientY - dragStart.y);
+    applyTransform();
+  }
+});
+
+function endPointer(e){
+  if(!activePointers.has(e.pointerId)){
+    return;
+  }
+  activePointers.delete(e.pointerId);
+  viewport.classList.remove("dragging");
+  if(activePointers.size < 2) pinchStartDist = null;
+  if(activePointers.size === 0){
+    dragStart = null;
+    clampPan();
+    applyTransform();
+    // ドラッグせずにタップした場合は、pointer capture のせいで
+    // ネイティブのclickイベントが発火しないため、ここで手動判定する
+    if(tapCandidate && !gestureMoved){
+      const pinEl = tapCandidate.target.closest(".map-pin");
+      if(pinEl && pinEl._pinData){
+        showPinInfo(pinEl._pinData);
+      }else if(mapEditTapCallback){
+        mapEditTapCallback(tapCandidate.x, tapCandidate.y);
+      }
+    }
+    tapCandidate = null;
+  }
+}
+viewport.addEventListener("pointerup", endPointer);
+viewport.addEventListener("pointercancel", endPointer);
+viewport.addEventListener("pointerleave", (e) => { if(activePointers.has(e.pointerId)) endPointer(e); });
+
+viewport.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  const rect = viewport.getBoundingClientRect();
+  const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+  const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
+  const factor = e.deltaY < 0 ? 1.15 : 1/1.15;
+  scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  tx = cx - worldX * scale;
+  ty = cy - worldY * scale;
+  clampPan();
+  applyTransform();
+}, { passive:false });
+
+window.addEventListener("resize", () => { clampPan(); applyTransform(); });
+
+// ── 座標登録ツール（?edit=1） ──
+if(urlParams.get("edit") === "1"){
+  document.getElementById("mapEditPanel").classList.add("show");
+  const select = document.getElementById("mapEditLocationSelect");
+  const unresolvedLocations = Object.keys(mapLocationLinks).filter(k => mapLocationLinks[k] === null);
+  select.innerHTML = `<option value="">-- 未登録の場所を選択 (${unresolvedLocations.length}件) --</option>` +
+    unresolvedLocations.map(k => `<option value="${k}">${k}</option>`).join("");
+
+  const collected = {};
+  function refreshOutput(){
+    const lines = Object.entries(collected).map(([k,v]) => `  ${JSON.stringify(k)}: { x:${v.x}, y:${v.y} },`);
+    document.getElementById("mapEditOutput").value = lines.join("\n");
+  }
+
+  mapEditTapCallback = (clientX, clientY) => {
+    const locKey = select.value;
+    if(!locKey) return;
+    const rect = viewport.getBoundingClientRect();
+    const cx = clientX - rect.left, cy = clientY - rect.top;
+    const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
+    const xPct = Math.round((worldX / naturalW) * 10000) / 100;
+    const yPct = Math.round((worldY / naturalH) * 10000) / 100;
+    document.getElementById("mapEditCoord").textContent = `${locKey} → x:${xPct}, y:${yPct}`;
+    collected[locKey] = { x:xPct, y:yPct };
+    refreshOutput();
+  };
+}
+
+renderPins();
+maybeStartPageTutorial(MAP_TUTORIAL_DONE_KEY, MAP_TUTORIAL_STEPS);
+document.addEventListener("langchange", renderPins);
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

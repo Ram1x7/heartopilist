@@ -954,6 +954,9 @@ function forceRepaint(){
 
 }
 
+// マップ機能（map.html）はまだ一般公開前。trueにすると図鑑モーダルに「地図で見る」リンクが復活する
+const MAP_FEATURE_PUBLIC = false;
+
 // モーダル
 function openModal(c){
  modal.style.display="block";
@@ -964,6 +967,10 @@ function openModal(c){
  let locHtml = displayLocation(c);
  if(c.seasonName){
    locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
+ }
+ // マップ機能は一般公開前のため、リンクは一旦非表示にしている（MAP_FEATURE_PUBLICをtrueにすると復活）
+ if(MAP_FEATURE_PUBLIC && typeof mapLocationLinks !== "undefined" && c.location && mapLocationLinks[c.location]){
+   locHtml += ` <a class="modal-map-link" href="map.html?loc=${encodeURIComponent(c.location)}" target="_blank">${icon("pin",{size:11})}${T("modal_view_on_map","地図で見る")}</a>`;
  }
  m_loc.innerHTML = locHtml;
  m_weather.innerText = formatWeather(c.weather);
