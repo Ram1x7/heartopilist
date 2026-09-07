@@ -27,10 +27,10 @@ const mapLocationLinks = {
   "巨木の川": { x:60.95, y:65.85 }, // landmarks:Giantwood River
   "旧海": { x:54.35, y:8.1 }, // landmarks:Old Sea
   "旧海の海辺": { x:54.35, y:8.1 }, // landmarks:Old Sea
-  "旧海・クジラ海": null,
+  "旧海・クジラ海": { x:33.4, y:32.15 }, // 旧海とクジラ海の中間点（境界域のため近似）
   "東海": { x:92.5, y:57.5 }, // landmarks:East Sea
   "東海の海辺": { x:92.5, y:57.5 }, // landmarks:East Sea
-  "東海・そよ風の海": null,
+  "東海・そよ風の海": { x:71.4, y:68.18 }, // 東海とそよ風の海の中間点（境界域のため近似）
   "森の湖": { x:76.35, y:59.9 }, // landmarks:Forest Lake
   "森の湖畔": { x:76.35, y:59.9 }, // landmarks:Forest Lake
   "森林": { x:82.39, y:50.25 }, // landmarks:Forest
