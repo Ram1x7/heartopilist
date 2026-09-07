@@ -1,5 +1,5 @@
 // キャッシュ名（更新時はバージョンを上げる）
-const CACHE_NAME = "hatopi-v2.274.0";
+const CACHE_NAME = "hatopi-v2.275.0";
 
 // キャッシュするファイル一覧
 const CACHE_FILES = [
@@ -18,6 +18,7 @@ const CACHE_FILES = [
   "./build.html",
   "./faq.html",
   "./achievements.html",
+  "./updates.html",
   "./css/style.css?v=20",
   "./css/design-system.css?v=4",
   "./css/art.css?v=68",
@@ -49,6 +50,7 @@ const CACHE_FILES = [
   "./js/data-faq.js",
   "./js/data-videos.js",
   "./js/data-achievements.js",
+  "./js/data-updates.js",
   "./js/art-config.js",
   "./js/art-masks.js",
   "./js/art-pixelate.js",

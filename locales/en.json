@@ -12,6 +12,7 @@
   "nav_event": "Events",
   "nav_achievement": "Achievements",
   "nav_faq": "Q&A",
+  "nav_updates": "Update History",
   "page_title_foods": "Recipe Dex | Hatopi Dex",
   "meta_description_foods": "Full list of Heartopia recipes. Check ingredients, ingredient cost, sell price, and profit.",
   "page_title_garden": "Garden Dex | Hatopi Dex",
@@ -1106,5 +1107,19 @@
   "build_wall_basis_height": "Height",
   "build_wall_height_label": "Height (rows to stack)",
   "build_wall_auto_width_hint": "Width will be auto-adjusted to {n}",
-  "build_wall_auto_height_hint": "Height will be auto-adjusted to {n}"
+  "build_wall_auto_height_hint": "Height will be auto-adjusted to {n}",
+  "page_title_updates": "Update History | Hatopi Dex",
+  "meta_description_updates": "Full update history for the Heartopia unofficial encyclopedia, Hatopi Dex.",
+  "updates_page_title": "Update History",
+  "updates_page_subtitle": "A record of every past update announcement",
+  "updates_help_title": "How to use Update History",
+  "updates_help_list_title": "Tap to see details",
+  "updates_help_list_body": "Tap an entry to expand the announcement from that update. Listed newest first.",
+  "updates_help_contact_title": "Send feedback via the anonymous form",
+  "updates_help_contact_body": "Feel free to send feedback, requests, or bug reports through the anonymous form.",
+  "updates_help_close": "Close",
+  "tutorial_updates_step1_title": "① Tap to see details",
+  "tutorial_updates_step1_body": "Tap an entry to expand the announcement from that update. Listed newest first.",
+  "tutorial_updates_step2_title": "② Send feedback via the anonymous form",
+  "tutorial_updates_step2_body": "Feel free to send feedback, requests, or bug reports through the anonymous form."
 }
