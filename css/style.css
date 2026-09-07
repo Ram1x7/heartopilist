@@ -1895,10 +1895,50 @@ body.dark .help-icon{
   color:var(--dark-accent);
 }
 
-.contact-form-btn{
+/* お問い合わせ誘導（faq.html/updates.htmlと共通のスタイル） */
+.contact-box{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  text-align:center;
+  margin-top:16px;
+}
+
+body.dark .contact-box{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.contact-box p{
+  font-size:12px;
+  color:var(--text-sub);
+  margin-bottom:10px;
+  line-height:1.7;
+}
+
+body.dark .contact-box p{
+  color:var(--dark-text-sub);
+}
+
+.contact-btn{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:5px;
+  padding:10px 24px;
+  border:1px solid var(--indigo);
+  border-radius:999px;
+  background:var(--indigo);
+  color:var(--on-fill);
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+body.dark .contact-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
 }
 
