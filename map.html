@@ -141,6 +141,8 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   stroke:#3c5a6e;
   stroke-width:0.15;
   vector-effect:non-scaling-stroke;
+  pointer-events:auto;
+  cursor:pointer;
 }
 
 /* 大エリア（4件）：小エリアの単純集約による近似形状。粗い輪郭であることを点線で示す */
@@ -157,6 +159,23 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   stroke-dasharray:0.6,0.6;
 }
 
+/* タップして選択中のエリア：赤枠＋斜線塗り */
+.map-area-shape.selected{
+  fill:url(#mapAreaHatch);
+  fill-opacity:0.65;
+  stroke:var(--vermillion);
+  stroke-width:0.5;
+}
+
+body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
+
+.map-area-hatch-line{
+  stroke:var(--vermillion);
+  stroke-width:0.5;
+}
+
+body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
+
 .map-area-label{
   font-size:2.6px;
   font-weight:700;
@@ -165,6 +184,8 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   paint-order:stroke;
   stroke:#fff;
   stroke-width:0.6px;
+  pointer-events:auto;
+  cursor:pointer;
 }
 
 .map-area-label.approx{
@@ -289,6 +310,11 @@ body.dark .map-info-card{
   border-color:var(--dark-border);
 }
 
+.map-info-card-body{
+  flex:1;
+  min-width:0;
+}
+
 .map-info-card-name{
   font-size:14px;
   font-weight:700;
@@ -299,11 +325,47 @@ body.dark .map-info-card-name{ color:var(--dark-text); }
 
 .map-info-card-cat{
   font-size:10.5px;
+  font-weight:700;
+  letter-spacing:0.03em;
   color:var(--text-sub);
-  margin-top:2px;
+  margin-bottom:2px;
 }
 
 body.dark .map-info-card-cat{ color:var(--dark-text-sub); }
+
+.map-info-card-action{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  background:var(--indigo);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .map-info-card-action{ background:var(--indigo-soft); }
+
+.map-info-card-close{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  padding:0;
+}
+
+body.dark .map-info-card-close{ background:var(--dark-card-alt); color:var(--dark-text-sub); }
 
 /* 座標登録ツール（?edit=1 でのみ表示） */
 .map-edit-panel{
@@ -408,7 +470,14 @@ body.dark .footer{ color:var(--dark-text-sub); }
 <div class="map-viewport" id="mapViewport">
   <div class="map-stage" id="mapStage">
     <img id="mapImg" src="" alt="Heartopia map">
-    <svg id="mapAreasLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+    <svg id="mapAreasLayer" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <pattern id="mapAreaHatch" width="1.4" height="1.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line class="map-area-hatch-line" x1="0" y1="0" x2="0" y2="1.4"></line>
+        </pattern>
+      </defs>
+      <g id="mapAreasGroup"></g>
+    </svg>
     <div id="mapPinsLayer"></div>
   </div>
   <div class="map-zoom-controls">
@@ -418,10 +487,12 @@ body.dark .footer{ color:var(--dark-text-sub); }
 </div>
 
 <div class="map-info-card" id="mapInfoCard">
-  <div>
-    <div class="map-info-card-name" id="mapInfoName"></div>
+  <div class="map-info-card-body">
     <div class="map-info-card-cat" id="mapInfoCat"></div>
+    <div class="map-info-card-name" id="mapInfoName"></div>
   </div>
+  <button class="map-info-card-action" id="mapInfoAction" style="display:none;"></button>
+  <button class="map-info-card-close" id="mapInfoClose" aria-label="close"></button>
 </div>
 
 <div class="map-edit-panel" id="mapEditPanel">
@@ -451,7 +522,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
     <span data-i18n="map_help_cat_body">地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_pin_title">ピンをタップ</strong><br>
-    <span data-i18n="map_help_pin_body">ピンをタップすると、その場所の名前が下に表示されます。</span></p>
+    <span data-i18n="map_help_pin_body">ピンやエリアをタップすると、その名前が下に表示されます。</span></p>
 
     <div style="text-align:center; margin-top:20px;">
       <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(MAP_TUTORIAL_DONE_KEY, MAP_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
@@ -589,13 +660,15 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // エリア境界の描画。「エリア」カテゴリで小エリア（全33件、元サイトで個別確認済み）を表示。
 // 「大エリア」カテゴリで4件の広域まとめ（近似・粗い形状）を追加表示する。
 // nameがnullのもの（Central Square/Home Plots）は形は確定しているが正式名未確認のため「？」付きで表示。
-function drawAreaShape(svg, area, kind){
+function drawAreaShape(container, area, kind){
   area.polygons.forEach(ring => {
     const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
     const poly = document.createElementNS(SVG_NS, "polygon");
     poly.setAttribute("points", points);
     poly.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
-    svg.appendChild(poly);
+    poly._areaData = area;
+    poly._areaKind = kind;
+    container.appendChild(poly);
   });
 
   const label = document.createElementNS(SVG_NS, "text");
@@ -605,18 +678,31 @@ function drawAreaShape(svg, area, kind){
   label.textContent = area.name
     ? (kind === "big" ? `${area.name}（概略）` : area.name)
     : `${area.key}？`;
-  svg.appendChild(label);
+  label._areaData = area;
+  label._areaKind = kind;
+  container.appendChild(label);
 }
 
 function renderAreas(){
-  const svg = document.getElementById("mapAreasLayer");
-  svg.innerHTML = "";
+  const group = document.getElementById("mapAreasGroup");
+  group.innerHTML = "";
   if(activeCats.has("area") && typeof mapAreasSmall !== "undefined"){
-    mapAreasSmall.forEach(a => drawAreaShape(svg, a, "small"));
+    mapAreasSmall.forEach(a => drawAreaShape(group, a, "small"));
   }
   if(activeCats.has("bigarea") && typeof mapAreasBig !== "undefined"){
-    mapAreasBig.forEach(a => drawAreaShape(svg, a, "big"));
+    mapAreasBig.forEach(a => drawAreaShape(group, a, "big"));
   }
+  applyAreaSelection();
+}
+
+// タップされたエリアの赤枠＋斜線ハイライト表示
+let selectedArea = null;
+function applyAreaSelection(){
+  document.querySelectorAll("#mapAreasGroup .map-area-shape.selected").forEach(el => el.classList.remove("selected"));
+  if(!selectedArea) return;
+  document.querySelectorAll("#mapAreasGroup .map-area-shape").forEach(el => {
+    if(el._areaData === selectedArea.area) el.classList.add("selected");
+  });
 }
 
 function showPinInfo(p){
@@ -626,8 +712,36 @@ function showPinInfo(p){
   };
   document.getElementById("mapInfoName").textContent = p.name;
   document.getElementById("mapInfoCat").textContent = catLabelMap[p.cat] || "";
+  document.getElementById("mapInfoAction").style.display = "none";
   document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = null;
+  applyAreaSelection();
 }
+
+function showAreaInfo(area, kind){
+  document.getElementById("mapInfoCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
+  document.getElementById("mapInfoName").textContent = area.name
+    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    : `${area.key}？`;
+  const actionBtn = document.getElementById("mapInfoAction");
+  actionBtn.style.display = "";
+  actionBtn.innerHTML = `${icon("search",{size:13})}<span>${T("map_view_location","ここを拡大表示")}</span>`;
+  actionBtn.onclick = () => {
+    const px = area.centroid.x / 100 * naturalW;
+    const py = area.centroid.y / 100 * naturalH;
+    centerOn(px, py, 2.0);
+  };
+  document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = { area, kind };
+  applyAreaSelection();
+}
+
+document.getElementById("mapInfoClose").innerHTML = icon("close",{size:14});
+document.getElementById("mapInfoClose").onclick = () => {
+  document.getElementById("mapInfoCard").classList.remove("show");
+  selectedArea = null;
+  applyAreaSelection();
+};
 
 // ── パン/ズーム ──
 const viewport = document.getElementById("mapViewport");
@@ -777,10 +891,13 @@ function endPointer(e){
     // ネイティブのclickイベントが発火しないため、ここで手動判定する
     if(tapCandidate && !gestureMoved){
       const pinEl = tapCandidate.target.closest(".map-pin");
+      const areaEl = tapCandidate.target.closest(".map-area-shape, .map-area-label");
       if(pinEl && pinEl._pinData){
         showPinInfo(pinEl._pinData);
       }else if(mapEditTapCallback){
         mapEditTapCallback(tapCandidate.x, tapCandidate.y);
+      }else if(areaEl && areaEl._areaData){
+        showAreaInfo(areaEl._areaData, areaEl._areaKind);
       }
     }
     tapCandidate = null;
