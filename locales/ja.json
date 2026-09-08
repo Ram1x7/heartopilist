@@ -1134,6 +1134,7 @@
   "map_cat_animal": "動物",
   "map_cat_event": "イベント",
   "map_cat_area": "エリア",
+  "map_cat_bigarea": "大エリア",
   "map_help_title": "マップの使い方",
   "map_help_move_title": "移動・拡大縮小",
   "map_help_move_body": "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。",

@@ -143,12 +143,18 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   vector-effect:non-scaling-stroke;
 }
 
-.map-area-shape.unverified{
-  fill:#999;
-  fill-opacity:0.12;
-  stroke:#999;
-  stroke-width:0.15;
-  stroke-dasharray:1,1;
+/* 大エリア（4件）：小エリアの単純集約による近似形状。粗い輪郭であることを点線で示す */
+.map-area-shape.approx{
+  fill:#c1955a;
+  fill-opacity:0.16;
+  stroke:#a97c3f;
+  stroke-width:0.2;
+  stroke-dasharray:1.2,0.8;
+}
+
+/* 正式な日本語名が未確認のエリア（Central Square/Home Plots） */
+.map-area-shape.unnamed{
+  stroke-dasharray:0.6,0.6;
 }
 
 .map-area-label{
@@ -161,7 +167,12 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   stroke-width:0.6px;
 }
 
-.map-area-label.unverified{
+.map-area-label.approx{
+  fill:#7a5c2e;
+  font-style:italic;
+}
+
+.map-area-label.unnamed{
   fill:#666;
   font-style:italic;
   font-size:2.2px;
@@ -391,6 +402,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <button class="ds-tab" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
   <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
   <button class="ds-tab" id="mapcat-area" onclick="toggleMapCat('area')" data-i18n="map_cat_area">エリア</button>
+  <button class="ds-tab" id="mapcat-bigarea" onclick="toggleMapCat('bigarea')" data-i18n="map_cat_bigarea">大エリア</button>
 </div>
 
 <div class="map-viewport" id="mapViewport">
@@ -566,30 +578,38 @@ function renderPins(){
 }
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const mapEditMode = urlParams.get("edit") === "1";
 
-// エリア境界の描画。「エリア」カテゴリがONの間だけ表示。
-// 未検証（verified:false）のものは編集モード時のみ、点線・グレーで参考表示する。
+// エリア境界の描画。「エリア」カテゴリで小エリア（全33件、元サイトで個別確認済み）を表示。
+// 「大エリア」カテゴリで4件の広域まとめ（近似・粗い形状）を追加表示する。
+// nameがnullのもの（Central Square/Home Plots）は形は確定しているが正式名未確認のため「？」付きで表示。
+function drawAreaShape(svg, area, kind){
+  area.polygons.forEach(ring => {
+    const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
+    const poly = document.createElementNS(SVG_NS, "polygon");
+    poly.setAttribute("points", points);
+    poly.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+    svg.appendChild(poly);
+  });
+
+  const label = document.createElementNS(SVG_NS, "text");
+  label.setAttribute("x", area.centroid.x);
+  label.setAttribute("y", area.centroid.y);
+  label.setAttribute("class", "map-area-label" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+  label.textContent = area.name
+    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    : `${area.key}？`;
+  svg.appendChild(label);
+}
+
 function renderAreas(){
   const svg = document.getElementById("mapAreasLayer");
   svg.innerHTML = "";
-  if(!activeCats.has("area") || typeof mapAreas === "undefined") return;
-
-  mapAreas.forEach(a => {
-    if(!a.verified && !mapEditMode) return;
-    const points = a.vertices.map(([x,y]) => `${x},${y}`).join(" ");
-    const poly = document.createElementNS(SVG_NS, "polygon");
-    poly.setAttribute("points", points);
-    poly.setAttribute("class", "map-area-shape" + (a.verified ? "" : " unverified"));
-    svg.appendChild(poly);
-
-    const label = document.createElementNS(SVG_NS, "text");
-    label.setAttribute("x", a.centroid.x);
-    label.setAttribute("y", a.centroid.y);
-    label.setAttribute("class", "map-area-label" + (a.verified ? "" : " unverified"));
-    label.textContent = a.verified ? a.name : `${a.guessedName}？`;
-    svg.appendChild(label);
-  });
+  if(activeCats.has("area") && typeof mapAreasSmall !== "undefined"){
+    mapAreasSmall.forEach(a => drawAreaShape(svg, a, "small"));
+  }
+  if(activeCats.has("bigarea") && typeof mapAreasBig !== "undefined"){
+    mapAreasBig.forEach(a => drawAreaShape(svg, a, "big"));
+  }
 }
 
 function showPinInfo(p){
