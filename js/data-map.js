@@ -27,8 +27,7 @@ const mapLandmarks = [
   { key:"Zephyr Sea", name:"そよ風の海", nameI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""}, x:50.3, y:78.85 },
   { key:"East Sea", name:"東海", nameI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""}, x:92.5, y:57.5 },
   { key:"Old Sea", name:"旧海", nameI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""}, x:54.35, y:8.1 },
-  // 「中心街」（大エリア全体）か「大広場」（その中の小エリア）か未確定（confidence:low）。要目視確認
-  { key:"Central Square", name:"中心街", nameI18n:{"ja":"中心街","en":"Central Square","zh-CN":"","zh-TW":"","ko":"","th":""}, x:49.85, y:51.5 },
+  { key:"Central Square", name:"大広場", nameI18n:{"ja":"大広場","en":"Central Square","zh-CN":"","zh-TW":"","ko":"","th":""}, x:49.85, y:51.5 },
   { key:"Fishing Village Square", name:"漁村広場", nameI18n:{"ja":"漁村広場","en":"Fishing Village Square","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.65, y:68.25 },
   { key:"Residential Street", name:"住宅街", nameI18n:{"ja":"住宅街","en":"Residential Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.6, y:44.15 },
   { key:"Garden Street", name:"花園街", nameI18n:{"ja":"花園街","en":"Garden Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:56.75, y:50.35 },
