@@ -868,7 +868,7 @@ const birdData = [
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山の湖",
- locationI18n:{"ja":"温泉の湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
+ locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/067.PNG"
 }, 
 {
