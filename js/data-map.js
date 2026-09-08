@@ -27,16 +27,22 @@ const mapLandmarks = [
   { key:"Zephyr Sea", name:"そよ風の海", nameI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""}, x:50.3, y:78.85 },
   { key:"East Sea", name:"東海", nameI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""}, x:92.5, y:57.5 },
   { key:"Old Sea", name:"旧海", nameI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""}, x:54.35, y:8.1 },
-  { key:"Central Square", name:"中心街", nameI18n:{"ja":"中心街","en":"Central Square","zh-CN":"","zh-TW":"","ko":"","th":""}, x:49.85, y:51.5 },
+  { key:"Central Square", name:"大広場", nameI18n:{"ja":"大広場","en":"Central Square","zh-CN":"","zh-TW":"","ko":"","th":""}, x:49.85, y:51.5 },
   { key:"Fishing Village Square", name:"漁村広場", nameI18n:{"ja":"漁村広場","en":"Fishing Village Square","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.65, y:68.25 },
   { key:"Residential Street", name:"住宅街", nameI18n:{"ja":"住宅街","en":"Residential Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.6, y:44.15 },
-  { key:"Garden Street", name:"ガーデン通り", nameI18n:{"ja":"ガーデン通り","en":"Garden Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:56.75, y:50.35 },
-  { key:"Art Street", name:"アート通り", nameI18n:{"ja":"アート通り","en":"Art Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:45.4, y:49.25 },
+  { key:"Garden Street", name:"花園街", nameI18n:{"ja":"花園街","en":"Garden Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:56.75, y:50.35 },
+  { key:"Art Street", name:"アート街", nameI18n:{"ja":"アート街","en":"Art Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:45.4, y:49.25 },
   { key:"Crater Lake", name:"火山湖", nameI18n:{"ja":"火山湖","en":"Crater Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:40.35, y:19.7 },
   { key:"Suburban Lake", name:"郊外の湖", nameI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:50.45, y:60.35 },
   { key:"Forest Lake", name:"森の湖", nameI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:76.35, y:59.9 },
   { key:"Meadow Lake", name:"草原の湖", nameI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:23.7, y:53.45 },
   { key:"Onsen Mountain Lake", name:"温泉山の湖", nameI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:51.6, y:25.85 },
+  // 以下4件は heartopia.guide のデータには無い広域ゾーン名（ユーザーがゲーム内マップの実機画像で確認）。
+  // 周辺の確定済みランドマークの重心から座標を算出した近似値。
+  { key:"Forest", name:"森林", nameI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""}, x:82.39, y:50.25 },
+  { key:"Flower Field", name:"花畑", nameI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""}, x:21.61, y:59.63 },
+  { key:"Onsen Mountain", name:"温泉山", nameI18n:{"ja":"温泉山","en":"Onsen Mountain","zh-CN":"","zh-TW":"","ko":"","th":""}, x:48.82, y:21.39 },
+  { key:"Fishing Village", name:"漁村", nameI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.43, y:72.13 },
 ];
 
 const mapNpcs = [

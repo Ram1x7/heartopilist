@@ -125,6 +125,59 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   -webkit-user-drag:none;
 }
 
+#mapAreasLayer{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  overflow:visible;
+}
+
+.map-area-shape{
+  fill:#6f8fb3;
+  fill-opacity:0.28;
+  stroke:#3c5a6e;
+  stroke-width:0.15;
+  vector-effect:non-scaling-stroke;
+}
+
+/* 大エリア（4件）：小エリアの単純集約による近似形状。粗い輪郭であることを点線で示す */
+.map-area-shape.approx{
+  fill:#c1955a;
+  fill-opacity:0.16;
+  stroke:#a97c3f;
+  stroke-width:0.2;
+  stroke-dasharray:1.2,0.8;
+}
+
+/* 正式な日本語名が未確認のエリア（Central Square/Home Plots） */
+.map-area-shape.unnamed{
+  stroke-dasharray:0.6,0.6;
+}
+
+.map-area-label{
+  font-size:2.6px;
+  font-weight:700;
+  fill:#2c2620;
+  text-anchor:middle;
+  paint-order:stroke;
+  stroke:#fff;
+  stroke-width:0.6px;
+}
+
+.map-area-label.approx{
+  fill:#7a5c2e;
+  font-style:italic;
+}
+
+.map-area-label.unnamed{
+  fill:#666;
+  font-style:italic;
+  font-size:2.2px;
+}
+
 .map-pin{
   position:absolute;
   transform:translate(-50%,-100%);
@@ -348,11 +401,14 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <button class="ds-tab" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
   <button class="ds-tab" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
   <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
+  <button class="ds-tab" id="mapcat-area" onclick="toggleMapCat('area')" data-i18n="map_cat_area">エリア</button>
+  <button class="ds-tab" id="mapcat-bigarea" onclick="toggleMapCat('bigarea')" data-i18n="map_cat_bigarea">大エリア</button>
 </div>
 
 <div class="map-viewport" id="mapViewport">
   <div class="map-stage" id="mapStage">
     <img id="mapImg" src="" alt="Heartopia map">
+    <svg id="mapAreasLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
     <div id="mapPinsLayer"></div>
   </div>
   <div class="map-zoom-controls">
@@ -374,6 +430,14 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <select id="mapEditLocationSelect"></select>
   <div class="map-edit-coord" id="mapEditCoord"></div>
   <textarea id="mapEditOutput" readonly></textarea>
+
+  <hr style="margin:14px 0; border:none; border-top:1px solid var(--border);">
+
+  <strong>既存ピンの位置修正</strong>
+  <p style="margin-top:6px;">位置がズレているNPC・バス停・ショップ・動物・地名・イベントを選んでから、正しい位置をマップでタップしてください。修正結果が下に追記されます。</p>
+  <select id="mapEditFixSelect"></select>
+  <div class="map-edit-coord" id="mapEditFixCoord"></div>
+  <textarea id="mapEditFixOutput" readonly></textarea>
 </div>
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
@@ -407,6 +471,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
 <script src="js/tutorial.js"></script>
 <script src="js/data-map.js"></script>
 <script src="js/data-map-locations.js"></script>
+<script src="js/data-map-areas.js"></script>
 <script>
 
 // ダークモード
@@ -476,6 +541,7 @@ function toggleMapCat(cat){
   if(activeCats.has(cat)) activeCats.delete(cat); else activeCats.add(cat);
   document.getElementById("mapcat-"+cat).classList.toggle("active", activeCats.has(cat));
   renderPins();
+  renderAreas();
 }
 
 // ── ピン一覧の組み立て ──
@@ -517,6 +583,41 @@ function renderPins(){
     el.onclick = (e) => { e.stopPropagation(); showPinInfo(p); };
     layer.appendChild(el);
   });
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// エリア境界の描画。「エリア」カテゴリで小エリア（全33件、元サイトで個別確認済み）を表示。
+// 「大エリア」カテゴリで4件の広域まとめ（近似・粗い形状）を追加表示する。
+// nameがnullのもの（Central Square/Home Plots）は形は確定しているが正式名未確認のため「？」付きで表示。
+function drawAreaShape(svg, area, kind){
+  area.polygons.forEach(ring => {
+    const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
+    const poly = document.createElementNS(SVG_NS, "polygon");
+    poly.setAttribute("points", points);
+    poly.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+    svg.appendChild(poly);
+  });
+
+  const label = document.createElementNS(SVG_NS, "text");
+  label.setAttribute("x", area.centroid.x);
+  label.setAttribute("y", area.centroid.y);
+  label.setAttribute("class", "map-area-label" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+  label.textContent = area.name
+    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    : `${area.key}？`;
+  svg.appendChild(label);
+}
+
+function renderAreas(){
+  const svg = document.getElementById("mapAreasLayer");
+  svg.innerHTML = "";
+  if(activeCats.has("area") && typeof mapAreasSmall !== "undefined"){
+    mapAreasSmall.forEach(a => drawAreaShape(svg, a, "small"));
+  }
+  if(activeCats.has("bigarea") && typeof mapAreasBig !== "undefined"){
+    mapAreasBig.forEach(a => drawAreaShape(svg, a, "big"));
+  }
 }
 
 function showPinInfo(p){
@@ -585,6 +686,7 @@ mapImg.onload = () => {
     centerOn(px, py, 2.2);
   }
   renderPins();
+  renderAreas();
 };
 
 function mapZoomStep(factor){
@@ -718,21 +820,58 @@ if(urlParams.get("edit") === "1"){
     document.getElementById("mapEditOutput").value = lines.join("\n");
   }
 
-  mapEditTapCallback = (clientX, clientY) => {
-    const locKey = select.value;
-    if(!locKey) return;
+  function screenToPct(clientX, clientY){
     const rect = viewport.getBoundingClientRect();
     const cx = clientX - rect.left, cy = clientY - rect.top;
     const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
-    const xPct = Math.round((worldX / naturalW) * 10000) / 100;
-    const yPct = Math.round((worldY / naturalH) * 10000) / 100;
-    document.getElementById("mapEditCoord").textContent = `${locKey} → x:${xPct}, y:${yPct}`;
-    collected[locKey] = { x:xPct, y:yPct };
-    refreshOutput();
+    return {
+      x: Math.round((worldX / naturalW) * 10000) / 100,
+      y: Math.round((worldY / naturalH) * 10000) / 100,
+    };
+  }
+
+  // ── 既存ピンの位置修正ツール ──
+  const fixSelect = document.getElementById("mapEditFixSelect");
+  const fixGroups = [
+    ["地名", (typeof mapLandmarks !== "undefined" ? mapLandmarks : []).map(p => ({ id:"landmark:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["NPC", (typeof mapNpcs !== "undefined" ? mapNpcs : []).map(p => ({ id:"npc:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["ショップ", (typeof mapShops !== "undefined" ? mapShops : []).map(p => ({ id:"shop:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["バス停", (typeof mapBusStops !== "undefined" ? mapBusStops : []).map((p,i) => ({ id:"busstop:"+i, label:"バス停 #"+(i+1), x:p.x, y:p.y }))],
+    ["動物", (typeof mapAnimals !== "undefined" ? mapAnimals : []).map(p => ({ id:"animal:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["イベント", (typeof mapEvents !== "undefined" ? mapEvents : []).map(p => ({ id:"event:"+p.key, label:p.name, x:p.x, y:p.y }))],
+  ];
+  fixSelect.innerHTML = `<option value="">-- 修正するピンを選択 --</option>` +
+    fixGroups.map(([label, items]) => `<optgroup label="${label}">` +
+      items.map(it => `<option value="${it.id}">${it.label}（現在地: x:${it.x}, y:${it.y}）</option>`).join("") +
+      `</optgroup>`
+    ).join("");
+
+  const fixCollected = {};
+  function refreshFixOutput(){
+    const lines = Object.entries(fixCollected).map(([k,v]) => `  ${k}: { x:${v.x}, y:${v.y} },`);
+    document.getElementById("mapEditFixOutput").value = lines.join("\n");
+  }
+
+  mapEditTapCallback = (clientX, clientY) => {
+    if(select.value){
+      const locKey = select.value;
+      const p = screenToPct(clientX, clientY);
+      document.getElementById("mapEditCoord").textContent = `${locKey} → x:${p.x}, y:${p.y}`;
+      collected[locKey] = p;
+      refreshOutput();
+    }else if(fixSelect.value){
+      const id = fixSelect.value;
+      const label = fixSelect.options[fixSelect.selectedIndex].textContent;
+      const p = screenToPct(clientX, clientY);
+      document.getElementById("mapEditFixCoord").textContent = `${label} → x:${p.x}, y:${p.y}`;
+      fixCollected[id] = p;
+      refreshFixOutput();
+    }
   };
 }
 
 renderPins();
+renderAreas();
 maybeStartPageTutorial(MAP_TUTORIAL_DONE_KEY, MAP_TUTORIAL_STEPS);
 document.addEventListener("langchange", renderPins);
 

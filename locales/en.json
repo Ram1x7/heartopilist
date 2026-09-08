@@ -1133,6 +1133,8 @@
   "map_cat_busstop": "Bus Stops",
   "map_cat_animal": "Animals",
   "map_cat_event": "Events",
+  "map_cat_area": "Areas",
+  "map_cat_bigarea": "Big Areas",
   "map_help_title": "How to use the Map",
   "map_help_move_title": "Move and zoom",
   "map_help_move_body": "Drag to move the map. Pinch, scroll, or use the +/- buttons at the bottom right to zoom.",
