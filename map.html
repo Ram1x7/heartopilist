@@ -159,6 +159,23 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   stroke-dasharray:0.6,0.6;
 }
 
+/* タップして選択中のエリア：赤枠＋斜線塗り */
+.map-area-shape.selected{
+  fill:url(#mapAreaHatch);
+  fill-opacity:0.65;
+  stroke:var(--vermillion);
+  stroke-width:0.5;
+}
+
+body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
+
+.map-area-hatch-line{
+  stroke:var(--vermillion);
+  stroke-width:0.5;
+}
+
+body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
+
 .map-area-label{
   font-size:2.6px;
   font-weight:700;
@@ -453,7 +470,14 @@ body.dark .footer{ color:var(--dark-text-sub); }
 <div class="map-viewport" id="mapViewport">
   <div class="map-stage" id="mapStage">
     <img id="mapImg" src="" alt="Heartopia map">
-    <svg id="mapAreasLayer" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+    <svg id="mapAreasLayer" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <pattern id="mapAreaHatch" width="1.4" height="1.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line class="map-area-hatch-line" x1="0" y1="0" x2="0" y2="1.4"></line>
+        </pattern>
+      </defs>
+      <g id="mapAreasGroup"></g>
+    </svg>
     <div id="mapPinsLayer"></div>
   </div>
   <div class="map-zoom-controls">
@@ -636,7 +660,7 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // エリア境界の描画。「エリア」カテゴリで小エリア（全33件、元サイトで個別確認済み）を表示。
 // 「大エリア」カテゴリで4件の広域まとめ（近似・粗い形状）を追加表示する。
 // nameがnullのもの（Central Square/Home Plots）は形は確定しているが正式名未確認のため「？」付きで表示。
-function drawAreaShape(svg, area, kind){
+function drawAreaShape(container, area, kind){
   area.polygons.forEach(ring => {
     const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
     const poly = document.createElementNS(SVG_NS, "polygon");
@@ -644,7 +668,7 @@ function drawAreaShape(svg, area, kind){
     poly.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
     poly._areaData = area;
     poly._areaKind = kind;
-    svg.appendChild(poly);
+    container.appendChild(poly);
   });
 
   const label = document.createElementNS(SVG_NS, "text");
@@ -656,18 +680,29 @@ function drawAreaShape(svg, area, kind){
     : `${area.key}？`;
   label._areaData = area;
   label._areaKind = kind;
-  svg.appendChild(label);
+  container.appendChild(label);
 }
 
 function renderAreas(){
-  const svg = document.getElementById("mapAreasLayer");
-  svg.innerHTML = "";
+  const group = document.getElementById("mapAreasGroup");
+  group.innerHTML = "";
   if(activeCats.has("area") && typeof mapAreasSmall !== "undefined"){
-    mapAreasSmall.forEach(a => drawAreaShape(svg, a, "small"));
+    mapAreasSmall.forEach(a => drawAreaShape(group, a, "small"));
   }
   if(activeCats.has("bigarea") && typeof mapAreasBig !== "undefined"){
-    mapAreasBig.forEach(a => drawAreaShape(svg, a, "big"));
+    mapAreasBig.forEach(a => drawAreaShape(group, a, "big"));
   }
+  applyAreaSelection();
+}
+
+// タップされたエリアの赤枠＋斜線ハイライト表示
+let selectedArea = null;
+function applyAreaSelection(){
+  document.querySelectorAll("#mapAreasGroup .map-area-shape.selected").forEach(el => el.classList.remove("selected"));
+  if(!selectedArea) return;
+  document.querySelectorAll("#mapAreasGroup .map-area-shape").forEach(el => {
+    if(el._areaData === selectedArea.area) el.classList.add("selected");
+  });
 }
 
 function showPinInfo(p){
@@ -679,6 +714,8 @@ function showPinInfo(p){
   document.getElementById("mapInfoCat").textContent = catLabelMap[p.cat] || "";
   document.getElementById("mapInfoAction").style.display = "none";
   document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = null;
+  applyAreaSelection();
 }
 
 function showAreaInfo(area, kind){
@@ -695,11 +732,15 @@ function showAreaInfo(area, kind){
     centerOn(px, py, 2.0);
   };
   document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = { area, kind };
+  applyAreaSelection();
 }
 
 document.getElementById("mapInfoClose").innerHTML = icon("close",{size:14});
 document.getElementById("mapInfoClose").onclick = () => {
   document.getElementById("mapInfoCard").classList.remove("show");
+  selectedArea = null;
+  applyAreaSelection();
 };
 
 // ── パン/ズーム ──
