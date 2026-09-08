@@ -430,6 +430,14 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <select id="mapEditLocationSelect"></select>
   <div class="map-edit-coord" id="mapEditCoord"></div>
   <textarea id="mapEditOutput" readonly></textarea>
+
+  <hr style="margin:14px 0; border:none; border-top:1px solid var(--border);">
+
+  <strong>既存ピンの位置修正</strong>
+  <p style="margin-top:6px;">位置がズレているNPC・バス停・ショップ・動物・地名・イベントを選んでから、正しい位置をマップでタップしてください。修正結果が下に追記されます。</p>
+  <select id="mapEditFixSelect"></select>
+  <div class="map-edit-coord" id="mapEditFixCoord"></div>
+  <textarea id="mapEditFixOutput" readonly></textarea>
 </div>
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
@@ -812,17 +820,53 @@ if(urlParams.get("edit") === "1"){
     document.getElementById("mapEditOutput").value = lines.join("\n");
   }
 
-  mapEditTapCallback = (clientX, clientY) => {
-    const locKey = select.value;
-    if(!locKey) return;
+  function screenToPct(clientX, clientY){
     const rect = viewport.getBoundingClientRect();
     const cx = clientX - rect.left, cy = clientY - rect.top;
     const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
-    const xPct = Math.round((worldX / naturalW) * 10000) / 100;
-    const yPct = Math.round((worldY / naturalH) * 10000) / 100;
-    document.getElementById("mapEditCoord").textContent = `${locKey} → x:${xPct}, y:${yPct}`;
-    collected[locKey] = { x:xPct, y:yPct };
-    refreshOutput();
+    return {
+      x: Math.round((worldX / naturalW) * 10000) / 100,
+      y: Math.round((worldY / naturalH) * 10000) / 100,
+    };
+  }
+
+  // ── 既存ピンの位置修正ツール ──
+  const fixSelect = document.getElementById("mapEditFixSelect");
+  const fixGroups = [
+    ["地名", (typeof mapLandmarks !== "undefined" ? mapLandmarks : []).map(p => ({ id:"landmark:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["NPC", (typeof mapNpcs !== "undefined" ? mapNpcs : []).map(p => ({ id:"npc:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["ショップ", (typeof mapShops !== "undefined" ? mapShops : []).map(p => ({ id:"shop:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["バス停", (typeof mapBusStops !== "undefined" ? mapBusStops : []).map((p,i) => ({ id:"busstop:"+i, label:"バス停 #"+(i+1), x:p.x, y:p.y }))],
+    ["動物", (typeof mapAnimals !== "undefined" ? mapAnimals : []).map(p => ({ id:"animal:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["イベント", (typeof mapEvents !== "undefined" ? mapEvents : []).map(p => ({ id:"event:"+p.key, label:p.name, x:p.x, y:p.y }))],
+  ];
+  fixSelect.innerHTML = `<option value="">-- 修正するピンを選択 --</option>` +
+    fixGroups.map(([label, items]) => `<optgroup label="${label}">` +
+      items.map(it => `<option value="${it.id}">${it.label}（現在地: x:${it.x}, y:${it.y}）</option>`).join("") +
+      `</optgroup>`
+    ).join("");
+
+  const fixCollected = {};
+  function refreshFixOutput(){
+    const lines = Object.entries(fixCollected).map(([k,v]) => `  ${k}: { x:${v.x}, y:${v.y} },`);
+    document.getElementById("mapEditFixOutput").value = lines.join("\n");
+  }
+
+  mapEditTapCallback = (clientX, clientY) => {
+    if(select.value){
+      const locKey = select.value;
+      const p = screenToPct(clientX, clientY);
+      document.getElementById("mapEditCoord").textContent = `${locKey} → x:${p.x}, y:${p.y}`;
+      collected[locKey] = p;
+      refreshOutput();
+    }else if(fixSelect.value){
+      const id = fixSelect.value;
+      const label = fixSelect.options[fixSelect.selectedIndex].textContent;
+      const p = screenToPct(clientX, clientY);
+      document.getElementById("mapEditFixCoord").textContent = `${label} → x:${p.x}, y:${p.y}`;
+      fixCollected[id] = p;
+      refreshFixOutput();
+    }
   };
 }
 
