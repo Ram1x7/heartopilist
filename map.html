@@ -159,6 +159,15 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
 
 body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
 
+/* 実際のゲームと同様、縮小表示している時だけ大エリアの範囲を見せる */
+.map-viewport.show-bigarea .map-area-shape.approx:not(.selected){
+  fill:#c1955a;
+  fill-opacity:0.16;
+  stroke:#a97c3f;
+  stroke-width:0.2;
+  stroke-dasharray:1.2,0.8;
+}
+
 .map-area-hatch-line{
   stroke:var(--vermillion);
   stroke-width:0.5;
@@ -738,9 +747,13 @@ let naturalW = 1200, naturalH = 1200;
 const MIN_SCALE = 0.4, MAX_SCALE = 5;
 const PAN_MARGIN = 120;
 const RUBBER_BAND = 0.35; // ドラッグ中に範囲外へ出た時の伸び具合（iOS風の抵抗）
+// 実際のゲームと同様、縮小表示している時だけ大エリア（概略）を見せる。
+// これ以上ズームインしたら非表示（タップは常に可能）に切り替える境界値。
+const BIGAREA_VISIBLE_MAX_SCALE = 1.0;
 
 function applyTransform(){
   stage.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  viewport.classList.toggle("show-bigarea", scale <= BIGAREA_VISIBLE_MAX_SCALE);
 }
 
 // 指定scaleでの許容パン範囲。ズーム後の着地点を先に計算する際にも使うため引数化している。
