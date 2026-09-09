@@ -208,11 +208,11 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
   cursor:pointer;
 }
 
+/* NPC・ショップ・イベント：白枠の丸バッジ */
 .map-pin-dot{
-  width:22px;
-  height:22px;
-  border-radius:50% 50% 50% 0;
-  transform:rotate(-45deg);
+  width:24px;
+  height:24px;
+  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -221,19 +221,32 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 }
 
 .map-pin-dot span{
-  transform:rotate(45deg);
-  font-size:11px;
+  font-size:12px;
   line-height:1;
 }
 
-.map-pin.cat-landmark .map-pin-dot{ background:var(--indigo); }
 .map-pin.cat-npc .map-pin-dot{ background:var(--gold); }
 .map-pin.cat-shop .map-pin-dot{ background:#4a8c5f; }
-.map-pin.cat-busstop .map-pin-dot{ background:#8a8a8a; }
-.map-pin.cat-animal .map-pin-dot{ background:#a97c50; }
 .map-pin.cat-event .map-pin-dot{ background:#c15a7a; }
 
+/* バス停・動物：バッジ無しでアイコンだけを大きめに表示 */
+.map-pin.cat-busstop .map-pin-dot,
+.map-pin.cat-animal .map-pin-dot{
+  width:auto;
+  height:auto;
+  background:none;
+  border:none;
+  box-shadow:none;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.55));
+}
+
+.map-pin.cat-busstop .map-pin-dot span,
+.map-pin.cat-animal .map-pin-dot span{
+  font-size:20px;
+}
+
 .map-pin.highlight .map-pin-dot{
+  background:var(--indigo);
   box-shadow:0 0 0 5px rgba(193,90,122,0.35), 0 2px 6px rgba(0,0,0,0.35);
   animation:mapPinBounce 1s ease-in-out infinite;
 }
@@ -241,6 +254,22 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 @keyframes mapPinBounce{
   0%,100%{ transform:translate(-50%,-100%) scale(1); }
   50%{ transform:translate(-50%,-110%) scale(1.08); }
+}
+
+/* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示） */
+.map-pin.cat-landmark{
+  cursor:pointer;
+  padding:3px 4px;
+}
+
+.map-pin.cat-landmark .map-pin-label{
+  margin-top:0;
+  background:none;
+  padding:0;
+  font-size:11px;
+  font-weight:700;
+  color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,0.7), 0 0 5px rgba(0,0,0,0.45);
 }
 
 .map-pin-label{
@@ -615,13 +644,32 @@ function toggleMapCat(cat){
 }
 
 // ── ピン一覧の組み立て ──
+// ショップ・動物は種類ごとに見た目で区別できるよう、個別の絵文字を割り当てる
+const SHOP_ICONS = {
+  "clothes-store": "👕",
+  "furniture-store": "🛋️",
+  "pets-store": "🐾",
+  "books-store": "📚",
+};
+const ANIMAL_ICONS = {
+  "panda": "🐼",
+  "capybara": "🦫",
+  "bunny": "🐰",
+  "fox": "🦊",
+  "sea-otter": "🦦",
+  "ferret": "🦡",
+  "silka-deer": "🦌",
+  "llama": "🦙",
+  "penguin": "🐧",
+};
+
 function buildAllPins(){
   const list = [];
-  mapLandmarks.forEach(p => list.push({ cat:"landmark", icon:"📍", name:displayName(p), x:p.x, y:p.y }));
+  mapLandmarks.forEach(p => list.push({ cat:"landmark", name:displayName(p), x:p.x, y:p.y }));
   mapNpcs.forEach(p => list.push({ cat:"npc", icon:"🧑", name:p.name, x:p.x, y:p.y }));
-  mapShops.forEach(p => list.push({ cat:"shop", icon:"🛍️", name:p.name, x:p.x, y:p.y }));
+  mapShops.forEach(p => list.push({ cat:"shop", icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
   mapBusStops.forEach(p => list.push({ cat:"busstop", icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
-  mapAnimals.forEach(p => list.push({ cat:"animal", icon:"🐾", name:p.name, x:p.x, y:p.y }));
+  mapAnimals.forEach(p => list.push({ cat:"animal", icon:ANIMAL_ICONS[p.key] || "🐾", name:p.name, x:p.x, y:p.y }));
   mapEvents.forEach(p => list.push({ cat:"event", icon:"⭐", name:p.name, x:p.x, y:p.y }));
   return list;
 }
@@ -648,7 +696,11 @@ function renderPins(){
     el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "");
     el.style.left = p.x + "%";
     el.style.top = p.y + "%";
-    el.innerHTML = `<div class="map-pin-dot"><span>${p.icon}</span></div><div class="map-pin-label">${p.name}</div>`;
+    // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外はアイコンのみで
+    // 常時ラベルは出さず、タップ時のカードで名前を確認する形にしている。
+    el.innerHTML = (p.cat === "landmark" && !p.highlight)
+      ? `<div class="map-pin-label">${p.name}</div>`
+      : `<div class="map-pin-dot"><span>${p.icon}</span></div>`;
     el._pinData = p;
     el.onclick = (e) => { e.stopPropagation(); showPinInfo(p); };
     layer.appendChild(el);
