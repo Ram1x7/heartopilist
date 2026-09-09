@@ -1139,14 +1139,14 @@
   "map_help_move_title": "Move and zoom",
   "map_help_move_body": "Drag to move the map. Pinch, scroll, or use the +/- buttons at the bottom right to zoom.",
   "map_help_cat_title": "Filter by category",
-  "map_help_cat_body": "Toggle Landmarks, NPCs, Shops, Bus Stops, Animals, and Events on or off.",
+  "map_help_cat_body": "Toggle NPCs, Shops, Bus Stops, Animals, and Events on or off.",
   "map_help_pin_title": "Tap a pin",
   "map_help_pin_body": "Tap a pin or area to show its name below the map.",
   "map_help_close": "Close",
   "tutorial_map_step1_title": "① Move and zoom",
   "tutorial_map_step1_body": "Drag to move the map. Pinch, scroll, or use the +/- buttons at the bottom right to zoom.",
   "tutorial_map_step2_title": "② Filter by category",
-  "tutorial_map_step2_body": "Toggle Landmarks, NPCs, Shops, Bus Stops, Animals, and Events on or off.",
+  "tutorial_map_step2_body": "Toggle NPCs, Shops, Bus Stops, Animals, and Events on or off.",
   "modal_view_on_map": "View on map",
   "map_view_location": "Zoom to this area"
 }

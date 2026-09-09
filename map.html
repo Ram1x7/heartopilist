@@ -233,39 +233,6 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
   50%{ transform:translate(-50%,-110%) scale(1.08); }
 }
 
-/* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示） */
-.map-pin.cat-landmark{
-  cursor:pointer;
-  padding:3px 4px;
-}
-
-.map-pin.cat-landmark .map-pin-label{
-  margin-top:0;
-  background:none;
-  padding:0;
-  font-size:11px;
-  font-weight:700;
-  color:#fff;
-  text-shadow:0 1px 2px rgba(0,0,0,0.7), 0 0 5px rgba(0,0,0,0.45);
-}
-
-.map-pin-label{
-  margin-top:2px;
-  font-size:9.5px;
-  font-weight:700;
-  color:var(--text);
-  background:rgba(255,255,255,0.88);
-  padding:1px 5px;
-  border-radius:6px;
-  white-space:nowrap;
-  pointer-events:none;
-}
-
-body.dark .map-pin-label{
-  color:var(--dark-text);
-  background:rgba(30,26,22,0.82);
-}
-
 /* ズームボタン */
 .map-zoom-controls{
   position:absolute;
@@ -463,7 +430,6 @@ body.dark .footer{ color:var(--dark-text-sub); }
 </div>
 
 <div class="map-cat-tabs">
-  <button class="ds-tab active" id="mapcat-landmark" onclick="toggleMapCat('landmark')" data-i18n="map_cat_landmark">地名</button>
   <button class="ds-tab active" id="mapcat-npc" onclick="toggleMapCat('npc')" data-i18n="map_cat_npc">NPC</button>
   <button class="ds-tab active" id="mapcat-shop" onclick="toggleMapCat('shop')" data-i18n="map_cat_shop">ショップ</button>
   <button class="ds-tab" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
@@ -511,7 +477,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <hr style="margin:14px 0; border:none; border-top:1px solid var(--border);">
 
   <strong>既存ピンの位置修正</strong>
-  <p style="margin-top:6px;">位置がズレているNPC・バス停・ショップ・動物・地名・イベントを選んでから、正しい位置をマップでタップしてください。修正結果が下に追記されます。</p>
+  <p style="margin-top:6px;">位置がズレているNPC・バス停・ショップ・動物・イベントを選んでから、正しい位置をマップでタップしてください。修正結果が下に追記されます。</p>
   <select id="mapEditFixSelect"></select>
   <div class="map-edit-coord" id="mapEditFixCoord"></div>
   <textarea id="mapEditFixOutput" readonly></textarea>
@@ -525,7 +491,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
     <span data-i18n="map_help_move_body">ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_cat_title">カテゴリで絞り込み</strong><br>
-    <span data-i18n="map_help_cat_body">地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。</span></p>
+    <span data-i18n="map_help_cat_body">NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_pin_title">ピンをタップ</strong><br>
     <span data-i18n="map_help_pin_body">ピンやエリアをタップすると、その名前が下に表示されます。</span></p>
@@ -586,32 +552,22 @@ function forceRepaint(){
 const MAP_TUTORIAL_DONE_KEY = "hatopiMap_tutorialDone";
 const MAP_TUTORIAL_STEPS = [
   { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。" },
-  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。" },
+  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。" },
 ];
 document.getElementById("helpBtn").innerHTML = icon("help");
 function openHelpModal(){ document.getElementById("helpModal").style.display = "block"; }
 function closeHelpModal(){ document.getElementById("helpModal").style.display = "none"; }
 
 // 多言語ヘルパー
-function currentLang(){
-  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
-    ? window.i18n.getCurrentLang()
-    : "ja";
-}
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
     return window.i18n.t(key, vars, fallback);
   }
   return fallback;
 }
-function displayName(obj){
-  if(!obj.nameI18n) return obj.name;
-  const lang = currentLang();
-  return obj.nameI18n[lang] || obj.name;
-}
 
 // ── カテゴリ表示状態 ──
-let activeCats = new Set(["landmark","npc","shop","event"]);
+let activeCats = new Set(["npc","shop","event"]);
 
 function toggleMapCat(cat){
   if(activeCats.has(cat)) activeCats.delete(cat); else activeCats.add(cat);
@@ -642,7 +598,6 @@ const ANIMAL_ICONS = {
 
 function buildAllPins(){
   const list = [];
-  mapLandmarks.forEach(p => list.push({ cat:"landmark", name:displayName(p), x:p.x, y:p.y }));
   mapNpcs.forEach(p => list.push({ cat:"npc", icon:"🧑", name:p.name, x:p.x, y:p.y }));
   mapShops.forEach(p => list.push({ cat:"shop", icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
   mapBusStops.forEach(p => list.push({ cat:"busstop", icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
@@ -673,11 +628,8 @@ function renderPins(){
     el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "");
     el.style.left = p.x + "%";
     el.style.top = p.y + "%";
-    // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外はアイコンのみで
     // 常時ラベルは出さず、タップ時のカードで名前を確認する形にしている。
-    el.innerHTML = (p.cat === "landmark" && !p.highlight)
-      ? `<div class="map-pin-label">${p.name}</div>`
-      : `<div class="map-pin-dot"><span>${p.icon}</span></div>`;
+    el.innerHTML = `<div class="map-pin-dot"><span>${p.icon}</span></div>`;
     el._pinData = p;
     el.onclick = (e) => { e.stopPropagation(); showPinInfo(p); };
     layer.appendChild(el);
@@ -1111,7 +1063,6 @@ if(urlParams.get("edit") === "1"){
   // ── 既存ピンの位置修正ツール ──
   const fixSelect = document.getElementById("mapEditFixSelect");
   const fixGroups = [
-    ["地名", (typeof mapLandmarks !== "undefined" ? mapLandmarks : []).map(p => ({ id:"landmark:"+p.key, label:p.name, x:p.x, y:p.y }))],
     ["NPC", (typeof mapNpcs !== "undefined" ? mapNpcs : []).map(p => ({ id:"npc:"+p.key, label:p.name, x:p.x, y:p.y }))],
     ["ショップ", (typeof mapShops !== "undefined" ? mapShops : []).map(p => ({ id:"shop:"+p.key, label:p.name, x:p.x, y:p.y }))],
     ["バス停", (typeof mapBusStops !== "undefined" ? mapBusStops : []).map((p,i) => ({ id:"busstop:"+i, label:"バス停 #"+(i+1), x:p.x, y:p.y }))],
