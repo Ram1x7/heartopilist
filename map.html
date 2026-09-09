@@ -135,28 +135,13 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   overflow:visible;
 }
 
+/* エリアは常時タップ可能だが、選択されるまで見た目には出さない（形だけの透明なタップ領域） */
 .map-area-shape{
-  fill:#6f8fb3;
-  fill-opacity:0.28;
-  stroke:#3c5a6e;
-  stroke-width:0.15;
+  fill:transparent;
+  stroke:none;
   vector-effect:non-scaling-stroke;
   pointer-events:auto;
   cursor:pointer;
-}
-
-/* 大エリア（4件）：小エリアの単純集約による近似形状。粗い輪郭であることを点線で示す */
-.map-area-shape.approx{
-  fill:#c1955a;
-  fill-opacity:0.16;
-  stroke:#a97c3f;
-  stroke-width:0.2;
-  stroke-dasharray:1.2,0.8;
-}
-
-/* 正式な日本語名が未確認のエリア（Central Square/Home Plots） */
-.map-area-shape.unnamed{
-  stroke-dasharray:0.6,0.6;
 }
 
 /* タップして選択中のエリア：赤枠＋斜線塗り */
@@ -165,6 +150,11 @@ body.dark .map-viewport{ border-color:var(--dark-border); }
   fill-opacity:0.65;
   stroke:var(--vermillion);
   stroke-width:0.5;
+}
+
+/* 大エリア（4件）：小エリアの単純集約による近似形状のため、選択時は点線で区別する */
+.map-area-shape.selected.approx{
+  stroke-dasharray:1.2,0.8;
 }
 
 body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
@@ -435,8 +425,6 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <button class="ds-tab" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
   <button class="ds-tab" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
   <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
-  <button class="ds-tab" id="mapcat-area" onclick="toggleMapCat('area')" data-i18n="map_cat_area">エリア</button>
-  <button class="ds-tab" id="mapcat-bigarea" onclick="toggleMapCat('bigarea')" data-i18n="map_cat_bigarea">大エリア</button>
 </div>
 
 <div class="map-viewport" id="mapViewport">
@@ -573,7 +561,6 @@ function toggleMapCat(cat){
   if(activeCats.has(cat)) activeCats.delete(cat); else activeCats.add(cat);
   document.getElementById("mapcat-"+cat).classList.toggle("active", activeCats.has(cat));
   renderPins();
-  renderAreas();
 }
 
 // ── ピン一覧の組み立て ──
@@ -638,10 +625,10 @@ function renderPins(){
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
-// エリア境界の描画。「エリア」カテゴリで小エリア（全33件、元サイトで個別確認済み）を表示。
-// 「大エリア」カテゴリで4件の広域まとめ（近似・粗い形状）を追加表示する。
-// エリア名は対応する地名ピン（同じ座標に配置済み）が常時表示しているため、
-// ここでは形（ポリゴン）のみを描画し、文字ラベルの二重表示はしない。
+// エリア境界の描画。小エリア（全33件、元サイトで個別確認済み）と大エリア（4件、近似・
+// 粗い形状）の形（ポリゴン）のみを描画する。タブでの表示切り替えは無く常に存在し、
+// 選択（タップ）されるまでは透明でタップ領域としてのみ機能する。名前は文字ラベルとしては
+// 出さず、タップ時の情報カードで確認する形にしている。
 function drawAreaShape(container, area, kind){
   area.polygons.forEach(ring => {
     const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
@@ -671,15 +658,18 @@ function polygonArea(polygons){
   return total;
 }
 
+// エリアはタブ切り替え無しで常に（見た目は非表示のまま）タップできるようにしている。
+// 大エリア（概略）を先に描画し、小エリア（確定済み・より精度が高い）を後に描画することで、
+// 重なっている場所をタップした時は常に小エリア側が優先されるようにする。
 function renderAreas(){
   const group = document.getElementById("mapAreasGroup");
   group.innerHTML = "";
-  if(activeCats.has("area") && typeof mapAreasSmall !== "undefined"){
+  if(typeof mapAreasBig !== "undefined"){
+    mapAreasBig.forEach(a => drawAreaShape(group, a, "big"));
+  }
+  if(typeof mapAreasSmall !== "undefined"){
     const sorted = [...mapAreasSmall].sort((a,b) => polygonArea(b.polygons) - polygonArea(a.polygons));
     sorted.forEach(a => drawAreaShape(group, a, "small"));
-  }
-  if(activeCats.has("bigarea") && typeof mapAreasBig !== "undefined"){
-    mapAreasBig.forEach(a => drawAreaShape(group, a, "big"));
   }
   applyAreaSelection();
 }
