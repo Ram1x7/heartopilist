@@ -176,29 +176,6 @@ body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
 
 body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 
-.map-area-label{
-  font-size:1.9px;
-  font-weight:700;
-  fill:#2c2620;
-  text-anchor:middle;
-  paint-order:stroke;
-  stroke:#fff;
-  stroke-width:0.45px;
-  pointer-events:auto;
-  cursor:pointer;
-}
-
-.map-area-label.approx{
-  fill:#7a5c2e;
-  font-style:italic;
-}
-
-.map-area-label.unnamed{
-  fill:#666;
-  font-style:italic;
-  font-size:1.6px;
-}
-
 .map-pin{
   position:absolute;
   transform:translate(-50%,-100%);
@@ -711,7 +688,8 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 
 // エリア境界の描画。「エリア」カテゴリで小エリア（全33件、元サイトで個別確認済み）を表示。
 // 「大エリア」カテゴリで4件の広域まとめ（近似・粗い形状）を追加表示する。
-// nameがnullのもの（Central Square/Home Plots）は形は確定しているが正式名未確認のため「？」付きで表示。
+// エリア名は対応する地名ピン（同じ座標に配置済み）が常時表示しているため、
+// ここでは形（ポリゴン）のみを描画し、文字ラベルの二重表示はしない。
 function drawAreaShape(container, area, kind){
   area.polygons.forEach(ring => {
     const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
@@ -722,17 +700,6 @@ function drawAreaShape(container, area, kind){
     poly._areaKind = kind;
     container.appendChild(poly);
   });
-
-  const label = document.createElementNS(SVG_NS, "text");
-  label.setAttribute("x", area.centroid.x);
-  label.setAttribute("y", area.centroid.y);
-  label.setAttribute("class", "map-area-label" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
-  label.textContent = area.name
-    ? (kind === "big" ? `${area.name}（概略）` : area.name)
-    : `${area.key}？`;
-  label._areaData = area;
-  label._areaKind = kind;
-  container.appendChild(label);
 }
 
 // ポリゴンの面積（シューレース公式、複数リングは合算）。
@@ -1084,7 +1051,7 @@ function endPointer(e){
     // ネイティブのclickイベントが発火しないため、ここで手動判定する
     if(tapCandidate && !gestureMoved){
       const pinEl = tapCandidate.target.closest(".map-pin");
-      const areaEl = tapCandidate.target.closest(".map-area-shape, .map-area-label");
+      const areaEl = tapCandidate.target.closest(".map-area-shape");
       if(pinEl && pinEl._pinData){
         showPinInfo(pinEl._pinData);
       }else if(mapEditTapCallback){
