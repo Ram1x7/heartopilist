@@ -1139,14 +1139,14 @@
   "map_help_move_title": "移動・拡大縮小",
   "map_help_move_body": "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。",
   "map_help_cat_title": "カテゴリで絞り込み",
-  "map_help_cat_body": "地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。",
+  "map_help_cat_body": "NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。",
   "map_help_pin_title": "ピンをタップ",
   "map_help_pin_body": "ピンやエリアをタップすると、その名前が下に表示されます。",
   "map_help_close": "閉じる",
   "tutorial_map_step1_title": "① 移動・拡大縮小",
   "tutorial_map_step1_body": "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。",
   "tutorial_map_step2_title": "② カテゴリで絞り込み",
-  "tutorial_map_step2_body": "地名・NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。",
+  "tutorial_map_step2_body": "NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。",
   "modal_view_on_map": "地図で見る",
   "map_view_location": "ここを拡大表示"
 }
