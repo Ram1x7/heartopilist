@@ -745,9 +745,14 @@ function showAreaInfo(area, kind){
   actionBtn.style.display = "";
   actionBtn.innerHTML = `${icon("search",{size:13})}<span>${T("map_view_location","ここを拡大表示")}</span>`;
   actionBtn.onclick = () => {
+    const targetScale = 2.0;
+    const vw = viewport.clientWidth, vh = viewport.clientHeight;
     const px = area.centroid.x / 100 * naturalW;
     const py = area.centroid.y / 100 * naturalH;
-    centerOn(px, py, 2.0);
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+    const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - px * targetScale));
+    const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - py * targetScale));
+    animateTo(targetTx, targetTy, targetScale, 320);
   };
   document.getElementById("mapInfoCard").classList.add("show");
   selectedArea = { area, kind };
@@ -770,22 +775,36 @@ mapImg.src = mapImage;
 let scale = 1, tx = 0, ty = 0;
 let naturalW = 1200, naturalH = 1200;
 const MIN_SCALE = 0.4, MAX_SCALE = 5;
+const PAN_MARGIN = 120;
+const RUBBER_BAND = 0.35; // ドラッグ中に範囲外へ出た時の伸び具合（iOS風の抵抗）
 
 function applyTransform(){
   stage.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
 }
 
+// 指定scaleでの許容パン範囲。ズーム後の着地点を先に計算する際にも使うため引数化している。
+function panBoundsAt(s){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const contentW = naturalW * s, contentH = naturalH * s;
+  const minTx = Math.min(vw - contentW - PAN_MARGIN, 0);
+  const maxTx = PAN_MARGIN;
+  const minTy = Math.min(vh - contentH - PAN_MARGIN, 0);
+  const maxTy = PAN_MARGIN;
+  return { minTx, maxTx, minTy, maxTy };
+}
+
 function clampPan(){
   // ある程度自由に動かせるが、画像が完全に画面外に消えないよう緩く制限
-  const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  const contentW = naturalW * scale, contentH = naturalH * scale;
-  const margin = 120;
-  const minTx = Math.min(vw - contentW - margin, 0);
-  const maxTx = margin;
-  const minTy = Math.min(vh - contentH - margin, 0);
-  const maxTy = margin;
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
   tx = Math.min(maxTx, Math.max(minTx, tx));
   ty = Math.min(maxTy, Math.max(minTy, ty));
+}
+
+// ドラッグ中に範囲外に出た場合、ゴムのように伸びる抵抗をかける（急な跳ね返りを防ぐ）
+function rubberBand(value, min, max){
+  if(value < min) return min - (min - value) * RUBBER_BAND;
+  if(value > max) return max + (value - max) * RUBBER_BAND;
+  return value;
 }
 
 function fitToViewport(){
@@ -820,15 +839,85 @@ mapImg.onload = () => {
   renderAreas();
 };
 
+// ── アニメーション（ズームボタン・エリアの「ここを拡大表示」・ラバーバンドの戻り） ──
+let animRAF = null;
+function stopAnim(){
+  if(animRAF){ cancelAnimationFrame(animRAF); animRAF = null; }
+}
+function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+function animateTo(targetTx, targetTy, targetScale, duration){
+  stopAnim();
+  stopMomentum();
+  const startTx = tx, startTy = ty, startScale = scale;
+  const startTime = performance.now();
+  function step(now){
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = easeOutCubic(t);
+    tx = startTx + (targetTx - startTx) * eased;
+    ty = startTy + (targetTy - startTy) * eased;
+    scale = startScale + (targetScale - startScale) * eased;
+    applyTransform();
+    animRAF = t < 1 ? requestAnimationFrame(step) : null;
+  }
+  animRAF = requestAnimationFrame(step);
+}
+
+// ── 慣性スクロール（指を離した後も勢いで動き、徐々に減速する） ──
+let momentumRAF = null;
+let velTrack = []; // 直近の { x, y, t } 履歴（速度計算用）
+function stopMomentum(){
+  if(momentumRAF){ cancelAnimationFrame(momentumRAF); momentumRAF = null; }
+}
+function trackVelocity(x, y){
+  const t = performance.now();
+  velTrack.push({ x, y, t });
+  while(velTrack.length > 6) velTrack.shift();
+  velTrack = velTrack.filter(p => t - p.t < 120); // 古すぎるサンプルは捨てる
+}
+function getVelocity(){
+  if(velTrack.length < 2) return { vx:0, vy:0 };
+  const first = velTrack[0], last = velTrack[velTrack.length - 1];
+  const dt = last.t - first.t;
+  if(dt <= 0) return { vx:0, vy:0 };
+  return { vx:(last.x - first.x) / dt, vy:(last.y - first.y) / dt }; // px/ms
+}
+function startMomentum(vx, vy){
+  stopMomentum();
+  if(Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02) return;
+  let lastT = performance.now();
+  function step(now){
+    const dt = Math.min(now - lastT, 48);
+    lastT = now;
+    tx += vx * dt;
+    ty += vy * dt;
+    const decay = Math.pow(0.0025, dt / 1000);
+    vx *= decay;
+    vy *= decay;
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+    if(tx < minTx || tx > maxTx) vx = 0;
+    if(ty < minTy || ty > maxTy) vy = 0;
+    clampPan();
+    applyTransform();
+    if(Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02){
+      momentumRAF = null;
+      return;
+    }
+    momentumRAF = requestAnimationFrame(step);
+  }
+  momentumRAF = requestAnimationFrame(step);
+}
+
 function mapZoomStep(factor){
+  stopAnim();
+  stopMomentum();
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
   const cx = vw / 2, cy = vh / 2;
   const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
-  scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
-  tx = cx - worldX * scale;
-  ty = cy - worldY * scale;
-  clampPan();
-  applyTransform();
+  const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, cx - worldX * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, cy - worldY * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 220);
 }
 
 // ポインターイベントで統一的にドラッグ・ピンチズームを処理
@@ -852,6 +941,8 @@ viewport.addEventListener("pointerdown", (e) => {
   // ズームボタンはネイティブのボタン挙動に任せる（pan/captureの対象外）
   if(e.target.closest(".map-zoom-btn")) return;
 
+  stopAnim();
+  stopMomentum();
   viewport.setPointerCapture(e.pointerId);
   activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
   if(activePointers.size === 1){
@@ -859,6 +950,7 @@ viewport.addEventListener("pointerdown", (e) => {
     viewport.classList.add("dragging");
     tapCandidate = { target:e.target, x:e.clientX, y:e.clientY };
     gestureMoved = false;
+    velTrack = [{ x:e.clientX, y:e.clientY, t:performance.now() }];
   }else if(activePointers.size === 2){
     const pts = [...activePointers.values()];
     pinchStartDist = distanceBetween(pts[0], pts[1]);
@@ -885,12 +977,19 @@ viewport.addEventListener("pointermove", (e) => {
       scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (dist / pinchStartDist)));
       tx = midX - worldX * scale;
       ty = midY - worldY * scale;
+      const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+      tx = rubberBand(tx, minTx, maxTx);
+      ty = rubberBand(ty, minTy, maxTy);
       applyTransform();
     }
   }else if(activePointers.size === 1 && dragStart){
-    tx = dragStart.tx + (e.clientX - dragStart.x);
-    ty = dragStart.ty + (e.clientY - dragStart.y);
+    const rawTx = dragStart.tx + (e.clientX - dragStart.x);
+    const rawTy = dragStart.ty + (e.clientY - dragStart.y);
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+    tx = rubberBand(rawTx, minTx, maxTx);
+    ty = rubberBand(rawTy, minTy, maxTy);
     applyTransform();
+    trackVelocity(e.clientX, e.clientY);
   }
 });
 
@@ -901,10 +1000,34 @@ function endPointer(e){
   activePointers.delete(e.pointerId);
   viewport.classList.remove("dragging");
   if(activePointers.size < 2) pinchStartDist = null;
+
+  if(activePointers.size === 1){
+    // ピンチ中に片方の指を離して1本指ドラッグに戻る場合、基準位置を
+    // 今の位置で取り直さないと直前のピンチ分だけ位置がジャンプしてしまう
+    const remaining = [...activePointers.values()][0];
+    dragStart = { x:remaining.x, y:remaining.y, tx, ty };
+    tapCandidate = null;
+    velTrack = [{ x:remaining.x, y:remaining.y, t:performance.now() }];
+  }
+
   if(activePointers.size === 0){
+    const wasDragging = !!dragStart;
     dragStart = null;
-    clampPan();
-    applyTransform();
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+    const outOfBounds = tx < minTx - 0.5 || tx > maxTx + 0.5 || ty < minTy - 0.5 || ty > maxTy + 0.5;
+    if(outOfBounds){
+      // ラバーバンドで伸びた分を滑らかに戻す
+      animateTo(
+        Math.min(maxTx, Math.max(minTx, tx)),
+        Math.min(maxTy, Math.max(minTy, ty)),
+        scale,
+        260
+      );
+    }else if(wasDragging){
+      const { vx, vy } = getVelocity();
+      startMomentum(vx, vy);
+    }
+    velTrack = [];
     // ドラッグせずにタップした場合は、pointer capture のせいで
     // ネイティブのclickイベントが発火しないため、ここで手動判定する
     if(tapCandidate && !gestureMoved){
@@ -927,6 +1050,8 @@ viewport.addEventListener("pointerleave", (e) => { if(activePointers.has(e.point
 
 viewport.addEventListener("wheel", (e) => {
   e.preventDefault();
+  stopAnim();
+  stopMomentum();
   const rect = viewport.getBoundingClientRect();
   const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
   const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
@@ -938,7 +1063,7 @@ viewport.addEventListener("wheel", (e) => {
   applyTransform();
 }, { passive:false });
 
-window.addEventListener("resize", () => { clampPan(); applyTransform(); });
+window.addEventListener("resize", () => { stopAnim(); stopMomentum(); clampPan(); applyTransform(); });
 
 // ── 座標登録ツール（?edit=1） ──
 if(urlParams.get("edit") === "1"){
