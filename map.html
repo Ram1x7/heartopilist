@@ -177,13 +177,13 @@ body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
 body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 
 .map-area-label{
-  font-size:2.6px;
+  font-size:1.9px;
   font-weight:700;
   fill:#2c2620;
   text-anchor:middle;
   paint-order:stroke;
   stroke:#fff;
-  stroke-width:0.6px;
+  stroke-width:0.45px;
   pointer-events:auto;
   cursor:pointer;
 }
@@ -196,7 +196,7 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 .map-area-label.unnamed{
   fill:#666;
   font-style:italic;
-  font-size:2.2px;
+  font-size:1.6px;
 }
 
 .map-pin{
@@ -683,11 +683,29 @@ function drawAreaShape(container, area, kind){
   container.appendChild(label);
 }
 
+// ポリゴンの面積（シューレース公式、複数リングは合算）。
+// 郊外のように他の小エリア（郊外の湖・中心街エリア群）を内包するケースがあるため、
+// 面積の大きい順に描画して、内包された小さいエリアが常にタップ判定の手前に来るようにする。
+function polygonArea(polygons){
+  let total = 0;
+  polygons.forEach(ring => {
+    let a = 0;
+    for(let i=0;i<ring.length;i++){
+      const [x1,y1] = ring[i];
+      const [x2,y2] = ring[(i+1) % ring.length];
+      a += x1*y2 - x2*y1;
+    }
+    total += Math.abs(a) / 2;
+  });
+  return total;
+}
+
 function renderAreas(){
   const group = document.getElementById("mapAreasGroup");
   group.innerHTML = "";
   if(activeCats.has("area") && typeof mapAreasSmall !== "undefined"){
-    mapAreasSmall.forEach(a => drawAreaShape(group, a, "small"));
+    const sorted = [...mapAreasSmall].sort((a,b) => polygonArea(b.polygons) - polygonArea(a.polygons));
+    sorted.forEach(a => drawAreaShape(group, a, "small"));
   }
   if(activeCats.has("bigarea") && typeof mapAreasBig !== "undefined"){
     mapAreasBig.forEach(a => drawAreaShape(group, a, "big"));
