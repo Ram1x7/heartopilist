@@ -996,10 +996,13 @@ function applyAreaSelection(){
 // （どの川・湖・海でも出現するという意味）。該当する地名すべてに紐づける。
 // 汎用location（川/湖/海）を紐づける対象は、ユーザー確認済みの以下の地名(mapLandmarksのkey)のみ。
 // 例えば「火山湖」は名前に「湖」を含むが対象外（生き物の出現ロジック上、他の湖とは別扱いのため）。
-const GENERIC_WATER_LANDMARK_KEYS = {
+const GENERIC_LOCATION_LANDMARK_KEYS = {
   "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
   "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
   "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  // 中心街＝大広場・住宅街・花園街・アート街をまとめたエリアのため、
+  // location「中心街」の生き物はこの4エリアすべてに出現する扱いにする
+  "中心街": ["Central Square", "Residential Street", "Garden Street", "Art Street"],
 };
 
 // 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
@@ -1024,7 +1027,7 @@ function buildLocationsByAreaKey(){
     Object.entries(mapLocationLinks).forEach(([locName, pt]) => {
       if(pt && Math.abs(pt.x - lm.x) < 0.01 && Math.abs(pt.y - lm.y) < 0.01) set.add(locName);
     });
-    Object.entries(GENERIC_WATER_LANDMARK_KEYS).forEach(([genericLoc, keys]) => {
+    Object.entries(GENERIC_LOCATION_LANDMARK_KEYS).forEach(([genericLoc, keys]) => {
       if(keys.includes(lm.key)) set.add(genericLoc);
     });
   });
