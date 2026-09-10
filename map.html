@@ -432,6 +432,39 @@ body.dark .map-info-card-close{ background:var(--dark-card-alt); color:var(--dar
 
 body.dark .area-detail-section-title{ color:var(--dark-text-sub); }
 
+/* 現在のリアルタイム図鑑の判定基準（天気・時間帯）の表示 */
+.area-detail-now-context{
+  font-size:11.5px;
+  color:var(--text-sub);
+  background:var(--card-sub);
+  border-radius:10px;
+  padding:6px 10px;
+  margin-bottom:14px;
+  display:inline-block;
+}
+
+body.dark .area-detail-now-context{ background:var(--dark-card-alt); color:var(--dark-text-sub); }
+
+/* 「今出現中」「今は出現していない」の見出し */
+.area-detail-availability-title{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:12.5px;
+  font-weight:700;
+  margin:14px 0 8px;
+}
+
+.area-detail-availability-title:first-of-type{ margin-top:0; }
+
+.area-detail-availability-title.is-now{ color:#4a8c5f; }
+.area-detail-availability-title.is-not-now{ color:var(--text-sub); }
+
+body.dark .area-detail-availability-title.is-not-now{ color:var(--dark-text-sub); }
+
+/* 今出現していないものは控えめな見た目にする */
+.area-detail-notnow{ opacity:0.55; }
+
 .area-detail-empty{
   background:var(--card-sub);
   border-radius:14px;
@@ -631,6 +664,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
     <h3 class="area-detail-name" id="areaDetailName"></h3>
     <button class="modal-close-btn area-detail-zoom-btn" id="areaDetailZoomBtn"></button>
     <div class="area-detail-section-title" data-i18n="map_detail_found_here">ここで見つかる生き物</div>
+    <div class="area-detail-now-context" id="areaDetailNowContext"></div>
     <div id="areaDetailList"></div>
     <div style="text-align:center; margin-top:20px;">
       <button class="modal-close-btn" onclick="closeAreaDetailModal()" data-i18n="map_help_close">閉じる</button>
@@ -688,6 +722,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
 <script src="js/data-fish.js"></script>
 <script src="js/data-bugs.js"></script>
 <script src="js/data-birds.js"></script>
+<script src="js/data-weather.js"></script>
 <script>
 
 // ダークモード
@@ -1008,6 +1043,63 @@ function getCreaturesForArea(area){
   return groups;
 }
 
+// ── リアルタイム図鑑（js/main.jsの天気・出現判定ロジックと同じもの。
+//    DOM依存の無い部分だけをこのページ用に抜き出している）──
+const ALL_WEATHER = ["晴れ","雨","虹"];
+const ALL_TIME = ["6-12","12-18","18-0","0-6"];
+const ZONE_LABELS = { "6-12":"6:00〜12:00", "12-18":"12:00〜18:00", "18-0":"18:00〜24:00", "0-6":"0:00〜6:00" };
+
+// 天気判定・出現判定は常にJST(UTC+9)基準（js/main.jsのgetJstDateと同じ）
+function getJstDate(){
+  return new Date(Date.now() + 9 * 3600 * 1000);
+}
+function getZone(){
+  const h = getJstDate().getUTCHours();
+  if(h>=6&&h<12) return "6-12";
+  if(h>=12&&h<18) return "12-18";
+  if(h>=18&&h<24) return "18-0";
+  return "0-6";
+}
+function getDateKey(offset=0){
+  const d = getJstDate();
+  d.setUTCDate(d.getUTCDate() + offset);
+  return d.toISOString().slice(0,10);
+}
+
+// 天気の手動入力（js/main.jsと同じlocalStorageキーを参照し、公式データ未入力時のみ使う）
+const MANUAL_WEATHER_KEY = "manualWeatherOverrides";
+function getManualWeatherOverride(dateKey, zone){
+  try{
+    const overrides = JSON.parse(localStorage.getItem(MANUAL_WEATHER_KEY) || "{}");
+    return overrides[`${dateKey}_${zone}`] || null;
+  }catch(e){
+    return null;
+  }
+}
+
+function getCurrentWeatherAndZone(){
+  const zone = getZone();
+  const todayKey = getDateKey(0);
+  const todayWeather = (typeof weatherData !== "undefined" ? weatherData[todayKey] : null) || {};
+  const officialWeather = todayWeather[zone];
+  const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
+  const weather = officialWeather || manualWeather || "不明";
+  return { zone, weather };
+}
+
+// js/main.jsのrender()内の判定式と同じロジック
+function isCreatureAvailableNow(c, weather, zone){
+  const weatherForCheck = weather === "流星雨" ? "晴れ" : weather;
+  const weatherMatch = c.weather.length === ALL_WEATHER.length || c.weather.includes(weatherForCheck);
+  const timeMatch = c.time.length === ALL_TIME.length || c.time.includes(zone);
+  return weatherMatch && timeMatch;
+}
+
+function translateWeatherWord(w){
+  const map = { "晴れ":"weather_sunny", "雨":"weather_rain", "虹":"weather_rainbow", "流星雨":"weather_meteor", "不明":"weather_unknown" };
+  return map[w] ? T(map[w], w) : w;
+}
+
 // 一覧カード用の軽量サムネイル画像パスを返す
 function mapThumbSrc(path){
   if(!path) return path;
@@ -1047,23 +1139,45 @@ function openAreaDetail(area, kind){
 
   const groups = getCreaturesForArea(area);
   const catOrder = ["fish","bug","bird"];
-  const nonEmpty = catOrder.filter(cat => groups[cat].length);
+  const { zone, weather } = getCurrentWeatherAndZone();
+  document.getElementById("areaDetailNowContext").textContent =
+    `${T("map_detail_now_context_prefix","現在の判定：")}${translateWeatherWord(weather)}・${ZONE_LABELS[zone] || zone}`;
+
+  // カテゴリごとに「今出現中」「今は出現していない」に振り分ける
+  const nowByCat = { fish:[], bug:[], bird:[] };
+  const notNowByCat = { fish:[], bug:[], bird:[] };
+  catOrder.forEach(cat => {
+    groups[cat].forEach(c => {
+      (isCreatureAvailableNow(c, weather, zone) ? nowByCat : notNowByCat)[cat].push(c);
+    });
+  });
+
+  const rowsHtml = (arr) => arr.map(c => `
+    <div class="area-detail-row">
+      <img src="${mapThumbSrc(c.img)}" alt="" loading="lazy">
+      <div class="area-detail-row-name">${displayName(c)}</div>
+      <div class="area-detail-row-level">Lv.${c.level ?? "-"}</div>
+    </div>
+  `).join("");
+
+  const groupsHtml = (byCat) => catOrder.filter(cat => byCat[cat].length).map(cat => `
+    <div class="area-detail-group">
+      <div class="area-detail-group-title">${icon(CREATURE_CAT_ICONS[cat],{size:13})}<span>${T(CREATURE_CAT_LABELS[cat], CREATURE_CAT_FALLBACKS[cat])}</span></div>
+      ${rowsHtml(byCat[cat])}
+    </div>
+  `).join("");
+
+  const totalCount = catOrder.reduce((n,cat) => n + groups[cat].length, 0);
   const list = document.getElementById("areaDetailList");
-  if(!nonEmpty.length){
+  if(!totalCount){
     list.innerHTML = `<div class="area-detail-empty">${T("map_detail_empty","まだ情報がありません")}</div>`;
   }else{
-    list.innerHTML = nonEmpty.map(cat => `
-      <div class="area-detail-group">
-        <div class="area-detail-group-title">${icon(CREATURE_CAT_ICONS[cat],{size:13})}<span>${T(CREATURE_CAT_LABELS[cat], CREATURE_CAT_FALLBACKS[cat])}</span></div>
-        ${groups[cat].map(c => `
-          <div class="area-detail-row">
-            <img src="${mapThumbSrc(c.img)}" alt="" loading="lazy">
-            <div class="area-detail-row-name">${displayName(c)}</div>
-            <div class="area-detail-row-level">Lv.${c.level ?? "-"}</div>
-          </div>
-        `).join("")}
-      </div>
-    `).join("");
+    const nowHtml = groupsHtml(nowByCat);
+    const notNowHtml = groupsHtml(notNowByCat);
+    list.innerHTML =
+      (nowHtml ? `<div class="area-detail-availability-title is-now">${icon("check",{size:13})}<span>${T("map_detail_now","今出現中")}</span></div>${nowHtml}`
+        : `<div class="area-detail-empty">${T("map_detail_none_now","今は出現しているものがありません")}</div>`) +
+      (notNowHtml ? `<div class="area-detail-availability-title is-not-now">${icon("close",{size:11})}<span>${T("map_detail_not_now","今は出現していない")}</span></div><div class="area-detail-notnow">${notNowHtml}</div>` : "");
   }
 
   document.getElementById("areaDetailModal").style.display = "block";
