@@ -45,6 +45,12 @@ const mapLandmarks = [
   { key:"Fishing Village", name:"漁村", nameI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""}, x:48.84, y:71.76 },
 ];
 
+// 白文字表示の地名とは別に、アイコンバッジ付きで表示する地点（ユーザー提供の画像・座標）
+const mapPois = [
+  { key:"Whale Strait", name:"クジラ海峡", nameI18n:{"ja":"クジラ海峡","en":"Whale Strait","zh-CN":"","zh-TW":"","ko":"","th":""}, x:17.61, y:53.04, icon:"images/map/poi/whale-strait.png" },
+  { key:"Research Lab", name:"研究所", nameI18n:{"ja":"研究所","en":"Research Lab","zh-CN":"","zh-TW":"","ko":"","th":""}, x:47.29, y:48.85, icon:"images/map/poi/research-lab.png" },
+];
+
 const mapNpcs = [
   { key:"bob", name:"bob", x:50.15, y:46.8 },
   { key:"atara", name:"atara", x:49.55, y:52.5 },
@@ -66,6 +72,7 @@ const mapNpcs = [
   { key:"doris", name:"doris", x:41.2, y:50.8 },
   { key:"blanc", name:"blanc", x:56.85, y:53.5 },
   { key:"azure", name:"azure", x:45.6, y:17.7 },
+  { key:"albart", name:"albart", x:61.32, y:42.3 },
 ];
 
 const mapShops = [
@@ -104,8 +111,8 @@ const mapEvents = [
   { key:"yellow-duck-jump-puzzle", name:"イエローダックジャンプパズル", x:22.8, y:75.1 },
   { key:"bait-the-insects", name:"虫寄せ", x:50.5, y:23.0 },
   { key:"nest-of-hundreds", name:"巣ごもり", x:47.25, y:68.8 },
-  { key:"snow-weekend-concert", name:"雪の週末コンサート", x:51.9, y:10.3 },
-  { key:"frostspore-fish", name:"氷晶の魚", x:32.5, y:10.05 },
-  { key:"frostspore-butterfly-event", name:"氷晶の蝶", x:81.45, y:36.0 },
+  // 熱気球クエスト：ユーザー提供の座標（サイトのマップ基準）。画面には縦に2つ並んで表示されるため、少しだけずらして配置
+  { key:"hot-air-balloon", name:"熱気球", x:17.05, y:39.35 },
+  { key:"hot-air-balloon", name:"熱気球", x:17.05, y:39.95 },
 ];
 
