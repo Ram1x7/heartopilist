@@ -38,10 +38,11 @@ const mapLandmarks = [
   { key:"Meadow Lake", name:"草原の湖", nameI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:23.6, y:53.66 },
   { key:"Onsen Mountain Lake", name:"温泉山の湖", nameI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:53.76, y:25.99 },
   // 以下4件は heartopia.guide のデータには無い広域ゾーン名（ユーザーがゲーム内マップの実機画像で確認）。
-  // 座標はdata-map-areas.jsの対応する大エリアの重心と同じ値にしている。
-  { key:"Forest", name:"森林", nameI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""}, x:79.04, y:52.48 },
-  { key:"Flower Field", name:"花畑", nameI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""}, x:20.84, y:55.02 },
-  { key:"Onsen Mountain", name:"温泉山", nameI18n:{"ja":"温泉山","en":"Onsen Mountain","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.33, y:19.71 },
+  // 座標はユーザー提供のゲーム内スクリーンショットの表記位置に合わせている（大エリアの
+  // 重心＝ズーム時の移動先はdata-map-areas.js側で別途管理、この文字表示位置とは必ずしも一致しない）。
+  { key:"Forest", name:"森林", nameI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""}, x:79.4, y:51.5 },
+  { key:"Flower Field", name:"花畑", nameI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""}, x:18.5, y:53.1 },
+  { key:"Onsen Mountain", name:"温泉山", nameI18n:{"ja":"温泉山","en":"Onsen Mountain","zh-CN":"","zh-TW":"","ko":"","th":""}, x:49.1, y:19.8 },
   { key:"Fishing Village", name:"漁村", nameI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""}, x:48.84, y:71.76 },
 ];
 
