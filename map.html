@@ -1003,6 +1003,12 @@ const GENERIC_LOCATION_LANDMARK_KEYS = {
   // 中心街＝大広場・住宅街・花園街・アート街をまとめたエリアのため、
   // location「中心街」の生き物はこの4エリアすべてに出現する扱いにする
   "中心街": ["Central Square", "Residential Street", "Garden Street", "Art Street"],
+  // 森林・漁村・花畑・温泉山も同様に、複数の小エリアをまとめた広域ゾーン名のため、
+  // その名前だけのlocationはこれらを構成する小エリア全てに出現する扱いにする
+  "森林": ["Jump Puzzle", "Spirit Oak Pine Forest", "Forest Island", "Deer Tower", "Giantwood River"],
+  "漁村": ["Lighthouse", "Wharf", "Fishing Village Square", "East Pier Fishing Village"],
+  "花畑": ["Whale Mountain", "Meadow Lake", "Windmill Flower Field", "Purple Light Beach"],
+  "温泉山": ["Onsen", "Onsen Mountain Lake", "Ruins", "Crater Lake", "Stone Cliff"],
 };
 
 // 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
