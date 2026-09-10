@@ -835,6 +835,9 @@ const NPC_IMAGES = {
   "dorothee": "images/map/npc/dorothee.png",
   "ka-ching": "images/map/npc/ka-ching.png",
   "albart": "images/map/npc/albart.png",
+  "doris": "images/map/npc/doris.webp",
+  "vanya": "images/map/npc/vanya.png",
+  "bill": "images/map/npc/bill.webp",
 };
 const SHOP_IMAGES = {
   "clothes-store": "images/map/shops/clothes-store.png",
@@ -924,16 +927,21 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // 粗い形状）の形（ポリゴン）のみを描画する。タブでの表示切り替えは無く常に存在し、
 // 選択（タップ）されるまでは透明でタップ領域としてのみ機能する。名前は文字ラベルとしては
 // 出さず、タップ時の情報カードで確認する形にしている。
+// 複数リングは<path>のサブパスとしてまとめ、fill-rule:evenoddで描画する。
+// これにより「他の小エリアを内包する穴」（郊外から中心街エリア群を除いた形など）も
+// 正しく表現できる（穴でなく単に離れた別々の区画が複数あるだけの場合も、重なりが
+// 無ければevenoddは従来のpolygon個別描画と同じ見た目になる）。
 function drawAreaShape(container, area, kind){
-  area.polygons.forEach(ring => {
-    const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
-    const poly = document.createElementNS(SVG_NS, "polygon");
-    poly.setAttribute("points", points);
-    poly.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
-    poly._areaData = area;
-    poly._areaKind = kind;
-    container.appendChild(poly);
-  });
+  const d = area.polygons
+    .map(ring => "M" + ring.map(([x,y]) => `${x},${y}`).join("L") + "Z")
+    .join(" ");
+  const path = document.createElementNS(SVG_NS, "path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+  path._areaData = area;
+  path._areaKind = kind;
+  container.appendChild(path);
 }
 
 // ポリゴンの面積（シューレース公式、複数リングは合算）。
@@ -988,10 +996,19 @@ function applyAreaSelection(){
 // （どの川・湖・海でも出現するという意味）。該当する地名すべてに紐づける。
 // 汎用location（川/湖/海）を紐づける対象は、ユーザー確認済みの以下の地名(mapLandmarksのkey)のみ。
 // 例えば「火山湖」は名前に「湖」を含むが対象外（生き物の出現ロジック上、他の湖とは別扱いのため）。
-const GENERIC_WATER_LANDMARK_KEYS = {
+const GENERIC_LOCATION_LANDMARK_KEYS = {
   "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
   "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
   "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  // 中心街＝大広場・住宅街・花園街・アート街をまとめたエリアのため、
+  // location「中心街」の生き物はこの4エリアすべてに出現する扱いにする
+  "中心街": ["Central Square", "Residential Street", "Garden Street", "Art Street"],
+  // 森林・漁村・花畑・温泉山も同様に、複数の小エリアをまとめた広域ゾーン名のため、
+  // その名前だけのlocationはこれらを構成する小エリア全てに出現する扱いにする
+  "森林": ["Jump Puzzle", "Spirit Oak Pine Forest", "Forest Island", "Deer Tower", "Giantwood River"],
+  "漁村": ["Lighthouse", "Wharf", "Fishing Village Square", "East Pier Fishing Village"],
+  "花畑": ["Whale Mountain", "Meadow Lake", "Windmill Flower Field", "Purple Light Beach"],
+  "温泉山": ["Onsen", "Onsen Mountain Lake", "Ruins", "Crater Lake", "Stone Cliff"],
 };
 
 // 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
@@ -1016,7 +1033,7 @@ function buildLocationsByAreaKey(){
     Object.entries(mapLocationLinks).forEach(([locName, pt]) => {
       if(pt && Math.abs(pt.x - lm.x) < 0.01 && Math.abs(pt.y - lm.y) < 0.01) set.add(locName);
     });
-    Object.entries(GENERIC_WATER_LANDMARK_KEYS).forEach(([genericLoc, keys]) => {
+    Object.entries(GENERIC_LOCATION_LANDMARK_KEYS).forEach(([genericLoc, keys]) => {
       if(keys.includes(lm.key)) set.add(genericLoc);
     });
   });
