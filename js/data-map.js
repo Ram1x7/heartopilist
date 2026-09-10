@@ -43,7 +43,9 @@ const mapLandmarks = [
   { key:"Forest", name:"森林", nameI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""}, x:79.4, y:51.5 },
   { key:"Flower Field", name:"花畑", nameI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""}, x:18.5, y:53.1 },
   { key:"Onsen Mountain", name:"温泉山", nameI18n:{"ja":"温泉山","en":"Onsen Mountain","zh-CN":"","zh-TW":"","ko":"","th":""}, x:49.1, y:19.8 },
-  { key:"Fishing Village", name:"漁村", nameI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""}, x:48.84, y:71.76 },
+  // 漁村はスクリーンショット上で「巣ごもり」イベントのアイコンとほぼ重なっていたため、
+  // そのアイコン位置を基準に調整（ユーザー確認済み）
+  { key:"Fishing Village", name:"漁村", nameI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""}, x:46.5, y:67.7 },
 ];
 
 // 白文字表示の地名とは別に、アイコンバッジ付きで表示する地点（ユーザー提供の画像・座標）
