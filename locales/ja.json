@@ -1151,5 +1151,9 @@
   "map_view_location": "ここを拡大表示",
   "map_view_details": "くわしく見る",
   "map_detail_found_here": "ここで見つかる生き物",
-  "map_detail_empty": "まだ情報がありません"
+  "map_detail_empty": "まだ情報がありません",
+  "map_detail_now_context_prefix": "現在の判定：",
+  "map_detail_now": "今出現中",
+  "map_detail_not_now": "今は出現していない",
+  "map_detail_none_now": "今は出現しているものがありません"
 }

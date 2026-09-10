@@ -1151,5 +1151,9 @@
   "map_view_location": "Zoom to this area",
   "map_view_details": "View details",
   "map_detail_found_here": "Found here",
-  "map_detail_empty": "No data yet for this area."
+  "map_detail_empty": "No data yet for this area.",
+  "map_detail_now_context_prefix": "Current conditions: ",
+  "map_detail_now": "Available now",
+  "map_detail_not_now": "Not available now",
+  "map_detail_none_now": "Nothing is available right now"
 }
