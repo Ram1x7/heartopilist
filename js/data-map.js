@@ -8,14 +8,14 @@ const mapLandmarks = [
   { key:"Lighthouse", name:"灯台", nameI18n:{"ja":"灯台","en":"Lighthouse","zh-CN":"","zh-TW":"","ko":"","th":""}, x:38.69, y:78.0 },
   { key:"Purple Light Beach", name:"パープルビーチ", nameI18n:{"ja":"パープルビーチ","en":"Purple Light Beach","zh-CN":"","zh-TW":"","ko":"","th":""}, x:21.6, y:72.75 },
   { key:"Suburbs", name:"郊外", nameI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""}, x:36, y:56 },
-  { key:"Stone Cliff", name:"石海岸の崖", nameI18n:{"ja":"石海岸の崖","en":"Stone Cliff","zh-CN":"","zh-TW":"","ko":"","th":""}, x:58.47, y:17.97 },
-  { key:"Whale Mountain", name:"クジラ山", nameI18n:{"ja":"クジラ山","en":"Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""}, x:19.63, y:39.54 },
+  { key:"Stone Cliff", name:"石海岸の崖", nameI18n:{"ja":"石海岸の崖","en":"Stone Cliff","zh-CN":"","zh-TW":"","ko":"","th":""}, x:61.88, y:20.57 },
+  { key:"Whale Mountain", name:"クジラ山", nameI18n:{"ja":"クジラ山","en":"Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""}, x:18.81, y:41.47 },
   { key:"Windmill Flower Field", name:"風車の花畑", nameI18n:{"ja":"風車の花畑","en":"Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""}, x:18.7, y:63.33 },
   { key:"Spirit Oak Pine Forest", name:"不思議な松林", nameI18n:{"ja":"不思議な松林","en":"Spirit Oak Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""}, x:80.11, y:53.21 },
   { key:"Deer Tower", name:"コジカ塔", nameI18n:{"ja":"コジカ塔","en":"Deer Tower","zh-CN":"","zh-TW":"","ko":"","th":""}, x:81.45, y:36.0 },
-  { key:"Ruins", name:"遺跡", nameI18n:{"ja":"遺跡","en":"Ruins","zh-CN":"","zh-TW":"","ko":"","th":""}, x:29.52, y:18.34 },
-  { key:"Onsen", name:"温泉", nameI18n:{"ja":"温泉","en":"Onsen","zh-CN":"","zh-TW":"","ko":"","th":""}, x:53.11, y:20.08 },
-  { key:"Rosy River", name:"霞川", nameI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""}, x:30.26, y:32.69 },
+  { key:"Ruins", name:"遺跡", nameI18n:{"ja":"遺跡","en":"Ruins","zh-CN":"","zh-TW":"","ko":"","th":""}, x:29.3, y:18.25 },
+  { key:"Onsen", name:"温泉", nameI18n:{"ja":"温泉","en":"Onsen","zh-CN":"","zh-TW":"","ko":"","th":""}, x:52.41, y:21.49 },
+  { key:"Rosy River", name:"霞川", nameI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""}, x:31.71, y:33.26 },
   { key:"Tranquil River", name:"静川", nameI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""}, x:36.25, y:67.92 },
   { key:"Giantwood River", name:"巨木の川", nameI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""}, x:61.95, y:66.81 },
   { key:"Shallow River", name:"浅水川", nameI18n:{"ja":"浅水川","en":"Shallow River","zh-CN":"","zh-TW":"","ko":"","th":""}, x:66.86, y:33.88 },
@@ -32,8 +32,8 @@ const mapLandmarks = [
   { key:"Residential Street", name:"住宅街", nameI18n:{"ja":"住宅街","en":"Residential Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:47.93, y:44.45 },
   { key:"Garden Street", name:"花園街", nameI18n:{"ja":"花園街","en":"Garden Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:56.04, y:51.14 },
   { key:"Art Street", name:"アート街", nameI18n:{"ja":"アート街","en":"Art Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:43.45, y:49.38 },
-  { key:"Crater Lake", name:"火山湖", nameI18n:{"ja":"火山湖","en":"Crater Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:37.71, y:18.08 },
-  // 郊外の湖・森の湖は、ゲーム内では複数の池/場所に同じ名前が繰り返し表示される広域の水系名のため、
+  { key:"Crater Lake", name:"火山湖", nameI18n:{"ja":"火山湖","en":"Crater Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:38.38, y:17.93 },
+  // 郊外の湖・森の湖・温泉山の湖は、ゲーム内では複数の池/場所に同じ名前が繰り返し表示される広域の水系名のため、
   // スクリーンショット由来の座標平均ではなく、data-map-areas.js側で手動デジタイズ済みの
   // 実際の池の形状（polygons）から算出した重心（最大の池の重心）に合わせている。
   { key:"Suburban Lake", name:"郊外の湖", nameI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:50.08, y:59.76 },
