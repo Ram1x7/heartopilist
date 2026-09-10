@@ -54,7 +54,7 @@ const mapPois = [
 const mapNpcs = [
   { key:"bob", name:"bob", x:50.15, y:46.8 },
   { key:"atara", name:"atara", x:49.55, y:52.5 },
-  { key:"collector", name:"collector", x:46.6, y:48.2 },
+  { key:"collector", name:"collector", x:36.6, y:47.45 },
   { key:"dorothee", name:"dorothee", x:48.95, y:47.05 },
   { key:"massimo", name:"massimo", x:48.6, y:44.2 },
   { key:"ka-ching", name:"ka-ching", x:41.85, y:41.4 },
@@ -71,7 +71,7 @@ const mapNpcs = [
   { key:"bill", name:"bill", x:44.5, y:73.05 },
   { key:"doris", name:"doris", x:41.2, y:50.8 },
   { key:"blanc", name:"blanc", x:56.85, y:53.5 },
-  { key:"azure", name:"azure", x:45.6, y:17.7 },
+  { key:"azure", name:"azure", x:47.71, y:47.54 },
   { key:"albart", name:"albart", x:61.32, y:42.3 },
 ];
 
