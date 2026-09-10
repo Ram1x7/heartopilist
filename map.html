@@ -205,6 +205,21 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 .map-pin.cat-shop .map-pin-dot{ background:#4a8c5f; }
 .map-pin.cat-event .map-pin-dot{ background:#c15a7a; }
 
+/* 実画像がある場合は、画像自体が完成されたバッジ（丸縁取り済み）のため、
+   絵文字用の色付き丸背景は付けずそのまま表示する */
+.map-pin.has-img .map-pin-dot{
+  background:none;
+  border:none;
+  box-shadow:none;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.45));
+}
+.map-pin-dot img{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+  display:block;
+}
+
 /* バス停・動物：バッジ無しでアイコンだけを大きめに表示 */
 .map-pin.cat-busstop .map-pin-dot,
 .map-pin.cat-animal .map-pin-dot{
@@ -743,6 +758,7 @@ function toggleMapCat(cat){
 
 // ── ピン一覧の組み立て ──
 // ショップ・動物は種類ごとに見た目で区別できるよう、個別の絵文字を割り当てる
+// （実画像が無いキーのみ、ここでのフォールバック絵文字が使われる）
 const SHOP_ICONS = {
   "clothes-store": "👕",
   "furniture-store": "🛋️",
@@ -761,6 +777,53 @@ const ANIMAL_ICONS = {
   "penguin": "🐧",
 };
 
+// ゲーム内画像が入手できたキーのみ実画像を使用し、それ以外は上記の絵文字にフォールバックする
+const NPC_IMAGES = {
+  "azure": "images/map/npc/azure.png",
+  "mrs-joan": "images/map/npc/mrs-joan.png",
+  "vernie": "images/map/npc/vernie.png",
+  "patty": "images/map/npc/patty.png",
+  "blanc": "images/map/npc/blanc.png",
+  "will": "images/map/npc/will.png",
+  "atara": "images/map/npc/atara.png",
+  "massimo": "images/map/npc/massimo.png",
+  "naniwa": "images/map/npc/naniwa.png",
+  "eric": "images/map/npc/eric.png",
+  "bob": "images/map/npc/bob.png",
+  "annie": "images/map/npc/annie.png",
+  "collector": "images/map/npc/collector.png",
+  "bailey-j": "images/map/npc/bailey-j.png",
+  "andrew": "images/map/npc/andrew.png",
+  "dorothee": "images/map/npc/dorothee.png",
+  "ka-ching": "images/map/npc/ka-ching.png",
+  "albart": "images/map/npc/albart.png",
+};
+const SHOP_IMAGES = {
+  "clothes-store": "images/map/shops/clothes-store.png",
+  "furniture-store": "images/map/shops/furniture-store.png",
+  "pets-store": "images/map/shops/pets-store.png",
+  "books-store": "images/map/shops/books-store.png",
+};
+const ANIMAL_IMAGES = {
+  "panda": "images/map/animals/panda.webp",
+  "sea-otter": "images/map/animals/sea-otter.webp",
+  "llama": "images/map/animals/llama.webp",
+  "fox": "images/map/animals/fox.webp",
+  "silka-deer": "images/map/animals/silka-deer.webp",
+  "capybara": "images/map/animals/capybara.webp",
+  "ferret": "images/map/animals/ferret.webp",
+  "bunny": "images/map/animals/bunny.webp",
+};
+const EVENT_IMAGES = {
+  "sea-fishing": "images/map/events/sea-fishing.webp",
+  "bait-the-insects": "images/map/events/bait-the-insects.webp",
+  "nest-of-hundreds": "images/map/events/nest-of-hundreds.png",
+  "bubble-machine-challenge": "images/map/events/bubble-machine-challenge.webp",
+  "yellow-duck-jump-puzzle": "images/map/events/yellow-duck-jump-puzzle.webp",
+  "hot-air-balloon": "images/map/events/hot-air-balloon.png",
+};
+const BUSSTOP_IMAGE = "images/map/bus-stop.webp";
+
 // 対応する小エリアが無く、大エリア（概略・広域ゾーン）としてのみ存在する地名。
 // 大エリアの形と同じく、縮小表示している時だけ表示する（常時表示だと他の地名と
 // 紛らわしいため）。
@@ -769,11 +832,14 @@ const BIGAREA_ONLY_LANDMARKS = new Set(["Forest", "Flower Field", "Onsen Mountai
 function buildAllPins(){
   const list = [];
   mapLandmarks.forEach(p => list.push({ cat:"landmark", name:displayName(p), x:p.x, y:p.y, bigareaOnly:BIGAREA_ONLY_LANDMARKS.has(p.key) }));
-  mapNpcs.forEach(p => list.push({ cat:"npc", icon:"🧑", name:p.name, x:p.x, y:p.y }));
-  mapShops.forEach(p => list.push({ cat:"shop", icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
-  mapBusStops.forEach(p => list.push({ cat:"busstop", icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
-  mapAnimals.forEach(p => list.push({ cat:"animal", icon:ANIMAL_ICONS[p.key] || "🐾", name:p.name, x:p.x, y:p.y }));
-  mapEvents.forEach(p => list.push({ cat:"event", icon:"⭐", name:p.name, x:p.x, y:p.y }));
+  if(typeof mapPois !== "undefined"){
+    mapPois.forEach(p => list.push({ cat:"poi", img:p.icon, name:displayName(p), x:p.x, y:p.y }));
+  }
+  mapNpcs.forEach(p => list.push({ cat:"npc", img:NPC_IMAGES[p.key], icon:"🧑", name:p.name, x:p.x, y:p.y }));
+  mapShops.forEach(p => list.push({ cat:"shop", img:SHOP_IMAGES[p.key], icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
+  mapBusStops.forEach(p => list.push({ cat:"busstop", img:BUSSTOP_IMAGE, icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
+  mapAnimals.forEach(p => list.push({ cat:"animal", img:ANIMAL_IMAGES[p.key], icon:ANIMAL_ICONS[p.key] || "🐾", name:p.name, x:p.x, y:p.y }));
+  mapEvents.forEach(p => list.push({ cat:"event", img:EVENT_IMAGES[p.key], icon:"⭐", name:p.name, x:p.x, y:p.y }));
   return list;
 }
 const allPins = buildAllPins();
@@ -792,19 +858,22 @@ if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
 function renderPins(){
   const layer = document.getElementById("mapPinsLayer");
   layer.innerHTML = "";
-  // 地名はタブでの切り替え対象ではなく、常に表示する
-  const list = allPins.filter(p => p.cat === "landmark" || activeCats.has(p.cat));
+  // 地名・アイコン付き地点はタブでの切り替え対象ではなく、常に表示する
+  const list = allPins.filter(p => p.cat === "landmark" || p.cat === "poi" || activeCats.has(p.cat));
   const finalList = highlightPin ? [...list, highlightPin] : list;
   finalList.forEach(p => {
     const el = document.createElement("div");
-    el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "") + (p.bigareaOnly ? " bigarea-only" : "");
+    el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "") + (p.bigareaOnly ? " bigarea-only" : "") + (p.img ? " has-img" : "");
     el.style.left = p.x + "%";
     el.style.top = p.y + "%";
-    // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外はアイコンのみで
-    // 常時ラベルは出さず、タップ時のカードで名前を確認する形にしている。
+    // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外は、実画像があれば
+    // その画像を、無ければ絵文字アイコンを使う（常時ラベルは出さず、タップ時の
+    // カードで名前を確認する形にしている）。
     el.innerHTML = (p.cat === "landmark" && !p.highlight)
       ? `<div class="map-pin-label">${p.name}</div>`
-      : `<div class="map-pin-dot"><span>${p.icon}</span></div>`;
+      : (p.img
+        ? `<div class="map-pin-dot"><img src="${p.img}" alt="" loading="lazy"></div>`
+        : `<div class="map-pin-dot"><span>${p.icon}</span></div>`);
     el._pinData = p;
     el.onclick = (e) => { e.stopPropagation(); showPinInfo(p); };
     layer.appendChild(el);
@@ -1003,7 +1072,7 @@ function closeAreaDetailModal(){
 
 function showPinInfo(p){
   const catLabelMap = {
-    landmark: T("map_cat_landmark","地名"), npc: T("map_cat_npc","NPC"), shop: T("map_cat_shop","ショップ"),
+    landmark: T("map_cat_landmark","地名"), poi: T("map_cat_landmark","地名"), npc: T("map_cat_npc","NPC"), shop: T("map_cat_shop","ショップ"),
     busstop: T("map_cat_busstop","バス停"), animal: T("map_cat_animal","動物"), event: T("map_cat_event","イベント"),
   };
   document.getElementById("mapInfoName").textContent = p.name;
