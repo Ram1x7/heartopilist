@@ -177,7 +177,10 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 
 .map-pin{
   position:absolute;
-  transform:translate(-50%,-100%);
+  /* ピンの見た目のサイズが地図のズームに合わせて拡大しすぎないよう、
+     ズーム倍率の逆数（--pin-scale）で打ち消して画面上のサイズをほぼ一定に保つ */
+  transform:translate(-50%,-100%) scale(var(--pin-scale, 1));
+  transform-origin:50% 100%;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -1133,6 +1136,8 @@ const BIGAREA_VISIBLE_MAX_SCALE = 1.0;
 function applyTransform(){
   stage.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
   viewport.classList.toggle("show-bigarea", scale <= BIGAREA_VISIBLE_MAX_SCALE);
+  // 地図を拡大するほどピンは相対的に小さく（画面上のサイズはほぼ一定に）なるようにする
+  viewport.style.setProperty("--pin-scale", (1 / scale).toFixed(4));
 }
 
 // 指定scaleでの許容パン範囲。ズーム後の着地点を先に計算する際にも使うため引数化している。
