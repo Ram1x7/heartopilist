@@ -20,7 +20,6 @@ const mapLocationLinks = {
   "中心街": { x:49.69, y:52.63 }, // landmarks:Central Square
   "冬季採録クエスト(追加段階)": null,
   "川": null,
-  "川(青魚影)": null,
   "川辺": null,
   "巣ごもりクエスト": { x:47.25, y:68.8 }, // events:nest-of-hundreds
   "巣ごもりクエスト(追加段階)": { x:47.25, y:68.8 }, // events:nest-of-hundreds
@@ -43,10 +42,8 @@ const mapLocationLinks = {
   "浅水川": { x:67.47, y:32.81 }, // landmarks:Shallow River
   "浅海の魚群クエスト(追加段階)": null,
   "海": null,
-  "海(青魚影)": null,
   "海辺": null,
   "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
-  "海釣りクエスト(金魚影)": { x:44.3, y:73.25 }, // events:sea-fishing
   "温泉山": { x:46.33, y:19.71 }, // landmarks:Onsen Mountain
   "温泉山-温泉": { x:53.11, y:20.08 }, // landmarks:Onsen
   "温泉山-温泉(崖の上)": { x:53.11, y:20.08 }, // landmarks:Onsen

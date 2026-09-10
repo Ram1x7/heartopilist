@@ -876,15 +876,34 @@ function applyAreaSelection(){
 // keyを逆引きして、エリアごとに「ここで見つかる生き物」のlocation文字列一覧を求める。
 // （エリアのポリゴン形状は川のように複数リングに分かれ、中心点が自身の形状の外に出る場合も
 // あるため、ポリゴンの内外判定ではなく座標の一致で判定する）
+// 図鑑データには「川」「湖」「海」という特定の地名を持たない汎用locationも存在する
+// （どの川・湖・海でも出現するという意味）。該当する地名すべてに紐づける。
+const GENERIC_WATER_LOCATIONS = { "川": "川", "湖": "湖", "海": "海" };
+
+// 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
+// 地名に対して該当エリア側のkeyが"Rozy River"表記になっているなど、稀にkeyの綴りが
+// 一致しないケースがあるため、その場合は名前（日本語）の一致でフォールバックする。
+function findAreaForLandmark(lm, allAreas){
+  return allAreas.find(a => a.key === lm.key) || allAreas.find(a => a.name === lm.name);
+}
+
 function buildLocationsByAreaKey(){
   const result = new Map();
   if(typeof mapLandmarks === "undefined" || typeof mapLocationLinks === "undefined") return result;
+  const allAreas = [
+    ...(typeof mapAreasSmall !== "undefined" ? mapAreasSmall : []),
+    ...(typeof mapAreasBig !== "undefined" ? mapAreasBig : []),
+  ];
   mapLandmarks.forEach(lm => {
+    const area = findAreaForLandmark(lm, allAreas);
+    if(!area) return;
+    if(!result.has(area.key)) result.set(area.key, new Set());
+    const set = result.get(area.key);
     Object.entries(mapLocationLinks).forEach(([locName, pt]) => {
-      if(pt && Math.abs(pt.x - lm.x) < 0.01 && Math.abs(pt.y - lm.y) < 0.01){
-        if(!result.has(lm.key)) result.set(lm.key, new Set());
-        result.get(lm.key).add(locName);
-      }
+      if(pt && Math.abs(pt.x - lm.x) < 0.01 && Math.abs(pt.y - lm.y) < 0.01) set.add(locName);
+    });
+    Object.entries(GENERIC_WATER_LOCATIONS).forEach(([suffix, genericLoc]) => {
+      if(lm.name && lm.name.endsWith(suffix)) set.add(genericLoc);
     });
   });
   return result;

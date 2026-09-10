@@ -100,8 +100,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"川(青魚影)",
- locationI18n:{"ja":"川(青魚影)","en":"River (Blue Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"川",
+ locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/008.PNG"
 },
 {
@@ -269,8 +269,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海(青魚影)",
- locationI18n:{"ja":"海(青魚影)","en":"Ocean (Blue Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海",
+ locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/021.PNG"
 },
 {
@@ -295,8 +295,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/023.PNG"
 },
 {
@@ -386,8 +386,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/030.PNG"
 },
 {
@@ -451,8 +451,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/035.PNG"
 },
 {
@@ -581,8 +581,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/045.PNG"
 },
 {
@@ -698,8 +698,8 @@ const fishData = [
  price:320,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/054.PNG"
 },
 {
@@ -776,8 +776,8 @@ const fishData = [
  price:535,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/060.PNG"
 },
 {
@@ -828,8 +828,8 @@ const fishData = [
  price:535,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/064.PNG"
 },
 {
@@ -867,8 +867,8 @@ const fishData = [
  price:850,
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/067.PNG"
 },
 {
@@ -1010,8 +1010,8 @@ const fishData = [
  price:850,
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
- location:"海釣りクエスト(金魚影)",
- locationI18n:{"ja":"海釣りクエスト(金魚影)","en":"Sea Fishing (Gold Shadow)","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"海釣りクエスト",
+ locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/078.PNG"
 },
 {
