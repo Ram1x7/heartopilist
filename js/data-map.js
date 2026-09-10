@@ -114,8 +114,8 @@ const mapEvents = [
   { key:"snow-weekend-concert", name:"雪の週末コンサート", x:51.9, y:10.3 },
   { key:"frostspore-fish", name:"氷晶の魚", x:32.5, y:10.05 },
   { key:"frostspore-butterfly-event", name:"氷晶の蝶", x:81.45, y:36.0 },
-  // 熱気球クエスト：ユーザー提供のゲーム内スクリーンショットから画像マッチングで概算した座標（西側に2箇所）
-  { key:"hot-air-balloon", name:"熱気球", x:17.5, y:37 },
-  { key:"hot-air-balloon", name:"熱気球", x:17.5, y:39.5 },
+  // 熱気球クエスト：ユーザー提供の座標（サイトのマップ基準）。画面には縦に2つ並んで表示されるため、少しだけずらして配置
+  { key:"hot-air-balloon", name:"熱気球", x:17.05, y:39.35 },
+  { key:"hot-air-balloon", name:"熱気球", x:17.05, y:39.95 },
 ];
 
