@@ -1148,5 +1148,8 @@
   "tutorial_map_step2_title": "② カテゴリで絞り込み",
   "tutorial_map_step2_body": "NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。",
   "modal_view_on_map": "地図で見る",
-  "map_view_location": "ここを拡大表示"
+  "map_view_location": "ここを拡大表示",
+  "map_view_details": "くわしく見る",
+  "map_detail_found_here": "ここで見つかる生き物",
+  "map_detail_empty": "まだ情報がありません"
 }

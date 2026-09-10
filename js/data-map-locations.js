@@ -11,8 +11,8 @@ const mapLocationLinks = {
   "そよ風の海の海辺": { x:50.06, y:76.29 }, // landmarks:Zephyr Sea
   "エアーミツバチ虫寄せ装置": { x:50.5, y:23.0 }, // events:bait-the-insects
   "ガーパイククエスト(追加段階)": null,
-  "クジラ海": { x:14, y:49.44 }, // landmarks:Whale Sea
-  "クジラ海の海辺": { x:14, y:49.44 }, // landmarks:Whale Sea
+  "クジラ海": { x:6, y:49 }, // landmarks:Whale Sea
+  "クジラ海の海辺": { x:6, y:49 }, // landmarks:Whale Sea
   "ニシキコウチュウクエスト(追加段階)": null,
   "ブランクの頭上": { x:56.85, y:53.5 }, // npcs:blanc
   "ホーム": { x:30.09, y:52.14 }, // landmarks:Home Plots
@@ -20,7 +20,6 @@ const mapLocationLinks = {
   "中心街": { x:49.69, y:52.63 }, // landmarks:Central Square
   "冬季採録クエスト(追加段階)": null,
   "川": null,
-  "川(青魚影)": null,
   "川辺": null,
   "巣ごもりクエスト": { x:47.25, y:68.8 }, // events:nest-of-hundreds
   "巣ごもりクエスト(追加段階)": { x:47.25, y:68.8 }, // events:nest-of-hundreds
@@ -28,14 +27,14 @@ const mapLocationLinks = {
   "旧海": { x:50, y:5 }, // landmarks:Old Sea
   "旧海の海辺": { x:50, y:5 }, // landmarks:Old Sea
   "旧海・クジラ海": { x:32.0, y:27.22 }, // 旧海とクジラ海の中間点（境界域のため近似）
-  "東海": { x:90.66, y:51.04 }, // landmarks:East Sea
-  "東海の海辺": { x:90.66, y:51.04 }, // landmarks:East Sea
+  "東海": { x:96, y:51 }, // landmarks:East Sea
+  "東海の海辺": { x:96, y:51 }, // landmarks:East Sea
   "東海・そよ風の海": { x:70.36, y:63.67 }, // 東海とそよ風の海の中間点（境界域のため近似）
   "森の湖": { x:76.1, y:49.66 }, // landmarks:Forest Lake
   "森の湖畔": { x:76.1, y:49.66 }, // landmarks:Forest Lake
   "森林": { x:79.04, y:52.48 }, // landmarks:Forest
-  "森林-コジカ塔": { x:78.78, y:38.67 }, // landmarks:Deer Tower
-  "森林-コジカ塔(木のてっぺん)": { x:78.78, y:38.67 }, // landmarks:Deer Tower
+  "森林-コジカ塔": { x:81.45, y:36.0 }, // landmarks:Deer Tower
+  "森林-コジカ塔(木のてっぺん)": { x:81.45, y:36.0 }, // landmarks:Deer Tower
   "森林-ジャンプステージ": { x:78.99, y:67.78 }, // landmarks:Jump Puzzle
   "森林-不思議な松林": { x:80.88, y:51.66 }, // landmarks:Spirit Oak Pine Forest
   "森林-森の島": { x:93.96, y:33.72 }, // landmarks:Forest Island
@@ -43,10 +42,8 @@ const mapLocationLinks = {
   "浅水川": { x:67.47, y:32.81 }, // landmarks:Shallow River
   "浅海の魚群クエスト(追加段階)": null,
   "海": null,
-  "海(青魚影)": null,
   "海辺": null,
   "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
-  "海釣りクエスト(金魚影)": { x:44.3, y:73.25 }, // events:sea-fishing
   "温泉山": { x:46.33, y:19.71 }, // landmarks:Onsen Mountain
   "温泉山-温泉": { x:53.11, y:20.08 }, // landmarks:Onsen
   "温泉山-温泉(崖の上)": { x:53.11, y:20.08 }, // landmarks:Onsen

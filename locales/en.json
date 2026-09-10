@@ -1148,5 +1148,8 @@
   "tutorial_map_step2_title": "② Filter by category",
   "tutorial_map_step2_body": "Toggle NPCs, Shops, Bus Stops, Animals, and Events on or off.",
   "modal_view_on_map": "View on map",
-  "map_view_location": "Zoom to this area"
+  "map_view_location": "Zoom to this area",
+  "map_view_details": "View details",
+  "map_detail_found_here": "Found here",
+  "map_detail_empty": "No data yet for this area."
 }
