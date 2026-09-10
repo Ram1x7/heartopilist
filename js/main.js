@@ -84,17 +84,30 @@ function setManualWeatherOverride(dateKey, zone, value){
 
 // #weatherNowの下に、天気が「不明」（公式データ未入力）の間だけ選択欄を表示する。
 // 選択するとこの端末にだけ保存され、他のユーザーには共有されない
+//
+// updateTime()は1秒ごとに呼ばれるが、その都度innerHTMLで<select>を作り直すと、
+// ユーザーがプルダウンを開いている最中でも1秒ごとに要素が作り直されて閉じてしまい、
+// 天気を選択しづらくなる不具合があった。dateKey・zone・選択中の値が前回描画時から
+// 変わっていない場合は再描画自体をスキップし、操作中の要素に触れないようにする。
+let lastWeatherOverrideSignature = null;
 function renderWeatherOverrideControl(officialWeather, dateKey, zone){
   const wrap = document.getElementById("weatherOverrideWrap");
   if(!wrap) return;
 
   if(officialWeather){
-    wrap.style.display = "none";
-    wrap.innerHTML = "";
+    if(lastWeatherOverrideSignature !== null){
+      wrap.style.display = "none";
+      wrap.innerHTML = "";
+      lastWeatherOverrideSignature = null;
+    }
     return;
   }
 
   const current = getManualWeatherOverride(dateKey, zone) || "";
+  const signature = `${dateKey}_${zone}_${current}`;
+  if(signature === lastWeatherOverrideSignature) return;
+  lastWeatherOverrideSignature = signature;
+
   const options = [`<option value="">${T("weather_manual_placeholder","天気を選択")}</option>`]
     .concat(MANUAL_WEATHER_OPTIONS.map(w => `<option value="${w}"${w === current ? " selected" : ""}>${translateWeatherWord(w)}</option>`))
     .join("");
