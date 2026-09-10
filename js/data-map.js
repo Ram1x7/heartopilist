@@ -33,11 +33,10 @@ const mapLandmarks = [
   { key:"Garden Street", name:"花園街", nameI18n:{"ja":"花園街","en":"Garden Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:56.04, y:51.14 },
   { key:"Art Street", name:"アート街", nameI18n:{"ja":"アート街","en":"Art Street","zh-CN":"","zh-TW":"","ko":"","th":""}, x:43.45, y:49.38 },
   { key:"Crater Lake", name:"火山湖", nameI18n:{"ja":"火山湖","en":"Crater Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:37.71, y:18.08 },
-  // 郊外の湖・森の湖は、ゲーム内では複数の池に同じ名前が繰り返し表示される広域の水系名のため、
-  // スクリーンショットに写った1箇所の座標だけを基準に変更すると別の位置に動くだけになる。
-  // 明確な誤りとまでは言えないため、今回は変更を見送っている。
-  { key:"Suburban Lake", name:"郊外の湖", nameI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:50.08, y:59.76 },
-  { key:"Forest Lake", name:"森の湖", nameI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:76.1, y:49.66 },
+  // 郊外の湖・森の湖は、ゲーム内では複数の池/場所に同じ名前が繰り返し表示される広域の水系名のため、
+  // 単一の正しい座標は存在しない。スクリーンショットに写った複数箇所の座標を平均した位置を採用している。
+  { key:"Suburban Lake", name:"郊外の湖", nameI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:54.31, y:49.93 },
+  { key:"Forest Lake", name:"森の湖", nameI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:76.23, y:51.58 },
   { key:"Meadow Lake", name:"草原の湖", nameI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:22.4, y:53.86 },
   { key:"Onsen Mountain Lake", name:"温泉山の湖", nameI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:53.76, y:25.99 },
   // 以下4件は heartopia.guide のデータには無い広域ゾーン名（ユーザーがゲーム内マップの実機画像で確認）。
