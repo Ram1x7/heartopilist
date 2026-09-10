@@ -929,7 +929,8 @@ function getCreaturesForArea(area){
     { cat:"bird", data: typeof birdData !== "undefined" ? birdData : [] },
   ];
   sources.forEach(({ cat, data }) => {
-    data.forEach(c => { if(locs.has(c.location)) groups[cat].push(c); });
+    // 終了済みのシーズン・フェス限定（ended:true）はここでも表示しない
+    data.forEach(c => { if(locs.has(c.location) && !c.ended) groups[cat].push(c); });
   });
   return groups;
 }
