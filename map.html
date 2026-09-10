@@ -232,9 +232,10 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
   50%{ transform:translate(-50%,-110%) scale(1.08); }
 }
 
-/* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示） */
+/* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示）。
+   タップ対象にはせず、下にあるエリアのタップを妨げないようにする */
 .map-pin.cat-landmark{
-  cursor:pointer;
+  pointer-events:none;
   padding:3px 4px;
 }
 
