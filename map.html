@@ -232,6 +232,21 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
   50%{ transform:translate(-50%,-110%) scale(1.08); }
 }
 
+/* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示） */
+.map-pin.cat-landmark{
+  cursor:pointer;
+  padding:3px 4px;
+}
+
+.map-pin.cat-landmark .map-pin-label{
+  font-size:11px;
+  font-weight:700;
+  color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,0.7), 0 0 5px rgba(0,0,0,0.45);
+  white-space:nowrap;
+  pointer-events:none;
+}
+
 /* ズームボタン */
 .map-zoom-controls{
   position:absolute;
@@ -556,11 +571,21 @@ function openHelpModal(){ document.getElementById("helpModal").style.display = "
 function closeHelpModal(){ document.getElementById("helpModal").style.display = "none"; }
 
 // 多言語ヘルパー
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
     return window.i18n.t(key, vars, fallback);
   }
   return fallback;
+}
+function displayName(obj){
+  if(!obj.nameI18n) return obj.name;
+  const lang = currentLang();
+  return obj.nameI18n[lang] || obj.name;
 }
 
 // ── カテゴリ表示状態 ──
@@ -594,6 +619,7 @@ const ANIMAL_ICONS = {
 
 function buildAllPins(){
   const list = [];
+  mapLandmarks.forEach(p => list.push({ cat:"landmark", name:displayName(p), x:p.x, y:p.y }));
   mapNpcs.forEach(p => list.push({ cat:"npc", icon:"🧑", name:p.name, x:p.x, y:p.y }));
   mapShops.forEach(p => list.push({ cat:"shop", icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
   mapBusStops.forEach(p => list.push({ cat:"busstop", icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
@@ -617,15 +643,19 @@ if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
 function renderPins(){
   const layer = document.getElementById("mapPinsLayer");
   layer.innerHTML = "";
-  const list = allPins.filter(p => activeCats.has(p.cat));
+  // 地名はタブでの切り替え対象ではなく、常に表示する
+  const list = allPins.filter(p => p.cat === "landmark" || activeCats.has(p.cat));
   const finalList = highlightPin ? [...list, highlightPin] : list;
   finalList.forEach(p => {
     const el = document.createElement("div");
     el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "");
     el.style.left = p.x + "%";
     el.style.top = p.y + "%";
+    // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外はアイコンのみで
     // 常時ラベルは出さず、タップ時のカードで名前を確認する形にしている。
-    el.innerHTML = `<div class="map-pin-dot"><span>${p.icon}</span></div>`;
+    el.innerHTML = (p.cat === "landmark" && !p.highlight)
+      ? `<div class="map-pin-label">${p.name}</div>`
+      : `<div class="map-pin-dot"><span>${p.icon}</span></div>`;
     el._pinData = p;
     el.onclick = (e) => { e.stopPropagation(); showPinInfo(p); };
     layer.appendChild(el);
