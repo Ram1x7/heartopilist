@@ -927,16 +927,21 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // 粗い形状）の形（ポリゴン）のみを描画する。タブでの表示切り替えは無く常に存在し、
 // 選択（タップ）されるまでは透明でタップ領域としてのみ機能する。名前は文字ラベルとしては
 // 出さず、タップ時の情報カードで確認する形にしている。
+// 複数リングは<path>のサブパスとしてまとめ、fill-rule:evenoddで描画する。
+// これにより「他の小エリアを内包する穴」（郊外から中心街エリア群を除いた形など）も
+// 正しく表現できる（穴でなく単に離れた別々の区画が複数あるだけの場合も、重なりが
+// 無ければevenoddは従来のpolygon個別描画と同じ見た目になる）。
 function drawAreaShape(container, area, kind){
-  area.polygons.forEach(ring => {
-    const points = ring.map(([x,y]) => `${x},${y}`).join(" ");
-    const poly = document.createElementNS(SVG_NS, "polygon");
-    poly.setAttribute("points", points);
-    poly.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
-    poly._areaData = area;
-    poly._areaKind = kind;
-    container.appendChild(poly);
-  });
+  const d = area.polygons
+    .map(ring => "M" + ring.map(([x,y]) => `${x},${y}`).join("L") + "Z")
+    .join(" ");
+  const path = document.createElementNS(SVG_NS, "path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+  path._areaData = area;
+  path._areaKind = kind;
+  container.appendChild(path);
 }
 
 // ポリゴンの面積（シューレース公式、複数リングは合算）。
