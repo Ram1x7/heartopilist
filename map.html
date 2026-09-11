@@ -169,8 +169,9 @@ body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
 }
 
 /* 縮小表示時は、重なっている小エリアをタップ対象から外し、
-   下にある大エリア側がタップされるようにする */
-.map-viewport.show-bigarea .map-area-shape:not(.approx){
+   下にある大エリア側がタップされるようにする（ホームなど大エリア／小エリアの
+   区別が無いエリアは keep-tappable クラスで対象外にし、常にタップ可能にする） */
+.map-viewport.show-bigarea .map-area-shape:not(.approx):not(.keep-tappable){
   pointer-events:none;
 }
 
@@ -956,6 +957,10 @@ const SVG_NS = "http://www.w3.org/2000/svg";
 // これにより「他の小エリアを内包する穴」（郊外から中心街エリア群を除いた形など）も
 // 正しく表現できる（穴でなく単に離れた別々の区画が複数あるだけの場合も、重なりが
 // 無ければevenoddは従来のpolygon個別描画と同じ見た目になる）。
+// ホームは大エリア／小エリアの区別が無く常に同じ範囲を指すため、
+// 縮小表示時も他の大エリアと同様にタップできるようにする
+const ALWAYS_TAPPABLE_AREA_KEYS = new Set(["Home Plots"]);
+
 function drawAreaShape(container, area, kind){
   const d = area.polygons
     .map(ring => "M" + ring.map(([x,y]) => `${x},${y}`).join("L") + "Z")
@@ -963,7 +968,7 @@ function drawAreaShape(container, area, kind){
   const path = document.createElementNS(SVG_NS, "path");
   path.setAttribute("d", d);
   path.setAttribute("fill-rule", "evenodd");
-  path.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : ""));
+  path.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : "") + (ALWAYS_TAPPABLE_AREA_KEYS.has(area.key) ? " keep-tappable" : ""));
   path._areaData = area;
   path._areaKind = kind;
   container.appendChild(path);
@@ -1168,7 +1173,7 @@ const CREATURE_CAT_ICONS = { fish:"fish", bug:"bug", bird:"bird" };
 function openAreaDetail(area, kind){
   document.getElementById("areaDetailCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
   document.getElementById("areaDetailName").textContent = area.name
-    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    ? area.name
     : `${area.key}？`;
 
   const zoomBtn = document.getElementById("areaDetailZoomBtn");
@@ -1248,7 +1253,7 @@ function showAreaInfo(area, kind){
   document.getElementById("mapInfoCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
   document.getElementById("mapInfoCat").classList.add("is-area");
   document.getElementById("mapInfoName").textContent = area.name
-    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    ? area.name
     : `${area.key}？`;
 
   const zoomBtn = document.getElementById("mapInfoZoom");
