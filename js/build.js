@@ -808,6 +808,7 @@ async function handleFrontFileSelect(file){
     document.getElementById("buildProceedBtn").disabled = false;
     document.getElementById("buildUploadBtnLabel").textContent = T("build_choose_again", "画像を選び直す");
     syncWallWidthFromHeight(); // 新しい画像の縦横比に合わせて幅（高さ基準時）を再計算
+    fitWidthToOtherDimLimit(); // 新しい画像の縦横比で上限を超える場合は幅を縮小
     updateWallAutoDimHint();
   }catch(e){
     alert(T("art_invalid_image", "対応していないファイル形式です（JPG・PNG・WebPのみ）"));
@@ -931,6 +932,7 @@ function readOptionInputs(){
   }else{
     settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
     document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
+    fitWidthToOtherDimLimit(); // 画像全体が上限内に収まるよう、必要なら幅を縮小
   }
   settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
@@ -1028,6 +1030,33 @@ function syncWallWidthFromHeight(){
   settings.width = Math.min(WALL_MAX_WIDTH, Math.max(2, derivedWidth));
 }
 
+// 幅を基準にしている場合（低い壁の「高さを基準にする」以外の全パターン）、
+// 縦長・横長の画像では画像の縦横比から求まるもう一方の軸（solid:高さ /
+// flat:奥行き / wall:行数）が上限（例: 立体モードは支柱17本）を超えることが
+// ある。computeOtherDim()はその場合そのまま上限に頭打ちするだけなので、
+// そのままだと画像の一部しか収まらず、意図しない切り抜きになってしまう。
+// どんな縦横比の画像でも全体が収まるように、上限を超える分だけ幅の方を
+// 自動的に縮小し、常に画像全体の縦横比を維持したまま上限内に収める
+function fitWidthToOtherDimLimit(){
+  if(!frontImage) return;
+  if(settings.mode === "wall" && settings.wallSizeBasis === "height") return; // こちらは逆方向に同期済み
+  const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
+  const maxOther = settings.mode === "flat" ? SITE_MAX_DEPTH
+    : settings.mode === "wall" ? WALL_MAX_HEIGHT_TIERS
+    : SITE_MAX_HEIGHT;
+  const compensation = settings.mode === "solid" ? SOLID_HEIGHT_ASPECT_COMPENSATION
+    : settings.mode === "wall" ? WALL_ROW_ASPECT_COMPENSATION
+    : 1;
+  const naiveOther = settings.width / aspect / compensation;
+  if(naiveOther <= maxOther) return;
+  const fittedWidth = Math.floor(maxOther * aspect * compensation);
+  settings.width = Math.min(currentWidthMax(), Math.max(2, fittedWidth));
+  const widthInput = document.getElementById("buildWidthInput");
+  if(widthInput) widthInput.value = String(settings.width);
+  const widthOutput = document.getElementById("buildWidthOutput");
+  if(widthOutput) widthOutput.textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
+}
+
 // ══════════════════════════════════════
 // 位置・拡大縮小の調整（正面画像のみ）
 // ══════════════════════════════════════
@@ -1041,6 +1070,7 @@ function openBuildCropStage(reset){
   // 高さ基準の場合、settings.widthは前回の画像から逆算した値のままの
   // 可能性があるため、切り抜き画面を開くたびに現在の画像で必ず再同期する
   syncWallWidthFromHeight();
+  fitWidthToOtherDimLimit();
   const otherDim = computeOtherDim();
   const targetKey = `${settings.width}x${otherDim}`;
   const viewport = document.getElementById("buildCropViewport");
