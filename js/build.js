@@ -17,7 +17,9 @@ import * as Build3D from "./build3d-scene.js";
 // ── 敷地の座標上限（ボクセル換算、幅×奥行き×高さ） ──
 const SITE_MAX_WIDTH = 96;
 const SITE_MAX_DEPTH = 120;
-const SITE_MAX_HEIGHT = 68;
+// ゲーム内では支柱を最大17本（=積み上げ高さ34マス分）までしか積めないため、
+// それに合わせて上限を17本（bounds.hは支柱の本数単位）とする
+const SITE_MAX_HEIGHT = 17;
 
 // 低い壁は幅4のパネルなので、支柱換算での敷地幅上限（SITE_MAX_WIDTH＝96マス分）
 // をそのまま「列数」の上限にすると、実際の物理幅は4倍（384マス分）になって
