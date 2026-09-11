@@ -79,6 +79,8 @@ const mapNpcs = [
   { key:"blanc", name:"blanc", x:56.85, y:53.5 },
   { key:"azure", name:"azure", x:47.71, y:47.54 },
   { key:"albart", name:"albart", x:61.32, y:42.3 },
+  // 熱気球イベント（2件、x:17.05, y:39.35/39.95）の間に配置
+  { key:"shonen", name:"shonen", x:17.05, y:39.65 },
 ];
 
 const mapShops = [
