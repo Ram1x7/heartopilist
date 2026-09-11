@@ -1008,6 +1008,35 @@ function renderAreas(){
   applyAreaSelection();
 }
 
+// 縮小表示時に小エリアのpointer-eventsを無効化しているせいでelementFromPointが
+// 何も拾えなかった場合のフォールバック。SVGのisPointInFill（fill-rule評価込みで
+// ジオメトリを直接判定できる）を使い、CSSのpointer-eventsに関係なく実際に
+// クリック位置を含む図形を探す。小エリア→大エリアの順に探し、見つかった方を返す
+// （対応する大エリアが存在しないクジラ海などの小エリアも、これで従来通り
+// タップできるようになる）
+function findAreaShapeAtPoint(clientX, clientY){
+  const svg = document.getElementById("mapAreasLayer");
+  if(!svg || !svg.createSVGPoint) return null;
+  const pt = svg.createSVGPoint();
+  pt.x = clientX;
+  pt.y = clientY;
+  const ctm = svg.getScreenCTM();
+  if(!ctm) return null;
+  const svgPt = pt.matrixTransform(ctm.inverse());
+  const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
+  let smallMatch = null, bigMatch = null;
+  shapes.forEach(el => {
+    if(smallMatch) return;
+    try{
+      if(el.isPointInFill(svgPt)){
+        if(el._areaKind === "big"){ if(!bigMatch) bigMatch = el; }
+        else smallMatch = el;
+      }
+    }catch(e){ /* 非対応環境では無視 */ }
+  });
+  return smallMatch || bigMatch;
+}
+
 // タップされたエリアの赤枠＋斜線ハイライト表示
 let selectedArea = null;
 function applyAreaSelection(){
@@ -1564,13 +1593,22 @@ function endPointer(e){
     // ネイティブのclickイベントが発火しないため、ここで手動判定する
     if(tapCandidate && !gestureMoved){
       const pinEl = tapCandidate.target.closest(".map-pin");
-      const areaEl = tapCandidate.target.closest(".map-area-shape");
+      let areaEl = tapCandidate.target.closest(".map-area-shape");
       if(pinEl && pinEl._pinData){
         handlePinTap(pinEl._pinData);
       }else if(mapEditTapCallback){
         mapEditTapCallback(tapCandidate.x, tapCandidate.y);
-      }else if(areaEl && areaEl._areaData){
-        showAreaInfo(areaEl._areaData, areaEl._areaKind);
+      }else{
+        // 縮小表示時は大エリアをタップしやすくするため小エリアのpointer-eventsを
+        // 無効化しているが、クジラ海など対応する大エリアが存在しない小エリアは
+        // 何もヒットせずタップが完全に無効になってしまう。elementFromPointで
+        // 何も見つからなかった場合は、図形の当たり判定（isPointInFill）で
+        // 直接ジオメトリを調べるフォールバックを行い、そうした小エリアも
+        // 従来通りタップできるようにする
+        if(!areaEl) areaEl = findAreaShapeAtPoint(tapCandidate.x, tapCandidate.y);
+        if(areaEl && areaEl._areaData){
+          showAreaInfo(areaEl._areaData, areaEl._areaKind);
+        }
       }
     }
     tapCandidate = null;
