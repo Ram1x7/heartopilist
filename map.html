@@ -1168,7 +1168,7 @@ const CREATURE_CAT_ICONS = { fish:"fish", bug:"bug", bird:"bird" };
 function openAreaDetail(area, kind){
   document.getElementById("areaDetailCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
   document.getElementById("areaDetailName").textContent = area.name
-    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    ? area.name
     : `${area.key}？`;
 
   const zoomBtn = document.getElementById("areaDetailZoomBtn");
@@ -1248,7 +1248,7 @@ function showAreaInfo(area, kind){
   document.getElementById("mapInfoCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
   document.getElementById("mapInfoCat").classList.add("is-area");
   document.getElementById("mapInfoName").textContent = area.name
-    ? (kind === "big" ? `${area.name}（概略）` : area.name)
+    ? area.name
     : `${area.key}？`;
 
   const zoomBtn = document.getElementById("mapInfoZoom");
