@@ -101,8 +101,13 @@ function bindPointer(){
   canvasEl.addEventListener("touchend", () => { pinchStartDist = null; });
 }
 
+// ズーム時の最小距離（＝最大ズームイン）は外接範囲(cameraSpanBasis)に単純比例
+// させると、96マスなど大きな建築では最大までズームインしても画面に収まる
+// マス数が多すぎて、下段がどのマス目か見分けづらくなる。そのため最小距離は
+// 絶対値でも頭打ちにし、建築の規模によらず十分近くまでズームできるようにする
 function clampDist(d){
-  return Math.min(Math.max(d, cameraSpanBasis * 0.15), cameraSpanBasis * 5);
+  const minDist = Math.min(cameraSpanBasis * 0.15, 8);
+  return Math.min(Math.max(d, minDist), cameraSpanBasis * 5);
 }
 
 function resize(){
