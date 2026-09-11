@@ -168,6 +168,12 @@ body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
   stroke-dasharray:1.2,0.8;
 }
 
+/* 縮小表示時は、重なっている小エリアをタップ対象から外し、
+   下にある大エリア側がタップされるようにする */
+.map-viewport.show-bigarea .map-area-shape:not(.approx){
+  pointer-events:none;
+}
+
 .map-area-hatch-line{
   stroke:var(--vermillion);
   stroke-width:0.5;
@@ -272,8 +278,9 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 .map-viewport.show-bigarea .map-pin.cat-landmark.bigarea-only{ display:flex; }
 
 /* 実際のゲームと同様、縮小表示時は大エリアの範囲・名前だけを見せ、
-   それ以外の地名ラベルは隠す（NPC・ショップ・動物・バス停・イベントのピンは表示したまま） */
-.map-viewport.show-bigarea .map-pin.cat-landmark:not(.bigarea-only){ display:none; }
+   それ以外の地名ラベルは隠す（NPC・ショップ・動物・バス停・イベントのピンは表示したまま。
+   海・川・湖の地名は位置把握に役立つため引き続き表示する） */
+.map-viewport.show-bigarea .map-pin.cat-landmark:not(.bigarea-only):not(.water){ display:none; }
 
 /* ズームボタン */
 .map-zoom-controls{
@@ -874,9 +881,17 @@ const BUSSTOP_IMAGE = "images/map/bus-stop.webp";
 // 紛らわしいため）。
 const BIGAREA_ONLY_LANDMARKS = new Set(["Forest", "Flower Field", "Onsen Mountain", "Fishing Village"]);
 
+// 海・川・湖の地名は、縮小表示時に他の地名ラベルを隠す場合でも
+// 引き続き表示したままにする（大エリアの名前と同様、位置把握に役立つため）
+const WATER_LANDMARK_KEYS = new Set([
+  "Whale Sea", "Zephyr Sea", "East Sea", "Old Sea",
+  "Rosy River", "Tranquil River", "Giantwood River", "Shallow River",
+  "Crater Lake", "Suburban Lake", "Forest Lake", "Meadow Lake", "Onsen Mountain Lake",
+]);
+
 function buildAllPins(){
   const list = [];
-  mapLandmarks.forEach(p => list.push({ cat:"landmark", name:displayName(p), x:p.x, y:p.y, bigareaOnly:BIGAREA_ONLY_LANDMARKS.has(p.key) }));
+  mapLandmarks.forEach(p => list.push({ cat:"landmark", name:displayName(p), x:p.x, y:p.y, bigareaOnly:BIGAREA_ONLY_LANDMARKS.has(p.key), water:WATER_LANDMARK_KEYS.has(p.key) }));
   if(typeof mapPois !== "undefined"){
     mapPois.forEach(p => list.push({ cat:"poi", img:p.icon, name:displayName(p), x:p.x, y:p.y }));
   }
@@ -908,7 +923,7 @@ function renderPins(){
   const finalList = highlightPin ? [...list, highlightPin] : list;
   finalList.forEach(p => {
     const el = document.createElement("div");
-    el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "") + (p.bigareaOnly ? " bigarea-only" : "") + (p.img ? " has-img" : "");
+    el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "") + (p.bigareaOnly ? " bigarea-only" : "") + (p.water ? " water" : "") + (p.img ? " has-img" : "");
     el.style.left = p.x + "%";
     el.style.top = p.y + "%";
     // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外は、実画像があれば
