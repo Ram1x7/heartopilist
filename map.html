@@ -271,6 +271,10 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 .map-pin.cat-landmark.bigarea-only{ display:none; }
 .map-viewport.show-bigarea .map-pin.cat-landmark.bigarea-only{ display:flex; }
 
+/* 実際のゲームと同様、縮小表示時は大エリアの範囲・名前だけを見せ、
+   それ以外の地名ラベルは隠す（NPC・ショップ・動物・バス停・イベントのピンは表示したまま） */
+.map-viewport.show-bigarea .map-pin.cat-landmark:not(.bigarea-only){ display:none; }
+
 /* ズームボタン */
 .map-zoom-controls{
   position:absolute;
