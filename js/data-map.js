@@ -114,7 +114,8 @@ const mapAnimals = [
 ];
 
 const mapEvents = [
-  { key:"sea-fishing", name:"海釣り1号", x:44.3, y:73.25 },
+  { key:"sea-fishing", name:"海釣り1号", x:45.02, y:75.09 },
+  { key:"sea-fishing", name:"海釣り2号", x:46.35, y:74.18 },
   { key:"bubble-machine-challenge", name:"バブルマシンチャレンジ", x:27.25, y:74.55 },
   { key:"yellow-duck-jump-puzzle", name:"イエローダックジャンプパズル", x:22.8, y:75.1 },
   { key:"bait-the-insects", name:"虫コイコイ", x:50.5, y:23.0 },
