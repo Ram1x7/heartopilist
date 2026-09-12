@@ -192,16 +192,30 @@ body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
 
 body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 
+/* ピン・地名ラベルは.map-stage（パン・ズームのCSS transformがかかる）の外側に
+   独立したレイヤーとして配置し、位置はJS側でtx/ty/scaleから計算したピクセル値を
+   直接指定する。以前は.map-stage内に置いて逆数スケール（--pin-scale）で見た目の
+   拡大を打ち消す方式だったが、ズーム用のCSS transformとの二重変換がブラウザの
+   合成処理で文字の再描画を伴い、拡大時に文字がボヤけて見える問題があったため */
+#mapPinsLayer{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  pointer-events:none;
+}
+
 .map-pin{
   position:absolute;
-  /* ピンの見た目のサイズが地図のズームに合わせて拡大しすぎないよう、
-     ズーム倍率の逆数（--pin-scale）で打ち消して画面上のサイズをほぼ一定に保つ */
-  transform:translate(-50%,-100%) scale(var(--pin-scale, 1));
+  transform:translate(-50%,-100%);
   transform-origin:50% 100%;
   display:flex;
   flex-direction:column;
   align-items:center;
   cursor:pointer;
+  pointer-events:auto;
 }
 
 /* NPC・ショップ・イベント：白枠の丸バッジ */
@@ -665,8 +679,8 @@ body.dark .footer{ color:var(--dark-text-sub); }
       </defs>
       <g id="mapAreasGroup"></g>
     </svg>
-    <div id="mapPinsLayer"></div>
   </div>
+  <div id="mapPinsLayer"></div>
   <div class="map-zoom-controls">
     <button class="map-zoom-btn" onclick="mapZoomStep(1.3)" aria-label="zoom in">＋</button>
     <button class="map-zoom-btn" onclick="mapZoomStep(1/1.3)" aria-label="zoom out">－</button>
@@ -942,8 +956,6 @@ function renderPins(){
   finalList.forEach(p => {
     const el = document.createElement("div");
     el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "") + (p.bigareaOnly ? " bigarea-only" : "") + (p.water ? " water" : "") + (p.alwaysVisible ? " keep-visible" : "") + (p.img ? " has-img" : "");
-    el.style.left = p.x + "%";
-    el.style.top = p.y + "%";
     // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外は、実画像があれば
     // その画像を、無ければ絵文字アイコンを使う（常時ラベルは出さず、タップ時の
     // カードで名前を確認する形にしている）。
@@ -955,6 +967,21 @@ function renderPins(){
     el._pinData = p;
     el.onclick = (e) => { e.stopPropagation(); handlePinTap(p); };
     layer.appendChild(el);
+  });
+  updatePinPositions();
+}
+
+// ピン・地名ラベルの画面上の位置（px）をtx/ty/scaleから計算して反映する。
+// .map-pinは.map-stageのCSS transformの外側にあるため、パン・ズーム操作の
+// たびにこの関数を呼んで位置を合わせ直す必要がある
+function updatePinPositions(){
+  document.querySelectorAll("#mapPinsLayer .map-pin").forEach(el => {
+    const p = el._pinData;
+    if(!p) return;
+    const worldX = p.x / 100 * naturalW;
+    const worldY = p.y / 100 * naturalH;
+    el.style.left = (worldX * scale + tx) + "px";
+    el.style.top = (worldY * scale + ty) + "px";
   });
 }
 
@@ -1379,8 +1406,7 @@ const BIGAREA_VISIBLE_MAX_SCALE = 1.0;
 function applyTransform(){
   stage.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
   viewport.classList.toggle("show-bigarea", scale <= BIGAREA_VISIBLE_MAX_SCALE);
-  // 地図を拡大するほどピンは相対的に小さく（画面上のサイズはほぼ一定に）なるようにする
-  viewport.style.setProperty("--pin-scale", (1 / scale).toFixed(4));
+  updatePinPositions();
 }
 
 // 指定scaleでの許容パン範囲。ズーム後の着地点を先に計算する際にも使うため引数化している。
