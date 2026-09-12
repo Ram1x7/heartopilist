@@ -1090,13 +1090,16 @@ const GENERIC_LOCATION_LANDMARK_KEYS = {
 // （「花畑」全体で出現するものは、大エリア「花畑」をタップした時にも見えるべきのため）。
 // 「中心街」は対応する広域ゾーンの地名ピンが無く（対応する小エリアの1つ「大広場」の
 // 座標と偶然一致した場合のみ紐づく仕組みのため）、大エリア「Central District」には
-// 上記の仕組みでは紐づかない。そのため、ここで大エリアのkeyへ直接対応付けている
+// 上記の仕組みでは紐づかない。また「郊外」は小エリア「Suburbs」には紐づくが、
+// 別key扱いの大エリア「Suburbs Big Area」には紐づかない。そのため、ここで
+// 大エリアのkeyへ直接対応付けている
 const GENERIC_LOCATION_BIGAREA_KEYS = {
   "森林": "Forest",
   "漁村": "Fishing Village",
   "花畑": "Flower Field",
   "温泉山": "Onsen Mountain",
   "中心街": "Central District",
+  "郊外": "Suburbs Big Area",
 };
 
 // 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
