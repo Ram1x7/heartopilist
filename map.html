@@ -175,6 +175,16 @@ body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
   pointer-events:none;
 }
 
+/* 大エリア（概略・粗い形状）は、単純集約のため小エリア間の隙間（道路など、
+   本来どのエリアにも属さない場所）まで大きくカバーしてしまっている。
+   拡大表示時にまでこれをタップ対象にしてしまうと、小エリアに属さない
+   何でもない場所をタップした時にも大エリアが選択され「ランダムにエリアが
+   選ばれる」ように見えてしまうため、大エリアは縮小表示時のみタップ可能にする
+   （ホームは例外的に常時タップ可能のため keep-tappable を優先する） */
+.map-area-shape.approx{ pointer-events:none; }
+.map-area-shape.approx.keep-tappable{ pointer-events:auto; }
+.map-viewport.show-bigarea .map-area-shape.approx{ pointer-events:auto; }
+
 .map-area-hatch-line{
   stroke:var(--vermillion);
   stroke-width:0.5;
@@ -1034,7 +1044,11 @@ function findAreaShapeAtPoint(clientX, clientY){
       }
     }catch(e){ /* 非対応環境では無視 */ }
   });
-  return smallMatch || bigMatch;
+  // 大エリアは縮小表示時のみタップ対象とする（CSSのpointer-events設定と揃える。
+  // 揃えないと、拡大表示中に小エリアに属さない場所をタップした時、本来タップ
+  // 対象外の大エリア（概略・粗い形状）が「ランダムに」選ばれてしまう）
+  const bigAreaTappable = viewport.classList.contains("show-bigarea");
+  return smallMatch || (bigAreaTappable ? bigMatch : null);
 }
 
 // タップされたエリアの赤枠＋斜線ハイライト表示
@@ -1071,6 +1085,20 @@ const GENERIC_LOCATION_LANDMARK_KEYS = {
   "温泉山": ["Onsen", "Onsen Mountain Lake", "Ruins", "Crater Lake", "Stone Cliff"],
 };
 
+// 上記の広域locationは、それを構成する各小エリアだけでなく、
+// 大エリア（概略）自体をタップした時にも表示されるようにする
+// （「花畑」全体で出現するものは、大エリア「花畑」をタップした時にも見えるべきのため）。
+// 「中心街」は対応する広域ゾーンの地名ピンが無く（対応する小エリアの1つ「大広場」の
+// 座標と偶然一致した場合のみ紐づく仕組みのため）、大エリア「Central District」には
+// 上記の仕組みでは紐づかない。そのため、ここで大エリアのkeyへ直接対応付けている
+const GENERIC_LOCATION_BIGAREA_KEYS = {
+  "森林": "Forest",
+  "漁村": "Fishing Village",
+  "花畑": "Flower Field",
+  "温泉山": "Onsen Mountain",
+  "中心街": "Central District",
+};
+
 // 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
 // 地名に対して該当エリア側のkeyが"Rozy River"表記になっているなど、稀にkeyの綴りが
 // 一致しないケースがあるため、その場合は名前（日本語）の一致でフォールバックする。
@@ -1096,6 +1124,10 @@ function buildLocationsByAreaKey(){
     Object.entries(GENERIC_LOCATION_LANDMARK_KEYS).forEach(([genericLoc, keys]) => {
       if(keys.includes(lm.key)) set.add(genericLoc);
     });
+  });
+  Object.entries(GENERIC_LOCATION_BIGAREA_KEYS).forEach(([genericLoc, bigKey]) => {
+    if(!result.has(bigKey)) result.set(bigKey, new Set());
+    result.get(bigKey).add(genericLoc);
   });
   return result;
 }
