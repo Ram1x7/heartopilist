@@ -116,8 +116,8 @@ const mapAnimals = [
 const mapEvents = [
   { key:"sea-fishing", name:"海釣り1号", x:45.02, y:75.09 },
   { key:"sea-fishing", name:"海釣り2号", x:46.35, y:74.18 },
-  { key:"bubble-machine-challenge", name:"バブルマシンチャレンジ", x:27.25, y:74.55 },
-  { key:"yellow-duck-jump-puzzle", name:"イエローダックジャンプパズル", x:22.8, y:75.1 },
+  { key:"bubble-machine-challenge", name:"シャボン玉マシンチャレンジ", x:27.25, y:74.55 },
+  { key:"yellow-duck-jump-puzzle", name:"アヒルのジャンプステージ", x:24.79, y:79.66 },
   { key:"bait-the-insects", name:"虫コイコイ", x:50.5, y:23.0 },
   { key:"nest-of-hundreds", name:"巣ごもり", x:47.25, y:68.8 },
   // 熱気球クエスト：ユーザー提供の座標（サイトのマップ基準）。画面には縦に2つ並んで表示されるため、少しだけずらして配置
