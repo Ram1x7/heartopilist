@@ -110,7 +110,6 @@ const mapAnimals = [
   { key:"ferret", name:"フェレット", x:28.0, y:34.15 },
   { key:"silka-deer", name:"シカ", x:80.5, y:53.1 },
   { key:"llama", name:"ラマ", x:23.85, y:69.1 },
-  { key:"penguin", name:"ペンギン", x:46.05, y:14.4 },
 ];
 
 const mapEvents = [
