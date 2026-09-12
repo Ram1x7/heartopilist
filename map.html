@@ -1027,18 +1027,23 @@ function renderAreas(){
 function findAreaShapeAtPoint(clientX, clientY){
   const svg = document.getElementById("mapAreasLayer");
   if(!svg || !svg.createSVGPoint) return null;
+  // svg.getScreenCTM()は祖先要素(.map-stage)のCSS transform（パン・ズーム）を
+  // 含めて計算する必要があり、ブラウザ（特にSafari/WebKit）によって解釈が
+  // ズレることがあり、無関係なエリアが選ばれる不具合の原因になっていた。
+  // そのため、既に他の座標変換（screenToPct等）で使っている自前のtx/ty/scale
+  // 計算に統一し、getScreenCTMへの依存を無くす
+  const rect = viewport.getBoundingClientRect();
+  const worldX = (clientX - rect.left - tx) / scale;
+  const worldY = (clientY - rect.top - ty) / scale;
   const pt = svg.createSVGPoint();
-  pt.x = clientX;
-  pt.y = clientY;
-  const ctm = svg.getScreenCTM();
-  if(!ctm) return null;
-  const svgPt = pt.matrixTransform(ctm.inverse());
+  pt.x = (worldX / naturalW) * 100;
+  pt.y = (worldY / naturalH) * 100;
   const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
   let smallMatch = null, bigMatch = null;
   shapes.forEach(el => {
     if(smallMatch) return;
     try{
-      if(el.isPointInFill(svgPt)){
+      if(el.isPointInFill(pt)){
         if(el._areaKind === "big"){ if(!bigMatch) bigMatch = el; }
         else smallMatch = el;
       }
