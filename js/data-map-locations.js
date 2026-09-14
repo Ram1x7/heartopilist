@@ -45,8 +45,10 @@ const mapLocationLinks = {
   "海辺": null,
   "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
   "温泉山": { x:49.1, y:19.8 }, // landmarks:Onsen Mountain
-  "温泉山-温泉": { x:52.41, y:21.49 }, // landmarks:Onsen
-  "温泉山-温泉(崖の上)": { x:52.41, y:21.49 }, // landmarks:Onsen
+  // 「温泉」のランドマーク座標は温泉山の湖の小さな池のすぐそばにあり、
+  // 池のポリゴンと重なってしまうため、地図で見る用にわずかにずらした座標を使う
+  "温泉山-温泉": { x:52.04, y:21.41 }, // landmarks:Onsen
+  "温泉山-温泉(崖の上)": { x:52.04, y:21.41 }, // landmarks:Onsen
   "温泉山-火山湖": { x:38.38, y:17.93 }, // landmarks:Crater Lake
   "温泉山-石海岸の崖": { x:61.88, y:20.57 }, // landmarks:Stone Cliff
   "温泉山-遺跡": { x:29.3, y:18.25 }, // landmarks:Ruins
@@ -65,8 +67,8 @@ const mapLocationLinks = {
   "花畑-クジラ山": { x:18.81, y:41.47 }, // landmarks:Whale Mountain
   "花畑-パープルビーチ": { x:21.6, y:72.75 }, // landmarks:Purple Light Beach
   "花畑-風車の花畑": { x:18.7, y:63.33 }, // landmarks:Windmill Flower Field
-  "草原の湖": { x:22.4, y:53.86 }, // landmarks:Meadow Lake
-  "草原の湖畔": { x:22.4, y:53.86 }, // landmarks:Meadow Lake
+  "草原の湖": { x:23.43, y:53.36 }, // landmarks:Meadow Lake
+  "草原の湖畔": { x:23.43, y:53.36 }, // landmarks:Meadow Lake
   "虫クエスト（追加段階）": null,
   "虫コイコイクエスト": null,
   "虫コイコイクエスト-遺跡(追加段階)": { x:29.3, y:18.25 }, // landmarks:Ruins

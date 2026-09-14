@@ -38,7 +38,7 @@ const mapLandmarks = [
   // 実際の池の形状（polygons）から算出した重心（最大の池の重心）に合わせている。
   { key:"Suburban Lake", name:"郊外の湖", nameI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:50.08, y:59.76 },
   { key:"Forest Lake", name:"森の湖", nameI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:76.1, y:49.66 },
-  { key:"Meadow Lake", name:"草原の湖", nameI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:22.4, y:53.86 },
+  { key:"Meadow Lake", name:"草原の湖", nameI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:23.43, y:53.36 },
   { key:"Onsen Mountain Lake", name:"温泉山の湖", nameI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:53.76, y:25.99 },
   // 以下4件は heartopia.guide のデータには無い広域ゾーン名（ユーザーがゲーム内マップの実機画像で確認）。
   // 座標はユーザー提供のゲーム内スクリーンショットの表記位置に合わせている（大エリアの

@@ -956,12 +956,15 @@ function findAreaForWorldPoint(px, py){
   pt.x = px;
   pt.y = py;
   const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
+  // 小エリアは面積の大きい順に描画されており、入れ子・重なりがある場合は
+  // 後から描画された（＝画面上で手前に来る）小さい方を優先する必要がある。
+  // そのため「最初に一致した要素」ではなく「最後に一致した要素」を採用する
+  // （タップ時のfindAreaShapeAtPointと同じ考え方）
   let smallMatch = null, bigMatch = null;
   shapes.forEach(el => {
-    if(smallMatch) return;
     try{
       if(el.isPointInFill(pt)){
-        if(el._areaKind === "big"){ if(!bigMatch) bigMatch = el; }
+        if(el._areaKind === "big"){ bigMatch = el; }
         else smallMatch = el;
       }
     }catch(e){ /* 非対応環境では無視 */ }
@@ -1087,12 +1090,14 @@ function findAreaShapeAtPoint(clientX, clientY){
   pt.x = (worldX / naturalW) * 100;
   pt.y = (worldY / naturalH) * 100;
   const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
+  // 小エリアは面積の大きい順に描画されており、入れ子・重なりがある場合は
+  // 後から描画された（＝画面上で手前に来る）小さい方を優先する必要がある。
+  // そのため「最初に一致した要素」ではなく「最後に一致した要素」を採用する
   let smallMatch = null, bigMatch = null;
   shapes.forEach(el => {
-    if(smallMatch) return;
     try{
       if(el.isPointInFill(pt)){
-        if(el._areaKind === "big"){ if(!bigMatch) bigMatch = el; }
+        if(el._areaKind === "big"){ bigMatch = el; }
         else smallMatch = el;
       }
     }catch(e){ /* 非対応環境では無視 */ }
