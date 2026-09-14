@@ -92,25 +92,24 @@ const mapShops = [
 
 const mapBusStops = [
   { x:34.0, y:53.3 },
-  { x:63.9, y:51.9 },
+  { x:63.8, y:52.47 },
   { x:47.9, y:65.4 },
   { x:21.8, y:53.2 },
-  { x:44.75, y:19.35 },
+  { x:51.29, y:21.96 },
   { x:48.0, y:37.3 },
-  { x:50.8, y:50.8 },
+  { x:48.24, y:50.5 },
   { x:79.8, y:50.0 },
 ];
 
 const mapAnimals = [
-  { key:"panda", name:"パンダ", x:77.9, y:69.4 },
-  { key:"capybara", name:"カピバラ", x:30.95, y:18.7 },
-  { key:"bunny", name:"うさぎ", x:35.65, y:53.75 },
-  { key:"fox", name:"きつね", x:20.25, y:63.95 },
-  { key:"sea-otter", name:"ラッコ", x:50.85, y:73.4 },
-  { key:"ferret", name:"フェレット", x:28.0, y:34.15 },
-  { key:"silka-deer", name:"シカ", x:80.5, y:53.1 },
-  { key:"llama", name:"ラマ", x:23.85, y:69.1 },
-  { key:"penguin", name:"ペンギン", x:46.05, y:14.4 },
+  { key:"panda", name:"パンダ", x:76.12, y:64.72 },
+  { key:"capybara", name:"カピバラ", x:32.22, y:19.21 },
+  { key:"bunny", name:"ウサギ", x:37.05, y:53.19 },
+  { key:"fox", name:"キツネ", x:23.04, y:56.81 },
+  { key:"sea-otter", name:"ラッコ", x:51.41, y:73.51 },
+  { key:"ferret", name:"テン", x:29.8, y:36.11 },
+  { key:"silka-deer", name:"ニホンジカ", x:79.36, y:46.36 },
+  { key:"llama", name:"アルパカ", x:32.06, y:70.89 },
 ];
 
 const mapEvents = [
