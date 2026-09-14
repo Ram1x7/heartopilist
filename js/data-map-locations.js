@@ -80,3 +80,22 @@ const mapLocationLinks = {
   "霞川": { x:31.71, y:33.26 }, // landmarks:Rosy River
   "静川": { x:36.25, y:67.92 }, // landmarks:Tranquil River
 };
+
+// 「湖」「川」「海」など、特定の1地点に絞れない汎用locationは上記では null にしているが、
+// 実際にはどの湖・川・海でも出現するという意味のため、地図で見るを押すと該当する
+// エリア全てをハイライト表示する（js/main.jsのリンク表示判定と、map.htmlのハイライト
+// 処理の両方から参照）。キーはエリア側(js/data-map-areas.js)のkeyに合わせている
+// （「霞川」の地名は"Rosy River"表記だが、エリア側は"Rozy River"表記のため注意）。
+// 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象、「水辺」は両方＋「湖」の全て。
+const mapMultiAreaLocations = {
+  "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
+  "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rozy River"],
+  "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  "川辺": ["Giantwood River", "Tranquil River", "Shallow River", "Rozy River"],
+  "海辺": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  "水辺": [
+    "Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake",
+    "Giantwood River", "Tranquil River", "Shallow River", "Rozy River",
+    "Old Sea", "Whale Sea", "Zephyr Sea", "East Sea",
+  ],
+};

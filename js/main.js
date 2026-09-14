@@ -982,7 +982,11 @@ function openModal(c){
  if(c.seasonName){
    locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
  }
- if(MAP_FEATURE_PUBLIC && typeof mapLocationLinks !== "undefined" && c.location && mapLocationLinks[c.location]){
+ const hasMapLink = c.location && (
+   (typeof mapLocationLinks !== "undefined" && mapLocationLinks[c.location]) ||
+   (typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[c.location])
+ );
+ if(MAP_FEATURE_PUBLIC && hasMapLink){
    // ページ遷移せず、埋め込みモーダルでマップを開く（hrefはJS無効時のフォールバック）
    locHtml += ` <a class="modal-map-link" href="map.html?loc=${encodeURIComponent(c.location)}" onclick='event.preventDefault(); openMapEmbed(${JSON.stringify(c.location)});'>${icon("pin",{size:11})}${T("modal_view_on_map","地図で見る")}</a>`;
  }
