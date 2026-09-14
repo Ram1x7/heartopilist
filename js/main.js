@@ -427,6 +427,7 @@ miniSearch.addEventListener("input", ()=>{
 // ×ボタン
 clearBtn.onclick = ()=>{
   searchInput.value = "";
+  miniSearch.value = "";
   localStorage.removeItem("searchKeyword");
   clearBtn.style.display = "none";
   render();
@@ -1903,6 +1904,7 @@ updateTime();
 // 保存データ読込
 searchInput.value =
   localStorage.getItem("searchKeyword") || "";
+miniSearch.value = searchInput.value;
 clearBtn.style.display =
   searchInput.value ? "flex" : "none";
 levelMin.value =
