@@ -1111,8 +1111,17 @@ function findAreaShapeAtPoint(clientX, clientY){
 
 // タップされたエリアの赤枠＋斜線ハイライト表示
 let selectedArea = null;
+// 「湖」「川」「海」等、複数エリアにまたがる汎用locationのハイライト用。
+// 通常のタップ選択（selectedArea）とは別に、複数エリアのkeyを保持する
+let selectedAreaMultiKeys = null;
 function applyAreaSelection(){
   document.querySelectorAll("#mapAreasGroup .map-area-shape.selected").forEach(el => el.classList.remove("selected"));
+  if(selectedAreaMultiKeys){
+    document.querySelectorAll("#mapAreasGroup .map-area-shape").forEach(el => {
+      if(el._areaData && selectedAreaMultiKeys.has(el._areaData.key)) el.classList.add("selected");
+    });
+    return;
+  }
   if(!selectedArea) return;
   document.querySelectorAll("#mapAreasGroup .map-area-shape").forEach(el => {
     if(el._areaData === selectedArea.area) el.classList.add("selected");
@@ -1132,6 +1141,14 @@ const GENERIC_LOCATION_LANDMARK_KEYS = {
   "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
   "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
   "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  // 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象。「水辺」はその両方＋「湖」の全て
+  "川辺": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
+  "海辺": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  "水辺": [
+    "Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake",
+    "Giantwood River", "Tranquil River", "Shallow River", "Rosy River",
+    "Old Sea", "Whale Sea", "Zephyr Sea", "East Sea",
+  ],
   // 中心街＝大広場・住宅街・花園街・アート街をまとめたエリアのため、
   // location「中心街」の生き物はこの4エリアすべてに出現する扱いにする
   "中心街": ["Central Square", "Residential Street", "Garden Street", "Art Street"],
@@ -1289,6 +1306,31 @@ function zoomToArea(area){
   animateTo(targetTx, targetTy, targetScale, 320);
 }
 
+// 複数エリア（「湖」「川」「海」等の汎用location）を全て画面内に収まるようにズームする
+function zoomToAreas(areas){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  areas.forEach(area => {
+    area.polygons.forEach(ring => {
+      ring.forEach(([x,y]) => {
+        const px = x / 100 * naturalW, py = y / 100 * naturalH;
+        if(px < minX) minX = px;
+        if(px > maxX) maxX = px;
+        if(py < minY) minY = py;
+        if(py > maxY) maxY = py;
+      });
+    });
+  });
+  const boxW = Math.max(1, maxX - minX), boxH = Math.max(1, maxY - minY);
+  const FIT_PADDING = 0.85; // 端に少し余白を持たせる
+  const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(vw / boxW, vh / boxH) * FIT_PADDING));
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - cx * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - cy * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 320);
+}
+
 const CREATURE_CAT_LABELS = { fish:"filter_fish", bug:"filter_bug", bird:"filter_bird" };
 const CREATURE_CAT_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥" };
 const CREATURE_CAT_ICONS = { fish:"fish", bug:"bug", bird:"bird" };
@@ -1369,6 +1411,7 @@ function showPinInfo(p){
   document.getElementById("mapInfoAction").style.display = "none";
   document.getElementById("mapInfoCard").classList.add("show");
   selectedArea = null;
+  selectedAreaMultiKeys = null;
   applyAreaSelection();
 }
 
@@ -1392,6 +1435,28 @@ function showAreaInfo(area, kind){
 
   document.getElementById("mapInfoCard").classList.add("show");
   selectedArea = { area, kind };
+  selectedAreaMultiKeys = null;
+  applyAreaSelection();
+}
+
+// 「湖」「川」「海」等、複数エリアにまたがる汎用location用の情報カード表示。
+// 単一エリアの「くわしく見る」は該当エリアが1つに定まらないため非表示にする
+function showMultiAreaInfo(areas){
+  document.getElementById("mapInfoCat").textContent = T("map_cat_multi_area","登場エリア");
+  document.getElementById("mapInfoCat").classList.add("is-area");
+  document.getElementById("mapInfoName").textContent = areas.map(a => a.name || a.key).join("・");
+
+  const zoomBtn = document.getElementById("mapInfoZoom");
+  zoomBtn.style.display = "";
+  zoomBtn.innerHTML = icon("search",{size:15});
+  zoomBtn.setAttribute("aria-label", T("map_view_location","ここを拡大表示"));
+  zoomBtn.onclick = () => zoomToAreas(areas);
+
+  document.getElementById("mapInfoAction").style.display = "none";
+
+  document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = null;
+  selectedAreaMultiKeys = new Set(areas.map(a => a.key));
   applyAreaSelection();
 }
 
@@ -1411,6 +1476,7 @@ document.getElementById("mapInfoClose").innerHTML = icon("close",{size:14});
 document.getElementById("mapInfoClose").onclick = () => {
   document.getElementById("mapInfoCard").classList.remove("show");
   selectedArea = null;
+  selectedAreaMultiKeys = null;
   applyAreaSelection();
 };
 
@@ -1485,8 +1551,17 @@ mapImg.onload = () => {
   fitToViewport();
   renderPins();
   renderAreas();
-  // ?loc= で指定された地点を含むエリアを、タップした時と同じ見た目で選択表示する
-  if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
+  // ?loc= で指定された地点を含むエリアを、タップした時と同じ見た目で選択表示する。
+  // 「湖」「川」「海」等の汎用locationは複数エリアにまたがるため、まずそちらを判定する
+  if(highlightLocKey && typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[highlightLocKey] && typeof mapAreasSmall !== "undefined"){
+    const areas = mapMultiAreaLocations[highlightLocKey]
+      .map(key => mapAreasSmall.find(a => a.key === key))
+      .filter(Boolean);
+    if(areas.length){
+      zoomToAreas(areas);
+      showMultiAreaInfo(areas);
+    }
+  }else if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
     const coord = mapLocationLinks[highlightLocKey];
     const areaEl = coord ? findAreaForWorldPoint(coord.x, coord.y) : null;
     if(areaEl && areaEl._areaData){
