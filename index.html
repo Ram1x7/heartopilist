@@ -51,7 +51,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=22">
+<link rel="stylesheet" href="css/style.css?v=23">
 <link rel="stylesheet" href="css/design-system.css?v=4">
 
 <link rel="prefetch" href="./foods.html">
@@ -96,6 +96,7 @@
   <a href="./index.html" class="site-nav-item active" data-i18n="nav_zukan">図鑑</a>
   <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
   <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
   <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
   <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
   <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
@@ -366,6 +367,14 @@
     <div id="m_craftInfo" class="modal-make-steps"></div>
     <div id="m_makeSteps" class="modal-make-steps"></div>
     <button class="modal-close-btn" onclick="closeModal()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<!-- 出現場所→マップ埋め込みモーダル（ページ遷移せずマップを確認できるようにする） -->
+<div id="mapEmbedModal" onclick="if(event.target.id==='mapEmbedModal')closeMapEmbed()">
+  <div class="map-embed-box">
+    <button class="map-embed-close" onclick="closeMapEmbed()" aria-label="close"></button>
+    <iframe id="mapEmbedFrame" class="map-embed-iframe" title="マップ"></iframe>
   </div>
 </div>
 
@@ -640,7 +649,7 @@ text-align:left;
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/tutorial.js"></script>
-<script src="js/main.js?v=29"></script>
+<script src="js/main.js?v=31"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=22">
+<link rel="stylesheet" href="./css/style.css?v=23">
 <link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
@@ -59,6 +59,18 @@
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
+
+/* ?embed=1（図鑑ページの埋め込みモーダル用iframe）では、サイト共通の
+   ヘッダー・ナビ・フッターを隠し、マップ本体だけを表示する。
+   限られた高さを最大限マップ表示に使えるようにする */
+body.embed-mode .title-bar,
+body.embed-mode .site-nav,
+body.embed-mode .page-header,
+body.embed-mode .footer{
+  display:none;
+}
+body.embed-mode{ padding:8px; }
+body.embed-mode .map-viewport{ height:calc(100vh - 60px); }
 
 .page-header{ margin-bottom:6px; }
 
@@ -268,17 +280,6 @@ body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
 .map-pin.cat-busstop .map-pin-dot span,
 .map-pin.cat-animal .map-pin-dot span{
   font-size:20px;
-}
-
-.map-pin.highlight .map-pin-dot{
-  background:var(--indigo);
-  box-shadow:0 0 0 5px rgba(193,90,122,0.35), 0 2px 6px rgba(0,0,0,0.35);
-  animation:mapPinBounce 1s ease-in-out infinite;
-}
-
-@keyframes mapPinBounce{
-  0%,100%{ transform:translate(-50%,-100%) scale(1); }
-  50%{ transform:translate(-50%,-110%) scale(1.08); }
 }
 
 /* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示）。
@@ -642,6 +643,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
   <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
   <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item active" data-i18n="nav_map">マップ</a>
   <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
   <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
   <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
@@ -935,15 +937,37 @@ function buildAllPins(){
 }
 const allPins = buildAllPins();
 
-// クエリパラメータ ?loc= で指定された地点にハイライトピンを追加
+// クエリパラメータ ?embed=1 のときは、図鑑ページの埋め込みモーダル（iframe）内での
+// 表示のため、サイト共通のヘッダー・ナビ・フッターを隠してマップ本体だけを表示する
 const urlParams = new URLSearchParams(location.search);
+if(urlParams.get("embed") === "1"){
+  document.body.classList.add("embed-mode");
+}
+
+// クエリパラメータ ?loc= で指定された地点を、マップ上でエリアをタップした時と
+// 同じ見た目（赤枠+斜線の選択表示、下部の情報カード）で示す。ピンは表示しない
 const highlightLocKey = urlParams.get("loc");
-let highlightPin = null;
-if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
-  const coord = mapLocationLinks[highlightLocKey];
-  if(coord){
-    highlightPin = { cat:"landmark", icon:"📌", name:highlightLocKey, x:coord.x, y:coord.y, highlight:true };
-  }
+
+// 指定した地図上の座標（%）を含むエリアの図形要素を返す（小エリア優先、
+// 見つからなければ大エリア）。endPointer()のフォールバック判定と同じロジック
+function findAreaForWorldPoint(px, py){
+  const svg = document.getElementById("mapAreasLayer");
+  if(!svg || !svg.createSVGPoint) return null;
+  const pt = svg.createSVGPoint();
+  pt.x = px;
+  pt.y = py;
+  const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
+  let smallMatch = null, bigMatch = null;
+  shapes.forEach(el => {
+    if(smallMatch) return;
+    try{
+      if(el.isPointInFill(pt)){
+        if(el._areaKind === "big"){ if(!bigMatch) bigMatch = el; }
+        else smallMatch = el;
+      }
+    }catch(e){ /* 非対応環境では無視 */ }
+  });
+  return smallMatch || bigMatch;
 }
 
 function renderPins(){
@@ -951,14 +975,13 @@ function renderPins(){
   layer.innerHTML = "";
   // 地名・アイコン付き地点はタブでの切り替え対象ではなく、常に表示する
   const list = allPins.filter(p => p.cat === "landmark" || p.cat === "poi" || activeCats.has(p.cat));
-  const finalList = highlightPin ? [...list, highlightPin] : list;
-  finalList.forEach(p => {
+  list.forEach(p => {
     const el = document.createElement("div");
-    el.className = "map-pin cat-" + p.cat + (p.highlight ? " highlight" : "") + (p.bigareaOnly ? " bigarea-only" : "") + (p.water ? " water" : "") + (p.alwaysVisible ? " keep-visible" : "") + (p.img ? " has-img" : "");
+    el.className = "map-pin cat-" + p.cat + (p.bigareaOnly ? " bigarea-only" : "") + (p.water ? " water" : "") + (p.alwaysVisible ? " keep-visible" : "") + (p.img ? " has-img" : "");
     // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外は、実画像があれば
     // その画像を、無ければ絵文字アイコンを使う（常時ラベルは出さず、タップ時の
     // カードで名前を確認する形にしている）。
-    el.innerHTML = (p.cat === "landmark" && !p.highlight)
+    el.innerHTML = (p.cat === "landmark")
       ? `<div class="map-pin-label">${p.name}</div>`
       : (p.img
         ? `<div class="map-pin-dot"><img src="${p.img}" alt="" loading="lazy"></div>`
@@ -1456,13 +1479,17 @@ mapImg.onload = () => {
   stage.style.width = naturalW + "px";
   stage.style.height = naturalH + "px";
   fitToViewport();
-  if(highlightPin){
-    const px = highlightPin.x / 100 * naturalW;
-    const py = highlightPin.y / 100 * naturalH;
-    centerOn(px, py, 2.2);
-  }
   renderPins();
   renderAreas();
+  // ?loc= で指定された地点を含むエリアを、タップした時と同じ見た目で選択表示する
+  if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
+    const coord = mapLocationLinks[highlightLocKey];
+    const areaEl = coord ? findAreaForWorldPoint(coord.x, coord.y) : null;
+    if(areaEl && areaEl._areaData){
+      zoomToArea(areaEl._areaData);
+      showAreaInfo(areaEl._areaData, areaEl._areaKind);
+    }
+  }
 };
 
 // ── アニメーション（ズームボタン・エリアの「ここを拡大表示」・ラバーバンドの戻り） ──
