@@ -45,8 +45,10 @@ const mapLocationLinks = {
   "海辺": null,
   "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
   "温泉山": { x:49.1, y:19.8 }, // landmarks:Onsen Mountain
-  "温泉山-温泉": { x:52.41, y:21.49 }, // landmarks:Onsen
-  "温泉山-温泉(崖の上)": { x:52.41, y:21.49 }, // landmarks:Onsen
+  // 「温泉」のランドマーク座標は温泉山の湖の小さな池のすぐそばにあり、
+  // 池のポリゴンと重なってしまうため、地図で見る用にわずかにずらした座標を使う
+  "温泉山-温泉": { x:52.04, y:21.41 }, // landmarks:Onsen
+  "温泉山-温泉(崖の上)": { x:52.04, y:21.41 }, // landmarks:Onsen
   "温泉山-火山湖": { x:38.38, y:17.93 }, // landmarks:Crater Lake
   "温泉山-石海岸の崖": { x:61.88, y:20.57 }, // landmarks:Stone Cliff
   "温泉山-遺跡": { x:29.3, y:18.25 }, // landmarks:Ruins
