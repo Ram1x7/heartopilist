@@ -1241,6 +1241,10 @@ body[data-icon-size="large"] .item{
   height:100%;
   border:none;
   display:block;
+  /* iframe上でのドラッグ・ピンチを、背景ページのスクロール／ズーム候補として
+     ブラウザに奪われないようにする（マップ内部のドラッグ操作がタップ扱いに
+     なってしまい、エリア選択ができなくなる問題への対策） */
+  touch-action:none;
 }
 
 .map-embed-close{
