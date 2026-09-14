@@ -967,8 +967,8 @@ function forceRepaint(){
 
 }
 
-// マップ機能（map.html）はまだ一般公開前。trueにすると図鑑モーダルに「地図で見る」リンクが復活する
-const MAP_FEATURE_PUBLIC = false;
+// マップ機能（map.html）を一般公開
+const MAP_FEATURE_PUBLIC = true;
 
 // モーダル
 function openModal(c){
