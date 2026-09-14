@@ -664,8 +664,8 @@ body.dark .footer{ color:var(--dark-text-sub); }
 <div class="map-cat-tabs">
   <button class="ds-tab active" id="mapcat-npc" onclick="toggleMapCat('npc')" data-i18n="map_cat_npc">NPC</button>
   <button class="ds-tab active" id="mapcat-shop" onclick="toggleMapCat('shop')" data-i18n="map_cat_shop">ショップ</button>
-  <button class="ds-tab" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
-  <button class="ds-tab" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
+  <button class="ds-tab active" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
+  <button class="ds-tab active" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
   <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
 </div>
 
@@ -826,7 +826,7 @@ function displayName(obj){
 }
 
 // ── カテゴリ表示状態 ──
-let activeCats = new Set(["npc","shop","event"]);
+let activeCats = new Set(["npc","shop","busstop","animal","event"]);
 
 function toggleMapCat(cat){
   if(activeCats.has(cat)) activeCats.delete(cat); else activeCats.add(cat);
