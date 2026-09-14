@@ -1095,9 +1095,28 @@ document.getElementById("mapEmbedModal").querySelector(".map-embed-close").inner
 // 読み込みが開始されないまま止まってしまうことがある。モーダルを表示した直後は
 // まだレイアウトが再計算されていない可能性があるため、offsetHeightを読んで
 // 強制的にレイアウトを確定させてからsrcを設定する
+// モーダルを開いている間は背景ページのスクロールを止める。iOS Safariでは
+// 固定表示のモーダルの裏でページがスクロールできる状態だと、内部のiframeの
+// 描画が乱れる（残像のような線が入る）ことや、タッチ操作がマップ側ではなく
+// 背景のスクロールとして扱われてタップが効かなくなることがあるため
+let bodyScrollLockY = 0;
+function lockBodyScroll(){
+  bodyScrollLockY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.top = -bodyScrollLockY + "px";
+  document.body.style.width = "100%";
+}
+function unlockBodyScroll(){
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.width = "";
+  window.scrollTo(0, bodyScrollLockY);
+}
+
 function openMapEmbed(location){
   const modalEl = document.getElementById("mapEmbedModal");
   const frame = document.getElementById("mapEmbedFrame");
+  lockBodyScroll();
   modalEl.style.display = "block";
   void frame.offsetHeight; // 強制リフロー（iframe自体のレイアウトを確定させる）
   frame.src = "map.html?embed=1&loc=" + encodeURIComponent(location);
@@ -1109,6 +1128,7 @@ function closeMapEmbed(){
   // （空文字だと現在のページ自身を指すURLとして解釈され、iframe内で
   // このページ自体が再読み込みされてしまうため、about:blankを使う）
   document.getElementById("mapEmbedFrame").src = "about:blank";
+  unlockBodyScroll();
 }
 
 function toggleMultiSelect(){

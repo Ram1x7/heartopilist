@@ -1241,6 +1241,11 @@ body[data-icon-size="large"] .item{
   height:100%;
   border:none;
   display:block;
+  /* touch-action:noneにするとマップ表示部分だけでなくiframe全体（下部の
+     情報カードにたどり着くためのスクロール操作も含む）でタッチ操作が
+     無効になってしまうため指定しない。マップ内部の操作自体は、
+     map.html側の.map-viewportに設定済みのtouch-action:noneで
+     すでに保護されている */
 }
 
 .map-embed-close{
