@@ -65,8 +65,8 @@ const mapLocationLinks = {
   "花畑-クジラ山": { x:18.81, y:41.47 }, // landmarks:Whale Mountain
   "花畑-パープルビーチ": { x:21.6, y:72.75 }, // landmarks:Purple Light Beach
   "花畑-風車の花畑": { x:18.7, y:63.33 }, // landmarks:Windmill Flower Field
-  "草原の湖": { x:22.4, y:53.86 }, // landmarks:Meadow Lake
-  "草原の湖畔": { x:22.4, y:53.86 }, // landmarks:Meadow Lake
+  "草原の湖": { x:23.43, y:53.36 }, // landmarks:Meadow Lake
+  "草原の湖畔": { x:23.43, y:53.36 }, // landmarks:Meadow Lake
   "虫クエスト（追加段階）": null,
   "虫コイコイクエスト": null,
   "虫コイコイクエスト-遺跡(追加段階)": { x:29.3, y:18.25 }, // landmarks:Ruins
