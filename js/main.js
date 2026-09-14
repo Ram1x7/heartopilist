@@ -981,9 +981,9 @@ function openModal(c){
  if(c.seasonName){
    locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
  }
- // マップ機能は一般公開前のため、リンクは一旦非表示にしている（MAP_FEATURE_PUBLICをtrueにすると復活）
  if(MAP_FEATURE_PUBLIC && typeof mapLocationLinks !== "undefined" && c.location && mapLocationLinks[c.location]){
-   locHtml += ` <a class="modal-map-link" href="map.html?loc=${encodeURIComponent(c.location)}" target="_blank">${icon("pin",{size:11})}${T("modal_view_on_map","地図で見る")}</a>`;
+   // ページ遷移せず、埋め込みモーダルでマップを開く（hrefはJS無効時のフォールバック）
+   locHtml += ` <a class="modal-map-link" href="map.html?loc=${encodeURIComponent(c.location)}" onclick='event.preventDefault(); openMapEmbed(${JSON.stringify(c.location)});'>${icon("pin",{size:11})}${T("modal_view_on_map","地図で見る")}</a>`;
  }
  m_loc.innerHTML = locHtml;
  m_weather.innerText = formatWeather(c.weather);
@@ -1086,6 +1086,29 @@ function openModal(c){
   
 function closeModal(){
  modal.style.display="none";
+}
+
+document.getElementById("mapEmbedModal").querySelector(".map-embed-close").innerHTML = icon("close",{size:14});
+
+// 出現場所→マップ埋め込みモーダル（ページ遷移せず、iframeでmap.htmlを表示する）
+// display:noneの（＝レイアウトが確定していない）iframeにsrcを設定すると、
+// 読み込みが開始されないまま止まってしまうことがある。モーダルを表示した直後は
+// まだレイアウトが再計算されていない可能性があるため、offsetHeightを読んで
+// 強制的にレイアウトを確定させてからsrcを設定する
+function openMapEmbed(location){
+  const modalEl = document.getElementById("mapEmbedModal");
+  const frame = document.getElementById("mapEmbedFrame");
+  modalEl.style.display = "block";
+  void frame.offsetHeight; // 強制リフロー（iframe自体のレイアウトを確定させる）
+  frame.src = "map.html?embed=1&loc=" + encodeURIComponent(location);
+  void frame.offsetHeight;
+}
+function closeMapEmbed(){
+  document.getElementById("mapEmbedModal").style.display = "none";
+  // 次回開いた時に確実に再読み込みされるよう、srcをクリアしておく
+  // （空文字だと現在のページ自身を指すURLとして解釈され、iframe内で
+  // このページ自体が再読み込みされてしまうため、about:blankを使う）
+  document.getElementById("mapEmbedFrame").src = "about:blank";
 }
 
 function toggleMultiSelect(){

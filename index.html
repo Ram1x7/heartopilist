@@ -51,7 +51,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=22">
+<link rel="stylesheet" href="css/style.css?v=23">
 <link rel="stylesheet" href="css/design-system.css?v=4">
 
 <link rel="prefetch" href="./foods.html">
@@ -370,6 +370,14 @@
   </div>
 </div>
 
+<!-- 出現場所→マップ埋め込みモーダル（ページ遷移せずマップを確認できるようにする） -->
+<div id="mapEmbedModal" onclick="if(event.target.id==='mapEmbedModal')closeMapEmbed()">
+  <div class="map-embed-box">
+    <button class="map-embed-close" onclick="closeMapEmbed()" aria-label="close"></button>
+    <iframe id="mapEmbedFrame" class="map-embed-iframe" title="マップ"></iframe>
+  </div>
+</div>
+
 <div style="font-size:12px; padding:10px; opacity:0.8;">
 
 <h3 data-i18n="privacy_title">プライバシーポリシー</h3>
@@ -641,7 +649,7 @@ text-align:left;
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/tutorial.js"></script>
-<script src="js/main.js?v=30"></script>
+<script src="js/main.js?v=31"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

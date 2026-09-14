@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=22">
+<link rel="stylesheet" href="./css/style.css?v=23">
 <link rel="stylesheet" href="./css/design-system.css?v=4">
 
 <link rel="prefetch" href="./index.html">
@@ -59,6 +59,18 @@
 *{ box-sizing:border-box; margin:0; padding:0; }
 
 body{ min-height:100vh; }
+
+/* ?embed=1（図鑑ページの埋め込みモーダル用iframe）では、サイト共通の
+   ヘッダー・ナビ・フッターを隠し、マップ本体だけを表示する。
+   限られた高さを最大限マップ表示に使えるようにする */
+body.embed-mode .title-bar,
+body.embed-mode .site-nav,
+body.embed-mode .page-header,
+body.embed-mode .footer{
+  display:none;
+}
+body.embed-mode{ padding:8px; }
+body.embed-mode .map-viewport{ height:calc(100vh - 60px); }
 
 .page-header{ margin-bottom:6px; }
 
@@ -936,8 +948,14 @@ function buildAllPins(){
 }
 const allPins = buildAllPins();
 
-// クエリパラメータ ?loc= で指定された地点にハイライトピンを追加
+// クエリパラメータ ?embed=1 のときは、図鑑ページの埋め込みモーダル（iframe）内での
+// 表示のため、サイト共通のヘッダー・ナビ・フッターを隠してマップ本体だけを表示する
 const urlParams = new URLSearchParams(location.search);
+if(urlParams.get("embed") === "1"){
+  document.body.classList.add("embed-mode");
+}
+
+// クエリパラメータ ?loc= で指定された地点にハイライトピンを追加
 const highlightLocKey = urlParams.get("loc");
 let highlightPin = null;
 if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
