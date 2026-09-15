@@ -1078,5 +1078,11 @@
   "build_wall_basis_height": "ความสูง",
   "build_wall_height_label": "ความสูง (จำนวนชั้นที่วางซ้อน)",
   "build_wall_auto_width_hint": "ความกว้างที่คำนวณอัตโนมัติ: {n}",
-  "build_wall_auto_height_hint": "ความสูงที่คำนวณอัตโนมัติ: {n}"
+  "build_wall_auto_height_hint": "ความสูงที่คำนวณอัตโนมัติ: {n}",
+  "bug_timer_title": "ตัวจับเวลาการเกิดใหม่ของแมลง",
+  "bug_timer_reset": "รีเซ็ต",
+  "bug_timer_count_label": "จำนวนที่จับได้",
+  "bug_timer_empty_hint": "กดปุ่มด้านล่างทันทีที่จับแมลงได้ เพื่อเริ่มนับถอยหลัง 1 นาที",
+  "bug_timer_toggle_aria": "แสดง/ซ่อนรายการตัวจับเวลา",
+  "bug_timer_capture_aria": "เริ่มตัวจับเวลาการเกิดใหม่ 1 นาที"
 }

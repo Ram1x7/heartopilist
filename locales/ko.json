@@ -1078,5 +1078,11 @@
   "build_wall_basis_height": "높이",
   "build_wall_height_label": "높이（쌓을 단수）",
   "build_wall_auto_width_hint": "자동 계산된 폭: {n}",
-  "build_wall_auto_height_hint": "자동 계산된 높이: {n}"
+  "build_wall_auto_height_hint": "자동 계산된 높이: {n}",
+  "bug_timer_title": "벌레 리팝 타이머",
+  "bug_timer_reset": "리셋",
+  "bug_timer_count_label": "포획 횟수",
+  "bug_timer_empty_hint": "벌레를 잡은 순간 아래 버튼을 누르면 1분 카운트다운이 시작됩니다",
+  "bug_timer_toggle_aria": "타이머 목록 열기/닫기",
+  "bug_timer_capture_aria": "1분 리팝 타이머 시작"
 }

@@ -1078,5 +1078,11 @@
   "build_wall_basis_height": "高度",
   "build_wall_height_label": "高度（堆叠层数）",
   "build_wall_auto_width_hint": "宽度将自动调整为{n}",
-  "build_wall_auto_height_hint": "高度将自动调整为{n}"
+  "build_wall_auto_height_hint": "高度将自动调整为{n}",
+  "bug_timer_title": "昆虫刷新计时器",
+  "bug_timer_reset": "重置",
+  "bug_timer_count_label": "捕获次数",
+  "bug_timer_empty_hint": "捕获到昆虫的瞬间按下方按钮，即可开始1分钟倒计时",
+  "bug_timer_toggle_aria": "展开/收起计时器列表",
+  "bug_timer_capture_aria": "开始1分钟刷新计时"
 }

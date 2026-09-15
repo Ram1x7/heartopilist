@@ -50,7 +50,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=25">
+<link rel="stylesheet" href="css/style.css?v=27">
 <link rel="stylesheet" href="css/design-system.css?v=4">
 
 <link rel="prefetch" href="./foods.html">
@@ -627,7 +627,30 @@ text-align:left;
   </div>
 </div>
 
-  
+<div id="bugTimerWidget" class="bug-timer-widget">
+  <div class="bug-timer-panel" id="bugTimerPanel" hidden>
+    <div class="bug-timer-panel-header">
+      <span data-i18n="bug_timer_title">虫リポップタイマー</span>
+      <button type="button" id="bugTimerResetBtn" data-i18n="bug_timer_reset">リセット</button>
+    </div>
+    <div class="bug-timer-clock" id="bugTimerClock"></div>
+    <div class="bug-timer-count-row">
+      <span data-i18n="bug_timer_count_label">捕獲回数</span>
+      <span id="bugTimerCountValue">0</span>
+    </div>
+    <div class="bug-timer-list" id="bugTimerList"></div>
+    <p class="bug-timer-empty-hint" id="bugTimerEmptyHint" data-i18n="bug_timer_empty_hint">下のボタンを押すと、捕獲した瞬間から1分のカウントダウンが始まります</p>
+  </div>
+  <div class="bug-timer-fab-row">
+    <button type="button" class="bug-timer-toggle-btn" id="bugTimerToggleBtn" data-i18n-aria-label="bug_timer_toggle_aria" aria-label="toggle bug timer list"></button>
+    <button type="button" class="bug-timer-capture-btn" id="bugTimerCaptureBtn" data-i18n-aria-label="bug_timer_capture_aria" aria-label="start bug respawn timer">
+      <span class="bug-timer-capture-icon"></span>
+      <span class="bug-timer-capture-badge" id="bugTimerBadge">0</span>
+    </button>
+  </div>
+</div>
+
+
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/i18n.js"></script>
@@ -646,6 +669,7 @@ text-align:left;
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/tutorial.js"></script>
+<script src="js/bug-timer.js"></script>
 <script src="js/main.js?v=36"></script>
 
 <script src="js/sw-register.js"></script>
