@@ -81,6 +81,15 @@ let savedDesigns = [];
 // ══════════════════════════════════════
 let editTool = "pen"; // "pen" | "eraser"
 let selectedMaterial = null; // {materialId, hex, name}（パレットから選んだ、ペンで使う建材）
+// 「重ねて置く」モード。ONの間は、既に支柱がある面をクリックすると（通常の
+// 「面に接する空きマスへ置く」ではなく）その同じマスへもう1本の支柱を
+// 重ねて追加する。立体（像）モードのみで使用可能（ボタン自体を他モードでは隠す）
+let stackMode = false;
+function setStackMode(on){
+  stackMode = !!on;
+  const btn = document.getElementById("buildStackToggleBtn");
+  if(btn) btn.classList.toggle("active", stackMode);
+}
 const EDIT_HISTORY_LIMIT = 50;
 let undoStack = [];
 let redoStack = [];
@@ -254,6 +263,13 @@ function updateEditToolbarVisibility(){
     hint.textContent = settings.mode === "wall"
       ? T("build_stage_hint_wall", "ドラッグ：回転 / ホイール：ズーム")
       : T("build_stage_hint", "ドラッグ：回転 / ホイール：ズーム / タップ：ペンで追加・消しゴムで削除");
+  }
+  // 「重ねて置く」（同じマスへの支柱の重複配置）は、支柱を積み上げる立体
+  // （像）モードのみ意味を持つ機能のため、それ以外のモードでは隠す
+  const stackBtn = document.getElementById("buildStackToggleBtn");
+  if(stackBtn){
+    stackBtn.style.display = settings.mode === "solid" ? "flex" : "none";
+    if(settings.mode !== "solid") setStackMode(false);
   }
 }
 
@@ -608,13 +624,37 @@ function handleEditClick(hit){
   if(editTool === "eraser"){
     if(!hit.voxel) return;
     pushHistory();
-    resultVoxels = resultVoxels.filter(v => !(v.x === hit.voxel.x && v.y === hit.voxel.y && v.z === hit.voxel.z));
+    // 同じマスに複数の支柱が重なっている場合でも、実際にクリックした1本だけを
+    // 消す（オブジェクトの参照で特定。万一見つからない場合のみ座標一致の
+    // 1本目にフォールバックする）
+    let idx = resultVoxels.indexOf(hit.voxel);
+    if(idx === -1){
+      idx = resultVoxels.findIndex(v => v.x === hit.voxel.x && v.y === hit.voxel.y && v.z === hit.voxel.z);
+    }
+    if(idx === -1) return;
+    resultVoxels.splice(idx, 1);
+    refreshVoxelView();
+    return;
+  }
+  if(!selectedMaterial) return;
+  // 「重ねて置く」モード：クリックした支柱と同じマスに、選択中の建材でもう1本
+  // 重ねて追加する（隣接マスではなく、クリックした支柱そのものの座標を使う。
+  // 何もない空間には反応しないため、既存の支柱をクリックした場合のみ動作する）
+  if(stackMode){
+    if(!hit.voxel) return;
+    pushHistory();
+    // 同じマスに何本重なっているかをlayerとして持たせる（0本目＝元の支柱）。
+    // 建材一覧の集計（computeBuildPillarSegments）はlayerごとに別々の支柱
+    // として高さを数える
+    const { x, y, z } = hit.voxel;
+    const layer = resultVoxels.filter(v => v.x === x && v.y === y && v.z === z).length;
+    resultVoxels.push({ x, y, z, layer, materialId: selectedMaterial.materialId, hex: selectedMaterial.hex, name: selectedMaterial.name });
     refreshVoxelView();
     return;
   }
   // ペン：クリックした面の外側に隣接するマスへ、選択中の建材を1つ追加する
   // （既存の面に接する形でのみ置ける。何もない空間に単独で置くことはできない）
-  if(!hit.adjacent || !selectedMaterial) return;
+  if(!hit.adjacent) return;
   const { x, y, z } = hit.adjacent;
   if(!inBounds(x, y, z)) return;
   if(resultVoxels.some(v => v.x === x && v.y === y && v.z === z)) return;
@@ -1599,28 +1639,38 @@ function buildColorNumberLabel(materialId, hex){
   return num ? `<span class="art-usage-number">#${num}</span> ` : "";
 }
 
+// 「重ねて置く」で同じマスに複数の支柱を配置した場合、layer（0＝元の支柱、
+// 1以降＝重ねて追加した分）ごとに完全に独立した1本の支柱として高さを数える。
+// レイヤーをまたいで連続区間をまとめてしまうと、実際より本数が少なく
+// 集計されてしまうため、レイヤーごとに分けてから列ごとの連続区間検出を行う
 function computeBuildPillarSegments(){
   if(!resultVoxels || !resultDims) return [];
-  const map = new Map();
-  resultVoxels.forEach(v => map.set(`${v.x},${v.y},${v.z}`, v));
+  const byLayer = new Map();
+  resultVoxels.forEach(v => {
+    const layer = v.layer || 0;
+    if(!byLayer.has(layer)) byLayer.set(layer, new Map());
+    byLayer.get(layer).set(`${v.x},${v.y},${v.z}`, v);
+  });
 
   const segments = [];
-  for(let z = 0; z < resultDims.d; z++){
-    for(let x = 0; x < resultDims.w; x++){
-      let run = null;
-      for(let y = 0; y < resultDims.h; y++){
-        const v = map.get(`${x},${y},${z}`);
-        const key = v ? v.materialId + "_" + v.hex : null;
-        if(run && run.key === key){
-          run.height++;
-        }else{
-          if(run && run.key) segments.push(run);
-          run = key ? { key, materialId: v.materialId, name: v.name, hex: v.hex, height: 1 } : null;
+  byLayer.forEach(map => {
+    for(let z = 0; z < resultDims.d; z++){
+      for(let x = 0; x < resultDims.w; x++){
+        let run = null;
+        for(let y = 0; y < resultDims.h; y++){
+          const v = map.get(`${x},${y},${z}`);
+          const key = v ? v.materialId + "_" + v.hex : null;
+          if(run && run.key === key){
+            run.height++;
+          }else{
+            if(run && run.key) segments.push(run);
+            run = key ? { key, materialId: v.materialId, name: v.name, hex: v.hex, height: 1 } : null;
+          }
         }
+        if(run && run.key) segments.push(run);
       }
-      if(run && run.key) segments.push(run);
     }
-  }
+  });
   return segments;
 }
 
@@ -1976,6 +2026,7 @@ function initBuildPage(){
   document.getElementById("buildToolPenBtn").addEventListener("click", () => setEditTool("pen"));
   document.getElementById("buildToolEraserBtn").addEventListener("click", () => setEditTool("eraser"));
   document.getElementById("buildPaletteBtn").addEventListener("click", openMaterialPickerModal);
+  document.getElementById("buildStackToggleBtn").addEventListener("click", () => setStackMode(!stackMode));
   document.getElementById("buildMaterialPickerCloseBtn").addEventListener("click", closeMaterialPickerModal);
   document.getElementById("buildMaterialPickerModal").addEventListener("click", (e) => {
     if(e.target.id === "buildMaterialPickerModal") closeMaterialPickerModal();

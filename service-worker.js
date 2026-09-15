@@ -70,7 +70,7 @@ const CACHE_FILES = [
   "./js/data-materials.js",
   "./js/three.module.min.js",
   "./js/build3d-scene.js",
-  "./js/build.js?v=30",
+  "./js/build.js?v=31",
   "./js/music-config.js",
   "./js/music-editor.js",
   "./js/music-hum.js",
