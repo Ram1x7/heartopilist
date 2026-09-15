@@ -1552,8 +1552,16 @@ mapImg.onload = () => {
   renderPins();
   renderAreas();
   // ?loc= で指定された地点を含むエリアを、タップした時と同じ見た目で選択表示する。
+  // 「森林」「温泉山」等、複数の小エリアをまとめた大エリア名そのもののlocationは
+  // 特定の小エリアには絞れないため、対応する大エリアをそのままハイライトする
+  if(highlightLocKey && typeof mapGenericBigAreaLocations !== "undefined" && mapGenericBigAreaLocations[highlightLocKey] && typeof mapAreasBig !== "undefined"){
+    const bigArea = mapAreasBig.find(a => a.key === mapGenericBigAreaLocations[highlightLocKey]);
+    if(bigArea){
+      zoomToArea(bigArea);
+      showAreaInfo(bigArea, "big");
+    }
   // 「湖」「川」「海」等の汎用locationは複数エリアにまたがるため、まずそちらを判定する
-  if(highlightLocKey && typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[highlightLocKey] && typeof mapAreasSmall !== "undefined"){
+  }else if(highlightLocKey && typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[highlightLocKey] && typeof mapAreasSmall !== "undefined"){
     const areas = mapMultiAreaLocations[highlightLocKey]
       .map(key => mapAreasSmall.find(a => a.key === key))
       .filter(Boolean);

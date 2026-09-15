@@ -984,7 +984,8 @@ function openModal(c){
  }
  const hasMapLink = c.location && (
    (typeof mapLocationLinks !== "undefined" && mapLocationLinks[c.location]) ||
-   (typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[c.location])
+   (typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[c.location]) ||
+   (typeof mapGenericBigAreaLocations !== "undefined" && mapGenericBigAreaLocations[c.location])
  );
  if(MAP_FEATURE_PUBLIC && hasMapLink){
    // ページ遷移せず、埋め込みモーダルでマップを開く（hrefはJS無効時のフォールバック）

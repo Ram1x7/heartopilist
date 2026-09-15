@@ -26,10 +26,10 @@ const mapLocationLinks = {
   "巨木の川": { x:61.95, y:66.81 }, // landmarks:Giantwood River
   "旧海": { x:50, y:5 }, // landmarks:Old Sea
   "旧海の海辺": { x:50, y:5 }, // landmarks:Old Sea
-  "旧海・クジラ海": { x:32.0, y:27.22 }, // 旧海とクジラ海の中間点（境界域のため近似）
+  // 「旧海・クジラ海」「東海・そよ風の海」は2つの海にまたがって出現する場所のため、
+  // 単一座標（中間点の近似）ではなくmapMultiAreaLocationsで両方をハイライトする
   "東海": { x:97.7, y:52.42 }, // landmarks:East Sea
   "東海の海辺": { x:97.7, y:52.42 }, // landmarks:East Sea
-  "東海・そよ風の海": { x:70.36, y:63.67 }, // 東海とそよ風の海の中間点（境界域のため近似）
   "森の湖": { x:76.1, y:49.66 }, // landmarks:Forest Lake
   "森の湖畔": { x:76.1, y:49.66 }, // landmarks:Forest Lake
   "森林": { x:79.4, y:51.5 }, // landmarks:Forest
@@ -42,6 +42,8 @@ const mapLocationLinks = {
   "浅水川": { x:66.86, y:33.88 }, // landmarks:Shallow River
   "浅海の魚群クエスト(追加段階)": null,
   "海": null,
+  "海洋清掃": null, // 貝殻の出現場所。マップ上に対応する固定地点が無いため地図で見るリンクは非表示のまま
+  "海洋清掃クエスト": null,
   "海辺": null,
   "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
   "温泉山": { x:49.1, y:19.8 }, // landmarks:Onsen Mountain
@@ -78,7 +80,7 @@ const mapLocationLinks = {
   "郊外の湖街": { x:50.08, y:59.76 }, // landmarks:Suburban Lake
   "郊外湖畔": { x:50.08, y:59.76 }, // landmarks:Suburban Lake
   "霞川": { x:31.71, y:33.26 }, // landmarks:Rosy River
-  "静川": { x:36.25, y:67.92 }, // landmarks:Tranquil River
+  "静川": { x:36.11, y:67.72 }, // landmarks:Tranquil River（元の座標(36.25,67.92)は自身のポリゴン外で隣接する「漁村-波止場」に重なっていたため、ポリゴン内に補正）
 };
 
 // 「湖」「川」「海」など、特定の1地点に絞れない汎用locationは上記では null にしているが、
@@ -98,4 +100,23 @@ const mapMultiAreaLocations = {
     "Giantwood River", "Tranquil River", "Shallow River", "Rozy River",
     "Old Sea", "Whale Sea", "Zephyr Sea", "East Sea",
   ],
+  // 隣接する2つの海にまたがって出現する場所。単一座標（境界の近似）で持つと
+  // どちらのエリアの範囲にも入らない位置になりがちなため、両方をハイライトする
+  "旧海・クジラ海": ["Old Sea", "Whale Sea"],
+  "東海・そよ風の海": ["East Sea", "Zephyr Sea"],
+};
+
+// 「森林」「温泉山」「漁村」「花畑」「中心街」は、複数の小エリアをまとめた広域
+// ゾーン名（大エリア）で、その名前だけのlocationは特定の小エリア1つには絞れない。
+// 上のmapLocationLinksには（ランドマークのピン座標をそのまま使っているため）
+// 何らかの小エリアの座標が入ってしまっているが、それだと実際とは異なる特定の
+// 小エリアが地図で見るに表示されてしまう。そのため、これらは座標ではなく
+// 対応する大エリア（js/data-map-areas.jsのmapAreasBigのkey）を直接指定し、
+// 大エリア全体をハイライト表示する
+const mapGenericBigAreaLocations = {
+  "森林": "Forest",
+  "温泉山": "Onsen Mountain",
+  "漁村": "Fishing Village",
+  "花畑": "Flower Field",
+  "中心街": "Central District",
 };
