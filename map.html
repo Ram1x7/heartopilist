@@ -1141,13 +1141,13 @@ const GENERIC_LOCATION_LANDMARK_KEYS = {
   "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
   "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
   "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
-  // 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象。「水辺」はその両方＋「湖」の全て
+  // 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象。「水辺」は海辺を除いた
+  // 水辺（湖＋川）が対象（ユーザー確認済み）
   "川辺": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
   "海辺": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
   "水辺": [
     "Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake",
     "Giantwood River", "Tranquil River", "Shallow River", "Rosy River",
-    "Old Sea", "Whale Sea", "Zephyr Sea", "East Sea",
   ],
   // 中心街＝大広場・住宅街・花園街・アート街をまとめたエリアのため、
   // location「中心街」の生き物はこの4エリアすべてに出現する扱いにする
