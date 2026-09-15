@@ -88,7 +88,8 @@ const mapLocationLinks = {
 // エリア全てをハイライト表示する（js/main.jsのリンク表示判定と、map.htmlのハイライト
 // 処理の両方から参照）。キーはエリア側(js/data-map-areas.js)のkeyに合わせている
 // （「霞川」の地名は"Rosy River"表記だが、エリア側は"Rozy River"表記のため注意）。
-// 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象、「水辺」は両方＋「湖」の全て。
+// 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象。「水辺」は海辺を除いた
+// 水辺（湖＋川）が対象（ユーザー確認済み）。
 const mapMultiAreaLocations = {
   "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
   "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rozy River"],
@@ -98,7 +99,6 @@ const mapMultiAreaLocations = {
   "水辺": [
     "Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake",
     "Giantwood River", "Tranquil River", "Shallow River", "Rozy River",
-    "Old Sea", "Whale Sea", "Zephyr Sea", "East Sea",
   ],
   // 隣接する2つの海にまたがって出現する場所。単一座標（境界の近似）で持つと
   // どちらのエリアの範囲にも入らない位置になりがちなため、両方をハイライトする
