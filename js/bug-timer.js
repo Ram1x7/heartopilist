@@ -35,6 +35,13 @@ function saveBugTimerActive(){
 }
 
 function renderBugTimer(){
+  // 現在時刻は、ページ上部の時計（#time／サーバー選択を反映した表示専用の
+  // 時刻）とズレないよう、その表示文字列をそのままミラーする
+  // （タイムゾーン計算をここで重複して持たないため）
+  const clock = document.getElementById("bugTimerClock");
+  const mainClock = document.getElementById("time");
+  if(clock) clock.textContent = mainClock ? mainClock.textContent : "";
+
   const badge = document.getElementById("bugTimerBadge");
   if(badge) badge.textContent = String(bugTimerCount);
   const countValue = document.getElementById("bugTimerCountValue");
