@@ -42,6 +42,8 @@ const mapLocationLinks = {
   "浅水川": { x:66.86, y:33.88 }, // landmarks:Shallow River
   "浅海の魚群クエスト(追加段階)": null,
   "海": null,
+  "海洋清掃": null, // 貝殻の出現場所。マップ上に対応する固定地点が無いため地図で見るリンクは非表示のまま
+  "海洋清掃クエスト": null,
   "海辺": null,
   "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
   "温泉山": { x:49.1, y:19.8 }, // landmarks:Onsen Mountain
