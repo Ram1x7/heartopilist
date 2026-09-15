@@ -224,8 +224,8 @@ const bugData = [
  price:110,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- location:"花畑",
- locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
+ location:"花畑-風車の花畑",
+ locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/bugs/019.PNG"
 },
 {
