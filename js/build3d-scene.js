@@ -186,6 +186,12 @@ function setVoxels(voxels, opts = {}){
   const color = new THREE.Color();
   voxels.forEach((v, i) => {
     dummy.position.set(v.x - bounds.w / 2 + 0.5, v.y * Y_UNIT_SCALE + Y_UNIT_SCALE / 2, v.z - bounds.d / 2 + 0.5);
+    // 「重ねて置く」で同じマスに複数の支柱がある場合、layerが1以上のものは
+    // 少しずつ縮小して入れ子状に表示する（全く同じ座標・同じ大きさだと
+    // ちらつき（Zファイティング）が起きて見分けが付かないため）
+    const layer = v.layer || 0;
+    const scale = layer > 0 ? Math.max(0.55, 1 - layer * 0.12) : 1;
+    dummy.scale.setScalar(scale);
     dummy.updateMatrix();
     mesh.setMatrixAt(i, dummy.matrix);
     color.set(v.hex);

@@ -699,6 +699,9 @@ body.dark .build-library-item{
         <span class="build-selected-swatch" id="buildSelectedSwatch"></span>
         <span data-i18n="build_tool_palette">建材を選ぶ</span>
       </button>
+      <button type="button" class="build-tool-btn" id="buildStackToggleBtn" style="display:none;" data-i18n-title="build_tool_stack_hint" title="同じマスに既に支柱がある場所をクリックすると、その上に別の支柱をもう1本重ねて置きます">
+        <span data-i18n="build_tool_stack">重ねて置く</span>
+      </button>
       <span class="build-toolbar-divider"></span>
       <button type="button" class="build-tool-btn" id="buildUndoBtn" disabled>
         <span class="btn-icon" data-icon="undo"></span>
@@ -917,7 +920,7 @@ function T(key, fallback, vars){
 </script>
 <script src="js/data-materials.js"></script>
 <script src="js/art-pixelate.js"></script>
-<script type="module" src="js/build.js?v=30"></script>
+<script type="module" src="js/build.js?v=31"></script>
 <script src="js/sw-register.js"></script>
 </body>
 </html>

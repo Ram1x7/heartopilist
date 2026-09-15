@@ -1076,6 +1076,8 @@
   "build_tool_pen": "ペン",
   "build_tool_eraser": "消しゴム",
   "build_tool_palette": "建材を選ぶ",
+  "build_tool_stack": "重ねて置く",
+  "build_tool_stack_hint": "同じマスに既に支柱がある場所をクリックすると、その上に別の支柱をもう1本重ねて置きます",
   "build_tool_undo": "元に戻す",
   "build_tool_redo": "やり直す",
   "build_progress_slider_label": "施工ステージ",

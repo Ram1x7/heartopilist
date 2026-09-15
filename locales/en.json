@@ -1076,6 +1076,8 @@
   "build_tool_pen": "Pen",
   "build_tool_eraser": "Eraser",
   "build_tool_palette": "Choose material",
+  "build_tool_stack": "Stack",
+  "build_tool_stack_hint": "Click a spot that already has a pillar to stack another one on the exact same tile",
   "build_tool_undo": "Undo",
   "build_tool_redo": "Redo",
   "build_progress_slider_label": "Build stage",
