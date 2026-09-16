@@ -35,6 +35,9 @@ html{
      追加対策。overscroll-behaviorは「スクロール領域の端に達した時の挙動」
      そのものを制御するプロパティで、body側でも同様に指定する） */
   overscroll-behavior-x:none;
+  /* ページ最上部で下にスワイプした時のバウンス（ラバーバンド効果）で、
+     本来の背景の上に隙間（余白）が見えてしまうのを防ぐ */
+  overscroll-behavior-y:none;
 }
 
 html.dark{
@@ -59,6 +62,7 @@ body{
   color:var(--text);
   overflow-x:hidden;
   overscroll-behavior-x:none;
+  overscroll-behavior-y:none;
   position:relative;
   animation:fadeIn 0.2s ease;
   /* PWA（ホーム画面追加）でピンチ操作すると画面全体が縮小され、周りに余白が
