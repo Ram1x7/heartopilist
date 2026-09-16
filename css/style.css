@@ -372,6 +372,11 @@ body.dark .page-tutorial-hint{
   width:100%;
   box-sizing:border-box;
   background:var(--card);
+  /* 検索・絞り込みなど中身が多いと画面の高さを超えることがあり、
+     その場合でも下部のボタンまで届くようパネル内で縦スクロールできるようにする */
+  max-height:calc(100vh - 16px);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
 }
 
 /* 天気 */
