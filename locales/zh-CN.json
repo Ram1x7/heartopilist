@@ -1097,5 +1097,7 @@
   "share_profile_age": "年龄段",
   "share_profile_gender": "性别",
   "share_profile_message": "一句话",
-  "share_profile_next": "生成预览"
+  "share_profile_next": "生成预览",
+  "share_layout_label": "版式",
+  "share_theme_label": "配色主题"
 }

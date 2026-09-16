@@ -1177,5 +1177,7 @@
   "share_profile_age": "年代",
   "share_profile_gender": "性別",
   "share_profile_message": "ひとこと",
-  "share_profile_next": "プレビューを作成"
+  "share_profile_next": "プレビューを作成",
+  "share_layout_label": "レイアウト",
+  "share_theme_label": "カラーテーマ"
 }

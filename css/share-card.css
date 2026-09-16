@@ -1,5 +1,32 @@
 /* コンプ状況シェア画像モーダル専用スタイル（index.htmlのみ読み込み） */
 
+.share-control-group{
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.share-control-label{
+  font-size: 11px;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+
+body.dark .share-control-label{
+  color: var(--dark-text-sub);
+}
+
+.share-control-row{
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.share-control-row button{
+  flex: none;
+  padding: 7px 12px;
+  font-size: 11px;
+}
+
 .share-canvas-wrap{
   position: relative;
 }

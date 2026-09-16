@@ -1097,5 +1097,7 @@
   "share_profile_age": "ช่วงอายุ",
   "share_profile_gender": "เพศ",
   "share_profile_message": "ข้อความสั้นๆ",
-  "share_profile_next": "สร้างตัวอย่าง"
+  "share_profile_next": "สร้างตัวอย่าง",
+  "share_layout_label": "เค้าโครง",
+  "share_theme_label": "ธีมสี"
 }

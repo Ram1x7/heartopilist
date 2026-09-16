@@ -1097,5 +1097,7 @@
   "share_profile_age": "연령대",
   "share_profile_gender": "성별",
   "share_profile_message": "한마디",
-  "share_profile_next": "미리보기 만들기"
+  "share_profile_next": "미리보기 만들기",
+  "share_layout_label": "레이아웃",
+  "share_theme_label": "컬러 테마"
 }

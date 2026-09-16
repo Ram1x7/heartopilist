@@ -100,7 +100,14 @@ const SHARE_THEMES = {
   },
 };
 const SHARE_THEME_DEFAULT = "navyGold";
-let currentShareTheme = SHARE_THEME_DEFAULT; // テーマ切替UIができるまでは固定
+// レイアウト/テーマの選択はプロフィール項目とは別に、localStorageへ記憶する
+// （個人情報を含まないUI設定のため。キーはプロフィール系とは別名にしている）
+const SHARE_THEME_STORAGE_KEY = "hatopiShareTheme";
+function loadShareThemePreference() {
+  const saved = localStorage.getItem(SHARE_THEME_STORAGE_KEY);
+  return SHARE_THEMES[saved] ? saved : SHARE_THEME_DEFAULT;
+}
+let currentShareTheme = loadShareThemePreference();
 
 // ============================================================
 // レイアウト定義
@@ -111,10 +118,12 @@ let currentShareTheme = SHARE_THEME_DEFAULT; // テーマ切替UIができるま
 // 左右に分割し、カラムごとにsectionsを積む）
 const SHARE_LAYOUTS = {
   portrait: {
+    label: "縦長",
     w: 960, h: 1280,
     sections: ["header", "medal", "categoryGrid", "footer"],
   },
   landscape: {
+    label: "横長",
     w: 1600, h: 900,
     outerMargin: 36, // 背景アートの縁飾りとカラムが重ならないよう左右に余白を確保
     columns: [
@@ -126,7 +135,12 @@ const SHARE_LAYOUTS = {
   },
 };
 const SHARE_LAYOUT_DEFAULT = "portrait";
-let currentShareLayout = SHARE_LAYOUT_DEFAULT; // レイアウト切替UIができるまでは固定
+const SHARE_LAYOUT_STORAGE_KEY = "hatopiShareLayout";
+function loadShareLayoutPreference() {
+  const saved = localStorage.getItem(SHARE_LAYOUT_STORAGE_KEY);
+  return SHARE_LAYOUTS[saved] ? saved : SHARE_LAYOUT_DEFAULT;
+}
+let currentShareLayout = loadShareLayoutPreference();
 
 const SERIF = "'Shippori Mincho', serif";
 
@@ -1035,3 +1049,42 @@ document.getElementById("shareProfileNextBtn").onclick = async () => {
   shareModal.style.display = "block";
   await drawShareCard();
 };
+
+// ============================================================
+// レイアウト／テーマ選択（タスク#37）
+// SHARE_LAYOUTS/SHARE_THEMESのキー・labelから動的にボタンを組み立てる。
+// 選択はプロフィール項目とは別にlocalStorageへ記憶し、次回シェア時も
+// 同じ設定で開く
+// ============================================================
+const shareLayoutRow = document.getElementById("shareLayoutRow");
+const shareThemeRow  = document.getElementById("shareThemeRow");
+
+function buildShareControlButtons(rowEl, options, currentKey, onSelect) {
+  rowEl.innerHTML = "";
+  Object.keys(options).forEach(key => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = options[key].label;
+    btn.classList.toggle("active", key === currentKey);
+    btn.onclick = async () => {
+      [...rowEl.children].forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      await onSelect(key);
+    };
+    rowEl.appendChild(btn);
+  });
+}
+
+function renderShareControlRows() {
+  buildShareControlButtons(shareLayoutRow, SHARE_LAYOUTS, currentShareLayout, async (key) => {
+    currentShareLayout = key;
+    localStorage.setItem(SHARE_LAYOUT_STORAGE_KEY, key);
+    await drawShareCard();
+  });
+  buildShareControlButtons(shareThemeRow, SHARE_THEMES, currentShareTheme, async (key) => {
+    currentShareTheme = key;
+    localStorage.setItem(SHARE_THEME_STORAGE_KEY, key);
+    await drawShareCard();
+  });
+}
+renderShareControlRows();
