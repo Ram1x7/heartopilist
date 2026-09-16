@@ -52,6 +52,7 @@
 
 <link rel="stylesheet" href="css/style.css?v=31">
 <link rel="stylesheet" href="css/design-system.css?v=4">
+<link rel="stylesheet" href="css/share-card.css?v=1">
 
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -621,7 +622,12 @@ text-align:left;
   <div id="shareModal">
   <div class="modal-box">
     <h3 data-i18n="share_title">コンプ状況をシェア</h3>
-    <canvas id="shareCanvas" width="960" height="1280"></canvas>
+    <div class="share-canvas-wrap">
+      <canvas id="shareCanvas" width="960" height="1280"></canvas>
+      <div id="shareCardLoading" class="share-card-loading" hidden>
+        <div class="share-card-spinner"></div>
+      </div>
+    </div>
     <button onclick="shareImage()" data-i18n="share_save">画像を保存・共有</button>
     <button class="modal-close-btn" onclick="closeShareModal()" data-i18n="share_close">閉じる</button>
   </div>

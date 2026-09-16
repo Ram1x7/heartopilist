@@ -42,6 +42,16 @@ function mapCategoryStats(stats){
 // ============================================================
 // テーマ定義（紺×金のみ実装。残り3テーマは背景画像タスクで追加予定）
 // ============================================================
+// 背景アート（4テーマとも「縁取り装飾＋下部に街並みシルエット、中央は
+// 空いたクリーム系の一枚絵」という共通構図のため、パネル・文字色などの
+// トークンはテーマ間で共通のままでよく、差分は背景画像と代替色のみ）
+const SHARE_THEME_TOKENS = {
+  panel: "rgba(255,253,247,0.86)", panelLine: "rgba(200,168,107,0.55)",
+  track: "rgba(122,113,100,0.12)",
+  ink: "#34302b", inkSub: "#7a7164",
+  indigo: "#3c5a6e", vermillion: "#b1503b",
+  gold: "#c8a86b", goldDeep: "#a3854f",
+};
 const SHARE_THEMES = {
   navyGold: {
     label: "紺×金",
@@ -49,15 +59,37 @@ const SHARE_THEMES = {
       portrait:  "assets/share-bg/navy-gold_portrait.png",
       landscape: "assets/share-bg/navy-gold_landscape.png",
     },
-    // 背景画像の読み込みが済むまで／失敗した場合の代替色（現行の生成り配色を踏襲）
+    // 背景画像の読み込み中／失敗時の代替グラデーション
     fallbackTop: "#f8f3e8", fallbackBottom: "#efe4cd",
-    panel: "rgba(255,253,247,0.86)", panelLine: "rgba(200,168,107,0.55)",
-    track: "rgba(122,113,100,0.12)",
-    ink: "#34302b", inkSub: "#7a7164",
-    indigo: "#3c5a6e", vermillion: "#b1503b",
-    gold: "#c8a86b", goldDeep: "#a3854f",
+    ...SHARE_THEME_TOKENS,
   },
-  // sakuraPink / skyBlue / forestGreen は次タスクで追加
+  sakuraPink: {
+    label: "桜ピンク",
+    bgImage: {
+      portrait:  "assets/share-bg/sakura-pink_portrait.png",
+      landscape: "assets/share-bg/sakura-pink_landscape.png",
+    },
+    fallbackTop: "#fdf3ee", fallbackBottom: "#f8dbe4",
+    ...SHARE_THEME_TOKENS,
+  },
+  skyBlue: {
+    label: "水色×白",
+    bgImage: {
+      portrait:  "assets/share-bg/sky-blue_portrait.png",
+      landscape: "assets/share-bg/sky-blue_landscape.png",
+    },
+    fallbackTop: "#eaf6fb", fallbackBottom: "#cfe9f5",
+    ...SHARE_THEME_TOKENS,
+  },
+  forestGreen: {
+    label: "深緑×金",
+    bgImage: {
+      portrait:  "assets/share-bg/forest-green_portrait.png",
+      landscape: "assets/share-bg/forest-green_landscape.png",
+    },
+    fallbackTop: "#f4f1e2", fallbackBottom: "#dfe6c8",
+    ...SHARE_THEME_TOKENS,
+  },
 };
 const SHARE_THEME_DEFAULT = "navyGold";
 let currentShareTheme = SHARE_THEME_DEFAULT; // テーマ切替UIができるまでは固定
@@ -65,8 +97,10 @@ let currentShareTheme = SHARE_THEME_DEFAULT; // テーマ切替UIができるま
 // ============================================================
 // レイアウト定義（縦長のみ実装。横長は次タスクで追加）
 // ============================================================
+// wは背景アートの実サイズ(1086×1448 = 3:4)に合わせた固定サイズ。
+// 中身の合計が枠より小さい分は上下中央寄せにする（drawShareCard参照）
 const SHARE_LAYOUTS = {
-  portrait: { w: 960, sections: ["header", "medal", "categoryGrid", "footer"] },
+  portrait: { w: 960, h: 1280, sections: ["header", "medal", "categoryGrid", "footer"] },
 };
 const SHARE_LAYOUT_DEFAULT = "portrait";
 
@@ -179,47 +213,45 @@ function getStats() {
 }
 
 // ============================================================
-// 装飾ヘルパー（紺×金テーマの暫定背景。実背景画像タスクで整理予定）
+// 背景画像の読み込み（テーマ×レイアウトの組み合わせごとにキャッシュ。
+// 一度読み込んだ組み合わせは以後即座に再利用する）
 // ============================================================
-function drawFlourish(ctx, cx, cy, scale, rot, alpha, color) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(rot);
-  ctx.scale(scale, scale);
-  ctx.globalAlpha = alpha;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.4;
-  for (let i = 0; i < 3; i++) {
-    ctx.beginPath();
-    ctx.arc(i * 26, 0, 30, Math.PI * 0.15, Math.PI * 0.85);
-    ctx.stroke();
-  }
-  ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2);
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.restore();
+const shareBgImageCache = new Map(); // key: "themeKey_layoutKey" -> Promise<HTMLImageElement|null>
+
+function getThemeBackgroundImage(themeKey, layoutKey) {
+  const cacheKey = `${themeKey}_${layoutKey}`;
+  if (shareBgImageCache.has(cacheKey)) return shareBgImageCache.get(cacheKey);
+
+  const src = SHARE_THEMES[themeKey].bgImage[layoutKey];
+  const promise = new Promise((resolve) => {
+    const img = new Image();
+    img.onload  = () => resolve(img);
+    img.onerror = () => {
+      console.warn(`[share-card] 背景画像の読み込みに失敗しました（${src}）。代替の単色背景で描画します`);
+      resolve(null);
+    };
+    img.src = src;
+  });
+  shareBgImageCache.set(cacheKey, promise);
+  return promise;
 }
 
-function drawSakura(ctx, cx, cy, r, rot, alpha) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(rot);
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = "rgba(177,80,59,0.16)";
-  for (let i = 0; i < 5; i++) {
-    ctx.save();
-    ctx.rotate((Math.PI * 2 / 5) * i);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.quadraticCurveTo(r * 0.55, -r * 0.4, 0, -r);
-    ctx.quadraticCurveTo(-r * 0.55, -r * 0.4, 0, 0);
-    ctx.fill();
-    ctx.restore();
+function showShareCardLoading(visible) {
+  const el = document.getElementById("shareCardLoading");
+  if (el) el.hidden = !visible;
+}
+
+// 背景を描画（画像が読み込めていればそれを全面に敷き、失敗時のみ代替グラデーション）
+function drawShareBackground(ctx, w, h, theme, bgImg) {
+  if (bgImg) {
+    ctx.drawImage(bgImg, 0, 0, w, h);
+    return;
   }
-  ctx.beginPath(); ctx.arc(0, 0, r * 0.16, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(200,168,107,0.35)";
-  ctx.fill();
-  ctx.restore();
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+  bgGrad.addColorStop(0, theme.fallbackTop);
+  bgGrad.addColorStop(1, theme.fallbackBottom);
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, w, h);
 }
 
 function drawCorner(ctx, cx, cy, len, rot, color) {
@@ -244,37 +276,6 @@ function drawProgressBar(ctx, x, y, bw, bh, pct, theme) {
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.roundRect(x, y, bw * pct / 100, bh, bh / 2); ctx.fill();
   }
-}
-
-// 背景（現状は暫定のグラデーション＋和柄装飾。実画像に差し替え予定）
-function drawShareBackground(ctx, w, h, theme) {
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-  bgGrad.addColorStop(0, theme.fallbackTop);
-  bgGrad.addColorStop(1, theme.fallbackBottom);
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, w, h);
-
-  drawFlourish(ctx, w - 70, 44,   1, 0.15,         0.28, theme.goldDeep);
-  drawFlourish(ctx, 70,     h-44, 1, Math.PI+0.15, 0.28, theme.goldDeep);
-  drawSakura(ctx, 56,     140, 20, -0.3, 1);
-  drawSakura(ctx, w - 52, 220, 16,  1.9, 1);
-  drawSakura(ctx, w - 44, h - 190, 18,  0.7, 1);
-  drawSakura(ctx, 50,     h - 90,  14, -1.4, 1);
-
-  ctx.save();
-  ctx.globalAlpha = 0.10;
-  ctx.fillStyle = theme.gold;
-  ctx.beginPath(); ctx.arc(w - 20, 10, 170, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(20, h - 10, 150, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-
-  ctx.save();
-  ctx.strokeStyle = "rgba(163,133,79,0.55)";
-  ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.roundRect(14, 14, w - 28, h - 28, 14); ctx.stroke();
-  ctx.strokeStyle = "rgba(163,133,79,0.3)";
-  ctx.beginPath(); ctx.roundRect(20, 20, w - 40, h - 40, 10); ctx.stroke();
-  ctx.restore();
 }
 
 // ============================================================
@@ -499,22 +500,36 @@ const SHARE_SECTIONS = {
 // ============================================================
 // 画像生成本体
 // ============================================================
-function drawShareCard() {
+async function drawShareCard() {
   const stats = getStats();
-  const theme = SHARE_THEMES[currentShareTheme];
-  const layout = SHARE_LAYOUTS[SHARE_LAYOUT_DEFAULT];
+  const themeKey = currentShareTheme;
+  const layoutKey = SHARE_LAYOUT_DEFAULT;
+  const theme = SHARE_THEMES[themeKey];
+  const layout = SHARE_LAYOUTS[layoutKey];
   const data = { stats, categories: mapCategoryStats(stats) };
 
+  // 背景画像はテーマ×レイアウトの組み合わせごとに初回だけ読み込み、以後はキャッシュを再利用する。
+  // 未読み込みの組み合わせだけモーダル内にスピナーを出す（キャッシュ済みなら一瞬で解決するので出さない）
+  const cacheKey = `${themeKey}_${layoutKey}`;
+  const alreadyCached = shareBgImageCache.has(cacheKey);
+  if (!alreadyCached) showShareCardLoading(true);
+  const bgImg = await getThemeBackgroundImage(themeKey, layoutKey);
+  if (!alreadyCached) showShareCardLoading(false);
+
   const w = layout.w;
-  const h = layout.sections.reduce((sum, key) => sum + SHARE_SECTIONS[key].height(w, data), 0);
+  const h = layout.h;
+  const contentHeight = layout.sections.reduce((sum, key) => sum + SHARE_SECTIONS[key].height(w, data), 0);
 
   shareCanvas.width  = w;
   shareCanvas.height = h;
   const ctx = shareCanvas.getContext("2d");
 
-  drawShareBackground(ctx, w, h, theme);
+  drawShareBackground(ctx, w, h, theme, bgImg);
 
-  let cur = 0;
+  // 背景アートは縁取り装飾＋下部に街並みシルエットがあるため、中身を
+  // 完全な中央寄せにすると下部カード・フッターが街並みと重なりやすい。
+  // 上側は空きが多いぶん、余白の25%だけを上に配せば安全に収まる
+  let cur = Math.max(0, (h - contentHeight) * 0.25);
   layout.sections.forEach(key => {
     cur += SHARE_SECTIONS[key].draw(ctx, 0, cur, w, theme, data);
   });
@@ -578,8 +593,9 @@ shareBtn.onclick = async () => {
     console.warn("[share-card] 明朝体フォントの読み込みに失敗しました。フォールバック書体で描画します", e);
   }
   await shareMascotReady;
-  drawShareCard();
+  // 背景画像の読み込み待ちがモーダル内のスピナーで見えるよう、先にモーダルを開いてから描画する
   shareModal.style.display = "block";
+  await drawShareCard();
 };
 
 function closeShareModal(){

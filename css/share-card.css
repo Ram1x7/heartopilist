@@ -1,0 +1,32 @@
+/* コンプ状況シェア画像モーダル専用スタイル（index.htmlのみ読み込み） */
+
+.share-canvas-wrap{
+  position: relative;
+}
+
+.share-card-loading{
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,253,247,0.75);
+  border-radius: 14px;
+}
+
+body.dark .share-card-loading{
+  background: rgba(44,40,35,0.75);
+}
+
+.share-card-spinner{
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(163,133,79,0.25);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: share-card-spin 0.8s linear infinite;
+}
+
+@keyframes share-card-spin{
+  to{ transform: rotate(360deg); }
+}
