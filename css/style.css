@@ -1284,6 +1284,7 @@ body.dark .map-embed-close{
   background:rgba(40,36,30,0.5);
   backdrop-filter:blur(5px);
   z-index:999;
+  overflow-y:auto;
 }
 
 .modal-box{
