@@ -150,9 +150,9 @@ const SHARE_LAYOUTS = {
     w: 1600, h: 900,
     outerMargin: 36, // 背景アートの縁飾りとカラムが重ならないよう左右に余白を確保
     columns: [
-      { widthRatio: 0.27, sections: ["profileCol"] },
-      { widthRatio: 0.36, sections: ["medalLarge"] },
-      { widthRatio: 0.37, sections: ["categoryGrid2x3"] },
+      { widthRatio: 0.22, sections: ["profileCol"] },
+      { widthRatio: 0.44, sections: ["medalLarge"] },
+      { widthRatio: 0.34, sections: ["categoryGrid2x3"] },
     ],
     footerSection: "footerWide",
   },
@@ -1078,7 +1078,7 @@ function drawMedalSection(ctx, x, y, w, theme, data) {
 }
 
 // 横長レイアウトの中央カラム用（大きめのメダル）
-const MEDAL_LARGE_R = 165;
+const MEDAL_LARGE_R = 199;
 function drawMedalLargeSection(ctx, x, y, w, theme, data) {
   return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data);
 }
@@ -1091,10 +1091,19 @@ function medalLargeHeight(data) {
 // ============================================================
 const CATEGORY_MARGIN_X = 64;
 const CATEGORY_GAP = 20;
-const CATEGORY_CARD_H = 208;
-const CATEGORY_GRID_HEIGHT = CATEGORY_CARD_H * 2 + CATEGORY_GAP + 16;
+// カード高さの基準値。drawCategoryCard内の装飾・文字サイズはこの値を基準にした
+// scale(ch/CATEGORY_CARD_BASE_H)で比例拡縮するため、レイアウトごとに異なる
+// カード高さ（縦長=基準のまま、横長=拡大）を渡しても内部の比率は崩れない
+const CATEGORY_CARD_BASE_H = 208;
+// 縦長：3列×2行のカード高さ（従来通り）
+const CATEGORY_CARD_H_PORTRAIT = 208;
+const CATEGORY_GRID_HEIGHT = CATEGORY_CARD_H_PORTRAIT * 2 + CATEGORY_GAP + 16;
+// 横長：2列×3行のカード高さ（メダル拡大に合わせてカードも大きく＝参考画像のプロポーションに近づける）
+const CATEGORY_CARD_H_LANDSCAPE = 260;
 
 function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
+  const scale = ch / CATEGORY_CARD_BASE_H;
+
   ctx.save();
   ctx.shadowColor  = "rgba(120,100,60,0.14)";
   ctx.shadowBlur   = 12;
@@ -1128,12 +1137,13 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   ctx.restore();
 
   // 四隅の金具風装飾（二重L字＋菱形の鋲）
-  const cornerLen = 18;
+  const cornerLen = 18 * scale;
+  const cornerInset = 8 * scale;
   [
-    [x + 8,      cy + 8,      0],
-    [x + cw - 8, cy + 8,      Math.PI / 2],
-    [x + cw - 8, cy + ch - 8, Math.PI],
-    [x + 8,      cy + ch - 8, -Math.PI / 2],
+    [x + cornerInset,      cy + cornerInset,      0],
+    [x + cw - cornerInset, cy + cornerInset,      Math.PI / 2],
+    [x + cw - cornerInset, cy + ch - cornerInset, Math.PI],
+    [x + cornerInset,      cy + ch - cornerInset, -Math.PI / 2],
   ].forEach(([cxr, cyr, rot]) => {
     drawOrnamentalCorner(ctx, cxr, cyr, cornerLen, rot, theme.gold, theme.goldDeep);
   });
@@ -1142,13 +1152,13 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   const pct = cat.total > 0 ? Math.floor(cat.done / cat.total * 100) : 0;
 
   // アイコンメダリオン（外側の淡いリング＋内側の彩色リング＋アイコン）
-  const badgeR  = 32;
-  const badgeCx = cx - 36;
-  const badgeCy = cy + 44;
+  const badgeR  = 32 * scale;
+  const badgeCx = cx - 36 * scale;
+  const badgeCy = cy + 44 * scale;
   ctx.save();
-  ctx.beginPath(); ctx.arc(badgeCx, badgeCy, badgeR + 5, 0, Math.PI * 2);
+  ctx.beginPath(); ctx.arc(badgeCx, badgeCy, badgeR + 5 * scale, 0, Math.PI * 2);
   ctx.strokeStyle = theme.gold;
-  ctx.lineWidth = 1.4;
+  ctx.lineWidth = 1.4 * scale;
   ctx.globalAlpha = 0.75;
   ctx.stroke();
   ctx.restore();
@@ -1158,63 +1168,63 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   badgeGrad.addColorStop(1, `${cat.accent}2b`);
   ctx.fillStyle = badgeGrad;
   ctx.fill();
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2 * scale;
   ctx.strokeStyle = cat.accent;
   ctx.stroke();
-  drawIcon(ctx, cat.icon, badgeCx, badgeCy, 32, cat.accent);
+  drawIcon(ctx, cat.icon, badgeCx, badgeCy, 32 * scale, cat.accent);
 
   ctx.textAlign = "left";
   ctx.fillStyle = theme.indigo;
-  ctx.font = `700 18px ${SERIF}`;
-  ctx.fillText(cat.label, cx + 6, badgeCy + 6);
+  ctx.font = `700 ${Math.round(18 * scale)}px ${SERIF}`;
+  ctx.fillText(cat.label, cx + 6 * scale, badgeCy + 6 * scale);
 
   ctx.textAlign = "center";
   ctx.save();
   ctx.shadowColor = "rgba(0,0,0,0.18)";
-  ctx.shadowBlur = 3;
+  ctx.shadowBlur = 3 * scale;
   ctx.shadowOffsetY = 1;
   ctx.fillStyle = theme.vermillion;
-  ctx.font = `700 36px ${SERIF}`;
-  ctx.fillText(`${pct}%`, cx, cy + 118);
+  ctx.font = `700 ${Math.round(36 * scale)}px ${SERIF}`;
+  ctx.fillText(`${pct}%`, cx, cy + 118 * scale);
   ctx.restore();
 
   ctx.fillStyle = theme.inkSub;
-  ctx.font = "13px sans-serif";
-  ctx.fillText(`${cat.done} / ${cat.total}`, cx, cy + 140);
+  ctx.font = `${Math.round(13 * scale)}px sans-serif`;
+  ctx.fillText(`${cat.done} / ${cat.total}`, cx, cy + 140 * scale);
 
-  drawProgressBar(ctx, x + 18, cy + 154, cw - 36, 8, pct, theme, cat.accent);
+  drawProgressBar(ctx, x + 18 * scale, cy + 154 * scale, cw - 36 * scale, 8 * scale, pct, theme, cat.accent);
 
   ctx.fillStyle = theme.inkSub;
-  ctx.font = "12px sans-serif";
-  ctx.fillText(`認証 ${cat.authDone} / ${cat.authTotal}`, cx, cy + 186);
+  ctx.font = `${Math.round(12 * scale)}px sans-serif`;
+  ctx.fillText(`認証 ${cat.authDone} / ${cat.authTotal}`, cx, cy + 186 * scale);
 }
 
-function drawCategoryGridCore(ctx, x, y, w, theme, data, cols, rows, marginX) {
+function drawCategoryGridCore(ctx, x, y, w, theme, data, cols, rows, marginX, cardH) {
   const cardW = (w - marginX * 2 - CATEGORY_GAP * (cols - 1)) / cols;
 
   data.categories.forEach((cat, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
     const cardX = x + marginX + col * (cardW + CATEGORY_GAP);
-    const cardY = y + row * (CATEGORY_CARD_H + CATEGORY_GAP);
-    drawCategoryCard(ctx, cardX, cardY, cardW, CATEGORY_CARD_H, cat, theme);
+    const cardY = y + row * (cardH + CATEGORY_GAP);
+    drawCategoryCard(ctx, cardX, cardY, cardW, cardH, cat, theme);
   });
 
-  return rows * CATEGORY_CARD_H + (rows - 1) * CATEGORY_GAP;
+  return rows * cardH + (rows - 1) * CATEGORY_GAP;
 }
 
 // 縦長：3列×2行
 function drawCategoryGridSection(ctx, x, y, w, theme, data) {
-  return drawCategoryGridCore(ctx, x, y, w, theme, data, 3, 2, CATEGORY_MARGIN_X) + 16;
+  return drawCategoryGridCore(ctx, x, y, w, theme, data, 3, 2, CATEGORY_MARGIN_X, CATEGORY_CARD_H_PORTRAIT) + 16;
 }
 
 // 横長：2列×3行（右カラム用。背景アートの縁飾りに近いぶん余白を広めに取る）
-const CATEGORY_GRID_2X3_MARGIN_X = 40;
+const CATEGORY_GRID_2X3_MARGIN_X = 24;
 function drawCategoryGrid2x3Section(ctx, x, y, w, theme, data) {
-  return drawCategoryGridCore(ctx, x, y, w, theme, data, 2, 3, CATEGORY_GRID_2X3_MARGIN_X);
+  return drawCategoryGridCore(ctx, x, y, w, theme, data, 2, 3, CATEGORY_GRID_2X3_MARGIN_X, CATEGORY_CARD_H_LANDSCAPE);
 }
 function categoryGrid2x3Height() {
-  return 3 * CATEGORY_CARD_H + 2 * CATEGORY_GAP;
+  return 3 * CATEGORY_CARD_H_LANDSCAPE + 2 * CATEGORY_GAP;
 }
 
 // ============================================================
