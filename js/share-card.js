@@ -364,22 +364,22 @@ function drawProfileAvatar(ctx, cx, cy, r, theme) {
   // 金の二重リング（内側は太め＋グロー、外側は細めの輪郭）
   ctx.save();
   ctx.shadowColor = theme.gold;
-  ctx.shadowBlur = 6;
+  ctx.shadowBlur = 12;
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 5;
   ctx.strokeStyle = theme.gold;
   ctx.stroke();
   ctx.restore();
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
-  ctx.lineWidth = 1.2;
+  ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, Math.PI * 2);
+  ctx.lineWidth = 2;
   ctx.strokeStyle = theme.goldDeep;
   ctx.globalAlpha = 0.6;
   ctx.stroke();
   ctx.restore();
 
-  // 上部の小さな宝石アクセント
-  drawGemAccent(ctx, cx, cy - r - 2, r * 0.18, theme);
+  // 上部の宝石アクセント
+  drawGemAccent(ctx, cx, cy - r - 5, r * 0.34, theme);
 }
 
 // ============================================================
@@ -504,32 +504,32 @@ function drawProfileTags(ctx, cx, y, tags, theme, fontPx) {
 }
 
 function profileBlockHeight(profile, compact) {
-  const avatarR = compact ? 48 : 56;
-  const gap = compact ? 16 : 18;
-  const nameFont = compact ? 22 : 28;
+  const avatarR = compact ? 56 : 68;
+  const gap = compact ? 18 : 20;
+  const nameFont = compact ? 26 : 34;
   let h = 34 + avatarR * 2 + gap;
   h += nameFont + 8;
-  const infoFont = compact ? 11 : 12;
+  const infoFont = compact ? 13 : 14;
   h += infoFont + 12 + 6; // ID・Lv行（バッジ）
-  if (profile.ageGroup || profile.genderGroup) h += 18;
+  if (profile.ageGroup || profile.genderGroup) h += 20;
   if (profile.styleTags && profile.styleTags.length) {
-    const tagFont = compact ? 10 : 11;
+    const tagFont = compact ? 12 : 13;
     h += 4 + (tagFont + 10) + 6;
   }
-  if (profile.message && profile.message.trim()) h += compact ? 18 : 22;
+  if (profile.message && profile.message.trim()) h += compact ? 20 : 24;
   h += compact ? 6 : 26;
   return h;
 }
 
 function drawProfileBlock(ctx, x, y, w, theme, profile, compact) {
-  const avatarR = compact ? 48 : 56;
+  const avatarR = compact ? 56 : 68;
   const cx = x + w / 2;
   const avatarCy = y + 34 + avatarR;
   drawProfileAvatar(ctx, cx, avatarCy, avatarR, theme);
 
-  let cur = avatarCy + avatarR + (compact ? 16 : 18);
+  let cur = avatarCy + avatarR + (compact ? 18 : 20);
 
-  const nameFont = compact ? 22 : 28;
+  const nameFont = compact ? 26 : 34;
   ctx.textAlign = "center";
   ctx.fillStyle = theme.indigo;
   ctx.font = `700 ${nameFont}px ${SERIF}`;
@@ -539,30 +539,30 @@ function drawProfileBlock(ctx, x, y, w, theme, profile, compact) {
   const infoParts = [];
   if (profile.id && profile.id.trim()) infoParts.push(`ID ${profile.id.trim()}`);
   infoParts.push(`Lv.${profile.level || 1}`);
-  const infoFont = compact ? 11 : 12;
+  const infoFont = compact ? 13 : 14;
   const infoH = drawInfoBadge(ctx, cx, cur, infoParts.join("  ・  "), theme, infoFont);
   cur += infoH + 6;
 
   const agParts = [profile.ageGroup, profile.genderGroup].filter(Boolean);
   if (agParts.length) {
     ctx.fillStyle = theme.inkSub;
-    ctx.font = `${compact ? 10 : 11}px sans-serif`;
-    ctx.fillText(agParts.join("・"), cx, cur + 11);
-    cur += 18;
+    ctx.font = `${compact ? 12 : 13}px sans-serif`;
+    ctx.fillText(agParts.join("・"), cx, cur + 12);
+    cur += 20;
   }
 
   if (profile.styleTags && profile.styleTags.length) {
     cur += 4;
-    const tagH = drawProfileTags(ctx, cx, cur, profile.styleTags, theme, compact ? 10 : 11);
+    const tagH = drawProfileTags(ctx, cx, cur, profile.styleTags, theme, compact ? 12 : 13);
     cur += tagH + 6;
   }
 
   if (profile.message && profile.message.trim()) {
     ctx.fillStyle = theme.inkSub;
-    ctx.font = `italic ${compact ? 11 : 12}px sans-serif`;
+    ctx.font = `italic ${compact ? 13 : 14}px sans-serif`;
     ctx.textAlign = "center";
     ctx.fillText(`「${profile.message.trim()}」`, cx, cur + 12);
-    cur += compact ? 18 : 22;
+    cur += compact ? 20 : 24;
   }
 
   if (!compact) {
@@ -592,8 +592,7 @@ function drawProfileBlock(ctx, x, y, w, theme, profile, compact) {
 // セクション：medal（総合コンプ率の二重リングメダル）
 // 縦長用(通常サイズ)・横長用(大サイズ)の両方から共通コアを呼ぶ
 // ============================================================
-const MEDAL_R = 76;
-const MEDAL_HEIGHT = MEDAL_R * 2 + 36 + 20; // メダル＋done/total行＋脚注行
+const MEDAL_R = 92;
 
 // 宝飾風のダイヤモンド型アクセント（メダル上部・アバター縁取りで共用）
 function drawGemAccent(ctx, cx, cy, size, theme) {
@@ -655,6 +654,14 @@ function drawRibbonBow(ctx, cx, cy, scale, theme) {
   ctx.restore();
 }
 
+// メダルの高さは描画側と完全に一致させるため、この計算式を単一の
+// 情報源としてdrawMedalCoreの戻り値・SHARE_SECTIONS.medal.height・
+// medalLargeHeight()の全てから呼び出す
+function medalCoreHeight(radius) {
+  const scale = radius / MEDAL_R;
+  return radius * 2 + 44 * scale + 30 * scale;
+}
+
 function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   const scale = radius / MEDAL_R;
   const totalAll = data.stats.total + data.stats.foodTotal + data.stats.gardenTotal;
@@ -671,46 +678,46 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   ctx.fill();
   ctx.restore();
 
-  // 外周リング（軽い金のグローつき）
+  // 外周リング（金のグローつき、太め）
   ctx.save();
   ctx.shadowColor = theme.gold;
-  ctx.shadowBlur = 10 * scale;
-  ctx.lineWidth = 3.5 * scale;
+  ctx.shadowBlur = 18 * scale;
+  ctx.lineWidth = 5 * scale;
   ctx.strokeStyle = theme.gold;
   ctx.beginPath(); ctx.arc(cx, medalCy, radius, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
   // 内側リング（二重構造をはっきり見せる）
   ctx.save();
-  ctx.lineWidth = 1.8 * scale;
+  ctx.lineWidth = 2.6 * scale;
   ctx.strokeStyle = theme.goldDeep;
-  ctx.globalAlpha = 0.6;
-  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 9 * scale, 0, Math.PI * 2); ctx.stroke();
+  ctx.globalAlpha = 0.65;
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 12 * scale, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
-  // 上部の宝石アクセント・下部のリボン結び
-  drawGemAccent(ctx, cx, medalCy - radius + 4 * scale, 15 * scale, theme);
-  drawRibbonBow(ctx, cx, medalCy + radius - 3 * scale, scale, theme);
+  // 上部の宝石アクセント・下部のリボン結び（メダルの大きさに合わせて拡大）
+  drawGemAccent(ctx, cx, medalCy - radius + 7 * scale, 32 * scale, theme);
+  drawRibbonBow(ctx, cx, medalCy + radius - 6 * scale, scale * 1.6, theme);
 
   ctx.textAlign = "center";
   ctx.fillStyle = theme.vermillion;
-  ctx.font = `700 ${Math.round(52 * scale)}px ${SERIF}`;
-  ctx.fillText(`${totalPct}%`, cx, medalCy + 10 * scale);
+  ctx.font = `700 ${Math.round(66 * scale)}px ${SERIF}`;
+  ctx.fillText(`${totalPct}%`, cx, medalCy + 14 * scale);
 
   ctx.fillStyle = theme.inkSub;
-  ctx.font = `500 ${Math.round(12 * scale)}px ${SERIF}`;
-  ctx.fillText("総 合 コ ン プ 率", cx, medalCy + 36 * scale);
+  ctx.font = `500 ${Math.round(14 * scale)}px ${SERIF}`;
+  ctx.fillText("総 合 コ ン プ 率", cx, medalCy + 44 * scale);
 
   ctx.fillStyle = theme.ink;
-  ctx.font = `${Math.round(13 * scale)}px sans-serif`;
-  ctx.fillText(`${doneAll} / ${totalAll}`, cx, medalCy + radius + 30 * scale);
+  ctx.font = `${Math.round(15 * scale)}px sans-serif`;
+  ctx.fillText(`${doneAll} / ${totalAll}`, cx, medalCy + radius + 38 * scale);
 
   // 総合%には図鑑の砂像・雪像（カードには出ないカテゴリ）も含む旨の注記
   ctx.fillStyle = theme.inkSub;
-  ctx.font = `${Math.round(10 * scale)}px sans-serif`;
-  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, medalCy + radius + 48 * scale);
+  ctx.font = `${Math.round(11 * scale)}px sans-serif`;
+  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, medalCy + radius + 58 * scale);
 
-  return radius * 2 + 36 * scale + 20 * scale;
+  return medalCoreHeight(radius);
 }
 
 function drawMedalSection(ctx, x, y, w, theme, data) {
@@ -718,13 +725,12 @@ function drawMedalSection(ctx, x, y, w, theme, data) {
 }
 
 // 横長レイアウトの中央カラム用（大きめのメダル）
-const MEDAL_LARGE_R = 130;
+const MEDAL_LARGE_R = 165;
 function drawMedalLargeSection(ctx, x, y, w, theme, data) {
   return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data);
 }
 function medalLargeHeight() {
-  const scale = MEDAL_LARGE_R / MEDAL_R;
-  return MEDAL_LARGE_R * 2 + 34 * scale + 18 * scale;
+  return medalCoreHeight(MEDAL_LARGE_R);
 }
 
 // ============================================================
@@ -732,7 +738,7 @@ function medalLargeHeight() {
 // ============================================================
 const CATEGORY_MARGIN_X = 64;
 const CATEGORY_GAP = 20;
-const CATEGORY_CARD_H = 172;
+const CATEGORY_CARD_H = 208;
 const CATEGORY_GRID_HEIGHT = CATEGORY_CARD_H * 2 + CATEGORY_GAP + 16;
 
 function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
@@ -762,16 +768,16 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   ctx.restore();
 
   // 四隅の金具風装飾（L字の縁取り＋小さな鋲）
-  const cornerLen = 12;
+  const cornerLen = 16;
   [
-    [x + 6,      cy + 6,      0],
-    [x + cw - 6, cy + 6,      Math.PI / 2],
-    [x + cw - 6, cy + ch - 6, Math.PI],
-    [x + 6,      cy + ch - 6, -Math.PI / 2],
+    [x + 7,      cy + 7,      0],
+    [x + cw - 7, cy + 7,      Math.PI / 2],
+    [x + cw - 7, cy + ch - 7, Math.PI],
+    [x + 7,      cy + ch - 7, -Math.PI / 2],
   ].forEach(([cxr, cyr, rot]) => {
     drawCorner(ctx, cxr, cyr, cornerLen, rot, theme.goldDeep);
     ctx.beginPath();
-    ctx.arc(cxr, cyr, 1.6, 0, Math.PI * 2);
+    ctx.arc(cxr, cyr, 2.2, 0, Math.PI * 2);
     ctx.fillStyle = theme.goldDeep;
     ctx.fill();
   });
@@ -780,35 +786,35 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   const pct = cat.total > 0 ? Math.floor(cat.done / cat.total * 100) : 0;
 
   // アイコン入り印章風バッジ
-  const badgeR  = 26;
-  const badgeCy = cy + 36;
-  ctx.beginPath(); ctx.arc(cx - 30, badgeCy, badgeR, 0, Math.PI * 2);
+  const badgeR  = 32;
+  const badgeCy = cy + 44;
+  ctx.beginPath(); ctx.arc(cx - 36, badgeCy, badgeR, 0, Math.PI * 2);
   ctx.fillStyle = `${cat.accent}1f`;
   ctx.fill();
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 2;
   ctx.strokeStyle = cat.accent;
   ctx.stroke();
-  drawIcon(ctx, cat.icon, cx - 30, badgeCy, 26, cat.accent);
+  drawIcon(ctx, cat.icon, cx - 36, badgeCy, 32, cat.accent);
 
   ctx.textAlign = "left";
   ctx.fillStyle = theme.indigo;
-  ctx.font = `700 15px ${SERIF}`;
-  ctx.fillText(cat.label, cx + 2, badgeCy + 5);
+  ctx.font = `700 18px ${SERIF}`;
+  ctx.fillText(cat.label, cx + 6, badgeCy + 6);
 
   ctx.textAlign = "center";
   ctx.fillStyle = theme.vermillion;
-  ctx.font = `700 27px ${SERIF}`;
-  ctx.fillText(`${pct}%`, cx, cy + 96);
+  ctx.font = `700 36px ${SERIF}`;
+  ctx.fillText(`${pct}%`, cx, cy + 118);
 
   ctx.fillStyle = theme.inkSub;
-  ctx.font = "11px sans-serif";
-  ctx.fillText(`${cat.done} / ${cat.total}`, cx, cy + 114);
+  ctx.font = "13px sans-serif";
+  ctx.fillText(`${cat.done} / ${cat.total}`, cx, cy + 140);
 
-  drawProgressBar(ctx, x + 16, cy + 126, cw - 32, 6, pct, theme);
+  drawProgressBar(ctx, x + 18, cy + 154, cw - 36, 8, pct, theme);
 
   ctx.fillStyle = theme.inkSub;
-  ctx.font = "10px sans-serif";
-  ctx.fillText(`認証 ${cat.authDone} / ${cat.authTotal}`, cx, cy + 154);
+  ctx.font = "12px sans-serif";
+  ctx.fillText(`認証 ${cat.authDone} / ${cat.authTotal}`, cx, cy + 186);
 }
 
 function drawCategoryGridCore(ctx, x, y, w, theme, data, cols, rows, marginX) {
@@ -890,7 +896,7 @@ const SHARE_SECTIONS = {
       ? drawProfileBlock(ctx, x, y, w, theme, data.profile, false)
       : drawHeaderSection(ctx, x, y, w, theme),
   },
-  medal:          { height: () => MEDAL_HEIGHT,           draw: drawMedalSection },
+  medal:          { height: () => medalCoreHeight(MEDAL_R), draw: drawMedalSection },
   categoryGrid:   { height: () => CATEGORY_GRID_HEIGHT,    draw: drawCategoryGridSection },
   footer:         { height: () => FOOTER_HEIGHT,           draw: drawFooterSection },
   profileCol: {
