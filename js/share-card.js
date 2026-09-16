@@ -90,6 +90,7 @@ const SHARE_THEMES = {
     fallbackTop: "#fdf3ee", fallbackBottom: "#f8dbe4",
     subtitlePanelAlpha: 0,
     ...SHARE_MEDAL_DISC_DEFAULT,
+    medalFrame: "assets/share-ui/medal-frame_sakura-pink.png",
     ...SHARE_THEME_TOKENS,
   },
   skyBlue: {
@@ -101,6 +102,7 @@ const SHARE_THEMES = {
     fallbackTop: "#eaf6fb", fallbackBottom: "#cfe9f5",
     subtitlePanelAlpha: 0,
     ...SHARE_MEDAL_DISC_DEFAULT,
+    medalFrame: "assets/share-ui/medal-frame_sky-blue.png",
     ...SHARE_THEME_TOKENS,
   },
   forestGreen: {
@@ -114,6 +116,7 @@ const SHARE_THEMES = {
     // このテーマだけ薄いパネルを敷いてコントラストを補う
     subtitlePanelAlpha: 0.6,
     ...SHARE_MEDAL_DISC_DEFAULT,
+    medalFrame: "assets/share-ui/medal-frame_forest-green.png",
     ...SHARE_THEME_TOKENS,
   },
 };
@@ -610,6 +613,23 @@ function drawInfoBadge(ctx, cx, y, text, theme, fontPx) {
   return h;
 }
 
+// 注記など小さな捕捉テキストを、賑やかな背景アートの上でも読めるよう
+// うっすらとした生成りパネルを敷いてから描く（yはテキストのベースライン）
+function drawNoteWithPanel(ctx, cx, y, text, theme, fontPx) {
+  ctx.textAlign = "center";
+  ctx.font = `${fontPx}px sans-serif`;
+  const w = ctx.measureText(text).width + 20;
+  const h = fontPx + 10;
+  ctx.save();
+  ctx.fillStyle = "rgba(255,253,247,0.8)";
+  ctx.beginPath();
+  ctx.roundRect(cx - w / 2, y - fontPx * 0.85, w, h, h / 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = theme.inkSub;
+  ctx.fillText(text, cx, y);
+}
+
 function drawProfileTags(ctx, cx, y, tags, theme, fontPx) {
   if (!tags || !tags.length) return 0;
   ctx.font = `${fontPx}px sans-serif`;
@@ -804,7 +824,7 @@ function medalCoreHeight(radius) {
 function medalFrameCoreHeight(radius) {
   const scale = radius / MEDAL_R;
   const naturalSpan = radius / MEDAL_FRAME_CIRCLE.r;
-  return naturalSpan + 34 * scale;
+  return naturalSpan + 60 * scale;
 }
 
 function drawMedalCore(ctx, cx, topY, radius, theme, data) {
@@ -855,10 +875,10 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
     ctx.font = `700 ${Math.round(14 * scale)}px sans-serif`;
     ctx.fillText(`達成数  ${doneAll} / ${totalAll}`, cx, medalCy + 64 * scale);
 
-    // 注記はリボン飾りが円の外に大きくはみ出す分、フレーム画像の実際の下端を基準に配置する
-    ctx.fillStyle = theme.inkSub;
-    ctx.font = `${Math.round(11 * scale)}px sans-serif`;
-    ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, frameY + drawH + 20 * scale);
+    // 注記はリボン飾りが円の外に大きくはみ出す分、フレーム画像の実際の下端を基準に配置する。
+    // 横長は縮尺が大きくリボン下端の装飾（吊り下げ宝石）に接近しやすいため、余白を広めに取る。
+    // 枠の外＝背景アートの上に直接乗るテーマ（深緑など）もあるため、パネルを敷いて読みやすくする
+    drawNoteWithPanel(ctx, cx, frameY + drawH + 44 * scale, "※図鑑全体（砂像・雪像含む）で集計", theme, Math.round(11 * scale));
 
     return medalFrameCoreHeight(radius);
   }
@@ -973,9 +993,7 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   ctx.fillText(doneText, cx, doneY + 5 * scale);
 
   // 総合%には図鑑の砂像・雪像（カードには出ないカテゴリ）も含む旨の注記
-  ctx.fillStyle = theme.inkSub;
-  ctx.font = `${Math.round(11 * scale)}px sans-serif`;
-  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, doneY + doneH / 2 + 20 * scale);
+  drawNoteWithPanel(ctx, cx, doneY + doneH / 2 + 20 * scale, "※図鑑全体（砂像・雪像含む）で集計", theme, Math.round(11 * scale));
 
   return medalCoreHeight(radius);
 }
