@@ -95,14 +95,30 @@ const SHARE_THEME_DEFAULT = "navyGold";
 let currentShareTheme = SHARE_THEME_DEFAULT; // テーマ切替UIができるまでは固定
 
 // ============================================================
-// レイアウト定義（縦長のみ実装。横長は次タスクで追加）
+// レイアウト定義
 // ============================================================
-// wは背景アートの実サイズ(1086×1448 = 3:4)に合わせた固定サイズ。
-// 中身の合計が枠より小さい分は上下中央寄せにする（drawShareCard参照）
+// w/hは各背景アートの実サイズ(縦長1086×1448=3:4、横長1672×941≒16:9)に
+// 合わせた固定サイズ。中身の合計が枠より小さい分は余白として配分する
+// （drawShareCard参照。縦長はsections配列を上から積む、横長はcolumns配列で
+// 左右に分割し、カラムごとにsectionsを積む）
 const SHARE_LAYOUTS = {
-  portrait: { w: 960, h: 1280, sections: ["header", "medal", "categoryGrid", "footer"] },
+  portrait: {
+    w: 960, h: 1280,
+    sections: ["header", "medal", "categoryGrid", "footer"],
+  },
+  landscape: {
+    w: 1600, h: 900,
+    outerMargin: 36, // 背景アートの縁飾りとカラムが重ならないよう左右に余白を確保
+    columns: [
+      { widthRatio: 0.27, sections: ["profileCol"] },
+      { widthRatio: 0.36, sections: ["medalLarge"] },
+      { widthRatio: 0.37, sections: ["categoryGrid2x3"] },
+    ],
+    footerSection: "footerWide",
+  },
 };
 const SHARE_LAYOUT_DEFAULT = "portrait";
+let currentShareLayout = SHARE_LAYOUT_DEFAULT; // レイアウト切替UIができるまでは固定
 
 const SERIF = "'Shippori Mincho', serif";
 
@@ -342,54 +358,115 @@ function drawHeaderSection(ctx, x, y, w, theme) {
 }
 
 // ============================================================
+// セクション：profileCol（横長レイアウトの左カラム）
+// プロフィール入力（名前・ID・レベル等）はタスク#36で実装予定のため、
+// 現時点ではheaderセクションと同じマスコット＋タイトルを縦積みで表示する
+// ============================================================
+const PROFILE_COL_MASCOT_R = 48;
+const PROFILE_COL_HEIGHT = PROFILE_COL_MASCOT_R * 2 + 18 + 26 + 8 + 14;
+
+function drawProfileColSection(ctx, x, y, w, theme) {
+  const cx = x + w / 2;
+  const mascotCy = y + PROFILE_COL_MASCOT_R;
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, mascotCy, PROFILE_COL_MASCOT_R, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  if (shareMascotImg.complete && shareMascotImg.naturalWidth > 0) {
+    ctx.drawImage(shareMascotImg, cx - PROFILE_COL_MASCOT_R, mascotCy - PROFILE_COL_MASCOT_R, PROFILE_COL_MASCOT_R * 2, PROFILE_COL_MASCOT_R * 2);
+  } else {
+    ctx.fillStyle = theme.panel;
+    ctx.fillRect(cx - PROFILE_COL_MASCOT_R, mascotCy - PROFILE_COL_MASCOT_R, PROFILE_COL_MASCOT_R * 2, PROFILE_COL_MASCOT_R * 2);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, mascotCy, PROFILE_COL_MASCOT_R, 0, Math.PI * 2);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = theme.gold;
+  ctx.stroke();
+  ctx.restore();
+
+  const titleY = mascotCy + PROFILE_COL_MASCOT_R + 18 + 22;
+  ctx.textAlign = "center";
+  ctx.fillStyle = theme.indigo;
+  ctx.font = `700 26px ${SERIF}`;
+  ctx.fillText("はとぴ図鑑", cx, titleY);
+
+  ctx.fillStyle = theme.inkSub;
+  ctx.font = `11px ${SERIF}`;
+  ctx.save();
+  ctx.letterSpacing = "0.2em";
+  ctx.fillText("COMPLETE STATUS", cx, titleY + 22);
+  ctx.restore();
+
+  return PROFILE_COL_HEIGHT;
+}
+
+// ============================================================
 // セクション：medal（総合コンプ率の二重リングメダル）
+// 縦長用(通常サイズ)・横長用(大サイズ)の両方から共通コアを呼ぶ
 // ============================================================
 const MEDAL_R = 76;
 const MEDAL_HEIGHT = MEDAL_R * 2 + 34 + 18; // メダル＋done/total行＋脚注行
 
-function drawMedalSection(ctx, x, y, w, theme, data) {
+function drawMedalCore(ctx, cx, topY, radius, theme, data) {
+  const scale = radius / MEDAL_R;
   const totalAll = data.stats.total + data.stats.foodTotal + data.stats.gardenTotal;
   const doneAll  = data.stats.done  + data.stats.foodDone  + data.stats.gardenDone;
   const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
-  const medalCx  = x + w / 2;
-  const medalCy  = y + MEDAL_R;
+  const medalCy  = topY + radius;
 
   ctx.save();
   ctx.shadowColor  = "rgba(120,100,60,0.18)";
-  ctx.shadowBlur   = 16;
-  ctx.shadowOffsetY = 6;
-  ctx.beginPath(); ctx.arc(medalCx, medalCy, MEDAL_R, 0, Math.PI * 2);
+  ctx.shadowBlur   = 16 * scale;
+  ctx.shadowOffsetY = 6 * scale;
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius, 0, Math.PI * 2);
   ctx.fillStyle = theme.panel;
   ctx.fill();
   ctx.restore();
   ctx.save();
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2.5 * scale;
   ctx.strokeStyle = theme.gold;
-  ctx.beginPath(); ctx.arc(medalCx, medalCy, MEDAL_R, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius, 0, Math.PI * 2); ctx.stroke();
   ctx.lineWidth = 1;
   ctx.strokeStyle = "rgba(163,133,79,0.45)";
-  ctx.beginPath(); ctx.arc(medalCx, medalCy, MEDAL_R - 8, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 8 * scale, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
   ctx.textAlign = "center";
   ctx.fillStyle = theme.vermillion;
-  ctx.font = `700 44px ${SERIF}`;
-  ctx.fillText(`${totalPct}%`, medalCx, medalCy + 8);
+  ctx.font = `700 ${Math.round(44 * scale)}px ${SERIF}`;
+  ctx.fillText(`${totalPct}%`, cx, medalCy + 8 * scale);
 
   ctx.fillStyle = theme.inkSub;
-  ctx.font = `12px ${SERIF}`;
-  ctx.fillText("総 合 コ ン プ 率", medalCx, medalCy + 34);
+  ctx.font = `${Math.round(12 * scale)}px ${SERIF}`;
+  ctx.fillText("総 合 コ ン プ 率", cx, medalCy + 34 * scale);
 
   ctx.fillStyle = theme.ink;
-  ctx.font = "13px sans-serif";
-  ctx.fillText(`${doneAll} / ${totalAll}`, medalCx, medalCy + MEDAL_R + 28);
+  ctx.font = `${Math.round(13 * scale)}px sans-serif`;
+  ctx.fillText(`${doneAll} / ${totalAll}`, cx, medalCy + radius + 28 * scale);
 
   // 総合%には図鑑の砂像・雪像（カードには出ないカテゴリ）も含む旨の注記
   ctx.fillStyle = theme.inkSub;
-  ctx.font = "10px sans-serif";
-  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", medalCx, medalCy + MEDAL_R + 46);
+  ctx.font = `${Math.round(10 * scale)}px sans-serif`;
+  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, medalCy + radius + 46 * scale);
 
-  return MEDAL_HEIGHT;
+  return radius * 2 + 34 * scale + 18 * scale;
+}
+
+function drawMedalSection(ctx, x, y, w, theme, data) {
+  return drawMedalCore(ctx, x + w / 2, y, MEDAL_R, theme, data);
+}
+
+// 横長レイアウトの中央カラム用（大きめのメダル）
+const MEDAL_LARGE_R = 130;
+function drawMedalLargeSection(ctx, x, y, w, theme, data) {
+  return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data);
+}
+function medalLargeHeight() {
+  const scale = MEDAL_LARGE_R / MEDAL_R;
+  return MEDAL_LARGE_R * 2 + 34 * scale + 18 * scale;
 }
 
 // ============================================================
@@ -455,19 +532,32 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   ctx.fillText(`認証 ${cat.authDone} / ${cat.authTotal}`, cx, cy + 154);
 }
 
-function drawCategoryGridSection(ctx, x, y, w, theme, data) {
-  const cols = 3, rows = 2;
-  const cardW  = (w - CATEGORY_MARGIN_X * 2 - CATEGORY_GAP * (cols - 1)) / cols;
+function drawCategoryGridCore(ctx, x, y, w, theme, data, cols, rows, marginX) {
+  const cardW = (w - marginX * 2 - CATEGORY_GAP * (cols - 1)) / cols;
 
   data.categories.forEach((cat, i) => {
     const col = i % cols;
     const row = Math.floor(i / cols);
-    const cardX = x + CATEGORY_MARGIN_X + col * (cardW + CATEGORY_GAP);
+    const cardX = x + marginX + col * (cardW + CATEGORY_GAP);
     const cardY = y + row * (CATEGORY_CARD_H + CATEGORY_GAP);
     drawCategoryCard(ctx, cardX, cardY, cardW, CATEGORY_CARD_H, cat, theme);
   });
 
-  return CATEGORY_GRID_HEIGHT;
+  return rows * CATEGORY_CARD_H + (rows - 1) * CATEGORY_GAP;
+}
+
+// 縦長：3列×2行
+function drawCategoryGridSection(ctx, x, y, w, theme, data) {
+  return drawCategoryGridCore(ctx, x, y, w, theme, data, 3, 2, CATEGORY_MARGIN_X) + 16;
+}
+
+// 横長：2列×3行（右カラム用。背景アートの縁飾りに近いぶん余白を広めに取る）
+const CATEGORY_GRID_2X3_MARGIN_X = 40;
+function drawCategoryGrid2x3Section(ctx, x, y, w, theme, data) {
+  return drawCategoryGridCore(ctx, x, y, w, theme, data, 2, 3, CATEGORY_GRID_2X3_MARGIN_X);
+}
+function categoryGrid2x3Height() {
+  return 3 * CATEGORY_CARD_H + 2 * CATEGORY_GAP;
 }
 
 // ============================================================
@@ -475,26 +565,47 @@ function drawCategoryGridSection(ctx, x, y, w, theme, data) {
 // ============================================================
 const FOOTER_HEIGHT = 50;
 
-function drawFooterSection(ctx, x, y, w, theme) {
-  ctx.strokeStyle = "rgba(163,133,79,0.4)";
-  ctx.lineWidth = 1;
+function drawFooterCore(ctx, x, y, w, theme) {
+  const dateText = new Date().toLocaleDateString("ja-JP");
+  const cx = x + w / 2;
+  const textY = y + 30;
+
+  // 背景アートの街並み帯と重なっても読めるよう、日付の下に小さな不透明パネルを敷く
+  ctx.font = `600 13px ${SERIF}`;
+  const textW = ctx.measureText(dateText).width;
+  const padX = 14, padY = 8;
+  ctx.save();
+  ctx.fillStyle = theme.panel;
   ctx.beginPath();
-  ctx.moveTo(x + CATEGORY_MARGIN_X, y + 16); ctx.lineTo(x + w - CATEGORY_MARGIN_X, y + 16);
-  ctx.stroke();
+  ctx.roundRect(cx - textW / 2 - padX, textY - 13, textW + padX * 2, 13 + padY * 2, 999);
+  ctx.fill();
+  ctx.restore();
 
   ctx.textAlign = "center";
   ctx.fillStyle = theme.goldDeep;
-  ctx.font = `600 13px ${SERIF}`;
-  ctx.fillText(new Date().toLocaleDateString("ja-JP"), x + w / 2, y + 36);
+  ctx.fillText(dateText, cx, textY + 8);
 
   return FOOTER_HEIGHT;
 }
 
+function drawFooterSection(ctx, x, y, w, theme) {
+  return drawFooterCore(ctx, x, y, w, theme);
+}
+
+// 横長レイアウト：3カラムの下に全幅で敷くフッター
+function drawFooterWideSection(ctx, x, y, w, theme) {
+  return drawFooterCore(ctx, x, y, w, theme);
+}
+
 const SHARE_SECTIONS = {
-  header:       { height: () => HEADER_HEIGHT,       draw: drawHeaderSection },
-  medal:        { height: () => MEDAL_HEIGHT,        draw: drawMedalSection },
-  categoryGrid: { height: () => CATEGORY_GRID_HEIGHT, draw: drawCategoryGridSection },
-  footer:       { height: () => FOOTER_HEIGHT,        draw: drawFooterSection },
+  header:         { height: () => HEADER_HEIGHT,         draw: drawHeaderSection },
+  medal:          { height: () => MEDAL_HEIGHT,           draw: drawMedalSection },
+  categoryGrid:   { height: () => CATEGORY_GRID_HEIGHT,    draw: drawCategoryGridSection },
+  footer:         { height: () => FOOTER_HEIGHT,           draw: drawFooterSection },
+  profileCol:     { height: () => PROFILE_COL_HEIGHT,      draw: drawProfileColSection },
+  medalLarge:     { height: () => medalLargeHeight(),      draw: drawMedalLargeSection },
+  categoryGrid2x3:{ height: () => categoryGrid2x3Height(), draw: drawCategoryGrid2x3Section },
+  footerWide:     { height: () => FOOTER_HEIGHT,           draw: drawFooterWideSection },
 };
 
 // ============================================================
@@ -503,7 +614,7 @@ const SHARE_SECTIONS = {
 async function drawShareCard() {
   const stats = getStats();
   const themeKey = currentShareTheme;
-  const layoutKey = SHARE_LAYOUT_DEFAULT;
+  const layoutKey = currentShareLayout;
   const theme = SHARE_THEMES[themeKey];
   const layout = SHARE_LAYOUTS[layoutKey];
   const data = { stats, categories: mapCategoryStats(stats) };
@@ -518,7 +629,6 @@ async function drawShareCard() {
 
   const w = layout.w;
   const h = layout.h;
-  const contentHeight = layout.sections.reduce((sum, key) => sum + SHARE_SECTIONS[key].height(w, data), 0);
 
   shareCanvas.width  = w;
   shareCanvas.height = h;
@@ -526,13 +636,46 @@ async function drawShareCard() {
 
   drawShareBackground(ctx, w, h, theme, bgImg);
 
-  // 背景アートは縁取り装飾＋下部に街並みシルエットがあるため、中身を
-  // 完全な中央寄せにすると下部カード・フッターが街並みと重なりやすい。
-  // 上側は空きが多いぶん、余白の25%だけを上に配せば安全に収まる
+  if (layout.columns) {
+    drawColumnLayout(ctx, layout, w, h, theme, data);
+  } else {
+    drawStackedLayout(ctx, layout, w, h, theme, data);
+  }
+}
+
+// 縦長：セクションを上から積む。背景アートは縁取り装飾＋下部に街並み
+// シルエットがあるため、完全な中央寄せだと下部カード・フッターが
+// 街並みと重なりやすい。上側は空きが多いぶん、余白の25%だけを上に
+// 配せば安全に収まる
+function drawStackedLayout(ctx, layout, w, h, theme, data) {
+  const contentHeight = layout.sections.reduce((sum, key) => sum + SHARE_SECTIONS[key].height(w, data), 0);
   let cur = Math.max(0, (h - contentHeight) * 0.25);
   layout.sections.forEach(key => {
     cur += SHARE_SECTIONS[key].draw(ctx, 0, cur, w, theme, data);
   });
+}
+
+// 横長：カラムに分割し、各カラム内は縦中央寄せ。下部には全幅のフッターを敷く
+function drawColumnLayout(ctx, layout, w, h, theme, data) {
+  const outerMargin = layout.outerMargin || 0;
+  const contentW = w - outerMargin * 2;
+  const footerH = layout.footerSection ? SHARE_SECTIONS[layout.footerSection].height(w, data) : 0;
+  const usableH = h - footerH - 20;
+
+  let colX = outerMargin;
+  layout.columns.forEach(col => {
+    const colW = col.widthRatio * contentW;
+    const colContentH = col.sections.reduce((sum, key) => sum + SHARE_SECTIONS[key].height(colW, data), 0);
+    let cy = Math.max(0, (usableH - colContentH) / 2);
+    col.sections.forEach(key => {
+      cy += SHARE_SECTIONS[key].draw(ctx, colX, cy, colW, theme, data);
+    });
+    colX += colW;
+  });
+
+  if (layout.footerSection) {
+    SHARE_SECTIONS[layout.footerSection].draw(ctx, 0, h - footerH, w, theme, data);
+  }
 }
 
 // シェア用の共通キャプション文言（画像シェア・Xポストで揃える）
