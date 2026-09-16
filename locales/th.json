@@ -1084,5 +1084,18 @@
   "bug_timer_count_label": "จำนวนที่จับได้",
   "bug_timer_empty_hint": "กดปุ่มด้านล่างทันทีที่จับแมลงได้ เพื่อเริ่มนับถอยหลัง 1 นาที",
   "bug_timer_toggle_aria": "แสดง/ซ่อนรายการตัวจับเวลา",
-  "bug_timer_capture_aria": "เริ่มตัวจับเวลาการเกิดใหม่ 1 นาที"
+  "bug_timer_capture_aria": "เริ่มตัวจับเวลาการเกิดใหม่ 1 นาที",
+  "share_profile_title": "กรอกโปรไฟล์ (ไม่บังคับ)",
+  "share_profile_hint": "ข้อมูลที่กรอกจะไม่ถูกบันทึกไว้ที่ใดเลย และสามารถแชร์โดยเว้นว่างไว้ได้เช่นกัน",
+  "share_profile_icon_btn": "เลือกรูปภาพ",
+  "share_profile_icon_clear": "ลบ",
+  "share_profile_name": "ชื่อผู้เล่น",
+  "share_profile_name_placeholder": "จะไม่แสดงในภาพหากเว้นว่างไว้",
+  "share_profile_id": "ID",
+  "share_profile_level": "เลเวลนักบุกเบิก",
+  "share_profile_tags": "สไตล์การเล่น (เลือกได้หลายรายการ)",
+  "share_profile_age": "ช่วงอายุ",
+  "share_profile_gender": "เพศ",
+  "share_profile_message": "ข้อความสั้นๆ",
+  "share_profile_next": "สร้างตัวอย่าง"
 }

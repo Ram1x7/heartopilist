@@ -1084,5 +1084,18 @@
   "bug_timer_count_label": "捕獲次數",
   "bug_timer_empty_hint": "捕獲到昆蟲的瞬間按下方按鈕，即可開始1分鐘倒數",
   "bug_timer_toggle_aria": "展開/收合計時器清單",
-  "bug_timer_capture_aria": "開始1分鐘重生計時"
+  "bug_timer_capture_aria": "開始1分鐘重生計時",
+  "share_profile_title": "填寫個人資料（選填）",
+  "share_profile_hint": "填寫的內容不會被儲存在任何地方，留空也可以直接分享",
+  "share_profile_icon_btn": "選擇圖片",
+  "share_profile_icon_clear": "刪除",
+  "share_profile_name": "玩家名稱",
+  "share_profile_name_placeholder": "留空則不會顯示在圖片中",
+  "share_profile_id": "ID",
+  "share_profile_level": "開拓者等級",
+  "share_profile_tags": "遊戲風格（可複選）",
+  "share_profile_age": "年齡層",
+  "share_profile_gender": "性別",
+  "share_profile_message": "一句話",
+  "share_profile_next": "產生預覽"
 }

@@ -1084,5 +1084,18 @@
   "bug_timer_count_label": "捕获次数",
   "bug_timer_empty_hint": "捕获到昆虫的瞬间按下方按钮，即可开始1分钟倒计时",
   "bug_timer_toggle_aria": "展开/收起计时器列表",
-  "bug_timer_capture_aria": "开始1分钟刷新计时"
+  "bug_timer_capture_aria": "开始1分钟刷新计时",
+  "share_profile_title": "填写资料（可选）",
+  "share_profile_hint": "填写的内容不会被保存在任何地方，留空也可以直接分享",
+  "share_profile_icon_btn": "选择图片",
+  "share_profile_icon_clear": "删除",
+  "share_profile_name": "玩家名",
+  "share_profile_name_placeholder": "留空则不会显示在图片中",
+  "share_profile_id": "ID",
+  "share_profile_level": "开拓者等级",
+  "share_profile_tags": "游戏风格（可多选）",
+  "share_profile_age": "年龄段",
+  "share_profile_gender": "性别",
+  "share_profile_message": "一句话",
+  "share_profile_next": "生成预览"
 }

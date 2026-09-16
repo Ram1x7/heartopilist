@@ -52,7 +52,7 @@
 
 <link rel="stylesheet" href="css/style.css?v=31">
 <link rel="stylesheet" href="css/design-system.css?v=4">
-<link rel="stylesheet" href="css/share-card.css?v=1">
+<link rel="stylesheet" href="css/share-card.css?v=2">
 
 <link rel="prefetch" href="./foods.html">
 <link rel="prefetch" href="./garden.html">
@@ -617,6 +617,64 @@ text-align:left;
 </div>
 
 </div>
+</div>
+
+  <div id="shareProfileModal">
+  <div class="modal-box share-profile-modal">
+    <h3 data-i18n="share_profile_title">プロフィールを入力（任意）</h3>
+    <p class="share-profile-hint" data-i18n="share_profile_hint">入力内容はどこにも保存されません。空欄のままシェアすることもできます</p>
+
+    <div class="share-profile-avatar-row">
+      <div class="share-profile-avatar-preview" id="shareProfileAvatarPreview"></div>
+      <div class="share-profile-avatar-btns">
+        <input type="file" id="shareProfileIconInput" accept="image/*" hidden>
+        <button type="button" id="shareProfileIconBtn" data-i18n="share_profile_icon_btn">画像を選ぶ</button>
+        <button type="button" id="shareProfileIconClearBtn" data-i18n="share_profile_icon_clear">削除</button>
+      </div>
+    </div>
+
+    <label class="share-profile-field">
+      <span data-i18n="share_profile_name">プレイヤー名</span>
+      <input type="text" id="shareProfileName" class="search" maxlength="20" data-i18n-placeholder="share_profile_name_placeholder" placeholder="未入力の場合は表示されません">
+    </label>
+
+    <label class="share-profile-field">
+      <span data-i18n="share_profile_id">ID</span>
+      <input type="text" id="shareProfileId" class="search" maxlength="24">
+    </label>
+
+    <div class="share-profile-field">
+      <span data-i18n="share_profile_level">開拓者レベル</span>
+      <div class="share-profile-level-row">
+        <input type="range" id="shareProfileLevel" class="level-slider" min="1" max="80" value="1">
+        <span id="shareProfileLevelValue" class="share-profile-level-value">Lv.1</span>
+      </div>
+    </div>
+
+    <div class="share-profile-field">
+      <span data-i18n="share_profile_tags">プレイスタイル（複数選択可）</span>
+      <div class="filter share-profile-tag-row" id="shareProfileTagRow"></div>
+    </div>
+
+    <div class="share-profile-age-gender-row">
+      <label class="share-profile-field">
+        <span data-i18n="share_profile_age">年代</span>
+        <select id="shareProfileAge" class="server-select"></select>
+      </label>
+      <label class="share-profile-field">
+        <span data-i18n="share_profile_gender">性別</span>
+        <select id="shareProfileGender" class="server-select"></select>
+      </label>
+    </div>
+
+    <label class="share-profile-field">
+      <span data-i18n="share_profile_message">ひとこと</span>
+      <input type="text" id="shareProfileMessage" class="search" maxlength="40">
+    </label>
+
+    <button type="button" id="shareProfileNextBtn" data-i18n="share_profile_next">プレビューを作成</button>
+    <button class="modal-close-btn" onclick="closeShareProfileModal()" data-i18n="share_close">閉じる</button>
+  </div>
 </div>
 
   <div id="shareModal">

@@ -325,6 +325,33 @@ function drawSubtitleWithPanel(ctx, cx, y, text, theme, fontPx, letterSpacing) {
   ctx.restore();
 }
 
+// アバター円（プロフィールでアイコン画像が選択されていればそれを、
+// なければサイトのマスコットを描く。名前未入力のプレースホルダー表示でも
+// アイコンが選ばれていればそちらを優先する）
+function drawProfileAvatar(ctx, cx, cy, r, theme) {
+  const img = (shareProfileIconImg.complete && shareProfileIconImg.naturalWidth > 0) ? shareProfileIconImg
+    : (shareMascotImg.complete && shareMascotImg.naturalWidth > 0) ? shareMascotImg
+    : null;
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+  if (img) {
+    ctx.drawImage(img, cx - r, cy - r, r * 2, r * 2);
+  } else {
+    ctx.fillStyle = theme.panel;
+    ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  }
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = theme.gold;
+  ctx.stroke();
+  ctx.restore();
+}
+
 // ============================================================
 // セクション：header（マスコット・タイトル・区切り線）
 // ============================================================
@@ -335,22 +362,8 @@ function drawHeaderSection(ctx, x, y, w, theme) {
   const mascotCx = x + w / 2;
   const mascotCy = y + 34 + mascotR;
 
+  drawProfileAvatar(ctx, mascotCx, mascotCy, mascotR, theme);
   ctx.save();
-  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
-  ctx.closePath();
-  ctx.clip();
-  if (shareMascotImg.complete && shareMascotImg.naturalWidth > 0) {
-    ctx.drawImage(shareMascotImg, mascotCx - mascotR, mascotCy - mascotR, mascotR * 2, mascotR * 2);
-  } else {
-    ctx.fillStyle = theme.panel;
-    ctx.fillRect(mascotCx - mascotR, mascotCy - mascotR, mascotR * 2, mascotR * 2);
-  }
-  ctx.restore();
-  ctx.save();
-  ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR, 0, Math.PI * 2);
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = theme.gold;
-  ctx.stroke();
   ctx.beginPath(); ctx.arc(mascotCx, mascotCy, mascotR + 6, 0, Math.PI * 2);
   ctx.lineWidth = 1;
   ctx.strokeStyle = "rgba(163,133,79,0.4)";
@@ -395,23 +408,7 @@ function drawProfileColSection(ctx, x, y, w, theme) {
   const cx = x + w / 2;
   const mascotCy = y + PROFILE_COL_MASCOT_R;
 
-  ctx.save();
-  ctx.beginPath(); ctx.arc(cx, mascotCy, PROFILE_COL_MASCOT_R, 0, Math.PI * 2);
-  ctx.closePath();
-  ctx.clip();
-  if (shareMascotImg.complete && shareMascotImg.naturalWidth > 0) {
-    ctx.drawImage(shareMascotImg, cx - PROFILE_COL_MASCOT_R, mascotCy - PROFILE_COL_MASCOT_R, PROFILE_COL_MASCOT_R * 2, PROFILE_COL_MASCOT_R * 2);
-  } else {
-    ctx.fillStyle = theme.panel;
-    ctx.fillRect(cx - PROFILE_COL_MASCOT_R, mascotCy - PROFILE_COL_MASCOT_R, PROFILE_COL_MASCOT_R * 2, PROFILE_COL_MASCOT_R * 2);
-  }
-  ctx.restore();
-  ctx.save();
-  ctx.beginPath(); ctx.arc(cx, mascotCy, PROFILE_COL_MASCOT_R, 0, Math.PI * 2);
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = theme.gold;
-  ctx.stroke();
-  ctx.restore();
+  drawProfileAvatar(ctx, cx, mascotCy, PROFILE_COL_MASCOT_R, theme);
 
   const titleY = mascotCy + PROFILE_COL_MASCOT_R + 18 + 22;
   ctx.textAlign = "center";
@@ -422,6 +419,119 @@ function drawProfileColSection(ctx, x, y, w, theme) {
   drawSubtitleWithPanel(ctx, cx, titleY + 22, "COMPLETE STATUS", theme, 11, "0.2em");
 
   return PROFILE_COL_HEIGHT;
+}
+
+// ============================================================
+// プロフィールブロック（名前が入力されている時に、上記header/profileColの
+// 代わりに描画される。compact=trueで横長カラム用の小さめサイズになる）
+// ============================================================
+function drawProfileTags(ctx, cx, y, tags, theme, fontPx) {
+  if (!tags || !tags.length) return 0;
+  ctx.font = `${fontPx}px sans-serif`;
+  const padX = 10, gap = 8, h = fontPx + 10;
+  const widths = tags.map(t => ctx.measureText(t).width + padX * 2);
+  const totalW = widths.reduce((a, b) => a + b, 0) + gap * (tags.length - 1);
+  let tx = cx - totalW / 2;
+  tags.forEach((t, i) => {
+    const tw = widths[i];
+    ctx.fillStyle = theme.panel;
+    ctx.strokeStyle = theme.panelLine;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(tx, y, tw, h, h / 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.textAlign = "center";
+    ctx.fillStyle = theme.indigo;
+    ctx.fillText(t, tx + tw / 2, y + h / 2 + fontPx * 0.35);
+    tx += tw + gap;
+  });
+  return h;
+}
+
+function profileBlockHeight(profile, compact) {
+  const avatarR = compact ? 48 : 56;
+  const gap = compact ? 16 : 18;
+  const nameFont = compact ? 22 : 28;
+  let h = 34 + avatarR * 2 + gap;
+  h += nameFont + 8;
+  h += 20; // ID・Lv行
+  if (profile.ageGroup || profile.genderGroup) h += 18;
+  if (profile.styleTags && profile.styleTags.length) {
+    const tagFont = compact ? 10 : 11;
+    h += 4 + (tagFont + 10) + 6;
+  }
+  if (profile.message && profile.message.trim()) h += compact ? 18 : 22;
+  h += compact ? 6 : 26;
+  return h;
+}
+
+function drawProfileBlock(ctx, x, y, w, theme, profile, compact) {
+  const avatarR = compact ? 48 : 56;
+  const cx = x + w / 2;
+  const avatarCy = y + 34 + avatarR;
+  drawProfileAvatar(ctx, cx, avatarCy, avatarR, theme);
+
+  let cur = avatarCy + avatarR + (compact ? 16 : 18);
+
+  const nameFont = compact ? 22 : 28;
+  ctx.textAlign = "center";
+  ctx.fillStyle = theme.indigo;
+  ctx.font = `700 ${nameFont}px ${SERIF}`;
+  ctx.fillText(profile.name.trim(), cx, cur + nameFont * 0.75);
+  cur += nameFont + 8;
+
+  const infoParts = [];
+  if (profile.id && profile.id.trim()) infoParts.push(`ID ${profile.id.trim()}`);
+  infoParts.push(`Lv.${profile.level || 1}`);
+  ctx.fillStyle = theme.inkSub;
+  ctx.font = `${compact ? 11 : 12}px sans-serif`;
+  ctx.fillText(infoParts.join("　・　"), cx, cur + 12);
+  cur += 20;
+
+  const agParts = [profile.ageGroup, profile.genderGroup].filter(Boolean);
+  if (agParts.length) {
+    ctx.fillStyle = theme.inkSub;
+    ctx.font = `${compact ? 10 : 11}px sans-serif`;
+    ctx.fillText(agParts.join("・"), cx, cur + 11);
+    cur += 18;
+  }
+
+  if (profile.styleTags && profile.styleTags.length) {
+    cur += 4;
+    const tagH = drawProfileTags(ctx, cx, cur, profile.styleTags, theme, compact ? 10 : 11);
+    cur += tagH + 6;
+  }
+
+  if (profile.message && profile.message.trim()) {
+    ctx.fillStyle = theme.inkSub;
+    ctx.font = `italic ${compact ? 11 : 12}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText(`「${profile.message.trim()}」`, cx, cur + 12);
+    cur += compact ? 18 : 22;
+  }
+
+  if (!compact) {
+    // 縦長は既存headerセクションと同じ飾り罫を末尾に添える
+    const dividerY = cur + 14;
+    ctx.strokeStyle = "rgba(163,133,79,0.5)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - 120, dividerY); ctx.lineTo(cx - 14, dividerY);
+    ctx.moveTo(cx + 14, dividerY);  ctx.lineTo(cx + 120, dividerY);
+    ctx.stroke();
+    ctx.save();
+    ctx.translate(cx, dividerY);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillStyle = theme.gold;
+    ctx.fillRect(-5, -5, 10, 10);
+    ctx.restore();
+    cur = dividerY + 12;
+  } else {
+    cur += 6;
+  }
+
+  return cur - y;
 }
 
 // ============================================================
@@ -586,8 +696,12 @@ function categoryGrid2x3Height() {
 // ============================================================
 const FOOTER_HEIGHT = 50;
 
-function drawFooterCore(ctx, x, y, w, theme) {
-  const dateText = new Date().toLocaleDateString("ja-JP");
+function drawFooterCore(ctx, x, y, w, theme, data) {
+  // プロフィール表示時は上部の大見出しが「はとぴ図鑑」ではなくプレイヤー名になるため、
+  // フッターに小さくサイト名を添えてブランドが消えないようにする
+  const dateText = hasProfileName(data && data.profile)
+    ? `はとぴ図鑑 ・ ${new Date().toLocaleDateString("ja-JP")}`
+    : new Date().toLocaleDateString("ja-JP");
   const cx = x + w / 2;
   const textY = y + 30;
 
@@ -609,21 +723,33 @@ function drawFooterCore(ctx, x, y, w, theme) {
   return FOOTER_HEIGHT;
 }
 
-function drawFooterSection(ctx, x, y, w, theme) {
-  return drawFooterCore(ctx, x, y, w, theme);
+function drawFooterSection(ctx, x, y, w, theme, data) {
+  return drawFooterCore(ctx, x, y, w, theme, data);
 }
 
 // 横長レイアウト：3カラムの下に全幅で敷くフッター
-function drawFooterWideSection(ctx, x, y, w, theme) {
-  return drawFooterCore(ctx, x, y, w, theme);
+function drawFooterWideSection(ctx, x, y, w, theme, data) {
+  return drawFooterCore(ctx, x, y, w, theme, data);
 }
 
+// header/profileColは、プロフィール名が入力済みならdrawProfileBlock（実データ）、
+// 未入力ならこれまで通りマスコット＋タイトルのプレースホルダーを描く
 const SHARE_SECTIONS = {
-  header:         { height: () => HEADER_HEIGHT,         draw: drawHeaderSection },
+  header: {
+    height: (w, data) => hasProfileName(data.profile) ? profileBlockHeight(data.profile, false) : HEADER_HEIGHT,
+    draw:   (ctx, x, y, w, theme, data) => hasProfileName(data.profile)
+      ? drawProfileBlock(ctx, x, y, w, theme, data.profile, false)
+      : drawHeaderSection(ctx, x, y, w, theme),
+  },
   medal:          { height: () => MEDAL_HEIGHT,           draw: drawMedalSection },
   categoryGrid:   { height: () => CATEGORY_GRID_HEIGHT,    draw: drawCategoryGridSection },
   footer:         { height: () => FOOTER_HEIGHT,           draw: drawFooterSection },
-  profileCol:     { height: () => PROFILE_COL_HEIGHT,      draw: drawProfileColSection },
+  profileCol: {
+    height: (w, data) => hasProfileName(data.profile) ? profileBlockHeight(data.profile, true) : PROFILE_COL_HEIGHT,
+    draw:   (ctx, x, y, w, theme, data) => hasProfileName(data.profile)
+      ? drawProfileBlock(ctx, x, y, w, theme, data.profile, true)
+      : drawProfileColSection(ctx, x, y, w, theme),
+  },
   medalLarge:     { height: () => medalLargeHeight(),      draw: drawMedalLargeSection },
   categoryGrid2x3:{ height: () => categoryGrid2x3Height(), draw: drawCategoryGrid2x3Section },
   footerWide:     { height: () => FOOTER_HEIGHT,           draw: drawFooterWideSection },
@@ -638,7 +764,7 @@ async function drawShareCard() {
   const layoutKey = currentShareLayout;
   const theme = SHARE_THEMES[themeKey];
   const layout = SHARE_LAYOUTS[layoutKey];
-  const data = { stats, categories: mapCategoryStats(stats) };
+  const data = { stats, categories: mapCategoryStats(stats), profile: shareProfileDraft };
 
   // 背景画像はテーマ×レイアウトの組み合わせごとに初回だけ読み込み、以後はキャッシュを再利用する。
   // 未読み込みの組み合わせだけモーダル内にスピナーを出す（キャッシュ済みなら一瞬で解決するので出さない）
@@ -733,11 +859,36 @@ async function shareImage(){
 }
 
 // ============================================================
+// プロフィール入力（タスク#36）
+// 入力内容はlocalStorageに一切保存しない。ページ内のメモリ上にのみ
+// 保持し、共有ボタンを押すたびに前回値をフォームへ再セットする
+// （リロードすれば消える＝仕様通り「保存しない」）
+// ============================================================
+const SHARE_STYLE_TAG_PRESETS = ["女性多め","夜更かし","まったり勢","ガチ勢","初心者","のんびり勢","コレクター気質"];
+const SHARE_AGE_OPTIONS = ["10代","20代","30代","40代","50代以上"];
+const SHARE_GENDER_OPTIONS = ["男性","女性","その他"];
+
+let shareProfileDraft = {
+  name: "", id: "", level: 1,
+  styleTags: [],
+  ageGroup: "", genderGroup: "",
+  message: "",
+  iconDataUrl: null,
+};
+// 選択されたアイコン画像（未選択時はnaturalWidth=0のまま。サーバーには送信しない）
+const shareProfileIconImg = new Image();
+
+function hasProfileName(profile) {
+  return !!(profile && profile.name && profile.name.trim());
+}
+
+// ============================================================
 // モーダル配線
 // ============================================================
 const shareBtn = document.getElementById("shareBtn");
 const shareModal = document.getElementById("shareModal");
 const shareCanvas = document.getElementById("shareCanvas");
+const shareProfileModal = document.getElementById("shareProfileModal");
 shareBtn.innerHTML = icon("share");
 
 shareBtn.onclick = async () => {
@@ -757,9 +908,7 @@ shareBtn.onclick = async () => {
     console.warn("[share-card] 明朝体フォントの読み込みに失敗しました。フォールバック書体で描画します", e);
   }
   await shareMascotReady;
-  // 背景画像の読み込み待ちがモーダル内のスピナーで見えるよう、先にモーダルを開いてから描画する
-  shareModal.style.display = "block";
-  await drawShareCard();
+  openShareProfileModal();
 };
 
 function closeShareModal(){
@@ -768,4 +917,121 @@ function closeShareModal(){
 
 shareModal.onclick = (e)=>{
   if(e.target === shareModal) closeShareModal();
+};
+
+// ── プロフィール入力モーダル ──
+const shareProfileNameInput    = document.getElementById("shareProfileName");
+const shareProfileIdInput      = document.getElementById("shareProfileId");
+const shareProfileLevelInput   = document.getElementById("shareProfileLevel");
+const shareProfileLevelValue   = document.getElementById("shareProfileLevelValue");
+const shareProfileTagRow       = document.getElementById("shareProfileTagRow");
+const shareProfileAgeSelect    = document.getElementById("shareProfileAge");
+const shareProfileGenderSelect = document.getElementById("shareProfileGender");
+const shareProfileMessageInput = document.getElementById("shareProfileMessage");
+const shareProfileAvatarPreview= document.getElementById("shareProfileAvatarPreview");
+const shareProfileIconInput    = document.getElementById("shareProfileIconInput");
+
+// 年代・性別の<select>は選択肢を一度だけ組み立てる（「非公開／未選択」を含む）
+function buildShareProfileSelectOptions(selectEl, options, placeholderLabel) {
+  selectEl.innerHTML = "";
+  const blank = document.createElement("option");
+  blank.value = "";
+  blank.textContent = placeholderLabel;
+  selectEl.appendChild(blank);
+  options.forEach(opt => {
+    const o = document.createElement("option");
+    o.value = opt;
+    o.textContent = opt;
+    selectEl.appendChild(o);
+  });
+}
+buildShareProfileSelectOptions(shareProfileAgeSelect, SHARE_AGE_OPTIONS, "非公開／未選択");
+buildShareProfileSelectOptions(shareProfileGenderSelect, SHARE_GENDER_OPTIONS, "非公開／未選択");
+
+// スタイルタグのチップ（複数選択トグル）を一度だけ組み立てる
+SHARE_STYLE_TAG_PRESETS.forEach(tag => {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = tag;
+  btn.onclick = () => {
+    const idx = shareProfileDraft.styleTags.indexOf(tag);
+    if (idx === -1) shareProfileDraft.styleTags.push(tag);
+    else shareProfileDraft.styleTags.splice(idx, 1);
+    btn.classList.toggle("active", idx === -1);
+  };
+  shareProfileTagRow.appendChild(btn);
+});
+
+function updateShareProfileAvatarPreview() {
+  if (shareProfileDraft.iconDataUrl) {
+    shareProfileAvatarPreview.style.backgroundImage = `url("${shareProfileDraft.iconDataUrl}")`;
+  } else {
+    shareProfileAvatarPreview.style.backgroundImage = "";
+  }
+}
+
+shareProfileIconInput.addEventListener("change", () => {
+  const file = shareProfileIconInput.files && shareProfileIconInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    shareProfileDraft.iconDataUrl = reader.result;
+    shareProfileIconImg.src = reader.result;
+    updateShareProfileAvatarPreview();
+  };
+  reader.onerror = () => {
+    console.warn("[share-card] アイコン画像の読み込みに失敗しました");
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById("shareProfileIconBtn").onclick = () => shareProfileIconInput.click();
+document.getElementById("shareProfileIconClearBtn").onclick = () => {
+  shareProfileDraft.iconDataUrl = null;
+  shareProfileIconImg.src = "";
+  shareProfileIconInput.value = "";
+  updateShareProfileAvatarPreview();
+};
+
+shareProfileLevelInput.addEventListener("input", () => {
+  shareProfileLevelValue.textContent = `Lv.${shareProfileLevelInput.value}`;
+});
+
+// 前回入力値（メモリ上のdraft）をフォームへ反映して開く
+function openShareProfileModal() {
+  shareProfileNameInput.value = shareProfileDraft.name;
+  shareProfileIdInput.value = shareProfileDraft.id;
+  shareProfileLevelInput.value = shareProfileDraft.level;
+  shareProfileLevelValue.textContent = `Lv.${shareProfileDraft.level}`;
+  shareProfileAgeSelect.value = shareProfileDraft.ageGroup;
+  shareProfileGenderSelect.value = shareProfileDraft.genderGroup;
+  shareProfileMessageInput.value = shareProfileDraft.message;
+  [...shareProfileTagRow.children].forEach(btn => {
+    btn.classList.toggle("active", shareProfileDraft.styleTags.includes(btn.textContent));
+  });
+  updateShareProfileAvatarPreview();
+  shareProfileModal.style.display = "block";
+}
+
+function closeShareProfileModal() {
+  shareProfileModal.style.display = "none";
+}
+
+shareProfileModal.onclick = (e) => {
+  if (e.target === shareProfileModal) closeShareProfileModal();
+};
+
+// フォームの値をdraftへ反映してプレビューへ進む（styleTagsはチップ操作時に反映済み）
+document.getElementById("shareProfileNextBtn").onclick = async () => {
+  shareProfileDraft.name = shareProfileNameInput.value.trim();
+  shareProfileDraft.id = shareProfileIdInput.value.trim();
+  shareProfileDraft.level = Number(shareProfileLevelInput.value) || 1;
+  shareProfileDraft.ageGroup = shareProfileAgeSelect.value;
+  shareProfileDraft.genderGroup = shareProfileGenderSelect.value;
+  shareProfileDraft.message = shareProfileMessageInput.value.trim();
+
+  closeShareProfileModal();
+  // 背景画像の読み込み待ちがモーダル内のスピナーで見えるよう、先にモーダルを開いてから描画する
+  shareModal.style.display = "block";
+  await drawShareCard();
 };

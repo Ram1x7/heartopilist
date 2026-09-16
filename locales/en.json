@@ -1164,5 +1164,18 @@
   "bug_timer_count_label": "Catches",
   "bug_timer_empty_hint": "Tap the button below the moment you catch a bug to start a 1-minute countdown",
   "bug_timer_toggle_aria": "Toggle timer list",
-  "bug_timer_capture_aria": "Start a 1-minute respawn timer"
+  "bug_timer_capture_aria": "Start a 1-minute respawn timer",
+  "share_profile_title": "Enter your profile (optional)",
+  "share_profile_hint": "Nothing entered here is saved anywhere. You can also share with these fields left blank.",
+  "share_profile_icon_btn": "Choose image",
+  "share_profile_icon_clear": "Remove",
+  "share_profile_name": "Player name",
+  "share_profile_name_placeholder": "Hidden from the image if left blank",
+  "share_profile_id": "ID",
+  "share_profile_level": "Explorer level",
+  "share_profile_tags": "Play style (multiple choice)",
+  "share_profile_age": "Age range",
+  "share_profile_gender": "Gender",
+  "share_profile_message": "Message",
+  "share_profile_next": "Create preview"
 }

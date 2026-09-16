@@ -1164,5 +1164,18 @@
   "bug_timer_count_label": "捕獲回数",
   "bug_timer_empty_hint": "下のボタンを押すと、捕獲した瞬間から1分のカウントダウンが始まります",
   "bug_timer_toggle_aria": "タイマー一覧の開閉",
-  "bug_timer_capture_aria": "1分のリポップタイマーを開始"
+  "bug_timer_capture_aria": "1分のリポップタイマーを開始",
+  "share_profile_title": "プロフィールを入力（任意）",
+  "share_profile_hint": "入力内容はどこにも保存されません。空欄のままシェアすることもできます",
+  "share_profile_icon_btn": "画像を選ぶ",
+  "share_profile_icon_clear": "削除",
+  "share_profile_name": "プレイヤー名",
+  "share_profile_name_placeholder": "未入力の場合は表示されません",
+  "share_profile_id": "ID",
+  "share_profile_level": "開拓者レベル",
+  "share_profile_tags": "プレイスタイル（複数選択可）",
+  "share_profile_age": "年代",
+  "share_profile_gender": "性別",
+  "share_profile_message": "ひとこと",
+  "share_profile_next": "プレビューを作成"
 }

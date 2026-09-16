@@ -1084,5 +1084,18 @@
   "bug_timer_count_label": "포획 횟수",
   "bug_timer_empty_hint": "벌레를 잡은 순간 아래 버튼을 누르면 1분 카운트다운이 시작됩니다",
   "bug_timer_toggle_aria": "타이머 목록 열기/닫기",
-  "bug_timer_capture_aria": "1분 리팝 타이머 시작"
+  "bug_timer_capture_aria": "1분 리팝 타이머 시작",
+  "share_profile_title": "프로필 입력 (선택)",
+  "share_profile_hint": "입력 내용은 어디에도 저장되지 않습니다. 빈칸인 채로 공유할 수도 있습니다",
+  "share_profile_icon_btn": "이미지 선택",
+  "share_profile_icon_clear": "삭제",
+  "share_profile_name": "플레이어 이름",
+  "share_profile_name_placeholder": "입력하지 않으면 표시되지 않습니다",
+  "share_profile_id": "ID",
+  "share_profile_level": "개척자 레벨",
+  "share_profile_tags": "플레이 스타일（복수 선택 가능）",
+  "share_profile_age": "연령대",
+  "share_profile_gender": "성별",
+  "share_profile_message": "한마디",
+  "share_profile_next": "미리보기 만들기"
 }

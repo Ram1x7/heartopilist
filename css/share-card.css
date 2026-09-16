@@ -30,3 +30,127 @@ body.dark .share-card-loading{
 @keyframes share-card-spin{
   to{ transform: rotate(360deg); }
 }
+
+/* ── プロフィール入力モーダル ── */
+#shareProfileModal{
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(40,36,30,0.5);
+  backdrop-filter: blur(5px);
+  z-index: 999;
+  overflow-y: auto;
+}
+
+.share-profile-modal{
+  max-width: 380px;
+  text-align: left;
+}
+
+.share-profile-modal h3{
+  text-align: center;
+}
+
+.share-profile-hint{
+  font-size: 11px;
+  color: var(--text-sub);
+  text-align: center;
+  margin: -4px 0 14px;
+}
+
+body.dark .share-profile-hint{
+  color: var(--dark-text-sub);
+}
+
+.share-profile-field{
+  display: block;
+  margin-bottom: 12px;
+}
+
+.share-profile-field > span{
+  display: block;
+  font-size: 11px;
+  color: var(--text-sub);
+  margin-bottom: 4px;
+}
+
+body.dark .share-profile-field > span{
+  color: var(--dark-text-sub);
+}
+
+.share-profile-field .search,
+.share-profile-field .server-select{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.share-profile-field .server-select{
+  text-align: left;
+  padding: 10px 12px;
+}
+
+.share-profile-avatar-row{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.share-profile-avatar-preview{
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--card-sub) center/cover no-repeat;
+  border: 2px solid var(--gold);
+}
+
+.share-profile-avatar-btns{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.share-profile-avatar-btns button{
+  width: 100%;
+}
+
+.share-profile-level-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.share-profile-level-row .level-slider{
+  flex: 1;
+  margin-top: 0;
+}
+
+.share-profile-level-value{
+  flex: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--indigo);
+  min-width: 44px;
+  text-align: right;
+}
+
+body.dark .share-profile-level-value{
+  color: var(--dark-accent);
+}
+
+.share-profile-tag-row{
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.share-profile-tag-row button{
+  flex: none;
+}
+
+.share-profile-age-gender-row{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
