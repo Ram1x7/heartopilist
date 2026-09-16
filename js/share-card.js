@@ -61,6 +61,9 @@ const SHARE_THEMES = {
     },
     // 背景画像の読み込み中／失敗時の代替グラデーション
     fallbackTop: "#f8f3e8", fallbackBottom: "#efe4cd",
+    // サブタイトル文字の背後に敷く薄パネルの不透明度（0で描かない）。
+    // 背景と文字色のコントラストが十分なテーマは0のままでよい
+    subtitlePanelAlpha: 0,
     ...SHARE_THEME_TOKENS,
   },
   sakuraPink: {
@@ -70,6 +73,7 @@ const SHARE_THEMES = {
       landscape: "assets/share-bg/sakura-pink_landscape.png",
     },
     fallbackTop: "#fdf3ee", fallbackBottom: "#f8dbe4",
+    subtitlePanelAlpha: 0,
     ...SHARE_THEME_TOKENS,
   },
   skyBlue: {
@@ -79,6 +83,7 @@ const SHARE_THEMES = {
       landscape: "assets/share-bg/sky-blue_landscape.png",
     },
     fallbackTop: "#eaf6fb", fallbackBottom: "#cfe9f5",
+    subtitlePanelAlpha: 0,
     ...SHARE_THEME_TOKENS,
   },
   forestGreen: {
@@ -88,6 +93,9 @@ const SHARE_THEMES = {
       landscape: "assets/share-bg/forest-green_landscape.png",
     },
     fallbackTop: "#f4f1e2", fallbackBottom: "#dfe6c8",
+    // 背景の葉の緑とサブタイトル文字色が近く読みにくいため、
+    // このテーマだけ薄いパネルを敷いてコントラストを補う
+    subtitlePanelAlpha: 0.6,
     ...SHARE_THEME_TOKENS,
   },
 };
@@ -294,6 +302,29 @@ function drawProgressBar(ctx, x, y, bw, bh, pct, theme) {
   }
 }
 
+// テーマによっては背景の柄とサブタイトル文字色が近く読みにくくなるため、
+// subtitlePanelAlphaが設定されているテーマだけ薄いパネルを敷いてから描く
+// （0のテーマでは何も描かず、見た目は変わらない）
+function drawSubtitleWithPanel(ctx, cx, y, text, theme, fontPx, letterSpacing) {
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.font = `${fontPx}px ${SERIF}`;
+  ctx.letterSpacing = letterSpacing;
+
+  if (theme.subtitlePanelAlpha > 0) {
+    const textW = ctx.measureText(text).width;
+    const padX = 14, padY = 6;
+    ctx.fillStyle = `rgba(255,253,247,${theme.subtitlePanelAlpha})`;
+    ctx.beginPath();
+    ctx.roundRect(cx - textW / 2 - padX, y - fontPx, textW + padX * 2, fontPx + padY * 2, 999);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = theme.inkSub;
+  ctx.fillText(text, cx, y);
+  ctx.restore();
+}
+
 // ============================================================
 // セクション：header（マスコット・タイトル・区切り線）
 // ============================================================
@@ -333,12 +364,7 @@ function drawHeaderSection(ctx, x, y, w, theme) {
   ctx.fillText("はとぴ図鑑", x + w / 2, titleY);
 
   const subtitleY = titleY + 8 + 14;
-  ctx.fillStyle = theme.inkSub;
-  ctx.font = `12px ${SERIF}`;
-  ctx.save();
-  ctx.letterSpacing = "0.28em";
-  ctx.fillText("C O M P L E T E   S T A T U S", x + w / 2, subtitleY);
-  ctx.restore();
+  drawSubtitleWithPanel(ctx, x + w / 2, subtitleY, "C O M P L E T E   S T A T U S", theme, 12, "0.28em");
 
   const dividerY = subtitleY + 16;
   ctx.strokeStyle = "rgba(163,133,79,0.5)";
@@ -393,12 +419,7 @@ function drawProfileColSection(ctx, x, y, w, theme) {
   ctx.font = `700 26px ${SERIF}`;
   ctx.fillText("はとぴ図鑑", cx, titleY);
 
-  ctx.fillStyle = theme.inkSub;
-  ctx.font = `11px ${SERIF}`;
-  ctx.save();
-  ctx.letterSpacing = "0.2em";
-  ctx.fillText("COMPLETE STATUS", cx, titleY + 22);
-  ctx.restore();
+  drawSubtitleWithPanel(ctx, cx, titleY + 22, "COMPLETE STATUS", theme, 11, "0.2em");
 
   return PROFILE_COL_HEIGHT;
 }
