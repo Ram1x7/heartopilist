@@ -2156,6 +2156,13 @@ body.dark .bug-timer-panel-header button{
 
 body.dark .bug-timer-clock{ color:var(--dark-text-sub); }
 
+.bug-timer-clock.bug-timer-clock-emphasis{
+  color:var(--vermillion);
+  font-weight:700;
+}
+
+body.dark .bug-timer-clock.bug-timer-clock-emphasis{ color:var(--dark-highlight); }
+
 .bug-timer-count-row{
   font-size:12px;
   color:var(--text-sub);
