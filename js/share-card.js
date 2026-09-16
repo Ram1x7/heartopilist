@@ -58,7 +58,7 @@ const SHARE_THEME_TOKENS = {
 // 未設定（null）のテーマは従来通りtheme.panel（生成り）のままになる
 const SHARE_MEDAL_DISC_DEFAULT = {
   medalDisc: null, medalPercentColor: null, medalLabelColor: null, medalDoneColor: null,
-  medalFrame: null,
+  medalFrame: null, bannerColors: null,
 };
 const SHARE_THEMES = {
   navyGold: {
@@ -79,6 +79,8 @@ const SHARE_THEMES = {
     // メダルの固定装飾（二重リング・宝石・リボン）をPNGフレームに置き換える版。
     // 読み込みに失敗した場合はnull扱いとなり、上のmedalDisc設定によるCanvas描画にフォールバックする
     medalFrame: "assets/share-ui/medal-frame_navy-gold.png",
+    // 「総合コンプリート率」ラベルを乗せるリボンバナーの配色（赤系）
+    bannerColors: { from: "#d97b5c", to: "#a8412c", stroke: "#7a3320" },
     ...SHARE_THEME_TOKENS,
   },
   sakuraPink: {
@@ -811,6 +813,45 @@ function drawRibbonBow(ctx, cx, cy, scale, theme) {
   ctx.restore();
 }
 
+// リング上部を横切るリボン状のバナー（両端が旗のように尖った六角形）。
+// ラベル文字を白で重ね、平面的にならないよう軽いグラデーション+縁取り+影を付ける
+function drawLabelBanner(ctx, cx, cy, w, h, colors, text, fontPx) {
+  const tail = h * 0.55;
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.25)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 2;
+  const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+  grad.addColorStop(0, colors.from);
+  grad.addColorStop(1, colors.to);
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.moveTo(-w / 2 - tail, 0);
+  ctx.lineTo(-w / 2, -h / 2);
+  ctx.lineTo(w / 2, -h / 2);
+  ctx.lineTo(w / 2 + tail, 0);
+  ctx.lineTo(w / 2, h / 2);
+  ctx.lineTo(-w / 2, h / 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+
+  ctx.lineWidth = 1.4;
+  ctx.strokeStyle = colors.stroke;
+  ctx.stroke();
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#fffaf0";
+  ctx.font = `500 ${fontPx}px ${SERIF}`;
+  ctx.letterSpacing = "1px";
+  ctx.fillText(text, 0, fontPx * 0.35);
+  ctx.letterSpacing = "0px";
+  ctx.restore();
+}
+
 // メダルの高さは描画側と完全に一致させるため、この計算式を単一の
 // 情報源としてdrawMedalCoreの戻り値・SHARE_SECTIONS.medal.height・
 // medalLargeHeight()の全てから呼び出す
@@ -856,20 +897,54 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
     ctx.restore();
 
     ctx.textAlign = "center";
-    ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.15)";
-    ctx.shadowBlur = 3 * scale;
-    ctx.fillStyle = theme.vermillion;
-    ctx.font = `700 ${Math.round(68 * scale)}px ${SERIF}`;
-    ctx.fillText(`${totalPct}%`, cx, medalCy + 10 * scale);
-    ctx.restore();
+    const useBanner = !!theme.bannerColors;
+    const pctY = useBanner ? medalCy + 14 * scale : medalCy + 10 * scale;
+    const pctFontPx = Math.round(68 * scale);
+    const pctText = `${totalPct}%`;
+    ctx.font = `700 ${pctFontPx}px ${SERIF}`;
 
-    ctx.save();
-    ctx.fillStyle = theme.inkSub;
-    ctx.font = `500 ${Math.round(15 * scale)}px ${SERIF}`;
-    ctx.letterSpacing = `${1.5 * scale}px`;
-    ctx.fillText("総合コンプリート率", cx, medalCy + 40 * scale);
-    ctx.restore();
+    if (useBanner) {
+      // 金のグラデーション＋濃い縁取り＋軽い光彩で、金属に浮き出た文字のような立体感を出す
+      ctx.save();
+      ctx.lineJoin = "round";
+      ctx.shadowColor = "rgba(80,50,10,0.45)";
+      ctx.shadowBlur = 5 * scale;
+      ctx.shadowOffsetY = 2 * scale;
+      ctx.lineWidth = Math.max(2, 3 * scale);
+      ctx.strokeStyle = "#5a3b1a";
+      ctx.strokeText(pctText, cx, pctY);
+      ctx.restore();
+
+      const pctGrad = ctx.createLinearGradient(cx, pctY - pctFontPx * 0.78, cx, pctY + pctFontPx * 0.12);
+      pctGrad.addColorStop(0, theme.goldDeep);
+      pctGrad.addColorStop(0.55, theme.gold);
+      pctGrad.addColorStop(1, theme.goldHighlight);
+      ctx.fillStyle = pctGrad;
+      ctx.fillText(pctText, cx, pctY);
+    } else {
+      ctx.save();
+      ctx.shadowColor = "rgba(0,0,0,0.15)";
+      ctx.shadowBlur = 3 * scale;
+      ctx.fillStyle = theme.vermillion;
+      ctx.fillText(pctText, cx, pctY);
+      ctx.restore();
+    }
+
+    const bannerFontPx = Math.round(15 * scale);
+    const bannerText = "総合コンプリート率";
+    if (useBanner) {
+      ctx.font = `500 ${bannerFontPx}px ${SERIF}`;
+      const bannerW = ctx.measureText(bannerText).width + 44 * scale;
+      const bannerH = 24 * scale;
+      drawLabelBanner(ctx, cx, medalCy - 66 * scale, bannerW, bannerH, theme.bannerColors, bannerText, bannerFontPx);
+    } else {
+      ctx.save();
+      ctx.fillStyle = theme.inkSub;
+      ctx.font = `500 ${bannerFontPx}px ${SERIF}`;
+      ctx.letterSpacing = `${1.5 * scale}px`;
+      ctx.fillText(bannerText, cx, medalCy + 40 * scale);
+      ctx.restore();
+    }
 
     ctx.fillStyle = theme.ink;
     ctx.font = `700 ${Math.round(14 * scale)}px sans-serif`;
