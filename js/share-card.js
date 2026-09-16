@@ -58,6 +58,7 @@ const SHARE_THEME_TOKENS = {
 // 未設定（null）のテーマは従来通りtheme.panel（生成り）のままになる
 const SHARE_MEDAL_DISC_DEFAULT = {
   medalDisc: null, medalPercentColor: null, medalLabelColor: null, medalDoneColor: null,
+  medalFrame: null,
 };
 const SHARE_THEMES = {
   navyGold: {
@@ -75,6 +76,9 @@ const SHARE_THEMES = {
     medalPercentColor: "#eec27a",
     medalLabelColor: "#f2e9d3",
     medalDoneColor: "#f2e9d3",
+    // メダルの固定装飾（二重リング・宝石・リボン）をPNGフレームに置き換える版。
+    // 読み込みに失敗した場合はnull扱いとなり、上のmedalDisc設定によるCanvas描画にフォールバックする
+    medalFrame: "assets/share-ui/medal-frame_navy-gold.png",
     ...SHARE_THEME_TOKENS,
   },
   sakuraPink: {
@@ -285,6 +289,33 @@ function getThemeBackgroundImage(themeKey, layoutKey) {
     img.src = src;
   });
   shareBgImageCache.set(cacheKey, promise);
+  return promise;
+}
+
+// ============================================================
+// メダル枠PNG（固定装飾）の読み込み。テーマごとに1枚のみでレイアウトに
+// 依存しないため、背景画像とは別のキャッシュで管理する
+// ============================================================
+const shareMedalFrameCache = new Map(); // key: themeKey -> Promise<HTMLImageElement|null>
+
+// メダル中央の生成り円の位置・半径（フレーム画像の一辺に対する比率。全テーマ共通の構図）
+const MEDAL_FRAME_CIRCLE = { cx: 0.4753, cy: 0.4896, r: 0.2967 };
+
+function getThemeMedalFrameImage(themeKey) {
+  const src = SHARE_THEMES[themeKey].medalFrame;
+  if (!src) return Promise.resolve(null);
+  if (shareMedalFrameCache.has(themeKey)) return shareMedalFrameCache.get(themeKey);
+
+  const promise = new Promise((resolve) => {
+    const img = new Image();
+    img.onload  = () => resolve(img);
+    img.onerror = () => {
+      console.warn(`[share-card] メダル枠画像の読み込みに失敗しました（${src}）。従来のCanvas描画で代替します`);
+      resolve(null);
+    };
+    img.src = src;
+  });
+  shareMedalFrameCache.set(themeKey, promise);
   return promise;
 }
 
@@ -768,6 +799,14 @@ function medalCoreHeight(radius) {
   return radius * 2 + 44 * scale + 30 * scale;
 }
 
+// フレーム画像を使う場合のメダル高さ。topYを画像そのものの上端として扱うため、
+// 画像の一辺の実寸（正方形なので描画後の高さと同じ）に注記ぶんの余白を足すだけでよい
+function medalFrameCoreHeight(radius) {
+  const scale = radius / MEDAL_R;
+  const naturalSpan = radius / MEDAL_FRAME_CIRCLE.r;
+  return naturalSpan + 34 * scale;
+}
+
 function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   const scale = radius / MEDAL_R;
   const totalAll = data.stats.total + data.stats.foodTotal + data.stats.gardenTotal;
@@ -775,6 +814,54 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
   const medalCy  = topY + radius;
   const hasDisc  = !!theme.medalDisc;
+
+  // フレーム画像モード：固定装飾（二重リング・宝石・リボン）はPNG任せにして、
+  // Canvasは中央の生成り円に重ねる可変情報（%・ラベル・達成数）のみ描画する。
+  // 画像は上部の宝石・下部のリボンが中央円から大きくはみ出す構図のため、
+  // topYは（円の上端ではなく）「画像そのものの上端」として扱う
+  if (data.medalFrameImg) {
+    const img = data.medalFrameImg;
+    const drawScale = radius / (img.naturalWidth * MEDAL_FRAME_CIRCLE.r);
+    const drawW = img.naturalWidth * drawScale;
+    const drawH = img.naturalHeight * drawScale;
+    const frameX = cx - img.naturalWidth * MEDAL_FRAME_CIRCLE.cx * drawScale;
+    const frameY = topY;
+    const medalCy = frameY + img.naturalHeight * MEDAL_FRAME_CIRCLE.cy * drawScale;
+
+    ctx.save();
+    ctx.shadowColor = "rgba(20,15,5,0.3)";
+    ctx.shadowBlur = 16 * scale;
+    ctx.shadowOffsetY = 6 * scale;
+    ctx.drawImage(img, frameX, frameY, drawW, drawH);
+    ctx.restore();
+
+    ctx.textAlign = "center";
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,0.15)";
+    ctx.shadowBlur = 3 * scale;
+    ctx.fillStyle = theme.vermillion;
+    ctx.font = `700 ${Math.round(68 * scale)}px ${SERIF}`;
+    ctx.fillText(`${totalPct}%`, cx, medalCy + 10 * scale);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = theme.inkSub;
+    ctx.font = `500 ${Math.round(15 * scale)}px ${SERIF}`;
+    ctx.letterSpacing = `${1.5 * scale}px`;
+    ctx.fillText("総合コンプリート率", cx, medalCy + 40 * scale);
+    ctx.restore();
+
+    ctx.fillStyle = theme.ink;
+    ctx.font = `700 ${Math.round(14 * scale)}px sans-serif`;
+    ctx.fillText(`達成数  ${doneAll} / ${totalAll}`, cx, medalCy + 64 * scale);
+
+    // 注記はリボン飾りが円の外に大きくはみ出す分、フレーム画像の実際の下端を基準に配置する
+    ctx.fillStyle = theme.inkSub;
+    ctx.font = `${Math.round(11 * scale)}px sans-serif`;
+    ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, frameY + drawH + 20 * scale);
+
+    return medalFrameCoreHeight(radius);
+  }
 
   // 1) 外周ドロップシャドウ（実績章らしい浮き上がり感）
   ctx.save();
@@ -902,8 +989,8 @@ const MEDAL_LARGE_R = 165;
 function drawMedalLargeSection(ctx, x, y, w, theme, data) {
   return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data);
 }
-function medalLargeHeight() {
-  return medalCoreHeight(MEDAL_LARGE_R);
+function medalLargeHeight(data) {
+  return data && data.medalFrameImg ? medalFrameCoreHeight(MEDAL_LARGE_R) : medalCoreHeight(MEDAL_LARGE_R);
 }
 
 // ============================================================
@@ -1088,7 +1175,10 @@ const SHARE_SECTIONS = {
       ? drawProfileBlock(ctx, x, y, w, theme, data.profile, false)
       : drawHeaderSection(ctx, x, y, w, theme),
   },
-  medal:          { height: () => medalCoreHeight(MEDAL_R), draw: drawMedalSection },
+  medal: {
+    height: (w, data) => data.medalFrameImg ? medalFrameCoreHeight(MEDAL_R) : medalCoreHeight(MEDAL_R),
+    draw: drawMedalSection,
+  },
   categoryGrid:   { height: () => CATEGORY_GRID_HEIGHT,    draw: drawCategoryGridSection },
   footer:         { height: () => FOOTER_HEIGHT,           draw: drawFooterSection },
   profileCol: {
@@ -1097,7 +1187,7 @@ const SHARE_SECTIONS = {
       ? drawProfileBlock(ctx, x, y, w, theme, data.profile, true)
       : drawProfileColSection(ctx, x, y, w, theme),
   },
-  medalLarge:     { height: () => medalLargeHeight(),      draw: drawMedalLargeSection },
+  medalLarge:     { height: (w, data) => medalLargeHeight(data), draw: drawMedalLargeSection },
   categoryGrid2x3:{ height: () => categoryGrid2x3Height(), draw: drawCategoryGrid2x3Section },
   footerWide:     { height: () => FOOTER_HEIGHT,           draw: drawFooterWideSection },
 };
@@ -1116,10 +1206,14 @@ async function drawShareCard() {
   // 背景画像はテーマ×レイアウトの組み合わせごとに初回だけ読み込み、以後はキャッシュを再利用する。
   // 未読み込みの組み合わせだけモーダル内にスピナーを出す（キャッシュ済みなら一瞬で解決するので出さない）
   const cacheKey = `${themeKey}_${layoutKey}`;
-  const alreadyCached = shareBgImageCache.has(cacheKey);
+  const alreadyCached = shareBgImageCache.has(cacheKey) && shareMedalFrameCache.has(themeKey);
   if (!alreadyCached) showShareCardLoading(true);
-  const bgImg = await getThemeBackgroundImage(themeKey, layoutKey);
+  const [bgImg, medalFrameImg] = await Promise.all([
+    getThemeBackgroundImage(themeKey, layoutKey),
+    getThemeMedalFrameImage(themeKey),
+  ]);
   if (!alreadyCached) showShareCardLoading(false);
+  data.medalFrameImg = medalFrameImg;
 
   const w = layout.w;
   const h = layout.h;
