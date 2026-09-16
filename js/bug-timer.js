@@ -40,7 +40,14 @@ function renderBugTimer(){
   // （タイムゾーン計算をここで重複して持たないため）
   const clock = document.getElementById("bugTimerClock");
   const mainClock = document.getElementById("time");
-  if(clock) clock.textContent = mainClock ? mainClock.textContent : "";
+  const clockText = mainClock ? mainClock.textContent : "";
+  if(clock){
+    clock.textContent = clockText;
+    // 各時間の59分〜00分の間（次の1分枠に切り替わる直前と直後）だけ強調表示する
+    const m = /^(\d{2}):(\d{2}):(\d{2})$/.exec(clockText);
+    const minute = m ? m[2] : null;
+    clock.classList.toggle("bug-timer-clock-emphasis", minute === "59" || minute === "00");
+  }
 
   const badge = document.getElementById("bugTimerBadge");
   if(badge) badge.textContent = String(bugTimerCount);
