@@ -58,7 +58,7 @@ const SHARE_THEME_TOKENS = {
 // 未設定（null）のテーマは従来通りtheme.panel（生成り）のままになる
 const SHARE_MEDAL_DISC_DEFAULT = {
   medalDisc: null, medalPercentColor: null, medalLabelColor: null, medalDoneColor: null,
-  medalFrame: null, bannerColors: null,
+  medalFrame: null,
 };
 const SHARE_THEMES = {
   navyGold: {
@@ -79,8 +79,6 @@ const SHARE_THEMES = {
     // メダルの固定装飾（二重リング・宝石・リボン）をPNGフレームに置き換える版。
     // 読み込みに失敗した場合はnull扱いとなり、上のmedalDisc設定によるCanvas描画にフォールバックする
     medalFrame: "assets/share-ui/medal-frame_navy-gold.png",
-    // 「総合コンプリート率」ラベルを乗せるリボンバナーの配色（赤系）
-    bannerColors: { from: "#d97b5c", to: "#a8412c", stroke: "#7a3320" },
     ...SHARE_THEME_TOKENS,
   },
   sakuraPink: {
@@ -305,6 +303,132 @@ const shareMedalFrameCache = new Map(); // key: themeKey -> Promise<HTMLImageEle
 
 // メダル中央の生成り円の位置・半径（フレーム画像の一辺に対する比率。全テーマ共通の構図）
 const MEDAL_FRAME_CIRCLE = { cx: 0.4753, cy: 0.4896, r: 0.2967 };
+
+// メダルPNG（drawImageで敷いた矩形＝frameX/frameY/drawW/drawH）を基準にした
+// 0〜1の正規化座標。「総合コンプリート率」「%」「達成数」の文字はPNG側に
+// 焼き込み済みのため、Canvasは数値だけをこの座標へ重ねる。4テーマとも
+// PNGの構図（円・バナー・達成数プレートの位置）が共通なため、座標もテーマ間で共通
+const SHARE_MEDAL_LAYOUT = {
+  percentage: {
+    // "%"はPNGに焼き込まれていないため、Canvas側で固定位置に描画する。
+    // signLeftXは"%"の左端（常に固定）。数値はここを右端としてtextAlign="right"で
+    // 左方向へ伸ばすため、桁数が変わっても%の位置は動かない
+    signLeftX: 0.615,
+    baselineY: 0.512,
+    fontSizeRatio: 0.185,
+    signFontSizeRatio: 0.115,
+    gapRatio: 0.01,
+  },
+  achievement: {
+    // "達成数"の文字と専用プレートはPNG側。空欄部分の中央にcompleted / totalを重ねる
+    centerX: 0.598,
+    baselineY: 0.678,
+    fontSizeRatio: 0.044,
+  },
+};
+
+// メダル数値の金属グラデーション・縁取り・達成数の文字色をテーマごとにまとめた設定。
+// 座標・fontSizeはSHARE_MEDAL_LAYOUTで共通のため、ここではテーマごとの色だけを持つ
+const SHARE_MEDAL_THEMES = {
+  navyGold: {
+    numberGradient: [
+      { stop: 0,    color: "#fffdf0" },
+      { stop: 0.25, color: "#fff3b0" },
+      { stop: 0.5,  color: "#f7d36d" },
+      { stop: 0.75, color: "#e4aa35" },
+      { stop: 0.9,  color: "#fff0a0" },
+      { stop: 1,    color: "#b97819" },
+    ],
+    strokeDark: "#7d4810",
+    strokeLight: "#e4ad3e",
+    highlightStroke: "rgba(255,255,230,0.75)",
+    shadowColor: "rgba(70,35,5,0.65)",
+    achievementColor: "#f2e9d3", // 生成り〜淡い金
+  },
+  sakuraPink: {
+    numberGradient: [
+      { stop: 0,    color: "#fff7f5" },
+      { stop: 0.25, color: "#ffd9c9" },
+      { stop: 0.5,  color: "#f0ac8f" },
+      { stop: 0.75, color: "#d97b5c" },
+      { stop: 0.9,  color: "#ffe3d0" },
+      { stop: 1,    color: "#a8543c" },
+    ],
+    strokeDark: "#7a3320",
+    strokeLight: "#e88a5e",
+    highlightStroke: "rgba(255,240,235,0.8)",
+    shadowColor: "rgba(90,30,15,0.55)",
+    achievementColor: "#7a1f3d", // 濃いローズピンク〜赤紫
+  },
+  skyBlue: {
+    numberGradient: [
+      { stop: 0,    color: "#ffffff" },
+      { stop: 0.25, color: "#eef6fb" },
+      { stop: 0.5,  color: "#cfe3ee" },
+      { stop: 0.75, color: "#9db8c8" },
+      { stop: 0.9,  color: "#f5fafd" },
+      { stop: 1,    color: "#7a95a5" },
+    ],
+    strokeDark: "#5a7080",
+    strokeLight: "#cfe0ea",
+    highlightStroke: "rgba(255,255,255,0.85)",
+    shadowColor: "rgba(40,60,75,0.5)",
+    achievementColor: "#1f4d6b", // 濃い青
+  },
+  forestGreen: {
+    numberGradient: [
+      { stop: 0,    color: "#fffbe8" },
+      { stop: 0.25, color: "#f2e2a0" },
+      { stop: 0.5,  color: "#d8b768" },
+      { stop: 0.75, color: "#a8823c" },
+      { stop: 0.9,  color: "#f5e8b0" },
+      { stop: 1,    color: "#7a5c26" },
+    ],
+    strokeDark: "#5c4318",
+    strokeLight: "#c9a34e",
+    highlightStroke: "rgba(255,250,220,0.75)",
+    shadowColor: "rgba(50,35,5,0.6)",
+    achievementColor: "#f2e9d3", // 生成り〜淡い金
+  },
+};
+
+// SSRカード風の立体的な金文字を描画する（外側シャドウ→濃い縁取り→明るい縁取り→
+// グラデーション本体→細いハイライト縁取り、の順で重ね描き）。%記号にも同じ関数を使う
+function drawGoldNumber(ctx, text, x, y, fontSizePx, align, mt) {
+  ctx.save();
+  ctx.textAlign = align;
+  ctx.textBaseline = "alphabetic";
+  ctx.font = `700 ${Math.round(fontSizePx)}px ${SERIF}`;
+  ctx.lineJoin = "round";
+
+  // ①外側シャドウ＋②濃い金の外縁
+  ctx.shadowColor = mt.shadowColor;
+  ctx.shadowBlur = fontSizePx * 0.09;
+  ctx.shadowOffsetY = fontSizePx * 0.03;
+  ctx.strokeStyle = mt.strokeDark;
+  ctx.lineWidth = fontSizePx * 0.13;
+  ctx.strokeText(text, x, y);
+
+  // ③明るい金の内縁（影は不要なので消す）
+  ctx.shadowColor = "transparent";
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = mt.strokeLight;
+  ctx.lineWidth = fontSizePx * 0.06;
+  ctx.strokeText(text, x, y);
+
+  // ④本体（縦グラデーション）
+  const grad = ctx.createLinearGradient(x, y - fontSizePx * 0.78, x, y + fontSizePx * 0.12);
+  mt.numberGradient.forEach(g => grad.addColorStop(g.stop, g.color));
+  ctx.fillStyle = grad;
+  ctx.fillText(text, x, y);
+
+  // ⑤細い白金ハイライト
+  ctx.strokeStyle = mt.highlightStroke;
+  ctx.lineWidth = Math.max(1, fontSizePx * 0.012);
+  ctx.strokeText(text, x, y);
+
+  ctx.restore();
+}
 
 function getThemeMedalFrameImage(themeKey) {
   const src = SHARE_THEMES[themeKey].medalFrame;
@@ -813,45 +937,6 @@ function drawRibbonBow(ctx, cx, cy, scale, theme) {
   ctx.restore();
 }
 
-// リング上部を横切るリボン状のバナー（両端が旗のように尖った六角形）。
-// ラベル文字を白で重ね、平面的にならないよう軽いグラデーション+縁取り+影を付ける
-function drawLabelBanner(ctx, cx, cy, w, h, colors, text, fontPx) {
-  const tail = h * 0.55;
-  ctx.save();
-  ctx.translate(cx, cy);
-
-  ctx.save();
-  ctx.shadowColor = "rgba(0,0,0,0.25)";
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetY = 2;
-  const grad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
-  grad.addColorStop(0, colors.from);
-  grad.addColorStop(1, colors.to);
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.moveTo(-w / 2 - tail, 0);
-  ctx.lineTo(-w / 2, -h / 2);
-  ctx.lineTo(w / 2, -h / 2);
-  ctx.lineTo(w / 2 + tail, 0);
-  ctx.lineTo(w / 2, h / 2);
-  ctx.lineTo(-w / 2, h / 2);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-
-  ctx.lineWidth = 1.4;
-  ctx.strokeStyle = colors.stroke;
-  ctx.stroke();
-
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#fffaf0";
-  ctx.font = `500 ${fontPx}px ${SERIF}`;
-  ctx.letterSpacing = "1px";
-  ctx.fillText(text, 0, fontPx * 0.35);
-  ctx.letterSpacing = "0px";
-  ctx.restore();
-}
-
 // メダルの高さは描画側と完全に一致させるため、この計算式を単一の
 // 情報源としてdrawMedalCoreの戻り値・SHARE_SECTIONS.medal.height・
 // medalLargeHeight()の全てから呼び出す
@@ -868,7 +953,7 @@ function medalFrameCoreHeight(radius) {
   return naturalSpan + 60 * scale;
 }
 
-function drawMedalCore(ctx, cx, topY, radius, theme, data, bannerYRatio = 0.97) {
+function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   const scale = radius / MEDAL_R;
   const totalAll = data.stats.total + data.stats.foodTotal + data.stats.gardenTotal;
   const doneAll  = data.stats.done  + data.stats.foodDone  + data.stats.gardenDone;
@@ -876,8 +961,9 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data, bannerYRatio = 0.97) 
   const medalCy  = topY + radius;
   const hasDisc  = !!theme.medalDisc;
 
-  // フレーム画像モード：固定装飾（二重リング・宝石・リボン）はPNG任せにして、
-  // Canvasは中央の生成り円に重ねる可変情報（%・ラベル・達成数）のみ描画する。
+  // フレーム画像モード：固定UI（二重リング・宝石・リボン・「総合コンプリート率」
+  // バナー・「達成数」プレートまで全てPNGに焼き込み済み）はdrawImageで配置するだけにし、
+  // Canvasはユーザーごとに変わる数値（%の数字・達成数のcompleted/total）だけを重ねる。
   // 画像は上部の宝石・下部のリボンが中央円から大きくはみ出す構図のため、
   // topYは（円の上端ではなく）「画像そのものの上端」として扱う
   if (data.medalFrameImg) {
@@ -887,8 +973,9 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data, bannerYRatio = 0.97) 
     const drawH = img.naturalHeight * drawScale;
     const frameX = cx - img.naturalWidth * MEDAL_FRAME_CIRCLE.cx * drawScale;
     const frameY = topY;
-    const medalCy = frameY + img.naturalHeight * MEDAL_FRAME_CIRCLE.cy * drawScale;
 
+    // 1) シェア画像背景（drawShareBackgroundで描画済み）
+    // 2) メダル透過PNG
     ctx.save();
     ctx.shadowColor = "rgba(20,15,5,0.3)";
     ctx.shadowBlur = 16 * scale;
@@ -896,64 +983,31 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data, bannerYRatio = 0.97) 
     ctx.drawImage(img, frameX, frameY, drawW, drawH);
     ctx.restore();
 
+    const mt = SHARE_MEDAL_THEMES[data.themeKey] || SHARE_MEDAL_THEMES.navyGold;
+    const L = SHARE_MEDAL_LAYOUT;
+
+    // 3) 総合コンプリート率の数値（"%"はPNGに無いためCanvasで固定位置に描画し、
+    // 数値はその左側にtextAlign="right"で伸ばす＝%の位置は桁数が変わっても動かない）
+    const percentBaselineY = frameY + drawH * L.percentage.baselineY;
+    const signLeftX = frameX + drawW * L.percentage.signLeftX;
+    const percentFontPx = drawW * L.percentage.fontSizeRatio;
+    const signFontPx = drawW * L.percentage.signFontSizeRatio;
+    const gapPx = drawW * L.percentage.gapRatio;
+
+    drawGoldNumber(ctx, String(totalPct), signLeftX - gapPx, percentBaselineY, percentFontPx, "right", mt);
+    drawGoldNumber(ctx, "%", signLeftX, percentBaselineY, signFontPx, "left", mt);
+
+    // 4) 達成数の数値（"達成数"の文字・プレートはPNG側。空欄部分に中央揃えで重ねる）
+    const achievementText = `${doneAll} / ${totalAll}`;
+    const achievementFontPx = drawW * L.achievement.fontSizeRatio;
+    const achievementCenterX = frameX + drawW * L.achievement.centerX;
+    const achievementBaselineY = frameY + drawH * L.achievement.baselineY;
+    ctx.save();
     ctx.textAlign = "center";
-    const useBanner = !!theme.bannerColors;
-    const pctY = useBanner ? medalCy + 14 * scale : medalCy + 10 * scale;
-    const pctFontPx = Math.round(68 * scale);
-    const pctText = `${totalPct}%`;
-    ctx.font = `700 ${pctFontPx}px ${SERIF}`;
-
-    if (useBanner) {
-      // 金のグラデーション＋濃い縁取り＋軽い光彩で、金属に浮き出た文字のような立体感を出す
-      ctx.save();
-      ctx.lineJoin = "round";
-      ctx.shadowColor = "rgba(80,50,10,0.5)";
-      ctx.shadowBlur = 6 * scale;
-      ctx.shadowOffsetY = 2 * scale;
-      ctx.lineWidth = Math.max(2.5, 4 * scale);
-      ctx.strokeStyle = "#4a2f14";
-      ctx.strokeText(pctText, cx, pctY);
-      ctx.restore();
-
-      const pctGrad = ctx.createLinearGradient(cx, pctY - pctFontPx * 0.78, cx, pctY + pctFontPx * 0.12);
-      pctGrad.addColorStop(0, "#8a6633");
-      pctGrad.addColorStop(0.45, theme.gold);
-      pctGrad.addColorStop(0.8, theme.goldLight);
-      pctGrad.addColorStop(1, theme.goldHighlight);
-      ctx.fillStyle = pctGrad;
-      ctx.fillText(pctText, cx, pctY);
-    } else {
-      ctx.save();
-      ctx.shadowColor = "rgba(0,0,0,0.15)";
-      ctx.shadowBlur = 3 * scale;
-      ctx.fillStyle = theme.vermillion;
-      ctx.fillText(pctText, cx, pctY);
-      ctx.restore();
-    }
-
-    const bannerFontPx = Math.round(15 * scale);
-    const bannerText = "総合コンプリート率";
-    if (useBanner) {
-      ctx.font = `500 ${bannerFontPx}px ${SERIF}`;
-      const bannerW = ctx.measureText(bannerText).width + 32 * scale;
-      const bannerH = 24 * scale;
-      // リングの外周ラインに串刺しになるよう、盤面の内側ではなくリング上端付近に重ねる。
-      // 比率(bannerYRatio)は呼び出し元のメダルサイズごとに調整し、小さいメダルでは
-      // 上部の宝石飾りと衝突しないよう少し低めに配置する
-      const bannerY = medalCy - radius * bannerYRatio;
-      drawLabelBanner(ctx, cx, bannerY, bannerW, bannerH, theme.bannerColors, bannerText, bannerFontPx);
-    } else {
-      ctx.save();
-      ctx.fillStyle = theme.inkSub;
-      ctx.font = `500 ${bannerFontPx}px ${SERIF}`;
-      ctx.letterSpacing = `${1.5 * scale}px`;
-      ctx.fillText(bannerText, cx, medalCy + 40 * scale);
-      ctx.restore();
-    }
-
-    ctx.fillStyle = theme.ink;
-    ctx.font = `700 ${Math.round(14 * scale)}px sans-serif`;
-    ctx.fillText(`達成数  ${doneAll} / ${totalAll}`, cx, medalCy + 64 * scale);
+    ctx.font = `700 ${Math.round(achievementFontPx)}px ${SERIF}`;
+    ctx.fillStyle = mt.achievementColor;
+    ctx.fillText(achievementText, achievementCenterX, achievementBaselineY);
+    ctx.restore();
 
     // 注記はリボン飾りが円の外に大きくはみ出す分、フレーム画像の実際の下端を基準に配置する。
     // 横長は縮尺が大きくリボン下端の装飾（吊り下げ宝石）に接近しやすいため、余白を広めに取る。
@@ -1079,15 +1133,13 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data, bannerYRatio = 0.97) 
 }
 
 function drawMedalSection(ctx, x, y, w, theme, data) {
-  // 縦長は半径が小さくバナー幅に対してリングの余白が狭いため、宝石飾りに
-  // かからないよう比率を下げて少し低めに配置する
-  return drawMedalCore(ctx, x + w / 2, y, MEDAL_R, theme, data, 0.76);
+  return drawMedalCore(ctx, x + w / 2, y, MEDAL_R, theme, data);
 }
 
 // 横長レイアウトの中央カラム用（大きめのメダル）
 const MEDAL_LARGE_R = 199;
 function drawMedalLargeSection(ctx, x, y, w, theme, data) {
-  return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data, 0.97);
+  return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data);
 }
 function medalLargeHeight(data) {
   return data && data.medalFrameImg ? medalFrameCoreHeight(MEDAL_LARGE_R) : medalCoreHeight(MEDAL_LARGE_R);
@@ -1311,7 +1363,7 @@ async function drawShareCard() {
   const layoutKey = currentShareLayout;
   const theme = SHARE_THEMES[themeKey];
   const layout = SHARE_LAYOUTS[layoutKey];
-  const data = { stats, categories: mapCategoryStats(stats), profile: shareProfileDraft };
+  const data = { stats, categories: mapCategoryStats(stats), profile: shareProfileDraft, themeKey };
 
   // 背景画像はテーマ×レイアウトの組み合わせごとに初回だけ読み込み、以後はキャッシュを再利用する。
   // 未読み込みの組み合わせだけモーダル内にスピナーを出す（キャッシュ済みなら一瞬で解決するので出さない）
@@ -1324,6 +1376,9 @@ async function drawShareCard() {
   ]);
   if (!alreadyCached) showShareCardLoading(false);
   data.medalFrameImg = medalFrameImg;
+  // メダルの巨大な金文字はShippori Minchoが未読込のまま描画されると
+  // フォールバック体になってしまうため、描画直前にフォント読み込み完了を保証する
+  try { await document.fonts.ready; } catch (e) { /* Safari等で失敗しても致命的ではないため無視 */ }
 
   const w = layout.w;
   const h = layout.h;
