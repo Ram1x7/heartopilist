@@ -868,7 +868,7 @@ function medalFrameCoreHeight(radius) {
   return naturalSpan + 60 * scale;
 }
 
-function drawMedalCore(ctx, cx, topY, radius, theme, data) {
+function drawMedalCore(ctx, cx, topY, radius, theme, data, bannerYRatio = 0.97) {
   const scale = radius / MEDAL_R;
   const totalAll = data.stats.total + data.stats.foodTotal + data.stats.gardenTotal;
   const doneAll  = data.stats.done  + data.stats.foodDone  + data.stats.gardenDone;
@@ -907,17 +907,18 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
       // 金のグラデーション＋濃い縁取り＋軽い光彩で、金属に浮き出た文字のような立体感を出す
       ctx.save();
       ctx.lineJoin = "round";
-      ctx.shadowColor = "rgba(80,50,10,0.45)";
-      ctx.shadowBlur = 5 * scale;
+      ctx.shadowColor = "rgba(80,50,10,0.5)";
+      ctx.shadowBlur = 6 * scale;
       ctx.shadowOffsetY = 2 * scale;
-      ctx.lineWidth = Math.max(2, 3 * scale);
-      ctx.strokeStyle = "#5a3b1a";
+      ctx.lineWidth = Math.max(2.5, 4 * scale);
+      ctx.strokeStyle = "#4a2f14";
       ctx.strokeText(pctText, cx, pctY);
       ctx.restore();
 
       const pctGrad = ctx.createLinearGradient(cx, pctY - pctFontPx * 0.78, cx, pctY + pctFontPx * 0.12);
-      pctGrad.addColorStop(0, theme.goldDeep);
-      pctGrad.addColorStop(0.55, theme.gold);
+      pctGrad.addColorStop(0, "#8a6633");
+      pctGrad.addColorStop(0.45, theme.gold);
+      pctGrad.addColorStop(0.8, theme.goldLight);
       pctGrad.addColorStop(1, theme.goldHighlight);
       ctx.fillStyle = pctGrad;
       ctx.fillText(pctText, cx, pctY);
@@ -934,9 +935,13 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
     const bannerText = "総合コンプリート率";
     if (useBanner) {
       ctx.font = `500 ${bannerFontPx}px ${SERIF}`;
-      const bannerW = ctx.measureText(bannerText).width + 44 * scale;
+      const bannerW = ctx.measureText(bannerText).width + 32 * scale;
       const bannerH = 24 * scale;
-      drawLabelBanner(ctx, cx, medalCy - 66 * scale, bannerW, bannerH, theme.bannerColors, bannerText, bannerFontPx);
+      // リングの外周ラインに串刺しになるよう、盤面の内側ではなくリング上端付近に重ねる。
+      // 比率(bannerYRatio)は呼び出し元のメダルサイズごとに調整し、小さいメダルでは
+      // 上部の宝石飾りと衝突しないよう少し低めに配置する
+      const bannerY = medalCy - radius * bannerYRatio;
+      drawLabelBanner(ctx, cx, bannerY, bannerW, bannerH, theme.bannerColors, bannerText, bannerFontPx);
     } else {
       ctx.save();
       ctx.fillStyle = theme.inkSub;
@@ -1074,13 +1079,15 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
 }
 
 function drawMedalSection(ctx, x, y, w, theme, data) {
-  return drawMedalCore(ctx, x + w / 2, y, MEDAL_R, theme, data);
+  // 縦長は半径が小さくバナー幅に対してリングの余白が狭いため、宝石飾りに
+  // かからないよう比率を下げて少し低めに配置する
+  return drawMedalCore(ctx, x + w / 2, y, MEDAL_R, theme, data, 0.76);
 }
 
 // 横長レイアウトの中央カラム用（大きめのメダル）
 const MEDAL_LARGE_R = 199;
 function drawMedalLargeSection(ctx, x, y, w, theme, data) {
-  return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data);
+  return drawMedalCore(ctx, x + w / 2, y, MEDAL_LARGE_R, theme, data, 0.97);
 }
 function medalLargeHeight(data) {
   return data && data.medalFrameImg ? medalFrameCoreHeight(MEDAL_LARGE_R) : medalCoreHeight(MEDAL_LARGE_R);
