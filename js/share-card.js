@@ -51,6 +51,13 @@ const SHARE_THEME_TOKENS = {
   ink: "#34302b", inkSub: "#7a7164",
   indigo: "#3c5a6e", vermillion: "#b1503b",
   gold: "#c8a86b", goldDeep: "#a3854f",
+  // メダル外周リングの金属的な質感用に、単色の金より明暗2段階を追加
+  goldLight: "#e3cd97", goldHighlight: "#fff6e0",
+};
+// メダル中央盤面を「実績章」らしい濃色にするテーマ用のオプション項目。
+// 未設定（null）のテーマは従来通りtheme.panel（生成り）のままになる
+const SHARE_MEDAL_DISC_DEFAULT = {
+  medalDisc: null, medalPercentColor: null, medalLabelColor: null, medalDoneColor: null,
 };
 const SHARE_THEMES = {
   navyGold: {
@@ -64,6 +71,10 @@ const SHARE_THEMES = {
     // サブタイトル文字の背後に敷く薄パネルの不透明度（0で描かない）。
     // 背景と文字色のコントラストが十分なテーマは0のままでよい
     subtitlePanelAlpha: 0,
+    medalDisc: { from: "#1c3350", to: "#0a1626", ring: "#3c5c82" },
+    medalPercentColor: "#eec27a",
+    medalLabelColor: "#f2e9d3",
+    medalDoneColor: "#f2e9d3",
     ...SHARE_THEME_TOKENS,
   },
   sakuraPink: {
@@ -74,6 +85,7 @@ const SHARE_THEMES = {
     },
     fallbackTop: "#fdf3ee", fallbackBottom: "#f8dbe4",
     subtitlePanelAlpha: 0,
+    ...SHARE_MEDAL_DISC_DEFAULT,
     ...SHARE_THEME_TOKENS,
   },
   skyBlue: {
@@ -84,6 +96,7 @@ const SHARE_THEMES = {
     },
     fallbackTop: "#eaf6fb", fallbackBottom: "#cfe9f5",
     subtitlePanelAlpha: 0,
+    ...SHARE_MEDAL_DISC_DEFAULT,
     ...SHARE_THEME_TOKENS,
   },
   forestGreen: {
@@ -96,6 +109,7 @@ const SHARE_THEMES = {
     // 背景の葉の緑とサブタイトル文字色が近く読みにくいため、
     // このテーマだけ薄いパネルを敷いてコントラストを補う
     subtitlePanelAlpha: 0.6,
+    ...SHARE_MEDAL_DISC_DEFAULT,
     ...SHARE_THEME_TOKENS,
   },
 };
@@ -292,6 +306,39 @@ function drawShareBackground(ctx, w, h, theme, bgImg) {
   ctx.fillRect(0, 0, w, h);
 }
 
+// 実績カードの角に付ける、金属製の金具風コーナー装飾。
+// 二重線のL字＋角の小さな菱形鋲で、単純なL字線より「作り込まれた額縁」感を出す
+function drawOrnamentalCorner(ctx, cx, cy, len, rot, color, colorDeep) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rot);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.moveTo(0, len); ctx.lineTo(0, 0); ctx.lineTo(len, 0);
+  ctx.stroke();
+  ctx.strokeStyle = colorDeep;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.6;
+  ctx.beginPath();
+  ctx.moveTo(5, len - 4); ctx.lineTo(5, 5); ctx.lineTo(len - 4, 5);
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(Math.PI / 4);
+  const s = 4.5;
+  const g = ctx.createLinearGradient(-s, -s, s, s);
+  g.addColorStop(0, "#fff6e0");
+  g.addColorStop(0.5, color);
+  g.addColorStop(1, colorDeep);
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.roundRect(-s, -s, s * 2, s * 2, 1.3); ctx.fill();
+  ctx.restore();
+}
+
+// 従来の単純なL字線（現状ほかに使用箇所は無いが、軽量な角飾りとして残す）
 function drawCorner(ctx, cx, cy, len, rot, color) {
   ctx.save();
   ctx.translate(cx, cy);
@@ -304,16 +351,36 @@ function drawCorner(ctx, cx, cy, len, rot, color) {
   ctx.restore();
 }
 
-function drawProgressBar(ctx, x, y, bw, bh, pct, theme) {
+function drawProgressBar(ctx, x, y, bw, bh, pct, theme, accent) {
+  ctx.save();
   ctx.fillStyle = theme.track;
   ctx.beginPath(); ctx.roundRect(x, y, bw, bh, bh / 2); ctx.fill();
+  ctx.strokeStyle = theme.panelLine;
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = 0.6;
+  ctx.stroke();
+  ctx.restore();
+
   if (pct > 0) {
+    const fillW = Math.max(bh, bw * pct / 100);
     const g = ctx.createLinearGradient(x, 0, x + bw, 0);
-    g.addColorStop(0, theme.goldDeep);
+    g.addColorStop(0, accent || theme.goldDeep);
     g.addColorStop(1, theme.gold);
+    ctx.save();
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.roundRect(x, y, bw * pct / 100, bh, bh / 2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(x, y, fillW, bh, bh / 2); ctx.fill();
+    ctx.globalAlpha = 0.32;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.roundRect(x, y, fillW, Math.max(1.5, bh * 0.4), bh * 0.2); ctx.fill();
+    ctx.restore();
   }
+
+  // 両端の小さな金具（バーが空でも「宝飾レール」らしく見せる）
+  ctx.save();
+  ctx.fillStyle = theme.goldDeep;
+  ctx.beginPath(); ctx.arc(x, y + bh / 2, bh * 0.42, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(x + bw, y + bh / 2, bh * 0.42, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 
 // テーマによっては背景の柄とサブタイトル文字色が近く読みにくくなるため、
@@ -361,25 +428,36 @@ function drawProfileAvatar(ctx, cx, cy, r, theme) {
   }
   ctx.restore();
 
-  // 金の二重リング（内側は太め＋グロー、外側は細めの輪郭）
+  // 金の三重リング（グロー付き太リング→細い装飾リング→外側の淡い輪郭）
   ctx.save();
   ctx.shadowColor = theme.gold;
   ctx.shadowBlur = 12;
+  const ringGrad = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  ringGrad.addColorStop(0, theme.goldHighlight);
+  ringGrad.addColorStop(0.5, theme.gold);
+  ringGrad.addColorStop(1, theme.goldDeep);
   ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2);
   ctx.lineWidth = 5;
-  ctx.strokeStyle = theme.gold;
+  ctx.strokeStyle = ringGrad;
   ctx.stroke();
   ctx.restore();
   ctx.save();
-  ctx.beginPath(); ctx.arc(cx, cy, r + 8, 0, Math.PI * 2);
-  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(cx, cy, r + 5, 0, Math.PI * 2);
+  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = theme.goldLight;
+  ctx.globalAlpha = 0.85;
+  ctx.stroke();
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, r + 9, 0, Math.PI * 2);
+  ctx.lineWidth = 1.6;
   ctx.strokeStyle = theme.goldDeep;
-  ctx.globalAlpha = 0.6;
+  ctx.globalAlpha = 0.5;
   ctx.stroke();
   ctx.restore();
 
   // 上部の宝石アクセント
-  drawGemAccent(ctx, cx, cy - r - 5, r * 0.34, theme);
+  drawGemAccent(ctx, cx, cy - r - 6, r * 0.36, theme);
 }
 
 // ============================================================
@@ -696,54 +774,121 @@ function drawMedalCore(ctx, cx, topY, radius, theme, data) {
   const doneAll  = data.stats.done  + data.stats.foodDone  + data.stats.gardenDone;
   const totalPct = totalAll > 0 ? Math.floor(doneAll / totalAll * 100) : 0;
   const medalCy  = topY + radius;
+  const hasDisc  = !!theme.medalDisc;
 
+  // 1) 外周ドロップシャドウ（実績章らしい浮き上がり感）
   ctx.save();
-  ctx.shadowColor  = "rgba(120,100,60,0.18)";
-  ctx.shadowBlur   = 16 * scale;
-  ctx.shadowOffsetY = 6 * scale;
+  ctx.shadowColor  = "rgba(20,15,5,0.35)";
+  ctx.shadowBlur   = 22 * scale;
+  ctx.shadowOffsetY = 9 * scale;
   ctx.beginPath(); ctx.arc(cx, medalCy, radius, 0, Math.PI * 2);
-  ctx.fillStyle = theme.panel;
+  ctx.fillStyle = theme.goldDeep;
   ctx.fill();
   ctx.restore();
 
-  // 外周リング（金のグローつき、太め）
+  // 2) 外側の太いゴールドリング（対角グラデーションで金属の反射を疑似的に表現）
+  const ringR = radius - 3 * scale;
+  const metalGrad = ctx.createLinearGradient(cx - radius, medalCy - radius, cx + radius, medalCy + radius);
+  metalGrad.addColorStop(0,    theme.goldHighlight);
+  metalGrad.addColorStop(0.28, theme.gold);
+  metalGrad.addColorStop(0.5,  theme.goldDeep);
+  metalGrad.addColorStop(0.72, theme.gold);
+  metalGrad.addColorStop(1,    theme.goldHighlight);
   ctx.save();
   ctx.shadowColor = theme.gold;
-  ctx.shadowBlur = 18 * scale;
-  ctx.lineWidth = 5 * scale;
-  ctx.strokeStyle = theme.gold;
-  ctx.beginPath(); ctx.arc(cx, medalCy, radius, 0, Math.PI * 2); ctx.stroke();
+  ctx.shadowBlur = 14 * scale;
+  ctx.lineWidth = 8 * scale;
+  ctx.strokeStyle = metalGrad;
+  ctx.beginPath(); ctx.arc(cx, medalCy, ringR, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
-  // 内側リング（二重構造をはっきり見せる）
+  // 3) 濃い金の縁取り（外側リングの内側輪郭を引き締める）
   ctx.save();
-  ctx.lineWidth = 2.6 * scale;
+  ctx.lineWidth = 1.6 * scale;
   ctx.strokeStyle = theme.goldDeep;
-  ctx.globalAlpha = 0.65;
-  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 12 * scale, 0, Math.PI * 2); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 8 * scale, 0, Math.PI * 2); ctx.stroke();
   ctx.restore();
 
-  // 上部の宝石アクセント・下部のリボン結び（メダルの大きさに合わせて拡大）
-  drawGemAccent(ctx, cx, medalCy - radius + 7 * scale, 32 * scale, theme);
-  drawRibbonBow(ctx, cx, medalCy + radius - 6 * scale, scale * 1.6, theme);
+  // 4) 内側ハイライトリング（べゼルの明るい縁）
+  ctx.save();
+  ctx.lineWidth = 1.4 * scale;
+  ctx.strokeStyle = theme.goldLight;
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 13 * scale, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
 
+  // 5) 中央盤面（テーマにmedalDiscがあれば濃色グラデーション、無ければ従来の生成り）
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 17 * scale, 0, Math.PI * 2);
+  if (hasDisc) {
+    const discGrad = ctx.createRadialGradient(cx, medalCy - radius * 0.3, radius * 0.1, cx, medalCy, radius);
+    discGrad.addColorStop(0, theme.medalDisc.from);
+    discGrad.addColorStop(1, theme.medalDisc.to);
+    ctx.fillStyle = discGrad;
+  } else {
+    ctx.fillStyle = theme.panel;
+  }
+  ctx.fill();
+  ctx.restore();
+
+  // 6) 盤面内側の薄い装飾リング
+  ctx.save();
+  ctx.lineWidth = 1 * scale;
+  ctx.strokeStyle = hasDisc ? theme.medalDisc.ring : theme.goldDeep;
+  ctx.globalAlpha = hasDisc ? 0.55 : 0.4;
+  ctx.beginPath(); ctx.arc(cx, medalCy, radius - 26 * scale, 0, Math.PI * 2); ctx.stroke();
+  ctx.restore();
+
+  // 7) 上部の宝石アクセント・8) 下部のリボン結び（メダルの大きさに合わせて拡大）
+  drawGemAccent(ctx, cx, medalCy - radius + 3 * scale, 36 * scale, theme);
+  drawRibbonBow(ctx, cx, medalCy + radius - 2 * scale, scale * 1.75, theme);
+
+  const percentColor = hasDisc ? theme.medalPercentColor : theme.vermillion;
+  const labelColor   = hasDisc ? theme.medalLabelColor   : theme.inkSub;
+  const doneColor    = hasDisc ? theme.medalDoneColor    : theme.ink;
+
+  // 9) パーセント（メダル内最大の文字。エンボス風に軽くドロップシャドウを添える）
   ctx.textAlign = "center";
-  ctx.fillStyle = theme.vermillion;
-  ctx.font = `700 ${Math.round(66 * scale)}px ${SERIF}`;
-  ctx.fillText(`${totalPct}%`, cx, medalCy + 14 * scale);
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
+  ctx.shadowBlur = 5 * scale;
+  ctx.shadowOffsetY = 2 * scale;
+  ctx.fillStyle = percentColor;
+  ctx.font = `700 ${Math.round(68 * scale)}px ${SERIF}`;
+  ctx.fillText(`${totalPct}%`, cx, medalCy + 10 * scale);
+  ctx.restore();
 
-  ctx.fillStyle = theme.inkSub;
-  ctx.font = `500 ${Math.round(14 * scale)}px ${SERIF}`;
-  ctx.fillText("総 合 コ ン プ 率", cx, medalCy + 44 * scale);
+  // 10) 「総合コンプリート率」ラベル
+  ctx.save();
+  ctx.fillStyle = labelColor;
+  ctx.font = `500 ${Math.round(15 * scale)}px ${SERIF}`;
+  ctx.letterSpacing = `${1.5 * scale}px`;
+  ctx.fillText("総合コンプリート率", cx, medalCy + 40 * scale);
+  ctx.restore();
 
-  ctx.fillStyle = theme.ink;
-  ctx.font = `${Math.round(15 * scale)}px sans-serif`;
-  ctx.fillText(`${doneAll} / ${totalAll}`, cx, medalCy + radius + 38 * scale);
+  // 達成数バッジ（リング外の小さなピル。盤面が濃色のテーマは半透明の濃紺、
+  // 生成り盤面のテーマは半透明の生成りにして、いずれも金の縁取りで統一する）
+  const doneText = `達成数  ${doneAll} / ${totalAll}`;
+  ctx.font = `700 ${Math.round(14 * scale)}px sans-serif`;
+  const doneW = ctx.measureText(doneText).width + 30 * scale;
+  const doneH = 25 * scale;
+  const doneY = medalCy + radius + 27 * scale;
+  ctx.save();
+  ctx.fillStyle = hasDisc ? "rgba(10,20,36,0.88)" : "rgba(255,253,247,0.85)";
+  ctx.strokeStyle = theme.gold;
+  ctx.lineWidth = 1 * scale;
+  ctx.beginPath();
+  ctx.roundRect(cx - doneW / 2, doneY - doneH / 2, doneW, doneH, doneH / 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+  ctx.fillStyle = doneColor;
+  ctx.fillText(doneText, cx, doneY + 5 * scale);
 
   // 総合%には図鑑の砂像・雪像（カードには出ないカテゴリ）も含む旨の注記
   ctx.fillStyle = theme.inkSub;
   ctx.font = `${Math.round(11 * scale)}px sans-serif`;
-  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, medalCy + radius + 58 * scale);
+  ctx.fillText("※図鑑全体（砂像・雪像含む）で集計", cx, doneY + doneH / 2 + 20 * scale);
 
   return medalCoreHeight(radius);
 }
@@ -789,40 +934,54 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   ctx.fillRect(x, cy, cw, ch);
   ctx.restore();
 
+  // 金色の外枠＋内側の細い枠（実績カードらしい二重の縁取り）
+  ctx.save();
+  ctx.strokeStyle = theme.gold;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.stroke();
+  ctx.restore();
   ctx.save();
   ctx.strokeStyle = theme.panelLine;
   ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.roundRect(x, cy, cw, ch, 14); ctx.stroke();
+  ctx.globalAlpha = 0.85;
+  ctx.beginPath(); ctx.roundRect(x + 5, cy + 5, cw - 10, ch - 10, 10); ctx.stroke();
   ctx.restore();
 
-  // 四隅の金具風装飾（L字の縁取り＋小さな鋲）
-  const cornerLen = 16;
+  // 四隅の金具風装飾（二重L字＋菱形の鋲）
+  const cornerLen = 18;
   [
-    [x + 7,      cy + 7,      0],
-    [x + cw - 7, cy + 7,      Math.PI / 2],
-    [x + cw - 7, cy + ch - 7, Math.PI],
-    [x + 7,      cy + ch - 7, -Math.PI / 2],
+    [x + 8,      cy + 8,      0],
+    [x + cw - 8, cy + 8,      Math.PI / 2],
+    [x + cw - 8, cy + ch - 8, Math.PI],
+    [x + 8,      cy + ch - 8, -Math.PI / 2],
   ].forEach(([cxr, cyr, rot]) => {
-    drawCorner(ctx, cxr, cyr, cornerLen, rot, theme.goldDeep);
-    ctx.beginPath();
-    ctx.arc(cxr, cyr, 2.2, 0, Math.PI * 2);
-    ctx.fillStyle = theme.goldDeep;
-    ctx.fill();
+    drawOrnamentalCorner(ctx, cxr, cyr, cornerLen, rot, theme.gold, theme.goldDeep);
   });
 
   const cx  = x + cw / 2;
   const pct = cat.total > 0 ? Math.floor(cat.done / cat.total * 100) : 0;
 
-  // アイコン入り印章風バッジ
+  // アイコンメダリオン（外側の淡いリング＋内側の彩色リング＋アイコン）
   const badgeR  = 32;
+  const badgeCx = cx - 36;
   const badgeCy = cy + 44;
-  ctx.beginPath(); ctx.arc(cx - 36, badgeCy, badgeR, 0, Math.PI * 2);
-  ctx.fillStyle = `${cat.accent}1f`;
+  ctx.save();
+  ctx.beginPath(); ctx.arc(badgeCx, badgeCy, badgeR + 5, 0, Math.PI * 2);
+  ctx.strokeStyle = theme.gold;
+  ctx.lineWidth = 1.4;
+  ctx.globalAlpha = 0.75;
+  ctx.stroke();
+  ctx.restore();
+  ctx.beginPath(); ctx.arc(badgeCx, badgeCy, badgeR, 0, Math.PI * 2);
+  const badgeGrad = ctx.createRadialGradient(badgeCx, badgeCy - badgeR * 0.4, badgeR * 0.1, badgeCx, badgeCy, badgeR);
+  badgeGrad.addColorStop(0, `${cat.accent}14`);
+  badgeGrad.addColorStop(1, `${cat.accent}2b`);
+  ctx.fillStyle = badgeGrad;
   ctx.fill();
   ctx.lineWidth = 2;
   ctx.strokeStyle = cat.accent;
   ctx.stroke();
-  drawIcon(ctx, cat.icon, cx - 36, badgeCy, 32, cat.accent);
+  drawIcon(ctx, cat.icon, badgeCx, badgeCy, 32, cat.accent);
 
   ctx.textAlign = "left";
   ctx.fillStyle = theme.indigo;
@@ -830,15 +989,20 @@ function drawCategoryCard(ctx, x, cy, cw, ch, cat, theme) {
   ctx.fillText(cat.label, cx + 6, badgeCy + 6);
 
   ctx.textAlign = "center";
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.18)";
+  ctx.shadowBlur = 3;
+  ctx.shadowOffsetY = 1;
   ctx.fillStyle = theme.vermillion;
   ctx.font = `700 36px ${SERIF}`;
   ctx.fillText(`${pct}%`, cx, cy + 118);
+  ctx.restore();
 
   ctx.fillStyle = theme.inkSub;
   ctx.font = "13px sans-serif";
   ctx.fillText(`${cat.done} / ${cat.total}`, cx, cy + 140);
 
-  drawProgressBar(ctx, x + 18, cy + 154, cw - 36, 8, pct, theme);
+  drawProgressBar(ctx, x + 18, cy + 154, cw - 36, 8, pct, theme, cat.accent);
 
   ctx.fillStyle = theme.inkSub;
   ctx.font = "12px sans-serif";
