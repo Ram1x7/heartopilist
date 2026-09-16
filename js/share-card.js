@@ -455,6 +455,18 @@ function drawProfileColSection(ctx, x, y, w, theme) {
 // プロフィールブロック（名前が入力されている時に、上記header/profileColの
 // 代わりに描画される。compact=trueで横長カラム用の小さめサイズになる）
 // ============================================================
+// 指定幅に収まるよう末尾を「…」で省略する（ctx.fontは呼び出し側で設定済みの前提）
+function fitTextWidth(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let lo = 0, hi = text.length;
+  while (lo < hi) {
+    const mid = (lo + hi + 1) >> 1;
+    if (ctx.measureText(text.slice(0, mid) + "…").width <= maxWidth) lo = mid;
+    else hi = mid - 1;
+  }
+  return text.slice(0, lo) + "…";
+}
+
 // バッジ風ピル（ID・レベル・プレイスタイルタグで共用）。ごく薄いグラデーション背景と
 // 両端の小さな金の鋲アクセントで、単色のシンプルな枠線ピルより少し装飾を足す
 function drawBadgePillAt(ctx, x, y, w, h, text, theme, fontPx) {
@@ -511,12 +523,18 @@ function profileBlockHeight(profile, compact) {
   h += nameFont + 8;
   const infoFont = compact ? 13 : 14;
   h += infoFont + 12 + 6; // ID・Lv行（バッジ）
-  if (profile.ageGroup || profile.genderGroup) h += 20;
+  if (profile.ageGroup || profile.genderGroup) {
+    const agFont = compact ? 12 : 13;
+    h += (agFont + 12) + 6; // 年代・性別行（バッジ）
+  }
   if (profile.styleTags && profile.styleTags.length) {
     const tagFont = compact ? 12 : 13;
     h += 4 + (tagFont + 10) + 6;
   }
-  if (profile.message && profile.message.trim()) h += compact ? 20 : 24;
+  if (profile.message && profile.message.trim()) {
+    const msgFont = compact ? 13 : 14;
+    h += (msgFont + 16) + (compact ? 4 : 6); // ひとことメッセージ（背景パネル付き）
+  }
   h += compact ? 6 : 26;
   return h;
 }
@@ -545,10 +563,9 @@ function drawProfileBlock(ctx, x, y, w, theme, profile, compact) {
 
   const agParts = [profile.ageGroup, profile.genderGroup].filter(Boolean);
   if (agParts.length) {
-    ctx.fillStyle = theme.inkSub;
-    ctx.font = `${compact ? 12 : 13}px sans-serif`;
-    ctx.fillText(agParts.join("・"), cx, cur + 12);
-    cur += 20;
+    const agFont = compact ? 12 : 13;
+    const agH = drawInfoBadge(ctx, cx, cur, agParts.join("・"), theme, agFont);
+    cur += agH + 6;
   }
 
   if (profile.styleTags && profile.styleTags.length) {
@@ -558,11 +575,22 @@ function drawProfileBlock(ctx, x, y, w, theme, profile, compact) {
   }
 
   if (profile.message && profile.message.trim()) {
+    // 背景アートが賑やかなテーマでも読めるよう、うっすらとした背景パネルを添える
+    const msgFont = compact ? 13 : 14;
+    ctx.font = `italic ${msgFont}px sans-serif`;
+    const text = fitTextWidth(ctx, `「${profile.message.trim()}」`, w - 24);
+    const textW = ctx.measureText(text).width + 28;
+    const mh = msgFont + 16;
+    ctx.save();
+    ctx.fillStyle = "rgba(255,253,247,0.78)";
+    ctx.beginPath();
+    ctx.roundRect(cx - textW / 2, cur, textW, mh, mh / 2);
+    ctx.fill();
+    ctx.restore();
     ctx.fillStyle = theme.inkSub;
-    ctx.font = `italic ${compact ? 13 : 14}px sans-serif`;
     ctx.textAlign = "center";
-    ctx.fillText(`「${profile.message.trim()}」`, cx, cur + 12);
-    cur += compact ? 20 : 24;
+    ctx.fillText(text, cx, cur + mh / 2 + msgFont * 0.35);
+    cur += mh + (compact ? 4 : 6);
   }
 
   if (!compact) {
