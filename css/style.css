@@ -1635,36 +1635,6 @@ body.dark #shareBtn{
   border-color:var(--dark-border);
 }
 
-/* シェアモーダル */
-#shareModal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(40,36,30,0.5);
-  backdrop-filter:blur(5px);
-  z-index:999;
-  overflow-y:auto;
-  padding:20px 0;
-  box-sizing:border-box;
-}
-
-#shareModal .modal-box{
-  max-width:340px;
-  margin:0 auto;
-  max-height:none;
-}
-
-#shareCanvas{
-  width:100%;
-  border-radius:14px;
-  border:1px solid var(--border);
-  margin-bottom:10px;
-}
-
-body.dark #shareCanvas{
-  border-color:var(--dark-border);
-}
-
 /* ナビゲーションバー */
 .site-nav{
   display:flex;
