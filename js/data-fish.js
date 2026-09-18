@@ -1659,7 +1659,7 @@ const fishData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ガーパイククエスト(追加段階)",
  locationI18n:{"ja":"ガーパイククエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG",
+ img:"images/fish/1027.PNG",
  auth:false
 }
   // ここに追加していく

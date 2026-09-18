@@ -75,4 +75,6 @@ const videoData = [
   { category:"meteor_shower", date:"2026-08-19", videoId:"jBf09qzvBBs", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-08-29", videoId:"jq4BHCpsUxE", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-09-12", videoId:"ZtFpM9ANpEA", note:"18:00~24:00" },
+  { category:"meteor_shower", date:"2026-09-16", videoId:"9qQ9fGX7iA8", note:"18:00~24:00" },
+  { category:"pink_bubble", date:"2026-09-19", videoId:"yt4Tc6eH2vw", note:"9/19~9/25" },
 ];

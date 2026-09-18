@@ -1162,6 +1162,63 @@ const foodsData = [
   auth:false
 },
 {
+  name:"7層バーガー",
+  nameI18n:{"ja":"7層バーガー","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/108.PNG",
+  cost:640, // 小麦95+極上ビーフ200×2+レタス145（既存レシピの単価から算出）
+  time:480,
+  rarity: [true,true,true,true,true],
+  prices:[1220],
+  materials:["小麦(種@95)","極上ビーフ(@200)","極上ビーフ(@200)","レタス(種@145)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/g_beef.jpg" },
+    { image:"./images/materials/g_beef.jpg" },
+    { image:"./images/materials/lettuce.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"サクサクソース手羽先",
+  nameI18n:{"ja":"サクサクソース手羽先","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/109.PNG",
+  cost:400, // 極上チキン100×3+調味油100（料理油と同単価として既存レシピから算出）
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[450],
+  materials:["極上チキン(@100)","極上チキン(@100)","極上チキン(@100)","調味油(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/g_chicken.jpg" },
+    { image:"./images/materials/g_chicken.jpg" },
+    { image:"./images/materials/g_chicken.jpg" },
+    { image:"./images/materials/oil.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"ダブル肉厚チキンバーガー",
+  nameI18n:{"ja":"ダブル肉厚チキンバーガー","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/110.PNG",
+  cost:435, // 小麦95×2+極上チキン100+レタス145（既存レシピの単価から算出）
+  time:480,
+  rarity: [true,true,true,true,true],
+  prices:[1210],
+  materials:["小麦(種@95)","小麦(種@95)","極上チキン(@100)","レタス(種@145)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/g_chicken.jpg" },
+    { image:"./images/materials/lettuce.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
   name:"コーヒー",
   nameI18n:{"ja":"コーヒー","en":"Coffee","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/034.PNG",
@@ -3886,7 +3943,7 @@ const foodsData = [
   name:"サボテンとゴールデンガーのスープ",
   nameI18n:{"ja":"サボテンとゴールデンガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
-  image:"./images/000.PNG",
+  image:"./images/foods/1089.PNG",
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3898,7 +3955,7 @@ const foodsData = [
     { image:"./images/materials/saboten.jpg" },
     { image:"./images/materials/natsume.jpg" },
     { image:"./images/materials/natsume.jpg" },
-    { image:"./images/000.PNG" }
+    { image:"./images/materials/gold.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:false
