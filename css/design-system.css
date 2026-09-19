@@ -356,3 +356,103 @@ body.dark .ds-sheet{
   background:var(--dark-card);
   color:var(--dark-text);
 }
+
+/* ══════════════════════════════════════
+   アップデート通知ポップアップ（js/update-popup.jsから動的に生成。
+   js/data-updates.jsの最新エントリを、未読の場合のみ一度お知らせする）
+   ══════════════════════════════════════ */
+.up-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(26,24,20,0.55);
+  backdrop-filter:blur(4px);
+  z-index:3100;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  box-sizing:border-box;
+}
+
+.up-box{
+  width:100%;
+  max-width:360px;
+  max-height:85vh;
+  overflow-y:auto;
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  padding:20px;
+  box-shadow:var(--shadow-md);
+  box-sizing:border-box;
+  text-align:left;
+}
+
+body.dark .up-box{
+  background:var(--dark-card);
+  color:var(--dark-text);
+}
+
+.up-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.up-icon{
+  flex-shrink:0;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:var(--indigo);
+  color:var(--on-fill);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+body.dark .up-icon{
+  background:var(--indigo-soft);
+}
+
+.up-date{
+  font-size:var(--font-size-sm);
+  color:var(--text-sub);
+}
+
+body.dark .up-date{
+  color:var(--dark-text-sub);
+}
+
+.up-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:var(--font-size-lg);
+  font-weight:700;
+  color:var(--indigo);
+}
+
+body.dark .up-title{
+  color:var(--dark-accent);
+}
+
+.up-body{
+  font-size:var(--font-size-base);
+  line-height:1.7;
+  margin-bottom:14px;
+}
+
+.up-link{
+  display:block;
+  font-size:var(--font-size-sm);
+  color:var(--indigo);
+  text-decoration:none;
+  margin-bottom:16px;
+}
+
+body.dark .up-link{
+  color:var(--dark-accent);
+}
+
+.up-close-btn{
+  width:100%;
+}
