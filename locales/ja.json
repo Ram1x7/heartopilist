@@ -69,6 +69,7 @@
   "food_time": "調理時間",
   "food_level": "レベル",
   "food_materials": "素材",
+  "food_materials_hint": "（）内の数値は素材の購入価格の目安です（種から育てる場合は種の価格）",
   "food_coin": "コイン",
   "food_unknown": "不明",
   "food_instant": "即時",

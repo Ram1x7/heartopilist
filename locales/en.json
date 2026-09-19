@@ -69,6 +69,7 @@
   "food_time": "Cook Time",
   "food_level": "Level",
   "food_materials": "Ingredients",
+  "food_materials_hint": "The number in parentheses is the approximate cost to obtain that ingredient (seed price if grown from a seed).",
   "food_coin": "Coins",
   "food_unknown": "Unknown",
   "food_instant": "Instant",
