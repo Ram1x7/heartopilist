@@ -687,6 +687,82 @@ const foodsData = [
   auth:false
 },
 {
+  name:"月餅",
+  nameI18n:{"ja":"月餅","en":"Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/111.PNG",
+  cost:390,
+  time:240,
+  rarity: [true,true,true,true,true],
+  prices:[820],
+  materials:["小麦(種@95)","小麦(種@95)","卵(@100)","月餅の食材ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/all_material.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"カスタード月餅",
+  nameI18n:{"ja":"カスタード月餅","en":"Custard Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/112.PNG",
+  cost:950,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[2610],
+  materials:["月餅ならなんでもOK","月餅ならなんでもOK","月餅ならなんでもOK","乳製品ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/tsukimochi.jpg" },
+    { image:"./images/materials/tsukimochi.jpg" },
+    { image:"./images/materials/tsukimochi.jpg" },
+    { image:"./images/materials/nyuseihin.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"ウサギのスノースキン月餅",
+  nameI18n:{"ja":"ウサギのスノースキン月餅","en":"Rabbit Snowskin Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/113.PNG",
+  cost:200,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[250],
+  materials:["米粉(@50)","米粉(@50)","牛乳(@50)","あずき(@50)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/komeko.jpg" },
+    { image:"./images/materials/komeko.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/azuki.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"ウサギのスノースキン月餅・大",
+  nameI18n:{"ja":"ウサギのスノースキン月餅・大","en":"Rabbit Snowskin Mooncake (Large)","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/114.PNG",
+  cost:800,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[1100],
+  materials:["ウサギのスノースキン月餅","ウサギのスノースキン月餅","ウサギのスノースキン月餅","ウサギのスノースキン月餅"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/usa_tsuki.jpg" },
+    { image:"./images/materials/usa_tsuki.jpg" },
+    { image:"./images/materials/usa_tsuki.jpg" },
+    { image:"./images/materials/usa_tsuki.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
   name:"復活のエッグ",
   nameI18n:{"ja":"復活のエッグ","en":"Egg of Revival","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/058.PNG",
@@ -910,6 +986,44 @@ const foodsData = [
     { image:"./images/materials/wheat.jpg" },
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/oil.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"月うさぎのとろとろ月餅",
+  nameI18n:{"ja":"月うさぎのとろとろ月餅","en":"Moon Rabbit Molten Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/115.PNG",
+  cost:300,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[350],
+  materials:["米粉(@50)","米粉(@50)","無菌卵(@100)","キンモクセイジャム(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/komeko.jpg" },
+    { image:"./images/materials/komeko.jpg" },
+    { image:"./images/materials/m_egg.jpg" },
+    { image:"./images/materials/jam_kinmokusei.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"キンモクセイのローストミルクティー",
+  nameI18n:{"ja":"キンモクセイのローストミルクティー","en":"Roasted Osmanthus Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/116.PNG",
+  cost:250,
+  time:0,
+  rarity: [true,true,true,true,true],
+  prices:[570],
+  materials:["牛乳(@50)","牛乳(@50)","あずき(@50)","キンモクセイジャム(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/azuki.jpg" },
+    { image:"./images/materials/jam_kinmokusei.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:false

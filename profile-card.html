@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>プロフィールカードメーカー｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の図鑑・料理・園芸・実績の進捗から、SNSでシェアできるプロフィールカードを作成できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | プロフィールカードメーカー">
+<meta property="og:description" content="図鑑・料理・園芸・実績の進捗から、SNSでシェアできるプロフィールカードを作成できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/profile-card.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | プロフィールカードメーカー">
+<meta name="twitter:description" content="図鑑・料理・園芸・実績の進捗から、SNSでシェアできるプロフィールカードを作成できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=32">
+<link rel="stylesheet" href="./css/design-system.css?v=4">
+<link rel="stylesheet" href="./css/profile-card.css?v=1">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./achievements.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./build.html" class="site-nav-item" data-i18n="nav_build">建築</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
+  <a href="./profile-card.html" class="site-nav-item active" data-i18n="nav_profile_card">カード</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+
+<div class="pc-page-header">
+  <h2 data-i18n="pc_page_title">プロフィールカードメーカー</h2>
+</div>
+<div class="pc-disclaimer" data-i18n="pc_disclaimer">※このプロフィールカードメーカーは非公式ファンツールです。入力内容とアバター画像はすべて端末内（このブラウザ）にのみ保存され、外部へ送信されることはありません。</div>
+
+<div class="pc-layout">
+  <div class="pc-preview-col">
+    <div class="pc-preview-wrap">
+      <div class="pc-preview-canvas-area">
+        <canvas id="pcPreviewCanvas" width="1672" height="941" role="img" aria-label="プロフィールカードのプレビュー"></canvas>
+        <div class="pc-preview-loading" id="pcPreviewLoading">画像を読み込み中…</div>
+      </div>
+      <div class="pc-preview-error" id="pcPreviewError" hidden></div>
+
+      <div class="pc-layout-toggle-row" role="group" aria-label="レイアウト切り替え">
+        <button type="button" class="ds-tab ds-tab-grow" id="pcLayoutLandscape" data-i18n="pc_layout_landscape">横型</button>
+        <button type="button" class="ds-tab ds-tab-grow" id="pcLayoutPortrait" data-i18n="pc_layout_portrait">縦型</button>
+      </div>
+
+      <div class="pc-theme-row" role="group" aria-label="テーマ切り替え" id="pcThemeRow"></div>
+
+      <div class="pc-actions-row">
+        <button type="button" class="ds-btn ds-btn-primary" id="pcSaveBtn" data-i18n="pc_save_png">PNGを保存</button>
+        <button type="button" class="ds-btn ds-btn-secondary" id="pcShareBtn" data-i18n="pc_share_sns">SNSへ共有</button>
+      </div>
+      <div aria-live="polite" class="pc-char-count" id="pcActionStatus"></div>
+    </div>
+  </div>
+
+  <div class="pc-form-col">
+
+    <!-- 1. 基本情報 -->
+    <section class="pc-section" id="pcSectionBasic">
+      <button type="button" class="pc-section-head"><span data-i18n="pc_section_basic">基本情報</span><span class="pc-chevron">▾</span></button>
+      <div class="pc-section-body">
+        <div class="pc-field">
+          <label for="pcPlayerName" data-i18n="pc_field_name">プレイヤー名</label>
+          <input type="text" id="pcPlayerName" maxlength="20" data-i18n-placeholder="pc_field_name_placeholder" placeholder="未入力の場合は表示されません">
+        </div>
+        <div class="pc-field">
+          <label for="pcPlayerId" data-i18n="pc_field_id">プレイヤーID</label>
+          <input type="text" id="pcPlayerId" maxlength="24">
+        </div>
+        <div class="pc-field">
+          <label for="pcLevel" data-i18n="pc_field_level">開拓者レベル</label>
+          <input type="number" id="pcLevel" min="1" max="999" value="1">
+        </div>
+        <div class="pc-field">
+          <label for="pcServer" data-i18n="pc_field_server">サーバー</label>
+          <input type="text" id="pcServer" maxlength="20" data-i18n-placeholder="pc_field_server_placeholder" placeholder="例：アジア1">
+        </div>
+        <div class="pc-field">
+          <label for="pcActivityTime" data-i18n="pc_field_activity">主な活動時間</label>
+          <input type="text" id="pcActivityTime" maxlength="20" data-i18n-placeholder="pc_field_activity_placeholder" placeholder="例：平日夜・週末">
+        </div>
+        <div class="pc-field">
+          <label for="pcSnsX" data-i18n="pc_field_sns_x">Xのユーザー名</label>
+          <input type="text" id="pcSnsX" maxlength="30" data-i18n-placeholder="pc_field_sns_placeholder" placeholder="@なしで入力">
+        </div>
+        <div class="pc-field">
+          <label for="pcSnsTiktok" data-i18n="pc_field_sns_tiktok">TikTokのユーザー名</label>
+          <input type="text" id="pcSnsTiktok" maxlength="30" data-i18n-placeholder="pc_field_sns_placeholder" placeholder="@なしで入力">
+        </div>
+        <div class="pc-field">
+          <label for="pcSnsYoutube" data-i18n="pc_field_sns_youtube">YouTubeチャンネル名</label>
+          <input type="text" id="pcSnsYoutube" maxlength="30">
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. アバター -->
+    <section class="pc-section" id="pcSectionAvatar">
+      <button type="button" class="pc-section-head"><span data-i18n="pc_section_avatar">アバター</span><span class="pc-chevron">▾</span></button>
+      <div class="pc-section-body">
+        <div class="pc-avatar-editor">
+          <div class="pc-avatar-stage" id="pcAvatarStage">
+            <div class="pc-avatar-stage-empty" id="pcAvatarEmpty" data-i18n="pc_avatar_empty">画像未設定</div>
+            <img id="pcAvatarImgEl" alt="" hidden>
+          </div>
+          <div class="pc-avatar-zoom-row">
+            <span aria-hidden="true">🔍</span>
+            <input type="range" id="pcAvatarZoom" min="1" max="3" step="0.01" value="1" aria-label="拡大縮小">
+          </div>
+          <div class="pc-avatar-buttons">
+            <label class="ds-btn ds-btn-secondary" for="pcAvatarInput" style="cursor:pointer;" data-i18n="pc_avatar_change">画像を選ぶ</label>
+            <input type="file" id="pcAvatarInput" accept="image/png,image/jpeg,image/webp" hidden>
+            <button type="button" class="ds-btn ds-btn-secondary" id="pcAvatarRecenter" data-i18n="pc_avatar_recenter">中央へ戻す</button>
+            <button type="button" class="ds-btn ds-btn-danger" id="pcAvatarDelete" data-i18n="pc_avatar_delete">削除</button>
+          </div>
+          <div class="pc-avatar-hint" data-i18n="pc_avatar_hint">ドラッグ（スマホはタッチ）で位置を調整できます</div>
+          <div class="pc-preview-error" id="pcAvatarError" hidden></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. タグ・自己紹介 -->
+    <section class="pc-section" id="pcSectionTags">
+      <button type="button" class="pc-section-head"><span data-i18n="pc_section_tags">タグ・自己紹介</span><span class="pc-chevron">▾</span></button>
+      <div class="pc-section-body">
+        <div class="pc-field">
+          <label data-i18n="pc_field_playstyle">プレイスタイル</label>
+          <div class="pc-tag-candidates" id="pcPlayStyleRow"></div>
+        </div>
+        <div class="pc-field">
+          <label data-i18n="pc_field_tags">プロフィールタグ（複数選択可）</label>
+          <div class="pc-tag-candidates" id="pcTagRow"></div>
+          <div class="pc-tag-custom-row">
+            <input type="text" id="pcTagCustomInput" maxlength="10" data-i18n-placeholder="pc_field_tag_custom_placeholder" placeholder="自由入力して追加">
+            <button type="button" class="ds-btn ds-btn-secondary" id="pcTagCustomAdd" data-i18n="pc_add">追加</button>
+          </div>
+        </div>
+        <div class="pc-field">
+          <label for="pcBio" data-i18n="pc_field_bio">ひとこと・自己紹介</label>
+          <textarea id="pcBio" maxlength="60" rows="3"></textarea>
+          <div class="pc-char-count" id="pcBioCount">0 / 60</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. 図鑑進捗 -->
+    <section class="pc-section" id="pcSectionProgress">
+      <button type="button" class="pc-section-head"><span data-i18n="pc_section_progress">図鑑進捗</span><span class="pc-chevron">▾</span></button>
+      <div class="pc-section-body">
+        <div class="pc-field">
+          <label data-i18n="pc_field_categories">カードに表示するカテゴリー（最大6件）</label>
+          <div class="pc-category-grid" id="pcCategoryGrid"></div>
+        </div>
+        <div class="pc-field">
+          <label data-i18n="pc_field_total_scope">総合コンプリート率の集計対象</label>
+          <select id="pcTotalScope">
+            <option value="all" data-i18n="pc_total_scope_all">全カテゴリー</option>
+            <option value="displayed" data-i18n="pc_total_scope_displayed">カードに表示中のカテゴリーのみ</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. デザイン -->
+    <section class="pc-section" id="pcSectionDesign">
+      <button type="button" class="pc-section-head"><span data-i18n="pc_section_design">デザイン</span><span class="pc-chevron">▾</span></button>
+      <div class="pc-section-body">
+        <div class="pc-toggle-row">
+          <label for="pcToggleSiteUrl" data-i18n="pc_toggle_site_url">はとぴ図鑑URLを表示</label>
+          <input type="checkbox" id="pcToggleSiteUrl" checked>
+        </div>
+        <div class="pc-toggle-row">
+          <label for="pcToggleSns" data-i18n="pc_toggle_sns">SNS情報を表示</label>
+          <input type="checkbox" id="pcToggleSns" checked>
+        </div>
+        <div class="pc-toggle-row">
+          <label for="pcToggleDate" data-i18n="pc_toggle_date">作成日を表示</label>
+          <input type="checkbox" id="pcToggleDate" checked>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. 保存・共有 -->
+    <section class="pc-section" id="pcSectionSave">
+      <button type="button" class="pc-section-head"><span data-i18n="pc_section_save">保存・共有</span><span class="pc-chevron">▾</span></button>
+      <div class="pc-section-body">
+        <p style="font-size:12px; color:var(--text-sub); margin:0;" data-i18n="pc_save_hint">入力内容はこの端末に自動保存されます。プレビュー右上のボタンからPNG保存・SNS共有ができます。</p>
+        <button type="button" class="ds-btn ds-btn-danger" id="pcResetBtn" data-i18n="pc_reset_all">入力内容を初期化</button>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/data-fish.js"></script>
+<script src="js/data-bugs.js"></script>
+<script src="js/data-birds.js"></script>
+<script src="js/data-sand.js"></script>
+<script src="js/data-snow.js"></script>
+<script src="js/data-shell.js"></script>
+<script src="js/data-foods.js"></script>
+<script src="js/data-crops.js"></script>
+<script src="js/data-flowers.js"></script>
+<script src="js/data-achievements.js"></script>
+<script src="js/profile-card-storage.js"></script>
+<script src="js/profile-card-progress.js"></script>
+<script src="js/profile-card-renderer.js"></script>
+<script src="js/profile-card.js"></script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

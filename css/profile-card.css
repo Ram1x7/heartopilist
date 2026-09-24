@@ -1,0 +1,284 @@
+/* css/profile-card.css
+   プロフィールカードメーカー専用スタイル。
+   カード本体はCanvas描画（背景アート＋動的UI）のため、ここは
+   編集フォーム・プレビュー枠・アバター編集UIなど「エディタ側の外枠」のみを扱う。
+   色はcss/style.css・css/design-system.cssの共通トークン（--indigo, --card, --border等）を使い、
+   ダークモードはbody.darkの上書きだけで自動的に追従させる。 */
+
+.pc-page-header{
+  text-align:center;
+  margin-bottom:10px;
+}
+.pc-page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.1em;
+}
+body.dark .pc-page-header h2{ color:var(--dark-accent); }
+
+.pc-disclaimer{
+  text-align:center;
+  font-size:11px;
+  color:var(--text-sub);
+  opacity:0.75;
+  margin-bottom:16px;
+}
+body.dark .pc-disclaimer{ color:var(--dark-text-sub); }
+
+.pc-layout{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  max-width:1200px;
+  margin:0 auto;
+}
+@media (min-width:900px){
+  .pc-layout{
+    flex-direction:row;
+    align-items:flex-start;
+  }
+  .pc-preview-col{
+    flex:1 1 55%;
+    position:sticky;
+    top:12px;
+  }
+  .pc-form-col{
+    flex:1 1 45%;
+    min-width:0;
+  }
+}
+
+/* ── プレビュー ── */
+.pc-preview-wrap{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg, 16px);
+  box-shadow:var(--shadow-sm);
+  padding:12px;
+}
+body.dark .pc-preview-wrap{ background:var(--dark-card); border-color:var(--dark-border); }
+
+.pc-preview-canvas-area{
+  position:relative;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:160px;
+}
+#pcPreviewCanvas{
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  touch-action:none; /* アバターのドラッグ操作をブラウザのスクロール・ズームと競合させない */
+  cursor:grab;
+}
+#pcPreviewCanvas:active{ cursor:grabbing; }
+
+.pc-preview-loading{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,253,247,0.7);
+  border-radius:8px;
+  font-size:13px;
+  color:var(--text-sub);
+}
+body.dark .pc-preview-loading{ background:rgba(30,27,22,0.7); color:var(--dark-text-sub); }
+.pc-preview-loading[hidden]{ display:none; }
+
+.pc-preview-error{
+  margin-top:8px;
+  padding:10px 12px;
+  border-radius:8px;
+  background:var(--vermillion-bg, #fbe8e2);
+  color:var(--vermillion);
+  font-size:12px;
+  line-height:1.6;
+}
+.pc-preview-error[hidden]{ display:none; }
+body.dark .pc-preview-error{ background:rgba(193,90,64,0.18); color:var(--dark-highlight); }
+
+.pc-layout-toggle-row,
+.pc-theme-row{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+  flex-wrap:wrap;
+}
+
+.pc-swatch{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:2px solid transparent;
+  cursor:pointer;
+  padding:0;
+  flex:0 0 auto;
+}
+.pc-swatch.active{ border-color:var(--indigo); box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--indigo); }
+body.dark .pc-swatch.active{ box-shadow:0 0 0 2px var(--dark-card), 0 0 0 4px var(--dark-accent); }
+
+.pc-actions-row{
+  display:flex;
+  gap:8px;
+  margin-top:14px;
+  flex-wrap:wrap;
+}
+.pc-actions-row .ds-btn{ flex:1 1 auto; min-height:44px; }
+
+/* ── フォーム側 ── */
+.pc-section{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg, 16px);
+  margin-bottom:14px;
+  overflow:hidden;
+}
+body.dark .pc-section{ background:var(--dark-card); border-color:var(--dark-border); }
+
+.pc-section-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  width:100%;
+  padding:14px 16px;
+  background:none;
+  border:none;
+  font-family:'Shippori Mincho', serif;
+  font-size:15px;
+  color:var(--indigo);
+  cursor:pointer;
+  text-align:left;
+  min-height:44px;
+}
+body.dark .pc-section-head{ color:var(--dark-accent); }
+.pc-section-head .pc-chevron{ transition:transform 0.2s ease; }
+.pc-section.collapsed .pc-chevron{ transform:rotate(-90deg); }
+
+.pc-section-body{
+  padding:0 16px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.pc-section.collapsed .pc-section-body{ display:none; }
+
+.pc-field{ display:flex; flex-direction:column; gap:4px; }
+.pc-field label{ font-size:12px; color:var(--text-sub); }
+body.dark .pc-field label{ color:var(--dark-text-sub); }
+
+.pc-field input[type="text"],
+.pc-field input[type="number"],
+.pc-field select,
+.pc-field textarea{
+  font-family:inherit;
+  font-size:15px; /* iOSでの自動ズームを防ぐため16px未満は避ける（実測15pxで確認済みのフォントとの兼ね合いのため16pxを推奨） */
+  padding:9px 10px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  width:100%;
+  box-sizing:border-box;
+}
+body.dark .pc-field input[type="text"],
+body.dark .pc-field input[type="number"],
+body.dark .pc-field select,
+body.dark .pc-field textarea{
+  border-color:var(--dark-border);
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+}
+.pc-field textarea{ resize:vertical; min-height:56px; }
+
+.pc-char-count{ font-size:11px; color:var(--text-sub); text-align:right; }
+body.dark .pc-char-count{ color:var(--dark-text-sub); }
+.pc-char-count.pc-char-count-over{ color:var(--vermillion); }
+
+.pc-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:44px;
+}
+.pc-toggle-row label{ font-size:13px; color:var(--text); }
+body.dark .pc-toggle-row label{ color:var(--dark-text); }
+
+.pc-tag-candidates{ display:flex; flex-wrap:wrap; gap:6px; }
+.pc-tag-chip{
+  padding:7px 12px;
+  min-height:32px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  cursor:pointer;
+}
+.pc-tag-chip.active{ background:var(--indigo); color:#fff; border-color:var(--indigo); }
+body.dark .pc-tag-chip{ border-color:var(--dark-border); background:var(--dark-card-alt); color:var(--dark-text); }
+body.dark .pc-tag-chip.active{ background:var(--dark-accent); color:#241f19; border-color:var(--dark-accent); }
+
+.pc-tag-custom-row{ display:flex; gap:6px; }
+.pc-tag-custom-row input{ flex:1; }
+
+.pc-category-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:8px;
+}
+.pc-category-slot select{ width:100%; }
+
+/* ── アバター編集 ── */
+.pc-avatar-editor{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+.pc-avatar-stage{
+  position:relative;
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  overflow:hidden;
+  background:var(--card-sub);
+  border:2px dashed var(--border);
+  touch-action:none;
+  cursor:grab;
+}
+.pc-avatar-stage:active{ cursor:grabbing; }
+body.dark .pc-avatar-stage{ background:var(--dark-card-alt); border-color:var(--dark-border); }
+.pc-avatar-stage img{
+  position:absolute;
+  left:0; top:0;
+  transform-origin:0 0;
+  pointer-events:none;
+  max-width:none;
+}
+.pc-avatar-stage-empty{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:12px;
+}
+body.dark .pc-avatar-stage-empty{ color:var(--dark-text-sub); }
+
+.pc-avatar-zoom-row{ display:flex; align-items:center; gap:8px; width:100%; max-width:260px; }
+.pc-avatar-buttons{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+
+.pc-avatar-hint{ font-size:11px; color:var(--text-sub); text-align:center; }
+body.dark .pc-avatar-hint{ color:var(--dark-text-sub); }
+
+@media (max-width:520px){
+  .pc-category-grid{ grid-template-columns:1fr; }
+}
