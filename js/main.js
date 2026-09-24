@@ -1484,7 +1484,7 @@ document.getElementById("disclaimer").textContent =
   T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  T("last_update_label","最終更新") + " 2026/09/14";
+  T("last_update_label","最終更新") + " 2026/09/25";
 
 // 更新通知が表示中は、閉じた直後（closeUpdatePopup）にチュートリアルを開始する
 if(document.getElementById("updatePopup").style.display !== "block"){
@@ -1498,7 +1498,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/09/14";
+    T("last_update_label","最終更新") + " 2026/09/25";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
