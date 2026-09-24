@@ -17,7 +17,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/001.PNG",
- auth:false
+ auth:true
 },
 {
  name:"自動車の砂像",
@@ -31,7 +31,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/002.PNG",
- auth:false
+ auth:true
 },
 {
  name:"カエルの砂像",
@@ -45,7 +45,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/003.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ウサギの砂像",
@@ -59,7 +59,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/004.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ヤドカリの砂像",
@@ -73,7 +73,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/005.PNG",
- auth:false
+ auth:true
 },
 {
  name:"失敗した砂像",
@@ -102,7 +102,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/000.PNG",
- auth:false
+ auth:true
 },
 {
  name:"船の砂像",
@@ -116,7 +116,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/008.PNG",
- auth:false
+ auth:true
 },
 {
  name:"クジラの砂像",
@@ -130,7 +130,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/009.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ホッキョクグマの砂像",
@@ -144,7 +144,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/010.PNG",
- auth:false
+ auth:true
 },
 {
  name:"モアイの砂像",
@@ -158,7 +158,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/011.PNG",
- auth:false
+ auth:true
 },
 {
  name:"クマの砂像",
@@ -172,7 +172,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/012.PNG",
- auth:false
+ auth:true
 },
 {
  name:"カモメの砂像",
@@ -186,7 +186,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/013.PNG",
- auth:false
+ auth:true
 },
 {
  name:"マッチョ猫の砂像",
@@ -200,7 +200,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/014.PNG",
- auth:false
+ auth:true
 },
 {
  name:"サボテンの砂像",
@@ -214,7 +214,7 @@ const sandData = [
  season:true,
  seasonName:"ホエールシーズン",
  img:"./images/sands/015.PNG",
- auth:false
+ auth:true
 }
  // ここに追加していく
 ].map((c,i) => ({
