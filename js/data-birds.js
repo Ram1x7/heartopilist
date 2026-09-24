@@ -1382,7 +1382,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ヤツガシラクエスト(追加段階)",
  locationI18n:{"ja":"ヤツガシラクエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG",
+ img:"images/birds/1026.PNG",
  auth:false
 }
  // ここに追加していく

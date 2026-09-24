@@ -1250,7 +1250,7 @@ const bugData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ニシキコウチュウクエスト(追加段階)",
  locationI18n:{"ja":"ニシキコウチュウクエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG",
+ img:"images/bugs/1025.PNG",
  auth:false
 },
  // ここに追加していく

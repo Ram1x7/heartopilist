@@ -28,7 +28,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=32">
-<link rel="stylesheet" href="./css/design-system.css?v=4">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./garden.html">
@@ -314,6 +314,15 @@ body.dark .f-material-img{ background:var(--dark-card-alt); border-color:var(--d
   font-size:11px;
   color:var(--text-sub);
   line-height:1.8;
+  margin-bottom:12px;
+}
+
+.f-material-hint{
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.75;
+  line-height:1.5;
+  margin-top:-6px;
   margin-bottom:12px;
 }
 
@@ -912,6 +921,8 @@ body.dark .calc-freeform-add{ color:var(--dark-accent); border-color:#7a6030; }
 <script src="js/nav-scroll.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/tutorial.js"></script>
 <script src="js/icon-size.js"></script>
@@ -1315,17 +1326,21 @@ function renderModal(){
           <div class="f-material-name">${item.label}</div>
         </div>
       `).join("");
+      const hasPriceHint = validItems.some(item => item.label.includes("(@"));
       materialsHTML = `
         <div class="f-section-title">${icon("ingredient",{size:14})} ${T("food_materials","素材")}</div>
         <div class="f-materials">${itemsHTML}</div>
+        ${hasPriceHint ? `<div class="f-material-hint">${T("food_materials_hint","（）内の数値は素材の購入価格の目安です（種から育てる場合は種の価格）")}</div>` : ""}
       `;
     }
   } else if(f.materials && f.materials.length > 0){
     const lines = f.materials.filter(m => m).map(m => `<div>・${m}</div>`).join("");
     if(lines){
+      const hasPriceHint = f.materials.some(m => m && m.includes("(@"));
       materialsHTML = `
         <div class="f-section-title">${icon("ingredient",{size:14})} ${T("food_materials","素材")}</div>
         <div class="f-material-text">${lines}</div>
+        ${hasPriceHint ? `<div class="f-material-hint">${T("food_materials_hint","（）内の数値は素材の購入価格の目安です（種から育てる場合は種の価格）")}</div>` : ""}
       `;
     }
   }
