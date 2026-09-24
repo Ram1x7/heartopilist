@@ -763,6 +763,44 @@ const foodsData = [
   auth:false
 },
 {
+  name:"チョコレート月餅",
+  nameI18n:{"ja":"チョコレート月餅","en":"Chocolate Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/117.PNG",
+  cost:400,
+  time:300,
+  rarity: [true,true,true,true,true],
+  prices:[1050],
+  materials:["小麦(種@95)","小麦(種@95)","卵(@100)","カカオ豆(種@110)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/egg.jpg" },
+    { image:"./images/materials/cacao.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  name:"チョコレート月餅・大",
+  nameI18n:{"ja":"チョコレート月餅・大","en":"Chocolate Mooncake (Large)","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/118.PNG",
+  cost:1250,
+  time:300,
+  rarity: [true,true,true,true,true],
+  prices:[3300],
+  materials:["チョコレート月餅(@400)","チョコレート月餅(@400)","チョコレート月餅(@400)","乳製品ならなんでもOK"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/choco_tsuki.jpg" },
+    { image:"./images/materials/choco_tsuki.jpg" },
+    { image:"./images/materials/choco_tsuki.jpg" },
+    { image:"./images/materials/nyuseihin.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
   name:"復活のエッグ",
   nameI18n:{"ja":"復活のエッグ","en":"Egg of Revival","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/058.PNG",
