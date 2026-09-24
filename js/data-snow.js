@@ -14,7 +14,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/001.PNG",
- auth:false
+ auth:true
 },
 {
  name:"雪小屋パーツ",
@@ -26,7 +26,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/002.PNG",
- auth:false
+ auth:true
 },
 {
  name:"アイスコーンの雪像",
@@ -38,7 +38,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/003.PNG",
- auth:false
+ auth:true
 },
 {
  name:"怪しい雪像",
@@ -63,7 +63,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/005.PNG",
- auth:false
+ auth:true
 },
 {
  name:"シフゾウ・タタの雪像",
@@ -75,7 +75,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/006.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ビーバー・ボブの雪像",
@@ -87,7 +87,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/007.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ヒツジ・ジョーンの雪像",
@@ -99,7 +99,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/008.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ハクチョウ・ロロの雪像",
@@ -111,7 +111,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/009.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ウサギ・アニーの雪像",
@@ -123,7 +123,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/010.PNG",
- auth:false
+ auth:true
 },
 {
  name:"シェフ・モモの雪像",
@@ -135,7 +135,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/011.PNG",
- auth:false
+ auth:true
 },
 {
  name:"ハチ・ナニワの雪像",
@@ -147,7 +147,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/012.PNG",
- auth:false
+ auth:true
 },
 {
  name:"コアラ・ベイリーの雪像",
@@ -159,7 +159,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/013.PNG",
- auth:false
+ auth:true
 },
 {
  name:"トム・ブランクの雪像",
@@ -171,7 +171,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/014.PNG",
- auth:false
+ auth:true
 },
 {
  name:"クマ・ヴァンニアの雪像",
@@ -183,7 +183,7 @@ const snowData = [
  season:true,
  seasonName:"スノーシーズン",
  img:"./images/snows/015.PNG",
- auth:false
+ auth:true
 }
  // ここに追加していく
 ].map((c,i) => ({
