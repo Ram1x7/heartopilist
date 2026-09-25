@@ -155,8 +155,10 @@ const PROFILE_CARD_LAYOUTS = {
   landscape: {
     width: 1672, height: 941,
     // プロフィール背景パネル：アバター〜ひとことメッセージまでを内包する土台。
-    // 提供済みのpanel.png（生成り色・縁取り・四隅装飾）を9-sliceで敷く（Canvas描画の代替パネルは使わない）
-    profilePanel: { x: 20, y: 80, w: 575, h: 660 },
+    // 提供済みのpanel.png（生成り色・縁取り・四隅装飾）を9-sliceで敷く（Canvas描画の代替パネルは使わない）。
+    // 2026/09調整：中央メダル拡大のため575→560pxへ縮小（案H採用）。9-slice描画のcap(140)は
+    // 固定のまま新しいw/hへ敷き直されるため、この値だけ変えればパネル自体は正しく再描画される。
+    profilePanel: { x: 20, y: 80, w: 560, h: 660 },
     // プロフィール上段（アバター・名前・ID・開拓者レベル・プレイスタイル・タグ・ひとこと）は、
     // 個々の要素へ絶対px座標を書かず、すべてprofilePanel(x,y,w,h)を基準にした比率で管理する
     // （xRatio/yRatioはpanel左上を原点としたw/h比、sizeRatio・maxWidthRatio等もpanelのw/hに対する比率）。
@@ -164,23 +166,27 @@ const PROFILE_CARD_LAYOUTS = {
     // 参考画像の構成（左＝アバター＋タグ、右＝名前＋ID/レベル/プレイスタイル、下＝ひとこと2行）に基づく。
     // 数値はavatar-frame.pngの装飾込みbbox実測（hole半径に対しleft1.30/right1.17/top1.37/bottom1.18倍）
     // とID/開拓者レベル/プレイスタイル各バッジの動的値込み実測から、パネル安全余白(24px)を侵さないよう算出。
+    // 2026/09調整：パネル幅575→560pxに伴い、アバター表示径190px・バッジ表示幅235pxの絶対値は
+    // そのまま維持しつつ、xRatio/sizeRatio/maxWidthRatio等をpanelW=560基準に再計算した
+    // （絶対px値 = ratio × 新しいpanelW、という関係を保つことで承認済みサイズを崩さない）。
+    // タグ・ひとことのmaxWidthは、パネル右端からの安全余白(約28px×2辺)を保つよう519→504pxへ調整。
     profileLayout: {
-      avatar: { xRatio: 165 / 575, yRatio: 225 / 660, sizeRatio: 190 / 575 },
-      name: { xRatio: 300 / 575, yRatio: 210 / 660, fontSizeRatio: 56 / 660, maxWidthRatio: 235 / 575 },
-      badges: { xRatio: 300 / 575, yRatio: 244 / 660, widthRatio: 235 / 575, rowGapRatio: 14 / 660 },
+      avatar: { xRatio: 165 / 560, yRatio: 225 / 660, sizeRatio: 190 / 560 },
+      name: { xRatio: 300 / 560, yRatio: 210 / 660, fontSizeRatio: 56 / 660, maxWidthRatio: 235 / 560 },
+      badges: { xRatio: 300 / 560, yRatio: 244 / 660, widthRatio: 235 / 560, rowGapRatio: 14 / 660 },
       // タグは上段グループ（アバター〜バッジ列）の下、パネル安全幅いっぱい（centerX中心）に
       // 中央揃えで配置する。個数で非表示にする処理はなく、最大maxPerRow個/行で入力順のまま
       // 並べ、幅が足りない時だけ全タグ共通の倍率で縮小する（pcFlowTagChipsCenteredNoLoss）。
       // gapAboveRatioは上段グループ下端からの間隔（目安20〜28px）
       tags: {
-        gapAboveRatio: 20 / 660, maxWidthRatio: 519 / 575,
-        heightRatio: 38 / 660, fontSizeRatio: 18 / 660, gapRatio: 12 / 575, rowGapRatio: 10 / 660, maxPerRow: 3,
+        gapAboveRatio: 20 / 660, maxWidthRatio: 504 / 560,
+        heightRatio: 38 / 660, fontSizeRatio: 18 / 660, gapRatio: 12 / 560, rowGapRatio: 10 / 660, maxPerRow: 3,
       },
       // ひとこと：タグ列の下、centerX中心に1行ずつ独立して中央揃え。
       // gapAboveRatioはタグ最終行下端からの間隔（目安28〜40px）。safeRect下端まで18px以上
       // 残すため、フォントを少し詰めて（34→30）全体の縦幅を圧縮している
       bio: {
-        gapAboveRatio: 24 / 660, maxWidthRatio: 519 / 575,
+        gapAboveRatio: 24 / 660, maxWidthRatio: 504 / 560,
         fontSizeRatio: 30 / 660, lineHeightRatio: 43 / 660, maxLines: 2,
       },
     },
@@ -189,11 +195,21 @@ const PROFILE_CARD_LAYOUTS = {
     // SNS情報（X/TikTok/YouTube、設定時のみ）。「hatopi-zukan（はとぴ図鑑）」の重複表記は
     // 右下ロゴと役割が被るためdrawSocialInfo側で削除済み
     socials: { x: 32, fontSize: 22, gap: 26, gapAbove: 18 },
-    // 中央メダル：中心(814,423) 半径168。
+    // 中央メダル：中心(850,423) 半径177（2026/09調整・案H採用）。
     // メダル画像はリング半径だけでなく、宝石・花・リボン・吊り飾りが外側へ大きく張り出すため、
-    // アルファ値のある可視ピクセル全体の外接矩形（参考画像で実測: left585 top90 right1040 bottom755）
-    // を基準にスケールを決定した（リング半径のみで一致判定しないこと）
-    medal: { cx: 814, cy: 423, r: 168, labelOffsetY: -12 },
+    // アルファ値のある可視ピクセル全体の外接矩形を基準にスケールを決定した
+    // （リング半径のみで一致判定しないこと）。
+    // 調整前(cx814,r168)からの変更点：プロフィールパネル幅575→560pxとメダル拡大により、
+    // パネル・カテゴリカードとの実測クリアランスを確保した上で、参考画像に近い大きさへ拡大した。
+    // r=181ではなくr=177を採用した理由：4テーマ共通のメダルPNG装飾は同一リング半径でも
+    // テーマごとに可視alpha外接矩形の大きさが微妙に異なり、sky-blueのみ他3テーマより
+    // 横幅が約2.5%大きい。cx=850(パネル右端580とカテゴリ左端1120のちょうど中間)はそのままに
+    // r=181で揃えるとsky-blueだけpanelClearance=1px/gridClearance=3pxまで詰まってしまうため、
+    // 4テーマ全てで安全なr=177（指示された下限）まで縮小して統一した
+    // （navy-gold/sakura-pink/forest-greenは14px前後、sky-blueは7px/9pxの実測クリアランスを確認済み。
+    // 詳細はPRのmeasurements.json参照）。
+    // PC_MEDAL_BASE_CX/CY/Rは変更しない（既存の実測アンカーテーブルの基準点のため）。
+    medal: { cx: 850, cy: 423, r: 177, labelOffsetY: -12 },
     // カテゴリカード：8枚(2列×4行)。drawCategoryCardImgがPNGの透明余白を除いたbbox
     // （実測約1093-1099×800-810px、比率約1.36:1）をsourceRectとして使うようになったため、
     // セル自体もその比率に合わせている（210×155、間隔20/10）。ロゴを上へ移動した分
@@ -1968,7 +1984,12 @@ function pcDrawAchievementValue(ctx, cx, cy, r, text, themeId) {
     labelBBoxTop: labelAnchor.bboxTop, labelBBoxBottom: labelAnchor.bboxBottom, labelInkCenterY,
     valueBBoxTop: appliedValueBBoxTop, valueBBoxBottom: appliedValueBBoxBottom,
     valueInkCenterY: (appliedValueBBoxTop + appliedValueBBoxBottom) / 2,
-    centerDifference: labelAnchor.inkCenterY - (appliedValueBBoxTop + appliedValueBBoxBottom) / 2,
+    // 修正: 以前はlabelAnchor.inkCenterY（基準点cx/cy=814/423・r=168空間の未スケール値）を
+    // そのままカード最終座標のvalueInkCenterYと比較していたため、cx/cy/rが基準からずれる
+    // （＝メダルサイズや中心を変更する）ほど無関係な差分が発生し、実際には正しく中心が
+    // 揃っているのに「ズレている」ように見える診断バグがあった。実際の描画位置と同じ
+    // 空間で比較するよう、スケール済みのlabelInkCenterYと比較する
+    centerDifference: labelInkCenterY - (appliedValueBBoxTop + appliedValueBBoxBottom) / 2,
     appliedCorrectionY: correctionY,
     renderedWidth: fontSize === baseFontSize ? naturalWidth : maxWidth,
   };
