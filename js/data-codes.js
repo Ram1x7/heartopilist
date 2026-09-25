@@ -314,6 +314,13 @@ const codesData = [
     expiry: "2026-10-01 00:59",
     active: true,
   },
+  {
+    code: "moonlike2609",
+    reward: "月の水晶×50，小麦の種×10，牛乳×10",
+    rewardI18n:{"ja":"月の水晶×50，小麦の種×10，牛乳×10","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-10-08 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
