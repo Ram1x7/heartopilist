@@ -87,6 +87,7 @@
   "codes_no_expired": "期限切れのコードはありません",
   "codes_badge_expired": "期限切れ",
   "codes_badge_active": "有効",
+  "codes_badge_days_left": "あと{n}日",
   "codes_received": "受取済",
   "codes_not_received": "○ 未受取",
   "codes_receive_title": "受け取り済みにする",

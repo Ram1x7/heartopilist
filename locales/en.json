@@ -87,6 +87,7 @@
   "codes_no_expired": "No expired codes",
   "codes_badge_expired": "Expired",
   "codes_badge_active": "Active",
+  "codes_badge_days_left": "{n} days left",
   "codes_received": "Received",
   "codes_not_received": "○ Not received",
   "codes_receive_title": "Mark as received",

@@ -435,6 +435,12 @@ function isExpired(expiry){
   return new Date(expiry) < new Date();
 }
 
+// 残り日数（期限までの日数を切り上げ、最低1日）
+function daysRemaining(expiry){
+  const diffMs = new Date(expiry) - new Date();
+  return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+}
+
 // 多言語ヘルパー
 function currentLang(){
   return (window.i18n && typeof window.i18n.getCurrentLang === "function")
@@ -493,7 +499,11 @@ function renderCodes(){
       <div class="code-card-top">
         <span class="code-value">${c.code}</span>
         <span class="code-badge ${expired ? "badge-expired" : "badge-active"}">
-          ${expired ? T("codes_badge_expired","期限切れ") : T("codes_badge_active","有効")}
+          ${expired
+            ? T("codes_badge_expired","期限切れ")
+            : (c.expiry
+              ? T("codes_badge_days_left","あと{n}日",{n:daysRemaining(c.expiry)})
+              : T("codes_badge_active","有効"))}
         </span>
       </div>
       <div class="code-reward">${icon("gift",{size:13})} ${displayReward(c)}</div>
