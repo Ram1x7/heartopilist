@@ -97,17 +97,135 @@
     });
   }
 
+  // 中央メダルの％数字専用フォント（Noto Serif JP 900、数字0-9と%のみを含む自己ホスト
+  // サブセット、OFLライセンス）をプロジェクト内のWOFF2からFontFace APIで読み込む。
+  // 外部CDNへ常時依存させないため、フォントファイルはfonts/配下へ同梱している。
+  // 読み込み前の代替フォントでCanvas画像が生成されないよう、renderNow()側でこの完了を待つ。
+  // 失敗時はfalseを返し、呼び出し側はCSSフォントスタックのフォールバック（システム明朝体）へ
+  // 自然に委ねる（中央メダルの配置ロジックは実測ベースのため、フォールバック時も破綻しない）
+  let medalDigitFontPromise = null;
+  function loadMedalDigitFont() {
+    if (medalDigitFontPromise) return medalDigitFontPromise;
+    if (typeof FontFace === "undefined") {
+      medalDigitFontPromise = Promise.resolve(false);
+      return medalDigitFontPromise;
+    }
+    const face = new FontFace("NotoSerifJPDigits900", "url(./fonts/NotoSerifJP-Digits-900.woff2) format('woff2')", { weight: "900" });
+    medalDigitFontPromise = face.load()
+      .then(loaded => { document.fonts.add(loaded); return true; })
+      .catch(e => {
+        console.warn("[profile-card] メダル数字フォントを読み込めませんでした。代替フォントで描画します", e);
+        return false;
+      });
+    return medalDigitFontPromise;
+  }
+
+  // 中央メダル下部「達成数」バッジの動的数値（例："492 / 600"）専用フォント
+  // （Noto Serif JP 800、数字0-9・スラッシュ・半角スペースのみの自己ホストサブセット、
+  // OFLライセンス=fonts/OFL-NotoSerifJP.txt）。参考画像実測で幅700は太すぎ、700は細すぎたため
+  // 800を採用。読み込み前の代替フォントでCanvas画像が生成されないよう、renderNow()側で待つ。
+  // 失敗時はfalseを返し、呼び出し側はCSSフォントスタックのフォールバックへ委ねる
+  let achievementValueFontPromise = null;
+  function loadAchievementValueFont() {
+    if (achievementValueFontPromise) return achievementValueFontPromise;
+    if (typeof FontFace === "undefined") {
+      achievementValueFontPromise = Promise.resolve(false);
+      return achievementValueFontPromise;
+    }
+    const face = new FontFace("NotoSerifJPAchievementValue800", "url(./fonts/NotoSerifJP-AchievementValue-800.woff2) format('woff2')", { weight: "800" });
+    achievementValueFontPromise = face.load()
+      .then(loaded => { document.fonts.add(loaded); return true; })
+      .catch(e => {
+        console.warn("[profile-card] 達成数フォントを読み込めませんでした。代替フォントで描画します", e);
+        return false;
+      });
+    return achievementValueFontPromise;
+  }
+
+  // カテゴリカード下部「達成数/総数」専用フォント（Noto Serif JP 700、数字0-9・半角スペースのみの
+  // 自己ホストサブセット、OFLライセンス=fonts/OFL-NotoSerifJP.txt）。参考画像実測で700/800を比較し、
+  // より細い700の方が参考画像の細身の明朝数字に近かったため採用（達成数バッジの800とは別サブセット）。
+  // 読み込み前の代替フォントでCanvas画像が生成されないよう、renderNow()側でこの完了を待つ
+  let categoryCountFontPromise = null;
+  function loadCategoryCountFont() {
+    if (categoryCountFontPromise) return categoryCountFontPromise;
+    if (typeof FontFace === "undefined") {
+      categoryCountFontPromise = Promise.resolve(false);
+      return categoryCountFontPromise;
+    }
+    const face = new FontFace("NotoSerifJPCategoryCount700", "url(./fonts/NotoSerifJP-CategoryCount-700.woff2) format('woff2')", { weight: "700" });
+    categoryCountFontPromise = face.load()
+      .then(loaded => { document.fonts.add(loaded); return true; })
+      .catch(e => {
+        console.warn("[profile-card] カテゴリ達成数フォントを読み込めませんでした。代替フォントで描画します", e);
+        return false;
+      });
+    return categoryCountFontPromise;
+  }
+
+  // 右下ブランドロゴ（透過PNG、紺×金、4テーマ共通・白ピル背景なし）。第一候補のslim版を本番で使用する。
+  // 補助アセットのため、読み込み失敗時はnullのままrendererへ渡し、従来のCanvas手描きへフォールバックする
+  let brandLogoImgPromise = null;
+  function getBrandLogoImage() {
+    if (brandLogoImgPromise) return brandLogoImgPromise;
+    brandLogoImgPromise = loadImg("./images/profile-card/parts/common/branding/hatopi-zukan-logo-slim.png");
+    return brandLogoImgPromise;
+  }
+
+  // プレイヤー名(700)・ひとこと(600)で使うShippori MinchoはCSS(<link>)経由のWebフォントで
+  // FontFace APIではなくdocument.fonts.load()で明示的に該当ウェイトを読み込む。
+  // DOM側でこの2ウェイトを使う要素が無い場合、document.fonts.readyだけでは
+  // 該当ウェイトの読み込みが保証されない（Canvas描画時にフォールバック書体へ落ちる原因になる）ため、
+  // 明示的にロードしてから待つ
+  let shipporiMinchoFontPromise = null;
+  function loadShipporiMinchoFonts() {
+    if (shipporiMinchoFontPromise) return shipporiMinchoFontPromise;
+    if (typeof document === "undefined" || !document.fonts || typeof document.fonts.load !== "function") {
+      shipporiMinchoFontPromise = Promise.resolve(false);
+      return shipporiMinchoFontPromise;
+    }
+    shipporiMinchoFontPromise = Promise.all([
+      document.fonts.load("700 68px 'Shippori Mincho'"),
+      document.fonts.load("600 40px 'Shippori Mincho'"),
+    ]).then(() => true).catch(e => {
+      console.warn("[profile-card] Shippori Minchoを読み込めませんでした。代替フォントで描画します", e);
+      return false;
+    });
+    return shipporiMinchoFontPromise;
+  }
+
   // 正式プロフィールパーツ（アバター枠・ID/開拓者レベル/プレイスタイルバッジ・タグ枠）を
   // テーマ単位でまとめて読み込む。1枚でも失敗したら全体をnullにし、
   // renderer側のCanvas手描きフォールバックへ委ねる（一部だけ差し替わる中途半端な状態を避ける）
   function getThemeProfilePartsImages(themeId) {
     if (profilePartsImgCache.has(themeId)) return profilePartsImgCache.get(themeId);
     const parts = PROFILE_CARD_THEMES[themeId].profileParts;
-    const keys = ["avatarFrame", "infoId", "infoLevel", "infoStyle", "tagFrame"];
+    const keys = ["avatarFrame", "infoId", "infoLevel", "infoStyle", "tagFrame", "panel"];
     const promise = Promise.all(keys.map(k => loadImg(parts[k].src)))
       .then(imgs => Object.fromEntries(keys.map((k, i) => [k, imgs[i]])));
     profilePartsImgCache.set(themeId, promise);
     return promise;
+  }
+
+  // カテゴリ進捗カードのPNG（豪華版・4テーマ共通・横型/縦型共通の1セット）。
+  // プロフィールパーツとは異なり、1枚読み込みに失敗してもそのカテゴリだけ
+  // renderer側でCanvas手描きにフォールバックさせたいため、Promise.allSettled相当で
+  // カテゴリごとに独立して読み込み、失敗したものはnullのまま返す（全体を巻き込まない）
+  const PC_CATEGORY_IMAGE_FILES = { fish: "fish", bug: "insect", bird: "bird", shell: "shell", food: "cooking", garden: "gardening", snow: "snow-statue", sand: "sand-statue" };
+  let categoryImgPromise = null; // Promise<{fish,bug,bird,shell,food,garden: HTMLImageElement|null}>
+  function getCommonCategoryImages() {
+    if (categoryImgPromise) return categoryImgPromise;
+    const ids = Object.keys(PC_CATEGORY_IMAGE_FILES);
+    categoryImgPromise = Promise.all(ids.map(id => {
+      const src = `./images/profile-card/parts/common/categories/${PC_CATEGORY_IMAGE_FILES[id]}.png`;
+      return loadImg(src)
+        .then(img => [id, img])
+        .catch(e => {
+          console.warn(`[profile-card] カテゴリカード画像を読み込めませんでした（${id}）。このカテゴリのみ手描きにフォールバックします`, e);
+          return [id, null];
+        });
+    })).then(entries => Object.fromEntries(entries));
+    return categoryImgPromise;
   }
 
   // ============================================================
@@ -124,6 +242,10 @@
     loadingEl.hidden = false;
     clearPreviewError();
     try {
+      try { await loadMedalDigitFont(); } catch (e) { /* フォールバックフォントで続行 */ }
+      try { await loadAchievementValueFont(); } catch (e) { /* フォールバックフォントで続行 */ }
+      try { await loadCategoryCountFont(); } catch (e) { /* フォールバックフォントで続行 */ }
+      try { await loadShipporiMinchoFonts(); } catch (e) { /* フォールバックフォントで続行 */ }
       try { await document.fonts.ready; } catch (e) { /* Safari等で失敗しても続行 */ }
       const layout = PROFILE_CARD_LAYOUTS[state.layout];
       canvas.width = layout.width;
@@ -157,8 +279,27 @@
         console.warn("[profile-card] プロフィールパーツ画像を読み込めませんでした。手描画にフォールバックします", e);
       }
 
+      // カテゴリ進捗カード画像（4テーマ共通・横型/縦型共通の1セット）。getCommonCategoryImages自体は
+      // 各カテゴリを個別にcatchしてnullへ落とすため、ここが失敗するのは
+      // 予期しない例外の場合のみ（その場合は6枚すべてCanvas手描きへフォールバック）
+      let categoryImages = null;
+      try {
+        categoryImages = await getCommonCategoryImages();
+      } catch (e) {
+        console.warn("[profile-card] カテゴリカード画像の読み込みで予期しないエラーが発生しました。手描画にフォールバックします", e);
+      }
+
+      // ブランドロゴも補助アセット。読み込み失敗時はnullのままrendererへ渡し、
+      // 従来のCanvas手描き（白ピル＋文字）へフォールバックする
+      let brandLogoImg = null;
+      try {
+        brandLogoImg = await getBrandLogoImage();
+      } catch (e) {
+        console.warn("[profile-card] ブランドロゴ画像を読み込めませんでした。手描画にフォールバックします", e);
+      }
+
       const stats = computeProfileCardStats();
-      renderProfileCard(ctx, state, { bgImg, avatarImg, mascotImg, medalFrameImg, profileParts }, stats);
+      renderProfileCard(ctx, state, { bgImg, avatarImg, mascotImg, medalFrameImg, profileParts, categoryImages, brandLogoImg }, stats);
     } catch (e) {
       showPreviewError("カードの描画中にエラーが発生しました。" + (e && e.message ? e.message : ""));
     } finally {
@@ -307,10 +448,10 @@
     scheduleRender();
   });
 
-  // ── カテゴリー選択（6枠、重複不可） ──
+  // ── カテゴリー選択（8枠、重複不可） ──
   const categoryGridEl = document.getElementById("pcCategoryGrid");
   const categorySelects = [];
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 8; i++) {
     const wrap = document.createElement("div");
     wrap.className = "pc-category-slot";
     const select = document.createElement("select");

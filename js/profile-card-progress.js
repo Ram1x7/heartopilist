@@ -18,7 +18,7 @@ const PROFILE_CARD_CATEGORIES = [
   { id: "garden",      label: "園芸",     icon: "sprout",      kind: "garden" },
   { id: "achievement", label: "実績",     icon: "medal",       kind: "achievement" },
 ];
-const PROFILE_CARD_DEFAULT_CATEGORY_IDS = ["fish", "bug", "bird", "shell", "food", "garden"];
+const PROFILE_CARD_DEFAULT_CATEGORY_IDS = ["fish", "bug", "bird", "shell", "food", "garden", "snow", "sand"];
 
 function profileCardSafeJsonParse(key) {
   try {
