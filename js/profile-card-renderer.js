@@ -1359,7 +1359,11 @@ const PROFILE_CARD_MEDAL_FRAME_RING = { cx: 627, cy: 627, r: 400 };
 const PC_MEDAL_BASE_R = 168;
 // 実測アンカー（PC_MEDAL_ANCHORS/PC_ACHIEVEMENT_*系）はすべてこの基準点(cx,cy)で採取したもの。
 // cx/cyがこの基準からずれる場合、絶対px値をそのまま使わず(値-基準点)*layoutScaleで
-// 相対オフセットとして適用する（cx/cyが基準と一致する通常時は従来と同じ値になる）
+// 相対オフセットとして適用する（cx/cyが基準と一致する通常時は従来と同じ値になる）。
+// これは横型（landscape）専用の基準点であることに注意：縦型はPC_ACHIEVEMENT_BASE_POINT.portrait
+// （下記）という別の基準点を持つ。以前はこのPC_MEDAL_BASE_CX/CYを縦型でも誤って流用しており、
+// 達成数の動的数値の座標が横型の基準点(814,423)を使って計算されてしまい、縦型自身の
+// medal.cx(543)を中心に描画すべき数値が約238px左にずれる不具合があった（2026/09修正）。
 const PC_MEDAL_BASE_CX = 814;
 const PC_MEDAL_BASE_CY = 423;
 // v7d確定時に一括で掛けていた歴史的な縮小係数（サイズそのものは既にこの数値を織り込んだ最終値のため、
@@ -1860,6 +1864,22 @@ const PC_ACHIEVEMENT_LABEL_ANCHOR = {
   },
 };
 
+// 達成数の動的数値・固定ラベルの位置計算専用の「基準点」（レイアウトごとに異なる）。
+// PC_ACHIEVEMENT_VALUE_RECT/PC_ACHIEVEMENT_LABEL_ANCHORの各値は、そのレイアウト自身の
+// medal.cx/cy/rにおける実測絶対px値のため、(値-基準点)*posScaleで相対オフセットへ変換する際の
+// 基準点・スケール分母は「そのレイアウト自身の測定時cx/cy/r」でなければならない。
+// 横型はPC_MEDAL_BASE_CX/CY/R(814,423,168)——r=168は測定時の値であり、H案採用後の
+// 本番r=177とは別（測定基準はH案採用前後で変えない）。縦型は測定時から本番まで
+// medal.cx/cy/rを一度も変更していないため、測定基準=現在の本番値(543,653,163)となる。
+const PC_ACHIEVEMENT_BASE_POINT = {
+  landscape: { cx: PC_MEDAL_BASE_CX, cy: PC_MEDAL_BASE_CY, r: PC_MEDAL_BASE_R },
+  portrait: { cx: 543, cy: 653, r: 163 },
+};
+function pcAchievementBasePointFor(cx, cy, r) {
+  const layoutKey = pcMedalLayoutKeyFor(cx, cy, r);
+  return (layoutKey && PC_ACHIEVEMENT_BASE_POINT[layoutKey]) || PC_ACHIEVEMENT_BASE_POINT.landscape;
+}
+
 function pcAchievementValueRectFor(cx, cy, r) {
   const layoutKey = pcMedalLayoutKeyFor(cx, cy, r);
   return (layoutKey && PC_ACHIEVEMENT_VALUE_RECT[layoutKey]) || PC_ACHIEVEMENT_VALUE_RECT.landscape;
@@ -1931,7 +1951,16 @@ let pcAchievementMeasureCanvas = null;
 // 実インク中心Yに動的数値の実インク中心Yが一致するよう補正して描画する
 // （フォントメトリクスベースのtextBaseline="middle"だけには依存しない）
 function pcDrawAchievementValue(ctx, cx, cy, r, text, themeId) {
+  // layoutScale：フォントサイズ・valueRect幅（＝自動縮小のトリガー）専用のスケール。
+  // 常にPC_MEDAL_BASE_R(168)基準のまま据え置く（横型・縦型とも従来の見た目・自動縮小挙動を
+  // 一切変えないため）。位置（X/Y座標）の計算だけは、下のposScale/baseへ切り替える。
   const layoutScale = r / PC_MEDAL_BASE_R;
+  // posScale/base：位置計算専用。レイアウトごとに異なる「実測時の基準点(cx,cy,r)」を使う
+  // （横型は従来通りPC_MEDAL_BASE_CX/CY/R、縦型は縦型自身のmedal.cx/cy/r＝543,653,163）。
+  // 以前はここもlayoutScale・PC_MEDAL_BASE_CX/CYを共用しており、縦型の達成数の動的数値が
+  // 横型の基準点(814,423)を使って計算され約238px左にずれる不具合があった（2026/09修正）。
+  const base = pcAchievementBasePointFor(cx, cy, r);
+  const posScale = r / base.r;
   const rect = pcAchievementValueRectFor(cx, cy, r);
   const baseFontSize = PC_ACHIEVEMENT_VALUE_BASE_FONT_SIZE * layoutScale;
   const maxWidth = rect.width * layoutScale;
@@ -1944,11 +1973,12 @@ function pcDrawAchievementValue(ctx, cx, cy, r, text, themeId) {
     ctx.font = `${PC_ACHIEVEMENT_VALUE_WEIGHT} ${fontSize}px ${PC_ACHIEVEMENT_VALUE_FONT}`;
   }
 
-  // rectはPC_MEDAL_BASE_CX/CY・baseRの基準点で実測した絶対px値のため、cx/cyが基準と
-  // 異なる場合は基準点からの相対オフセットとして(値-基準点)*layoutScaleを適用する
-  // （cx/cyが基準と一致する通常時は従来と同じ絶対値になり、既存の見た目は変わらない）
-  const valueCenterX = cx + (rect.x + rect.width / 2 - PC_MEDAL_BASE_CX) * layoutScale;
-  const valueCenterY = cy + (rect.y + rect.height / 2 - PC_MEDAL_BASE_CY) * layoutScale;
+  // rectはそのレイアウト自身の基準点(base.cx/cy/r)で実測した絶対px値のため、cx/cy/rが基準と
+  // 異なる場合は基準点からの相対オフセットとして(値-基準点)*posScaleを適用する
+  // （cx/cy/rが基準と一致する通常時はposScale=1・オフセット0となり、rect値がそのまま絶対
+  // 座標として使われる＝従来通りの見た目になる）
+  const valueCenterX = cx + (rect.x + rect.width / 2 - base.cx) * posScale;
+  const valueCenterY = cy + (rect.y + rect.height / 2 - base.cy) * posScale;
 
   // 縮小後の実fontSize・実テキストで再測定するため、縮小の有無に関わらずこの時点の
   // fontSizeでオフスクリーン計測する（ズレたfontSizeで測って縮小後にズレたままにしない）
@@ -1957,8 +1987,9 @@ function pcDrawAchievementValue(ctx, cx, cy, r, text, themeId) {
   const initialDrawY = valueCenterY;
   const valueInkCenterY = initialDrawY + inkMeasure.offset;
   const labelAnchor = pcAchievementLabelAnchorFor(cx, cy, r, themeId);
-  // labelAnchor.inkCenterYも基準点cyでの実測絶対px値のため、同様に相対オフセット変換する
-  const labelInkCenterY = cy + (labelAnchor.inkCenterY - PC_MEDAL_BASE_CY) * layoutScale;
+  // labelAnchor.inkCenterYも基準点(base.cy)での実測絶対px値のため、同様に相対オフセット変換する
+  // （位置の話なのでposScale/base.cyを使う。フォントサイズ用のlayoutScaleとは別軸）
+  const labelInkCenterY = cy + (labelAnchor.inkCenterY - base.cy) * posScale;
   const calibration = pcAchievementValueVCenterCalibrationFor(cx, cy, r) * layoutScale;
   const correctionY = labelInkCenterY - valueInkCenterY + calibration;
   const finalDrawY = initialDrawY + correctionY;
@@ -1977,10 +2008,14 @@ function pcDrawAchievementValue(ctx, cx, cy, r, text, themeId) {
   const appliedValueBBoxTop = finalDrawY + (inkMeasure.top - inkMeasure.drawY);
   const appliedValueBBoxBottom = finalDrawY + (inkMeasure.bottom - inkMeasure.drawY);
 
+  // X方向はctx.textAlign="center"でvalueCenterXへ描画しているため、実インク中心Xは
+  // 構造上valueCenterXと一致する（textAlignの仕様上、追加の補正計算は不要）。
+  // ただし検証時は診断値を鵜呑みにせず、実Canvasピクセル(alpha走査)からも独立して
+  // 確認すること（本フィールドはあくまで描画に使った値の記録用）
   window.__pcAchievementValueDebug = {
-    text, themeId, cx, cy, r, layoutScale, rect, baseFontSize, fontSize,
+    text, themeId, cx, cy, r, layoutScale, posScale, base, valueRect: rect, baseFontSize, fontSize,
     naturalWidth, maxWidth, shrunk: naturalWidth > maxWidth,
-    valueCenterX, valueCenterY, initialDrawY, finalDrawY, calibration,
+    valueCenterX, valueCenterY, initialDrawY, finalDrawX: valueCenterX, finalDrawY, calibration,
     labelBBoxTop: labelAnchor.bboxTop, labelBBoxBottom: labelAnchor.bboxBottom, labelInkCenterY,
     valueBBoxTop: appliedValueBBoxTop, valueBBoxBottom: appliedValueBBoxBottom,
     valueInkCenterY: (appliedValueBBoxTop + appliedValueBBoxBottom) / 2,
@@ -1989,7 +2024,10 @@ function pcDrawAchievementValue(ctx, cx, cy, r, text, themeId) {
     // （＝メダルサイズや中心を変更する）ほど無関係な差分が発生し、実際には正しく中心が
     // 揃っているのに「ズレている」ように見える診断バグがあった。実際の描画位置と同じ
     // 空間で比較するよう、スケール済みのlabelInkCenterYと比較する
-    centerDifference: labelInkCenterY - (appliedValueBBoxTop + appliedValueBBoxBottom) / 2,
+    centerDifferenceY: labelInkCenterY - (appliedValueBBoxTop + appliedValueBBoxBottom) / 2,
+    // X中心差：textAlign="center"により構造上常に0（valueCenterXそのものがdrawX）。
+    // 参考として明示的にフィールド化しておく
+    centerDifferenceX: 0,
     appliedCorrectionY: correctionY,
     renderedWidth: fontSize === baseFontSize ? naturalWidth : maxWidth,
   };
