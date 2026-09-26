@@ -47,6 +47,7 @@ const videoData = [
   { category:"pink_bubble", date:"2026-09-05", videoId:"ukuLhFiW0AE", note:"9/5~9/11" },
   { category:"pink_bubble", date:"2026-09-12", videoId:"4Sxjeklu1Ow", note:"9/12~9/18" },
   { category:"pink_bubble", date:"2026-09-19", videoId:"yt4Tc6eH2vw", note:"9/19~9/25" },
+  { category:"pink_bubble", date:"2026-09-26", videoId:"hyivmpqw8ig", note:"9/26~10/2" },
   { category:"meteor_shower", date:"2026-01-24", videoId:"NseJtUPwK7g", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-02-07", videoId:"gCBvEQ_Anzc", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-02-14", videoId:"eIPZGHHw0kQ", note:"18:00~24:00" },
