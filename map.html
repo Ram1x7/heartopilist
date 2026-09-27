@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=32">
+<link rel="stylesheet" href="./css/style.css?v=33">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
@@ -765,6 +765,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
 <script src="js/data-fish.js"></script>
 <script src="js/data-bugs.js"></script>
 <script src="js/data-birds.js"></script>
+<script src="js/weather-master.js"></script>
 <script src="js/data-weather.js"></script>
 <script>
 
@@ -1267,27 +1268,32 @@ function getManualWeatherOverride(dateKey, zone){
   }
 }
 
+// 天気の実体は1時間ごと(hourly)。ルックアップは常にJST基準（js/main.jsのupdateTimeと同じ）
 function getCurrentWeatherAndZone(){
   const zone = getZone();
   const todayKey = getDateKey(0);
-  const todayWeather = (typeof weatherData !== "undefined" ? weatherData[todayKey] : null) || {};
-  const officialWeather = todayWeather[zone];
+  const jstHH = String(getJstDate().getUTCHours()).padStart(2,"0");
+  const todayData = typeof weatherData !== "undefined" ? weatherData[todayKey] : null;
+  const todayHourly = (todayData && todayData.hourly) || {};
+  const officialWeather = todayHourly[jstHH];
   const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
   const weather = officialWeather || manualWeather || "不明";
   return { zone, weather };
 }
 
-// js/main.jsのrender()内の判定式と同じロジック
+// js/main.jsのrender()内の判定式と同じロジック（js/weather-master.jsのカテゴリ変換を使う）
 function isCreatureAvailableNow(c, weather, zone){
-  const weatherForCheck = weather === "流星雨" ? "晴れ" : weather;
+  const weatherForCheck = weather === "不明" ? weather : weatherDexCategory(weather);
   const weatherMatch = c.weather.length === ALL_WEATHER.length || c.weather.includes(weatherForCheck);
   const timeMatch = c.time.length === ALL_TIME.length || c.time.includes(zone);
   return weatherMatch && timeMatch;
 }
 
+// 天気名(晴れ/くもり/小雨/流星雨1など)をi18n翻訳する（js/weather-master.js参照。js/main.jsと同じロジック）
 function translateWeatherWord(w){
-  const map = { "晴れ":"weather_sunny", "雨":"weather_rain", "虹":"weather_rainbow", "流星雨":"weather_meteor", "不明":"weather_unknown" };
-  return map[w] ? T(map[w], w) : w;
+  if(w === "不明") return T("weather_unknown", w);
+  const key = typeof weatherI18nKey === "function" ? weatherI18nKey(w) : null;
+  return key ? T(key, w) : w;
 }
 
 // 一覧カード用の軽量サムネイル画像パスを返す

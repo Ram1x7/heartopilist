@@ -50,7 +50,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=32">
+<link rel="stylesheet" href="css/style.css?v=33">
 <link rel="stylesheet" href="css/design-system.css?v=5">
 
 <link rel="prefetch" href="./foods.html">
@@ -161,10 +161,7 @@
 <div id="dailySpotCalendarModal" onclick="if(event.target.id==='dailySpotCalendarModal')closeDailySpotCalendar()">
   <div class="modal-box daily-spot-calendar-modal">
     <h3><span id="dailySpotCalTitleIcon"></span><span data-i18n="daily_spot_calendar_title">出現カレンダー</span></h3>
-    <div class="daily-spot-calendar-tabs">
-      <button id="calTab_hotaru" class="daily-spot-calendar-tab active" onclick="setDailySpotCalendarTab('hotaru')"></button>
-      <button id="calTab_oak" class="daily-spot-calendar-tab" onclick="setDailySpotCalendarTab('oak')"></button>
-    </div>
+    <p class="weather-forecast-server-note" id="weatherForecastServerNote" data-i18n="forecast_server_time_note">時刻は選択中のサーバー時間で表示しています</p>
     <div class="daily-spot-calendar-list" id="dailySpotCalendarList"></div>
     <button class="modal-close-btn" onclick="closeDailySpotCalendar()" data-i18n="modal_close">閉じる</button>
   </div>
@@ -204,6 +201,7 @@
   <div id="weatherNow" class="weather-now"></div>
   <div id="weatherNext" class="weather-next"></div>
   <div id="weatherOverrideWrap" class="weather-override-wrap" style="display:none"></div>
+  <div id="weatherHourStrip" class="weather-hour-strip"></div>
 </div>
 <div class="search-wrap">
   <span class="search-icon"></span>
@@ -649,6 +647,7 @@ text-align:left;
 <script src="js/icons.js"></script>
 <script src="js/data-updates.js"></script>
 <script src="js/update-popup.js"></script>
+<script src="js/weather-master.js"></script>
 <script src="js/data-weather.js"></script>
 <script src="js/data-fish.js"></script>
 <script src="js/data-bugs.js"></script>
@@ -664,7 +663,7 @@ text-align:left;
 <script src="js/toast.js"></script>
 <script src="js/tutorial.js"></script>
 <script src="js/bug-timer.js"></script>
-<script src="js/main.js?v=37"></script>
+<script src="js/main.js?v=39"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

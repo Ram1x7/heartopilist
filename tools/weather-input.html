@@ -20,13 +20,22 @@
 </head>
 <body>
 
-<h1>天気データ入力ツール（開発者用）</h1>
+<h1>天気データ入力ツール（開発者用・現在未対応）</h1>
+<p class="note" style="color:#b00020;font-weight:bold;">
+  ⚠️ js/data-weather.js のフォーマットが「6時間帯ごとの手入力」(windows相当のみ)から
+  「1日ごとの windows + hourly(1時間ごと)」形式へ変更されました。このツールはまだ
+  旧フォーマット用のままで、新フォーマットの生成には対応していません。
+  今後のデータ追加は、WEATHER_FEATURE_SPEC.md に記載の通り、ChatGPTのブラウジング機能で
+  https://heartopia.th.gl/ja/forecast を巡回して収集する方法を使ってください
+  （収集したJSONをそのまま js/data-weather.js の weatherData オブジェクトへ日付単位で
+  マージします）。このツールは当面、旧データの参照用としてのみ残しています。
+</p>
 <p class="note">
   このページはサイトの一部ではありません。<code>js/data-weather.js</code> を更新するための
   ローカル専用ツールです（本番には公開/リンクしていません）。
 </p>
 
-<h2>1. 現在の js/data-weather.js の中身を貼り付け</h2>
+<h2>1. 現在の js/data-weather.js の中身を貼り付け（旧フォーマット専用・現在未使用）</h2>
 <p class="note"><code>const weatherData = { ... };</code> の部分をそのまま貼ってください。</p>
 <textarea id="currentData" placeholder='const weatherData = {
  &quot;2026-08-01&quot;: {

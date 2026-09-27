@@ -309,27 +309,17 @@ function formatWeather(arr){
 }
 
 // 単一の天気ワード（晴れ/雨/虹/流星雨/不明）をi18n翻訳
+// 天気名(晴れ/くもり/小雨/流星雨1など。js/weather-master.js参照)をi18n翻訳する。
+// マスター未登録の名前（今後増える想定）は翻訳キーが無いため生の文字列をそのまま返す
 function translateWeatherWord(w){
- const map = {
-   "晴れ":"weather_sunny",
-   "雨":"weather_rain",
-   "虹":"weather_rainbow",
-   "流星雨":"weather_meteor",
-   "不明":"weather_unknown"
- };
- return map[w] ? T(map[w], w) : w;
+ if(w === "不明") return T("weather_unknown", w);
+ const key = typeof weatherI18nKey === "function" ? weatherI18nKey(w) : null;
+ return key ? T(key, w) : w;
 }
 
-// 天気の単語（晴れ/雨/虹/流星雨）に対応するアイコンHTMLを返す（不明などは非表示）
-function weatherIconHTML(w){
-  const map = {
-    "晴れ":"weatherSun",
-    "雨":"weatherRain",
-    "虹":"weatherRainbow",
-    "流星雨":"weatherMeteor",
-  };
-  return map[w] ? `${icon(map[w], {size:13})} ` : "";
-}
+// weatherIconHTML()の実体はjs/weather-master.js（図鑑・天気予報カレンダー共通）。
+// 晴れ/虹/雨/流星雨(1-3含む)は既存のゲーム内アイコン画像を、それ以外（くもり等、
+// 専用アイコン未提供の天気）は絵文字にフォールバックする
 
 const searchInput = document.getElementById("search");
 const miniSearch = document.getElementById("miniSearch");
@@ -688,12 +678,13 @@ function render(){
   // 終了したフェス・シーズン限定は別セクションで表示するためここでは除外
   if (c.ended) return false;
 
-  // 流星雨は晴れ扱い
+  // 天気名(晴れ/くもり/小雨/流星雨1など)を出現判定用の粗いカテゴリ(晴れ/雨/虹)へ変換する
+  // （js/weather-master.js。流星雨・オーロラ・雪・猛暑・花吹雪等は晴れ扱い）。
+  // 天気が「不明」（データ無し・手動入力もされていない）の間は変換せずそのままにし、
+  // 天気限定の生き物を誤って「今出現中」扱いしない（従来通りの安全側デフォルト）
   const weatherForCheck =
-   currentWeather === "流星雨"
-    ? "晴れ"
-    : currentWeather;
-   
+    currentWeather === "不明" ? currentWeather : weatherDexCategory(currentWeather);
+
   // 天気一致
   const weatherMatch =
     c.weather.length === ALL_WEATHER.length ||
@@ -797,6 +788,11 @@ function setServer(server){
     const target = creatures.find(c => c.name === modal.dataset.currentCreature);
     if(target) openModal(target);
   }
+
+  // 出現カレンダーが表示中なら、時刻ラベル（サーバー時間）を再計算して反映
+  if(dailySpotCalendarModal && dailySpotCalendarModal.style.display === "block"){
+    renderDailySpotCalendar();
+  }
 }
 
 function updateTime(){
@@ -804,10 +800,13 @@ function updateTime(){
  const zone = getZone();
 
  const todayKey = getDateKey(0);
- const tomorrowKey = getDateKey(1);
+ // 天気の実体は1時間ごと(hourly)で持っている。ルックアップは常にJST基準
+ const jstHour = getJstDate().getUTCHours();
+ const jstHH = String(jstHour).padStart(2,"0");
 
- const todayWeather = weatherData[todayKey] || {};
- const officialWeather = todayWeather[zone];
+ const todayData = weatherData[todayKey];
+ const todayHourly = (todayData && todayData.hourly) || {};
+ const officialWeather = todayHourly[jstHH];
  // 公式データが無い間だけ、この端末の手動入力（あれば）を使う。
  // 公式データが入力されると、次にこの関数が呼ばれた時点で自動的にそちらへ切り替わる
  const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
@@ -821,19 +820,12 @@ function updateTime(){
  currentWeatherIsManual = !officialWeather && !!manualWeather;
  currentWeatherDateKey = todayKey;
 
- // 次の天気（そのままでOK）
- const zones = ["6-12","12-18","18-0","0-6"];
- const nextIndex = (zones.indexOf(zone)+1) % 4;
- const nextZone = zones[nextIndex];
-
- let nextWeather;
-
- if(nextZone === "0-6"){
-   const tomorrowWeather = weatherData[tomorrowKey] || {};
-   nextWeather = tomorrowWeather[nextZone] || "不明";
- }else{
-   nextWeather = todayWeather[nextZone] || "不明";
- }
+ // 次の天気：次の1時間を見る（日をまたぐ場合は翌日のhourly["00"]）
+ const nextHour = (jstHour + 1) % 24;
+ const nextHH = String(nextHour).padStart(2,"0");
+ const nextDateKey = nextHour === 0 ? getDateKey(1) : todayKey;
+ const nextData = weatherData[nextDateKey];
+ const nextWeather = (nextData && nextData.hourly && nextData.hourly[nextHH]) || "不明";
 
  const hh = String(now.getUTCHours()).padStart(2,"0");
  const mm = String(now.getUTCMinutes()).padStart(2,"0");
@@ -844,6 +836,7 @@ function updateTime(){
   `${T("weather_now_label","今：")}${translateWeatherWord(weather)}${currentWeatherIsManual ? T("weather_manual_suffix","（手動入力）") : ""}`;
  document.getElementById("weatherNext").innerText =
   `${T("weather_next_label","次：")}${translateWeatherWord(nextWeather)}`;
+ renderWeatherHourStrip(jstHour, weather, nextHour, nextWeather);
  renderWeatherOverrideControl(officialWeather, todayKey, zone);
  document.getElementById("miniTime").innerText = `${hh}:${mm}`;
 
@@ -854,6 +847,28 @@ document.getElementById("miniWeather").innerText =
  if(changed){
    render();
  }
+}
+
+// 「今：/次：」の下に、現在の1時間区間・次の1時間区間の天気を時刻付きで表示する
+// （選択中サーバーのオフセットに合わせた時刻表示。データのルックアップは常にJST基準のまま）
+function renderWeatherHourStrip(jstHour, weather, nextJstHour, nextWeather){
+  const el = document.getElementById("weatherHourStrip");
+  if(!el) return;
+  const chip = (label, hour, w) => {
+    const start = typeof jstHourToServerDisplayHour === "function" ? jstHourToServerDisplayHour(hour) : hour;
+    const end = (start + 1) % 24;
+    return `
+      <span class="weather-hour-chip">
+        <span class="weather-hour-chip-label">${label}</span>
+        ${weatherIconHTML(w, {size:13})}
+        <span class="weather-hour-chip-time">${start}:00〜${end}:00</span>
+        <span>${translateWeatherWord(w)}</span>
+      </span>
+    `;
+  };
+  el.innerHTML =
+    chip(T("weather_now_label","今："), jstHour, weather) +
+    chip(T("weather_next_label","次："), nextJstHour, nextWeather);
 }
 
 // 今日の日付取得（天気データのルックアップ用／常にJST固定）
@@ -1507,7 +1522,6 @@ document.addEventListener("langchange", ()=>{
   }
 
   renderDailySpots();
-  updateDailySpotCalendarTabLabels();
   if(dailySpotCalendarModal && dailySpotCalendarModal.style.display === "block"){
     renderDailySpotCalendar();
   }
@@ -1562,14 +1576,13 @@ function renderDailySpots(){
   }).join("");
 }
 
-// ── カレンダーモーダル ──
+// ── カレンダーモーダル（蛍石・オークの木・天気を、カテゴリ別タブではなく日付ごとにまとめて表示） ──
 const dailySpotCalendarModal = document.getElementById("dailySpotCalendarModal");
 const dailySpotCalendarBtn   = document.getElementById("dailySpotCalendarBtn");
-let currentDailySpotCalendarTab = "hotaru";
 
 if(dailySpotCalendarBtn){
   dailySpotCalendarBtn.onclick = () => {
-    updateDailySpotCalendarTabLabels();
+    weatherCalendarDetailDate = null; // 開く度に一覧表示から始める
     renderDailySpotCalendar();
     dailySpotCalendarModal.style.display = "block";
   };
@@ -1579,48 +1592,145 @@ function closeDailySpotCalendar(){
   if(dailySpotCalendarModal) dailySpotCalendarModal.style.display = "none";
 }
 
-function setDailySpotCalendarTab(key){
-  currentDailySpotCalendarTab = key;
-  ["hotaru","oak"].forEach(k=>{
-    const btn = document.getElementById("calTab_"+k);
-    if(btn) btn.classList.toggle("active", k === key);
-  });
-  renderDailySpotCalendar();
-}
-
-function updateDailySpotCalendarTabLabels(){
-  if(typeof dailySpots === "undefined") return;
-  ["hotaru","oak"].forEach(key=>{
-    const btn = document.getElementById("calTab_"+key);
-    if(btn){
-      btn.textContent = dailySpotLabel(key);
-    }
-  });
-}
+// 行をタップするとその日の1時間ごとの天気詳細に切り替わる（nullなら一覧表示）
+let weatherCalendarDetailDate = null;
 
 function renderDailySpotCalendar(){
   const listEl = document.getElementById("dailySpotCalendarList");
-  if(!listEl || typeof getDailySpotCalendar === "undefined") return;
+  if(!listEl) return;
 
-  const days = getDailySpotCalendar(currentDailySpotCalendarTab, 30);
+  if(weatherCalendarDetailDate){
+    renderWeatherCalendarDayDetail(listEl, weatherCalendarDetailDate);
+  }else{
+    renderCombinedSpotCalendarList(listEl);
+  }
+}
 
-  listEl.innerHTML = days.map(d => {
-    const isToday = d.offset === 0;
-    // 表示用の日付ラベル（例: 07/26）
-    const [, m, day] = d.dateKey.split("-");
-    const dateLabel = `${m}/${day}`;
-    return `
-      <div class="daily-spot-calendar-row ${isToday ? "today" : ""}">
-        <span class="daily-spot-calendar-date">${dateLabel}${isToday ? " " + T("daily_spot_today_tag","(今日)") : ""}</span>
-        <span>${d.location}</span>
+// 今日から30日分、各日ごとに「蛍石・オークの木・天気」をまとめてカード表示する（3日ごとに横並び）。
+// 蛍石・オークの木は`getDailySpotFor`で確定的に算出できるため常に表示できるが、
+// 天気は収集済みの期間のみ（未収集の日は「準備中」）
+function renderCombinedSpotCalendarList(listEl){
+  if(typeof getDailySpotFor === "undefined"){ listEl.innerHTML = ""; return; }
+
+  const wkFallback = ["日","月","火","水","木","金","土"];
+  const wkKeys = ["weekday_sun","weekday_mon","weekday_tue","weekday_wed","weekday_thu","weekday_fri","weekday_sat"];
+
+  const cards = [];
+  for(let offset = 0; offset < 30; offset++){
+    // 蛍石・オークの木は毎日6:00(JST)更新のゲーム内日付。天気もこれに合わせることで、
+    // 深夜0:00〜5:59台に「今日」カードを開いても木・石・天気がすべて同じ日を指すようにする
+    const dateKey = getDailySpotDateKey(offset);
+    const isToday = offset === 0;
+    const [, m, day] = dateKey.split("-");
+    const weekday = new Date(dateKey + "T00:00:00Z").getUTCDay();
+    const wkLabel = T(wkKeys[weekday], wkFallback[weekday]);
+    const dateColorClass = weekday === 6 ? "is-sat" : weekday === 0 ? "is-sun" : "";
+    const dateLabel = `${m}/${day}(${wkLabel})`;
+
+    const spotRows = ["hotaru","oak"].map(key => {
+      const spot = getDailySpotFor(key, offset);
+      if(!spot) return "";
+      const spotImg = spot.image || (dailySpots[key] && dailySpots[key].itemImg) || "";
+      const spotIcon = spotImg
+        ? `<img class="daily-cal-day-icon-img" src="${spotImg}" alt="${dailySpotLabel(key)}">`
+        : "";
+      return `
+        <div class="daily-cal-day-row">
+          <span class="daily-cal-day-icon">${spotIcon}</span>
+          <span class="daily-cal-day-value">${spot.location}</span>
+        </div>
+      `;
+    }).join("");
+
+    const dayData = typeof weatherData !== "undefined" ? weatherData[dateKey] : null;
+    const weatherBody = dayData && dayData.windows
+      ? `<span class="weather-spot-row-icons">${["00-06","06-12","12-18","18-24"].map(wk => {
+          const w = dayData.windows[wk];
+          return w ? weatherIconHTML(w, {size:12}) : "";
+        }).join("")}</span>`
+      : `<span class="weather-spot-row-nodata">${T("forecast_no_data","準備中")}</span>`;
+
+    cards.push(`
+      <div class="daily-cal-day-card ${isToday ? "today" : ""}">
+        <div class="daily-cal-day-date ${dateColorClass}">${dateLabel}</div>
+        ${spotRows}
+        <div class="daily-cal-day-weather" data-weather-date="${dateKey}">
+          ${weatherBody}
+        </div>
       </div>
-    `;
-  }).join("");
+    `);
+  }
+  listEl.innerHTML = `<div class="daily-cal-grid">${cards.join("")}</div>`;
+  listEl.querySelectorAll("[data-weather-date]").forEach(row => {
+    row.addEventListener("click", () => {
+      weatherCalendarDetailDate = row.dataset.weatherDate;
+      renderDailySpotCalendar();
+    });
+  });
+}
+
+// 特定の日の1時間ごとの天気（時刻は選択中サーバーのオフセットで表示）
+function renderWeatherCalendarDayDetail(listEl, dateKey){
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  const wkKeys = ["weekday_sun","weekday_mon","weekday_tue","weekday_wed","weekday_thu","weekday_fri","weekday_sat"];
+  const wkFallback = ["日","月","火","水","木","金","土"];
+  const dayLabel = T("forecast_day_label","{y}年{m}月{d}日（{wk}）",
+    { y, m, d, wk: T(wkKeys[weekday], wkFallback[weekday]) });
+
+  const dayData = weatherData[dateKey];
+  let bodyHTML;
+  if(!dayData || !dayData.hourly){
+    bodyHTML = `<div class="weather-day-nodata">${T("forecast_no_data_day","この日の天気データはまだ収集していません（準備中）")}</div>`;
+  }else{
+    const hourly = dayData.hourly;
+    const isToday = dateKey === getDailySpotDateKey(0);
+    const currentJstHour = isToday ? getJstDate().getUTCHours() : -1;
+
+    let hasMeteor = false, hasRainbow = false;
+    Object.values(hourly).forEach(w => {
+      if(isMeteorWeather(w)) hasMeteor = true;
+      if(isRainbowWeather(w)) hasRainbow = true;
+    });
+    const badges = [];
+    if(hasMeteor) badges.push([weatherIconHTML("流星雨",{size:14}), T("forecast_badge_meteor","この日は流星雨が発生します")]);
+    if(hasRainbow) badges.push([weatherIconHTML("虹",{size:14}), T("forecast_badge_rainbow","この日は虹が見られます")]);
+    const badgesHTML = badges.map(([iconHtml,label]) =>
+      `<div class="weather-day-special-badge"><span>${iconHtml}</span><span>${label}</span></div>`
+    ).join("");
+
+    let rowsHTML = "";
+    for(let h = 0; h < 24; h++){
+      const hh = String(h).padStart(2,"0");
+      const w = hourly[hh] || "不明";
+      const isNow = h === currentJstHour;
+      const displayHour = typeof jstHourToServerDisplayHour === "function" ? jstHourToServerDisplayHour(h) : h;
+      rowsHTML += `
+        <div class="weather-hour-row ${isNow ? "current-hour" : ""}">
+          <span class="weather-hour-time">${displayHour}:00</span>
+          <span class="weather-hour-emoji">${weatherIconHTML(w,{size:14})}</span>
+          <span class="weather-hour-name">${translateWeatherWord(w)}</span>
+          ${isNow ? `<span class="weather-hour-now-tag">${T("forecast_now_tag","今")}</span>` : ""}
+        </div>
+      `;
+    }
+    bodyHTML = `${badgesHTML ? `<div class="weather-day-special">${badgesHTML}</div>` : ""}<div class="weather-hour-list">${rowsHTML}</div>`;
+  }
+
+  listEl.innerHTML = `
+    <button class="ds-btn ds-btn-secondary weather-day-back" id="weatherDayBackBtn">${T("forecast_back_to_calendar","← カレンダーに戻る")}</button>
+    <div class="weather-day-detail-title">${dayLabel}</div>
+    ${bodyHTML}
+  `;
+  const backBtn = document.getElementById("weatherDayBackBtn");
+  if(backBtn) backBtn.addEventListener("click", () => {
+    weatherCalendarDetailDate = null;
+    renderDailySpotCalendar();
+  });
 }
 
 // 初期描画
 renderDailySpots();
-updateDailySpotCalendarTabLabels();
 
 // ══════════════════════════════════════
 // 今日やることリスト ダッシュボード
@@ -1773,19 +1883,19 @@ function renderDailyTasks(){
     sectionSpots = sectionHTML("pin", T("daily_tasks_section_spots","蛍石・オークの木"), spotRows);
   }
 
-  // 今日の天気予報
+  // 今日の天気予報（windows=4時間帯の代表天気。天気予報ページと同じ区分）
   if(typeof weatherData !== "undefined"){
     const todayKey = getDateKey(0);
-    const todayWeather = weatherData[todayKey] || {};
-    // [zoneキー, JST開始時, JST終了時]
-    const zones = [
-      ["0-6", 0, 6],
-      ["6-12", 6, 12],
+    const todayWindows = (weatherData[todayKey] && weatherData[todayKey].windows) || {};
+    // [windowsキー, JST開始時, JST終了時]
+    const windowDefs = [
+      ["00-06", 0, 6],
+      ["06-12", 6, 12],
       ["12-18", 12, 18],
-      ["18-0", 18, 24],
+      ["18-24", 18, 24],
     ];
-    const weatherRows = zones.map(([z, startH, endH]) => {
-      const w = todayWeather[z] || "不明";
+    const weatherRows = windowDefs.map(([wk, startH, endH]) => {
+      const w = todayWindows[wk] || "不明";
       return `
       <div class="daily-task-row">
         <span class="daily-task-label">${formatServerZoneLabel(startH, endH)}</span>
@@ -1801,25 +1911,24 @@ function renderDailyTasks(){
     const HOUR = 3600000;
     const now = Date.now();
 
-    // "YYYY-MM-DD"（JST基準のカレンダー日付）を、そのJST 0:00に対応する絶対時刻(ms)に変換
+    // "YYYY-MM-DD"（JST基準のカレンダー日付）の指定時(0-23)に対応する絶対時刻(ms)に変換
     // ※ブラウザのローカルタイムゾーンに依存させないため、UTC解釈から9時間分を差し引く
-    const jstMidnight = (dateStr) => {
+    const jstHourStart = (dateStr, h) => {
       const t = Date.parse(dateStr + "T00:00:00Z");
-      return isNaN(t) ? NaN : t - 9 * HOUR;
+      return isNaN(t) ? NaN : t - 9 * HOUR + h * HOUR;
     };
 
-    // 指定の天気が発生したゾーンの開始から、windowHours以内かどうか（今日・昨日の2日分をチェック）
-    const isRecentWeatherZone = (targetWeather, windowHours) => {
+    // matchFnに一致する天気が、過去windowHours時間以内(hourly単位)に発生していたか（今日・昨日の2日分を走査）
+    const isRecentWeather = (matchFn, windowHours) => {
       if(typeof weatherData === "undefined") return false;
-      const zoneDefs = [["6-12", 6], ["12-18", 12], ["18-0", 18], ["0-6", 0]];
       for(let offset = 0; offset <= 1; offset++){
         const dateKey = getDateKey(-offset);
-        const dayWeather = weatherData[dateKey];
-        if(!dayWeather) continue;
-        const base = jstMidnight(dateKey);
-        for(const [z, startH] of zoneDefs){
-          if(dayWeather[z] !== targetWeather) continue;
-          const start = base + startH * HOUR;
+        const day = weatherData[dateKey];
+        if(!day || !day.hourly) continue;
+        for(let h = 0; h < 24; h++){
+          const hh = String(h).padStart(2,"0");
+          if(!matchFn(day.hourly[hh])) continue;
+          const start = jstHourStart(dateKey, h);
           if(now >= start && now < start + windowHours * HOUR) return true;
         }
       }
@@ -1834,10 +1943,10 @@ function renderDailyTasks(){
     `;
 
     let videoRows = "";
-    if(isRecentWeatherZone("流星雨", 24)){
+    if(isRecentWeather(isMeteorWeather, 24)){
       videoRows += videoLinkRow("weatherMeteor", T("daily_tasks_video_meteor","流星雨の欠片が拾えます"), "meteor_shower");
     }
-    if(isRecentWeatherZone("虹", 6)){
+    if(isRecentWeather(isRainbowWeather, 6)){
       videoRows += videoLinkRow("weatherRainbow", T("daily_tasks_video_rainbow","虹の日が発生中です"), "rainbow_day");
     }
     if(todayWeekday === 5){
