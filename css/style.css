@@ -873,6 +873,155 @@ body.dark .weekly-shop-countdown{
   color:var(--dark-accent);
 }
 
+/* ══════════════════════════════════════
+   出現カレンダー モーダル内「天気」タブ
+   （既存の蛍石/オークの木タブと同じdailySpotCalendarModalに統合）
+   ══════════════════════════════════════ */
+.weather-forecast-server-note{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-bottom:8px;
+  text-align:center;
+}
+body.dark .weather-forecast-server-note{ color:var(--dark-text-sub); }
+
+/* 天気タブの日別行（既存の.daily-spot-calendar-rowに、その日の天気アイコンを添える） */
+.weather-spot-row-icons{
+  display:flex;
+  gap:4px;
+  align-items:center;
+}
+.weather-spot-row-nodata{
+  font-size:11px;
+  color:var(--text-sub);
+}
+body.dark .weather-spot-row-nodata{ color:var(--dark-text-sub); }
+
+/* ── 日別1時間ごと詳細（天気タブの行をタップすると表示） ── */
+.weather-day-detail-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--indigo);
+  text-align:center;
+  margin-bottom:10px;
+}
+body.dark .weather-day-detail-title{ color:var(--dark-accent); }
+
+.weather-day-back{
+  display:inline-flex;
+  margin-bottom:10px;
+  font-size:12px;
+}
+
+.weather-day-special{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:12px;
+}
+.weather-day-special-badge{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--vermillion-bg);
+  border-radius:12px;
+  padding:6px 10px;
+  font-size:11px;
+  color:var(--vermillion);
+  text-align:left;
+}
+body.dark .weather-day-special-badge{
+  background:#3a1f1a;
+  color:#e8907a;
+}
+
+.weather-day-nodata{
+  text-align:center;
+  padding:24px 12px;
+  color:var(--text-sub);
+  font-size:12px;
+}
+body.dark .weather-day-nodata{ color:var(--dark-text-sub); }
+
+.weather-hour-list{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  max-height:50vh;
+  overflow-y:auto;
+}
+.weather-hour-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+}
+body.dark .weather-hour-row{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+.weather-hour-row.current-hour{
+  border-color:var(--indigo);
+  border-width:2px;
+}
+body.dark .weather-hour-row.current-hour{ border-color:var(--dark-accent); }
+
+.weather-hour-time{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  width:44px;
+  flex-shrink:0;
+  text-align:left;
+}
+body.dark .weather-hour-time{ color:var(--dark-text-sub); }
+.weather-hour-emoji{ font-size:14px; width:20px; text-align:center; flex-shrink:0; }
+.weather-hour-name{ font-size:12px; color:var(--text); flex:1; text-align:left; }
+body.dark .weather-hour-name{ color:var(--dark-text); }
+.weather-hour-now-tag{
+  font-size:9px;
+  color:var(--on-fill);
+  background:var(--indigo);
+  border-radius:999px;
+  padding:2px 6px;
+}
+body.dark .weather-hour-now-tag{ background:var(--dark-accent); }
+
+/* ── 天気表示（今：/次：）下部の1時間ごとストリップ ── */
+.weather-hour-strip{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+.weather-hour-chip{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  background:var(--card-sub);
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:11px;
+  color:var(--text);
+}
+body.dark .weather-hour-chip{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+}
+.weather-hour-chip-label{
+  font-weight:700;
+  color:var(--text-sub);
+}
+body.dark .weather-hour-chip-label{ color:var(--dark-text-sub); }
+.weather-hour-chip-time{
+  color:var(--text-sub);
+}
+body.dark .weather-hour-chip-time{ color:var(--dark-text-sub); }
+
 .daily-task-section{
   margin-bottom:14px;
 }
@@ -1016,29 +1165,6 @@ body.dark .daily-task-value.highlight{
   padding:10px 0;
 }
 
-.daily-spot-calendar-tabs{
-  display:flex;
-  gap:8px;
-  margin-bottom:10px;
-}
-
-.daily-spot-calendar-tab{
-  flex:1;
-  border:1px solid var(--border);
-  border-radius:999px;
-  padding:8px;
-  background:var(--card-sub);
-  color:var(--text-sub);
-  font-family:'Zen Maru Gothic', sans-serif;
-  font-size:12px;
-}
-
-.daily-spot-calendar-tab.active{
-  background:var(--indigo);
-  color:#fff;
-  border-color:var(--indigo);
-}
-
 .daily-spot-calendar-list{
   max-height:50vh;
   overflow-y:auto;
@@ -1071,6 +1197,85 @@ body.dark .daily-spot-calendar-row.today{
   color:var(--text-sub);
   font-size:11px;
 }
+
+/* 出現カレンダー：蛍石・オークの木・天気を日付ごとにまとめたカード（3日ごとに横並び） */
+.daily-cal-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:6px;
+}
+
+.daily-cal-day-card{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:6px 4px;
+}
+body.dark .daily-cal-day-card{ border-color:var(--dark-border); }
+.daily-cal-day-card.today{
+  border-color:var(--indigo);
+  border-width:2px;
+}
+body.dark .daily-cal-day-card.today{ border-color:var(--dark-accent); }
+
+.daily-cal-day-date{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:3px;
+  text-align:center;
+}
+body.dark .daily-cal-day-date{ color:var(--dark-accent); }
+.daily-cal-day-date.is-sat{ color:#2f6fd1; }
+.daily-cal-day-date.is-sun{ color:#d1392f; }
+body.dark .daily-cal-day-date.is-sat{ color:#7cabf5; }
+body.dark .daily-cal-day-date.is-sun{ color:#ff8f85; }
+
+.daily-cal-day-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:4px;
+  padding:1px 0;
+  font-size:11px;
+}
+.daily-cal-day-icon{
+  flex-shrink:0;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+}
+/* .modal-box img の共通ルール（padding:8px・margin-bottom:10px等）を打ち消し、
+   絵文字と同じ見た目のサイズに収める */
+.modal-box .daily-cal-day-icon-img{
+  width:11px;
+  height:11px;
+  padding:0;
+  margin:0;
+  object-fit:contain;
+  border-radius:3px;
+  background:var(--card);
+  flex-shrink:0;
+}
+body.dark .modal-box .daily-cal-day-icon-img{ background:var(--dark-card); }
+.daily-cal-day-value{
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body.dark .daily-cal-day-value{ color:var(--dark-text); }
+
+.daily-cal-day-weather{
+  cursor:pointer;
+  border-top:1px solid var(--border);
+  margin-top:3px;
+  padding-top:3px;
+  display:flex;
+  justify-content:center;
+}
+body.dark .daily-cal-day-weather{ border-color:var(--dark-border); }
+.daily-cal-day-weather .weather-spot-row-icons{ gap:2px; }
+.daily-cal-day-weather .weather-spot-row-nodata{ font-size:10px; }
 
 /* ボタン */
 .filter button,
