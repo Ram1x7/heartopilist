@@ -1655,8 +1655,15 @@ function renderCombinedSpotCalendarList(listEl){
     const dayData = typeof weatherData !== "undefined" ? weatherData[dateKey] : null;
     const weatherBody = dayData && dayData.windows
       ? `<span class="weather-spot-row-icons">${["00-06","06-12","12-18","18-24"].map(wk => {
-          const w = dayData.windows[wk];
-          return w ? weatherIconHTML(w, {size:12}) : "";
+          if(!dayData.windows[wk]) return "";
+          // ウィンドウの代表アイコンは、そのウィンドウ内の1時間ごとの天気から算出する
+          // （weatherWindowIcons。晴れ/くもりしかなければ晴れ、雨があれば雨…等の優先度判定）
+          const [startH, endH] = wk.split("-").map(Number);
+          const hourly = dayData.hourly || {};
+          const hoursInWindow = [];
+          for(let h = startH; h < endH; h++) hoursInWindow.push(hourly[String(h).padStart(2,"0")]);
+          const iconNames = weatherWindowIcons(hoursInWindow);
+          return iconNames.map(name => weatherIconHTML(name, {size:12})).join("");
         }).join("")}</span>`
       : `<span class="weather-spot-row-nodata">${T("forecast_no_data","準備中")}</span>`;
 
