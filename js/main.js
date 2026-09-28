@@ -159,6 +159,15 @@ function getZone(){
  return"0-6";
 }
 
+// 天気データ(weatherData[date].windows)のキー順。「今：/次：」の6時間ウィンドウ計算に使う
+const WEATHER_WINDOW_ORDER = ["00-06","06-12","12-18","18-24"];
+function weatherWindowKeyForHour(h){
+  if(h < 6) return "00-06";
+  if(h < 12) return "06-12";
+  if(h < 18) return "12-18";
+  return "18-24";
+}
+
 // i18n連携用ヘルパー（i18n未準備時は日本語フォールバックを返す）
 function T(key, fallback, vars){
   if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
@@ -800,13 +809,19 @@ function updateTime(){
  const zone = getZone();
 
  const todayKey = getDateKey(0);
- // 天気の実体は1時間ごと(hourly)で持っている。ルックアップは常にJST基準
  const jstHour = getJstDate().getUTCHours();
  const jstHH = String(jstHour).padStart(2,"0");
 
  const todayData = weatherData[todayKey];
- const todayHourly = (todayData && todayData.hourly) || {};
- const officialWeather = todayHourly[jstHH];
+
+ // 「今：/次：」・図鑑の出現判定は6時間ウィンドウの天気（晴れ/雨/虹/流星雨の4択のみ）で行う。
+ // くもり・小雨・天気雨等はこの4つのいずれかのバリエーションに過ぎないため、
+ // weatherWindowCategory()で畳み込んでから使う（1時間ごとの内訳は下のhour-stripでのみ使用）
+ const currentWindowKey = weatherWindowKeyForHour(jstHour);
+ const todayWindows = (todayData && todayData.windows) || {};
+ const rawOfficialWindow = todayWindows[currentWindowKey];
+ const officialWeather = rawOfficialWindow ? weatherWindowCategory(rawOfficialWindow) : null;
+
  // 公式データが無い間だけ、この端末の手動入力（あれば）を使う。
  // 公式データが入力されると、次にこの関数が呼ばれた時点で自動的にそちらへ切り替わる
  const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
@@ -820,12 +835,22 @@ function updateTime(){
  currentWeatherIsManual = !officialWeather && !!manualWeather;
  currentWeatherDateKey = todayKey;
 
- // 次の天気：次の1時間を見る（日をまたぐ場合は翌日のhourly["00"]）
+ // 次の天気：次の6時間ウィンドウ（日をまたぐ場合は翌日の"00-06"）
+ const nextWindowIndex = (WEATHER_WINDOW_ORDER.indexOf(currentWindowKey) + 1) % WEATHER_WINDOW_ORDER.length;
+ const nextWindowKey = WEATHER_WINDOW_ORDER[nextWindowIndex];
+ const nextWindowDateKey = nextWindowKey === "00-06" ? getDateKey(1) : todayKey;
+ const nextWindowData = weatherData[nextWindowDateKey];
+ const rawNextWindow = nextWindowData && nextWindowData.windows && nextWindowData.windows[nextWindowKey];
+ const nextWeather = rawNextWindow ? weatherWindowCategory(rawNextWindow) : "不明";
+
+ // hour-stripは1時間ごとの実際の天気（生の値、畳み込みしない）を表示する
+ const todayHourly = (todayData && todayData.hourly) || {};
+ const hourlyWeather = todayHourly[jstHH] || "不明";
  const nextHour = (jstHour + 1) % 24;
  const nextHH = String(nextHour).padStart(2,"0");
- const nextDateKey = nextHour === 0 ? getDateKey(1) : todayKey;
- const nextData = weatherData[nextDateKey];
- const nextWeather = (nextData && nextData.hourly && nextData.hourly[nextHH]) || "不明";
+ const nextHourDateKey = nextHour === 0 ? getDateKey(1) : todayKey;
+ const nextHourData = weatherData[nextHourDateKey];
+ const nextHourlyWeather = (nextHourData && nextHourData.hourly && nextHourData.hourly[nextHH]) || "不明";
 
  const hh = String(now.getUTCHours()).padStart(2,"0");
  const mm = String(now.getUTCMinutes()).padStart(2,"0");
@@ -836,7 +861,7 @@ function updateTime(){
   `${T("weather_now_label","今：")}${translateWeatherWord(weather)}${currentWeatherIsManual ? T("weather_manual_suffix","（手動入力）") : ""}`;
  document.getElementById("weatherNext").innerText =
   `${T("weather_next_label","次：")}${translateWeatherWord(nextWeather)}`;
- renderWeatherHourStrip(jstHour, weather, nextHour, nextWeather);
+ renderWeatherHourStrip(jstHour, hourlyWeather, nextHour, nextHourlyWeather);
  renderWeatherOverrideControl(officialWeather, todayKey, zone);
  document.getElementById("miniTime").innerText = `${hh}:${mm}`;
 
@@ -851,9 +876,19 @@ document.getElementById("miniWeather").innerText =
 
 // 「今：/次：」の下に、現在の1時間区間・次の1時間区間の天気を時刻付きで表示する
 // （選択中サーバーのオフセットに合わせた時刻表示。データのルックアップは常にJST基準のまま）
+//
+// updateTime()は1秒ごとに呼ばれるが、中身（時刻・天気・サーバー）が前回描画時から
+// 変わっていなければ再描画をスキップする。ここをスキップしないと、天気アイコン（<img>）が
+// 1秒ごとに作り直されてチラつく原因になる
+let lastWeatherHourStripSignature = null;
 function renderWeatherHourStrip(jstHour, weather, nextJstHour, nextWeather){
   const el = document.getElementById("weatherHourStrip");
   if(!el) return;
+
+  const signature = `${jstHour}_${weather}_${nextJstHour}_${nextWeather}_${currentServer}_${currentLang()}`;
+  if(signature === lastWeatherHourStripSignature) return;
+  lastWeatherHourStripSignature = signature;
+
   const chip = (label, hour, w) => {
     const start = typeof jstHourToServerDisplayHour === "function" ? jstHourToServerDisplayHour(hour) : hour;
     const end = (start + 1) % 24;
@@ -1499,7 +1534,7 @@ document.getElementById("disclaimer").textContent =
   T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  T("last_update_label","最終更新") + " 2026/09/25";
+  T("last_update_label","最終更新") + " 2026/09/28";
 
 // 更新通知が表示中は、閉じた直後（closeUpdatePopup）にチュートリアルを開始する
 if(document.getElementById("updatePopup").style.display !== "block"){
@@ -1513,7 +1548,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/09/25";
+    T("last_update_label","最終更新") + " 2026/09/28";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){

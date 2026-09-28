@@ -820,8 +820,8 @@ const birdData = [
  img:"images/birds/063.PNG"
 }, 
 {
- name:"コムクドリ",
- nameI18n:{"ja":"コムクドリ","en":"Chestnut-cheeked Starling","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"シロハラムクドリ",
+ nameI18n:{"ja":"シロハラムクドリ","en":"White-shouldered Starling","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:11,
  authCount:600,
  price:30,
