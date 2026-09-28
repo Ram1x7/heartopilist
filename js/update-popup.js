@@ -60,8 +60,18 @@
     }
   }
 
+  // 更新通知を表示するかどうかの判定が終わったタイミングで必ず一度だけ発火する
+  // （表示しない場合も、表示して閉じられた場合も）。他のスクリプト（index.html側の
+  // チュートリアル開始処理など）が、更新通知と重ならないタイミングを知るためのフック
+  function notifyDone() {
+    document.dispatchEvent(new CustomEvent("hatopiUpdatePopupDone"));
+  }
+
   function showUpdatePopup() {
-    if (typeof updatesData === "undefined" || !updatesData.length) return;
+    if (typeof updatesData === "undefined" || !updatesData.length) {
+      notifyDone();
+      return;
+    }
 
     var latest = updatesData[updatesData.length - 1];
     var seenId = getSeenId();
@@ -74,11 +84,15 @@
       // ユーザーなので、最新の更新を一度お知らせする。
       if (!hasEngagedBefore()) {
         setSeenId(latest.id);
+        notifyDone();
         return;
       }
       seenId = 0;
     }
-    if (seenId >= latest.id) return;
+    if (seenId >= latest.id) {
+      notifyDone();
+      return;
+    }
 
     var overlay = document.createElement("div");
     overlay.id = "updatePopupOverlay";
@@ -106,6 +120,7 @@
     function close() {
       setSeenId(latest.id);
       overlay.remove();
+      notifyDone();
     }
 
     overlay.addEventListener("click", function (e) {

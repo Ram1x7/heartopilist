@@ -1389,33 +1389,6 @@ levelMax.addEventListener(
   updateLevelRange
 );
 
-const popupVersion = "3.6.0";
-
-if(
- localStorage.getItem("popupVersion")
- !== popupVersion
-){
- document.getElementById(
-   "updatePopup"
- ).style.display = "block";
-}
-
-function closeUpdatePopup(){
-
- localStorage.setItem(
-   "popupVersion",
-   popupVersion
- );
-
- document.getElementById(
-   "updatePopup"
- ).style.display = "none";
-
- // 更新通知を閉じた直後に、まだチュートリアル初回表示が済んでいなければ
- // ここから開始する（更新通知とチュートリアルが同時に重なって表示されるのを防ぐ）
- maybeStartPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);
-}
-
 const topPanel =
   document.getElementById("topPanel");
 
@@ -1536,10 +1509,12 @@ document.getElementById("disclaimer").textContent =
 document.getElementById("lastUpdate").textContent =
   T("last_update_label","最終更新") + " 2026/09/28";
 
-// 更新通知が表示中は、閉じた直後（closeUpdatePopup）にチュートリアルを開始する
-if(document.getElementById("updatePopup").style.display !== "block"){
+// 更新通知（js/update-popup.js）の表示要否が決まった後にチュートリアルを開始する
+// （更新通知とチュートリアルが同時に重なって表示されるのを防ぐ。
+// 通知が出ない場合も、出て閉じられた場合も、必ず一度だけ"hatopiUpdatePopupDone"が飛んでくる）
+document.addEventListener("hatopiUpdatePopupDone", function(){
   maybeStartPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);
-}
+}, { once: true });
 
 // 言語切替時に動的コンテンツを再描画
 document.addEventListener("langchange", ()=>{
