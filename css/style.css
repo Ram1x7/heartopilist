@@ -394,17 +394,20 @@ body.dark .page-tutorial-hint{
 /* 天気全体 */
 .weather-wrap{
   display:flex;
+  flex-wrap:wrap;
   justify-content:center;
   align-items:flex-end;
-  gap:8px;
+  gap:4px 8px;
   margin-bottom:8px;
 }
 
-/* 今の天気 */
+/* 今の天気（狭い画面で「晴れ」等が文字単位で折り返されるのを防ぐ） */
 .weather-now{
   font-size:18px;
   font-family:'Shippori Mincho', serif;
   color:var(--indigo);
+  white-space:nowrap;
+  flex-shrink:0;
 }
 
 /* 次の天気 */
@@ -413,6 +416,8 @@ body.dark .page-tutorial-hint{
   opacity:0.8;
   color:var(--text-sub);
   margin-bottom:2px;
+  white-space:nowrap;
+  flex-shrink:0;
 }
 
 /* ダークモード */

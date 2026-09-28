@@ -95,7 +95,16 @@ function isRainbowWeather(name) {
   return name === "虹" || name === "月虹";
 }
 
+// 6時間ウィンドウの「本当の」天気（晴れ/雨/虹/流星雨の4択のみ）。
+// くもり・小雨・大雨・豪雨・天気雨・月雨・月虹などは、これら4つのいずれかを構成する
+// バリエーションに過ぎないため、ここで畳み込む。「今：/次：」の表示と図鑑の出現判定は
+// 常にこの4値経由で行うこと（1時間ごとの内訳表示にはこの関数を使わない）
+function weatherWindowCategory(name) {
+  if (isMeteorWeather(name)) return "流星雨";
+  return weatherDexCategory(name);
+}
+
 // tools/validate-weather-data.js（Node）から読み込めるようにする
 if (typeof module !== "undefined") {
-  module.exports = { WEATHER_MASTER, weatherInfo, weatherDexCategory, weatherEmoji, weatherI18nKey, weatherIconHTML, isMeteorWeather, isRainbowWeather };
+  module.exports = { WEATHER_MASTER, weatherInfo, weatherDexCategory, weatherEmoji, weatherI18nKey, weatherIconHTML, isMeteorWeather, isRainbowWeather, weatherWindowCategory };
 }
