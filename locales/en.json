@@ -1241,5 +1241,8 @@
   "forecast_badge_meteor": "A meteor shower occurs today",
   "forecast_badge_rainbow": "A rainbow can be seen today",
   "forecast_month_label": "{y}/{m}",
-  "forecast_day_label": "{y}/{m}/{d} ({wk})"
+  "forecast_day_label": "{y}/{m}/{d} ({wk})",
+  "forecast_prev_month": "Previous month",
+  "forecast_next_month": "Next month",
+  "forecast_no_data_month": "No dates to show for this month"
 }

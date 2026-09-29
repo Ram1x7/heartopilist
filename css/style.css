@@ -1203,6 +1203,53 @@ body.dark .daily-spot-calendar-row.today{
   font-size:11px;
 }
 
+/* 出現カレンダー：月ごとのナビゲーション */
+.daily-cal-month-nav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin-bottom:8px;
+}
+.daily-cal-month-btn{
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--indigo);
+  border-radius:999px;
+  width:28px;
+  height:28px;
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.daily-cal-month-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+body.dark .daily-cal-month-btn{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-accent);
+}
+.daily-cal-month-label{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  font-weight:700;
+  color:var(--indigo);
+  min-width:80px;
+  text-align:center;
+}
+body.dark .daily-cal-month-label{ color:var(--dark-accent); }
+
+.daily-cal-day-nodata{
+  text-align:center;
+  font-size:12px;
+  color:var(--text-sub);
+  padding:24px 0;
+}
+body.dark .daily-cal-day-nodata{ color:var(--dark-text-sub); }
+
 /* 出現カレンダー：蛍石・オークの木・天気を日付ごとにまとめたカード（3日ごとに横並び） */
 .daily-cal-grid{
   display:grid;
