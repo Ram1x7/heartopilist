@@ -133,8 +133,11 @@ const ICONS = {
 // 天気・認証マスターは、線画SVGではなくゲーム内アイコン風の画像に差し替える
 const ICON_IMAGE_SRC = {
   weatherSun: "images/currency/sunny.png",
+  weatherSunNight: "images/currency/yoru_sunny.png",
   weatherRain: "images/currency/rainy.png",
   weatherRainbow: "images/currency/rainbow.png",
+  weatherMoonRainbow: "images/currency/tsukiniji.png",
+  weatherCloudy: "images/currency/kumori.png",
   weatherMeteor: "images/currency/starrain.png",
   medal: "images/currency/master.png",
   medalOutline: "images/currency/beginner.png",
