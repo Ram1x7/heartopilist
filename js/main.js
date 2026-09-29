@@ -1593,6 +1593,7 @@ const dailySpotCalendarBtn   = document.getElementById("dailySpotCalendarBtn");
 if(dailySpotCalendarBtn){
   dailySpotCalendarBtn.onclick = () => {
     weatherCalendarDetailDate = null; // 開く度に一覧表示から始める
+    weatherCalendarViewYM = null;     // 開く度に「今日を含む月」から始める
     renderDailySpotCalendar();
     dailySpotCalendarModal.style.display = "block";
   };
@@ -1605,6 +1606,10 @@ function closeDailySpotCalendar(){
 // 行をタップするとその日の1時間ごとの天気詳細に切り替わる（nullなら一覧表示）
 let weatherCalendarDetailDate = null;
 
+// 出現カレンダーで現在表示中の年月（{year, month}、monthは1〜12）。
+// nullの場合は「今日を含む月」として扱う（renderCombinedSpotCalendarList内で解決する）
+let weatherCalendarViewYM = null;
+
 function renderDailySpotCalendar(){
   const listEl = document.getElementById("dailySpotCalendarList");
   if(!listEl) return;
@@ -1616,26 +1621,36 @@ function renderDailySpotCalendar(){
   }
 }
 
-// 今日から30日分、各日ごとに「蛍石・オークの木・天気」をまとめてカード表示する（3日ごとに横並び）。
+// 選択中の月の中で、各日ごとに「蛍石・オークの木・天気」をまとめてカード表示する（3日ごとに横並び）。
+// 過ぎた日付（今日より前）は表示しない。月送りナビゲーションで他の月にも移動できる
+// （今日を含む月より前には戻れない）。
 // 蛍石・オークの木は`getDailySpotFor`で確定的に算出できるため常に表示できるが、
 // 天気は収集済みの期間のみ（未収集の日は「準備中」）
 function renderCombinedSpotCalendarList(listEl){
   if(typeof getDailySpotFor === "undefined"){ listEl.innerHTML = ""; return; }
 
+  // 蛍石・オークの木は毎日6:00(JST)更新のゲーム内日付。天気もこれに合わせることで、
+  // 深夜0:00〜5:59台に「今日」カードを開いても木・石・天気がすべて同じ日を指すようにする
+  const todayKey = getDailySpotDateKey(0);
+  const [todayYear, todayMonth] = todayKey.split("-").map(Number);
+  if(!weatherCalendarViewYM) weatherCalendarViewYM = { year: todayYear, month: todayMonth };
+  const { year, month } = weatherCalendarViewYM;
+  const isAtStartMonth = (year === todayYear && month === todayMonth);
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+
   const wkFallback = ["日","月","火","水","木","金","土"];
   const wkKeys = ["weekday_sun","weekday_mon","weekday_tue","weekday_wed","weekday_thu","weekday_fri","weekday_sat"];
 
   const cards = [];
-  for(let offset = 0; offset < 30; offset++){
-    // 蛍石・オークの木は毎日6:00(JST)更新のゲーム内日付。天気もこれに合わせることで、
-    // 深夜0:00〜5:59台に「今日」カードを開いても木・石・天気がすべて同じ日を指すようにする
-    const dateKey = getDailySpotDateKey(offset);
+  for(let d = 1; d <= daysInMonth; d++){
+    const dateKey = `${year}-${String(month).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    if(dateKey < todayKey) continue; // 過ぎた日付は表示しない
+    const offset = daysBetween(todayKey, dateKey);
     const isToday = offset === 0;
-    const [, m, day] = dateKey.split("-");
     const weekday = new Date(dateKey + "T00:00:00Z").getUTCDay();
     const wkLabel = T(wkKeys[weekday], wkFallback[weekday]);
     const dateColorClass = weekday === 6 ? "is-sat" : weekday === 0 ? "is-sun" : "";
-    const dateLabel = `${m}/${day}(${wkLabel})`;
+    const dateLabel = `${month}/${d}(${wkLabel})`;
 
     const spotRows = ["hotaru","oak"].map(key => {
       const spot = getDailySpotFor(key, offset);
@@ -1677,7 +1692,37 @@ function renderCombinedSpotCalendarList(listEl){
       </div>
     `);
   }
-  listEl.innerHTML = `<div class="daily-cal-grid">${cards.join("")}</div>`;
+  const monthLabel = T("forecast_month_label", "{y}年{m}月", { y: year, m: month });
+  const navHTML = `
+    <div class="daily-cal-month-nav">
+      <button type="button" class="daily-cal-month-btn" id="weatherCalPrevMonth" ${isAtStartMonth ? "disabled" : ""} aria-label="${T("forecast_prev_month","前の月")}">‹</button>
+      <span class="daily-cal-month-label">${monthLabel}</span>
+      <button type="button" class="daily-cal-month-btn" id="weatherCalNextMonth" aria-label="${T("forecast_next_month","次の月")}">›</button>
+    </div>
+  `;
+  const bodyHTML = cards.length
+    ? `<div class="daily-cal-grid">${cards.join("")}</div>`
+    : `<div class="daily-cal-day-nodata">${T("forecast_no_data_month","この月に表示できる日付はありません")}</div>`;
+  listEl.innerHTML = navHTML + bodyHTML;
+
+  const prevBtn = document.getElementById("weatherCalPrevMonth");
+  const nextBtn = document.getElementById("weatherCalNextMonth");
+  if(prevBtn) prevBtn.addEventListener("click", () => {
+    if(isAtStartMonth) return;
+    let { year, month } = weatherCalendarViewYM;
+    month -= 1;
+    if(month < 1){ month = 12; year -= 1; }
+    weatherCalendarViewYM = { year, month };
+    renderDailySpotCalendar();
+  });
+  if(nextBtn) nextBtn.addEventListener("click", () => {
+    let { year, month } = weatherCalendarViewYM;
+    month += 1;
+    if(month > 12){ month = 1; year += 1; }
+    weatherCalendarViewYM = { year, month };
+    renderDailySpotCalendar();
+  });
+
   listEl.querySelectorAll("[data-weather-date]").forEach(row => {
     row.addEventListener("click", () => {
       weatherCalendarDetailDate = row.dataset.weatherDate;

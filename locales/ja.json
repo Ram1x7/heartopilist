@@ -1241,5 +1241,8 @@
   "forecast_badge_meteor": "この日は流星雨が発生します",
   "forecast_badge_rainbow": "この日は虹が見られます",
   "forecast_month_label": "{y}年{m}月",
-  "forecast_day_label": "{y}年{m}月{d}日（{wk}）"
+  "forecast_day_label": "{y}年{m}月{d}日（{wk}）",
+  "forecast_prev_month": "前の月",
+  "forecast_next_month": "次の月",
+  "forecast_no_data_month": "この月に表示できる日付はありません"
 }
