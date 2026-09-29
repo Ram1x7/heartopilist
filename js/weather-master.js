@@ -5,9 +5,12 @@
 // 両方から参照する。
 //
 // gameIcon: js/icons.js の icon() に渡す名前（ICON_IMAGE_SRCで既存のゲーム内アイコン画像に
-// 差し替え済みのもの）。晴れ・虹・雨・流星雨の4種のみ、以前から用意されている専用アイコンを使う。
-// くもり・その他の天気は専用アイコン未提供のため、絵文字にフォールバックする
+// 差し替え済みのもの）。晴れ・虹・雨・流星雨・くもり・月虹は専用アイコンを使う。
+// それ以外の天気は専用アイコン未提供のため、絵文字にフォールバックする
 //（専用アイコンが用意され次第、ここにgameIconを追加するだけで済むようにしてある）。
+// なお「晴れ」は18:00〜翌6:00(JST)の間だけ夜用アイコン(weatherSunNight)に差し替わる。
+// これは天気名では区別されないため、weatherIconHTML()がopts.hourを見て切り替える
+//（NIGHT_ICON_OVERRIDESを参照）。
 //
 // dexCategory: 既存の図鑑出現判定（c.weather配列、"晴れ"/"雨"/"虹"の3値のみ）に渡すための
 // 粗いカテゴリ。流星雨・オーロラ・雪・猛暑・花吹雪など、出現条件データ側に存在しない特殊気象は
@@ -21,7 +24,7 @@ const WEATHER_MASTER = {
   // 「雨」単体は実データ(hourly)には出現しないが、天気手動入力（MANUAL_WEATHER_OPTIONS）の
   // 選択肢として存在するため、ここにも定義しておく
   "雨":       { emoji: "🌧️", gameIcon: "weatherRain",    dexCategory: "雨",   i18nKey: "weather_rain" },
-  "くもり":   { emoji: "☁️", gameIcon: null,             dexCategory: "晴れ", i18nKey: "weather_cloudy" },
+  "くもり":   { emoji: "☁️", gameIcon: "weatherCloudy",  dexCategory: "晴れ", i18nKey: "weather_cloudy" },
   "小雨":     { emoji: "🌧️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_light_rain" },
   "大雨":     { emoji: "🌧️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_heavy_rain" },
   "豪雨":     { emoji: "⛈️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_storm" },
@@ -29,7 +32,7 @@ const WEATHER_MASTER = {
   // 夜間の雨系。名称に反して出現判定上は「雨」カテゴリとして扱う（README/仕様書参照）
   "月雨":     { emoji: "🌙", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_moon_rain" },
   "虹":       { emoji: "🌈", gameIcon: "weatherRainbow", dexCategory: "虹",   i18nKey: "weather_rainbow" },
-  "月虹":     { emoji: "🌈", gameIcon: "weatherRainbow", dexCategory: "虹",   i18nKey: "weather_moon_rainbow" },
+  "月虹":     { emoji: "🌈", gameIcon: "weatherMoonRainbow", dexCategory: "虹", i18nKey: "weather_moon_rainbow" },
   "流星雨":   { emoji: "☄️", gameIcon: "weatherMeteor",  dexCategory: "晴れ", i18nKey: "weather_meteor" },
   "流星雨1":  { emoji: "☄️", gameIcon: "weatherMeteor",  dexCategory: "晴れ", i18nKey: "weather_meteor" },
   "流星雨2":  { emoji: "☄️", gameIcon: "weatherMeteor",  dexCategory: "晴れ", i18nKey: "weather_meteor" },
@@ -72,16 +75,32 @@ function weatherI18nKey(name) {
 // 現状のアイコン画像は中央の絵柄が箱の約6割程度しかない）
 const WEATHER_ICON_IMG_SCALE = 1.4;
 
-// 天気名に対応するHTML（アイコンまたは絵文字）を返す。晴れ/虹/雨/流星雨(1-3含む)は
+// 天気名では区別されないが、夜間(18:00〜翌6:00 JST)だけ別アイコンを使いたい天気。
+// weatherIconHTML()がopts.hourを受け取った時だけ参照する
+const NIGHT_ICON_OVERRIDES = {
+  "晴れ": "weatherSunNight",
+};
+
+function isNightHour(hour) {
+  return hour != null && (hour >= 18 || hour < 6);
+}
+
+// 天気名に対応するHTML（アイコンまたは絵文字）を返す。晴れ/虹/雨/流星雨(1-3含む)/くもり/月虹は
 // 既存のゲーム内アイコン画像（js/icons.js）を、それ以外は絵文字にフォールバックする。
 // opts.sizeは「絵文字として見えるサイズ」の指定。アイコン画像側は見た目をそろえるため
 // 内部で拡大して描画する。
+// opts.hour（JSTの0〜23）を渡すと、夜間アイコンが定義されている天気（現状は「晴れ」のみ）を
+// 夜用アイコンに差し替える。省略時は常に日中用アイコンのまま。
 // ブラウザ環境（window.icon）専用
 function weatherIconHTML(name, opts) {
   const info = weatherInfo(name);
   const size = (opts && opts.size) || 13;
-  if (info.gameIcon && typeof window !== "undefined" && typeof window.icon === "function") {
-    return `${window.icon(info.gameIcon, { size: Math.round(size * WEATHER_ICON_IMG_SCALE) })} `;
+  let gameIcon = info.gameIcon;
+  if (opts && isNightHour(opts.hour) && NIGHT_ICON_OVERRIDES[name]) {
+    gameIcon = NIGHT_ICON_OVERRIDES[name];
+  }
+  if (gameIcon && typeof window !== "undefined" && typeof window.icon === "function") {
+    return `${window.icon(gameIcon, { size: Math.round(size * WEATHER_ICON_IMG_SCALE) })} `;
   }
   return info.emoji ? `<span style="font-size:${size}px;line-height:1;">${info.emoji}</span> ` : "";
 }

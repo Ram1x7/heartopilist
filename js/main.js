@@ -895,7 +895,7 @@ function renderWeatherHourStrip(jstHour, weather, nextJstHour, nextWeather){
     return `
       <span class="weather-hour-chip">
         <span class="weather-hour-chip-label">${label}</span>
-        ${weatherIconHTML(w, {size:13})}
+        ${weatherIconHTML(w, {size:13, hour})}
         <span class="weather-hour-chip-time">${start}:00〜${end}:00</span>
         <span>${translateWeatherWord(w)}</span>
       </span>
@@ -1684,7 +1684,7 @@ function renderCombinedSpotCalendarList(listEl){
           const hoursInWindow = [];
           for(let h = startH; h < endH; h++) hoursInWindow.push(hourly[String(h).padStart(2,"0")]);
           const iconNames = weatherWindowIcons(hoursInWindow);
-          return iconNames.map(name => weatherIconHTML(name, {size:12})).join("");
+          return iconNames.map(name => weatherIconHTML(name, {size:12, hour:startH})).join("");
         }).join("")}</span>`
       : `<span class="weather-spot-row-nodata">${T("forecast_no_data","準備中")}</span>`;
 
@@ -1777,7 +1777,7 @@ function renderWeatherCalendarDayDetail(listEl, dateKey){
       rowsHTML += `
         <div class="weather-hour-row ${isNow ? "current-hour" : ""}">
           <span class="weather-hour-time">${displayHour}:00</span>
-          <span class="weather-hour-emoji">${weatherIconHTML(w,{size:14})}</span>
+          <span class="weather-hour-emoji">${weatherIconHTML(w,{size:14, hour:h})}</span>
           <span class="weather-hour-name">${translateWeatherWord(w)}</span>
           ${isNow ? `<span class="weather-hour-now-tag">${T("forecast_now_tag","今")}</span>` : ""}
         </div>
@@ -1968,7 +1968,7 @@ function renderDailyTasks(){
       return `
       <div class="daily-task-row">
         <span class="daily-task-label">${formatServerZoneLabel(startH, endH)}</span>
-        <span class="daily-task-value">${weatherIconHTML(w)}${translateWeatherWord(w)}</span>
+        <span class="daily-task-value">${weatherIconHTML(w, {hour:startH})}${translateWeatherWord(w)}</span>
       </div>
     `;
     }).join("");
