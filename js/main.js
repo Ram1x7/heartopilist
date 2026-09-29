@@ -1638,6 +1638,12 @@ function renderCombinedSpotCalendarList(listEl){
   const isAtStartMonth = (year === todayYear && month === todayMonth);
   const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
 
+  // 天気データが収集済みの最新月より先には進めない（未収集の月を延々とめくれてしまうのを防ぐ）
+  const collectedMonths = typeof weatherData !== "undefined" ? Object.keys(weatherData).map(k => k.slice(0, 7)) : [];
+  const latestCollectedYM = collectedMonths.length ? collectedMonths.sort()[collectedMonths.length - 1] : null;
+  const viewYM = `${year}-${String(month).padStart(2,"0")}`;
+  const isAtEndMonth = latestCollectedYM ? viewYM >= latestCollectedYM : false;
+
   const wkFallback = ["日","月","火","水","木","金","土"];
   const wkKeys = ["weekday_sun","weekday_mon","weekday_tue","weekday_wed","weekday_thu","weekday_fri","weekday_sat"];
 
@@ -1697,7 +1703,7 @@ function renderCombinedSpotCalendarList(listEl){
     <div class="daily-cal-month-nav">
       <button type="button" class="daily-cal-month-btn" id="weatherCalPrevMonth" ${isAtStartMonth ? "disabled" : ""} aria-label="${T("forecast_prev_month","前の月")}">‹</button>
       <span class="daily-cal-month-label">${monthLabel}</span>
-      <button type="button" class="daily-cal-month-btn" id="weatherCalNextMonth" aria-label="${T("forecast_next_month","次の月")}">›</button>
+      <button type="button" class="daily-cal-month-btn" id="weatherCalNextMonth" ${isAtEndMonth ? "disabled" : ""} aria-label="${T("forecast_next_month","次の月")}">›</button>
     </div>
   `;
   const bodyHTML = cards.length
@@ -1716,6 +1722,7 @@ function renderCombinedSpotCalendarList(listEl){
     renderDailySpotCalendar();
   });
   if(nextBtn) nextBtn.addEventListener("click", () => {
+    if(isAtEndMonth) return;
     let { year, month } = weatherCalendarViewYM;
     month += 1;
     if(month > 12){ month = 1; year += 1; }
