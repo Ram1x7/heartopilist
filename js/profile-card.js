@@ -512,7 +512,7 @@
         const authPct = Math.round(profileCardPct({ done: s.authDone, total: s.authTotal }));
         bars.push(`
           <div class="pc-detail-progress-bar">
-            <span class="pc-detail-progress-bar-label">認証</span>
+            <span class="pc-detail-progress-bar-label">${icon("medal", { size: 12 })}認証</span>
             <div class="pc-detail-progress-track"><div class="pc-detail-progress-fill pc-detail-progress-fill-auth" style="width:${authPct}%"></div></div>
             <span class="pc-detail-progress-count">${s.authDone} / ${s.authTotal}</span>
           </div>
