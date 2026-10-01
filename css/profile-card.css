@@ -26,6 +26,19 @@ body.dark .pc-page-header h2{ color:var(--dark-accent); }
 }
 body.dark .pc-disclaimer{ color:var(--dark-text-sub); }
 
+.pc-paused-notice{
+  text-align:center;
+  font-size:12px;
+  font-weight:bold;
+  color:var(--indigo);
+  background:var(--indigo-soft);
+  border-radius:10px;
+  padding:8px 12px;
+  max-width:1200px;
+  margin:0 auto 16px;
+}
+body.dark .pc-paused-notice{ color:var(--dark-accent); background:var(--dark-card-alt); }
+
 .pc-layout{
   display:flex;
   flex-direction:column;
@@ -232,6 +245,90 @@ body.dark .pc-tag-chip.active{ background:var(--dark-accent); color:#241f19; bor
   gap:8px;
 }
 .pc-category-slot select{ width:100%; }
+
+/* カード作成機能が非公開の間、このセクションはpc-form-colの外（body直下）に置かれるため、
+   pc-layoutと同じ最大幅・中央寄せを単独でも持たせる */
+#pcSectionDetailProgress{
+  max-width:1200px;
+  margin:0 auto 14px;
+}
+
+/* ── 詳細進捗（星5・認証を分けて表示） ── */
+.pc-detail-progress-hint{
+  font-size:11px;
+  color:var(--text-sub);
+  margin:0;
+}
+body.dark .pc-detail-progress-hint{ color:var(--dark-text-sub); }
+
+.pc-detail-progress-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.pc-detail-progress-row{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--card-sub);
+}
+body.dark .pc-detail-progress-row{ border-color:var(--dark-border); background:var(--dark-card-alt); }
+
+.pc-detail-progress-label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:13px;
+  font-weight:bold;
+  color:var(--text);
+}
+body.dark .pc-detail-progress-label{ color:var(--dark-text); }
+
+.pc-detail-progress-bars{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.pc-detail-progress-bar{
+  display:grid;
+  grid-template-columns:40px 1fr auto;
+  align-items:center;
+  gap:8px;
+}
+.pc-detail-progress-bar-label{
+  font-size:11px;
+  color:var(--text-sub);
+  white-space:nowrap;
+}
+body.dark .pc-detail-progress-bar-label{ color:var(--dark-text-sub); }
+
+.pc-detail-progress-track{
+  height:8px;
+  border-radius:999px;
+  background:var(--border);
+  overflow:hidden;
+}
+body.dark .pc-detail-progress-track{ background:var(--dark-border); }
+
+.pc-detail-progress-fill{
+  height:100%;
+  border-radius:999px;
+  background:var(--indigo);
+}
+body.dark .pc-detail-progress-fill{ background:var(--dark-accent); }
+.pc-detail-progress-fill-auth{ background:var(--gold, #c9a84a); }
+
+.pc-detail-progress-count{
+  font-size:11px;
+  color:var(--text-sub);
+  white-space:nowrap;
+  min-width:48px;
+  text-align:right;
+}
+body.dark .pc-detail-progress-count{ color:var(--dark-text-sub); }
 
 /* ── アバター編集 ── */
 .pc-avatar-editor{

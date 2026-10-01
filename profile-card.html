@@ -29,7 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=35">
 <link rel="stylesheet" href="./css/design-system.css?v=4">
-<link rel="stylesheet" href="./css/profile-card.css?v=1">
+<link rel="stylesheet" href="./css/profile-card.css?v=2">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -76,7 +76,19 @@
   <h2 data-i18n="pc_page_title">プロフィールカードメーカー</h2>
 </div>
 <div class="pc-disclaimer" data-i18n="pc_disclaimer">※このプロフィールカードメーカーは非公式ファンツールです。入力内容とアバター画像はすべて端末内（このブラウザ）にのみ保存され、外部へ送信されることはありません。</div>
+<div class="pc-paused-notice" data-i18n="pc_card_maker_paused_notice">※現在カード作成機能は一時的に非公開にしています。進捗確認のみご利用いただけます。</div>
 
+<!-- 進捗の詳細（星5/獲得数・認証を分けて確認）：カード作成機能が非公開の間、このページの主役 -->
+<section class="pc-section" id="pcSectionDetailProgress">
+  <button type="button" class="pc-section-head"><span data-i18n="pc_section_detail_progress">進捗の詳細（星5・認証）</span><span class="pc-chevron">▾</span></button>
+  <div class="pc-section-body">
+    <p class="pc-detail-progress-hint" data-i18n="pc_detail_progress_hint">カードには星5＋認証を合算した進捗が表示されますが、ここでは全カテゴリーの星5進捗と認証進捗を別々に確認できます。</p>
+    <div class="pc-detail-progress-list" id="pcDetailProgressList"></div>
+  </div>
+</section>
+
+<!-- プロフィールカード作成機能：一旦非公開（準備が整い次第再開予定）。コードは温存し、CSSで非表示にしているだけ -->
+<div id="pcCardMakerWrap" hidden>
 <div class="pc-layout">
   <div class="pc-preview-col">
     <div class="pc-preview-wrap">
@@ -238,6 +250,7 @@
     </section>
 
   </div>
+</div>
 </div>
 
 <script src="js/edge-swipe-guard.js"></script>

@@ -604,7 +604,7 @@ const birdData = [
  level:7,
  authCount:1080,
  price:22,
- star5:"虹 / 18〜0",
+ star5:"虹 / 12〜0",
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"巣ごもりクエスト",
