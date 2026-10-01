@@ -299,6 +299,9 @@ body.dark .pc-detail-progress-label{ color:var(--dark-text); }
   gap:8px;
 }
 .pc-detail-progress-bar-label{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
   font-size:11px;
   color:var(--text-sub);
   white-space:nowrap;

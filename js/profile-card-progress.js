@@ -16,7 +16,7 @@ const PROFILE_CARD_CATEGORIES = [
   { id: "snow",        label: "雪像",     icon: "snow",        kind: "creature", type: "snow" },
   { id: "food",        label: "料理",     icon: "ingredient",  kind: "food" },
   { id: "garden",      label: "園芸",     icon: "sprout",      kind: "garden" },
-  { id: "achievement", label: "実績",     icon: "medal",       kind: "achievement", starLabel: "獲得数" },
+  { id: "achievement", label: "実績",     icon: "trophy",      kind: "achievement", starLabel: "獲得数" },
 ];
 const PROFILE_CARD_DEFAULT_CATEGORY_IDS = ["fish", "bug", "bird", "shell", "food", "garden", "snow", "sand"];
 
