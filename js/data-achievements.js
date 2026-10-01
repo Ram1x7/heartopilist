@@ -710,8 +710,8 @@ const achievementsData = [
   {
     id: 72,
     hidden: true,
-    name: "空高く",
-    nameI18n: {"ja":"空高く", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    name: "大空に想いを馳せて",
+    nameI18n: {"ja":"大空に想いを馳せて", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     flavorText: "熱気球クエストでは、景色を楽しむ他にも、できることがたくさんあります。",
     flavorTextI18n: {"ja":"熱気球クエストでは、景色を楽しむ他にも、できることがたくさんあります。", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "熱気球クエストの称号をすべて獲得する。",
