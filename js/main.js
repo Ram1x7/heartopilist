@@ -150,6 +150,15 @@ function getJstDate(){
   return new Date(Date.now() + 9 * 3600 * 1000);
 }
 
+// 出現カレンダー専用：JST 0:00を基準にした日付キー（YYYY-MM-DD）。
+// 今日のやることリスト等（6:00更新＝getDailySpotDateKey）とは区切りを分けたいという
+// 要望のため、出現カレンダーの「今日」判定・月送り・表示対象日の絞り込みはこちらを使う
+function getCalendarTodayKey(offsetDays = 0){
+  const d = getJstDate();
+  d.setUTCDate(d.getUTCDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
+
 // 時間帯取得（天気判定・出現判定用／常にJST固定）
 function getZone(){
  const h = getJstDate().getUTCHours();
@@ -1629,9 +1638,10 @@ function renderDailySpotCalendar(){
 function renderCombinedSpotCalendarList(listEl){
   if(typeof getDailySpotFor === "undefined"){ listEl.innerHTML = ""; return; }
 
-  // 蛍石・オークの木は毎日6:00(JST)更新のゲーム内日付。天気もこれに合わせることで、
-  // 深夜0:00〜5:59台に「今日」カードを開いても木・石・天気がすべて同じ日を指すようにする
-  const todayKey = getDailySpotDateKey(0);
+  // カレンダーの日付区切りはJST 0:00基準（today = 実際の暦日）。
+  // 蛍石・オークの木は6:00(JST)更新のゲーム内日付のため、深夜0:00〜5:59台の「今日」カードは
+  // まだ前日の場所を表示する（gameDayKeyForDate参照）。天気・行の表示対象自体は実日付で揃える
+  const todayKey = getCalendarTodayKey(0);
   const [todayYear, todayMonth] = todayKey.split("-").map(Number);
   if(!weatherCalendarViewYM) weatherCalendarViewYM = { year: todayYear, month: todayMonth };
   const { year, month } = weatherCalendarViewYM;
@@ -1651,15 +1661,17 @@ function renderCombinedSpotCalendarList(listEl){
   for(let d = 1; d <= daysInMonth; d++){
     const dateKey = `${year}-${String(month).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
     if(dateKey < todayKey) continue; // 過ぎた日付は表示しない
-    const offset = daysBetween(todayKey, dateKey);
-    const isToday = offset === 0;
+    const isToday = dateKey === todayKey;
     const weekday = new Date(dateKey + "T00:00:00Z").getUTCDay();
     const wkLabel = T(wkKeys[weekday], wkFallback[weekday]);
     const dateColorClass = weekday === 6 ? "is-sat" : weekday === 0 ? "is-sun" : "";
     const dateLabel = `${month}/${d}(${wkLabel})`;
 
+    // 蛍石・オークの木は6:00(JST)更新のため、「今日」カードでかつJST0:00〜5:59台の間だけは
+    // まだ前日の場所を表示する（カレンダー自体の日付区切りは実日付0:00のまま変えない）
+    const gameDayKeyForDate = isToday ? getDailySpotDateKey(0) : dateKey;
     const spotRows = ["hotaru","oak"].map(key => {
-      const spot = getDailySpotFor(key, offset);
+      const spot = getDailySpotForDateKey(key, gameDayKeyForDate);
       if(!spot) return "";
       const spotImg = spot.image || (dailySpots[key] && dailySpots[key].itemImg) || "";
       const spotIcon = spotImg
@@ -1753,7 +1765,7 @@ function renderWeatherCalendarDayDetail(listEl, dateKey){
     bodyHTML = `<div class="weather-day-nodata">${T("forecast_no_data_day","この日の天気データはまだ収集していません（準備中）")}</div>`;
   }else{
     const hourly = dayData.hourly;
-    const isToday = dateKey === getDailySpotDateKey(0);
+    const isToday = dateKey === getCalendarTodayKey(0);
     const currentJstHour = isToday ? getJstDate().getUTCHours() : -1;
 
     let hasMeteor = false, hasRainbow = false;
