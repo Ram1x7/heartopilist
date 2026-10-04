@@ -57,6 +57,9 @@ const dailySpots = {
 // 例）7/26 5:59 JST までは "2026-07-26" ではなく "2026-07-25" を返す
 //     7/26 6:00 JST になった瞬間から "2026-07-26" を返す
 // offsetDays はこの「ゲーム内の今日」からさらに何日後/前かを指定する
+// ※ 出現カレンダー（js/main.jsのrenderCombinedSpotCalendarList）の日付区切りは
+//   これとは別に実日付0:00基準（getCalendarTodayKey）を使う。今日のやることリスト等、
+//   6:00更新のままでよいものはこちらを引き続き使う
 function getDailySpotDateKey(offsetDays = 0){
   const jstNow = new Date(Date.now() + 9 * 3600 * 1000); // JSTの現在時刻
   // 6時間分を引くことで「6:00更新」を「0:00更新」の暦日計算に変換する
@@ -75,11 +78,18 @@ function daysBetween(dateKeyA, dateKeyB){
 // 指定した日（offsetDays日後、デフォルト0=今日）の場所を取得
 // 戻り値: { location, image } または null（データ未設定時）
 function getDailySpotFor(key, offsetDays = 0){
+  return getDailySpotForDateKey(key, getDailySpotDateKey(offsetDays));
+}
+
+// 指定したゲーム内日付キー（YYYY-MM-DD、6:00更新基準）そのものの場所を取得。
+// 出現カレンダーのように「今からの相対日数」ではなく「この日付の場所」を直接知りたい
+// 場合に使う（gameDayKeyの算出は呼び出し側の責任）
+// 戻り値: { location, image } または null（データ未設定時）
+function getDailySpotForDateKey(key, gameDayKey){
   const spot = dailySpots[key];
   if(!spot || !spot.LOCATIONS || spot.LOCATIONS.length === 0) return null;
 
-  const todayKey = getDailySpotDateKey(offsetDays);
-  const diff = daysBetween(spot.BASE_DATE, todayKey);
+  const diff = daysBetween(spot.BASE_DATE, gameDayKey);
   const cycleLen = spot.LOCATIONS.length; // 通常50
   const idx = ((diff % cycleLen) + cycleLen) % cycleLen;
 
@@ -88,7 +98,7 @@ function getDailySpotFor(key, offsetDays = 0){
     ? spot.LOCATION_IMAGES[location]
     : null;
 
-  return { location, image, dateKey: todayKey };
+  return { location, image, dateKey: gameDayKey };
 }
 
 // 指定した日数分（今日からdays日間）の場所一覧を取得（カレンダー表示用）
