@@ -1639,8 +1639,9 @@ function renderCombinedSpotCalendarList(listEl){
   if(typeof getDailySpotFor === "undefined"){ listEl.innerHTML = ""; return; }
 
   // カレンダーの日付区切りはJST 0:00基準（today = 実際の暦日）。
-  // 蛍石・オークの木は6:00(JST)更新のゲーム内日付のため、深夜0:00〜5:59台の「今日」カードは
-  // まだ前日の場所を表示する（gameDayKeyForDate参照）。天気・行の表示対象自体は実日付で揃える
+  // 蛍石・オークの木は本来6:00(JST)更新のゲーム内日付だが、カレンダー表示上は
+  // 6:00を待たずにカレンダーの日付（0:00切り替え）に合わせて表示してよいとのことなので、
+  // 各カードはそのカードの日付（dateKey）の場所をそのまま表示する
   const todayKey = getCalendarTodayKey(0);
   const [todayYear, todayMonth] = todayKey.split("-").map(Number);
   if(!weatherCalendarViewYM) weatherCalendarViewYM = { year: todayYear, month: todayMonth };
@@ -1667,11 +1668,8 @@ function renderCombinedSpotCalendarList(listEl){
     const dateColorClass = weekday === 6 ? "is-sat" : weekday === 0 ? "is-sun" : "";
     const dateLabel = `${month}/${d}(${wkLabel})`;
 
-    // 蛍石・オークの木は6:00(JST)更新のため、「今日」カードでかつJST0:00〜5:59台の間だけは
-    // まだ前日の場所を表示する（カレンダー自体の日付区切りは実日付0:00のまま変えない）
-    const gameDayKeyForDate = isToday ? getDailySpotDateKey(0) : dateKey;
     const spotRows = ["hotaru","oak"].map(key => {
-      const spot = getDailySpotForDateKey(key, gameDayKeyForDate);
+      const spot = getDailySpotForDateKey(key, dateKey);
       if(!spot) return "";
       const spotImg = spot.image || (dailySpots[key] && dailySpots[key].itemImg) || "";
       const spotIcon = spotImg
