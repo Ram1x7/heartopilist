@@ -5,8 +5,8 @@
 
 const snowData = [
 {
- name:"立方体雪ブロック",
- nameI18n:{"ja":"立方体雪ブロック","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ name:"ジオメトリック雪ブロック",
+ nameI18n:{"ja":"ジオメトリック雪ブロック","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:1,
  price:155,
  weather:["晴れ","雨","虹"],
