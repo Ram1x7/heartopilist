@@ -1,5 +1,5 @@
 // キャッシュ名（更新時はバージョンを上げる）
-const CACHE_NAME = "hatopi-v2.416.0";
+const CACHE_NAME = "hatopi-v2.417.0";
 
 // キャッシュするファイル一覧
 const CACHE_FILES = [
@@ -156,7 +156,13 @@ self.addEventListener("fetch", (e) => {
   }
 
   e.respondWith(
-    fetch(e.request)
+    // cache:"no-store" でブラウザ自体のHTTPキャッシュを明示的にバイパスする。
+    // これを指定しないと、index.html等（バージョンクエリなし）がブラウザの
+    // 通常のHTTPキャッシュ側で有効期限内と判断され、SWの「ネットワーク優先」の
+    // つもりのfetch()がネットワークに出ずキャッシュ応答で済んでしまうことがあり、
+    // 新しいjs/css（?v=N）への参照に更新されないまま古い内容が延々と表示され続ける
+    // 不具合の原因になっていた（ホーム画面追加のPWAで特に顕著）
+    fetch(e.request, { cache: "no-store" })
       .then((response) => {
         // 正常なレスポンスならキャッシュを更新
         if(response && response.status === 200){
