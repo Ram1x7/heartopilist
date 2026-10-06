@@ -1200,6 +1200,10 @@ function buildLocationsByAreaKey(){
     if(!area) return;
     if(!result.has(area.key)) result.set(area.key, new Set());
     const set = result.get(area.key);
+    // 地名自体は必ず自分のエリアに含める。mapLocationLinks側の座標は
+    // ポリゴン内に収めるため個別に補正されていることがあり（例：静川）、
+    // その場合lm.x/yとズレて下の座標一致判定だけでは拾えなくなるため
+    set.add(lm.name);
     Object.entries(mapLocationLinks).forEach(([locName, pt]) => {
       if(pt && Math.abs(pt.x - lm.x) < 0.01 && Math.abs(pt.y - lm.y) < 0.01) set.add(locName);
     });
