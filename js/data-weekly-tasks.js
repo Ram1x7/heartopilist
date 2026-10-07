@@ -45,7 +45,7 @@ const weeklyShops = [
     shop: "レコード店",
     shopI18n: {"ja":"レコード店","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     items: [
-      { name: "他の音楽会社のレコード", detail: "毎週2種類／各種コインで購入" },
+      { name: "他の音楽会社のレコード", detail: "毎週2種類／各種コインで購入", img: "./images/weekly-shop/027.png" },
     ],
   },
   {
