@@ -494,40 +494,6 @@
   }
   renderCategorySelects();
 
-  // ── 詳細進捗（星5・認証を分けて表示。カード本体の合算表示とは独立） ──
-  const detailProgressListEl = document.getElementById("pcDetailProgressList");
-  function renderDetailProgress() {
-    const detailed = computeProfileCardStatsDetailed();
-    detailProgressListEl.innerHTML = PROFILE_CARD_CATEGORIES.map(def => {
-      const s = detailed[def.id] || { starDone: 0, starTotal: 0, authDone: 0, authTotal: 0 };
-      const starPct = Math.round(profileCardPct({ done: s.starDone, total: s.starTotal }));
-      const bars = [`
-        <div class="pc-detail-progress-bar">
-          <span class="pc-detail-progress-bar-label">${def.starLabel || "星5"}</span>
-          <div class="pc-detail-progress-track"><div class="pc-detail-progress-fill" style="width:${starPct}%"></div></div>
-          <span class="pc-detail-progress-count">${s.starDone} / ${s.starTotal}</span>
-        </div>
-      `];
-      if (s.authTotal > 0) {
-        const authPct = Math.round(profileCardPct({ done: s.authDone, total: s.authTotal }));
-        bars.push(`
-          <div class="pc-detail-progress-bar">
-            <span class="pc-detail-progress-bar-label">${icon("medal", { size: 12 })}認証</span>
-            <div class="pc-detail-progress-track"><div class="pc-detail-progress-fill pc-detail-progress-fill-auth" style="width:${authPct}%"></div></div>
-            <span class="pc-detail-progress-count">${s.authDone} / ${s.authTotal}</span>
-          </div>
-        `);
-      }
-      return `
-        <div class="pc-detail-progress-row">
-          <div class="pc-detail-progress-label">${icon(def.icon, { size: 15 })}<span>${def.label}</span></div>
-          <div class="pc-detail-progress-bars">${bars.join("")}</div>
-        </div>
-      `;
-    }).join("");
-  }
-  renderDetailProgress();
-
   // ── レイアウト・テーマ ──
   const layoutBtns = {
     landscape: document.getElementById("pcLayoutLandscape"),

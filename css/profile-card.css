@@ -333,6 +333,19 @@ body.dark .pc-detail-progress-fill{ background:var(--dark-accent); }
 }
 body.dark .pc-detail-progress-count{ color:var(--dark-text-sub); }
 
+/* ── 総合（全カテゴリー合算）の星5・認証進捗：ページ最上部に常時表示 ── */
+.pc-detail-progress-total-wrap{
+  max-width:1200px;
+  margin:0 auto 14px;
+}
+.pc-detail-progress-row-total{
+  border-color:var(--indigo);
+  border-width:2px;
+  background:var(--indigo-soft);
+}
+body.dark .pc-detail-progress-row-total{ border-color:var(--dark-accent); background:var(--dark-card-alt); }
+.pc-detail-progress-row-total .pc-detail-progress-label{ font-size:15px; }
+
 /* ── アバター編集 ── */
 .pc-avatar-editor{
   display:flex;
