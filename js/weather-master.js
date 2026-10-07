@@ -25,12 +25,12 @@ const WEATHER_MASTER = {
   // 選択肢として存在するため、ここにも定義しておく
   "雨":       { emoji: "🌧️", gameIcon: "weatherRain",    dexCategory: "雨",   i18nKey: "weather_rain" },
   "くもり":   { emoji: "☁️", gameIcon: "weatherCloudy",  dexCategory: "晴れ", i18nKey: "weather_cloudy" },
-  "小雨":     { emoji: "🌧️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_light_rain" },
-  "大雨":     { emoji: "🌧️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_heavy_rain" },
+  "小雨":     { emoji: "🌧️", gameIcon: "weatherLightRain", dexCategory: "雨",   i18nKey: "weather_light_rain" },
+  "大雨":     { emoji: "🌧️", gameIcon: "weatherHeavyRain", dexCategory: "雨",   i18nKey: "weather_heavy_rain" },
   "豪雨":     { emoji: "⛈️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_storm" },
-  "天気雨":   { emoji: "🌦️", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_sun_shower" },
+  "天気雨":   { emoji: "🌦️", gameIcon: "weatherSunShower", dexCategory: "雨",   i18nKey: "weather_sun_shower" },
   // 夜間の雨系。名称に反して出現判定上は「雨」カテゴリとして扱う（README/仕様書参照）
-  "月雨":     { emoji: "🌙", gameIcon: null,             dexCategory: "雨",   i18nKey: "weather_moon_rain" },
+  "月雨":     { emoji: "🌙", gameIcon: "weatherMoonRain", dexCategory: "雨",   i18nKey: "weather_moon_rain" },
   "虹":       { emoji: "🌈", gameIcon: "weatherRainbow", dexCategory: "虹",   i18nKey: "weather_rainbow" },
   "月虹":     { emoji: "🌈", gameIcon: "weatherMoonRainbow", dexCategory: "虹", i18nKey: "weather_moon_rainbow" },
   "流星雨":   { emoji: "☄️", gameIcon: "weatherMeteor",  dexCategory: "晴れ", i18nKey: "weather_meteor" },

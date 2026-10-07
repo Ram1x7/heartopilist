@@ -27,6 +27,7 @@ const CURRENCY_ICON_SRC = {
   tsurutsuru_oak: "images/currency/tsurutsuru_oak.png",
   seed_wheat: "images/currency/seed_wheat.png",
   milk: "images/currency/milk.png",
+  mermaid_shippo: "images/currency/mermaid_shippo.png",
 };
 
 function currencyIcon(type) {
@@ -39,6 +40,7 @@ function injectCurrencyIcons(text) {
   if (!text) return text;
   return text
     .replace(/フェスコイン/g, `${currencyIcon("fescoin")}フェスコイン`)
+    .replace(/マーメイドの魚寄せ装置/g, `${currencyIcon("mermaid_shippo")}マーメイドの魚寄せ装置`)
     .replace(/(?<!トレンド)(?<!フェス)コイン/g, `${currencyIcon("coin")}コイン`)
     .replace(/願い星/g, `${currencyIcon("negaiboshi")}願い星`)
     .replace(/シェフ特製サラダ/g, `${currencyIcon("chef_salad")}シェフ特製サラダ`)
