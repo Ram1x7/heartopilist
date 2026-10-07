@@ -60,16 +60,22 @@ function maybeStartPageTutorial(doneKey, steps){
   setTimeout(() => startPageTutorial(doneKey, steps), 400);
 }
 
+// 開始前にフォーカスされていた要素。閉じたときにここへフォーカスを戻す
+let _tutReturnFocusEl = null;
+
 function startPageTutorial(doneKey, steps){
   ensureTutorialDom();
   _tutDoneKey = doneKey;
   _tutSteps = steps;
   _tutStep = 0;
+  _tutReturnFocusEl = document.activeElement;
   document.getElementById("dsTutorialBackdrop").style.display = "block";
   document.getElementById("dsTutorialHighlight").style.display = "block";
   document.getElementById("dsTutorialPopup").style.display = "block";
   document.getElementById("dsTutorialSkipBtn").textContent = tutT("tutorial_skip", "スキップ");
   renderTutorialStep();
+  // ポップアップ内（次へ進むボタン）へフォーカスを移す
+  document.getElementById("dsTutorialNextBtn").focus();
 }
 
 function renderTutorialStep(){
@@ -127,6 +133,7 @@ function nextTutorialStep(){
   }
   _tutStep++;
   renderTutorialStep();
+  document.getElementById("dsTutorialNextBtn").focus();
 }
 
 function endPageTutorial(){
@@ -137,6 +144,12 @@ function endPageTutorial(){
   if(backdrop) backdrop.style.display = "none";
   if(highlight) highlight.style.display = "none";
   if(popup) popup.style.display = "none";
+  // 閉じた後は、チュートリアル開始前にフォーカスしていた要素へ戻す
+  // （対象が消えている場合は無理にフォーカスしない）
+  if(_tutReturnFocusEl && document.contains(_tutReturnFocusEl) && typeof _tutReturnFocusEl.focus === "function"){
+    _tutReturnFocusEl.focus();
+  }
+  _tutReturnFocusEl = null;
 }
 
 // ヘルプモーダル等からの手動再生（既読フラグを消してから開始）

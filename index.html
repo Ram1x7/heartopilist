@@ -50,7 +50,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=35">
+<link rel="stylesheet" href="css/style.css?v=36">
 <link rel="stylesheet" href="css/design-system.css?v=5">
 
 <link rel="prefetch" href="./foods.html">
@@ -85,7 +85,7 @@
   <div class="title-buttons">
    <button id="helpBtn" aria-label="help"></button>
    <button id="shareBtn" aria-label="share"></button>
-   <button id="dataSyncBtn" aria-label="data sync"></button>
+   <button id="dataSyncBtn" aria-label="backup and device transfer"></button>
    <button id="darkToggle" aria-label="toggle dark mode"></button>
   </div>
     
@@ -294,23 +294,7 @@
         </button>
       </div>
 
-      <div class="filter" id="bulkStarRow" style="display:none;">
-        <button id="bulkCheckBtn" onclick="bulkCheck()">
-          <span class="btn-icon" data-icon="star"></span><span data-i18n="bulk_star_check">一括チェック</span>
-        </button>
-        <button id="bulkUncheckBtn" onclick="bulkUncheck()">
-          <span class="btn-icon" data-icon="starOutline"></span><span data-i18n="bulk_star_uncheck">一括解除</span>
-        </button>
-      </div>
-
-      <div class="filter" id="authBulkRow" style="display:none;">
-        <button id="bulkAuthCheckBtn" onclick="bulkAuthCheck()">
-          <span class="btn-icon" data-icon="medal"></span><span data-i18n="bulk_auth_check">一括チェック</span>
-        </button>
-        <button id="bulkAuthUncheckBtn" onclick="bulkAuthUncheck()">
-          <span class="btn-icon" data-icon="medalOutline"></span><span data-i18n="bulk_auth_uncheck">一括解除</span>
-        </button>
-      </div>
+      <p class="bulk-accordion-hint" id="bulkAccordionHint" style="display:none;"></p>
 
     </div>
   </div>
@@ -318,6 +302,36 @@
 </div>
 
 </div>
+
+  <!-- ── 絞り込み状態の要約（アコーディオンを閉じても常に見える） ── -->
+  <div class="filter-summary" id="filterSummary">
+    <div class="filter-summary-chips" id="filterSummaryChips"></div>
+    <div class="filter-summary-meta">
+      <span class="filter-summary-sort" id="filterSummarySort"></span>
+      <span class="filter-summary-count" id="filterSummaryCount"></span>
+    </div>
+  </div>
+
+  <!-- ── 複数選択モード中の状態・操作バー（アコーディオンを閉じても常に見える） ── -->
+  <div class="bulk-status-bar" id="bulkStatusBar" style="display:none;">
+    <div class="bulk-status-top">
+      <span class="bulk-status-count" id="bulkStatusCount"></span>
+      <div class="bulk-status-top-actions">
+        <button type="button" class="filter-chip" id="bulkClearSelectionBtn" onclick="clearBulkSelection()"></button>
+        <button type="button" class="filter-chip filter-chip-clear-all" id="bulkExitModeBtn" onclick="toggleMultiSelect()"></button>
+      </div>
+    </div>
+    <div class="bulk-action-row">
+      <button type="button" class="bulk-action-btn" id="bulkCheckBtnBar" onclick="bulkCheck()"></button>
+      <button type="button" class="bulk-action-btn" id="bulkUncheckBtnBar" onclick="bulkUncheck()"></button>
+      <button type="button" class="bulk-action-btn" id="bulkAuthCheckBtnBar" onclick="bulkAuthCheck()"></button>
+      <button type="button" class="bulk-action-btn" id="bulkAuthUncheckBtnBar" onclick="bulkAuthUncheck()"></button>
+    </div>
+    <div class="bulk-undo-row" id="bulkUndoRow" style="display:none;">
+      <span id="bulkUndoText"></span>
+      <button type="button" class="bulk-undo-btn" id="bulkUndoBtn"></button>
+    </div>
+  </div>
 
   <div id="list" class="grid"></div>
   <div id="endedList"></div>
@@ -470,12 +484,13 @@ text-align:left;
 複数選択→一括チェックも可能です。</span></p>
 
 <p><strong><span class="help-icon" data-icon="checkSquare"></span><span data-i18n="help_multi_title">複数選択機能</span></strong><br>
-<span data-i18n="help_multi_body_1">複数選択機能は手順がやや複雑なので説明します。</span><br>
+<span data-i18n="help_multi_body_1">複数選択機能の使い方を説明します。</span><br>
 <span data-i18n="help_multi_body_2">１．複数選択を押すと複数選択モードになります。</span><br>
-<span data-i18n="help_multi_body_3">２．複数選択モードの状態で、チェックする生き物を全部タップします。</span><br>
-<span data-i18n="help_multi_body_4">３．タップし終えたら、星5または認証の一括チェックボタン押します。</span><br>
-<span data-i18n="help_multi_body_5">４．一括チェックが終わったら、もう一度複数選択ボタンを押します。</span><br>
-<span data-i18n="help_multi_body_6">これで完了です！星5と認証は同時にチェックはできないのでご了承ください。</span></p>
+<span data-i18n="help_multi_body_3">２．複数選択モードの状態で、対象の生き物を全部タップします（選択中の件数が一覧の上に表示されます）。</span><br>
+<span data-i18n="help_multi_body_4">３．タップし終えたら、一覧の上に表示される操作バーから「★5達成にする」「認証済みにする」などを押します。</span><br>
+<span data-i18n="help_multi_body_5">４．間違えた場合は、操作バーに表示される「元に戻す」を押すと直前の変更を取り消せます。</span><br>
+<span data-i18n="help_multi_body_6">５．終わったら操作バーの「選択終了」を押すと複数選択モードが終わります。</span><br>
+<span data-i18n="help_multi_body_7">★5と認証は同時にチェックはできないのでご了承ください。</span></p>
 
 <p><strong><span class="help-icon" data-icon="level"></span><span data-i18n="help_level_title">レベル範囲</span></strong><br>
 <span data-i18n="help_level_body">表示するLvを絞り込めます。</span></p>
@@ -490,8 +505,8 @@ text-align:left;
 <span data-i18n="help_share_body">シェアボタンを押すとプロフィールカードメーカーが開きます。<br>
 図鑑・料理・園芸・実績の進捗をまとめたシェア画像を作成できます。</span></p>
 
-<p><strong><span class="help-icon" data-icon="download"></span><span data-i18n="help_sync_title">データ同期</span></strong><br>
-<span data-i18n="help_sync_body">上部のボタンから、コンプ状況や設定などのデータをファイルに書き出したり読み込んだりできます。機種変更やブラウザの変更時のバックアップにご利用ください。</span></p>
+<p><strong><span class="help-icon" data-icon="download"></span><span data-i18n="help_sync_title">バックアップ・端末移行</span></strong><br>
+<span data-i18n="help_sync_body">上部のボタンから、コンプ状況や設定などのデータをファイルに書き出したり読み込んだりできます。自動では同期されないため、機種変更やブラウザの変更時は、あらかじめバックアップを書き出しておいてください。</span></p>
 
 <p><strong><span class="help-icon" data-icon="moon"></span><span data-i18n="help_theme_title">ダークモード・言語</span></strong><br>
 <span data-i18n="help_theme_body">上部のボタンでダークモードを切り替えられます。言語は日本語 / English / 한국어 / ไทย / 简体中文 / 繁體中文に対応しています。</span></p>
@@ -543,11 +558,10 @@ overflow-y:auto;
 text-align:left;
 ">
 
-<h3 style="text-align:center;"><span id="dataSyncTitleIcon"></span><span data-i18n="data_sync_title">データ同期</span></h3>
+<h3 style="text-align:center;"><span id="dataSyncTitleIcon"></span><span data-i18n="data_sync_title">バックアップ・端末移行</span></h3>
 
 <p style="font-size:12px; line-height:1.7;" data-i18n="data_sync_body">
-このサイトのデータ（コンプ状況・認証記録・料理計算機・園芸通知設定・ペット・ギフトコード受取状況・今日やることリストのチェックなど）は端末のブラウザ内にのみ保存されています。<br>
-別の端末に移したり、ブラウザのデータを消してしまう前にバックアップしたい場合は、以下から書き出し・読み込みができます。
+このサイトのデータ（コンプ状況・認証記録・料理計算機・園芸通知設定・ペット・ギフトコード受取状況・今日やることリストのチェックなど）は、自動で他の端末と同期されることはなく、この端末のこのブラウザにのみ保存されています。別の端末に移したり、ブラウザのデータを消してしまう前にバックアップしたい場合は、以下から書き出し・読み込みができます。
 </p>
 
 <button onclick="exportAllData()">
@@ -555,7 +569,7 @@ text-align:left;
 </button>
 
 <button onclick="document.getElementById('dataSyncFile').click()">
-<span class="btn-icon" data-icon="upload"></span><span data-i18n="data_sync_import">バックアップを読み込む</span>
+<span class="btn-icon" data-icon="upload"></span><span data-i18n="data_sync_import">バックアップを読み込む（上書き）</span>
 </button>
 
 <p style="font-size:10px; opacity:0.6; margin-top:10px;" data-i18n="data_sync_note">
@@ -564,6 +578,46 @@ text-align:left;
 
 <div style="text-align:center; margin-top:16px;">
 <button class="modal-close-btn" onclick="closeDataSyncModal()" data-i18n="modal_close">閉じる</button>
+</div>
+
+</div>
+</div>
+
+<!-- バックアップ読み込み前の確認（上書きされることと、先にバックアップを取る選択肢を明示する） -->
+<div id="dataSyncImportConfirmModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(4px);
+z-index:3100;
+">
+
+<div class="modal-box" style="
+width:90%;
+max-width:340px;
+margin:70px auto;
+padding:20px;
+border-radius:28px;
+text-align:left;
+">
+
+<h3 style="text-align:center;" data-i18n="data_sync_import_confirm_title">読み込みの確認</h3>
+
+<p style="font-size:12px; line-height:1.7;" data-i18n="data_sync_import_confirm_body">
+読み込むと現在のデータは上書きされます。必要であれば、読み込む前に今のデータをバックアップとして書き出せます。
+</p>
+
+<button onclick="confirmImportWithBackup()">
+<span class="btn-icon" data-icon="download"></span><span data-i18n="data_sync_import_backup_first">バックアップしてから読み込む</span>
+</button>
+
+<button onclick="confirmImportProceed()">
+<span class="btn-icon" data-icon="upload"></span><span data-i18n="data_sync_import_proceed">そのまま読み込む</span>
+</button>
+
+<div style="text-align:center; margin-top:16px;">
+<button class="modal-close-btn" onclick="cancelPendingImport()" data-i18n="data_sync_import_cancel">キャンセル</button>
 </div>
 
 </div>
@@ -616,7 +670,7 @@ text-align:left;
 <script src="js/toast.js"></script>
 <script src="js/tutorial.js"></script>
 <script src="js/bug-timer.js"></script>
-<script src="js/main.js?v=48"></script>
+<script src="js/main.js?v=49"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

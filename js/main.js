@@ -22,6 +22,8 @@ let weatherMode = "current";
 // "only" = 今の天気でしか出ないやつ
 let multiSelectMode = false;
 let selectedItems = {};
+let _lastVisibleNames = null;
+let activeBulkUndo = null;
 
 let currentZone="";
 let currentWeather="";
@@ -548,6 +550,100 @@ function sortList(arr){
   return out;
 }
 
+// 現在適用中の絞り込み条件を、解除可能なチップのリストとして返す。
+// 並び替え・サーバー・言語・テーマ・表示サイズ・進捗記録は対象外（既定値のまま個別解除しない）
+const TYPE_FILTER_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥", sand:"砂像", snow:"雪像", shell:"貝殻" };
+function getActiveFilterChips(){
+  const chips = [];
+
+  if(currentFilter !== "all"){
+    chips.push({
+      label: T("filter_"+currentFilter, TYPE_FILTER_FALLBACKS[currentFilter] || currentFilter),
+      onClear: () => setFilter("all"),
+    });
+  }
+
+  if(weatherMode !== "current"){
+    const modeLabel = weatherMode === "only"
+      ? T("weather_only","今の天気限定")
+      : T("weather_hidden","今は出現しない");
+    chips.push({ label: modeLabel, onClear: () => setWeatherMode("current") });
+  }
+
+  if(limitedOnly){
+    chips.push({
+      label: T("filter_limited_only","シーズン・フェス限定のみ"),
+      onClear: () => setLimitedOnly(false),
+    });
+  }
+
+  if(minLevel > 1 || maxLevel < 14){
+    chips.push({
+      label: T("level_range_text", `Lv.${minLevel}〜${maxLevel}`, {min:minLevel, max:maxLevel}),
+      onClear: () => {
+        levelMin.value = 1;
+        levelMax.value = 14;
+        updateLevelRange();
+      },
+    });
+  }
+
+  const keyword = searchInput.value;
+  if(keyword){
+    chips.push({
+      label: T("filter_summary_search", `検索：${keyword}`, {keyword}),
+      onClear: () => clearBtn.onclick(),
+    });
+  }
+
+  return chips;
+}
+
+// 絞り込み条件のみ既定値へ戻す（並び替え・サーバー・言語・テーマ・表示サイズ・進捗記録は対象外）
+function clearAllFilters(){
+  setFilter("all");
+  setWeatherMode("current");
+  setLimitedOnly(false);
+  searchInput.value = "";
+  miniSearch.value = "";
+  localStorage.removeItem("searchKeyword");
+  clearBtn.style.display = "none";
+  levelMin.value = 1;
+  levelMax.value = 14;
+  updateLevelRange();
+}
+
+const SORT_LABEL_FALLBACKS = {
+  book: "図鑑順",
+  level: "レベル順",
+  unchecked: "未コンプ順",
+  unauth: "未認証順",
+};
+// 絞り込みチップ・結果件数・現在の並び替えを表示する（絞り込みパネルを閉じていても常に見える）
+function renderFilterSummary(activeChips, resultCount){
+  const chipsEl = document.getElementById("filterSummaryChips");
+  const countEl = document.getElementById("filterSummaryCount");
+  const sortEl = document.getElementById("filterSummarySort");
+  if(!chipsEl || !countEl || !sortEl) return;
+
+  chipsEl.innerHTML = activeChips.map((c,i) => `
+    <button type="button" class="filter-chip" data-chip-index="${i}" aria-label="${T("filter_chip_remove_aria", `${c.label}の絞り込みを解除`, {label:c.label})}">
+      <span>${c.label}</span>${icon("close",{size:10})}
+    </button>
+  `).join("") + (activeChips.length ? `<button type="button" class="filter-chip filter-chip-clear-all" id="clearAllFiltersBtn">${T("filter_clear_all","絞り込みを解除")}</button>` : "");
+
+  chipsEl.querySelectorAll(".filter-chip[data-chip-index]").forEach(btn => {
+    btn.onclick = () => activeChips[Number(btn.dataset.chipIndex)].onClear();
+  });
+  const clearAllBtn = document.getElementById("clearAllFiltersBtn");
+  if(clearAllBtn) clearAllBtn.onclick = clearAllFilters;
+
+  sortEl.textContent = T("filter_summary_sort", `並び替え：${T("sort_"+currentSort, SORT_LABEL_FALLBACKS[currentSort])}`, {
+    sort: T("sort_"+currentSort, SORT_LABEL_FALLBACKS[currentSort]),
+  });
+  countEl.textContent = T("filter_result_count", `${resultCount}件`, {count:resultCount});
+}
+
 // 一覧カード用の軽量サムネイル画像パスを返す（詳細モーダルは元画像のまま）
 function thumbSrc(path){
   if(!path) return path;
@@ -619,6 +715,7 @@ function createCard(c){
         "selected",
         selectedItems[c.name]
       );
+      updateBulkStatusBar();
       return;
     }
     openModal(c);
@@ -639,6 +736,7 @@ function createCard(c){
       "checkedData",
       JSON.stringify(checkedData)
     );
+    invalidateBulkUndo();
     render();
   };
 
@@ -651,6 +749,7 @@ function createCard(c){
       if(guardToggle()) return;
       authData[c.name] = !authData[c.name];
       localStorage.setItem("authData", JSON.stringify(authData));
+      invalidateBulkUndo();
       render();
     };
   }
@@ -765,15 +864,39 @@ function render(){
  list = applyCommonFilters(list);
  list = sortList(list);
 
+ // 検索・種類変更などで一覧の中身が変わった場合は、選択中の対象を見失わないよう選択を解除する
+ // （見えなくなった対象を意図せず一括更新しないため）
+ if(multiSelectMode && _lastVisibleNames){
+   const hasSelection = Object.keys(selectedItems).some(name => selectedItems[name]);
+   if(hasSelection){
+     const newNames = new Set(list.map(c => c.name));
+     const stillAllVisible = Object.keys(selectedItems).every(
+       name => !selectedItems[name] || newNames.has(name)
+     );
+     if(!stillAllVisible){
+       selectedItems = {};
+       showToast(T("bulk_selection_cleared_by_filter","一覧が変わったため選択を解除しました"));
+     }
+   }
+ }
+ _lastVisibleNames = new Set(list.map(c => c.name));
+
  const el=document.getElementById("list");
  el.innerHTML="";
 
+ const activeChips = getActiveFilterChips();
+
  // 出現なし
  if(list.length===0){
-  el.innerHTML=`<p>${T("no_results","出現なし")}</p>`;
+  el.innerHTML = activeChips.length
+   ? `<div class="no-results-block"><p>${T("no_results_filtered","条件に合う生き物がいません")}</p><button type="button" class="filter-chip filter-chip-clear-all" onclick="clearAllFilters()">${T("filter_clear_all","絞り込みを解除")}</button></div>`
+   : `<p class="no-results-block">${T("no_results","出現なし")}</p>`;
  } else {
   list.forEach(c => el.appendChild(createCard(c)));
  }
+
+ renderFilterSummary(activeChips, list.length);
+ updateBulkStatusBar();
 
  // 終了したフェス・シーズン限定（「今は出現しない」表示時のみ、最下部に表示）
  const endedEl = document.getElementById("endedList");
@@ -1196,75 +1319,160 @@ function closeMapEmbed(){
   unlockBodyScroll();
 }
 
+// 複数選択機能の説明は、ヘルプモーダルに埋もれさせず、この機能を
+// 初めて開いた場面で一度だけ短く表示する（初回案内の3点には含めない）
+const BULK_SELECT_TUTORIAL_DONE_KEY = "hatopiIndex_bulkSelectTutorialDone";
+const BULK_SELECT_TUTORIAL_STEPS = [
+  { selector: "#bulkStatusBar", titleKey: "tutorial_bulk_step1_title", titleFallback: "複数選択の使い方", textKey: "tutorial_bulk_step1_body", textFallback: "選択した生き物をまとめて★5達成・認証済みにできます。操作はこのバーから行えます。" },
+];
+
 function toggleMultiSelect(){
   multiSelectMode = !multiSelectMode;
   document.getElementById("multiBtn")
     .classList.toggle("active", multiSelectMode);
-  document.getElementById("bulkStarRow").style.display =
-    multiSelectMode ? "flex" : "none";
-  document.getElementById("authBulkRow").style.display =
-    multiSelectMode ? "flex" : "none";
   if(!multiSelectMode){
     selectedItems = {};
+    invalidateBulkUndo();
   }
   render();
+  if(multiSelectMode){
+    maybeStartPageTutorial(BULK_SELECT_TUTORIAL_DONE_KEY, BULK_SELECT_TUTORIAL_STEPS);
+  }
 }
 
-function bulkCheck(){
-  Object.keys(selectedItems).forEach(name=>{
-    if(selectedItems[name]){
-      checkedData[name] = true;
-    }
-  });
-  localStorage.setItem(
-    "checkedData",
-    JSON.stringify(checkedData)
-  );
+// 選択は解除するが、複数選択モード自体は終了しない
+function clearBulkSelection(){
   selectedItems = {};
-  render();
-} 
-
-function bulkUncheck(){
-  Object.keys(selectedItems).forEach(name=>{
-    if(selectedItems[name]){
-      checkedData[name] = false;
-    }
+  document.querySelectorAll("#list .item.selected").forEach(el=>{
+    el.classList.remove("selected");
   });
-  localStorage.setItem(
-    "checkedData",
-    JSON.stringify(checkedData)
-  );
-  selectedItems = {};
-  render();
+  updateBulkStatusBar();
 }
 
-function bulkAuthCheck(){
-  Object.keys(selectedItems).forEach(name=>{
-    if(selectedItems[name]){
-      const c = creatures.find(c => c.name === name);
-      if(c && c.auth !== false){
-        authData[name] = true;
-      }
-    }
+// 複数選択モード・選択件数・一括操作バーの表示を常に最新状態に保つ
+// （絞り込みパネルやアコーディオンを閉じていても状態が分かるようにするため）
+function updateBulkStatusBar(){
+  const bar = document.getElementById("bulkStatusBar");
+  const hint = document.getElementById("bulkAccordionHint");
+  if(!bar) return;
+
+  if(!multiSelectMode){
+    bar.style.display = "none";
+    if(hint) hint.style.display = "none";
+    return;
+  }
+
+  bar.style.display = "block";
+  if(hint){
+    hint.style.display = "block";
+    hint.textContent = T("bulk_accordion_hint","選択中の操作は一覧の上に表示される操作バーから行えます。");
+  }
+
+  const count = Object.values(selectedItems).filter(Boolean).length;
+  document.getElementById("bulkStatusCount").textContent =
+    T("bulk_selected_count", `${count}件選択中`, {count});
+
+  document.getElementById("bulkClearSelectionBtn").textContent =
+    T("bulk_clear_selection","選択を解除");
+  document.getElementById("bulkExitModeBtn").textContent =
+    T("bulk_exit_mode","選択終了");
+  document.getElementById("bulkCheckBtnBar").textContent =
+    T("bulk_star_check_label","★5達成にする");
+  document.getElementById("bulkUncheckBtnBar").textContent =
+    T("bulk_star_uncheck_label","★5記録を解除");
+  document.getElementById("bulkAuthCheckBtnBar").textContent =
+    T("bulk_auth_check_label","認証済みにする");
+  document.getElementById("bulkAuthUncheckBtnBar").textContent =
+    T("bulk_auth_uncheck_label","認証記録を解除");
+
+  const disabled = count === 0;
+  ["bulkCheckBtnBar","bulkUncheckBtnBar","bulkAuthCheckBtnBar","bulkAuthUncheckBtnBar"].forEach(id=>{
+    document.getElementById(id).disabled = disabled;
   });
-  localStorage.setItem("authData", JSON.stringify(authData));
-  selectedItems = {};
-  render();
 }
 
-function bulkAuthUncheck(){
-  Object.keys(selectedItems).forEach(name=>{
-    if(selectedItems[name]){
-      const c = creatures.find(c => c.name === name);
-      if(c && c.auth !== false){
-        authData[name] = false;
-      }
+// 一括操作の「元に戻す」が、後から行われた別の記録変更を巻き戻してしまわないよう無効化する
+function invalidateBulkUndo(){
+  activeBulkUndo = null;
+  const row = document.getElementById("bulkUndoRow");
+  if(row) row.style.display = "none";
+}
+
+// ★5・認証の一括設定/解除の共通処理。
+// 対象ごとの変更前の値を保存しておき、「元に戻す」で一律反転ではなく元の値へ復元できるようにする
+function applyBulkAction(kind, newValue){
+  const names = Object.keys(selectedItems).filter(name => selectedItems[name]);
+  if(names.length === 0) return;
+
+  const store = kind === "auth" ? authData : checkedData;
+  const storageKey = kind === "auth" ? "authData" : "checkedData";
+  const snapshot = {};
+  let changedCount = 0;
+
+  names.forEach(name=>{
+    if(kind === "auth"){
+      const c = creatures.find(cr => cr.name === name);
+      if(!c || c.auth === false) return;
     }
+    snapshot[name] = !!store[name];
+    store[name] = newValue;
+    changedCount++;
   });
-  localStorage.setItem("authData", JSON.stringify(authData));
+
+  if(changedCount === 0) return;
+
+  localStorage.setItem(storageKey, JSON.stringify(store));
   selectedItems = {};
   render();
+
+  if(changedCount > 0){
+    showBulkUndoBar(kind, storageKey, snapshot, newValue, changedCount);
+  }
 }
+
+function showBulkUndoBar(kind, storageKey, snapshot, newValue, count){
+  const row = document.getElementById("bulkUndoRow");
+  const textEl = document.getElementById("bulkUndoText");
+  const btn = document.getElementById("bulkUndoBtn");
+  if(!row || !textEl || !btn) return;
+
+  const messageKey = kind === "auth"
+    ? (newValue ? "bulk_result_auth_check" : "bulk_result_auth_uncheck")
+    : (newValue ? "bulk_result_star_check" : "bulk_result_star_uncheck");
+  const messageFallback = kind === "auth"
+    ? (newValue ? `${count}件を認証済みにしました` : `${count}件の認証記録を解除しました`)
+    : (newValue ? `${count}件を★5達成にしました` : `${count}件の★5記録を解除しました`);
+
+  textEl.textContent = T(messageKey, messageFallback, {count});
+  btn.textContent = T("bulk_undo","元に戻す");
+  row.style.display = "flex";
+
+  activeBulkUndo = { storageKey, snapshot };
+
+  clearTimeout(row._hideTimer);
+  row._hideTimer = setTimeout(()=>{
+    row.style.display = "none";
+    activeBulkUndo = null;
+  }, 6000);
+
+  btn.onclick = ()=>{
+    if(!activeBulkUndo || activeBulkUndo.snapshot !== snapshot) return;
+    const store = storageKey === "authData" ? authData : checkedData;
+    Object.keys(snapshot).forEach(name=>{
+      store[name] = snapshot[name];
+    });
+    localStorage.setItem(storageKey, JSON.stringify(store));
+    clearTimeout(row._hideTimer);
+    row.style.display = "none";
+    activeBulkUndo = null;
+    render();
+  };
+}
+
+function bulkCheck(){ applyBulkAction("star", true); }
+function bulkUncheck(){ applyBulkAction("star", false); }
+function bulkAuthCheck(){ applyBulkAction("auth", true); }
+function bulkAuthUncheck(){ applyBulkAction("auth", false); }
 
 
 const shareBtn = document.getElementById("shareBtn");
@@ -1464,12 +1672,12 @@ if(dataSyncModal){
 
 // ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
 const INDEX_TUTORIAL_DONE_KEY = "hatopiIndex_tutorialDone";
+// 初回案内は要点を3つに絞る（検索・種類切り替え等の細かい操作説明は
+// ヘルプモーダル（#helpBtn）に残したままなので、ここでは繰り返さない）
 const INDEX_TUTORIAL_STEPS = [
-  { selector: "#search", titleKey: "tutorial_index_step1_title", titleFallback: "① 検索する", textKey: "tutorial_index_step1_body", textFallback: "名前や出現場所のキーワードで検索できます。" },
-  { selector: "#typeFilterRow", titleKey: "tutorial_index_step2_title", titleFallback: "② 種類を切り替え", textKey: "tutorial_index_step2_body", textFallback: "魚・虫・野鳥に加え、砂像・雪像・貝殻の表示にも切り替えられます。" },
-  { selector: "#filterAccordionToggle", titleKey: "tutorial_index_step3_title", titleFallback: "③ 絞り込み・並び替え", textKey: "tutorial_index_step3_body", textFallback: "出現モードやレベル範囲、並び順などをここで細かく設定できます。" },
-  { selector: "#list", titleKey: "tutorial_index_step4_title", titleFallback: "④ 一覧をタップ", textKey: "tutorial_index_step4_body", textFallback: "気になる生き物をタップすると、出現条件や売価などの詳細が確認できます。" },
-  { selector: "#helpBtn", titleKey: "tutorial_index_step5_title", titleFallback: "⑤ 使い方をもっと見る", textKey: "tutorial_index_step5_body", textFallback: "このボタンからいつでも詳しい使い方を見返せます。" },
+  { selector: "#list", titleKey: "tutorial_index_step1_title", titleFallback: "①今、捕まえられる生き物を探せる", textKey: "tutorial_index_step1_body", textFallback: "天気や時間に合わせて、今出現する生き物の一覧が表示されます。上の検索や絞り込みで、探したい生き物だけに絞ることもできます。" },
+  { selector: ".check-btn", titleKey: "tutorial_index_step2_title", titleFallback: "②★5・認証の進捗を記録できる", textKey: "tutorial_index_step2_body", textFallback: "カードの★ボタンで★5達成、認証バッジのボタンで認証マスターを記録できます。記録はこの端末に保存されます。" },
+  { selector: "#dailyTasksBtn", titleKey: "tutorial_index_step3_title", titleFallback: "③今日やることを確認できる", textKey: "tutorial_index_step3_body", textFallback: "今日の天気・場所や、期限が近いイベントなど、今日やることをまとめて確認できます。" },
 ];
 
 // 初期化
