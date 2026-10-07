@@ -22,6 +22,7 @@ const videoData = [
   { category:"rainbow_day", date:"2026-09-08", videoId:"Y2MDqNOhr60", note:"12:00~18:00" },
   { category:"rainbow_day", date:"2026-09-20", videoId:"9B9TLChrosA", note:"18:00~24:00" },
   { category:"rainbow_day", date:"2026-09-30", videoId:"kB1-mSjtb50", note:"12:00~18:00" },
+  { category:"rainbow_day", date:"2026-10-07", videoId:"dWu9eYCAAyE", note:"12:00~18:00" },
   { category:"pink_bubble", date:"2026-03-28", videoId:"_R5hpYsCPBc", note:"3/2~4/3" },
   { category:"pink_bubble", date:"2026-04-04", videoId:"6l-OgjGEZCM", note:"4/4~4/10" },
   { category:"pink_bubble", date:"2026-04-11", videoId:"_GEntp084Nw", note:"4/11~4/17" },
