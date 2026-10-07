@@ -1476,7 +1476,7 @@ function bulkAuthUncheck(){ applyBulkAction("auth", false); }
 
 
 const shareBtn = document.getElementById("shareBtn");
-shareBtn.innerHTML = icon("share");
+shareBtn.innerHTML = icon("trophy");
 
 shareBtn.onclick = () => {
   location.href = "./profile-card.html";
