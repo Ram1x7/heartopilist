@@ -1351,7 +1351,7 @@ function renderModal(){
     <div class="f-price-card">
       <div class="f-info-row" style="margin-bottom:8px;">
         <span class="f-info-label">${T("food_cost","材料費")}</span>
-        <span class="f-info-value">${coinText(f.cost || 0)}</span>
+        <span class="f-info-value">${f.cost != null ? coinText(f.cost) : T("food_unconfirmed","未確認")}</span>
       </div>
       ${priceTableHTML}
     </div>
@@ -1359,7 +1359,7 @@ function renderModal(){
     <div class="f-info" style="margin-bottom:12px;">
       <div class="f-info-row">
         <span class="f-info-label">${T("food_time","調理時間")}</span>
-        <span class="f-info-value">${formatTime(f.time)}</span>
+        <span class="f-info-value">${f.time != null ? formatTime(f.time) : T("food_unconfirmed","未確認")}</span>
       </div>
       ${f.level != null ? `
       <div class="f-info-row">
