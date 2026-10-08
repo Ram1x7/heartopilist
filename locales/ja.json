@@ -88,6 +88,7 @@
   "food_unknown": "不明",
   "food_instant": "即時",
   "food_unconfirmed": "未確認",
+  "food_restore": "回復量",
   "food_min": "分",
   "food_hour": "時間",
   "codes_page_title": "ギフトコード",

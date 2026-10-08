@@ -217,18 +217,20 @@ body.dark .f-info-value.profit-minus{ color:var(--dark-highlight); }
 .f-price-table th{
   background:var(--card-sub);
   color:var(--text-sub);
-  padding:5px 6px;
+  padding:5px 3px;
   text-align:center;
   font-weight:500;
+  white-space:nowrap;
 }
 
 body.dark .f-price-table th{ background:var(--dark-card-alt); }
 
 .f-price-table td{
   text-align:center;
-  padding:5px 6px;
+  padding:5px 3px;
   border-top:1px solid var(--border);
   color:var(--text);
+  white-space:nowrap;
 }
 
 body.dark .f-price-table td{ color:#ece4d4; border-color:#46423b; }
@@ -1287,16 +1289,21 @@ function renderModal(){
   const hasFesField = f.fesCoinPrice !== undefined;
   const fesPrices5 = f.fesCoinPrice != null ? derivePrices(f.fesCoinPrice, "food", f.rarity) : [null,null,null,null,null];
 
+  // TH.GL掲載の回復量をそのまま表示する（★1の値から倍率計算はしない）
+  const kaifukuText = v => `${currencyIcon("kaifuku")}${v.toLocaleString()}`;
+
   const priceRows = [0,1,2,3,4].map(i => {
     const p = prices5[i];
     if(p == null) return ""; // その星が存在しない場合は行ごと省略
     const profit = p - costVal;
     const profitClass = profit >= 0 ? "profit-plus" : "profit-minus";
     const profitText = (profit >= 0 ? "+" : "-") + coinText(Math.abs(profit));
-    const fesCell = hasFesField
-      ? `<td>${fesPrices5[i] != null ? fesCoinText(fesPrices5[i]) : "-"}</td>`
-      : "";
-    return `<tr><td>☆${i+1}</td><td>${coinText(p)}</td><td class="${profitClass}">${profitText}</td>${fesCell}</tr>`;
+    // フェスコイン列はhas-fesが無い料理でもCSS側のnth-child指定で正しく隠れるよう、
+    // 中身が無くても必ずtdを出力する（省略すると後続の回復量列が1つ前に詰まってずれる）
+    const fesCell = `<td>${hasFesField ? (fesPrices5[i] != null ? fesCoinText(fesPrices5[i]) : "-") : ""}</td>`;
+    const restoreValue = Array.isArray(f.restore) ? f.restore[i] : null;
+    const restoreCell = `<td>${Number.isFinite(restoreValue) ? kaifukuText(restoreValue) : T("food_unconfirmed","未確認")}</td>`;
+    return `<tr><td>☆${i+1}</td><td>${coinText(p)}</td><td class="${profitClass}">${profitText}</td>${fesCell}${restoreCell}</tr>`;
   }).join("");
 
   const priceTableHTML = `
@@ -1306,6 +1313,7 @@ function renderModal(){
         <th>${T("food_price_col_price","売価")}</th>
         <th>${T("food_price_col_profit","利益")}</th>
         <th>${T("food_price_col_fes","フェスコイン")}</th>
+        <th>${T("food_restore","回復量")}</th>
       </tr>
       ${priceRows}
     </table>
