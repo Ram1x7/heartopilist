@@ -84,6 +84,17 @@ input[type="range"]{
   touch-action:manipulation;
 }
 
+/* 画像の長押しによる保存メニュー（iOS Safariの「写真に保存」等）を抑止する。
+   Android Chrome等、OS側の長押しメニューはCSSだけでは完全には防げないが、
+   それでも長押しによるドラッグ開始・テキスト選択ハイライトは防げるため、
+   全ページ共通で画像に適用する */
+img{
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
 @keyframes fadeIn{
   from{ opacity:0; }
   to{ opacity:1; }
