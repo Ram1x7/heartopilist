@@ -4145,14 +4145,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1091.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：ホオズキ15分（フェス限定作物の標準値、果物枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[240],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","果物ならなんでもOK"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","果物ならなんでもOK"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/all_fruit.jpg" }
@@ -4167,14 +4167,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1092.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：ホオズキ15分・リンゴは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","リンゴ(種@160)"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","リンゴ(種@160)"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/ringo.jpg" }
@@ -4183,23 +4183,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Mandarin Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Mandarin Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"Cape Gooseberry & Orange Hot Cocoa",
+  nameI18n:{"ja":"","en":"Cape Gooseberry & Orange Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1093.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：ホオズキ15分・オレンジは作物timerなし（対象外、他レシピでも(@価格)表記なし）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","マンダリン"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","オレンジ"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
-    { image:"./images/materials/mandarin.png" }
+    { image:"./images/materials/orange.jpg" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
@@ -4211,14 +4211,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1094.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：ホオズキ15分・ブルーベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[240],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","ブルーベリー"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","ブルーベリー"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/blueberry.png" }
@@ -4233,14 +4233,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1095.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：ホオズキ15分・ラズベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","ラズベリー"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","ラズベリー"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/raspberry.png" }
@@ -4255,14 +4255,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1096.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:360, // 素材の成長時間から算出：ホオズキ15分・いちご360分（6時間）→長い方の360分
   rarity: [true,true,true,true,true],
   prices:[580],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","イチゴ(種@125)"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","イチゴ(種@125)"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/strawberry.jpg" }
@@ -4277,14 +4277,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1097.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:600, // 素材の成長時間から算出：ホオズキ15分・ブドウ600分（10時間）→長い方の600分
   rarity: [true,true,true,true,true],
   prices:[690],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","ブドウ(種@160)"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","ブドウ(種@160)"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/grape.jpg" }
@@ -4299,14 +4299,14 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1098.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:30, // 素材の成長時間から算出：ホオズキ15分・パイナップル30分→長い方の30分
   rarity: [true,true,true,true,true],
   prices:[260],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ケープグーズベリー","シナモンココアパウダー","牛乳(@50)","パイナップル(種@15)"],
-  level:null, // 開放レベル未確認
+  materials:["ホオズキ","シナモンココアパウダー","牛乳(@50)","パイナップル(種@15)"],
+  level:1,
   materials_image:[
-    { image:"./images/materials/cape_gooseberry.png" },
+    { image:"./images/materials/hoozuki.png" },
     { image:"./images/materials/cinnamon_cocoa_powder.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/pineapple.jpg" }
@@ -4321,15 +4321,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1099.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、野菜枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[240],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","パンプキン","牛乳(@50)","野菜ならなんでもOK"],
-  level:null, // 開放レベル未確認
+  materials:["ハニーマッシュルーム","かぼちゃ","牛乳(@50)","野菜ならなんでもOK"],
+  level:1,
   materials_image:[
     { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/all_vege.jpg" }
   ],
@@ -4343,15 +4343,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1100.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:60, // 素材の成長時間から算出：かぼちゃ15分・ジャガイモ60分→長い方の60分
   rarity: [true,true,true,true,true],
   prices:[300],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","パンプキン","牛乳(@50)","ジャガイモ(種@30)"],
-  level:null, // 開放レベル未確認
+  materials:["ハニーマッシュルーム","かぼちゃ","牛乳(@50)","ジャガイモ(種@30)"],
+  level:1,
   materials_image:[
     { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/potato.jpg" }
   ],
@@ -4365,15 +4365,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1101.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:720, // 素材の成長時間から算出：かぼちゃ15分・トウモロコシ720分（12時間）→長い方の720分
   rarity: [true,true,true,true,true],
   prices:[730],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","パンプキン","牛乳(@50)","トウモロコシ(種@170)"],
-  level:null, // 開放レベル未確認
+  materials:["ハニーマッシュルーム","かぼちゃ","牛乳(@50)","トウモロコシ(種@170)"],
+  level:1,
   materials_image:[
     { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/corn.jpg" }
   ],
@@ -4387,15 +4387,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1102.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：かぼちゃ15分・トマト15分→どちらも15分
   rarity: [true,true,true,true,true],
   prices:[240],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","パンプキン","牛乳(@50)","トマト(種@10)"],
-  level:null, // 開放レベル未確認
+  materials:["ハニーマッシュルーム","かぼちゃ","牛乳(@50)","トマト(種@10)"],
+  level:1,
   materials_image:[
     { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/tomato.jpg" }
   ],
@@ -4409,15 +4409,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1103.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:120, // 素材の成長時間から算出：かぼちゃ15分・ニンジン120分（2時間）→長い方の120分
   rarity: [true,true,true,true,true],
   prices:[370],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","パンプキン","牛乳(@50)","ニンジン(種@25)"],
-  level:null, // 開放レベル未確認
+  materials:["ハニーマッシュルーム","かぼちゃ","牛乳(@50)","ニンジン(種@25)"],
+  level:1,
   materials_image:[
     { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/carrot.jpg" }
   ],
@@ -4431,15 +4431,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1104.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:420, // 素材の成長時間から算出：かぼちゃ15分・ナス420分（7時間）→長い方の420分
   rarity: [true,true,true,true,true],
   prices:[620],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","パンプキン","牛乳(@50)","ナス(種@135)"],
-  level:null, // 開放レベル未確認
+  materials:["ハニーマッシュルーム","かぼちゃ","牛乳(@50)","ナス(種@135)"],
+  level:1,
   materials_image:[
     { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/eggplant.jpg" }
   ],
@@ -4453,12 +4453,12 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1105.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、コウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト","パンプキン","コウイカ"],
-  level:null, // 開放レベル未確認
+  materials:["トムヤムペースト","かぼちゃ","コウイカ"],
+  level:1,
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
@@ -4469,15 +4469,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1106.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（骨なしコウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト","パンプキン","骨なしコウイカ"],
-  level:null, // 開放レベル未確認
+  materials:["トムヤムペースト","かぼちゃ","骨なしコウイカ"],
+  level:1,
   materials_image:[
     { image:"./images/materials/tom_yum_paste.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/spineless_cuttlefish.png" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
@@ -4490,15 +4490,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1107.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（ファラオコウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト","パンプキン","ファラオコウイカ"],
-  level:null, // 開放レベル未確認
+  materials:["トムヤムペースト","かぼちゃ","ファラオコウイカ"],
+  level:1,
   materials_image:[
     { image:"./images/materials/tom_yum_paste.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/pharaoh_cuttlefish.png" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
@@ -4511,15 +4511,15 @@ const foodsData = [
   ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
   image:"./images/foods/1108.PNG",
   cost:null, // 材料費未確認（一部素材が個数・価格未公開のため算出不可）
-  time:null, // 調理時間未確認
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（ゴールデンコウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト","パンプキン","ゴールデンコウイカ"],
-  level:null, // 開放レベル未確認
+  materials:["トムヤムペースト","かぼちゃ","ゴールデンコウイカ"],
+  level:1,
   materials_image:[
     { image:"./images/materials/tom_yum_paste.png" },
-    { image:"./images/materials/pumpkin.png" },
+    { image:"./images/materials/kabocha.png" },
     { image:"./images/materials/golden_cuttlefish.png" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
@@ -4536,8 +4536,8 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[1060],
   // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["Cape Gooseberry Hot Cocoa","Cape Gooseberry Hot Cocoa","クリーミーパンプキンスープならなんでもOK","トムヤムヌードルならなんでもOK"],
-  level:null, // 開放レベル未確認
+  materials:["Cape Gooseberry Hot Cocoa","Cape Gooseberry Hot Cocoa","クリーミーかぼちゃスープならなんでもOK","トムヤムヌードルならなんでもOK"],
+  level:1,
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
