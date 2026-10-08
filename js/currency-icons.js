@@ -28,6 +28,7 @@ const CURRENCY_ICON_SRC = {
   seed_wheat: "images/currency/seed_wheat.png",
   milk: "images/currency/milk.png",
   mermaid_shippo: "images/currency/mermaid_shippo.png",
+  kaifuku: "images/currency/kaifuku.png",
 };
 
 function currencyIcon(type) {
