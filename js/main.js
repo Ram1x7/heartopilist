@@ -1992,11 +1992,15 @@ function renderWeatherCalendarDayDetail(listEl, dateKey){
       const w = hourly[hh] || "不明";
       const isNow = h === currentJstHour;
       const displayHour = typeof jstHourToServerDisplayHour === "function" ? jstHourToServerDisplayHour(h) : h;
+      // 流星雨1〜3は出現判定上は同じ扱いだが、1時間ごとの表示では強さの区別が
+      // 分かるよう元データの末尾数字をそのまま残す（他の天気名はtranslateWeatherWordのみ）
+      const meteorVariant = /^流星雨([123])$/.exec(w);
+      const hourWeatherLabel = meteorVariant ? `${translateWeatherWord(w)}${meteorVariant[1]}` : translateWeatherWord(w);
       rowsHTML += `
         <div class="weather-hour-row ${isNow ? "current-hour" : ""}">
           <span class="weather-hour-time">${displayHour}:00</span>
           <span class="weather-hour-emoji">${weatherIconHTML(w,{size:14, hour:h})}</span>
-          <span class="weather-hour-name">${translateWeatherWord(w)}</span>
+          <span class="weather-hour-name">${hourWeatherLabel}</span>
           ${isNow ? `<span class="weather-hour-now-tag">${T("forecast_now_tag","今")}</span>` : ""}
         </div>
       `;
