@@ -4942,7 +4942,7 @@ const foodsData = [
   image:"./images/foods/1106.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45576",
-  cost:null, // 材料費未確認（シリヤケイカの価格情報なしのため算出不可）
+  cost:60, // トムヤムペースト50+かぼちゃ10+シリヤケイカ0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（シリヤケイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
@@ -4965,7 +4965,7 @@ const foodsData = [
   image:"./images/foods/1107.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45577",
-  cost:null, // 材料費未確認（トラフコウイカの価格情報なしのため算出不可）
+  cost:60, // トムヤムペースト50+かぼちゃ10+トラフコウイカ0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（トラフコウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
@@ -4988,7 +4988,7 @@ const foodsData = [
   image:"./images/foods/1108.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45578",
-  cost:null, // 材料費未確認（コウイカの価格情報なしのため算出不可）
+  cost:60, // トムヤムペースト50+かぼちゃ10+コウイカ0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（コウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
