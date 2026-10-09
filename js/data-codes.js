@@ -337,6 +337,13 @@ const codesData = [
     expiry: "2026-12-04 00:59",
     active: true,
   },
+  {
+    code: "hangeulday1009",
+    reward: "願い星×10，無垢な蛍石×2，ツルツルオーク×2",
+    rewardI18n:{"ja":"願い星×10，無垢な蛍石×2，ツルツルオーク×2","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-12-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
