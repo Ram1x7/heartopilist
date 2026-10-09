@@ -1242,14 +1242,20 @@ function getCreaturesForArea(area){
   return getCreaturesForLocations(getLocationsForArea(area));
 }
 
-// mapLocationEventLinks（location文字列 -> イベントキー）の逆引き。
-// 1つのイベントキーに複数のlocation文字列が紐づくことがある
-// （例：「巣ごもりクエスト」「巣ごもりクエスト(追加段階)」は共にnest-of-hundreds）
+// mapEventQuestNamePrefixes（クエスト名プレフィックス -> イベントキー）を使って、
+// 図鑑データに実際に登場する出現場所名を前方一致で振り分ける。
+// 「虫コイコイクエスト-遺跡(追加段階)」のような派生locationも同じクエストとして
+// まとめて扱うことで、イベントマーカーの「くわしく見る」一覧に含まれるようにする
 const mapEventLocationNames = (() => {
   const map = {};
-  if(typeof mapLocationEventLinks !== "undefined"){
-    Object.entries(mapLocationEventLinks).forEach(([loc, key]) => {
-      (map[key] = map[key] || []).push(loc);
+  if(typeof mapEventQuestNamePrefixes !== "undefined"){
+    const allLocs = new Set();
+    [typeof fishData !== "undefined" ? fishData : [], typeof bugData !== "undefined" ? bugData : [], typeof birdData !== "undefined" ? birdData : []]
+      .forEach(data => data.forEach(c => { if(c.location) allLocs.add(c.location); }));
+    Object.entries(mapEventQuestNamePrefixes).forEach(([prefix, key]) => {
+      allLocs.forEach(loc => {
+        if(loc.startsWith(prefix)) (map[key] = map[key] || []).push(loc);
+      });
     });
   }
   return map;
