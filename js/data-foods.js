@@ -4583,7 +4583,7 @@ const foodsData = [
   image:"./images/foods/1091.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45556",
-  cost:null, // 材料費未確認（果物枠がワイルドカードのため算出不可）
+  cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+果物0（ワイルドカード枠は最安のブルーベリー等0円を採用）
   time:15, // 素材の成長時間から算出：ホオズキ15分（フェス限定作物の標準値、果物枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[240],
@@ -4775,7 +4775,7 @@ const foodsData = [
   image:"./images/foods/1099.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45567",
-  cost:null, // 材料費未確認（野菜枠がワイルドカードのため算出不可。ナラタケは0・かぼちゃ10・牛乳50はユーザー確認済み）
+  cost:60, // ナラタケ0+かぼちゃ10+牛乳50+野菜0（ワイルドカード枠は最安の野菜0円を採用）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、野菜枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[240],
@@ -4912,14 +4912,14 @@ const foodsData = [
   auth:false
 },
 {
-  name:"イカとトムヤムクンヌードル",
-  nameI18n:{"ja":"イカとトムヤムクンヌードル","en":"Tom Yum Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
+  name:"イカのトムヤムクンヌードル",
+  nameI18n:{"ja":"イカのトムヤムクンヌードル","en":"Tom Yum Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1105.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45575",
-  cost:null, // 材料費未確認（イカ枠がワイルドカードのため算出不可）
+  cost:60, // トムヤムペースト50+かぼちゃ10+イカ0（ワイルドカード枠は最安のイカ0円を採用）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、イカ枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
@@ -5011,7 +5011,7 @@ const foodsData = [
   image:"./images/foods/1109.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45579",
-  cost:null, // 材料費未確認（材料が他の料理そのものであり、原材料費の概念が適用できないため）
+  cost:340, // ホオズキ香るホットココア110×2+かぼちゃとキノコのクリームポタージュ60+イカのトムヤムクンヌードル60（各ワイルドカード枠は最安の料理の材料費を採用）
   time:720, // ユーザー確認済み：素材に使う各料理の調理時間のうち最も長いものを採用（かぼちゃとコーンのクリームポタージュの720分）
   rarity: [true,true,true,true,true],
   prices:[1060],
