@@ -4070,6 +4070,7 @@ const foodsData = [
   name:"サボテンフレッシュジュース",
   nameI18n:{"ja":"サボテンフレッシュジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1070.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45505",
@@ -4093,6 +4094,7 @@ const foodsData = [
   name:"サボテンリンゴジュース",
   nameI18n:{"ja":"サボテンリンゴジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1071.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45506",
@@ -4116,6 +4118,7 @@ const foodsData = [
   name:"サボテンオレンジジュース",
   nameI18n:{"ja":"サボテンオレンジジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1072.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45507",
@@ -4139,6 +4142,7 @@ const foodsData = [
   name:"サボテンブルーベリージュース",
   nameI18n:{"ja":"サボテンブルーベリージュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1073.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45508",
@@ -4162,6 +4166,7 @@ const foodsData = [
   name:"サボテンラズベリージュース",
   nameI18n:{"ja":"サボテンラズベリージュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1074.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45509",
@@ -4185,6 +4190,7 @@ const foodsData = [
   name:"サボテンイチゴジュース",
   nameI18n:{"ja":"サボテンイチゴジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1075.PNG",
   restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45510",
@@ -4208,6 +4214,7 @@ const foodsData = [
   name:"サボテンブドウジュース",
   nameI18n:{"ja":"サボテンブドウジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1076.PNG",
   restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45511",
@@ -4231,6 +4238,7 @@ const foodsData = [
   name:"サボテンパイナップルジュース",
   nameI18n:{"ja":"サボテンパイナップルジュース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1077.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45512",
@@ -4254,6 +4262,7 @@ const foodsData = [
   name:"野菜焼き肉",
   nameI18n:{"ja":"野菜焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1078.PNG",
   restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45516",
@@ -4277,6 +4286,7 @@ const foodsData = [
   name:"ジャガイモ焼き肉",
   nameI18n:{"ja":"ジャガイモ焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1079.PNG",
   restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45517",
@@ -4300,6 +4310,7 @@ const foodsData = [
   name:"トウモロコシ焼き肉",
   nameI18n:{"ja":"トウモロコシ焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1080.PNG",
   restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45518",
@@ -4323,6 +4334,7 @@ const foodsData = [
   name:"トマト焼き肉",
   nameI18n:{"ja":"トマト焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1081.PNG",
   restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45519",
@@ -4346,6 +4358,7 @@ const foodsData = [
   name:"ニンジン焼き肉",
   nameI18n:{"ja":"ニンジン焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1082.PNG",
   restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45520",
@@ -4369,6 +4382,7 @@ const foodsData = [
   name:"ナス焼き肉",
   nameI18n:{"ja":"ナス焼き肉","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1083.PNG",
   restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45521",
@@ -4392,6 +4406,7 @@ const foodsData = [
   name:"サボテンと魚のスープ",
   nameI18n:{"ja":"サボテンと魚のスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1084.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45524",
@@ -4415,6 +4430,7 @@ const foodsData = [
   name:"サボテンとペールゴールドガーのスープ",
   nameI18n:{"ja":"サボテンとペールゴールドガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1085.PNG",
   restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45525",
@@ -4438,6 +4454,7 @@ const foodsData = [
   name:"サボテンとブラウンブロッチガーのスープ",
   nameI18n:{"ja":"サボテンとブラウンブロッチガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1086.PNG",
   restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45526",
@@ -4461,6 +4478,7 @@ const foodsData = [
   name:"サボテンとシルバーガーのスープ",
   nameI18n:{"ja":"サボテンとシルバーガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1087.PNG",
   restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45527",
@@ -4484,6 +4502,7 @@ const foodsData = [
   name:"サボテンとブラックスポットガーのスープ",
   nameI18n:{"ja":"サボテンとブラックスポットガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1088.PNG",
   restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45528",
@@ -4507,6 +4526,7 @@ const foodsData = [
   name:"サボテンとゴールデンガーのスープ",
   nameI18n:{"ja":"サボテンとゴールデンガーのスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1089.PNG",
   restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45529",
@@ -4530,6 +4550,7 @@ const foodsData = [
   name:"原始風味セット",
   nameI18n:{"ja":"原始風味セット","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
+  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1090.PNG",
   restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45530",
@@ -4558,7 +4579,7 @@ const foodsData = [
   name:"Cape Gooseberry Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1091.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45556",
@@ -4582,7 +4603,7 @@ const foodsData = [
   name:"Cape Gooseberry & Apple Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Apple Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1092.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45557",
@@ -4606,7 +4627,7 @@ const foodsData = [
   name:"Cape Gooseberry & Orange Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Orange Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1093.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45558",
@@ -4630,7 +4651,7 @@ const foodsData = [
   name:"Cape Gooseberry & Blueberry Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Blueberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1094.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45559",
@@ -4654,7 +4675,7 @@ const foodsData = [
   name:"Cape Gooseberry & Raspberry Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Raspberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1095.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45560",
@@ -4678,7 +4699,7 @@ const foodsData = [
   name:"Cape Gooseberry & Strawberry Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Strawberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1096.PNG",
   restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45561",
@@ -4702,7 +4723,7 @@ const foodsData = [
   name:"Cape Gooseberry & Grape Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Grape Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1097.PNG",
   restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45562",
@@ -4726,7 +4747,7 @@ const foodsData = [
   name:"Cape Gooseberry & Pineapple Hot Cocoa",
   nameI18n:{"ja":"","en":"Cape Gooseberry & Pineapple Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1098.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45563",
@@ -4750,7 +4771,7 @@ const foodsData = [
   name:"Creamy Pumpkin Mushroom Soup",
   nameI18n:{"ja":"","en":"Creamy Pumpkin Mushroom Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1099.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45567",
@@ -4774,7 +4795,7 @@ const foodsData = [
   name:"Creamy Pumpkin Potato Soup",
   nameI18n:{"ja":"","en":"Creamy Pumpkin Potato Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1100.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45568",
@@ -4798,7 +4819,7 @@ const foodsData = [
   name:"Creamy Pumpkin Corn Soup",
   nameI18n:{"ja":"","en":"Creamy Pumpkin Corn Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1101.PNG",
   restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45569",
@@ -4822,7 +4843,7 @@ const foodsData = [
   name:"Creamy Pumpkin Tomato Soup",
   nameI18n:{"ja":"","en":"Creamy Pumpkin Tomato Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1102.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45570",
@@ -4846,7 +4867,7 @@ const foodsData = [
   name:"Creamy Pumpkin Carrot Soup",
   nameI18n:{"ja":"","en":"Creamy Pumpkin Carrot Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1103.PNG",
   restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45571",
@@ -4870,7 +4891,7 @@ const foodsData = [
   name:"Creamy Pumpkin Eggplant Soup",
   nameI18n:{"ja":"","en":"Creamy Pumpkin Eggplant Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1104.PNG",
   restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45572",
@@ -4894,7 +4915,7 @@ const foodsData = [
   name:"Tom Yum Cuttlefish Noodles",
   nameI18n:{"ja":"","en":"Tom Yum Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1105.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45575",
@@ -4912,7 +4933,7 @@ const foodsData = [
   name:"Tom Yum Spineless Cuttlefish Noodles",
   nameI18n:{"ja":"","en":"Tom Yum Spineless Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1106.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45576",
@@ -4935,7 +4956,7 @@ const foodsData = [
   name:"Tom Yum Pharaoh Cuttlefish Noodles",
   nameI18n:{"ja":"","en":"Tom Yum Pharaoh Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1107.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45577",
@@ -4958,7 +4979,7 @@ const foodsData = [
   name:"Tom Yum Golden Cuttlefish Noodles",
   nameI18n:{"ja":"","en":"Tom Yum Golden Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1108.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45578",
@@ -4981,7 +5002,7 @@ const foodsData = [
   name:"Gloomwood Meal",
   nameI18n:{"ja":"","en":"Gloomwood Meal","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
   fes:true,
-  ended:true, // 2026/10/10フェス開始前の準備。開始日になったらfalseへ切り替えること
+  ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1109.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45579",

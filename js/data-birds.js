@@ -1314,6 +1314,7 @@ const birdData = [
  name:"オレンジ羽のヤツガシラ",
  nameI18n:{"ja":"オレンジ羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:15,
  fesCoinPrice:5,
@@ -1329,6 +1330,7 @@ const birdData = [
  name:"青い羽のヤツガシラ",
  nameI18n:{"ja":"青い羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:15,
  fesCoinPrice:5,
@@ -1344,6 +1346,7 @@ const birdData = [
  name:"緑羽のヤツガシラ",
  nameI18n:{"ja":"緑羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:15,
  fesCoinPrice:5,
@@ -1359,6 +1362,7 @@ const birdData = [
  name:"赤い羽のヤツガシラ",
  nameI18n:{"ja":"赤い羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:15,
  fesCoinPrice:5,
@@ -1374,6 +1378,7 @@ const birdData = [
  name:"カラフルなヤツガシラ",
  nameI18n:{"ja":"カラフルなヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:17,
  fesCoinPrice:5,

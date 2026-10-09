@@ -298,6 +298,7 @@ const cropData = [
     weedCount: 3,
     auth: false,
     fes: true,
+    ended: true, // 2026/10/10 6:00 原始の呼び声フェス終了
     eventName: "原始の呼び声",
     bookIndex: 19,
   },

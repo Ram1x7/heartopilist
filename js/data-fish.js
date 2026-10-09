@@ -1591,6 +1591,7 @@ const fishData = [
  name:"ペールゴールドガーパイク",
  nameI18n:{"ja":"ペールゴールドガーパイク","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  shadow:"大",
  price:215,
@@ -1606,6 +1607,7 @@ const fishData = [
  name:"ブラウンブロッチガーパイク",
  nameI18n:{"ja":"ブラウンブロッチガーパイク","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  shadow:"大",
  price:215,
@@ -1621,6 +1623,7 @@ const fishData = [
  name:"シルバーガーパイク",
  nameI18n:{"ja":"シルバーガーパイク","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  shadow:"大",
  price:215,
@@ -1636,6 +1639,7 @@ const fishData = [
  name:"ブラックスポットガーパイク",
  nameI18n:{"ja":"ブラックスポットガーパイク","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  shadow:"大",
  price:215,
@@ -1651,6 +1655,7 @@ const fishData = [
  name:"ゴールデンガーパイク",
  nameI18n:{"ja":"ゴールデンガーパイク","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  shadow:"大",
  price:320,
@@ -1660,6 +1665,70 @@ const fishData = [
  location:"ガーパイククエスト(追加段階)",
  locationI18n:{"ja":"ガーパイククエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/1027.PNG",
+ auth:false
+},
+{
+ name:"シリヤケイカ",
+ nameI18n:{"ja":"シリヤケイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ shadow:"中",
+ price:155,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"旧海",
+ locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/fish/1028.PNG",
+ auth:false
+},
+{
+ name:"トラフコウイカ",
+ nameI18n:{"ja":"トラフコウイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ shadow:"中",
+ price:155,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"旧海",
+ locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/fish/1029.PNG",
+ auth:false
+},
+{
+ name:"コウイカ",
+ nameI18n:{"ja":"コウイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ shadow:"中",
+ price:155,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"旧海",
+ locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/fish/1030.PNG",
+ auth:false
+},
+{
+ name:"ブルークリオネ",
+ nameI18n:{"ja":"ブルークリオネ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ shadow:"小",
+ price:100,
+ fesCoinPrice:15,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"旧海",
+ locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/fish/1031.PNG",
  auth:false
 }
   // ここに追加していく
