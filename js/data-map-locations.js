@@ -2,6 +2,9 @@
 // heartopia.guide/map のランドマーク名と直接対応が取れるものだけ先に登録済み。
 // null のものは対応するマップ上の地点が未登録（今後、座標登録ツールで追加予定）。
 // クエスト名（「」や『追加段階』を含むもの）は固定の場所を持たないため基本null。
+// ただし「海釣りクエスト」「虫コイコイクエスト」「巣ごもりクエスト」等、
+// js/data-map.jsのmapEventsに対応するイベントマーカーが存在するクエストは、
+// 下のmapLocationEventLinksで紐づける（固定座標ではなくイベントのピンを直接ハイライトするため）。
 
 const mapLocationLinks = {
   "「アクターバト」クエスト(追加段階)": null,
@@ -21,8 +24,8 @@ const mapLocationLinks = {
   "冬季採録クエスト(追加段階)": null,
   "川": null,
   "川辺": null,
-  "巣ごもりクエスト": { x:47.25, y:68.8 }, // events:nest-of-hundreds
-  "巣ごもりクエスト(追加段階)": { x:47.25, y:68.8 }, // events:nest-of-hundreds
+  "巣ごもりクエスト": null, // mapLocationEventLinksでイベントマーカーにリンク
+  "巣ごもりクエスト(追加段階)": null, // mapLocationEventLinksでイベントマーカーにリンク
   "巨木の川": { x:61.95, y:66.81 }, // landmarks:Giantwood River
   "旧海": { x:50, y:5 }, // landmarks:Old Sea
   "旧海の海辺": { x:50, y:5 }, // landmarks:Old Sea
@@ -45,7 +48,7 @@ const mapLocationLinks = {
   "海洋清掃": null, // 貝殻の出現場所。マップ上に対応する固定地点が無いため地図で見るリンクは非表示のまま
   "海洋清掃クエスト": null,
   "海辺": null,
-  "海釣りクエスト": { x:44.3, y:73.25 }, // events:sea-fishing
+  "海釣りクエスト": null, // mapLocationEventLinksでイベントマーカーにリンク
   "温泉山": { x:49.1, y:19.8 }, // landmarks:Onsen Mountain
   // 「温泉」のランドマーク座標は温泉山の湖の小さな池のすぐそばにあり、
   // 池のポリゴンと重なってしまうため、地図で見る用にわずかにずらした座標を使う
@@ -119,4 +122,15 @@ const mapGenericBigAreaLocations = {
   "漁村": "Fishing Village",
   "花畑": "Flower Field",
   "中心街": "Central District",
+};
+
+// 「固定の場所を持たないクエスト」のうち、js/data-map.jsのmapEventsに対応する
+// イベントマーカー（⭐アイコン）が存在するもの。地図で見るを押すと、周辺の
+// エリア（ランドマーク）ではなく、このイベントのピンそのものをハイライトする。
+// キーはmapEvents側のkeyに合わせている
+const mapLocationEventLinks = {
+  "海釣りクエスト": "sea-fishing",
+  "虫コイコイクエスト": "bait-the-insects",
+  "巣ごもりクエスト": "nest-of-hundreds",
+  "巣ごもりクエスト(追加段階)": "nest-of-hundreds",
 };

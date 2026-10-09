@@ -935,7 +935,7 @@ function buildAllPins(){
   mapShops.forEach(p => list.push({ cat:"shop", img:SHOP_IMAGES[p.key], icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
   mapBusStops.forEach(p => list.push({ cat:"busstop", img:BUSSTOP_IMAGE, icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
   mapAnimals.forEach(p => list.push({ cat:"animal", img:ANIMAL_IMAGES[p.key], icon:ANIMAL_ICONS[p.key] || "🐾", name:p.name, x:p.x, y:p.y }));
-  mapEvents.forEach(p => list.push({ cat:"event", img:EVENT_IMAGES[p.key], icon:"⭐", name:p.name, x:p.x, y:p.y }));
+  mapEvents.forEach(p => list.push({ cat:"event", key:p.key, img:EVENT_IMAGES[p.key], icon:"⭐", name:p.name, x:p.x, y:p.y }));
   return list;
 }
 const allPins = buildAllPins();
@@ -1222,9 +1222,8 @@ function getLocationsForArea(area){
   return locationsByAreaKey.get(area.key) || new Set();
 }
 
-// エリア内で見つかる魚・虫・野鳥を、図鑑データのlocation文字列で逆引きする
-function getCreaturesForArea(area){
-  const locs = getLocationsForArea(area);
+// 指定したlocation文字列の集合に一致する魚・虫・野鳥を、図鑑データから逆引きする
+function getCreaturesForLocations(locs){
   const groups = { fish:[], bug:[], bird:[] };
   const sources = [
     { cat:"fish", data: typeof fishData !== "undefined" ? fishData : [] },
@@ -1236,6 +1235,32 @@ function getCreaturesForArea(area){
     data.forEach(c => { if(locs.has(c.location) && !c.ended) groups[cat].push(c); });
   });
   return groups;
+}
+
+// エリア内で見つかる魚・虫・野鳥を、図鑑データのlocation文字列で逆引きする
+function getCreaturesForArea(area){
+  return getCreaturesForLocations(getLocationsForArea(area));
+}
+
+// mapLocationEventLinks（location文字列 -> イベントキー）の逆引き。
+// 1つのイベントキーに複数のlocation文字列が紐づくことがある
+// （例：「巣ごもりクエスト」「巣ごもりクエスト(追加段階)」は共にnest-of-hundreds）
+const mapEventLocationNames = (() => {
+  const map = {};
+  if(typeof mapLocationEventLinks !== "undefined"){
+    Object.entries(mapLocationEventLinks).forEach(([loc, key]) => {
+      (map[key] = map[key] || []).push(loc);
+    });
+  }
+  return map;
+})();
+
+// イベントマーカー（クエスト）に対応する魚・虫・野鳥を逆引きする。
+// 対応するlocation文字列が無いイベント（ミニゲーム等）はnullを返す
+function getCreaturesForEventKey(eventKey){
+  const names = mapEventLocationNames[eventKey];
+  if(!names || !names.length) return null;
+  return getCreaturesForLocations(new Set(names));
 }
 
 // ── リアルタイム図鑑（js/main.jsの天気・出現判定ロジックと同じもの。
@@ -1354,25 +1379,53 @@ function zoomToAreas(areas){
   animateTo(targetTx, targetTy, targetScale, 320);
 }
 
+// クエストのイベントマーカー（⭐）1つ、または同じキーを持つ複数のピン
+// （例：「海釣り1号」「海釣り2号」）を全て画面内に収まるようにズームする
+function zoomToEventPins(points){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  points.forEach(p => {
+    const px = p.x / 100 * naturalW, py = p.y / 100 * naturalH;
+    if(px < minX) minX = px;
+    if(px > maxX) maxX = px;
+    if(py < minY) minY = py;
+    if(py > maxY) maxY = py;
+  });
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  if(points.length === 1){
+    const targetScale = 2.0;
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+    const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - cx * targetScale));
+    const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - cy * targetScale));
+    animateTo(targetTx, targetTy, targetScale, 320);
+    return;
+  }
+  const boxW = Math.max(1, maxX - minX), boxH = Math.max(1, maxY - minY);
+  const FIT_PADDING = 0.85;
+  const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(vw / boxW, vh / boxH) * FIT_PADDING));
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - cx * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - cy * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 320);
+}
+
 const CREATURE_CAT_LABELS = { fish:"filter_fish", bug:"filter_bug", bird:"filter_bird" };
 const CREATURE_CAT_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥" };
 const CREATURE_CAT_ICONS = { fish:"fish", bug:"bug", bird:"bird" };
 
-function openAreaDetail(area, kind){
-  document.getElementById("areaDetailCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
-  document.getElementById("areaDetailName").textContent = area.name
-    ? area.name
-    : `${area.key}？`;
+// エリア／イベント共通：出現する魚・虫・野鳥の一覧モーダルを組み立てる
+function renderDetailModal(catLabel, name, groups, onZoom){
+  document.getElementById("areaDetailCat").textContent = catLabel;
+  document.getElementById("areaDetailName").textContent = name;
 
   const zoomBtn = document.getElementById("areaDetailZoomBtn");
   zoomBtn.innerHTML = `${icon("search",{size:13})}<span>${T("map_view_location","ここを拡大表示")}</span>`;
   zoomBtn.onclick = () => {
-    zoomToArea(area);
+    onZoom();
     closeAreaDetailModal();
     document.getElementById("mapInfoCard").classList.remove("show");
   };
 
-  const groups = getCreaturesForArea(area);
   const catOrder = ["fish","bug","bird"];
   const { zone, weather } = getCurrentWeatherAndZone();
   document.getElementById("areaDetailNowContext").textContent =
@@ -1418,6 +1471,25 @@ function openAreaDetail(area, kind){
   document.getElementById("areaDetailModal").style.display = "block";
 }
 
+function openAreaDetail(area, kind){
+  renderDetailModal(
+    kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア"),
+    area.name ? area.name : `${area.key}？`,
+    getCreaturesForArea(area),
+    () => zoomToArea(area)
+  );
+}
+
+// クエストのイベントマーカーに対応する出現一覧モーダル
+function openEventDetail(eventKey, name, groups, pins){
+  renderDetailModal(
+    T("map_cat_event","イベント"),
+    name,
+    groups,
+    () => zoomToEventPins(pins)
+  );
+}
+
 function closeAreaDetailModal(){
   document.getElementById("areaDetailModal").style.display = "none";
 }
@@ -1431,7 +1503,21 @@ function showPinInfo(p){
   document.getElementById("mapInfoCat").textContent = catLabelMap[p.cat] || "";
   document.getElementById("mapInfoCat").classList.remove("is-area");
   document.getElementById("mapInfoZoom").style.display = "none";
-  document.getElementById("mapInfoAction").style.display = "none";
+
+  // クエストのイベントマーカーのうち、図鑑データのlocationと紐づくもの
+  // （海釣り・虫コイコイ・巣ごもり等）は、エリアと同様に「くわしく見る」から
+  // 出現中の魚・虫・野鳥の一覧を見られるようにする
+  const actionBtn = document.getElementById("mapInfoAction");
+  const eventGroups = p.cat === "event" && p.key ? getCreaturesForEventKey(p.key) : null;
+  if(eventGroups){
+    const pins = typeof mapEvents !== "undefined" ? mapEvents.filter(e => e.key === p.key) : [];
+    actionBtn.style.display = "";
+    actionBtn.innerHTML = `<span>${T("map_view_details","くわしく見る")}</span>`;
+    actionBtn.onclick = () => openEventDetail(p.key, p.name, eventGroups, pins);
+  }else{
+    actionBtn.style.display = "none";
+  }
+
   document.getElementById("mapInfoCard").classList.add("show");
   selectedArea = null;
   selectedAreaMultiKeys = null;
@@ -1591,6 +1677,16 @@ mapImg.onload = () => {
     if(areas.length){
       zoomToAreas(areas);
       showMultiAreaInfo(areas);
+    }
+  // 「海釣りクエスト」等、固定の場所を持たないがイベントマーカー（⭐）が
+  // 存在するクエストは、周辺のランドマーク/エリアではなく、そのイベントの
+  // ピンそのものをハイライトする
+  }else if(highlightLocKey && typeof mapLocationEventLinks !== "undefined" && mapLocationEventLinks[highlightLocKey] && typeof mapEvents !== "undefined"){
+    const eventKey = mapLocationEventLinks[highlightLocKey];
+    const matches = mapEvents.filter(e => e.key === eventKey);
+    if(matches.length){
+      zoomToEventPins(matches);
+      showPinInfo({ name:highlightLocKey, cat:"event", key:eventKey, x:matches[0].x, y:matches[0].y });
     }
   }else if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
     const coord = mapLocationLinks[highlightLocKey];
