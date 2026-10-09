@@ -1217,7 +1217,10 @@ function openModal(c){
  m_priceTable.classList.toggle("has-fes", hasFesField);
  const fesPrices = hasFesField ? calcStars(c.fesCoinPrice ?? 0, isBird) : [null,null,null,null,null];
  const fesPriceEls = [m_fesPrice1, m_fesPrice2, m_fesPrice3, m_fesPrice4, m_fesPrice5];
- fesPriceEls.forEach((el, i) => { el.innerHTML = hasFesField ? fmtCell(fesPrices[i], "fescoin") : ""; });
+ // フェスによってフェスコインのアイコンが異なるため、データ側にfesCoinIconが
+ // 指定されていればそれを使う（未指定時は従来通り共通の"fescoin"）
+ const fesCoinIconType = c.fesCoinIcon || "fescoin";
+ fesPriceEls.forEach((el, i) => { el.innerHTML = hasFesField ? fmtCell(fesPrices[i], fesCoinIconType) : ""; });
 
  // 星1しか存在しない場合は★2〜5の行を隠す
  [m_priceRow2, m_priceRow3, m_priceRow4, m_priceRow5].forEach(el=>{

@@ -29,6 +29,7 @@ const CURRENCY_ICON_SRC = {
   milk: "images/currency/milk.png",
   mermaid_shippo: "images/currency/mermaid_shippo.png",
   kaifuku: "images/currency/kaifuku.png",
+  yuuyafes_coin: "images/currency/yuuyafes_coin.png",
 };
 
 function currencyIcon(type) {

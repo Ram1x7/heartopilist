@@ -1192,6 +1192,7 @@ const bugData = [
  name:"ムラサキツノホタル",
  nameI18n:{"ja":"ムラサキツノホタル","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:110,
  fesCoinPrice:30,
@@ -1206,6 +1207,7 @@ const bugData = [
  name:"ハイイロツノホタル",
  nameI18n:{"ja":"ハイイロツノホタル","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:110,
  fesCoinPrice:30,
@@ -1220,6 +1222,7 @@ const bugData = [
  name:"モモイロツノホタル",
  nameI18n:{"ja":"モモイロツノホタル","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:110,
  fesCoinPrice:30,
@@ -1234,6 +1237,7 @@ const bugData = [
  name:"ブラウンカブト",
  nameI18n:{"ja":"ブラウンカブト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:110,
  fesCoinPrice:30,
@@ -1248,6 +1252,7 @@ const bugData = [
  name:"レインボーカブト",
  nameI18n:{"ja":"レインボーカブト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
+ ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
  price:165,
  fesCoinPrice:45,
@@ -1256,6 +1261,66 @@ const bugData = [
  location:"ニシキコウチュウクエスト(追加段階)",
  locationI18n:{"ja":"ニシキコウチュウクエスト(追加段階)","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/bugs/1025.PNG",
+ auth:false
+},
+{
+ name:"シイタケフンチュウ",
+ nameI18n:{"ja":"シイタケフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ price:110,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-ジャンプステージ",
+ locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/bugs/1026.PNG",
+ auth:false
+},
+{
+ name:"オレンジフンチュウ",
+ nameI18n:{"ja":"オレンジフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ price:110,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-不思議な松林",
+ locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/bugs/1027.PNG",
+ auth:false
+},
+{
+ name:"イチゴフンチュウ",
+ nameI18n:{"ja":"イチゴフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ price:110,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-コジカ塔",
+ locationI18n:{"ja":"森林-コジカ塔","en":"Forest - Fawn Tower","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/bugs/1028.PNG",
+ auth:false
+},
+{
+ name:"かぼちゃフンチュウ",
+ nameI18n:{"ja":"かぼちゃフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ price:110,
+ fesCoinPrice:25,
+ fesCoinIcon:"yuuyafes_coin",
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"森林-不思議な松林",
+ locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/bugs/1029.PNG",
  auth:false
 },
  // ここに追加していく
