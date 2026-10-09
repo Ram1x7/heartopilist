@@ -4588,6 +4588,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[240],
   fesCoinPrice:35,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","果物ならなんでもOK"],
   level:1,
   materials_image:[
@@ -4612,6 +4613,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[260],
   fesCoinPrice:40,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","リンゴ"],
   level:1,
   materials_image:[
@@ -4636,6 +4638,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[260],
   fesCoinPrice:40,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","オレンジ"],
   level:1,
   materials_image:[
@@ -4660,6 +4663,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[240],
   fesCoinPrice:35,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","ブルーベリー"],
   level:1,
   materials_image:[
@@ -4684,6 +4688,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[260],
   fesCoinPrice:40,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","ラズベリー"],
   level:1,
   materials_image:[
@@ -4708,6 +4713,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[580],
   fesCoinPrice:85,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","イチゴ(種@125)"],
   level:1,
   materials_image:[
@@ -4732,6 +4738,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[690],
   fesCoinPrice:100,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","ブドウ(種@160)"],
   level:1,
   materials_image:[
@@ -4756,6 +4763,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[260],
   fesCoinPrice:40,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","パイナップル(種@15)"],
   level:1,
   materials_image:[
@@ -4780,6 +4788,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[240],
   fesCoinPrice:35,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","野菜ならなんでもOK"],
   level:1,
   materials_image:[
@@ -4804,6 +4813,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[300],
   fesCoinPrice:45,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","ジャガイモ(種@30)"],
   level:1,
   materials_image:[
@@ -4828,6 +4838,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[730],
   fesCoinPrice:105,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","トウモロコシ(種@170)"],
   level:1,
   materials_image:[
@@ -4852,6 +4863,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[240],
   fesCoinPrice:35,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","トマト(種@10)"],
   level:1,
   materials_image:[
@@ -4876,6 +4888,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[370],
   fesCoinPrice:55, // フェス星2売価82から逆算（55×1.5=82.5を切り捨てて82、ユーザー確認済み）
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","ニンジン(種@25)"],
   level:1,
   materials_image:[
@@ -4900,6 +4913,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[620],
   fesCoinPrice:90,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","ナス(種@135)"],
   level:1,
   materials_image:[
@@ -4924,6 +4938,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[290],
   fesCoinPrice:45,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","イカならなんでもOK"],
   level:1,
   materials_image:[
@@ -4947,6 +4962,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[290],
   fesCoinPrice:45,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","シリヤケイカ"],
   level:1,
   materials_image:[
@@ -4970,6 +4986,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[290],
   fesCoinPrice:45, // フェス星2売価67から逆算（45×1.5=67.5を切り捨てて67、ユーザー確認済み）
+  fesCoinIcon:"yuuyafes_coin",
   materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","トラフコウイカ"],
   level:1,
   materials_image:[
@@ -4993,6 +5010,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[290],
   fesCoinPrice:45,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","コウイカ"],
   level:1,
   materials_image:[
@@ -5016,6 +5034,7 @@ const foodsData = [
   rarity: [true,true,true,true,true],
   prices:[1060],
   fesCoinPrice:160,
+  fesCoinIcon:"yuuyafes_coin",
   materials:["ホオズキホットココアならなんでもOK","ホオズキホットココアならなんでもOK","かぼちゃのクリームポタージュならなんでもOK","イカのトムヤムクンヌードルならなんでもOK"],
   level:1,
   materials_image:[
