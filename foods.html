@@ -1280,7 +1280,9 @@ function renderModal(){
   const box = document.getElementById("modalBox");
 
   const coinText = v => `${currencyIcon("coin")}${v.toLocaleString()}`;
-  const fesCoinText = v => `${currencyIcon("fescoin")}${v.toLocaleString()}`;
+  // フェスによってフェスコインのアイコンが異なるため、データ側にfesCoinIconが
+  // 指定されていればそれを使う（未指定時は従来通り共通の"fescoin"）
+  const fesCoinText = v => `${currencyIcon(f.fesCoinIcon || "fescoin")}${v.toLocaleString()}`;
 
   // 星1〜5の売価・利益を切り替えなしで一度に見られるよう、全星分をまとめて算出する
   const prices5 = f.prices ? derivePrices(f.prices[0], "food", f.rarity) : [null,null,null,null,null];
