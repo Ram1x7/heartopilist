@@ -4573,11 +4573,11 @@ const foodsData = [
 
 // ── 2026/10/10開始フェス料理（19品）──
 // 出典: https://heartopia.th.gl/db/cooking （素材名・★1〜5売価・画像）
-// 準備段階のデータにつき、正式な日本語名・調理時間・開放レベル・フェスコイン価格・
-// 素材個数は未確認（null）。フェス開始後にゲーム内で照合し、随時更新すること。
+// 正式な日本語名・フェスコイン価格はユーザー確認済み。調理時間・開放レベル・
+// 素材個数は引き続き未確認（null）。判明次第更新すること。
 {
-  name:"Cape Gooseberry Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキ香るホットココア",
+  nameI18n:{"ja":"ホオズキ香るホットココア","en":"Cape Gooseberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1091.PNG",
@@ -4587,12 +4587,12 @@ const foodsData = [
   time:15, // 素材の成長時間から算出：ホオズキ15分（フェス限定作物の標準値、果物枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[240],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:35,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","果物ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/all_fruit.jpg" }
   ],
@@ -4600,23 +4600,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Apple Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Apple Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキリンゴホットココア",
+  nameI18n:{"ja":"ホオズキリンゴホットココア","en":"Cape Gooseberry & Apple Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1092.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45557",
-  cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+リンゴ0（リンゴは種がなく購入費がかからないため0。シナモンココアパウダーは価格未確定・暫定50として算出）
+  cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+リンゴ0（リンゴは種がなく購入費がかからないため0。シナモンココアパウダーの価格50はユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・リンゴは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:40,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","リンゴ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/ringo.jpg" }
   ],
@@ -4624,23 +4624,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Orange Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Orange Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキオレンジホットココア",
+  nameI18n:{"ja":"ホオズキオレンジホットココア","en":"Cape Gooseberry & Orange Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1093.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45558",
-  cost:null, // 材料費未確認（オレンジの価格情報なしのため算出不可）
+  cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+オレンジ0（オレンジは種がなく購入費がかからないため0。いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・オレンジは作物timerなし（対象外、他レシピでも(@価格)表記なし）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:40,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","オレンジ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/orange.jpg" }
   ],
@@ -4648,8 +4648,8 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Blueberry Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Blueberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキブルーベリーホットココア",
+  nameI18n:{"ja":"ホオズキブルーベリーホットココア","en":"Cape Gooseberry & Blueberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1094.PNG",
@@ -4659,12 +4659,12 @@ const foodsData = [
   time:15, // 素材の成長時間から算出：ホオズキ15分・ブルーベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[240],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:35,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","ブルーベリー"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/buruberi.jpg" }
   ],
@@ -4672,8 +4672,8 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Raspberry Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Raspberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキラズベリーホットココア",
+  nameI18n:{"ja":"ホオズキラズベリーホットココア","en":"Cape Gooseberry & Raspberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1095.PNG",
@@ -4683,12 +4683,12 @@ const foodsData = [
   time:15, // 素材の成長時間から算出：ホオズキ15分・ラズベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:40,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","ラズベリー"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/razuberi.jpg" }
   ],
@@ -4696,23 +4696,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Strawberry Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Strawberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキイチゴホットココア",
+  nameI18n:{"ja":"ホオズキイチゴホットココア","en":"Cape Gooseberry & Strawberry Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1096.PNG",
   restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45561",
-  cost:235, // ホオズキ10+シナモンココアパウダー50+牛乳50+イチゴ125（シナモンココアパウダーは価格未確定・暫定50として算出）
+  cost:235, // ホオズキ10+シナモンココアパウダー50+牛乳50+イチゴ125（シナモンココアパウダーの価格50はユーザー確認済み）
   time:360, // 素材の成長時間から算出：ホオズキ15分・いちご360分（6時間）→長い方の360分
   rarity: [true,true,true,true,true],
   prices:[580],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:85,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","イチゴ(種@125)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/strawberry.jpg" }
   ],
@@ -4720,23 +4720,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Grape Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Grape Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキブドウホットココア",
+  nameI18n:{"ja":"ホオズキブドウホットココア","en":"Cape Gooseberry & Grape Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1097.PNG",
   restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45562",
-  cost:270, // ホオズキ10+シナモンココアパウダー50+牛乳50+ブドウ160（シナモンココアパウダーは価格未確定・暫定50として算出）
+  cost:270, // ホオズキ10+シナモンココアパウダー50+牛乳50+ブドウ160（シナモンココアパウダーの価格50はユーザー確認済み）
   time:600, // 素材の成長時間から算出：ホオズキ15分・ブドウ600分（10時間）→長い方の600分
   rarity: [true,true,true,true,true],
   prices:[690],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:100,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","ブドウ(種@160)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/grape.jpg" }
   ],
@@ -4744,23 +4744,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Cape Gooseberry & Pineapple Hot Cocoa",
-  nameI18n:{"ja":"","en":"Cape Gooseberry & Pineapple Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"ホオズキパイナップルホットココア",
+  nameI18n:{"ja":"ホオズキパイナップルホットココア","en":"Cape Gooseberry & Pineapple Hot Cocoa","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1098.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45563",
-  cost:125, // ホオズキ10+シナモンココアパウダー50+牛乳50+パイナップル15（シナモンココアパウダーは価格未確定・暫定50として算出）
+  cost:125, // ホオズキ10+シナモンココアパウダー50+牛乳50+パイナップル15（シナモンココアパウダーの価格50はユーザー確認済み）
   time:30, // 素材の成長時間から算出：ホオズキ15分・パイナップル30分→長い方の30分
   rarity: [true,true,true,true,true],
   prices:[260],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
+  fesCoinPrice:40,
   materials:["ホオズキ(種@10)","シナモンココアパウダー(@50)","牛乳(@50)","パイナップル(種@15)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/hoozuki.png" },
-    { image:"./images/materials/cinnamon_cocoa_powder.png" },
+    { image:"./images/materials/hozuki.jpg" },
+    { image:"./images/materials/sinamonn_cocoa.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/pineapple.jpg" }
   ],
@@ -4768,23 +4768,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Creamy Pumpkin Mushroom Soup",
-  nameI18n:{"ja":"","en":"Creamy Pumpkin Mushroom Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"かぼちゃとキノコのクリームポタージュ",
+  nameI18n:{"ja":"かぼちゃとキノコのクリームポタージュ","en":"Creamy Pumpkin Mushroom Soup","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1099.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45567",
-  cost:null, // 材料費未確認（ハニーマッシュルームの価格情報なしのため算出不可）
+  cost:null, // 材料費未確認（野菜枠がワイルドカードのため算出不可。ナラタケは0・かぼちゃ10・牛乳50はユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、野菜枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[240],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","かぼちゃ(種@10)","牛乳(@50)","野菜ならなんでもOK"],
+  fesCoinPrice:35,
+  materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","野菜ならなんでもOK"],
   level:1,
   materials_image:[
-    { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/kabocha.png" },
+    { image:"./images/materials/naratake.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/all_vege.jpg" }
   ],
@@ -4792,23 +4792,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Creamy Pumpkin Potato Soup",
-  nameI18n:{"ja":"","en":"Creamy Pumpkin Potato Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"かぼちゃとジャガイモのクリームポタージュ",
+  nameI18n:{"ja":"かぼちゃとジャガイモのクリームポタージュ","en":"Creamy Pumpkin Potato Soup","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1100.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45568",
-  cost:null, // 材料費未確認（ハニーマッシュルームの価格情報なしのため算出不可）
+  cost:90, // ナラタケ0+かぼちゃ10+牛乳50+ジャガイモ30（いずれもユーザー確認済み）
   time:60, // 素材の成長時間から算出：かぼちゃ15分・ジャガイモ60分→長い方の60分
   rarity: [true,true,true,true,true],
   prices:[300],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","かぼちゃ(種@10)","牛乳(@50)","ジャガイモ(種@30)"],
+  fesCoinPrice:45,
+  materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","ジャガイモ(種@30)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/kabocha.png" },
+    { image:"./images/materials/naratake.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/potato.jpg" }
   ],
@@ -4816,23 +4816,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Creamy Pumpkin Corn Soup",
-  nameI18n:{"ja":"","en":"Creamy Pumpkin Corn Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"かぼちゃとコーンのクリームポタージュ",
+  nameI18n:{"ja":"かぼちゃとコーンのクリームポタージュ","en":"Creamy Pumpkin Corn Soup","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1101.PNG",
   restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45569",
-  cost:null, // 材料費未確認（ハニーマッシュルームの価格情報なしのため算出不可）
+  cost:230, // ナラタケ0+かぼちゃ10+牛乳50+トウモロコシ170（いずれもユーザー確認済み）
   time:720, // 素材の成長時間から算出：かぼちゃ15分・トウモロコシ720分（12時間）→長い方の720分
   rarity: [true,true,true,true,true],
   prices:[730],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","かぼちゃ(種@10)","牛乳(@50)","トウモロコシ(種@170)"],
+  fesCoinPrice:105,
+  materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","トウモロコシ(種@170)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/kabocha.png" },
+    { image:"./images/materials/naratake.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/corn.jpg" }
   ],
@@ -4840,23 +4840,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Creamy Pumpkin Tomato Soup",
-  nameI18n:{"ja":"","en":"Creamy Pumpkin Tomato Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"かぼちゃとトマトのクリームポタージュ",
+  nameI18n:{"ja":"かぼちゃとトマトのクリームポタージュ","en":"Creamy Pumpkin Tomato Soup","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1102.PNG",
   restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45570",
-  cost:null, // 材料費未確認（ハニーマッシュルームの価格情報なしのため算出不可）
+  cost:70, // ナラタケ0+かぼちゃ10+牛乳50+トマト10（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分・トマト15分→どちらも15分
   rarity: [true,true,true,true,true],
   prices:[240],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","かぼちゃ(種@10)","牛乳(@50)","トマト(種@10)"],
+  fesCoinPrice:35,
+  materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","トマト(種@10)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/kabocha.png" },
+    { image:"./images/materials/naratake.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/tomato.jpg" }
   ],
@@ -4864,23 +4864,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Creamy Pumpkin Carrot Soup",
-  nameI18n:{"ja":"","en":"Creamy Pumpkin Carrot Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"かぼちゃとニンジンのクリームポタージュ",
+  nameI18n:{"ja":"かぼちゃとニンジンのクリームポタージュ","en":"Creamy Pumpkin Carrot Soup","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1103.PNG",
   restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45571",
-  cost:null, // 材料費未確認（ハニーマッシュルームの価格情報なしのため算出不可）
+  cost:85, // ナラタケ0+かぼちゃ10+牛乳50+ニンジン25（いずれもユーザー確認済み）
   time:120, // 素材の成長時間から算出：かぼちゃ15分・ニンジン120分（2時間）→長い方の120分
   rarity: [true,true,true,true,true],
   prices:[370],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","かぼちゃ(種@10)","牛乳(@50)","ニンジン(種@25)"],
+  fesCoinPrice:55, // フェス星2売価82から逆算（55×1.5=82.5を切り捨てて82、ユーザー確認済み）
+  materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","ニンジン(種@25)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/kabocha.png" },
+    { image:"./images/materials/naratake.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/carrot.jpg" }
   ],
@@ -4888,23 +4888,23 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Creamy Pumpkin Eggplant Soup",
-  nameI18n:{"ja":"","en":"Creamy Pumpkin Eggplant Soup","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"かぼちゃとナスのクリームポタージュ",
+  nameI18n:{"ja":"かぼちゃとナスのクリームポタージュ","en":"Creamy Pumpkin Eggplant Soup","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1104.PNG",
   restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45572",
-  cost:null, // 材料費未確認（ハニーマッシュルームの価格情報なしのため算出不可）
+  cost:195, // ナラタケ0+かぼちゃ10+牛乳50+ナス135（いずれもユーザー確認済み）
   time:420, // 素材の成長時間から算出：かぼちゃ15分・ナス420分（7時間）→長い方の420分
   rarity: [true,true,true,true,true],
   prices:[620],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["ハニーマッシュルーム","かぼちゃ(種@10)","牛乳(@50)","ナス(種@135)"],
+  fesCoinPrice:90,
+  materials:["ナラタケ","かぼちゃ(種@10)","牛乳(@50)","ナス(種@135)"],
   level:1,
   materials_image:[
-    { image:"./images/materials/honey_mushroom.png" },
-    { image:"./images/materials/kabocha.png" },
+    { image:"./images/materials/naratake.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/eggplant.jpg" }
   ],
@@ -4912,107 +4912,118 @@ const foodsData = [
   auth:false
 },
 {
-  name:"Tom Yum Cuttlefish Noodles",
-  nameI18n:{"ja":"","en":"Tom Yum Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"イカとトムヤムクンヌードル",
+  nameI18n:{"ja":"イカとトムヤムクンヌードル","en":"Tom Yum Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1105.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45575",
-  cost:null, // 材料費未確認（コウイカの価格情報なしのため算出不可）
-  time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、コウイカは作物ではないため対象外）
+  cost:null, // 材料費未確認（イカ枠がワイルドカードのため算出不可）
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、イカ枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","コウイカ"],
+  fesCoinPrice:45,
+  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","イカならなんでもOK"],
   level:1,
+  materials_image:[
+    { image:"./images/materials/tomuyamu_paste.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/all_ika.jpg" }
+  ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
 {
-  name:"Tom Yum Spineless Cuttlefish Noodles",
-  nameI18n:{"ja":"","en":"Tom Yum Spineless Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"シリヤケイカのトムヤムクンヌードル",
+  nameI18n:{"ja":"シリヤケイカのトムヤムクンヌードル","en":"Tom Yum Spineless Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1106.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45576",
-  cost:null, // 材料費未確認（骨なしコウイカの価格情報なしのため算出不可）
-  time:15, // 素材の成長時間から算出：かぼちゃ15分（骨なしコウイカは作物ではないため対象外）
+  cost:null, // 材料費未確認（シリヤケイカの価格情報なしのため算出不可）
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（シリヤケイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","骨なしコウイカ"],
+  fesCoinPrice:45,
+  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","シリヤケイカ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/tom_yum_paste.png" },
-    { image:"./images/materials/kabocha.png" },
-    { image:"./images/materials/spineless_cuttlefish.png" }
+    { image:"./images/materials/tomuyamu_paste.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/shiriyake_ika.jpg" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
 {
-  name:"Tom Yum Pharaoh Cuttlefish Noodles",
-  nameI18n:{"ja":"","en":"Tom Yum Pharaoh Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"トラフコウイカのトムヤムクンヌードル",
+  nameI18n:{"ja":"トラフコウイカのトムヤムクンヌードル","en":"Tom Yum Pharaoh Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1107.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45577",
-  cost:null, // 材料費未確認（ファラオコウイカの価格情報なしのため算出不可）
-  time:15, // 素材の成長時間から算出：かぼちゃ15分（ファラオコウイカは作物ではないため対象外）
+  cost:null, // 材料費未確認（トラフコウイカの価格情報なしのため算出不可）
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（トラフコウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","ファラオコウイカ"],
+  fesCoinPrice:45, // フェス星2売価67から逆算（45×1.5=67.5を切り捨てて67、ユーザー確認済み）
+  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","トラフコウイカ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/tom_yum_paste.png" },
-    { image:"./images/materials/kabocha.png" },
-    { image:"./images/materials/pharaoh_cuttlefish.png" }
+    { image:"./images/materials/tomuyamu_paste.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/torafu_ika.jpg" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
 {
-  name:"Tom Yum Golden Cuttlefish Noodles",
-  nameI18n:{"ja":"","en":"Tom Yum Golden Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"コウイカのトムヤムクンヌードル",
+  nameI18n:{"ja":"コウイカのトムヤムクンヌードル","en":"Tom Yum Golden Cuttlefish Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1108.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45578",
-  cost:null, // 材料費未確認（ゴールデンコウイカの価格情報なしのため算出不可）
-  time:15, // 素材の成長時間から算出：かぼちゃ15分（ゴールデンコウイカは作物ではないため対象外）
+  cost:null, // 材料費未確認（コウイカの価格情報なしのため算出不可）
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（コウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
   prices:[290],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","ゴールデンコウイカ"],
+  fesCoinPrice:45,
+  materials:["トムヤムペースト(@50)","かぼちゃ(種@10)","コウイカ"],
   level:1,
   materials_image:[
-    { image:"./images/materials/tom_yum_paste.png" },
-    { image:"./images/materials/kabocha.png" },
-    { image:"./images/materials/golden_cuttlefish.png" }
+    { image:"./images/materials/tomuyamu_paste.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/kou_ika.jpg" }
   ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
 {
-  name:"Gloomwood Meal",
-  nameI18n:{"ja":"","en":"Gloomwood Meal","zh-CN":"","zh-TW":"","ko":"","th":""}, // 正式な日本語名が判明次第、nameとnameI18n.jaを更新すること
+  name:"幽林の不思議セット",
+  nameI18n:{"ja":"幽林の不思議セット","en":"Gloomwood Meal","zh-CN":"","zh-TW":"","ko":"","th":""},
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1109.PNG",
   restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45579",
   cost:null, // 材料費未確認（材料が他の料理そのものであり、原材料費の概念が適用できないため）
-  time:null, // 調理時間未確認
+  time:720, // ユーザー確認済み：素材に使う各料理の調理時間のうち最も長いものを採用（かぼちゃとコーンのクリームポタージュの720分）
   rarity: [true,true,true,true,true],
   prices:[1060],
-  // fesCoinPrice: フェスコイン価格は未確認のため未設定（判明次第追加）
-  materials:["Cape Gooseberry Hot Cocoa","Cape Gooseberry Hot Cocoa","クリーミーかぼちゃスープならなんでもOK","トムヤムヌードルならなんでもOK"],
+  fesCoinPrice:160,
+  materials:["ホオズキホットココアならなんでもOK","ホオズキホットココアならなんでもOK","かぼちゃのクリームポタージュならなんでもOK","イカのトムヤムクンヌードルならなんでもOK"],
   level:1,
+  materials_image:[
+    { image:"./images/materials/all_hozuki_cocoa.jpg" },
+    { image:"./images/materials/all_hozuki_cocoa.jpg" },
+    { image:"./images/materials/all_kabotya_potage.jpg" },
+    { image:"./images/materials/all_ika_noodle.jpg" }
+  ],
   authTarget: null, // フェス限定レシピのため認証マスター対象外
   auth:false
 },
