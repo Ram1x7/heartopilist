@@ -4655,7 +4655,7 @@ const foodsData = [
   image:"./images/foods/1094.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45559",
-  cost:null, // 材料費未確認（ブルーベリーの価格情報なしのため算出不可）
+  cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+ブルーベリー0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・ブルーベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[240],
@@ -4679,7 +4679,7 @@ const foodsData = [
   image:"./images/foods/1095.PNG",
   restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
   restoreSourceId: "cooking-45560",
-  cost:null, // 材料費未確認（ラズベリーの価格情報なしのため算出不可）
+  cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+ラズベリー0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・ラズベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
   prices:[260],
