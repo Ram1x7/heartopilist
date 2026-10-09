@@ -134,3 +134,16 @@ const mapLocationEventLinks = {
   "巣ごもりクエスト": "nest-of-hundreds",
   "巣ごもりクエスト(追加段階)": "nest-of-hundreds",
 };
+
+// イベントマーカーの「くわしく見る」一覧（出現する魚・虫・野鳥）に含める
+// 出現場所名のプレフィックス。「虫コイコイクエスト-遺跡(追加段階)」のように、
+// クエスト名の後に地名や「(追加段階)」が続く派生locationも同じクエストの
+// 出現場所としてまとめて扱う。
+// ※「虫コイコイクエスト-遺跡(追加段階)」は固定座標(遺跡)を持つため、
+// その生物自身の「地図で見る」リンク先はmapLocationLinks側の遺跡座標のまま
+// （上のmapLocationEventLinksには含めない）。ここはあくまで一覧表示用
+const mapEventQuestNamePrefixes = {
+  "海釣りクエスト": "sea-fishing",
+  "虫コイコイクエスト": "bait-the-insects",
+  "巣ごもりクエスト": "nest-of-hundreds",
+};
