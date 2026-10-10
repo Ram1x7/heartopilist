@@ -294,6 +294,24 @@ const flowerData = [
     eventName: "原始の呼び声",
     bookIndex: 18,
   },
+  {
+    name: "ヒガンバナ",
+    nameI18n:{"ja":"ヒガンバナ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    img: "./images/flowers/higanbana.PNG",
+    seedImg: "./images/flowers/seed_higanbana.jpg",
+    level: 1,
+    growTime: 1440,   // 1日(24時間)
+    seedPrice: 30,
+    prices: [125],
+    fesCoinPrice: 25,
+    fesCoinIcon: "yuuyafes_coin",
+    colors: ["赤","黄","白","オレンジ","ピンク","黒","桃","紫","青","夜光"],
+    auth: false,
+    fes: true,
+    ended: false, // 2026/10/10開始
+    eventName: "幽夜の集い",
+    bookIndex: 19,
+  },
 ];
 
 // 交配レア度マップ

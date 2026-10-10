@@ -219,6 +219,21 @@ const cropData = [
     eventName: null,
     bookIndex: 14,
   },
+  {
+    name: "かぼちゃ",
+    nameI18n:{"ja":"かぼちゃ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    img: "./images/crops/kabotya.PNG",
+    seedImg: "./images/crops/seed_kabotya.jpg",
+    level: 1,
+    growTime: 15,
+    seedPrice: 10,
+    prices: [30],
+    weedCount: 3,
+    auth: false,
+    isEvent: false,
+    eventName: null,
+    bookIndex: 15,
+  },
 
   // ── イベント作物 ────────────────────────
   {
@@ -235,7 +250,7 @@ const cropData = [
     season: true,
     ended: true,
     eventName: "スノーシーズン",
-    bookIndex: 15,
+    bookIndex: 16,
   },
   {
     name: "ロメインレタス",
@@ -251,7 +266,7 @@ const cropData = [
     fes: true,
     ended: true,
     eventName: "ドリームライト",
-    bookIndex: 16,
+    bookIndex: 17,
   },
   {
     name: "レモンバーベナ",
@@ -267,7 +282,7 @@ const cropData = [
     fes: true,
     ended: true,
     eventName: "ブロック市街地",
-    bookIndex: 17,
+    bookIndex: 18,
   },
   {
     name: "スターフルーツ",
@@ -283,7 +298,7 @@ const cropData = [
     season: true,
     ended: true,
     eventName: "ホエールシーズン",
-    bookIndex: 18,
+    bookIndex: 19,
   },
   {
     name: "ウチワサボテン",
@@ -300,6 +315,24 @@ const cropData = [
     fes: true,
     ended: true, // 2026/10/10 6:00 原始の呼び声フェス終了
     eventName: "原始の呼び声",
-    bookIndex: 19,
+    bookIndex: 20,
+  },
+  {
+    name: "ホオズキ",
+    nameI18n:{"ja":"ホオズキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    img: "./images/crops/hozuki.PNG",
+    seedImg: "./images/crops/seed_hozuki.jpg",
+    level: 1,
+    growTime: 15,
+    seedPrice: 10,
+    prices: [30],
+    fesCoinPrice: 5,
+    fesCoinIcon: "yuuyafes_coin",
+    weedCount: 3,
+    auth: false,
+    fes: true,
+    ended: false, // 2026/10/10開始
+    eventName: "幽夜の集い",
+    bookIndex: 21,
   },
 ];
