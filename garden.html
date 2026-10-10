@@ -1136,7 +1136,9 @@ function renderModal(item){
   const hasFesField = item.fesCoinPrice !== undefined;
   const derivedFesPrices = item.fesCoinPrice != null ? derivePrices(item.fesCoinPrice, isFlower ? "flower" : "crop") : null;
   const coinText = v => `${currencyIcon("coin")}${v.toLocaleString()}`;
-  const fesCoinText = v => `${currencyIcon("fescoin")}${v.toLocaleString()}`;
+  // フェスによってフェスコインのアイコンが異なるため、データ側にfesCoinIconが
+  // 指定されていればそれを使う（未指定時は従来通り共通の"fescoin"）
+  const fesCoinText = v => `${currencyIcon(item.fesCoinIcon || "fescoin")}${v.toLocaleString()}`;
 
   const priceRows = stars.map((s,i) => `
     <tr>

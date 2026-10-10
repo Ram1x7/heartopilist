@@ -101,7 +101,7 @@ const sandData = [
  craftAnswer:"灯台",
  season:true,
  seasonName:"ホエールシーズン",
- img:"./images/000.PNG",
+ img:"./images/sands/016.PNG",
  auth:true
 },
 {
