@@ -125,20 +125,27 @@ function weatherWindowCategory(name) {
 
 // 出現カレンダーの6時間ウィンドウ要約アイコン用：そのウィンドウ内の1時間ごとの天気の
 // 配列から、表示すべき代表天気を1〜2件返す（実際のアイコン描画はweatherIconHTMLへ）。
-// 優先順位: 流星雨 > 虹 > 雨 > 晴れ（くもり等はすべて晴れ扱い）。
+// 優先順位: 流星雨 > 虹 > 雨 > 雪 > 晴れ（くもり等はすべて晴れ扱い）。
 // ただし「雨」と「流星雨」が両方含まれる場合だけは、流星雨だけに丸めず両方を返す
-// （雨のち流星雨のような日に、雨の情報が消えてしまわないようにするため）
+// （雨のち流星雨のような日に、雨の情報が消えてしまわないようにするため）。
+// 雪（弱い雪/大雪/豪雪）はdexCategory上は「晴れ」に丸めているが、アイコン表示まで
+// 晴れにしてしまうと雪の日が太陽・月アイコンになってしまうため、ここでは別枠で判定する
 function weatherWindowIcons(hourlyNames) {
   let hasRain = false, hasRainbow = false, hasMeteor = false;
+  let hasHeavySnow = false, hasLightSnow = false;
   (hourlyNames || []).forEach(name => {
     if (!name) return;
     if (isMeteorWeather(name)) hasMeteor = true;
     else if (isRainbowWeather(name)) hasRainbow = true;
     else if (weatherDexCategory(name) === "雨") hasRain = true;
+    else if (name === "大雪" || name === "豪雪") hasHeavySnow = true;
+    else if (name === "弱い雪") hasLightSnow = true;
   });
   if (hasMeteor) return hasRain ? ["雨", "流星雨"] : ["流星雨"];
   if (hasRainbow) return ["虹"];
   if (hasRain) return ["雨"];
+  if (hasHeavySnow) return ["大雪"];
+  if (hasLightSnow) return ["弱い雪"];
   return ["晴れ"];
 }
 
