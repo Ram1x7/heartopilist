@@ -1264,8 +1264,9 @@ const bugData = [
  auth:false
 },
 {
+ // th.gl ID: insects-51239 / イベント「幽夜の集い」2026-10-10開始
  name:"シイタケフンチュウ",
- nameI18n:{"ja":"シイタケフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シイタケフンチュウ","en":"Shiitake Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  price:110,
@@ -1279,8 +1280,9 @@ const bugData = [
  auth:false
 },
 {
+ // th.gl ID: insects-51240 / イベント「幽夜の集い」2026-10-10開始
  name:"オレンジフンチュウ",
- nameI18n:{"ja":"オレンジフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オレンジフンチュウ","en":"Mandarin Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  price:110,
@@ -1294,8 +1296,9 @@ const bugData = [
  auth:false
 },
 {
+ // th.gl ID: insects-51241 / イベント「幽夜の集い」2026-10-10開始
  name:"イチゴフンチュウ",
- nameI18n:{"ja":"イチゴフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イチゴフンチュウ","en":"Strawberry Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  price:110,
@@ -1309,8 +1312,9 @@ const bugData = [
  auth:false
 },
 {
+ // th.gl ID: insects-51242 / イベント「幽夜の集い」2026-10-10開始
  name:"かぼちゃフンチュウ",
- nameI18n:{"ja":"かぼちゃフンチュウ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"かぼちゃフンチュウ","en":"Pumpkin Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  price:110,
@@ -1321,6 +1325,23 @@ const bugData = [
  location:"森林-不思議な松林",
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/bugs/1029.PNG",
+ auth:false
+},
+{
+ // th.gl ID: insects-51243 / イベント「幽夜の集い」2026-10-10開始
+ // 特殊入手イベント名（ユーザー確認済み）
+ // ☆2売価は標準倍率(floor×1.5=247)と異なりユーザー確認済みの248を個別指定（prices参照）
+ name:"トリュフフンチュウ",
+ nameI18n:{"ja":"トリュフフンチュウ","en":"Truffle Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ price:165,
+ prices:[165,248,330,660,1320],
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"フンチュウ変異クエスト",
+ locationI18n:{"ja":"フンチュウ変異クエスト","en":"Dung Beetle Mutation Event","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/000.PNG", // 画像未登録のため仮画像
  auth:false
 },
  // ここに追加していく

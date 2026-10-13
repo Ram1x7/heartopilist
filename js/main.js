@@ -463,12 +463,15 @@ function applyCommonFilters(arr){
   const keyword = document.getElementById("search").value;
   if(keyword){
     const kw = keyword.toLowerCase();
-    out = out.filter(c =>
-      (c.name || "").toLowerCase().includes(kw) ||
-      (c.location || "").toLowerCase().includes(kw) ||
-      displayName(c).toLowerCase().includes(kw) ||
-      displayLocation(c).toLowerCase().includes(kw)
-    );
+    out = out.filter(c => {
+      // 表示中の言語に関わらず、登録済みの全言語名（英語名など）でも検索できるようにする
+      const i18nMatch = c.nameI18n && Object.values(c.nameI18n).some(n => (n || "").toLowerCase().includes(kw));
+      return (c.name || "").toLowerCase().includes(kw) ||
+        (c.location || "").toLowerCase().includes(kw) ||
+        displayName(c).toLowerCase().includes(kw) ||
+        displayLocation(c).toLowerCase().includes(kw) ||
+        i18nMatch;
+    });
   }
 
   out = out.filter(c =>
@@ -1208,7 +1211,9 @@ function openModal(c){
  }
 
  const isBird = c.type === "bird";
- const prices = calcStars(basePrice, isBird);
+ // 標準の倍率計算に乗らない例外（フンチュウ系統など）のため、
+ // ★1〜5を個別指定するpricesが存在する場合はそちらを優先する
+ const prices = Array.isArray(c.prices) ? c.prices : calcStars(basePrice, isBird);
  const priceEls = [m_price1, m_price2, m_price3, m_price4, m_price5];
  priceEls.forEach((el, i) => { el.innerHTML = fmtCell(prices[i], "coin"); });
 
