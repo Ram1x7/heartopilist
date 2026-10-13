@@ -1668,8 +1668,9 @@ const fishData = [
  auth:false
 },
 {
+ // th.gl ID: fish-10435 / イベント「幽夜の集い」2026-10-10開始
  name:"シリヤケイカ",
- nameI18n:{"ja":"シリヤケイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シリヤケイカ","en":"Spineless Cuttlefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  shadow:"中",
@@ -1684,8 +1685,9 @@ const fishData = [
  auth:false
 },
 {
+ // th.gl ID: fish-10436 / イベント「幽夜の集い」2026-10-10開始
  name:"トラフコウイカ",
- nameI18n:{"ja":"トラフコウイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トラフコウイカ","en":"Pharaoh Cuttlefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  shadow:"中",
@@ -1700,8 +1702,9 @@ const fishData = [
  auth:false
 },
 {
+ // th.gl ID: fish-10437 / イベント「幽夜の集い」2026-10-10開始
  name:"コウイカ",
- nameI18n:{"ja":"コウイカ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コウイカ","en":"Golden Cuttlefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  shadow:"中",
@@ -1716,8 +1719,9 @@ const fishData = [
  auth:false
 },
 {
+ // th.gl ID: fish-10438 / イベント「幽夜の集い」2026-10-10開始
  name:"ブルークリオネ",
- nameI18n:{"ja":"ブルークリオネ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ブルークリオネ","en":"Blue Sea Angel","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
  level:1,
  shadow:"小",
@@ -1729,6 +1733,38 @@ const fishData = [
  location:"旧海",
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/1031.PNG",
+ auth:false
+},
+{
+ // th.gl ID: fish-10439 / イベント「幽夜の集い」2026-10-10開始
+ // 特殊入手イベント名（ユーザー確認済み）
+ name:"グリーンクリオネ",
+ nameI18n:{"ja":"グリーンクリオネ","en":"Green Sea Angel","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ shadow:"小", // 魚影の個別指定なし。クリオネ系統（ブルークリオネ）に準拠し推定
+ price:150,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"幽光魚群クエスト",
+ locationI18n:{"ja":"幽光魚群クエスト","en":"Spectral Shoal Event","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/000.PNG", // 画像未登録のため仮画像
+ auth:false
+},
+{
+ // th.gl ID: fish-10440 / イベント「幽夜の集い」2026-10-10開始
+ // 特殊入手イベント名（ユーザー確認済み）
+ name:"パープルクリオネ",
+ nameI18n:{"ja":"パープルクリオネ","en":"Purple Sea Angel","zh-CN":"","zh-TW":"","ko":"","th":""},
+ fes:true,
+ level:1,
+ shadow:"小", // 魚影の個別指定なし。クリオネ系統（ブルークリオネ）に準拠し推定
+ price:150,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"幽光魚群クエスト",
+ locationI18n:{"ja":"幽光魚群クエスト","en":"Spectral Shoal Event","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/000.PNG", // 画像未登録のため仮画像
  auth:false
 }
   // ここに追加していく
