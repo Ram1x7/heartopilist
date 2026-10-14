@@ -96,5 +96,11 @@ const catFoods = [
 {id:"145",name:{jp:"ブラウンブロッチガーパイク",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/145.PNG"},
 {id:"146",name:{jp:"シルバーガーパイク",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/146.PNG"},
 {id:"147",name:{jp:"ブラックスポットガーパイク",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/147.PNG"},
-{id:"148",name:{jp:"ゴールデンガーパイク",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/148.PNG"}
+{id:"148",name:{jp:"ゴールデンガーパイク",en:"",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/148.PNG"},
+{id:"149",name:{jp:"シリヤケイカ",en:"Spineless Cuttlefish",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/149.PNG"},
+{id:"150",name:{jp:"トラフコウイカ",en:"Pharaoh Cuttlefish",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/150.PNG"},
+{id:"151",name:{jp:"コウイカ",en:"Golden Cuttlefish",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/151.PNG"},
+{id:"152",name:{jp:"ブルークリオネ",en:"Blue Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/152.PNG"},
+{id:"153",name:{jp:"グリーンクリオネ",en:"Green Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/153.PNG"},
+{id:"154",name:{jp:"パープルクリオネ",en:"Purple Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/154.PNG"}
 ];
