@@ -1337,11 +1337,13 @@ const bugData = [
  level:1,
  price:165,
  prices:[165,248,330,660,1320],
+ fesCoinPrice:35, // ★2=52・★3=70はユーザー確認済み（標準の切り捨て計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"フンチュウ変異クエスト",
  locationI18n:{"ja":"フンチュウ変異クエスト","en":"Dung Beetle Mutation Event","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/bugs/1030.PNG",
  auth:false
 },
  // ここに追加していく

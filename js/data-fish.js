@@ -1744,11 +1744,13 @@ const fishData = [
  level:1,
  shadow:"小", // 魚影の個別指定なし。クリオネ系統（ブルークリオネ）に準拠し推定
  price:150,
+ fesCoinPrice:25, // ★3=50はユーザー確認済み（標準の切り捨て計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"幽光魚群クエスト",
  locationI18n:{"ja":"幽光魚群クエスト","en":"Spectral Shoal Event","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/fish/1032.PNG",
  auth:false
 },
 {
@@ -1760,11 +1762,13 @@ const fishData = [
  level:1,
  shadow:"小", // 魚影の個別指定なし。クリオネ系統（ブルークリオネ）に準拠し推定
  price:150,
+ fesCoinPrice:25, // ★2=37・★3=50・★4=100はユーザー確認済み（標準の切り捨て計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"幽光魚群クエスト",
  locationI18n:{"ja":"幽光魚群クエスト","en":"Spectral Shoal Event","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/fish/1033.PNG",
  auth:false
 }
   // ここに追加していく
