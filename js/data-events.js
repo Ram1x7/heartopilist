@@ -585,9 +585,9 @@ const eventData = [
     name: "フェス「幽夜の集い」",
     img: "./images/events/e052.jpg",
     start: "2026-10-10 06:00",
-    end: null,
+    end: "2026-11-21 05:59",
     exchangeEnd: null,
-    detail: "詳細は近日公開予定です。",
+    detail: "開催条件：開拓者レベル7に到達し、初心者ガイド「答えはここにある」冒険クエストを完了する。",
     link: "https://x.com/heartopia_jp/status/2106670675163218008?s=61",
   },
   {
