@@ -1220,7 +1220,10 @@ function openModal(c){
  // フェス限定：フェスコインでの売却価格（通常コインと同じ計算方法で★1〜5を算出）
  const hasFesField = c.fesCoinPrice !== undefined;
  m_priceTable.classList.toggle("has-fes", hasFesField);
- const fesPrices = hasFesField ? calcStars(c.fesCoinPrice ?? 0, isBird) : [null,null,null,null,null];
+ // フェスコインも同様に、標準の倍率計算に乗らない例外のためfesPricesがあれば優先する
+ const fesPrices = hasFesField
+   ? (Array.isArray(c.fesPrices) ? c.fesPrices : calcStars(c.fesCoinPrice ?? 0, isBird))
+   : [null,null,null,null,null];
  const fesPriceEls = [m_fesPrice1, m_fesPrice2, m_fesPrice3, m_fesPrice4, m_fesPrice5];
  // フェスによってフェスコインのアイコンが異なるため、データ側にfesCoinIconが
  // 指定されていればそれを使う（未指定時は従来通り共通の"fescoin"）

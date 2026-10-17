@@ -1397,12 +1397,15 @@ const birdData = [
  fes:true,
  level:1,
  price:10,
+ fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
+ fesCoinIcon:"yuuyafes_coin",
+ fesPrices:[2,10,20,null,null],
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-石海岸の崖",
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1027.PNG",
  auth:false
 },
 {
@@ -1412,12 +1415,15 @@ const birdData = [
  fes:true,
  level:1,
  price:10,
+ fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
+ fesCoinIcon:"yuuyafes_coin",
+ fesPrices:[2,10,20,null,null],
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-温泉",
  locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1028.PNG",
  auth:false
 },
 {
@@ -1427,12 +1433,15 @@ const birdData = [
  fes:true,
  level:1,
  price:10,
+ fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
+ fesCoinIcon:"yuuyafes_coin",
+ fesPrices:[2,10,20,null,null],
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-火山湖",
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1029.PNG",
  auth:false
 },
 {
@@ -1442,12 +1451,15 @@ const birdData = [
  fes:true,
  level:1,
  price:10,
+ fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
+ fesCoinIcon:"yuuyafes_coin",
+ fesPrices:[2,10,20,null,null],
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
  location:"温泉山-遺跡",
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1030.PNG",
  auth:false
 },
 {
@@ -1463,7 +1475,7 @@ const birdData = [
  time:["6-12","12-18","18-0","0-6"],
  location:"ワタリガラスの隠し餌クエスト",
  locationI18n:{"ja":"ワタリガラスの隠し餌クエスト","en":"Raven's Hoard Event","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1031.PNG",
  auth:false
 },
 {
@@ -1473,12 +1485,14 @@ const birdData = [
  fes:true,
  level:1,
  price:2,
+ fesCoinPrice:1, // ★2=4はユーザー確認済み（標準の鳥用計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1035.PNG",
  auth:false
 },
 {
@@ -1488,12 +1502,14 @@ const birdData = [
  fes:true,
  level:1,
  price:2,
+ fesCoinPrice:1, // ★2=4はユーザー確認済み（標準の鳥用計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1036.PNG",
  auth:false
 },
 {
@@ -1503,12 +1519,14 @@ const birdData = [
  fes:true,
  level:1,
  price:2,
+ fesCoinPrice:1, // ★2=4はユーザー確認済み（標準の鳥用計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1037.PNG",
  auth:false
 },
 {
@@ -1518,12 +1536,14 @@ const birdData = [
  fes:true,
  level:1,
  price:2,
+ fesCoinPrice:1, // ★2=4はユーザー確認済み（標準の鳥用計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1032.PNG",
  auth:false
 },
 {
@@ -1533,12 +1553,14 @@ const birdData = [
  fes:true,
  level:1,
  price:2,
+ fesCoinPrice:1, // ★2=4はユーザー確認済み（標準の鳥用計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1033.PNG",
  auth:false
 },
 {
@@ -1548,12 +1570,14 @@ const birdData = [
  fes:true,
  level:1,
  price:2,
+ fesCoinPrice:1, // ★2=4はユーザー確認済み（標準の鳥用計算式と一致）
+ fesCoinIcon:"yuuyafes_coin",
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18"],
  location:"森林-森の島",
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/000.PNG", // 画像未登録のため仮画像
+ img:"images/birds/1034.PNG",
  auth:false
 }
  // ここに追加していく
