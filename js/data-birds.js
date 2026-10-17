@@ -1399,7 +1399,7 @@ const birdData = [
  price:10,
  fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
  fesCoinIcon:"yuuyafes_coin",
- fesPrices:[2,10,20,null,null],
+ fesPrices:[2,10,20,40,80], // ★4=40・★5=80は★2=10を基準にした倍率計算（標準鳥式の2倍・4倍・8倍パターンを適用）
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
@@ -1417,7 +1417,7 @@ const birdData = [
  price:10,
  fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
  fesCoinIcon:"yuuyafes_coin",
- fesPrices:[2,10,20,null,null],
+ fesPrices:[2,10,20,40,80], // ★4=40・★5=80は★2=10を基準にした倍率計算（標準鳥式の2倍・4倍・8倍パターンを適用）
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
@@ -1435,7 +1435,7 @@ const birdData = [
  price:10,
  fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
  fesCoinIcon:"yuuyafes_coin",
- fesPrices:[2,10,20,null,null],
+ fesPrices:[2,10,20,40,80], // ★4=40・★5=80は★2=10を基準にした倍率計算（標準鳥式の2倍・4倍・8倍パターンを適用）
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
@@ -1453,7 +1453,7 @@ const birdData = [
  price:10,
  fesCoinPrice:2, // ★2=10・★3=20はユーザー確認済み（標準の鳥用計算式とは不一致のためfesPricesを個別指定）
  fesCoinIcon:"yuuyafes_coin",
- fesPrices:[2,10,20,null,null],
+ fesPrices:[2,10,20,40,80], // ★4=40・★5=80は★2=10を基準にした倍率計算（標準鳥式の2倍・4倍・8倍パターンを適用）
  star5:"雨・虹 / 全時間",
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
