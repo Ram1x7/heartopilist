@@ -66,14 +66,11 @@
   overflow-x:auto;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
+  margin-bottom:8px;
 }
 
 #otSeasonRow::-webkit-scrollbar{
   display:none;
-}
-
-#otSeasonRow{
-  margin-bottom:8px;
 }
 
 #otSeasonRow button{
@@ -291,6 +288,11 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
     <button id="otCat_furniture" onclick="setOtCategory('furniture')" data-i18n="order_trend_cat_furniture">家具</button>
     <button id="otCat_clothing" onclick="setOtCategory('clothing')" data-i18n="order_trend_cat_clothing">服</button>
     <button id="otCat_other" onclick="setOtCategory('other')" data-i18n="order_trend_cat_other">その他</button>
+  </div>
+
+  <div class="filter" id="otSortRow">
+    <button id="otSort_book" class="active" onclick="setOtSort('book')" data-i18n="shop_sort_book">並び順</button>
+    <button id="otSort_unowned" onclick="setOtSort('unowned')" data-i18n="order_trend_sort_unowned">未所持順</button>
   </div>
 
   <div class="filter">

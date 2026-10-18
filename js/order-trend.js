@@ -121,6 +121,29 @@ function otMatchesFilters(item){
   return true;
 }
 
+// ── 並び替え ──
+let otSortMode = "book"; // "book" = 並び順 / "unowned" = 未所持順
+function setOtSort(mode){
+  otSortMode = mode;
+  document.getElementById("otSort_book").classList.toggle("active", mode === "book");
+  document.getElementById("otSort_unowned").classList.toggle("active", mode === "unowned");
+  renderOtContent();
+}
+
+function sortOtItems(items){
+  if(otSortMode !== "unowned") return items;
+  // 未所持を先に、所持済みを後ろに（同じ状態内は元の並び順を維持）
+  return items
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => {
+      const aOwned = otOwned[a.item.id] ? 1 : 0;
+      const bOwned = otOwned[b.item.id] ? 1 : 0;
+      if(aOwned !== bOwned) return aOwned - bOwned;
+      return a.index - b.index;
+    })
+    .map(x => x.item);
+}
+
 function fmtOtPrice(item){
   const iconHTML = typeof currencyIcon === "function" ? currencyIcon(item.currency) : "";
   let html = `<span class="ot-item-price-icon">${iconHTML}</span>${item.price.toLocaleString()}`;
@@ -195,12 +218,12 @@ function renderOtContent(){
     blocks.push(`
       <div class="ot-season-block">
         <h2 class="ot-season-title">${label}</h2>
-        <div class="ot-grid">${seasonItems.map(otCardHTML).join("")}</div>
+        <div class="ot-grid">${sortOtItems(seasonItems).map(otCardHTML).join("")}</div>
       </div>
     `);
   });
   if(noSeasonItems.length){
-    blocks.push(`<div class="ot-season-block"><div class="ot-grid">${noSeasonItems.map(otCardHTML).join("")}</div></div>`);
+    blocks.push(`<div class="ot-season-block"><div class="ot-grid">${sortOtItems(noSeasonItems).map(otCardHTML).join("")}</div></div>`);
   }
 
   content.innerHTML = blocks.join("");
