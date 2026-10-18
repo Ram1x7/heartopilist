@@ -73,7 +73,7 @@
     opening = true; button.disabled = true;
     const ticket = ++generation, requestedFrame = activeFrameId;
     try {
-      const { openPreview, loadPreviewStyles } = await import('./art-3d-preview.js?v=5');
+      const { openPreview, loadPreviewStyles } = await import('./art-3d-preview.js?v=6');
       await loadPreviewStyles();
       if(ticket !== generation || !available() || requestedFrame !== activeFrameId) return;
       openedFrame = requestedFrame;
