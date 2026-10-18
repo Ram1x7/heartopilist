@@ -66,7 +66,7 @@ otClearBtn.onclick = ()=>{
 // ── シーズン絞り込み ──
 let otSeason = "all";
 const otSeasonKeys = typeof orderTrendSeasons === "object"
-  ? Object.keys(orderTrendSeasons).sort((a, b)=> (orderTrendSeasons[b].order||0) - (orderTrendSeasons[a].order||0))
+  ? Object.keys(orderTrendSeasons).sort((a, b)=> (orderTrendSeasons[a].order||0) - (orderTrendSeasons[b].order||0))
   : [];
 
 (function buildSeasonFilter(){
@@ -88,6 +88,7 @@ const otSeasonKeys = typeof orderTrendSeasons === "object"
     btn.onclick = ()=> setOtSeason(key);
     row.appendChild(btn);
   });
+  // 横スクロールのフェード＋矢印表示はjs/scroll-hint.js（.scroll-hint-wrap共通）が担当
 })();
 
 function setOtSeason(key){

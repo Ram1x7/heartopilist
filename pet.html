@@ -567,6 +567,7 @@ body.dark .footer {
 </div>
 
 <!-- サイトナビ -->
+<div class="scroll-hint-wrap">
 <nav class="site-nav">
   <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
   <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
@@ -584,12 +585,13 @@ body.dark .footer {
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
+</div>
 
 <!-- コントロールカード -->
 <div class="card sticky">
   <div class="control-inner">
     <div class="control-row" id="petAddRow">
-      <div class="pet-selector" id="petSelector"></div>
+      <div class="scroll-hint-wrap"><div class="pet-selector" id="petSelector"></div></div>
       <select id="petTypeSelect" class="type-select">
         <option value="dog">🐶 犬</option>
         <option value="cat">🐱 猫</option>
@@ -691,6 +693,7 @@ body.dark .footer {
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/data-updates.js"></script>

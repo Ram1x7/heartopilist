@@ -413,7 +413,6 @@
   "shop_no_results": "該当するアイテムがありません",
   "order_trend_page_title": "オーダーチケット",
   "order_trend_page_subtitle": "商品注文で過去に入荷したトレンドアイテムの一覧です",
-  "order_trend_note": "名称表示が無いまま撮影されたアイテムは、見た目の説明のみ表示しています（斜体表示）。正式名称が分かる方はぜひ教えてください。",
   "order_trend_search_placeholder": "アイテム名で検索",
   "order_trend_cat_all": "すべて",
   "order_trend_cat_furniture": "家具",

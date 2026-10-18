@@ -638,6 +638,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
   </div>
 </div>
 
+<div class="scroll-hint-wrap">
 <nav class="site-nav">
   <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
   <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
@@ -655,18 +656,21 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
+</div>
 
 <div class="page-header">
   <h2 data-i18n="map_page_title">マップ</h2>
   <p data-i18n="map_page_subtitle">ドラッグで移動・ピンチ／ホイールで拡大縮小できます</p>
 </div>
 
+<div class="scroll-hint-wrap">
 <div class="map-cat-tabs">
   <button class="ds-tab active" id="mapcat-npc" onclick="toggleMapCat('npc')" data-i18n="map_cat_npc">NPC</button>
   <button class="ds-tab active" id="mapcat-shop" onclick="toggleMapCat('shop')" data-i18n="map_cat_shop">ショップ</button>
   <button class="ds-tab active" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
   <button class="ds-tab active" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
   <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
+</div>
 </div>
 
 <div class="map-viewport" id="mapViewport">
@@ -754,6 +758,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/data-updates.js"></script>
