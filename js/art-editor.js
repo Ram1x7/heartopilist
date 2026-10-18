@@ -4,8 +4,7 @@
 // Phase 3: Undo/Redo（スナップショット方式、最大50段階）
 // Phase 4.5: キャンバスの「実データのマス数」と「画面上の表示サイズ」を分離し、
 //   正方形以外の比率にも対応（1マスは常に正方形として描画）
-// キャンバスサイズはjs/art-config.jsのFREE_CANVAS_RATIOS（比率×サイズレベル、
-// art-pia.comのConsole出力から確認済みの実数値）から選択する
+// キャンバスサイズはjs/art-config.jsのFREE_CANVAS_RATIOS（比率×サイズレベル）から選択する
 
 // ズーム100%＝画面（.art-canvas-area、固定サイズの表示エリア）にキャンバス全体が
 // ちょうど収まる大きさ。1マスのピクセルサイズはfitCellSize()で動的に求める

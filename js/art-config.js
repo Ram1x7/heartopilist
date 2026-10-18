@@ -1,8 +1,7 @@
 // js/art-config.js
 // 「アート」機能（art-create.html / art-convert.html）で共有するキャンバスサイズ設定。
 //
-// 以下のデータは、ユーザーがart-pia.com（参考サイト）のConsoleから実際に書き出して
-// 提供してくれた正確な値をもとにしている（推測値ではない）。
+// ゲーム内キャンバスの寸法とパーツ構成を定義する。
 //
 // FREE_CANVAS_RATIOS: 自由キャンバスの比率（5種）×サイズレベル（4段階）。
 // DESIGN_FRAME_PRESETS: 「画像から作る」で選べるゲーム内デザイン枠（衣装・家具など）。
@@ -25,8 +24,8 @@ function ratioShapeBox(ratioId, maxSide){
 }
 
 // パーツ選択画面用：実物の写真の代わりに、そのパーツの輪郭線（maskLines）だけを
-// 背景無地の小さなSVGとして描く（js/art-masks.jsのPRESET_MASKS＝art-pia.comの実データが
-// 元になっており、キャンバス編集画面・切り抜き画面の輪郭線表示と完全に同じデータを使う）
+// 背景無地の小さなSVGとして描く。js/art-masks.jsのPRESET_MASKSを使い、
+// 編集画面・切り抜き画面と同じ輪郭線を表示する。
 function partOutlineThumbSvg(frameId, partId, maxSide){
   const frame = DESIGN_FRAME_PRESETS.find(f => f.id === frameId);
   const part = frame && frame.parts.find(p => p.id === partId);

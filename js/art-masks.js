@@ -1,6 +1,5 @@
 // js/art-masks.js
 // アイテム別プリセットの輪郭線(maskLines)・使用不可マス(disabledRanges)データ。
-// art-pia.com（参考サイト）のlocalStorageから取得した実データをもとにしている。
 //
 // PRESET_MASKS[プリセットid][パーツid] = {
 //   maskLines: [[{x,y}, ...], ...],   // 輪郭線の頂点座標（複数パスの場合あり）。単位はグリッドのマス
