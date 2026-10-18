@@ -2,18 +2,35 @@ import * as THREE from './vendor/three/three.module.min.js';
 import { buildTshirt } from './art-3d-models/tshirt.js';
 import { polygonMask, nearestInside } from './art-3d-models/pattern-helpers.js';
 
+let stylesheetPromise;
+export function loadPreviewStyles() {
+  if(stylesheetPromise) return stylesheetPromise;
+  const href=new URL('../css/art-preview-panel.css?v=1',import.meta.url).href;
+  stylesheetPromise=new Promise((resolve,reject)=>{
+    let link=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(item=>item.href===href);
+    if(link?.sheet){resolve();return;}
+    const fresh=!link;
+    if(fresh){link=document.createElement('link');link.rel='stylesheet';link.href=href;}
+    link.addEventListener('load',resolve,{once:true});
+    link.addEventListener('error',()=>{link.remove();stylesheetPromise=null;reject(new Error('Preview stylesheet unavailable'));},{once:true});
+    if(fresh)document.head.append(link);
+  });
+  return stylesheetPromise;
+}
+
 // One viewer per editor, no writes to browser storage or source pixel arrays.
 export function openPreview(bridge, onClose) {
   const dialog=document.createElement('dialog');
-  dialog.className='art3d-dialog'; dialog.setAttribute('aria-labelledby','art3d-title');
-  dialog.innerHTML=`<header class="art3d-header"><div><p class="art3d-eyebrow">はとぴ図鑑 · アート</p><h2 id="art3d-title">デザインを、立体で確認</h2></div><button type="button" class="art3d-close" data-close aria-label="3Dプレビューを閉じる">閉じる</button></header>
-    <div class="art3d-body"><div><div class="art3d-stage" role="img" aria-label="Tシャツの立体表示。ドラッグで回転できます"><p class="art3d-status" role="status">3Dを準備しています…</p></div>
-    <p class="art3d-stage-caption">Tシャツ · ドラッグして、ぐるっと確認</p><div class="art3d-directions" aria-label="表示する方向"><button type="button" data-view="front">前</button><button type="button" data-view="back">後</button><button type="button" data-view="left">左</button><button type="button" data-view="right">右</button><button type="button" data-view="reset">初期位置</button></div></div>
-    <div class="art3d-options"><h3>デザインの組み合わせ</h3><p class="art3d-help">背面や袖に使う作品を選べます。<br>編集中の面は、そのまま反映されます。</p><div class="art3d-controls"><button type="button" data-color aria-pressed="false">色確認</button> <button type="button" data-auto aria-pressed="false">自動回転</button></div></div></div>
-    <p class="art3d-note">ドラッグで回転できます。未設定の面・未着色のマスは白で表示します。形状と柄の位置は目安です。ゲーム内の着用姿とは異なる場合があります。</p>`;
+  dialog.className='hatopi-preview'; dialog.setAttribute('aria-labelledby','hatopi-preview-title');
+  dialog.innerHTML=`<header class="hatopi-preview-header"><div><span class="hatopi-preview-tag">Tシャツ</span><h2 id="hatopi-preview-title" tabindex="-1">3Dプレビュー</h2></div><button type="button" data-close aria-label="3Dプレビューを閉じる">閉じる <span aria-hidden="true">×</span></button></header>
+    <div class="hatopi-preview-body"><section class="hatopi-preview-viewer" aria-label="仕上がりを確認"><div class="hatopi-preview-stage"><p class="hatopi-preview-status" role="status">Tシャツを読み込んでいます…</p></div>
+    <p class="hatopi-preview-caption">指やマウスで動かして、向きを変えられます</p><div class="hatopi-preview-directions" aria-label="見る方向"><button type="button" data-view="front">正面</button><button type="button" data-view="back">背面</button><button type="button" data-view="left">左側</button><button type="button" data-view="right">右側</button></div><div class="hatopi-preview-tools"><button type="button" data-view="reset">向きを戻す</button><button type="button" data-auto aria-pressed="false">自動で回す</button><button type="button" data-color aria-pressed="false">色を確認</button></div></section>
+    <section class="hatopi-preview-settings" aria-labelledby="hatopi-preview-parts-title"><header><h3 id="hatopi-preview-parts-title">使うデザイン</h3><p>編集中の面は、そのまま表示されます。<br>ほかの面は保存したデザインから選べます。</p></header><div class="hatopi-preview-parts"></div><p class="hatopi-preview-hint">選んでも、保存したデザインは変更されません。</p></section></div>
+    <details class="hatopi-preview-note"><summary>表示について</summary><p>デザインを選んでいない面と、塗っていないマスは白で表示します。「色を確認」を押すと、陰影を外して配色を見られます。形や柄の位置は目安です。ゲーム内の着用姿とは異なる場合があります。</p></details>`;
   document.body.append(dialog); dialog.showModal();
-  const stage=dialog.querySelector('.art3d-stage'),status=dialog.querySelector('.art3d-status');
-  const options=dialog.querySelector('.art3d-options'), selections={},selects={};
+  dialog.querySelector('h2').focus({preventScroll:true});
+  const stage=dialog.querySelector('.hatopi-preview-stage'),status=dialog.querySelector('.hatopi-preview-status');
+  const options=dialog.querySelector('.hatopi-preview-parts'), selections={},selects={};
   const abort=new AbortController(), signal=abort.signal;
   let renderer=null, scene=null, camera=null, model=null, observer=null;
   let closed=false, raf=0, pending=false, auto=false, color=false, lastTime=0;
@@ -22,8 +39,8 @@ export function openPreview(bridge, onClose) {
   const listen=(target,event,fn)=>target.addEventListener(event,fn,{signal});
   const error=message=>{ status.textContent=message;status.setAttribute('role','alert'); };
   for(const [role,definition] of Object.entries(bridge.roles)) {
-    const label=document.createElement('label');label.append(document.createTextNode(definition.label+'のデザイン'));
-    const select=document.createElement('select');select.setAttribute('aria-label',definition.label+'のデザイン');
+    const label=document.createElement('label');label.append(document.createTextNode(definition.label));
+    const select=document.createElement('select');select.setAttribute('aria-label',definition.label);
     label.append(select); options.append(label); selects[role]=select;
     listen(select,'change',()=>{selections[role]=select.value;requestUpdate();});
   }
@@ -32,7 +49,7 @@ export function openPreview(bridge, onClose) {
     for(const role of Object.keys(bridge.roles)) {
       const select=selects[role],value=selections[role]||'';
       const candidates=bridge.candidates(role);
-      const entries=role===active?[{id:'',name:'編集中の内容（未保存も反映）'}]:[{id:'',name:'未設定（白）'},...candidates];
+      const entries=role===active?[{id:'',name:'編集中のデザイン'}]:[{id:'',name:'白のまま（未設定）'},...candidates];
       // Avoid resetting focus / selected option while drawing.
       const signature=JSON.stringify([active,entries]);
       if(select.dataset.signature!==signature) {
@@ -108,7 +125,7 @@ export function openPreview(bridge, onClose) {
   function schedule() { if(!closed && !document.hidden && !raf) raf=requestAnimationFrame(draw); }
   function requestUpdate() {pending=true;schedule();}
   function setAuto(value) {
-    auto=value;lastTime=0;dialog.querySelector('[data-auto]').setAttribute('aria-pressed',String(auto));schedule();
+    auto=value;lastTime=0;const button=dialog.querySelector('[data-auto]');button.setAttribute('aria-pressed',String(auto));button.textContent=auto?'自動回転を止める':'自動で回す';schedule();
   }
   function close() {
     if(closed) return;closed=true;abort.abort();cancelAnimationFrame(raf);observer?.disconnect();
@@ -125,7 +142,7 @@ export function openPreview(bridge, onClose) {
   listen(document,'visibilitychange',()=>{cancelAnimationFrame(raf);raf=0;lastTime=0;if(!document.hidden)schedule();});
   listen(dialog.querySelector('[data-auto]'),'click',()=>setAuto(!auto));
   listen(dialog.querySelector('[data-color]'),'click',()=>{
-    color=!color;dialog.querySelector('[data-color]').setAttribute('aria-pressed',String(color));
+    color=!color;const button=dialog.querySelector('[data-color]');button.setAttribute('aria-pressed',String(color));button.textContent=color?'陰影を戻す':'色を確認';
     if(modelMesh)modelMesh.material=surfaces.map(s=>color?s.basic:s.cloth);schedule();
   });
   dialog.querySelectorAll('[data-view]').forEach(button=>listen(button,'click',()=>{
