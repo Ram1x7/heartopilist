@@ -133,6 +133,12 @@ function fmtOtPrice(item){
   return html;
 }
 
+// ── 所持済み記録 ──
+let otOwned = JSON.parse(localStorage.getItem("orderTrendOwned") || "{}");
+function saveOtOwned(){
+  localStorage.setItem("orderTrendOwned", JSON.stringify(otOwned));
+}
+
 function otCardHTML(item){
   const nameHTML = item.name
     ? `<div class="ot-item-name">${item.name}</div>`
@@ -145,9 +151,15 @@ function otCardHTML(item){
   if(item.arrivalDays != null){
     subParts.push(`${T("order_trend_days_label","入荷まで")}:${item.arrivalDays}${T("order_trend_days_unit","日")}`);
   }
+  const owned = !!otOwned[item.id];
   return `
     <div class="ot-card">
-      <img src="${item.img}" loading="lazy" alt="">
+      <div class="img-wrap">
+        <button class="check-btn ${owned ? "checked" : ""}" data-ot-check="${item.id}" aria-label="owned">
+          ${icon(owned ? "check" : "checkSquare", {size:13})}
+        </button>
+        <img src="${item.img}" loading="lazy" alt="">
+      </div>
       ${nameHTML}
       <div class="ot-item-price">${fmtOtPrice(item)}</div>
       ${subParts.length ? `<div class="ot-item-sub">${subParts.join("　")}</div>` : ""}
@@ -193,6 +205,15 @@ function renderOtContent(){
 
   content.innerHTML = blocks.join("");
 }
+
+document.getElementById("otContent").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-ot-check]");
+  if(!btn) return;
+  const id = btn.getAttribute("data-ot-check");
+  otOwned[id] = !otOwned[id];
+  saveOtOwned();
+  renderOtContent();
+});
 
 // i18n連携用ヘルパー（i18n未準備時は日本語フォールバックを返す）
 function T(key, fallback, vars){
