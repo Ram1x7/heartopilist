@@ -34,3 +34,8 @@
 .hatopi-preview :focus-visible{outline:2px solid var(--gold,#c8a86b);outline-offset:3px}
 body.dark .hatopi-preview{--hp-paper:var(--dark-card,#2c2823);--hp-wash:var(--dark-card-alt,#383329);--hp-ink:var(--dark-text,#ece4d4);--hp-muted:var(--dark-text-sub,#b3a89a);--hp-line:var(--dark-border,#46423b);--hp-accent:var(--indigo-soft,#5a7d92)}
 @media(max-width:700px){.hatopi-preview{width:calc(100vw - 20px);max-height:94dvh;border-radius:18px}.hatopi-preview .hatopi-preview-header{padding:14px}.hatopi-preview-header>div{display:block}.hatopi-preview h2{font-size:17px;margin-top:5px}.hatopi-preview .hatopi-preview-tag{padding:0;background:none}.hatopi-preview .hatopi-preview-body{grid-template-columns:1fr;padding:14px;gap:18px}.hatopi-preview .hatopi-preview-stage{height:clamp(230px,38dvh,350px)}.hatopi-preview .hatopi-preview-settings{padding:14px}.hatopi-preview .hatopi-preview-note{margin:0 14px 14px}.hatopi-preview-tools button{flex:1;padding:9px 6px}.hatopi-preview-directions button{padding:9px 6px}}
+
+.hatopi-preview .hatopi-preview-guide{margin-top:12px;border-top:1px solid var(--hp-line);padding-top:6px;color:var(--hp-muted);font-size:11px;line-height:1.8}
+.hatopi-preview-guide summary{padding:7px 0;cursor:pointer;font-weight:700;color:var(--hp-ink);min-height:36px}
+.hatopi-preview-guide ol{margin:6px 0 10px;padding-left:20px}.hatopi-preview-guide li+li{margin-top:8px}
+.hatopi-preview .hatopi-preview-guide p{margin:0;color:var(--hp-muted);font-size:11px;line-height:1.8}

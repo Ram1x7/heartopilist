@@ -5,7 +5,7 @@ import { polygonMask, nearestInside } from './art-3d-models/pattern-helpers.js';
 let stylesheetPromise;
 export function loadPreviewStyles() {
   if(stylesheetPromise) return stylesheetPromise;
-  const href=new URL('../css/art-preview-panel.css?v=1',import.meta.url).href;
+  const href=new URL('../css/art-preview-panel.css?v=2',import.meta.url).href;
   stylesheetPromise=new Promise((resolve,reject)=>{
     let link=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(item=>item.href===href);
     if(link?.sheet){resolve();return;}
@@ -25,7 +25,7 @@ export function openPreview(bridge, onClose) {
   dialog.innerHTML=`<header class="hatopi-preview-header"><div><span class="hatopi-preview-tag" data-item-name></span><h2 id="hatopi-preview-title" tabindex="-1">3Dプレビュー</h2></div><button type="button" data-close aria-label="3Dプレビューを閉じる">閉じる <span aria-hidden="true">×</span></button></header>
     <div class="hatopi-preview-body"><section class="hatopi-preview-viewer" aria-label="仕上がりを確認"><div class="hatopi-preview-stage"><p class="hatopi-preview-status" role="status">立体モデルを読み込んでいます…</p></div>
     <p class="hatopi-preview-caption">指やマウスで動かして、向きを変えられます</p><div class="hatopi-preview-directions" aria-label="見る方向"><button type="button" data-view="front">正面</button><button type="button" data-view="back">背面</button><button type="button" data-view="left">左側</button><button type="button" data-view="right">右側</button></div><div class="hatopi-preview-tools"><button type="button" data-view="reset">向きを戻す</button><button type="button" data-auto aria-pressed="false">自動で回す</button><button type="button" data-color aria-pressed="false">色を確認</button></div></section>
-    <section class="hatopi-preview-settings" aria-labelledby="hatopi-preview-parts-title"><header><h3 id="hatopi-preview-parts-title">使うデザイン</h3><p>編集中の面は、そのまま表示されます。<br>ほかの面は保存したデザインから選べます。</p></header><div class="hatopi-preview-parts"></div><p class="hatopi-preview-hint">選んでも、保存したデザインは変更されません。</p></section></div>
+    <section class="hatopi-preview-settings" aria-labelledby="hatopi-preview-parts-title"><header><h3 id="hatopi-preview-parts-title">使うデザイン</h3><p>編集中のパーツは、保存前でも自動で反映されます。</p></header><details class="hatopi-preview-guide"><summary>背面・袖などの指定方法</summary><ol><li>いま編集中のデザインを「保存する」で保存します。</li><li>「新規作成」で同じ衣装の「バック」や袖などを選び、デザインを作って保存します。</li><li>「一覧を見る」から元のデザインを開き、3Dプレビューの各パーツ欄で保存したデザインを選びます。</li></ol><p>候補には、同じ衣装・パーツ・サイズの保存デザインだけが表示されます。</p></details><div class="hatopi-preview-parts"></div><p class="hatopi-preview-hint">未設定のパーツは白で表示します。選んでも、保存したデザインは変更されません。</p></section></div>
     <details class="hatopi-preview-note"><summary>表示について</summary><p>デザインを選んでいない面と、塗っていないマスは白で表示します。「色を確認」を押すと、陰影を外して配色を見られます。形や柄の位置は目安です。ゲーム内の着用姿とは異なる場合があります。</p></details>`;
   dialog.querySelector('[data-item-name]').textContent=bridge.title||'Tシャツ';
   document.body.append(dialog); dialog.showModal();
