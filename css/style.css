@@ -1952,6 +1952,69 @@ body.dark .site-nav-item.active{
   color:#fdf9ef;
 }
 
+/* 横スクロール可能な要素（ナビ・各種フィルタータブ）が画面外に続いている
+   ことを示すフェード＋矢印。js/scroll-hint.jsが.scroll-hint-wrapを自動検出し、
+   スクロール位置に応じて.scroll-hint-left/.scroll-hint-rightを付け外しする。
+   フェードの色は背景がページ地（--bg-top）かカード内（--card）かで変わるため、
+   --sh-bg/--sh-bg-darkで上書きできるようにしてある（既定はページ地の色） */
+.scroll-hint-wrap{
+  position:relative;
+  min-width:0;
+}
+
+.scroll-hint-wrap::before,
+.scroll-hint-wrap::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:28px;
+  display:flex;
+  align-items:center;
+  font-size:16px;
+  color:var(--text-sub);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.2s;
+  z-index:1;
+}
+
+.scroll-hint-wrap::before{
+  content:"‹";
+  left:0;
+  justify-content:flex-start;
+  background:linear-gradient(to right, var(--sh-bg, var(--bg-top)), transparent);
+}
+
+.scroll-hint-wrap::after{
+  content:"›";
+  right:0;
+  justify-content:flex-end;
+  background:linear-gradient(to left, var(--sh-bg, var(--bg-top)), transparent);
+}
+
+.scroll-hint-wrap.scroll-hint-left::before{ opacity:1; }
+.scroll-hint-wrap.scroll-hint-right::after{ opacity:1; }
+
+body.dark .scroll-hint-wrap::before,
+body.dark .scroll-hint-wrap::after{
+  color:var(--dark-text-sub);
+}
+
+body.dark .scroll-hint-wrap::before{
+  background:linear-gradient(to right, var(--sh-bg-dark, var(--dark-bg-top)), transparent);
+}
+
+body.dark .scroll-hint-wrap::after{
+  background:linear-gradient(to left, var(--sh-bg-dark, var(--dark-bg-top)), transparent);
+}
+
+/* カード内（.card内）で使う場合はページ地ではなくカード背景にフェードさせる */
+.card .scroll-hint-wrap{
+  --sh-bg:var(--card);
+  --sh-bg-dark:var(--dark-card);
+}
+
 /* ══════════════════════════════════════
    SVGアイコン共通
    ══════════════════════════════════════ */

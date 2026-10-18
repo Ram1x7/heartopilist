@@ -351,7 +351,6 @@
   "shop_no_results": "해당하는 아이템이 없습니다",
   "order_trend_page_title": "주문권",
   "order_trend_page_subtitle": "상품 주문으로 과거에 입고된 트렌드 아이템 목록입니다",
-  "order_trend_note": "이름이 표시되지 않은 채 촬영된 아이템은 외형 설명만 표시됩니다(기울임꼴). 정식 명칭을 아시는 분은 알려주세요.",
   "order_trend_search_placeholder": "아이템 이름으로 검색",
   "order_trend_cat_all": "전체",
   "order_trend_cat_furniture": "가구",

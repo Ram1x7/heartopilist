@@ -351,7 +351,6 @@
   "shop_no_results": "ไม่พบไอเทมที่ตรงกัน",
   "order_trend_page_title": "ตั๋วสั่งซื้อ",
   "order_trend_page_subtitle": "รายการไอเทมเทรนด์ในอดีตที่สั่งซื้อผ่านระบบสั่งสินค้า",
-  "order_trend_note": "ไอเทมที่ไม่มีชื่อปรากฏในภาพจะแสดงเฉพาะคำอธิบายรูปลักษณ์ (ตัวเอียง) หากทราบชื่อทางการ กรุณาแจ้งให้เราทราบ",
   "order_trend_search_placeholder": "ค้นหาด้วยชื่อไอเทม",
   "order_trend_cat_all": "ทั้งหมด",
   "order_trend_cat_furniture": "เฟอร์นิเจอร์",

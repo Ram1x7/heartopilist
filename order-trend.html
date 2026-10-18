@@ -55,25 +55,31 @@
 
 <style>
 /* オーダーチケットページ専用（他ページの.gridには影響しない） */
-.ot-note{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:10px 14px;
-  margin-bottom:14px;
-  font-size:11px;
-  line-height:1.7;
-  color:var(--text-sub);
-}
-
-body.dark .ot-note{
-  background:var(--dark-card);
-  border-color:var(--dark-border);
-  color:var(--dark-text-sub);
-}
-
 .ot-controls{
   margin-bottom:14px;
+}
+
+/* シーズン絞り込み：シーズン名の長さがまちまちなため、.filterの
+   「均等幅flex:1」ではなく.site-navと同様の横スクロール方式にする */
+#otSeasonRow{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+
+#otSeasonRow::-webkit-scrollbar{
+  display:none;
+}
+
+#otSeasonRow{
+  margin-bottom:8px;
+}
+
+#otSeasonRow button{
+  flex:none;
+  white-space:nowrap;
+  padding:8px 14px;
 }
 
 .ot-controls .search-wrap{
@@ -132,7 +138,7 @@ body.dark .ot-card{
   border-color:var(--dark-border);
 }
 
-.ot-card img{
+.ot-card > img{
   width:100%;
   aspect-ratio:1/1;
   object-fit:contain;
@@ -140,7 +146,7 @@ body.dark .ot-card{
   background:var(--card-sub);
 }
 
-body.dark .ot-card img{
+body.dark .ot-card > img{
   background:var(--dark-card-alt);
 }
 
@@ -165,7 +171,8 @@ body.dark .ot-item-name.unconfirmed{
   align-items:center;
   justify-content:center;
   gap:3px;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
+  white-space:nowrap;
   font-size:11px;
   font-weight:700;
   color:var(--vermillion);
@@ -242,6 +249,7 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
   </div>
 </div>
 
+<div class="scroll-hint-wrap">
 <nav class="site-nav">
   <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
   <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
@@ -260,13 +268,12 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
+</div>
 
 <div class="page-header">
   <h1 data-i18n="order_trend_page_title">オーダーチケット</h1>
   <p class="page-subtitle" data-i18n="order_trend_page_subtitle">商品注文で過去に入荷したトレンドアイテムの一覧です</p>
 </div>
-
-<div class="ot-note" data-i18n="order_trend_note">名称表示が無いまま撮影されたアイテムは、見た目の説明のみ表示しています（斜体表示）。正式名称が分かる方はぜひ教えてください。</div>
 
 <div class="ot-controls">
   <div class="search-wrap">
@@ -275,7 +282,9 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
     <button id="otClearBtn" aria-label="clear search"></button>
   </div>
 
-  <div class="filter" id="otSeasonRow"></div>
+  <div class="scroll-hint-wrap">
+    <div class="filter" id="otSeasonRow"></div>
+  </div>
 
   <div class="filter" id="otCategoryRow">
     <button id="otCat_all" class="active" onclick="setOtCategory('all')" data-i18n="order_trend_cat_all">すべて</button>
@@ -317,6 +326,7 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/data-updates.js"></script>
