@@ -366,7 +366,7 @@
   "order_trend_help_filter_title": "分类筛选",
   "order_trend_help_filter_body": "可以按家具、服装、其他进行筛选。",
   "order_trend_empty": "没有符合条件的物品",
-  "order_trend_stamps_label": "所需印章",
+  "order_trend_stamps_label": "所需订购券",
   "order_trend_days_label": "到货天数",
   "order_trend_days_unit": "天",
   "data_sync_title": "备份・转移设备",

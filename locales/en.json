@@ -428,7 +428,7 @@
   "order_trend_help_filter_title": "Category filter",
   "order_trend_help_filter_body": "You can filter by Furniture, Clothing, or Other.",
   "order_trend_empty": "No matching items",
-  "order_trend_stamps_label": "Stamps needed",
+  "order_trend_stamps_label": "Tickets needed",
   "order_trend_days_label": "Arrives in",
   "order_trend_days_unit": " days",
   "aria_check_label": "Mark as complete",
