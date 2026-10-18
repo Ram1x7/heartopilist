@@ -10,21 +10,23 @@ const root=new URL('../',import.meta.url);
 function patterns(context) {
   for(const file of ['js/art-config.js','js/art-masks.js']) vm.runInContext(fs.readFileSync(new URL(file,root),'utf8'),context);
 }
-test('all T-shirt surfaces have finite coordinates, valid UVs and bounded triangle count',()=>{
+test('T-shirt shell, lining and edges have valid geometry and independent cached buffers',()=>{
   const context=vm.createContext({});patterns(context);
   const parts=vm.runInContext(`Object.fromEntries(DESIGN_FRAME_PRESETS.find(f=>f.id==='t_shirt').parts.map((p,i)=>[
     ['front','back','leftSleeve','rightSleeve'][i],{width:p.width,height:p.height,maskLines:PRESET_MASKS.t_shirt[p.id].maskLines}]))`,context);
-  const surfaces=buildTshirt(THREE,parts);
-  assert.equal(surfaces.length,4);
-  let triangles=0;
-  for(const {geometry} of surfaces) {
+  const {geometry,groups}=buildTshirt(THREE,parts);
+  assert.ok(groups.some(g=>g.fabricLining));
+  assert.deepEqual(new Set(groups.map(g=>g.role)),new Set(['front','back','leftSleeve','rightSleeve']));
+  {
     const p=geometry.getAttribute('position'),uv=geometry.getAttribute('uv'),n=geometry.getAttribute('normal');
     assert.ok(p.array.every(Number.isFinite));assert.ok(n.array.every(Number.isFinite));
     assert.ok(uv.array.every(value=>Number.isFinite(value)&&value>=0&&value<=1));
     assert.ok(geometry.index.array.every(value=>value<p.count));
-    triangles+=geometry.index.count/3;geometry.dispose();
+    assert.ok(geometry.index.count/3>100000 && geometry.index.count/3<300000);
+    const other=buildTshirt(THREE,parts).geometry,original=other.attributes.position.array[0];
+    geometry.translate(5,0,0);assert.equal(other.attributes.position.array[0],original);
+    other.dispose();geometry.dispose();
   }
-  assert.ok(triangles<20000);
 });
 
 test('adapter uses unsaved active pixels, explicit compatible saved parts, and never writes storage',async()=>{

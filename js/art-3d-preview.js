@@ -1,5 +1,6 @@
 import * as THREE from './vendor/three/three.module.min.js';
 import { buildTshirt } from './art-3d-models/tshirt.js';
+import { polygonMask, nearestInside } from './art-3d-models/pattern-helpers.js';
 
 // One viewer per editor, no writes to browser storage or source pixel arrays.
 export function openPreview(bridge, onClose) {
@@ -16,7 +17,7 @@ export function openPreview(bridge, onClose) {
   const abort=new AbortController(), signal=abort.signal;
   let renderer=null, scene=null, camera=null, model=null, observer=null;
   let closed=false, raf=0, pending=false, auto=false, color=false, lastTime=0;
-  let surfaces=[], oldPixels={}, rememberedRole=null;
+  let surfaces=[], oldPixels={}, rememberedRole=null, modelGeometry=null, modelMesh=null, bump=null;
   let drag=null;
   const listen=(target,event,fn)=>target.addEventListener(event,fn,{signal});
   const error=message=>{ status.textContent=message;status.setAttribute('role','alert'); };
@@ -50,7 +51,12 @@ export function openPreview(bridge, onClose) {
     const texture=new THREE.CanvasTexture(canvas);
     texture.colorSpace=THREE.SRGBColorSpace;texture.magFilter=THREE.NearestFilter;
     texture.minFilter=THREE.NearestFilter;texture.generateMipmaps=false;
-    return {canvas,ctx,texture};
+    const rawCanvas=document.createElement('canvas');rawCanvas.width=part.width;rawCanvas.height=part.height;
+    const rawctx=rawCanvas.getContext('2d'),rawTexture=new THREE.CanvasTexture(rawCanvas);
+    rawTexture.colorSpace=THREE.SRGBColorSpace;rawTexture.magFilter=THREE.NearestFilter;
+    rawTexture.minFilter=THREE.NearestFilter;rawTexture.generateMipmaps=false;
+    const mask=polygonMask(part.maskLines[0],part.width,part.height);
+    return {canvas,ctx,texture,rawCanvas,rawctx,rawTexture,mask,nearest:nearestInside(mask,part.width,part.height)};
   }
   function writeTexture(target,part) {
     const {ctx,canvas,texture}=target;
@@ -58,6 +64,19 @@ export function openPreview(bridge, onClose) {
     if(part.pixels) for(let i=0;i<part.pixels.length;i++) if(part.pixels[i]) {
       ctx.fillStyle=part.pixels[i];ctx.fillRect(i%part.width,Math.floor(i/part.width),1,1);
     }
+    // Extend the visible pattern into its margins so UV edges do not pick up white.
+    const image=ctx.getImageData(0,0,part.width,part.height);
+    const counts=new Map();let dominant='#ffffff',maxCount=0;
+    for(let i=0;i<target.mask.length;i++) {
+      if(target.mask[i]) {
+        const hex=part.pixels?.[i]||'#ffffff',count=(counts.get(hex)||0)+1;
+        counts.set(hex,count);if(count>maxCount){maxCount=count;dominant=hex;}
+      } else if(target.nearest[i]>=0) image.data.set(image.data.subarray(target.nearest[i]*4,target.nearest[i]*4+4),i*4);
+    }
+    ctx.putImageData(image,0,0);
+    if(target.lining){ctx.fillStyle=dominant;ctx.fillRect(0,0,canvas.width,canvas.height);}
+    target.rawctx.drawImage(canvas,0,0);target.rawTexture.needsUpdate=true;
+    ctx.globalAlpha=.18;ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.globalAlpha=1;
     texture.needsUpdate=true;
   }
   function changed(role,pixels) {
@@ -73,10 +92,11 @@ export function openPreview(bridge, onClose) {
     const parts=bridge.snapshot(selections);
     if(!parts) { close();return; }
     if(!renderer) return;
-    for(const surface of surfaces) if(changed(surface.role,parts[surface.role].pixels)) {
+    const changedRoles=new Set(Object.keys(parts).filter(role=>changed(role,parts[role].pixels)));
+    for(const surface of surfaces) if(changedRoles.has(surface.role)) {
       writeTexture(surface,parts[surface.role]);
-      oldPixels[surface.role]=parts[surface.role].pixels?.slice()||null;
     }
+    for(const role of changedRoles)oldPixels[role]=parts[role].pixels?.slice()||null;
   }
   function draw(time=0) {
     raf=0;if(closed || document.hidden || !renderer) return;
@@ -93,7 +113,8 @@ export function openPreview(bridge, onClose) {
   function close() {
     if(closed) return;closed=true;abort.abort();cancelAnimationFrame(raf);observer?.disconnect();
     if(renderer) {
-      surfaces.forEach(s=>{s.geometry.dispose();s.texture.dispose();s.basic.dispose();s.cloth.dispose();});
+      surfaces.forEach(s=>{s.texture.dispose();s.rawTexture.dispose();s.basic.dispose();s.cloth.dispose();});
+      modelGeometry?.dispose();bump?.dispose();
       renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();
     }
     dialog.close();dialog.remove();onClose();
@@ -105,7 +126,7 @@ export function openPreview(bridge, onClose) {
   listen(dialog.querySelector('[data-auto]'),'click',()=>setAuto(!auto));
   listen(dialog.querySelector('[data-color]'),'click',()=>{
     color=!color;dialog.querySelector('[data-color]').setAttribute('aria-pressed',String(color));
-    surfaces.forEach(s=>{s.mesh.material=color?s.basic:s.cloth;});schedule();
+    if(modelMesh)modelMesh.material=surfaces.map(s=>color?s.basic:s.cloth);schedule();
   });
   dialog.querySelectorAll('[data-view]').forEach(button=>listen(button,'click',()=>{
     if(!model) return;setAuto(false);
@@ -119,16 +140,28 @@ export function openPreview(bridge, onClose) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.toneMapping=THREE.NoToneMapping;
     scene=new THREE.Scene();model=new THREE.Group();model.rotation.set(.15,-.25,0);scene.add(model);
-    scene.add(new THREE.AmbientLight(0xffffff,1.8));
-    const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(1,2,3);scene.add(light);
-    camera=new THREE.PerspectiveCamera(28,1,.01,20);camera.position.set(0,0,3.3);
-    for(const {role,geometry} of buildTshirt(THREE,parts)) {
-      const target=makeTexture(parts[role]);
-      const basic=new THREE.MeshBasicMaterial({map:target.texture,side:THREE.DoubleSide,toneMapped:false});
-      const cloth=new THREE.MeshStandardMaterial({map:target.texture,side:THREE.DoubleSide,roughness:.95,metalness:0});
-      const mesh=new THREE.Mesh(geometry,cloth);model.add(mesh);
-      surfaces.push({role,geometry,...target,basic,cloth,mesh});
+    scene.add(new THREE.AmbientLight(0xffffff,.55*Math.PI));
+    const light=new THREE.DirectionalLight(0xffffff,.65*Math.PI);light.position.set(.9,.8,1);scene.add(light);
+    const rearLight=new THREE.DirectionalLight(0xffffff,.18*Math.PI);rearLight.position.set(-.5,-.3,-1);scene.add(rearLight);
+    camera=new THREE.PerspectiveCamera(20,1,.01,100);camera.position.set(0,0,4);
+    const clothCanvas=document.createElement('canvas');clothCanvas.width=clothCanvas.height=32;
+    const clothCtx=clothCanvas.getContext('2d'),clothPixels=clothCtx.createImageData(32,32);
+    for(let y=0;y<32;y++)for(let x=0;x<32;x++){
+      const shade=Math.round(128+32*Math.sin(x*Math.PI/4)*Math.sin(y*Math.PI/4));
+      clothPixels.data.set([shade,shade,shade,255],(y*32+x)*4);
     }
+    clothCtx.putImageData(clothPixels,0,0);bump=new THREE.CanvasTexture(clothCanvas);
+    bump.wrapS=bump.wrapT=THREE.RepeatWrapping;bump.repeat.set(32,64);
+    const built=buildTshirt(THREE,parts);modelGeometry=built.geometry;
+    modelGeometry.computeBoundingBox();const center=modelGeometry.boundingBox.getCenter(new THREE.Vector3());
+    modelGeometry.translate(-center.x,-center.y,-center.z);modelGeometry.computeBoundingSphere();
+    for(const {role,fabricLining} of built.groups) {
+      const target=makeTexture(parts[role]);
+      const basic=new THREE.MeshBasicMaterial({map:target.rawTexture,side:THREE.FrontSide,toneMapped:false});
+      const cloth=new THREE.MeshStandardMaterial({map:target.texture,side:THREE.FrontSide,roughness:.94,metalness:0,bumpMap:bump,bumpScale:.0001});
+      surfaces.push({role,...target,basic,cloth,lining:!!fabricLining});
+    }
+    modelMesh=new THREE.Mesh(modelGeometry,surfaces.map(s=>s.cloth));model.add(modelMesh);
     const canvas=renderer.domElement;
     canvas.setAttribute('aria-label','ドラッグでTシャツを回転');canvas.tabIndex=0;
     stage.append(canvas);
@@ -155,7 +188,8 @@ export function openPreview(bridge, onClose) {
     observer=new ResizeObserver(()=>{
       const w=Math.max(1,stage.clientWidth),h=Math.max(1,stage.clientHeight);
       renderer.setSize(w,h);camera.aspect=w/h;
-      camera.position.z=Math.max(2.5,1.35/(camera.aspect*Math.tan(camera.fov*Math.PI/360))*.55);
+      const halfAngle=Math.min(camera.fov*Math.PI/360,Math.atan(Math.tan(camera.fov*Math.PI/360)*camera.aspect));
+      camera.position.z=modelGeometry.boundingSphere.radius/(Math.sin(halfAngle)*.91);
       camera.updateProjectionMatrix();schedule();
     });observer.observe(stage);
     status.textContent='';sync();schedule();
