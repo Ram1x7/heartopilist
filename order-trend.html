@@ -135,6 +135,11 @@ body.dark .ot-card{
   border-color:var(--dark-border);
 }
 
+/* チェック済み（入手済み）は薄暗くして一覧の最後にまとめる */
+.ot-card.ot-owned{
+  opacity:0.5;
+}
+
 .ot-card .img-wrap > img{
   width:100%;
   aspect-ratio:1/1;
@@ -285,14 +290,9 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
 
   <div class="filter" id="otCategoryRow">
     <button id="otCat_all" class="active" onclick="setOtCategory('all')" data-i18n="order_trend_cat_all">すべて</button>
-    <button id="otCat_furniture" onclick="setOtCategory('furniture')" data-i18n="order_trend_cat_furniture">家具</button>
     <button id="otCat_clothing" onclick="setOtCategory('clothing')" data-i18n="order_trend_cat_clothing">服</button>
+    <button id="otCat_furniture" onclick="setOtCategory('furniture')" data-i18n="order_trend_cat_furniture">家具</button>
     <button id="otCat_other" onclick="setOtCategory('other')" data-i18n="order_trend_cat_other">その他</button>
-  </div>
-
-  <div class="filter" id="otSortRow">
-    <button id="otSort_book" class="active" onclick="setOtSort('book')" data-i18n="shop_sort_book">並び順</button>
-    <button id="otSort_unowned" onclick="setOtSort('unowned')" data-i18n="order_trend_sort_unowned">未所持順</button>
   </div>
 
   <div class="filter">
@@ -318,7 +318,10 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
     <span data-i18n="order_trend_help_season_body">トレンドシーズンごとに絞り込みできます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="order_trend_help_filter_title">カテゴリ絞り込み</strong><br>
-    <span data-i18n="order_trend_help_filter_body">家具・服・その他で絞り込みできます。</span></p>
+    <span data-i18n="order_trend_help_filter_body">服・家具・その他で絞り込みできます。「すべて」選択時は服→家具→その他の順にまとまります。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="order_trend_help_check_title">入手済みチェック</strong><br>
+    <span data-i18n="order_trend_help_check_body">画像左上のボタンをタップすると入手済みとしてチェックできます。チェックしたアイテムは薄暗く表示され、自動的に一覧の最後に移動します。もう一度タップすると解除できます。</span></p>
 
     <div style="text-align:center; margin-top:20px;">
       <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="shop_help_close">閉じる</button>
