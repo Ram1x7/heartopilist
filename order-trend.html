@@ -108,17 +108,19 @@ body.dark #otClearBtn{
 
 .ot-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  /* minmax(0,1fr)：列の最小幅を0にしないと、折り返さない長いテキストが
+     列幅を押し広げ、グリッド全体が画面からはみ出す（小サイズ4列で顕著） */
+  grid-template-columns:repeat(3, minmax(0,1fr));
   gap:10px;
   margin-top:10px;
 }
 
 body[data-icon-size="small"] .ot-grid{
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(4, minmax(0,1fr));
   gap:8px;
 }
 body[data-icon-size="large"] .ot-grid{
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(2, minmax(0,1fr));
   gap:12px;
 }
 
@@ -128,6 +130,8 @@ body[data-icon-size="large"] .ot-grid{
   border-radius:14px;
   padding:8px;
   text-align:center;
+  display:flex;
+  flex-direction:column;
 }
 
 body.dark .ot-card{
@@ -172,13 +176,14 @@ body.dark .ot-item-name.unconfirmed{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:3px;
-  flex-wrap:nowrap;
-  white-space:nowrap;
+  gap:3px 4px;
+  flex-wrap:wrap;
   font-size:11px;
   font-weight:700;
   color:var(--vermillion);
-  margin-top:3px;
+  /* 名前の行数に関わらず、価格以下を常にカード下端に揃える */
+  margin-top:auto;
+  padding-top:6px;
 }
 
 body.dark .ot-item-price{ color:var(--dark-highlight); }
@@ -206,6 +211,8 @@ body.dark .ot-item-price .ot-original{ color:var(--dark-text-sub); }
   font-size:9px;
   color:var(--text-sub);
   line-height:1.5;
+  /* 項目が無いアイテムでも高さを確保し、価格欄の位置がずれないようにする */
+  min-height:1.5em;
 }
 
 body.dark .ot-item-sub{ color:var(--dark-text-sub); }

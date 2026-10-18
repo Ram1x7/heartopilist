@@ -184,7 +184,7 @@ function otCardHTML(item){
       </div>
       ${nameHTML}
       <div class="ot-item-price">${fmtOtPrice(item)}</div>
-      ${subParts.length ? `<div class="ot-item-sub">${subParts.join("　")}</div>` : ""}
+      <div class="ot-item-sub">${subParts.join("　")}</div>
     </div>
   `;
 }
