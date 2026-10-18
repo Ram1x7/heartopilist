@@ -57,3 +57,52 @@ test('adapter uses unsaved active pixels, explicit compatible saved parts, and n
   vm.runInContext("activeFrameId='book'",context);context.window.HatopiArt3D.refresh();
   assert.equal(button.hidden,true);assert.equal(closed,1);assert.equal(bridge.snapshot({}),null);
 });
+
+test('every clothing preset and every part opens with valid model groups and read-only pixels',async()=>{
+  const {buildGarment}=await import('../js/art-3d-models/garment.js');
+  const listeners={},button={hidden:true,disabled:false,addEventListener:(event,fn)=>listeners[event]=fn,focus(){}};
+  let bridge,closes=0,onClose;
+  const context=vm.createContext({console,document:{getElementById:()=>button},window:{}});
+  patterns(context);
+  vm.runInContext(`let activeFrameId='',activePartId='',gridWidth=0,gridHeight=0,pixels=[],savedDesigns=[];`,context);
+  const module=new vm.SyntheticModule(['openPreview','loadPreviewStyles'],function(){
+    this.setExport('loadPreviewStyles',()=>Promise.resolve());
+    this.setExport('openPreview',(b,close)=>{bridge=b;onClose=close;return {close(){closes++;close();},update(){}};});
+  },{context});
+  await module.link(()=>{});await module.evaluate();
+  new vm.Script(fs.readFileSync(new URL('js/art-3d-adapter.js',root),'utf8'),{importModuleDynamically:()=>module}).runInContext(context);
+  const frames=vm.runInContext("DESIGN_FRAME_PRESETS.filter(f=>f.category==='clothes')",context);
+  assert.equal(frames.length,11);
+  for(const frame of frames) {
+    for(const part of frame.parts) {
+      vm.runInContext(`activeFrameId=${JSON.stringify(frame.id)};activePartId=${JSON.stringify(part.id)};gridWidth=${part.width};gridHeight=${part.height};pixels=new Array(gridWidth*gridHeight).fill('#124578');`,context);
+      context.window.HatopiArt3D.refresh();assert.equal(button.hidden,false,frame.id);
+      await listeners.click();assert.equal(bridge.title,frame.name);
+      const parts=bridge.snapshot({}),active=bridge.activeRole();
+      assert.equal(parts[active].pixels[0],'#124578');
+      assert.equal(Object.values(parts).filter(p=>p.pixels).length,1);
+      assert.deepEqual(Object.values(bridge.roles).map(p=>p.id),Array.from(frame.parts,p=>p.id));
+      if(part===frame.parts[0]) {
+        const {geometry,groups}=buildGarment(THREE,parts,bridge.kind);
+        const positions=geometry.attributes.position,uv=geometry.attributes.uv,normals=geometry.attributes.normal;
+        assert.ok(positions.array.every(Number.isFinite),frame.id+' positions');
+        assert.ok(normals.array.every(Number.isFinite),frame.id+' normals');
+        assert.ok(uv.array.every(v=>Number.isFinite(v)&&v>=0&&v<=1),frame.id+' UV');
+        assert.ok(geometry.index.array.every(v=>Number.isInteger(v)&&v<positions.count),frame.id+' indices');
+        assert.equal(groups.reduce((total,g)=>total+g.count,0),geometry.index.count);
+        assert.ok(groups.every(g=>parts[g.role]),frame.id+' group roles');
+        assert.deepEqual(new Set(groups.map(g=>g.role)),new Set(Object.keys(parts)),frame.id+' all parts represented');
+        assert.ok(geometry.index.count/3>10000 && geometry.index.count/3<400000,frame.id+' triangle budget');
+        for(const group of groups) if(group.colorSample)assert.ok(group.colorSample.every(v=>v>=0&&v<=1));
+        geometry.dispose();
+      }
+      onClose();
+    }
+  }
+  // Changing directly between supported frames must discard the old viewer.
+  await listeners.click();
+  vm.runInContext("activeFrameId='tank_top';activePartId='default';gridWidth=64;gridHeight=64;pixels=new Array(4096).fill(null)",context);
+  context.window.HatopiArt3D.refresh();assert.equal(closes,1);
+  await listeners.click();assert.equal(bridge.kind,'tank');
+  vm.runInContext("activeFrameId='book'",context);context.window.HatopiArt3D.refresh();assert.equal(button.hidden,true);assert.equal(closes,2);
+});
