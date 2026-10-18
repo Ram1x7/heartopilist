@@ -41,7 +41,7 @@ test('adapter uses unsaved active pixels, explicit compatible saved parts, and n
       {id:'back',name:'選んだ背面',frameId:'t_shirt',partId:'canvas-1777194719606',width:64,height:80,pixelData:new Array(5120).fill('#abcdef')},
       {id:'bad',name:'不正な寸法',frameId:'t_shirt',partId:'canvas-1777194719606',width:1,height:1,pixelData:['#ffffff']}
     ];`,context);
-  const module=new vm.SyntheticModule(['openPreview'],function(){this.setExport('openPreview',(b)=>{bridge=b;return {close(){closed++;},update(){updates++;}};});},{context});
+  const module=new vm.SyntheticModule(['openPreview','loadPreviewStyles'],function(){this.setExport('loadPreviewStyles',()=>Promise.resolve());this.setExport('openPreview',(b)=>{bridge=b;return {close(){closed++;},update(){updates++;}};});},{context});
   await module.link(()=>{});await module.evaluate();
   const script=new vm.Script(fs.readFileSync(new URL('js/art-3d-adapter.js',root),'utf8'),{importModuleDynamically:()=>module});
   script.runInContext(context);
