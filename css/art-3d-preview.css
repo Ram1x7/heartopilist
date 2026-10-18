@@ -1,26 +1,67 @@
+/* Art preview uses the encyclopedia's paper, ink and indigo design tokens. */
 #art3DOpenBtn[hidden]{display:none}
-.art3d-dialog{border:1px solid #a98ad3;border-radius:20px;padding:0;width:min(960px,94vw);max-height:92dvh;background:#fff;color:#29243b;box-shadow:0 16px 70px #0005}
-.art3d-dialog::backdrop{background:#17102b99}
-.art3d-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #cbbbe1}
-.art3d-header h2{margin:0;font-size:1.1rem}
-.art3d-dialog button,.art3d-dialog select{font:inherit;border:1px solid #b8a2d0;border-radius:9px;background:#f9f6ff;color:inherit;padding:9px 12px;min-height:42px}
-.art3d-dialog button{cursor:pointer}
-.art3d-dialog button[aria-pressed=true]{background:#e2d1ff;border-color:#8759b5}
-.art3d-body{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;padding:16px}
-.art3d-stage{height:440px;min-width:0;position:relative;background:radial-gradient(ellipse at 50% 40%,#f7f5fc,#e6dfef);border-radius:14px;overflow:hidden}
+#art3DOpenBtn{font-family:'Zen Maru Gothic',sans-serif;min-height:44px}
+.art3d-dialog{
+  --preview-paper:var(--card);--preview-wash:var(--card-sub);
+  --preview-ink:var(--text);--preview-muted:var(--text-sub);
+  --preview-border:var(--border);--preview-accent:var(--indigo);
+  box-sizing:border-box;width:min(1000px,calc(100vw - 32px));max-height:92dvh;
+  padding:0;border:1px solid var(--preview-border);border-radius:22px;
+  background:var(--preview-paper);color:var(--preview-ink);
+  font-family:'Zen Maru Gothic',sans-serif;font-size:13px;
+  box-shadow:0 24px 80px rgba(35,30,24,.24);overscroll-behavior:contain;
+}
+.art3d-dialog *{box-sizing:border-box}
+.art3d-dialog::backdrop{background:rgba(30,27,23,.6);backdrop-filter:blur(4px)}
+.art3d-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px 18px;border-bottom:1px solid var(--preview-border)}
+.art3d-eyebrow{margin:0 0 5px;color:var(--preview-muted);font-size:11px;font-weight:700;letter-spacing:.14em}
+.art3d-header h2{margin:0;color:var(--preview-ink);font-family:'Shippori Mincho',serif;font-size:23px;font-weight:700;letter-spacing:.05em;line-height:1.5}
+.art3d-dialog button,.art3d-dialog select{
+  font-family:'Zen Maru Gothic',sans-serif;font-size:12px;font-weight:700;
+  border:1px solid var(--preview-border);background:var(--preview-paper);color:var(--preview-ink);
+  min-height:44px;padding:10px 15px;line-height:1.5;
+}
+.art3d-dialog button{border-radius:999px;cursor:pointer;transition:background .15s,border-color .15s,box-shadow .15s}
+.art3d-dialog button:hover{border-color:var(--gold);background:var(--preview-wash)}
+.art3d-dialog button[aria-pressed=true]{background:var(--preview-accent);border-color:var(--preview-accent);color:var(--on-fill,#fdf9ef)}
+.art3d-close{flex-shrink:0}
+.art3d-body{display:grid;grid-template-columns:minmax(0,1fr) 270px;align-items:start;gap:20px;padding:22px 24px 16px}
+.art3d-stage{
+  height:440px;min-width:0;position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--preview-border);
+  background-color:var(--preview-wash);
+  background-image:radial-gradient(ellipse at 50% 35%,var(--preview-paper),transparent 75%);
+}
 .art3d-stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
 .art3d-stage canvas:active{cursor:grabbing}
-.art3d-status{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;pointer-events:none}
+.art3d-stage-caption{margin:10px 0 0;text-align:center;color:var(--preview-muted);font-size:11px;line-height:1.6}
+.art3d-status{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;color:var(--preview-muted);pointer-events:none}
 .art3d-status:empty{display:none}
-.art3d-options{display:flex;flex-direction:column;gap:12px}
-.art3d-options label{display:flex;flex-direction:column;gap:5px;font-size:.9rem}
-.art3d-options select{width:100%}
-.art3d-options p,.art3d-note{font-size:.82rem;line-height:1.6;margin:0}
-.art3d-directions{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px}
-.art3d-note{padding:0 16px 16px;color:#655775}
-.art3d-dialog :focus-visible{outline:3px solid #47b7d6;outline-offset:2px}
-body.dark .art3d-dialog{background:#252136;color:#f1eafa}
-body.dark .art3d-dialog button,body.dark .art3d-dialog select{background:#363047;color:#f1eafa}
-body.dark .art3d-dialog button[aria-pressed=true]{background:#654584}
-body.dark .art3d-note{color:#c9bddd}
-@media(max-width:700px){.art3d-body{grid-template-columns:1fr}.art3d-stage{height: min(45dvh,380px);min-height:230px}.art3d-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.art3d-options .art3d-controls{grid-column:1/-1}.art3d-dialog{max-height:94dvh}.art3d-header{padding:10px 14px}}
+.art3d-options{display:flex;flex-direction:column;gap:12px;padding:18px;background:var(--preview-wash);border:1px solid var(--preview-border);border-radius:16px}
+.art3d-options h3{margin:0;font-family:'Zen Maru Gothic',sans-serif;font-size:14px;font-weight:700;color:var(--preview-ink)}
+.art3d-options .art3d-help{font-size:11px;line-height:1.8;margin:0 0 4px;color:var(--preview-muted)}
+.art3d-options label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:var(--preview-ink)}
+.art3d-options select{width:100%;min-width:0;border-radius:10px;font-weight:500;padding:10px}
+.art3d-options select:disabled{opacity:1;color:var(--preview-muted);background:var(--preview-paper);border-style:dashed}
+.art3d-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 0 0;border-top:1px solid var(--preview-border);order:2}
+.art3d-controls button{padding:9px 6px;font-size:11px}
+.art3d-directions{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:14px}
+.art3d-directions button{min-width:44px;padding:9px 15px}
+.art3d-note{margin:0 24px 22px;padding:12px 14px;border-left:3px solid var(--gold);border-radius:0 10px 10px 0;background:var(--preview-wash);color:var(--preview-muted);font-size:11px;line-height:1.9}
+.art3d-dialog :focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+body.dark .art3d-dialog{
+  --preview-paper:var(--dark-card);--preview-wash:var(--dark-card-alt);
+  --preview-ink:var(--dark-text);--preview-muted:var(--dark-text-sub);
+  --preview-border:var(--dark-border);--preview-accent:var(--indigo-soft);
+}
+@media(max-width:700px){
+  .art3d-dialog{width:calc(100vw - 20px);max-height:94dvh;border-radius:18px}
+  .art3d-header{padding:16px;gap:10px}.art3d-header h2{font-size:20px}
+  .art3d-eyebrow{font-size:10px}.art3d-close{padding:8px 12px!important}
+  .art3d-body{grid-template-columns:1fr;gap:16px;padding:16px}
+  .art3d-stage{height:min(42dvh,360px);min-height:220px}
+  .art3d-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
+  .art3d-options h3,.art3d-options .art3d-help,.art3d-controls{grid-column:1/-1}
+  .art3d-options .art3d-help{margin:0}.art3d-controls{padding-top:12px}
+  .art3d-note{margin:0 16px 16px}.art3d-directions{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){.art3d-dialog button{transition:none}}

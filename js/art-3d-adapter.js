@@ -52,7 +52,7 @@
     opening = true; button.disabled = true;
     const ticket = ++generation;
     try {
-      const { openPreview } = await import('./art-3d-preview.js?v=2');
+      const { openPreview } = await import('./art-3d-preview.js?v=3');
       if(ticket !== generation || !available()) return;
       viewer = openPreview(bridge, () => { viewer = null; button.focus(); });
     } catch(error) {
