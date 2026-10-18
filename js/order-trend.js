@@ -140,7 +140,7 @@ function otCardHTML(item){
   const subParts = [];
   if(item.size) subParts.push(`${item.size}`);
   if(item.stampsRequired != null){
-    subParts.push(`${T("order_trend_stamps_label","必要スタンプ")}:${item.stampsRequired}`);
+    subParts.push(`${T("order_trend_stamps_label","必要チケット")}:${item.stampsRequired}`);
   }
   if(item.arrivalDays != null){
     subParts.push(`${T("order_trend_days_label","入荷まで")}:${item.arrivalDays}${T("order_trend_days_unit","日")}`);

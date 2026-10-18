@@ -366,7 +366,7 @@
   "order_trend_help_filter_title": "카테고리 필터",
   "order_trend_help_filter_body": "가구·의상·기타로 필터링할 수 있습니다.",
   "order_trend_empty": "해당하는 아이템이 없습니다",
-  "order_trend_stamps_label": "필요 스탬프",
+  "order_trend_stamps_label": "필요 주문권",
   "order_trend_days_label": "입고까지",
   "order_trend_days_unit": "일",
   "data_sync_title": "백업·기기 이전",
