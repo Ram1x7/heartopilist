@@ -1,5 +1,5 @@
 import * as THREE from './vendor/three/three.module.min.js';
-import { buildTshirt } from './art-3d-models/tshirt.js';
+import { buildGarment } from './art-3d-models/garment.js';
 import { polygonMask, nearestInside } from './art-3d-models/pattern-helpers.js';
 
 let stylesheetPromise;
@@ -22,11 +22,12 @@ export function loadPreviewStyles() {
 export function openPreview(bridge, onClose) {
   const dialog=document.createElement('dialog');
   dialog.className='hatopi-preview'; dialog.setAttribute('aria-labelledby','hatopi-preview-title');
-  dialog.innerHTML=`<header class="hatopi-preview-header"><div><span class="hatopi-preview-tag">Tシャツ</span><h2 id="hatopi-preview-title" tabindex="-1">3Dプレビュー</h2></div><button type="button" data-close aria-label="3Dプレビューを閉じる">閉じる <span aria-hidden="true">×</span></button></header>
-    <div class="hatopi-preview-body"><section class="hatopi-preview-viewer" aria-label="仕上がりを確認"><div class="hatopi-preview-stage"><p class="hatopi-preview-status" role="status">Tシャツを読み込んでいます…</p></div>
+  dialog.innerHTML=`<header class="hatopi-preview-header"><div><span class="hatopi-preview-tag" data-item-name></span><h2 id="hatopi-preview-title" tabindex="-1">3Dプレビュー</h2></div><button type="button" data-close aria-label="3Dプレビューを閉じる">閉じる <span aria-hidden="true">×</span></button></header>
+    <div class="hatopi-preview-body"><section class="hatopi-preview-viewer" aria-label="仕上がりを確認"><div class="hatopi-preview-stage"><p class="hatopi-preview-status" role="status">立体モデルを読み込んでいます…</p></div>
     <p class="hatopi-preview-caption">指やマウスで動かして、向きを変えられます</p><div class="hatopi-preview-directions" aria-label="見る方向"><button type="button" data-view="front">正面</button><button type="button" data-view="back">背面</button><button type="button" data-view="left">左側</button><button type="button" data-view="right">右側</button></div><div class="hatopi-preview-tools"><button type="button" data-view="reset">向きを戻す</button><button type="button" data-auto aria-pressed="false">自動で回す</button><button type="button" data-color aria-pressed="false">色を確認</button></div></section>
     <section class="hatopi-preview-settings" aria-labelledby="hatopi-preview-parts-title"><header><h3 id="hatopi-preview-parts-title">使うデザイン</h3><p>編集中の面は、そのまま表示されます。<br>ほかの面は保存したデザインから選べます。</p></header><div class="hatopi-preview-parts"></div><p class="hatopi-preview-hint">選んでも、保存したデザインは変更されません。</p></section></div>
     <details class="hatopi-preview-note"><summary>表示について</summary><p>デザインを選んでいない面と、塗っていないマスは白で表示します。「色を確認」を押すと、陰影を外して配色を見られます。形や柄の位置は目安です。ゲーム内の着用姿とは異なる場合があります。</p></details>`;
+  dialog.querySelector('[data-item-name]').textContent=bridge.title||'Tシャツ';
   document.body.append(dialog); dialog.showModal();
   dialog.querySelector('h2').focus({preventScroll:true});
   const stage=dialog.querySelector('.hatopi-preview-stage'),status=dialog.querySelector('.hatopi-preview-status');
@@ -72,7 +73,8 @@ export function openPreview(bridge, onClose) {
     const rawctx=rawCanvas.getContext('2d'),rawTexture=new THREE.CanvasTexture(rawCanvas);
     rawTexture.colorSpace=THREE.SRGBColorSpace;rawTexture.magFilter=THREE.NearestFilter;
     rawTexture.minFilter=THREE.NearestFilter;rawTexture.generateMipmaps=false;
-    const mask=polygonMask(part.maskLines[0],part.width,part.height);
+    const mask=new Uint8Array(part.width*part.height);
+    for(const path of part.maskLines) polygonMask(path,part.width,part.height).forEach((value,index)=>{mask[index]|=value;});
     return {canvas,ctx,texture,rawCanvas,rawctx,rawTexture,mask,nearest:nearestInside(mask,part.width,part.height)};
   }
   function writeTexture(target,part) {
@@ -91,7 +93,8 @@ export function openPreview(bridge, onClose) {
       } else if(target.nearest[i]>=0) image.data.set(image.data.subarray(target.nearest[i]*4,target.nearest[i]*4+4),i*4);
     }
     ctx.putImageData(image,0,0);
-    if(target.lining){ctx.fillStyle=dominant;ctx.fillRect(0,0,canvas.width,canvas.height);}
+    if(target.colorSample){const [x,y]=target.colorSample;const sample=part.pixels?.[Math.min(part.height-1,Math.floor(y*part.height))*part.width+Math.min(part.width-1,Math.floor(x*part.width))];ctx.fillStyle=sample||'#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}
+    else if(target.lining){ctx.fillStyle=dominant;ctx.fillRect(0,0,canvas.width,canvas.height);}
     target.rawctx.drawImage(canvas,0,0);target.rawTexture.needsUpdate=true;
     ctx.globalAlpha=.18;ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.globalAlpha=1;
     texture.needsUpdate=true;
@@ -169,18 +172,19 @@ export function openPreview(bridge, onClose) {
     }
     clothCtx.putImageData(clothPixels,0,0);bump=new THREE.CanvasTexture(clothCanvas);
     bump.wrapS=bump.wrapT=THREE.RepeatWrapping;bump.repeat.set(32,64);
-    const built=buildTshirt(THREE,parts);modelGeometry=built.geometry;
+    const built=buildGarment(THREE,parts,bridge.kind||'tshirt');modelGeometry=built.geometry;
     modelGeometry.computeBoundingBox();const center=modelGeometry.boundingBox.getCenter(new THREE.Vector3());
     modelGeometry.translate(-center.x,-center.y,-center.z);modelGeometry.computeBoundingSphere();
-    for(const {role,fabricLining} of built.groups) {
+    const side=['tshirt','tank','sweatshirt','shoes','maryJane'].includes(bridge.kind||'tshirt')?THREE.FrontSide:THREE.DoubleSide;
+    for(const {role,fabricLining,colorSample} of built.groups) {
       const target=makeTexture(parts[role]);
-      const basic=new THREE.MeshBasicMaterial({map:target.rawTexture,side:THREE.FrontSide,toneMapped:false});
-      const cloth=new THREE.MeshStandardMaterial({map:target.texture,side:THREE.FrontSide,roughness:.94,metalness:0,bumpMap:bump,bumpScale:.0001});
-      surfaces.push({role,...target,basic,cloth,lining:!!fabricLining});
+      const basic=new THREE.MeshBasicMaterial({map:target.rawTexture,side,toneMapped:false});
+      const cloth=new THREE.MeshStandardMaterial({map:target.texture,side,roughness:.94,metalness:0,bumpMap:bump,bumpScale:.0001});
+      surfaces.push({role,...target,basic,cloth,lining:!!fabricLining,colorSample});
     }
     modelMesh=new THREE.Mesh(modelGeometry,surfaces.map(s=>s.cloth));model.add(modelMesh);
     const canvas=renderer.domElement;
-    canvas.setAttribute('aria-label','ドラッグでTシャツを回転');canvas.tabIndex=0;
+    canvas.setAttribute('aria-label',(bridge.title||'Tシャツ')+'。ドラッグまたは矢印キーで回転');canvas.tabIndex=0;
     stage.append(canvas);
     listen(canvas,'pointerdown',event=>{
       if(drag || !event.isPrimary) return;setAuto(false);
