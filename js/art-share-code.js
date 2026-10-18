@@ -10,7 +10,8 @@
 // 古いバージョンのコードもそのまま復元できるようにする（後方互換）。
 //
 // コード構造： <lzStringで圧縮したJSON>.<簡易チェックサム>
-// JSON側は [フォーマットバージョン, パレットバージョン, 幅, 高さ, デザイン枠ID,
+// v2は [2, デザイン枠ID, 編集パーツID, 名前, [[パーツID, v1コード], ...]]。
+// 旧v1のJSON側は [フォーマットバージョン, パレットバージョン, 幅, 高さ, デザイン枠ID,
 //          パーツID, デザイン名, ランレングス配列] という順序固定の配列（キー名を
 // 持たせずデータ量を減らす）。
 
@@ -74,6 +75,11 @@ function shareChecksum(str){
 // ── エンコード：現在のデザインを共有コード文字列にする ──
 // design: { width, height, pixelData, frameId, partId, name }
 function encodeDesignToShareCode(design){
+  if(design.frameId && design.parts && Object.keys(design.parts).length){
+    const payload=[2,design.frameId,design.partId,design.name||'',Object.entries(design.parts).map(([id,part])=>[id,encodeDesignToShareCode({...part,frameId:design.frameId,partId:id})])];
+    const blob=LZString.compressToEncodedURIComponent(JSON.stringify(payload));
+    return `${blob}.${shareChecksum(blob)}`;
+  }
   const table = getSharePaletteTable(SHARE_CODE_PALETTE_VERSION);
   const indexMap = buildSharePaletteIndexMap(table);
   // 0=未着色、1以降=パレット表のindex+1（パレット外の色が万一残っていた場合も未着色扱いにする）
@@ -98,12 +104,14 @@ function encodeDesignToShareCode(design){
   return `${blob}.${shareChecksum(blob)}`;
 }
 
+// Version 2 wraps validated version-1 parts into one item; version 1 remains supported.
 // ── デコード：共有コード文字列からデザインを復元する ──
 // 成功時 { width, height, pixelData, frameId, partId, name }
 // 失敗時 { error: "<T()用のi18nキー>" }
-function decodeShareCode(code){
+function decodeShareCode(code, nesting=0){
   const trimmed = String(code || "").trim();
   if(!trimmed) return { error: "art_share_code_empty" };
+  if(trimmed.length>2000000)return {error:"art_share_code_invalid"};
 
   const dot = trimmed.lastIndexOf(".");
   if(dot <= 0 || dot === trimmed.length - 1) return { error: "art_share_code_invalid" };
@@ -124,6 +132,24 @@ function decodeShareCode(code){
     payload = JSON.parse(json);
   }catch(e){
     return { error: "art_share_code_invalid" };
+  }
+  if(Array.isArray(payload) && payload[0]===2){
+    const invalid=()=>({error:'art_share_code_invalid'});
+    if(nesting || payload.length!==5)return invalid();
+    const [,frameId,partId,name,entries]=payload;
+    const frame=DESIGN_FRAME_PRESETS.find(f=>f.id===frameId);
+    if(!frame || !Array.isArray(entries) || !entries.length || entries.length>frame.parts.length)return invalid();
+    const parts={};
+    for(const entry of entries){
+      if(!Array.isArray(entry) || entry.length!==2 || typeof entry[1]!=='string')return invalid();
+      const [id,code]=entry,definition=frame.parts.find(p=>p.id===id);
+      if(!definition || Object.hasOwn(parts,id))return invalid();
+      const part=decodeShareCode(code,1);
+      if(part.error || part.frameId!==frameId || part.partId!==id || part.width!==definition.width || part.height!==definition.height)return invalid();
+      parts[id]={width:part.width,height:part.height,pixelData:part.pixelData};
+    }
+    if(!Object.hasOwn(parts,partId))return invalid();
+    return {...parts[partId],frameId,partId,name:typeof name==='string'?name:'',parts};
   }
   if(!Array.isArray(payload) || payload.length < 8) return { error: "art_share_code_invalid" };
 

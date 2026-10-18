@@ -1,5 +1,5 @@
 // キャッシュ名（更新時はバージョンを上げる）
-const CACHE_NAME = "hatopi-v2.493.0";
+const CACHE_NAME = "hatopi-v2.494.0";
 
 // キャッシュするファイル一覧
 const CACHE_FILES = [
@@ -26,7 +26,7 @@ const CACHE_FILES = [
   "./css/style.css?v=37",
   "./css/design-system.css?v=5",
   "./css/art.css?v=68",
-  "./css/art-preview-panel.css?v=2",
+  "./css/art-preview-panel.css?v=3",
   "./css/music.css?v=49",
   "./css/profile-card.css?v=3",
   "./js/main.js?v=55",
@@ -70,9 +70,17 @@ const CACHE_FILES = [
   "./js/art-template-match.js",
   "./js/lz-string.min.js",
   "./js/qrcode.js",
-  "./js/art-share-code.js",
-  "./js/art-editor.js",
-  "./js/art-3d-adapter.js?v=6",
+  "./js/art-share-code.js?v=2",
+  "./js/art-editor.js?v=2",
+  "./js/art-project.js?v=1",
+  "./js/art-3d-adapter.js?v=7",
+  "./js/art-3d-preview.js?v=7",
+  "./js/art-3d-export.js",
+  "./js/art-3d-models/garment.js",
+  "./js/art-3d-models/furniture.js",
+  "./js/art-3d-models/pattern-garment.js",
+  "./js/art-3d-models/pattern-helpers.js",
+  "./js/vendor/three/three.module.min.js",
   "./js/art-paint-guide.js",
   "./js/art-screenshot-import.js",
   "./js/art-converter.js",

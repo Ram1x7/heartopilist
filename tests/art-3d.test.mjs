@@ -29,80 +29,53 @@ test('T-shirt shell, lining and edges have valid geometry and independent cached
   }
 });
 
-test('adapter uses unsaved active pixels, explicit compatible saved parts, and never writes storage',async()=>{
-  const listeners={};const button={hidden:true,disabled:false,addEventListener:(name,fn)=>listeners[name]=fn,focus(){}};
-  let bridge, closed=0, updates=0;
-  const context=vm.createContext({console,document:{getElementById:()=>button},window:{},
-    localStorage:{setItem(){throw Error('unexpected storage write');}}});
-  patterns(context);
-  vm.runInContext(`let activeFrameId='t_shirt',activePartId='default',gridWidth=64,gridHeight=80;
-    let pixels=new Array(64*80).fill('#123456');
-    let savedDesigns=[
-      {id:'back',name:'選んだ背面',frameId:'t_shirt',partId:'canvas-1777194719606',width:64,height:80,pixelData:new Array(5120).fill('#abcdef')},
-      {id:'bad',name:'不正な寸法',frameId:'t_shirt',partId:'canvas-1777194719606',width:1,height:1,pixelData:['#ffffff']}
-    ];`,context);
-  const module=new vm.SyntheticModule(['openPreview','loadPreviewStyles'],function(){this.setExport('loadPreviewStyles',()=>Promise.resolve());this.setExport('openPreview',(b)=>{bridge=b;return {close(){closed++;},update(){updates++;}};});},{context});
-  await module.link(()=>{});await module.evaluate();
-  const script=new vm.Script(fs.readFileSync(new URL('js/art-3d-adapter.js',root),'utf8'),{importModuleDynamically:()=>module});
-  script.runInContext(context);
-  context.window.HatopiArt3D.refresh();assert.equal(button.hidden,false);
-  await listeners.click();assert.ok(bridge);
-  const before=vm.runInContext('JSON.stringify({pixels,savedDesigns})',context);
-  assert.equal(bridge.candidates('back').length,1);
-  let parts=bridge.snapshot({});assert.equal(parts.front.pixels[0],'#123456');assert.equal(parts.back.pixels,null);
-  parts=bridge.snapshot({back:'back'});assert.equal(parts.back.pixels[0],'#abcdef');
-  assert.equal(vm.runInContext('JSON.stringify({pixels,savedDesigns})',context),before);
-  vm.runInContext("pixels[0]='#ff0000'",context);context.window.HatopiArt3D.refresh();
-  assert.equal(bridge.snapshot({}).front.pixels[0],'#ff0000');assert.equal(updates,1);
-  vm.runInContext("activeFrameId='book'",context);context.window.HatopiArt3D.refresh();
-  assert.equal(button.hidden,true);assert.equal(closed,1);assert.equal(bridge.snapshot({}),null);
-});
-
-test('every clothing preset and every part opens with valid model groups and read-only pixels',async()=>{
-  const {buildGarment}=await import('../js/art-3d-models/garment.js');
-  const listeners={},button={hidden:true,disabled:false,addEventListener:(event,fn)=>listeners[event]=fn,focus(){}};
-  let bridge,closes=0,onClose;
-  const context=vm.createContext({console,document:{getElementById:()=>button},window:{}});
-  patterns(context);
-  vm.runInContext(`let activeFrameId='',activePartId='',gridWidth=0,gridHeight=0,pixels=[],savedDesigns=[];`,context);
+function adapter(){
+  const listeners={},button={hidden:true,disabled:false,addEventListener:(event,fn)=>listeners[event]=fn,focus(){},setAttribute(){}};
+  let bridge,closes=0,updates=0,done;
+  const context=vm.createContext({console,document:{getElementById:()=>button},window:{},clearTimeout,showToast(){}});patterns(context);
+  vm.runInContext(`let activeFrameId='',activePartId='',gridWidth=0,gridHeight=0,pixels=[],savedDesigns=[],blockStatus={},isLocked=false;function saveDraft(){window.HatopiArtProject.snapshot();}`,context);
+  vm.runInContext(fs.readFileSync(new URL('js/art-project.js',root),'utf8'),context);
   const module=new vm.SyntheticModule(['openPreview','loadPreviewStyles'],function(){
     this.setExport('loadPreviewStyles',()=>Promise.resolve());
-    this.setExport('openPreview',(b,close)=>{bridge=b;onClose=close;return {close(){closes++;close();},update(){}};});
+    this.setExport('openPreview',(b,close)=>{bridge=b;done=close;return {close(){closes++;close();},update(){updates++;}};});
   },{context});
-  await module.link(()=>{});await module.evaluate();
-  new vm.Script(fs.readFileSync(new URL('js/art-3d-adapter.js',root),'utf8'),{importModuleDynamically:()=>module}).runInContext(context);
-  const frames=vm.runInContext("DESIGN_FRAME_PRESETS.filter(f=>f.category==='clothes')",context);
-  assert.equal(frames.length,11);
-  for(const frame of frames) {
-    for(const part of frame.parts) {
-      vm.runInContext(`activeFrameId=${JSON.stringify(frame.id)};activePartId=${JSON.stringify(part.id)};gridWidth=${part.width};gridHeight=${part.height};pixels=new Array(gridWidth*gridHeight).fill('#124578');`,context);
-      context.window.HatopiArt3D.refresh();assert.equal(button.hidden,false,frame.id);
-      await listeners.click();assert.equal(bridge.title,frame.name);
-      const parts=bridge.snapshot({}),active=bridge.activeRole();
-      assert.equal(parts[active].pixels[0],'#124578');
-      assert.equal(Object.values(parts).filter(p=>p.pixels).length,1);
-      assert.deepEqual(Object.values(bridge.roles).map(p=>p.id),Array.from(frame.parts,p=>p.id));
-      if(part===frame.parts[0]) {
-        const {geometry,groups}=buildGarment(THREE,parts,bridge.kind);
-        const positions=geometry.attributes.position,uv=geometry.attributes.uv,normals=geometry.attributes.normal;
-        assert.ok(positions.array.every(Number.isFinite),frame.id+' positions');
-        assert.ok(normals.array.every(Number.isFinite),frame.id+' normals');
-        assert.ok(uv.array.every(v=>Number.isFinite(v)&&v>=0&&v<=1),frame.id+' UV');
-        assert.ok(geometry.index.array.every(v=>Number.isInteger(v)&&v<positions.count),frame.id+' indices');
-        assert.equal(groups.reduce((total,g)=>total+g.count,0),geometry.index.count);
-        assert.ok(groups.every(g=>parts[g.role]),frame.id+' group roles');
-        assert.deepEqual(new Set(groups.map(g=>g.role)),new Set(Object.keys(parts)),frame.id+' all parts represented');
-        assert.ok(geometry.index.count/3>10000 && geometry.index.count/3<400000,frame.id+' triangle budget');
-        for(const group of groups) if(group.colorSample)assert.ok(group.colorSample.every(v=>v>=0&&v<=1));
-        geometry.dispose();
-      }
-      onClose();
+  async function init(){await module.link(()=>{});await module.evaluate();new vm.Script(fs.readFileSync(new URL('js/art-3d-adapter.js',root),'utf8'),{importModuleDynamically:()=>module}).runInContext(context);}
+  function activate(id,index=0){vm.runInContext(`{const f=DESIGN_FRAME_PRESETS.find(f=>f.id===${JSON.stringify(id)}),p=f.parts[${index}];activeFrameId=f.id;activePartId=p.id;gridWidth=p.width;gridHeight=p.height;pixels=new Array(gridWidth*gridHeight).fill('#124578');window.HatopiArtProject.reset();}`,context);context.window.HatopiArt3D.refresh();}
+  return {context,button,init,activate,open:()=>listeners.click(),close:()=>done(),get bridge(){return bridge;},get closes(){return closes;},get updates(){return updates;}};
+}
+test('all 22 item presets and every part connect to finite model geometry',async()=>{
+  const {buildGarment}=await import('../js/art-3d-models/garment.js');
+  const {buildFurniture}=await import('../js/art-3d-models/furniture.js');
+  const a=adapter();await a.init();
+  const frames=vm.runInContext('DESIGN_FRAME_PRESETS',a.context);assert.equal(frames.length,22);
+  for(const frame of frames)for(let i=0;i<frame.parts.length;i++){
+    a.activate(frame.id,i);assert.equal(a.button.hidden,false,frame.id);await a.open();
+    const b=a.bridge,parts=b.snapshot();assert.equal(b.title,frame.name);assert.equal(parts[b.activeRole()].pixels[0],'#124578');
+    assert.equal(Object.values(parts).filter(p=>p.pixels).length,1);
+    if(i===0 || frame.id==='book'){
+      const {geometry:g,groups}=b.simplified?buildFurniture(THREE,parts,b.kind,b.activeRole()):buildGarment(THREE,parts,b.kind);
+      const p=g.attributes.position,uv=g.attributes.uv,n=g.attributes.normal;
+      assert.ok(p.array.every(Number.isFinite),frame.id+' positions');assert.ok(n.array.every(Number.isFinite),frame.id+' normals');
+      assert.ok(uv.array.every(v=>Number.isFinite(v)&&v>=0&&v<=1),frame.id+' UV');
+      assert.ok(g.index.array.every(v=>Number.isInteger(v)&&v<p.count),frame.id+' indices');
+      assert.equal(groups.reduce((total,g)=>total+g.count,0),g.index.count);
+      assert.ok(groups.every(g=>parts[g.role]),frame.id+' roles');
+      assert.ok(g.index.count>100 && g.index.count<1200000,frame.id+' triangle budget');
+      if(frame.id!=='book')assert.deepEqual(new Set(groups.map(g=>g.role)),new Set(Object.keys(parts)),frame.id+' all parts');
+      g.dispose();
     }
+    a.close();
   }
-  // Changing directly between supported frames must discard the old viewer.
-  await listeners.click();
-  vm.runInContext("activeFrameId='tank_top';activePartId='default';gridWidth=64;gridHeight=64;pixels=new Array(4096).fill(null)",context);
-  context.window.HatopiArt3D.refresh();assert.equal(closes,1);
-  await listeners.click();assert.equal(bridge.kind,'tank');
-  vm.runInContext("activeFrameId='book'",context);context.window.HatopiArt3D.refresh();assert.equal(button.hidden,true);assert.equal(closes,2);
+});
+test('saved parts are copied into the project, persist after close and reject wrong item/size',async()=>{
+  const a=adapter();await a.init();a.activate('t_shirt');
+  vm.runInContext(`savedDesigns=[{id:'legacy',name:'背面',frameId:'t_shirt',partId:'canvas-1777194719606',width:64,height:80,pixelData:new Array(5120).fill('#abcdef')},
+    {id:'bad',frameId:'pants',partId:'default',width:64,height:80,pixelData:new Array(5120).fill('#abcdef')}];`,a.context);
+  await a.open();const before=vm.runInContext('JSON.stringify(savedDesigns)',a.context);
+  assert.equal(a.bridge.candidates('back').length,1);assert.equal(a.bridge.useDesign('back','bad'),false);
+  assert.equal(a.bridge.useDesign('back','legacy'),true);assert.equal(a.bridge.snapshot().back.pixels[0],'#abcdef');
+  assert.equal(vm.runInContext('JSON.stringify(savedDesigns)',a.context),before);
+  a.close();await a.open();assert.equal(a.bridge.snapshot().back.pixels[0],'#abcdef');
+  a.activate('tank_top');assert.equal(a.closes,1);await a.open();assert.equal(a.bridge.kind,'tank');
+  vm.runInContext('activeFrameId=null',a.context);a.context.window.HatopiArt3D.refresh();assert.equal(a.button.hidden,true);assert.equal(a.closes,2);
 });
