@@ -90,6 +90,7 @@ function initArtEditor(){
     activeFrameId = draft.frameId || null;
     activePartId = draft.partId || null;
     isLocked = !!draft.locked;
+    window.HatopiArtProject.reset(draft);
     rebuildActiveMask();
     if(loadedFromShareUrl) saveDraft(); // URLのコードから読み込んだ内容を下書きとして永続化する
     // 画像変換（「画像から作る」）を確定した直後の下書きにだけ立つ目印。作業モード選択の
@@ -242,7 +243,7 @@ function bindModeWizardControls(){
 
 // ── 新規キャンバス作成モーダルを「新規作成」ボタンから開く（既存キャンバスがある場合のみキャンセル可能） ──
 function openNewCanvasModal(){
-  if(!confirm(T("art_confirm_new_canvas", "現在のキャンバスを保存せずに新しいキャンバスを作成しますか？"))) return;
+  if(!confirm("編集中の作品（全パーツ）を保存せずに、新しい作品を作成しますか？")) return;
   newCanvasModalCancelable = true;
   document.getElementById("gridSizeCancelWrap").style.display = "block";
   showFrameStep1();
@@ -481,6 +482,7 @@ function createCanvas(w, h, frameId, partId){
   inspectedCell = null;
   activeFrameId = frameId || null;
   activePartId = partId || null;
+  window.HatopiArtProject.reset();
   // 自由サイズ（frameId未指定）で作成した場合は、モーダルの選択状態も
   // デザイン枠の選択なしに揃えておく（次回モーダルを開いた時の表示を一致させるため）
   if(!frameId){
@@ -1061,6 +1063,7 @@ function toggleHighlight(c){
 
 // ── 描画（1マスは常に正方形。gridWidth/gridHeightが異なっても比率を維持） ──
 function renderCanvas(){
+  window.HatopiArtProject.renderTabs();
   // The 3D adapter only reads editor data; UI overlays must never become a texture.
   if(window.HatopiArt3D) window.HatopiArt3D.refresh();
   const cell = currentCellSize();
@@ -2011,11 +2014,15 @@ function bindTransformControls(){
 }
 
 // ── 下書きの自動保存（作業中の状態のみ。名前を付けた保存はSAVED_DESIGNS_KEY側で管理） ──
+let draftStorageWarning = false;
 function saveDraft(){
-  localStorage.setItem(DRAFT_KEY, JSON.stringify({
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify({
     width: gridWidth, height: gridHeight, pixelData: pixels, blockStatus, designId: currentDesignId,
     frameId: activeFrameId, partId: activePartId, locked: isLocked,
-  }));
+    parts: window.HatopiArtProject.snapshot(),
+  })); draftStorageWarning = false; }
+  catch(error) { if(!draftStorageWarning){draftStorageWarning = true;showToast('下書きを保存できませんでした。共有コードでバックアップしてください。');} }
+
 }
 
 function saveDraftDebounced(){
@@ -2049,39 +2056,20 @@ function persistSavedDesigns(){
 
 function saveCurrentAsDesign(){
   const existing = savedDesigns.find(d => d.id === currentDesignId);
-  if(existing){
-    existing.width = gridWidth;
-    existing.height = gridHeight;
-    existing.pixelData = pixels.slice();
-    existing.blockStatus = { ...blockStatus };
-    existing.frameId = activeFrameId;
-    existing.partId = activePartId;
-    existing.locked = isLocked;
-    existing.updatedAt = Date.now();
-    persistSavedDesigns();
-    showToast(T("art_toast_updated", "更新しました"));
-    return;
-  }
-
-  const name = prompt(T("art_save_prompt", "デザイン名を入力してください"), T("art_default_design_name", "デザイン"));
-  if(name === null) return; // キャンセル
+  const name = existing ? existing.name : prompt(T("art_save_prompt", "デザイン名を入力してください"), T("art_default_design_name", "デザイン"));
+  if(name === null) return;
   const design = {
-    id: "design-" + Date.now(),
+    id: existing?.id || "design-" + Date.now() + "-" + Math.random().toString(36).slice(2,7),
     name: name.trim() || T("art_default_design_name", "デザイン"),
-    width: gridWidth,
-    height: gridHeight,
-    pixelData: pixels.slice(),
-    blockStatus: { ...blockStatus },
-    frameId: activeFrameId,
-    partId: activePartId,
-    locked: isLocked,
-    updatedAt: Date.now(),
+    width: gridWidth, height: gridHeight, pixelData: pixels.slice(), blockStatus: {...blockStatus},
+    frameId: activeFrameId, partId: activePartId, locked: isLocked,
+    parts: window.HatopiArtProject.snapshot(), updatedAt: Date.now()
   };
-  savedDesigns.push(design);
-  persistSavedDesigns();
-  currentDesignId = design.id;
-  saveDraft();
-  showToast(T("art_toast_saved", "保存しました"));
+  const next = existing ? savedDesigns.map(d => d.id === design.id ? design : d) : [...savedDesigns, design];
+  try { localStorage.setItem(SAVED_DESIGNS_KEY, JSON.stringify(next)); }
+  catch(error) { showToast('保存できませんでした。端末の空き容量を確認し、共有コードでバックアップしてください。'); return; }
+  savedDesigns = next; currentDesignId = design.id; saveDraft();
+  showToast(existing ? T("art_toast_updated", "更新しました") : T("art_toast_saved", "保存しました"));
 }
 
 // ── 進捗（未着手/作業中/完了）の判定 ──
@@ -2167,7 +2155,7 @@ function renderMyDesignsList(){
       <canvas class="art-mydesign-thumb" id="artMyDesignThumb_${d.id}"></canvas>
       <div class="art-mydesign-info">
         <div class="art-mydesign-name">${escapeHtml(d.name)}</div>
-        <div class="art-mydesign-meta">${d.width} × ${d.height}</div>
+        <div class="art-mydesign-meta">${d.width} × ${d.height}${d.parts ? ` · ${Object.keys(d.parts).length}パーツ` : ""}</div>
         <div class="art-mydesign-progress-row">
           <div class="art-mydesign-progress-bar"><div class="art-mydesign-progress-fill is-${progress.status}" style="width:${progress.percent}%"></div></div>
           <span class="art-mydesign-progress-label is-${progress.status}">${statusLabel[progress.status]} ${progress.percent}%</span>
@@ -2218,6 +2206,7 @@ function loadDesign(id){
   activeFrameId = design.frameId || null;
   activePartId = design.partId || null;
   isLocked = !!design.locked;
+  window.HatopiArtProject.reset(design);
   editMode = false;
   rebuildActiveMask();
   undoStack = [];
@@ -2321,6 +2310,7 @@ function openShareCodeModal(){
   const code = encodeDesignToShareCode({
     width: gridWidth, height: gridHeight, pixelData: pixels,
     frameId: activeFrameId, partId: activePartId, name: currentDesignName(),
+    parts: window.HatopiArtProject.snapshot(),
   });
   const url = buildShareUrl(code);
   document.getElementById("artShareCodeText").value = code;
@@ -2404,7 +2394,7 @@ function importFromPastedCode(){
     document.getElementById("artImportCodeError").textContent = T(result.error, "共有コードの読み込みに失敗しました");
     return;
   }
-  const hasExistingContent = pixels.some(c => c);
+  const hasExistingContent = pixels.some(c => c) || Object.values(window.HatopiArtProject.snapshot()).some(p=>p.pixelData.some(Boolean));
   if(hasExistingContent && !confirm(T("art_share_import_confirm_overwrite", "現在編集中のデザインを、共有されたデザインに置き換えます。よろしいですか？"))){
     return;
   }
@@ -2422,6 +2412,7 @@ function applyImportedDesign(design){
   currentDesignId = null;
   activeFrameId = design.frameId;
   activePartId = design.partId;
+  window.HatopiArtProject.reset(design);
   isLocked = false;
   editMode = false;
   inspectedCell = null;
@@ -2455,14 +2446,14 @@ function applyShareCodeFromUrlIfPresent(existingDraft){
     return existingDraft;
   }
 
-  const hasExistingContent = existingDraft && Array.isArray(existingDraft.pixelData) && existingDraft.pixelData.some(c => c);
+  const hasExistingContent = existingDraft && ((Array.isArray(existingDraft.pixelData) && existingDraft.pixelData.some(Boolean)) || Object.values(existingDraft.parts||{}).some(p=>Array.isArray(p?.pixelData) && p.pixelData.some(Boolean)));
   if(hasExistingContent && !confirm(T("art_share_import_confirm_overwrite", "現在編集中のデザインを、共有されたデザインに置き換えます。よろしいですか？"))){
     return existingDraft;
   }
 
   return {
     width: result.width, height: result.height, pixelData: result.pixelData,
-    frameId: result.frameId, partId: result.partId, blockStatus: {}, designId: null, locked: false,
+    frameId: result.frameId, partId: result.partId, parts: result.parts, blockStatus: {}, designId: null, locked: false,
   };
 }
 
@@ -2634,4 +2625,5 @@ document.addEventListener("langchange", () => {
   requestAnimationFrame(adjustMobileCanvasAreaHeight);
 });
 
+window.addEventListener('pagehide',()=>{if(pixels.length===gridWidth*gridHeight)saveDraft();});
 initArtEditor();

@@ -1,11 +1,13 @@
 import * as THREE from './vendor/three/three.module.min.js';
 import { buildGarment } from './art-3d-models/garment.js';
+import { capturePreviewPng } from './art-3d-export.js';
+import { buildFurniture } from './art-3d-models/furniture.js';
 import { polygonMask, nearestInside } from './art-3d-models/pattern-helpers.js';
 
 let stylesheetPromise;
 export function loadPreviewStyles() {
   if(stylesheetPromise) return stylesheetPromise;
-  const href=new URL('../css/art-preview-panel.css?v=2',import.meta.url).href;
+  const href=new URL('../css/art-preview-panel.css?v=3',import.meta.url).href;
   stylesheetPromise=new Promise((resolve,reject)=>{
     let link=Array.from(document.querySelectorAll('link[rel="stylesheet"]')).find(item=>item.href===href);
     if(link?.sheet){resolve();return;}
@@ -20,48 +22,48 @@ export function loadPreviewStyles() {
 
 // One viewer per editor, no writes to browser storage or source pixel arrays.
 export function openPreview(bridge, onClose) {
-  const dialog=document.createElement('dialog');
-  dialog.className='hatopi-preview'; dialog.setAttribute('aria-labelledby','hatopi-preview-title');
+  const dialog=document.createElement('section');
+  dialog.className='hatopi-preview';dialog.setAttribute('role','region'); dialog.setAttribute('aria-labelledby','hatopi-preview-title');
   dialog.innerHTML=`<header class="hatopi-preview-header"><div><span class="hatopi-preview-tag" data-item-name></span><h2 id="hatopi-preview-title" tabindex="-1">3Dプレビュー</h2></div><button type="button" data-close aria-label="3Dプレビューを閉じる">閉じる <span aria-hidden="true">×</span></button></header>
     <div class="hatopi-preview-body"><section class="hatopi-preview-viewer" aria-label="仕上がりを確認"><div class="hatopi-preview-stage"><p class="hatopi-preview-status" role="status">立体モデルを読み込んでいます…</p></div>
-    <p class="hatopi-preview-caption">指やマウスで動かして、向きを変えられます</p><div class="hatopi-preview-directions" aria-label="見る方向"><button type="button" data-view="front">正面</button><button type="button" data-view="back">背面</button><button type="button" data-view="left">左側</button><button type="button" data-view="right">右側</button></div><div class="hatopi-preview-tools"><button type="button" data-view="reset">向きを戻す</button><button type="button" data-auto aria-pressed="false">自動で回す</button><button type="button" data-color aria-pressed="false">色を確認</button></div></section>
-    <section class="hatopi-preview-settings" aria-labelledby="hatopi-preview-parts-title"><header><h3 id="hatopi-preview-parts-title">使うデザイン</h3><p>編集中のパーツは、保存前でも自動で反映されます。</p></header><details class="hatopi-preview-guide"><summary>背面・袖などの指定方法</summary><ol><li>いま編集中のデザインを「保存する」で保存します。</li><li>「新規作成」で同じ衣装の「バック」や袖などを選び、デザインを作って保存します。</li><li>「一覧を見る」から元のデザインを開き、3Dプレビューの各パーツ欄で保存したデザインを選びます。</li></ol><p>候補には、同じ衣装・パーツ・サイズの保存デザインだけが表示されます。</p></details><div class="hatopi-preview-parts"></div><p class="hatopi-preview-hint">未設定のパーツは白で表示します。選んでも、保存したデザインは変更されません。</p></section></div>
-    <details class="hatopi-preview-note"><summary>表示について</summary><p>デザインを選んでいない面と、塗っていないマスは白で表示します。「色を確認」を押すと、陰影を外して配色を見られます。形や柄の位置は目安です。ゲーム内の着用姿とは異なる場合があります。</p></details>`;
+    <p class="hatopi-preview-caption">指やマウスで動かして、向きを変えられます</p><div class="hatopi-preview-directions" aria-label="見る方向"><button type="button" data-view="front">正面</button><button type="button" data-view="back">背面</button><button type="button" data-view="left">左側</button><button type="button" data-view="right">右側</button></div><div class="hatopi-preview-tools"><button type="button" data-view="reset">向きを戻す</button><button type="button" data-auto aria-pressed="false">自動で回す</button><button type="button" data-color aria-pressed="false">色を確認</button><button type="button" data-export title="背景が透明なPNG画像を保存" disabled>3D画像を保存</button></div></section>
+    <details class="hatopi-preview-settings" open><summary>パーツの編集・取り込み</summary><p>上のパーツボタンで切り替えながら編集できます。全パーツは一つの作品として下書き・保存・共有コードに含まれます。</p><div class="hatopi-preview-parts"></div><p class="hatopi-preview-hint">保存デザインを選ぶと、この作品のパーツにコピーします。取り込んだ内容も「保存する」でまとめて保存できます。</p></details></div>
+    <p class="hatopi-preview-export-status" role="status"></p><details class="hatopi-preview-note"><summary>表示について</summary><p>未設定・未着色のマスは白で表示します。「色を確認」で陰影を外せます。家具・本は型紙を貼った簡易モデルです。形や柄の位置は目安で、ゲーム内の見た目とは異なります。</p></details>`;
   dialog.querySelector('[data-item-name]').textContent=bridge.title||'Tシャツ';
-  document.body.append(dialog); dialog.showModal();
-  dialog.querySelector('h2').focus({preventScroll:true});
+  const layout=document.querySelector('.art-layout');layout.append(dialog);layout.classList.add('art-layout--preview');
+  if(window.matchMedia('(max-width:799px)').matches)dialog.querySelector('.hatopi-preview-settings').open=false;
+  requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
   const stage=dialog.querySelector('.hatopi-preview-stage'),status=dialog.querySelector('.hatopi-preview-status');
-  const options=dialog.querySelector('.hatopi-preview-parts'), selections={},selects={};
+  const options=dialog.querySelector('.hatopi-preview-parts'), selects={},editButtons={};
   const abort=new AbortController(), signal=abort.signal;
   let renderer=null, scene=null, camera=null, model=null, observer=null;
   let closed=false, raf=0, pending=false, auto=false, color=false, lastTime=0;
   let surfaces=[], oldPixels={}, rememberedRole=null, modelGeometry=null, modelMesh=null, bump=null;
   let drag=null;
   const listen=(target,event,fn)=>target.addEventListener(event,fn,{signal});
-  const error=message=>{ status.textContent=message;status.setAttribute('role','alert'); };
+  const error=message=>{ status.textContent=message;status.setAttribute('role','alert');dialog.querySelectorAll('[data-view],[data-auto],[data-color],[data-export]').forEach(button=>button.disabled=true); };
   for(const [role,definition] of Object.entries(bridge.roles)) {
-    const label=document.createElement('label');label.append(document.createTextNode(definition.label));
-    const select=document.createElement('select');select.setAttribute('aria-label',definition.label);
-    label.append(select); options.append(label); selects[role]=select;
-    listen(select,'change',()=>{selections[role]=select.value;requestUpdate();});
+    const row=document.createElement('div'),label=document.createElement('label');label.append(document.createTextNode(definition.label));
+    const select=document.createElement('select');select.setAttribute('aria-label',definition.label+'に保存デザインを取り込む');
+    const edit=document.createElement('button');edit.type='button';edit.textContent='このパーツを編集';
+    edit.setAttribute('aria-label',definition.label+'を編集');
+    label.append(select);row.append(label,edit);options.append(row);selects[role]=select;editButtons[role]=edit;
+    listen(edit,'click',()=>bridge.switchPart(role));
+    listen(select,'change',()=>{
+      if(!select.value)return;
+      bridge.useDesign(role,select.value==='__blank'?'':select.value);requestUpdate();rebuildChoices();
+    });
   }
   function rebuildChoices() {
     const active=bridge.activeRole();
     for(const role of Object.keys(bridge.roles)) {
-      const select=selects[role],value=selections[role]||'';
-      const candidates=bridge.candidates(role);
-      const entries=role===active?[{id:'',name:'編集中のデザイン'}]:[{id:'',name:'白のまま（未設定）'},...candidates];
-      // Avoid resetting focus / selected option while drawing.
+      const select=selects[role],current=role===active;
+      const entries=current?[{id:'',name:'編集中のパーツ'}]:[{id:'',name:bridge.hasPart(role)?'この作品のパーツ':'未設定（白）'},...bridge.candidates(role),{id:'__blank',name:'白に戻す'}];
       const signature=JSON.stringify([active,entries]);
-      if(select.dataset.signature!==signature) {
-        select.replaceChildren(...entries.map(entry=>new Option(entry.name,entry.id)));
-        select.dataset.signature=signature;
-      }
-      select.disabled=role===active;
-      select.value=entries.some(entry=>entry.id===value)?value:'';
-      if(role!==active) selections[role]=select.value;
+      if(select.dataset.signature!==signature){select.replaceChildren(...entries.map(entry=>new Option(entry.name,entry.id)));select.dataset.signature=signature;}
+      select.disabled=current;select.value='';editButtons[role].disabled=current;
     }
-    if(active!==rememberedRole) { rememberedRole=active; oldPixels={}; }
+    if(active!==rememberedRole){rememberedRole=active;oldPixels={};}
   }
   function makeTexture(part) {
     const canvas=document.createElement('canvas');canvas.width=part.width;canvas.height=part.height;
@@ -93,7 +95,8 @@ export function openPreview(bridge, onClose) {
       } else if(target.nearest[i]>=0) image.data.set(image.data.subarray(target.nearest[i]*4,target.nearest[i]*4+4),i*4);
     }
     ctx.putImageData(image,0,0);
-    if(target.colorSample){const [x,y]=target.colorSample;const sample=part.pixels?.[Math.min(part.height-1,Math.floor(y*part.height))*part.width+Math.min(part.width-1,Math.floor(x*part.width))];ctx.fillStyle=sample||'#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}
+    if(target.solidColor){ctx.fillStyle=target.solidColor;ctx.fillRect(0,0,canvas.width,canvas.height);}
+    else if(target.colorSample){const [x,y]=target.colorSample;const sample=part.pixels?.[Math.min(part.height-1,Math.floor(y*part.height))*part.width+Math.min(part.width-1,Math.floor(x*part.width))];ctx.fillStyle=sample||'#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);}
     else if(target.lining){ctx.fillStyle=dominant;ctx.fillRect(0,0,canvas.width,canvas.height);}
     target.rawctx.drawImage(canvas,0,0);target.rawTexture.needsUpdate=true;
     ctx.globalAlpha=.18;ctx.fillStyle='#ffffff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.globalAlpha=1;
@@ -108,9 +111,9 @@ export function openPreview(bridge, onClose) {
   }
   function sync() {
     if(closed) return;
-    rebuildChoices();
-    const parts=bridge.snapshot(selections);
+    const parts=bridge.snapshot();
     if(!parts) { close();return; }
+    rebuildChoices();
     if(!renderer) return;
     const changedRoles=new Set(Object.keys(parts).filter(role=>changed(role,parts[role].pixels)));
     for(const surface of surfaces) if(changedRoles.has(surface.role)) {
@@ -121,12 +124,13 @@ export function openPreview(bridge, onClose) {
   function draw(time=0) {
     raf=0;if(closed || document.hidden || !renderer) return;
     if(pending) {pending=false;sync();}
+    if(closed)return;
     if(auto && lastTime) model.rotation.y+=Math.min(50,time-lastTime)*.00035;
     lastTime=time;renderer.render(scene,camera);
     if(auto) schedule();
   }
   function schedule() { if(!closed && !document.hidden && !raf) raf=requestAnimationFrame(draw); }
-  function requestUpdate() {pending=true;schedule();}
+  function requestUpdate() {if(!renderer){sync();return;}pending=true;schedule();}
   function setAuto(value) {
     auto=value;lastTime=0;const button=dialog.querySelector('[data-auto]');button.setAttribute('aria-pressed',String(auto));button.textContent=auto?'自動回転を止める':'自動で回す';schedule();
   }
@@ -137,11 +141,23 @@ export function openPreview(bridge, onClose) {
       modelGeometry?.dispose();bump?.dispose();
       renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();
     }
-    dialog.close();dialog.remove();onClose();
+    dialog.remove();layout.classList.remove('art-layout--preview');window.dispatchEvent(new Event('resize'));onClose();
   }
+  listen(dialog.querySelector('[data-export]'),'click',async()=>{
+    if(!renderer || closed)return;
+    const button=dialog.querySelector('[data-export]'),message=dialog.querySelector('.hatopi-preview-export-status');
+    button.disabled=true;message.textContent='画像を作っています…';
+    try{
+      const kind=bridge.kind,blob=await capturePreviewPng(renderer,scene,camera);
+      const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='hatopi-'+kind+'-3d.png';
+      document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+      message.textContent='PNG画像を作成しました。端末のダウンロード先を確認してください。';
+    }catch(error){message.textContent='画像を保存できませんでした。もう一度お試しください。';}
+    finally{button.disabled=false;schedule();}
+  });
   listen(dialog.querySelector('[data-close]'),'click',close);
-  listen(dialog,'cancel',event=>{event.preventDefault();close();});
-  listen(dialog,'click',event=>{if(event.target===dialog) close();});
+  listen(dialog,'keydown',event=>{if(event.key==='Escape'){event.stopPropagation();close();document.getElementById('art3DOpenBtn').focus();}});
+
   listen(document,'visibilitychange',()=>{cancelAnimationFrame(raf);raf=0;lastTime=0;if(!document.hidden)schedule();});
   listen(dialog.querySelector('[data-auto]'),'click',()=>setAuto(!auto));
   listen(dialog.querySelector('[data-color]'),'click',()=>{
@@ -154,7 +170,7 @@ export function openPreview(bridge, onClose) {
     model.rotation.set(.15,angles[button.dataset.view],0);schedule();
   }));
   try {
-    rebuildChoices();const parts=bridge.snapshot(selections);
+    rebuildChoices();const parts=bridge.snapshot();
     if(!parts) {close();return {close,update:requestUpdate};}
     renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;
@@ -172,15 +188,15 @@ export function openPreview(bridge, onClose) {
     }
     clothCtx.putImageData(clothPixels,0,0);bump=new THREE.CanvasTexture(clothCanvas);
     bump.wrapS=bump.wrapT=THREE.RepeatWrapping;bump.repeat.set(32,64);
-    const built=buildGarment(THREE,parts,bridge.kind||'tshirt');modelGeometry=built.geometry;
+    const built=bridge.simplified?buildFurniture(THREE,parts,bridge.kind,bridge.activeRole()):buildGarment(THREE,parts,bridge.kind||'tshirt');modelGeometry=built.geometry;
     modelGeometry.computeBoundingBox();const center=modelGeometry.boundingBox.getCenter(new THREE.Vector3());
     modelGeometry.translate(-center.x,-center.y,-center.z);modelGeometry.computeBoundingSphere();
     const side=['tshirt','tank','sweatshirt','shoes','maryJane'].includes(bridge.kind||'tshirt')?THREE.FrontSide:THREE.DoubleSide;
-    for(const {role,fabricLining,colorSample} of built.groups) {
+    for(const {role,fabricLining,colorSample,solidColor} of built.groups) {
       const target=makeTexture(parts[role]);
       const basic=new THREE.MeshBasicMaterial({map:target.rawTexture,side,toneMapped:false});
       const cloth=new THREE.MeshStandardMaterial({map:target.texture,side,roughness:.94,metalness:0,bumpMap:bump,bumpScale:.0001});
-      surfaces.push({role,...target,basic,cloth,lining:!!fabricLining,colorSample});
+      surfaces.push({role,...target,basic,cloth,lining:!!fabricLining,colorSample,solidColor});
     }
     modelMesh=new THREE.Mesh(modelGeometry,surfaces.map(s=>s.cloth));model.add(modelMesh);
     const canvas=renderer.domElement;
@@ -213,10 +229,10 @@ export function openPreview(bridge, onClose) {
       camera.position.z=modelGeometry.boundingSphere.radius/(Math.sin(halfAngle)*.91);
       camera.updateProjectionMatrix();schedule();
     });observer.observe(stage);
-    status.textContent='';sync();schedule();
+    status.textContent='';dialog.querySelector('[data-export]').disabled=false;sync();schedule();
   } catch(error_) {
     console.warn('3D preview unavailable',error_);
-    error('この環境では3Dを表示できません。閉じると2D編集を続けられます。');
+    error('この環境では3Dを表示できません。2Dの編集・保存はそのまま使えます。');
   }
   return {close,update:requestUpdate};
 }
