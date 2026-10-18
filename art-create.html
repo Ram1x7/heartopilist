@@ -29,6 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=37">
 <link rel="stylesheet" href="./css/art.css?v=68">
+<link rel="stylesheet" href="./css/art-3d-preview.css?v=1">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
@@ -112,6 +113,7 @@
 <div class="art-canvas-status-bar" id="artCanvasStatusBar">
   <button class="art-edit-mode-btn" id="artEditModeBtn" data-i18n="art_edit_mode_on">編集する</button>
   <button class="art-lock-btn" id="artLockBtn" data-i18n="art_lock">固定する</button>
+  <button class="art-edit-mode-btn" id="art3DOpenBtn" hidden>3Dプレビュー</button>
 </div>
 
 <div class="art-layout">
@@ -627,6 +629,7 @@ function T(key, fallback, vars){
 <script src="js/lz-string.min.js"></script>
 <script src="js/qrcode.js"></script>
 <script src="js/art-share-code.js"></script>
+<script src="js/art-3d-adapter.js?v=1"></script>
 <script src="js/art-editor.js"></script>
 <script src="js/art-paint-guide.js"></script>
 <script src="js/art-screenshot-import.js"></script>
