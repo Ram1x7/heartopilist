@@ -104,7 +104,7 @@ function setOtSeason(key){
 let otCategory = "all";
 function setOtCategory(cat){
   otCategory = cat;
-  ["all","furniture","clothing","other"].forEach((c)=>{
+  ["all","clothing","furniture","other"].forEach((c)=>{
     const btn = document.getElementById("otCat_" + c);
     if(btn) btn.classList.toggle("active", c === cat);
   });
@@ -122,23 +122,22 @@ function otMatchesFilters(item){
 }
 
 // ── 並び替え ──
-let otSortMode = "book"; // "book" = 並び順 / "unowned" = 未所持順
-function setOtSort(mode){
-  otSortMode = mode;
-  document.getElementById("otSort_book").classList.toggle("active", mode === "book");
-  document.getElementById("otSort_unowned").classList.toggle("active", mode === "unowned");
-  renderOtContent();
-}
-
+// オーダーチケットは一度入手すると再入手できないため「所持/未所持」の切り替えは
+// 設けず、チェックした時点で自動的に一番下へ移動する（常時有効・切り替え不要）。
+// カテゴリ「すべて」選択時は服→家具→その他の順にまとめる（それ以外は元の並び順）
+const OT_CATEGORY_ORDER = { clothing: 0, furniture: 1, other: 2 };
 function sortOtItems(items){
-  if(otSortMode !== "unowned") return items;
-  // 未所持を先に、所持済みを後ろに（同じ状態内は元の並び順を維持）
   return items
     .map((item, index) => ({ item, index }))
     .sort((a, b) => {
       const aOwned = otOwned[a.item.id] ? 1 : 0;
       const bOwned = otOwned[b.item.id] ? 1 : 0;
       if(aOwned !== bOwned) return aOwned - bOwned;
+      if(otCategory === "all"){
+        const aCat = OT_CATEGORY_ORDER[a.item.category] ?? 99;
+        const bCat = OT_CATEGORY_ORDER[b.item.category] ?? 99;
+        if(aCat !== bCat) return aCat - bCat;
+      }
       return a.index - b.index;
     })
     .map(x => x.item);
@@ -176,7 +175,7 @@ function otCardHTML(item){
   }
   const owned = !!otOwned[item.id];
   return `
-    <div class="ot-card">
+    <div class="ot-card ${owned ? "ot-owned" : ""}">
       <div class="img-wrap">
         <button class="check-btn ${owned ? "checked" : ""}" data-ot-check="${item.id}" aria-label="owned">
           ${icon(owned ? "check" : "checkSquare", {size:13})}
