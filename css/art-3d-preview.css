@@ -1,0 +1,26 @@
+#art3DOpenBtn[hidden]{display:none}
+.art3d-dialog{border:1px solid #a98ad3;border-radius:20px;padding:0;width:min(960px,94vw);max-height:92dvh;background:#fff;color:#29243b;box-shadow:0 16px 70px #0005}
+.art3d-dialog::backdrop{background:#17102b99}
+.art3d-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #cbbbe1}
+.art3d-header h2{margin:0;font-size:1.1rem}
+.art3d-dialog button,.art3d-dialog select{font:inherit;border:1px solid #b8a2d0;border-radius:9px;background:#f9f6ff;color:inherit;padding:9px 12px;min-height:42px}
+.art3d-dialog button{cursor:pointer}
+.art3d-dialog button[aria-pressed=true]{background:#e2d1ff;border-color:#8759b5}
+.art3d-body{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;padding:16px}
+.art3d-stage{height:440px;min-width:0;position:relative;background:radial-gradient(ellipse at 50% 40%,#f7f5fc,#e6dfef);border-radius:14px;overflow:hidden}
+.art3d-stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.art3d-stage canvas:active{cursor:grabbing}
+.art3d-status{position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:24px;pointer-events:none}
+.art3d-status:empty{display:none}
+.art3d-options{display:flex;flex-direction:column;gap:12px}
+.art3d-options label{display:flex;flex-direction:column;gap:5px;font-size:.9rem}
+.art3d-options select{width:100%}
+.art3d-options p,.art3d-note{font-size:.82rem;line-height:1.6;margin:0}
+.art3d-directions{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px}
+.art3d-note{padding:0 16px 16px;color:#655775}
+.art3d-dialog :focus-visible{outline:3px solid #47b7d6;outline-offset:2px}
+body.dark .art3d-dialog{background:#252136;color:#f1eafa}
+body.dark .art3d-dialog button,body.dark .art3d-dialog select{background:#363047;color:#f1eafa}
+body.dark .art3d-dialog button[aria-pressed=true]{background:#654584}
+body.dark .art3d-note{color:#c9bddd}
+@media(max-width:700px){.art3d-body{grid-template-columns:1fr}.art3d-stage{height: min(45dvh,380px);min-height:230px}.art3d-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.art3d-options .art3d-controls{grid-column:1/-1}.art3d-dialog{max-height:94dvh}.art3d-header{padding:10px 14px}}

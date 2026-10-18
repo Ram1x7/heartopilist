@@ -1062,6 +1062,8 @@ function toggleHighlight(c){
 
 // ── 描画（1マスは常に正方形。gridWidth/gridHeightが異なっても比率を維持） ──
 function renderCanvas(){
+  // The 3D adapter only reads editor data; UI overlays must never become a texture.
+  if(window.HatopiArt3D) window.HatopiArt3D.refresh();
   const cell = currentCellSize();
   canvas.width = gridWidth * cell;
   canvas.height = gridHeight * cell;
