@@ -6,10 +6,10 @@ import { polygonMask, nearestInside } from './art-3d-models/pattern-helpers.js';
 export function openPreview(bridge, onClose) {
   const dialog=document.createElement('dialog');
   dialog.className='art3d-dialog'; dialog.setAttribute('aria-labelledby','art3d-title');
-  dialog.innerHTML=`<header class="art3d-header"><h2 id="art3d-title">Tシャツの3Dプレビュー</h2><button type="button" data-close aria-label="3Dプレビューを閉じる">閉じる</button></header>
+  dialog.innerHTML=`<header class="art3d-header"><div><p class="art3d-eyebrow">はとぴ図鑑 · アート</p><h2 id="art3d-title">デザインを、立体で確認</h2></div><button type="button" class="art3d-close" data-close aria-label="3Dプレビューを閉じる">閉じる</button></header>
     <div class="art3d-body"><div><div class="art3d-stage" role="img" aria-label="Tシャツの立体表示。ドラッグで回転できます"><p class="art3d-status" role="status">3Dを準備しています…</p></div>
-    <div class="art3d-directions" aria-label="表示する方向"><button type="button" data-view="front">前</button><button type="button" data-view="back">後</button><button type="button" data-view="left">左</button><button type="button" data-view="right">右</button><button type="button" data-view="reset">初期位置</button></div></div>
-    <div class="art3d-options"><div class="art3d-controls"><button type="button" data-color aria-pressed="false">色確認</button> <button type="button" data-auto aria-pressed="false">自動回転</button></div></div></div>
+    <p class="art3d-stage-caption">Tシャツ · ドラッグして、ぐるっと確認</p><div class="art3d-directions" aria-label="表示する方向"><button type="button" data-view="front">前</button><button type="button" data-view="back">後</button><button type="button" data-view="left">左</button><button type="button" data-view="right">右</button><button type="button" data-view="reset">初期位置</button></div></div>
+    <div class="art3d-options"><h3>デザインの組み合わせ</h3><p class="art3d-help">背面や袖に使う作品を選べます。<br>編集中の面は、そのまま反映されます。</p><div class="art3d-controls"><button type="button" data-color aria-pressed="false">色確認</button> <button type="button" data-auto aria-pressed="false">自動回転</button></div></div></div>
     <p class="art3d-note">ドラッグで回転できます。未設定の面・未着色のマスは白で表示します。形状と柄の位置は目安です。ゲーム内の着用姿とは異なる場合があります。</p>`;
   document.body.append(dialog); dialog.showModal();
   const stage=dialog.querySelector('.art3d-stage'),status=dialog.querySelector('.art3d-status');
@@ -22,7 +22,7 @@ export function openPreview(bridge, onClose) {
   const listen=(target,event,fn)=>target.addEventListener(event,fn,{signal});
   const error=message=>{ status.textContent=message;status.setAttribute('role','alert'); };
   for(const [role,definition] of Object.entries(bridge.roles)) {
-    const label=document.createElement('label');label.append(document.createTextNode(definition.label));
+    const label=document.createElement('label');label.append(document.createTextNode(definition.label+'のデザイン'));
     const select=document.createElement('select');select.setAttribute('aria-label',definition.label+'のデザイン');
     label.append(select); options.append(label); selects[role]=select;
     listen(select,'change',()=>{selections[role]=select.value;requestUpdate();});
