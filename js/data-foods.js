@@ -1137,6 +1137,98 @@ const foodsData = [
   auth:false
 },
 {
+  // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
+  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
+  name:"ユラユラチーズかぼちゃパスタ",
+  nameI18n:{"ja":"ユラユラチーズかぼちゃパスタ","en":"Ghost Cheesy Pumpkin Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/1110.PNG",
+  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
+  restoreSourceId: "cooking-45583",
+  cost:220, // かぼちゃ10×2+チーズ100+料理油100
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（他はかぼちゃ以外の作物を使用しないため対象外）
+  rarity: [true,true,true,true,true],
+  prices:[310],
+  materials:["かぼちゃ(種@10)","かぼちゃ(種@10)","チーズ(@100)","料理油(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/cheese.jpg" },
+    { image:"./images/materials/oil.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
+  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
+  name:"かぼちゃニャンコクッキー",
+  nameI18n:{"ja":"かぼちゃニャンコクッキー","en":"Pumpkin Cat Cookie","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/1111.PNG",
+  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
+  restoreSourceId: "cooking-45584",
+  cost:355, // かぼちゃ10+バター150+小麦95+チーズ100
+  time:240, // 素材の成長時間から算出：かぼちゃ15分・小麦240分→長い方の240分
+  rarity: [true,true,true,true,true],
+  prices:[670],
+  materials:["かぼちゃ(種@10)","バター(@150)","小麦(種@95)","チーズ(@100)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/wheat.jpg" },
+    { image:"./images/materials/cheese.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
+  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
+  name:"不気味に笑うかぼちゃタルト",
+  nameI18n:{"ja":"不気味に笑うかぼちゃタルト","en":"Spooky Pumpkin Tart","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/1112.PNG",
+  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
+  restoreSourceId: "cooking-45585",
+  cost:305, // かぼちゃ10+牛乳50+バター150+小麦95
+  time:240, // 素材の成長時間から算出：かぼちゃ15分・小麦240分→長い方の240分
+  rarity: [true,true,true,true,true],
+  prices:[620],
+  materials:["かぼちゃ(種@10)","牛乳(@50)","バター(@150)","小麦(種@95)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/batter.jpg" },
+    { image:"./images/materials/wheat.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
+  // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
+  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
+  name:"ユラユラかぼちゃチョコ",
+  nameI18n:{"ja":"ユラユラかぼちゃチョコ","en":"Ghost Pumpkin Chocolate","zh-CN":"","zh-TW":"","ko":"","th":""},
+  image:"./images/foods/1113.PNG",
+  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
+  restoreSourceId: "cooking-45586",
+  cost:550, // かぼちゃ10+牛乳50×2+チョコソース440
+  time:15, // 素材の成長時間から算出：かぼちゃ15分（他はかぼちゃ以外の作物を使用しないため対象外）
+  rarity: [true,true,true,true,true],
+  prices:[1610],
+  materials:["かぼちゃ(種@10)","牛乳(@50)","牛乳(@50)","チョコソース(@440)"],
+  level:1,
+  materials_image:[
+    { image:"./images/materials/kabotya.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/milk.jpg" },
+    { image:"./images/materials/choco_source.jpg" }
+  ],
+  authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
+  auth:false
+},
+{
   name:"月うさぎのとろとろ月餅",
   nameI18n:{"ja":"月うさぎのとろとろ月餅","en":"Moon Rabbit Molten Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/115.PNG",
