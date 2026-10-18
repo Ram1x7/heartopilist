@@ -139,18 +139,20 @@ body.dark .shop-category-title{ color:var(--dark-accent); }
 
 .shop-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  /* minmax(0,1fr)：列の最小幅を0にしないと、折り返さない長いテキストが
+     列幅を押し広げ、グリッド全体が画面からはみ出すことがある */
+  grid-template-columns:repeat(3, minmax(0,1fr));
   gap:10px;
   margin-top:10px;
 }
 
 /* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのまま */
 body[data-icon-size="small"] .shop-grid{
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(4, minmax(0,1fr));
   gap:8px;
 }
 body[data-icon-size="large"] .shop-grid{
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(2, minmax(0,1fr));
   gap:12px;
 }
 
