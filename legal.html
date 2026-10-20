@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>プライバシーポリシー・ライセンス｜はとぴ図鑑</title>
+<meta name="description" content="はとぴ図鑑のプライバシーポリシーと、使用しているオープンソースソフトウェアのライセンス表記。">
+<meta name="robots" content="noindex">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=37">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+*{ box-sizing:border-box; margin:0; padding:0; }
+body{ min-height:100vh; }
+
+.legal-back-link{
+  display:inline-block;
+  margin:10px 0 0;
+  font-size:12px;
+  color:var(--indigo);
+  text-decoration:none;
+}
+body.dark .legal-back-link{ color:var(--dark-accent); }
+
+.legal-section{
+  font-size:13px;
+  line-height:1.7;
+  padding:10px;
+}
+.legal-section h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:17px;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+  margin-top:26px;
+  margin-bottom:8px;
+}
+body.dark .legal-section h2{ color:var(--dark-accent); }
+.legal-section h2:first-of-type{ margin-top:10px; }
+.legal-section ul{ margin:0 0 10px 18px; padding:0; }
+.legal-section li{ margin-bottom:4px; }
+</style>
+</head>
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<a class="legal-back-link" href="./index.html" data-i18n="legal_back_link">← 図鑑に戻る</a>
+
+<div class="legal-section">
+
+<h2 data-i18n="privacy_title">プライバシーポリシー</h2>
+<p data-i18n="privacy_body">
+本サイトのほとんどのデータはブラウザ内（LocalStorage）のみで管理され、外部に送信されることはありません。ただし、以下の場合に限り外部へのデータ送信が発生します。
+</p>
+<ul>
+<li data-i18n="privacy_item_ga">アクセス解析のため、Google Analyticsを使用しています。</li>
+<li data-i18n="privacy_item_notif">庭ページの収穫・草抜き通知機能を有効にした場合、通知を送るためFCM（Firebase Cloud Messaging）トークン・作物名・通知時刻を本サイトのサーバー（Firebase／Google Cloud）に送信します。</li>
+<li data-i18n="privacy_item_external">フォント表示のためGoogle Fontsから、動画再生のためYouTubeから、それぞれ外部リソースを読み込みます。</li>
+</ul>
+
+<h2 data-i18n="licenses_title">使用ライブラリ・ライセンス</h2>
+<p data-i18n="licenses_body">
+本サイトでは、以下のオープンソースソフトウェアを使用しています。
+</p>
+<ul>
+<li>three.js — MIT License — Copyright © 2010-2023 Three.js Authors</li>
+<li>qrcode-generator — MIT License — Copyright (c) 2009 Kazuhiko Arase</li>
+<li>lz-string — MIT License — Copyright (c) 2013 pieroxy</li>
+<li>Noto Serif JP — SIL Open Font License 1.1 — Copyright 2014-2021 Adobe, Copyright 2014-2021 Google Inc.</li>
+</ul>
+
+</div>
+
+<p id="disclaimer" style="font-size:10px; opacity:0.5; text-align:center; margin-top:20px; padding:0 10px;">
+</p>
+
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+
+document.getElementById("disclaimer").textContent =
+  T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
+
+document.addEventListener("langchange", ()=>{
+  document.getElementById("disclaimer").textContent =
+    T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
+});
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>
