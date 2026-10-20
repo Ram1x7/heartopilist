@@ -1668,7 +1668,7 @@ const fishData = [
  auth:false
 },
 {
- // th.gl ID: fish-10435 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"シリヤケイカ",
  nameI18n:{"ja":"シリヤケイカ","en":"Spineless Cuttlefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1685,7 +1685,7 @@ const fishData = [
  auth:false
 },
 {
- // th.gl ID: fish-10436 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"トラフコウイカ",
  nameI18n:{"ja":"トラフコウイカ","en":"Pharaoh Cuttlefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1702,7 +1702,7 @@ const fishData = [
  auth:false
 },
 {
- // th.gl ID: fish-10437 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"コウイカ",
  nameI18n:{"ja":"コウイカ","en":"Golden Cuttlefish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1719,7 +1719,7 @@ const fishData = [
  auth:false
 },
 {
- // th.gl ID: fish-10438 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"ブルークリオネ",
  nameI18n:{"ja":"ブルークリオネ","en":"Blue Sea Angel","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1736,7 +1736,7 @@ const fishData = [
  auth:false
 },
 {
- // th.gl ID: fish-10439 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"グリーンクリオネ",
  nameI18n:{"ja":"グリーンクリオネ","en":"Green Sea Angel","zh-CN":"","zh-TW":"","ko":"","th":""},
@@ -1754,7 +1754,7 @@ const fishData = [
  auth:false
 },
 {
- // th.gl ID: fish-10440 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"パープルクリオネ",
  nameI18n:{"ja":"パープルクリオネ","en":"Purple Sea Angel","zh-CN":"","zh-TW":"","ko":"","th":""},

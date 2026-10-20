@@ -1264,7 +1264,7 @@ const bugData = [
  auth:false
 },
 {
- // th.gl ID: insects-51239 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"シイタケフンチュウ",
  nameI18n:{"ja":"シイタケフンチュウ","en":"Shiitake Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1280,7 +1280,7 @@ const bugData = [
  auth:false
 },
 {
- // th.gl ID: insects-51240 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"オレンジフンチュウ",
  nameI18n:{"ja":"オレンジフンチュウ","en":"Mandarin Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1296,7 +1296,7 @@ const bugData = [
  auth:false
 },
 {
- // th.gl ID: insects-51241 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"イチゴフンチュウ",
  nameI18n:{"ja":"イチゴフンチュウ","en":"Strawberry Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1312,7 +1312,7 @@ const bugData = [
  auth:false
 },
 {
- // th.gl ID: insects-51242 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  name:"かぼちゃフンチュウ",
  nameI18n:{"ja":"かぼちゃフンチュウ","en":"Pumpkin Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1328,7 +1328,7 @@ const bugData = [
  auth:false
 },
 {
- // th.gl ID: insects-51243 / イベント「幽夜の集い」2026-10-10開始
+ // イベント「幽夜の集い」2026-10-10開始
  // 特殊入手イベント名（ユーザー確認済み）
  // ☆2売価は標準倍率(floor×1.5=247)と異なりユーザー確認済みの248を個別指定（prices参照）
  name:"トリュフフンチュウ",

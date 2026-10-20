@@ -1391,7 +1391,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69348 / イベント「幽夜の集い」2026-10-17出現開始
+ // イベント「幽夜の集い」2026-10-17出現開始
  name:"リンゴワタリガラス",
  nameI18n:{"ja":"リンゴワタリガラス","en":"Apple Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1409,7 +1409,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69349 / イベント「幽夜の集い」2026-10-17出現開始
+ // イベント「幽夜の集い」2026-10-17出現開始
  name:"ミカンワタリガラス",
  nameI18n:{"ja":"ミカンワタリガラス","en":"Mandarin Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1427,7 +1427,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69350 / イベント「幽夜の集い」2026-10-17出現開始
+ // イベント「幽夜の集い」2026-10-17出現開始
  name:"イチゴワタリガラス",
  nameI18n:{"ja":"イチゴワタリガラス","en":"Strawberry Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1445,7 +1445,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69351 / イベント「幽夜の集い」2026-10-17出現開始
+ // イベント「幽夜の集い」2026-10-17出現開始
  name:"カボチャワタリガラス",
  nameI18n:{"ja":"カボチャワタリガラス","en":"Pumpkin Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1463,7 +1463,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69352 / イベント「幽夜の集い」2026-10-17出現開始
+ // イベント「幽夜の集い」2026-10-17出現開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"トリュフワタリガラス",
  nameI18n:{"ja":"トリュフワタリガラス","en":"Truffle Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
@@ -1479,7 +1479,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69353 / イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
+ // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"タンザニアウーリーコウモリ",
  nameI18n:{"ja":"タンザニアウーリーコウモリ","en":"Tanzanian Woolly Bat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1496,7 +1496,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69354 / イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
+ // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"シロヘラコウモリ",
  nameI18n:{"ja":"シロヘラコウモリ","en":"Honduran White Bat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1513,7 +1513,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69355 / イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
+ // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"パナイスンダオオコウモリ",
  nameI18n:{"ja":"パナイスンダオオコウモリ","en":"Long-Toothed Fruit Bat","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1530,7 +1530,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69356 / イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
+ // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"アメリカオオコノハズク",
  nameI18n:{"ja":"アメリカオオコノハズク","en":"Eastern Screech Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1547,7 +1547,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69357 / イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
+ // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"アフリカオオコノハズク",
  nameI18n:{"ja":"アフリカオオコノハズク","en":"Northern White-Faced Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1564,7 +1564,7 @@ const birdData = [
  auth:false
 },
 {
- // th.gl ID: birds-69358 / イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
+ // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"カキイロコノハズク",
  nameI18n:{"ja":"カキイロコノハズク","en":"Palau Scops Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
