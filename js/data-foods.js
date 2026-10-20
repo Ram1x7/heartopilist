@@ -1637,7 +1637,7 @@ const foodsData = [
   time:0,
   rarity: [true,true,true,true,true],
   prices:[300],
-  materials:["コーヒー豆×2(@50×2)","牛乳×2(@50×2)"],
+  materials:["コーヒー豆(@50)","コーヒー豆(@50)","牛乳(@50)","牛乳(@50)"],
   level:2,
   materials_image:[
     { image:"./images/materials/coffee.jpg" },
