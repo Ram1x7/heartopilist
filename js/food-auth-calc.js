@@ -131,15 +131,15 @@ function isFreeCategoryMaterial(name){
 
 // ── 素材名から中間素材となる料理データを検索 ──
 // "ティラミス(@300)" のような表記から、括弧の価格表記を除いた名前で
-// foodsData 内を検索する。完全一致優先、なければ前方一致を試みる。
+// foodsData 内を完全一致で検索する。
+// ※以前は前方一致（例: "コーヒー豆"が"コーヒー"にマッチ）もフォールバックして
+//   いたが、素材名が偶然別の料理名を前方一致してしまい、無関係な（むしろ
+//   逆方向の）レシピへ分解されてしまう誤爆があったため廃止した。
 function findRecipeForMaterial(materialName){
   if(!materialName) return null;
   const bareName = materialName.replace(/[（(].*?[）)]/g, "").trim();
   let recipe = foodsData.find(f => f.name === materialName);
   if(!recipe) recipe = foodsData.find(f => f.name === bareName);
-  if(!recipe){
-    recipe = foodsData.find(f => bareName && bareName.startsWith(f.name));
-  }
   return recipe || null;
 }
 
