@@ -961,7 +961,7 @@ const foodsData = [
   level:1,
   materials_image:[
     { image:"./images/materials/egg.jpg" },
-    { image:"./images/materials/apple.jpg" },
+    { image:"./images/materials/ringo.jpg" },
     { image:null },
     { image:null }
   ],
@@ -2751,7 +2751,7 @@ const foodsData = [
     { image:"./images/materials/egg.jpg" },
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/sugar.jpg" },
-    { image:"./images/materials/apple.jpg" }
+    { image:"./images/materials/ringo.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:false
@@ -3483,7 +3483,7 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/all_vege2.jpg" },
     { image:"./images/materials/all_vege2.jpg" },
-    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:"./images/materials/romeinn_takos.jpg" },
     { image:null }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3506,7 +3506,7 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/noshida.jpg" },
     { image:"./images/materials/noshida.jpg" },
-    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:"./images/materials/romeinn_takos.jpg" },
     { image:null }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3529,7 +3529,7 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/noninniku.jpg" },
     { image:"./images/materials/noninniku.jpg" },
-    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:"./images/materials/romeinn_takos.jpg" },
     { image:null }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3552,7 +3552,7 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/nogobou.jpg" },
     { image:"./images/materials/nogobou.jpg" },
-    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:"./images/materials/romeinn_takos.jpg" },
     { image:null }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3575,7 +3575,7 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/nokarashina.jpg" },
     { image:"./images/materials/nokarashina.jpg" },
-    { image:"./images/materials/romeinn_tacos.jpg" },
+    { image:"./images/materials/romeinn_takos.jpg" },
     { image:null }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3783,7 +3783,7 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/spring_tea.jpg" },
     { image:"./images/materials/r_bucket.jpg" },
-    { image:"./images/materials/sansai_tacos.jpg" },
+    { image:"./images/materials/sansai_takos.jpg" },
     { image:null }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
@@ -3806,8 +3806,8 @@ const foodsData = [
   materials_image:[
     { image:"./images/materials/spring_tea.jpg" },
     { image:"./images/materials/b_bucket.jpg" },
-    { image:"./images/materials/sansai_tacos.jpg" },
-    { image:"./images/materials/sansai_tacos.jpg" }
+    { image:"./images/materials/sansai_takos.jpg" },
+    { image:"./images/materials/sansai_takos.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
   auth:false
