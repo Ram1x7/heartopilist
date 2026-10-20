@@ -331,6 +331,7 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
     <span data-i18n="order_trend_help_check_body">画像左上のボタンをタップすると入手済みとしてチェックできます。チェックしたアイテムは薄暗く表示され、自動的に一覧の最後に移動します。もう一度タップすると解除できます。</span></p>
 
     <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(ORDER_TREND_TUTORIAL_DONE_KEY, ORDER_TREND_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
       <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="shop_help_close">閉じる</button>
     </div>
   </div>
@@ -346,8 +347,9 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
 <script src="js/currency-icons.js"></script>
 <script src="js/toast.js"></script>
 <script src="js/icon-size.js"></script>
+<script src="js/tutorial.js"></script>
 <script src="js/data-order-trend.js"></script>
-<script src="js/order-trend.js?v=1"></script>
+<script src="js/order-trend.js?v=2"></script>
 
 <script src="js/sw-register.js"></script>
 </body>

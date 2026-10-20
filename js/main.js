@@ -1736,7 +1736,7 @@ document.getElementById("disclaimer").textContent =
   T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
 
 document.getElementById("lastUpdate").textContent =
-  T("last_update_label","最終更新") + " 2026/09/28";
+  T("last_update_label","最終更新") + " 2026/10/20";
 
 // 更新通知（js/update-popup.js）の表示要否が決まった後にチュートリアルを開始する
 // （更新通知とチュートリアルが同時に重なって表示されるのを防ぐ。
@@ -1752,7 +1752,7 @@ document.addEventListener("langchange", ()=>{
   document.getElementById("disclaimer").textContent =
     T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
   document.getElementById("lastUpdate").textContent =
-    T("last_update_label","最終更新") + " 2026/09/28";
+    T("last_update_label","最終更新") + " 2026/10/20";
 
   // モーダル表示中なら翻訳を反映して再表示
   if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
