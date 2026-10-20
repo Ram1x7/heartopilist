@@ -1,9 +1,9 @@
 // js/data-weather.js
 // Heartopiaの天気データ（固定カレンダー制／プレイヤー間共通・ランダムではない）
 //
-// 収集方法: ChatGPTのブラウジング機能で https://heartopia.th.gl/ja/forecast を
-// 月送りで巡回し、日毎の天気を手動収集したもの（tools/validate-weather-data.js で
-// 形式チェック可能）。日付キーは常にJST(UTC+9)基準。
+// 収集方法: 月送りで巡回し、日毎の天気を手動収集したもの
+// （tools/validate-weather-data.js で形式チェック可能）。
+// 日付キーは常にJST(UTC+9)基準。
 //
 // フォーマット:
 //   "YYYY-MM-DD": {

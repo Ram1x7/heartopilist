@@ -5,8 +5,7 @@ const foodsData = [
   name:"田園サラダ",
   nameI18n:{"ja":"田園サラダ","en":"Country Salad","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/001.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45101",
+  restore: [15,18,21,24,30],
   cost:20,
   time:15,
   rarity: [true,true,true,true,true],
@@ -26,8 +25,7 @@ const foodsData = [
   name:"ミックスジャム",
   nameI18n:{"ja":"ミックスジャム","en":"Mixed Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/002.PNG",
-  restore: [22,26,31,35,44], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45102",
+  restore: [22,26,31,35,44],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -47,8 +45,7 @@ const foodsData = [
   name:"ラズベリージャム",
   nameI18n:{"ja":"ラズベリージャム","en":"Raspberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/003.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45103",
+  restore: [30,36,42,48,60],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -68,8 +65,7 @@ const foodsData = [
   name:"トマトソース",
   nameI18n:{"ja":"トマトソース","en":"Tomato Sauce","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/004.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45104",
+  restore: [35,42,49,56,70],
   cost:40,
   time:15,
   rarity: [true,true,true,true,true],
@@ -89,8 +85,7 @@ const foodsData = [
   name:"ブルーベリージャム",
   nameI18n:{"ja":"ブルーベリージャム","en":"Blueberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/005.PNG",
-  restore: [22,26,31,35,44], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45105",
+  restore: [22,26,31,35,44],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -110,8 +105,7 @@ const foodsData = [
   name:"リンゴジャム",
   nameI18n:{"ja":"リンゴジャム","en":"Apple Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/006.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45106",
+  restore: [35,42,49,56,70],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -131,8 +125,7 @@ const foodsData = [
   name:"オレンジジャム",
   nameI18n:{"ja":"オレンジジャム","en":"Orange Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/007.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45107",
+  restore: [35,42,49,56,70],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -152,8 +145,7 @@ const foodsData = [
   name:"不気味な食べ物",
   nameI18n:{"ja":"不気味な食べ物","en":"Creepy Food","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/009.PNG",
-  restore: null, // TH.GL掲載の★1〜5回復量  // 未確認（TH.GLに対応項目なし）
-  restoreSourceId: null,
+  restore: null, // 未確認
   cost:0,
   time:0,
   rarity: [true,false,false,false,false],
@@ -173,8 +165,7 @@ const foodsData = [
   name:"不気味な飲み物",
   nameI18n:{"ja":"不気味な飲み物","en":"Creepy Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/010.PNG",
-  restore: null, // TH.GL掲載の★1〜5回復量  // 未確認（TH.GLに対応項目なし）
-  restoreSourceId: null,
+  restore: null, // 未確認
   cost:0,
   time:0,
   rarity: [true,false,false,false,false],
@@ -194,8 +185,7 @@ const foodsData = [
   name:"いちごジャム",
   nameI18n:{"ja":"いちごジャム","en":"Strawberry Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/011.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45161",
+  restore: [40,48,56,64,80],
   cost:500,
   time:360,
   rarity: [true,true,true,true,true],
@@ -215,8 +205,7 @@ const foodsData = [
   name:"パイナップルジャム",
   nameI18n:{"ja":"パイナップルジャム","en":"Pineapple Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/012.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45164",
+  restore: [40,48,56,64,80],
   cost:60,
   time:30,
   rarity: [true,true,true,true,true],
@@ -236,8 +225,7 @@ const foodsData = [
   name:"ブドウジャム",
   nameI18n:{"ja":"ブドウジャム","en":"Grape Jam","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/013.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45165",
+  restore: [40,48,56,64,80],
   cost:640,
   time:600,
   rarity: [true,true,true,true,true],
@@ -257,8 +245,7 @@ const foodsData = [
   name:"チョコソース",
   nameI18n:{"ja":"チョコソース","en":"Chocolate Sauce","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/068.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45230",
+  restore: [80,96,112,128,160],
   cost:440,
   time:300,
   rarity: [true,true,true,true,true],
@@ -279,8 +266,7 @@ const foodsData = [
   name:"スターフルーツジャム",
   nameI18n:{"ja":"スターフルーツジャム","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/096.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45531",
+  restore: [20,24,28,32,40],
   cost:40,
   time:15,
   rarity: [true,true,true,true,true],
@@ -300,8 +286,7 @@ const foodsData = [
   name:"フィッシュアンドチップス",
   nameI18n:{"ja":"フィッシュアンドチップス","en":"Fish and Chips","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/008.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45111",
+  restore: [40,48,56,64,80],
   cost:60,
   time:60,
   rarity: [true,true,true,true,true],
@@ -321,8 +306,7 @@ const foodsData = [
   name:"チーズケーキ",
   nameI18n:{"ja":"チーズケーキ","en":"Cheesecake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/014.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45120",
+  restore: [50,60,70,80,100],
   cost:245,
   time:240,
   rarity: [true,true,true,true,true],
@@ -342,8 +326,7 @@ const foodsData = [
   name:"オリジナルロールケーキ",
   nameI18n:{"ja":"オリジナルロールケーキ","en":"Original Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/015.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45153",
+  restore: [35,42,49,56,70],
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
@@ -363,8 +346,7 @@ const foodsData = [
   name:"赤いロールケーキ",
   nameI18n:{"ja":"赤いロールケーキ","en":"Red Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/016.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45154",
+  restore: [48,58,67,77,96],
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
@@ -384,8 +366,7 @@ const foodsData = [
   name:"オレンジのロールケーキ",
   nameI18n:{"ja":"オレンジのロールケーキ","en":"Orange Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/017.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45155",
+  restore: [48,58,67,77,96],
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
@@ -405,8 +386,7 @@ const foodsData = [
   name:"黄色いロールケーキ",
   nameI18n:{"ja":"黄色いロールケーキ","en":"Yellow Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/018.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45156",
+  restore: [48,58,67,77,96],
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
@@ -426,8 +406,7 @@ const foodsData = [
   name:"紫のロールケーキ",
   nameI18n:{"ja":"紫のロールケーキ","en":"Purple Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/019.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45157",
+  restore: [48,58,67,77,96],
   cost:450,
   time:1,
   rarity: [true,true,true,true,true],
@@ -447,8 +426,7 @@ const foodsData = [
   name:"緑のロールケーキ",
   nameI18n:{"ja":"緑のロールケーキ","en":"Green Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/020.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45158",
+  restore: [48,58,67,77,96],
   cost:550,
   time:0,
   rarity: [true,true,true,true,true],
@@ -468,8 +446,7 @@ const foodsData = [
   name:"水色ロールケーキ",
   nameI18n:{"ja":"水色ロールケーキ","en":"Light Blue Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/021.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45159",
+  restore: [48,58,67,77,96],
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
@@ -489,8 +466,7 @@ const foodsData = [
   name:"青いロールケーキ",
   nameI18n:{"ja":"青いロールケーキ","en":"Blue Roll Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/022.PNG",
-  restore: [48,58,67,77,96], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45160",
+  restore: [48,58,67,77,96],
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
@@ -510,8 +486,7 @@ const foodsData = [
   name:"キノコパイ",
   nameI18n:{"ja":"キノコパイ","en":"Mushroom Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/023.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45352",
+  restore: [35,42,49,56,70],
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -531,8 +506,7 @@ const foodsData = [
   name:"ヒラタケパイ",
   nameI18n:{"ja":"ヒラタケパイ","en":"Oyster Mushroom Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/024.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45353",
+  restore: [35,42,49,56,70],
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -552,8 +526,7 @@ const foodsData = [
   name:"シイタケパイ",
   nameI18n:{"ja":"シイタケパイ","en":"Shiitake Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/025.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45354",
+  restore: [35,42,49,56,70],
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -573,8 +546,7 @@ const foodsData = [
   name:"マッシュルームパイ",
   nameI18n:{"ja":"マッシュルームパイ","en":"Button Mushroom Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/026.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45355",
+  restore: [35,42,49,56,70],
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -594,8 +566,7 @@ const foodsData = [
   name:"ヤマドリタケパイ",
   nameI18n:{"ja":"ヤマドリタケパイ","en":"Porcini Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/027.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45356",
+  restore: [35,42,49,56,70],
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -615,8 +586,7 @@ const foodsData = [
   name:"トリュフパイ",
   nameI18n:{"ja":"トリュフパイ","en":"Truffle Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/028.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45357",
+  restore: [80,96,112,128,160],
   cost:195,
   time:240,
   rarity: [true,true,true,true,true],
@@ -636,8 +606,7 @@ const foodsData = [
   name:"焼きキノコ",
   nameI18n:{"ja":"焼きキノコ","en":"Grilled Mushrooms","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/029.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45358",
+  restore: [15,18,21,24,30],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -657,8 +626,7 @@ const foodsData = [
   name:"焼きヒラタケ",
   nameI18n:{"ja":"焼きヒラタケ","en":"Grilled Oyster Mushroom","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/030.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45359",
+  restore: [15,18,21,24,30],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -678,8 +646,7 @@ const foodsData = [
   name:"焼きシイタケ",
   nameI18n:{"ja":"焼きシイタケ","en":"Grilled Shiitake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/031.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45360",
+  restore: [15,18,21,24,30],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -699,8 +666,7 @@ const foodsData = [
   name:"焼きマッシュルーム",
   nameI18n:{"ja":"焼きマッシュルーム","en":"Grilled Button Mushroom","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/032.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45361",
+  restore: [15,18,21,24,30],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -720,8 +686,7 @@ const foodsData = [
   name:"焼きヤマドリタケ",
   nameI18n:{"ja":"焼きヤマドリタケ","en":"Grilled Porcini","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/033.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45362",
+  restore: [15,18,21,24,30],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -741,8 +706,7 @@ const foodsData = [
   name:"温泉卵",
   nameI18n:{"ja":"温泉卵","en":"Onsen Egg","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/056.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45420",
+  restore: [15,18,21,24,30],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -762,8 +726,7 @@ const foodsData = [
   name:"月餅",
   nameI18n:{"ja":"月餅","en":"Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/111.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45180",
+  restore: [45,54,63,72,90],
   cost:390,
   time:240,
   rarity: [true,true,true,true,true],
@@ -783,8 +746,7 @@ const foodsData = [
   name:"カスタード月餅",
   nameI18n:{"ja":"カスタード月餅","en":"Custard Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/112.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45181",
+  restore: [55,66,77,88,110],
   cost:950,
   time:0,
   rarity: [true,true,true,true,true],
@@ -804,8 +766,7 @@ const foodsData = [
   name:"ウサギのスノースキン月餅",
   nameI18n:{"ja":"ウサギのスノースキン月餅","en":"Rabbit Snowskin Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/113.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45389",
+  restore: [20,24,28,32,40],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -825,8 +786,7 @@ const foodsData = [
   name:"ウサギのスノースキン月餅・大",
   nameI18n:{"ja":"ウサギのスノースキン月餅・大","en":"Rabbit Snowskin Mooncake (Large)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/114.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45390",
+  restore: [25,30,35,40,50],
   cost:800,
   time:0,
   rarity: [true,true,true,true,true],
@@ -846,8 +806,7 @@ const foodsData = [
   name:"チョコレート月餅",
   nameI18n:{"ja":"チョコレート月餅","en":"Chocolate Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/117.PNG",
-  restore: [75,90,105,120,150], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45391",
+  restore: [75,90,105,120,150],
   cost:400,
   time:300,
   rarity: [true,true,true,true,true],
@@ -867,8 +826,7 @@ const foodsData = [
   name:"チョコレート月餅・大",
   nameI18n:{"ja":"チョコレート月餅・大","en":"Chocolate Mooncake (Large)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/118.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45392",
+  restore: [80,96,112,128,160],
   cost:1250,
   time:300,
   rarity: [true,true,true,true,true],
@@ -888,8 +846,7 @@ const foodsData = [
   name:"復活のエッグ",
   nameI18n:{"ja":"復活のエッグ","en":"Egg of Revival","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/058.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45463",
+  restore: [20,24,28,32,40],
   cost:100,
   time:1,
   rarity: [true,true,true,true,true],
@@ -909,8 +866,7 @@ const foodsData = [
   name:"復活祭の模様入り卵(紫)",
   nameI18n:{"ja":"復活祭の模様入り卵(紫)","en":"Easter Patterned Egg (Purple)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/059.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45464",
+  restore: [50,60,70,80,100],
   cost:260,
   time:600,
   rarity: [true,true,true,true,true],
@@ -930,8 +886,7 @@ const foodsData = [
   name:"復活祭の模様入り卵(緑)",
   nameI18n:{"ja":"復活祭の模様入り卵(緑)","en":"Easter Patterned Egg (Green)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/060.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45465",
+  restore: [50,60,70,80,100],
   cost:245,
   time:480,
   rarity: [true,true,true,true,true],
@@ -951,8 +906,7 @@ const foodsData = [
   name:"復活祭の模様入り卵(オレンジ)",
   nameI18n:{"ja":"復活祭の模様入り卵(オレンジ)","en":"Easter Patterned Egg (Orange)","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/061.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45466",
+  restore: [20,24,28,32,40],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -972,8 +926,7 @@ const foodsData = [
   name:"復活祭のイースターエッグの宴",
   nameI18n:{"ja":"復活祭のイースターエッグの宴","en":"Easter Egg Feast","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/062.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45467",
+  restore: [55,66,77,88,110],
   cost:755,
   time:600,
   rarity: [true,true,true,true,true],
@@ -993,8 +946,7 @@ const foodsData = [
   name:"三角の白米ちまき",
   nameI18n:{"ja":"三角の白米ちまき","en":"Triangular White Rice Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/071.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45499",
+  restore: [25,30,35,40,50],
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1014,8 +966,7 @@ const foodsData = [
   name:"三角のあずきちまき",
   nameI18n:{"ja":"三角のあずきちまき","en":"Triangular Red Bean Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/072.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45500",
+  restore: [25,30,35,40,50],
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1035,8 +986,7 @@ const foodsData = [
   name:"三角の卵黄入り肉ちまき",
   nameI18n:{"ja":"三角の卵黄入り肉ちまき","en":"Triangular Meat & Egg Yolk Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/073.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45501",
+  restore: [40,48,56,64,80],
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1056,8 +1006,7 @@ const foodsData = [
   name:"枕型の白米ちまき",
   nameI18n:{"ja":"枕型の白米ちまき","en":"Pillow-shaped White Rice Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/074.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45502",
+  restore: [25,30,35,40,50],
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1077,8 +1026,7 @@ const foodsData = [
   name:"枕型のこしあんちまき",
   nameI18n:{"ja":"枕型のこしあんちまき","en":"Pillow-shaped Red Bean Paste Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/075.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45503",
+  restore: [25,30,35,40,50],
   cost:162,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1098,8 +1046,7 @@ const foodsData = [
   name:"枕型の卵黄入りちまき",
   nameI18n:{"ja":"枕型の卵黄入りちまき","en":"Pillow-shaped Egg Yolk Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/076.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45504",
+  restore: [40,48,56,64,80],
   cost:362,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1119,8 +1066,7 @@ const foodsData = [
   name:"巧果",
   nameI18n:{"ja":"巧果","en":"Pillow-shaped Egg Yolk Zongzi","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/107.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45552",
+  restore: [100,120,140,160,200],
   cost:390,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1138,12 +1084,10 @@ const foodsData = [
 },
 {
   // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
-  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
   name:"ユラユラチーズかぼちゃパスタ",
   nameI18n:{"ja":"ユラユラチーズかぼちゃパスタ","en":"Ghost Cheesy Pumpkin Noodles","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1110.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45583",
+  restore: [35,42,49,56,70],
   cost:220, // かぼちゃ10×2+チーズ100+料理油100
   time:15, // 素材の成長時間から算出：かぼちゃ15分（他はかぼちゃ以外の作物を使用しないため対象外）
   rarity: [true,true,true,true,true],
@@ -1161,12 +1105,10 @@ const foodsData = [
 },
 {
   // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
-  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
   name:"かぼちゃニャンコクッキー",
   nameI18n:{"ja":"かぼちゃニャンコクッキー","en":"Pumpkin Cat Cookie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1111.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45584",
+  restore: [60,72,84,96,120],
   cost:355, // かぼちゃ10+バター150+小麦95+チーズ100
   time:240, // 素材の成長時間から算出：かぼちゃ15分・小麦240分→長い方の240分
   rarity: [true,true,true,true,true],
@@ -1184,12 +1126,10 @@ const foodsData = [
 },
 {
   // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
-  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
   name:"不気味に笑うかぼちゃタルト",
   nameI18n:{"ja":"不気味に笑うかぼちゃタルト","en":"Spooky Pumpkin Tart","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1112.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45585",
+  restore: [60,72,84,96,120],
   cost:305, // かぼちゃ10+牛乳50+バター150+小麦95
   time:240, // 素材の成長時間から算出：かぼちゃ15分・小麦240分→長い方の240分
   rarity: [true,true,true,true,true],
@@ -1207,12 +1147,10 @@ const foodsData = [
 },
 {
   // 10/30開始予定のハロウィンイベント交換ショップで入手予定のレシピ（キャンディ30個で交換）
-  // 画像はTH.GL掲載の64×64pxアイコンを拡大したもの（イベント未実装のため高画質画像は未取得）
   name:"ユラユラかぼちゃチョコ",
   nameI18n:{"ja":"ユラユラかぼちゃチョコ","en":"Ghost Pumpkin Chocolate","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1113.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45586",
+  restore: [100,120,140,160,200],
   cost:550, // かぼちゃ10+牛乳50×2+チョコソース440
   time:15, // 素材の成長時間から算出：かぼちゃ15分（他はかぼちゃ以外の作物を使用しないため対象外）
   rarity: [true,true,true,true,true],
@@ -1232,8 +1170,7 @@ const foodsData = [
   name:"月うさぎのとろとろ月餅",
   nameI18n:{"ja":"月うさぎのとろとろ月餅","en":"Moon Rabbit Molten Mooncake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/115.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45587",
+  restore: [35,42,49,56,70],
   cost:300,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1253,8 +1190,7 @@ const foodsData = [
   name:"キンモクセイのローストミルクティー",
   nameI18n:{"ja":"キンモクセイのローストミルクティー","en":"Roasted Osmanthus Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/116.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45588",
+  restore: [55,66,77,88,110],
   cost:250,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1274,8 +1210,7 @@ const foodsData = [
   name:"モルチーズカヌレ",
   nameI18n:{"ja":"モルチーズカヌレ","en":"Maltese Canelé","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/063.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45224",
+  restore: [45,54,63,72,90],
   cost:370,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1295,8 +1230,7 @@ const foodsData = [
   name:"レトリバーカヌレ",
   nameI18n:{"ja":"レトリバーカヌレ","en":"Retriever Canelé","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/064.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45225",
+  restore: [35,42,49,56,70],
   cost:295,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1316,8 +1250,7 @@ const foodsData = [
   name:"モルチーズコンパンナ",
   nameI18n:{"ja":"モルチーズコンパンナ","en":"Maltese Con Panna","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/065.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45226",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1337,8 +1270,7 @@ const foodsData = [
   name:"レトリバーコンパンナ",
   nameI18n:{"ja":"レトリバーコンパンナ","en":"Retriever Con Panna","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/066.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45227",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1358,8 +1290,7 @@ const foodsData = [
   name:"ラブリーMALTESEコンパンナ",
   nameI18n:{"ja":"ラブリーMALTESEコンパンナ","en":"Lovely Maltese Con Panna","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/067.PNG",
-  restore: [85,102,119,136,170], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45228",
+  restore: [85,102,119,136,170],
   cost:500,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1379,8 +1310,7 @@ const foodsData = [
   name:"若草のケーキ",
   nameI18n:{"ja":"若草のケーキ","en":"Spring Green Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/057.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45462",
+  restore: [50,60,70,80,100],
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1400,8 +1330,7 @@ const foodsData = [
   name:"虹のときめきグミ",
   nameI18n:{"ja":"虹のときめきグミ","en":"Rainbow Sparkle Gummy","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/070.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45497",
+  restore: [20,24,28,32,40],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1421,8 +1350,7 @@ const foodsData = [
   name:"虹のドキドキグミ",
   nameI18n:{"ja":"虹のドキドキグミ","en":"Rainbow Thrill Gummy","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/069.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45498",
+  restore: [20,24,28,32,40],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1442,8 +1370,7 @@ const foodsData = [
   name:"バンチョおすすめエビフライ寿司",
   nameI18n:{"ja":"バンチョおすすめエビフライ寿司","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/105.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45550",
+  restore: [45,54,63,72,90],
   cost:112,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1463,8 +1390,7 @@ const foodsData = [
   name:"バンチョおすすめ玉子丼",
   nameI18n:{"ja":"バンチョおすすめ玉子丼","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/106.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45551",
+  restore: [40,48,56,64,80],
   cost:124,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1484,8 +1410,7 @@ const foodsData = [
   name:"シナモロールのクレープ",
   nameI18n:{"ja":"シナモロールのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/102.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45553",
+  restore: [80,96,112,128,160],
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1505,8 +1430,7 @@ const foodsData = [
   name:"クロミのクレープ",
   nameI18n:{"ja":"クロミのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/103.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45554",
+  restore: [80,96,112,128,160],
   cost:345,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1526,8 +1450,7 @@ const foodsData = [
   name:"マイメロのクレープ",
   nameI18n:{"ja":"マイメロのクレープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/104.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45555",
+  restore: [80,96,112,128,160],
   cost:395,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1547,8 +1470,7 @@ const foodsData = [
   name:"7層バーガー",
   nameI18n:{"ja":"7層バーガー","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/108.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45580",
+  restore: [100,120,140,160,200],
   cost:640, // 小麦95+極上ビーフ200×2+レタス145（既存レシピの単価から算出）
   time:480,
   rarity: [true,true,true,true,true],
@@ -1568,8 +1490,7 @@ const foodsData = [
   name:"サクサクソース手羽先",
   nameI18n:{"ja":"サクサクソース手羽先","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/109.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45581",
+  restore: [50,60,70,80,100],
   cost:400, // 極上チキン100×3+調味油100（料理油と同単価として既存レシピから算出）
   time:0,
   rarity: [true,true,true,true,true],
@@ -1589,8 +1510,7 @@ const foodsData = [
   name:"ダブル肉厚チキンバーガー",
   nameI18n:{"ja":"ダブル肉厚チキンバーガー","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/110.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45582",
+  restore: [100,120,140,160,200],
   cost:435, // 小麦95×2+極上チキン100+レタス145（既存レシピの単価から算出）
   time:480,
   rarity: [true,true,true,true,true],
@@ -1610,8 +1530,7 @@ const foodsData = [
   name:"コーヒー",
   nameI18n:{"ja":"コーヒー","en":"Coffee","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/034.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45108",
+  restore: [40,48,56,64,80],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1631,8 +1550,7 @@ const foodsData = [
   name:"カフェラテ",
   nameI18n:{"ja":"カフェラテ","en":"Café Latte","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/035.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45109",
+  restore: [40,48,56,64,80],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1652,8 +1570,7 @@ const foodsData = [
   name:"スモークサーモンベーグル",
   nameI18n:{"ja":"スモークサーモンベーグル","en":"Smoked Salmon Bagel","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/036.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45110",
+  restore: [50,60,70,80,100],
   cost:205,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1673,8 +1590,7 @@ const foodsData = [
   name:"海ぶどうとシイタケの茶碗蒸し",
   nameI18n:{"ja":"海ぶどうとシイタケの茶碗蒸し","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/097.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45547",
+  restore: [35,42,49,56,70],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1694,8 +1610,7 @@ const foodsData = [
   name:"ワカメと肉団子のスープ",
   nameI18n:{"ja":"ワカメと肉団子のスープ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/098.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45548",
+  restore: [55,66,77,88,110],
   cost:400,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1715,8 +1630,7 @@ const foodsData = [
   name:"シーフードリゾット",
   nameI18n:{"ja":"シーフードリゾット","en":"Seafood Risotto","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/037.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45114",
+  restore: [40,48,56,64,80],
   cost:105,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1736,8 +1650,7 @@ const foodsData = [
   name:"カントリー風煮込み",
   nameI18n:{"ja":"カントリー風煮込み","en":"Country-style Stew","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/038.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45121",
+  restore: [60,72,84,96,120],
   cost:185,
   time:640,
   rarity: [true,true,true,true,true],
@@ -1757,8 +1670,7 @@ const foodsData = [
   name:"トリュフのクリームパスタ",
   nameI18n:{"ja":"トリュフのクリームパスタ","en":"Truffle Cream Pasta","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/039.PNG",
-  restore: [90,108,126,144,180], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45363",
+  restore: [90,108,126,144,180],
   cost:240,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1778,8 +1690,7 @@ const foodsData = [
   name:"シーアスパラガスのエビチャーハン",
   nameI18n:{"ja":"シーアスパラガスのエビチャーハン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/099.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45549",
+  restore: [25,30,35,40,50],
   cost:12,
   time:20,
   rarity: [true,true,true,true,true],
@@ -1799,8 +1710,7 @@ const foodsData = [
   name:"シーフードピザ",
   nameI18n:{"ja":"シーフードピザ","en":"Seafood Pizza","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/040.PNG",
-  restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45112",
+  restore: [70,84,98,112,140],
   cost:235,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1820,8 +1730,7 @@ const foodsData = [
   name:"ミートソースパスタ",
   nameI18n:{"ja":"ミートソースパスタ","en":"Meat Sauce Pasta","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/041.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45123",
+  restore: [80,96,112,128,160],
   cost:405,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1841,8 +1750,7 @@ const foodsData = [
   name:"アップルパイ",
   nameI18n:{"ja":"アップルパイ","en":"Apple Pie","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/042.PNG",
-  restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45115",
+  restore: [70,84,98,112,140],
   cost:345,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1862,8 +1770,7 @@ const foodsData = [
   name:"ニンジンケーキ",
   nameI18n:{"ja":"ニンジンケーキ","en":"Carrot Cake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/043.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45162",
+  restore: [55,66,77,88,110],
   cost:245,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1883,8 +1790,7 @@ const foodsData = [
   name:"コーンポタージュ",
   nameI18n:{"ja":"コーンポタージュ","en":"Corn Potage","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/044.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45163",
+  restore: [80,96,112,128,160],
   cost:540,
   time:720,
   rarity: [true,true,true,true,true],
@@ -1904,8 +1810,7 @@ const foodsData = [
   name:"豪華海鮮盛り合わせ",
   nameI18n:{"ja":"豪華海鮮盛り合わせ","en":"Deluxe Seafood Platter","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/045.PNG",
-  restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45117",
+  restore: [65,78,91,104,130],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1925,8 +1830,7 @@ const foodsData = [
   name:"ティラミス",
   nameI18n:{"ja":"ティラミス","en":"Tiramisu","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/046.PNG",
-  restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45113",
+  restore: [65,78,91,104,130],
   cost:300,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1946,8 +1850,7 @@ const foodsData = [
   name:"キャンプセット",
   nameI18n:{"ja":"キャンプセット","en":"Camping Set","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/047.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45124",
+  restore: [100,120,140,160,200],
   cost:840,
   time:240,
   rarity: [true,true,true,true,true],
@@ -1967,8 +1870,7 @@ const foodsData = [
   name:"英式アフタヌーンティー",
   nameI18n:{"ja":"英式アフタヌーンティー","en":"English Afternoon Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/048.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45122",
+  restore: [25,30,35,40,50],
   cost:300,
   time:0,
   rarity: [true,true,true,true,true],
@@ -1988,8 +1890,7 @@ const foodsData = [
   name:"ミートバーガー",
   nameI18n:{"ja":"ミートバーガー","en":"Meat Burger","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/049.PNG",
-  restore: [75,90,105,120,150], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45424",
+  restore: [75,90,105,120,150],
   cost:480,
   time:480,
   rarity: [true,true,true,true,true],
@@ -2009,8 +1910,7 @@ const foodsData = [
   name:"アカザエビの前菜",
   nameI18n:{"ja":"アカザエビの前菜","en":"Norway Lobster Appetizer","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/050.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45125",
+  restore: [30,36,42,48,60],
   cost:145,
   time:480,
   rarity: [true,true,true,true,true],
@@ -2030,8 +1930,7 @@ const foodsData = [
   name:"北欧ブルーアカザエビの前菜",
   nameI18n:{"ja":"北欧ブルーアカザエビの前菜","en":"Nordic Blue Norway Lobster Appetizer","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/051.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45126",
+  restore: [60,72,84,96,120],
   cost:145,
   time:480,
   rarity: [true,true,true,true,true],
@@ -2051,8 +1950,7 @@ const foodsData = [
   name:"ナスとひき肉の炒め物",
   nameI18n:{"ja":"ナスとひき肉の炒め物","en":"Stir-fried Eggplant and Ground Meat","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/052.PNG",
-  restore: [75,90,105,120,150], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45425",
+  restore: [75,90,105,120,150],
   cost:475,
   time:420,
   rarity: [true,true,true,true,true],
@@ -2072,8 +1970,7 @@ const foodsData = [
   name:"キャンドルディナー",
   nameI18n:{"ja":"キャンドルディナー","en":"Candlelight Dinner","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/053.PNG",
-  restore: [75,90,105,120,150], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45116",
+  restore: [75,90,105,120,150],
   cost:630,
   time:240,
   rarity: [true,true,true,true,true],
@@ -2093,8 +1990,7 @@ const foodsData = [
   name:"蒸しタラバガニ",
   nameI18n:{"ja":"蒸しタラバガニ","en":"Steamed King Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/054.PNG",
-  restore: [90,108,126,144,180], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45127",
+  restore: [90,108,126,144,180],
   cost:150,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2114,8 +2010,7 @@ const foodsData = [
   name:"蒸し黄金タラバガニ",
   nameI18n:{"ja":"蒸し黄金タラバガニ","en":"Steamed Golden King Crab","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/055.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45128",
+  restore: [100,120,140,160,200],
   cost:150,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2135,8 +2030,7 @@ const foodsData = [
   name:"香る紅茶",
   nameI18n:{"ja":"香る紅茶","en":"Fragrant Black Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/077.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45231",
+  restore: [40,48,56,64,80],
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2156,8 +2050,7 @@ const foodsData = [
   name:"濃厚ミルクティー",
   nameI18n:{"ja":"濃厚ミルクティー","en":"Rich Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/078.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45232",
+  restore: [40,48,56,64,80],
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2177,8 +2070,7 @@ const foodsData = [
   name:"ココアミルクティー",
   nameI18n:{"ja":"ココアミルクティー","en":"Cocoa Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/079.PNG",
-  restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45233",
+  restore: [70,84,98,112,140],
   cost:660,
   time:300,
   rarity: [true,true,true,true,true],
@@ -2198,8 +2090,7 @@ const foodsData = [
   name:"シェイク",
   nameI18n:{"ja":"シェイク","en":"Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/080.PNG",
-  restore: [12,14,17,19,24], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45188",
+  restore: [12,14,17,19,24],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2219,8 +2110,7 @@ const foodsData = [
   name:"ココアシェイク",
   nameI18n:{"ja":"ココアシェイク","en":"Cocoa Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/081.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45189",
+  restore: [55,66,77,88,110],
   cost:320,
   time:300,
   rarity: [true,true,true,true,true],
@@ -2240,8 +2130,7 @@ const foodsData = [
   name:"ラズベリーシェイク",
   nameI18n:{"ja":"ラズベリーシェイク","en":"Raspberry Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/082.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45190",
+  restore: [15,18,21,24,30],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2261,8 +2150,7 @@ const foodsData = [
   name:"ブルーベリーシェイク",
   nameI18n:{"ja":"ブルーベリーシェイク","en":"Blueberry Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/083.PNG",
-  restore: [12,14,17,19,24], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45191",
+  restore: [12,14,17,19,24],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2282,8 +2170,7 @@ const foodsData = [
   name:"リンゴシェイク",
   nameI18n:{"ja":"リンゴシェイク","en":"Apple Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/084.PNG",
-  restore: [18,22,25,29,36], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45192",
+  restore: [18,22,25,29,36],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2303,8 +2190,7 @@ const foodsData = [
   name:"オレンジシェイク",
   nameI18n:{"ja":"オレンジシェイク","en":"Orange Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/085.PNG",
-  restore: [18,22,25,29,36], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45193",
+  restore: [18,22,25,29,36],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2324,8 +2210,7 @@ const foodsData = [
   name:"パイナップルシェイク",
   nameI18n:{"ja":"パイナップルシェイク","en":"Pineapple Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/086.PNG",
-  restore: [15,18,21,24,30], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45234",
+  restore: [15,18,21,24,30],
   cost:130,
   time:30,
   rarity: [true,true,true,true,true],
@@ -2345,8 +2230,7 @@ const foodsData = [
   name:"いちごシェイク",
   nameI18n:{"ja":"いちごシェイク","en":"Strawberry Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/087.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45235",
+  restore: [60,72,84,96,120],
   cost:250,
   time:360,
   rarity: [true,true,true,true,true],
@@ -2366,8 +2250,7 @@ const foodsData = [
   name:"ブドウシェイク",
   nameI18n:{"ja":"ブドウシェイク","en":"Grape Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/088.PNG",
-  restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45236",
+  restore: [70,84,98,112,140],
   cost:420,
   time:600,
   rarity: [true,true,true,true,true],
@@ -2387,8 +2270,7 @@ const foodsData = [
   name:"抹茶シェイク",
   nameI18n:{"ja":"抹茶シェイク","en":"Matcha Shake","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/089.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45237",
+  restore: [40,48,56,64,80],
   cost:600,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2408,8 +2290,7 @@ const foodsData = [
   name:"フレッシュ緑茶",
   nameI18n:{"ja":"フレッシュ緑茶","en":"Fresh Green Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/090.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45238",
+  restore: [25,30,35,40,50],
   cost:100,
   time:45,
   rarity: [true,true,true,true,true],
@@ -2429,8 +2310,7 @@ const foodsData = [
   name:"フレッシュミルクティー",
   nameI18n:{"ja":"フレッシュミルクティー","en":"Fresh Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/091.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45239",
+  restore: [25,30,35,40,50],
   cost:150,
   time:45,
   rarity: [true,true,true,true,true],
@@ -2450,8 +2330,7 @@ const foodsData = [
   name:"抹茶ミルクティー",
   nameI18n:{"ja":"抹茶ミルクティー","en":"Matcha Milk Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/092.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45240",
+  restore: [35,42,49,56,70],
   cost:350,
   time:45,
   rarity: [true,true,true,true,true],
@@ -2471,8 +2350,7 @@ const foodsData = [
   name:"ヒナギクハーブティー",
   nameI18n:{"ja":"ヒナギクハーブティー","en":"Daisy Herbal Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/093.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45242",
+  restore: [20,24,28,32,40],
   cost:110,
   time:1440,
   rarity: [true,true,true,true,true],
@@ -2492,8 +2370,7 @@ const foodsData = [
   name:"ローズティー",
   nameI18n:{"ja":"ローズティー","en":"Rose Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/094.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45243",
+  restore: [80,96,112,128,160],
   cost:650,
   time:4320,
   rarity: [true,true,true,true,true],
@@ -2513,8 +2390,7 @@ const foodsData = [
   name:"アフターヌーンティー",
   nameI18n:{"ja":"アフターヌーンティー","en":"Afternoon Tea","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/095.PNG",
-  restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45241",
+  restore: [65,78,91,104,130],
   cost:1690,
   time:240,
   rarity: [true,true,true,true,true],
@@ -2534,8 +2410,7 @@ const foodsData = [
   name:"エビのアボカドカップ詰め",
   nameI18n:{"ja":"エビのアボカドカップ詰め","en":"Shrimp-stuffed Avocado Cup","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/100.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45426",
+  restore: [80,96,112,128,160],
   cost:360,
   time:840,
   rarity: [true,true,true,true,true],
@@ -2555,8 +2430,7 @@ const foodsData = [
   name:"チーズカニ爪フライ",
   nameI18n:{"ja":"チーズカニ爪フライ","en":"Fried Cheese Crab Claw","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/101.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45427",
+  restore: [80,96,112,128,160],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2578,8 +2452,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1001.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45428",
+  restore: [20,24,28,32,40],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2601,8 +2474,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1002.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45429",
+  restore: [20,24,28,32,40],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2624,8 +2496,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1003.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45430",
+  restore: [40,48,56,64,80],
   cost:560,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2647,8 +2518,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1004.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45431",
+  restore: [25,30,35,40,50],
   cost:220,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2670,8 +2540,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1005.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45432",
+  restore: [25,30,35,40,50],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2693,8 +2562,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1006.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45433",
+  restore: [25,30,35,40,50],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2716,8 +2584,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1007.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45434",
+  restore: [25,30,35,40,50],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2739,8 +2606,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1008.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45435",
+  restore: [25,30,35,40,50],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2762,8 +2628,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1009.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45436",
+  restore: [25,30,35,40,50],
   cost:200,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2785,8 +2650,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1010.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45437",
+  restore: [40,48,56,64,80],
   cost:1180,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2808,8 +2672,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1011.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45468",
+  restore: [20,24,28,32,40],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2831,8 +2694,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1012.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45469",
+  restore: [25,30,35,40,50],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2854,8 +2716,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1013.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45470",
+  restore: [25,30,35,40,50],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2877,8 +2738,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1014.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45471",
+  restore: [20,24,28,32,40],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2900,8 +2760,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1015.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45472",
+  restore: [25,30,35,40,50],
   cost:100,
   time:0,
   rarity: [true,true,true,true,true],
@@ -2923,8 +2782,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1016.PNG",
-  restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45473",
+  restore: [65,78,91,104,130],
   cost:350,
   time:360,
   rarity: [true,true,true,true,true],
@@ -2946,8 +2804,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1017.PNG",
-  restore: [80,96,112,128,160], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45474",
+  restore: [80,96,112,128,160],
   cost:420,
   time:600,
   rarity: [true,true,true,true,true],
@@ -2969,8 +2826,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1018.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45475",
+  restore: [25,30,35,40,50],
   cost:130,
   time:30,
   rarity: [true,true,true,true,true],
@@ -2992,8 +2848,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1019.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45479",
+  restore: [30,36,42,48,60],
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3015,8 +2870,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1020.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45480",
+  restore: [30,36,42,48,60],
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3037,8 +2891,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1021.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45481",
+  restore: [30,36,42,48,60],
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3060,8 +2913,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1022.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45482",
+  restore: [30,36,42,48,60],
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3083,8 +2935,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1023.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45483",
+  restore: [30,36,42,48,60],
   cost:210,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3105,8 +2956,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1024.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45484",
+  restore: [55,66,77,88,110],
   cost:335,
   time:360,
   rarity: [true,true,true,true,true],
@@ -3128,8 +2978,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1025.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45485",
+  restore: [60,72,84,96,120],
   cost:370,
   time:600,
   rarity: [true,true,true,true,true],
@@ -3151,8 +3000,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1026.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45486",
+  restore: [30,36,42,48,60],
   cost:225,
   time:30,
   rarity: [true,true,true,true,true],
@@ -3174,8 +3022,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1027.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45490",
+  restore: [40,48,56,64,80],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3197,8 +3044,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1028.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45491",
+  restore: [40,48,56,64,80],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3219,8 +3065,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1029.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45492",
+  restore: [40,48,56,64,80],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3242,8 +3087,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1030.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45493",
+  restore: [40,48,56,64,80],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3265,8 +3109,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1031.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45494",
+  restore: [40,48,56,64,80],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3288,8 +3131,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1032.PNG",
-  restore: [55,66,77,88,110], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45495",
+  restore: [55,66,77,88,110],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3311,8 +3153,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1033.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45496",
+  restore: [35,42,49,56,70],
   cost:455,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3334,8 +3175,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1034.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45438",
+  restore: [60,72,84,96,120],
   cost:470,
   time:720,
   rarity: [true,true,true,true,true],
@@ -3357,8 +3197,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1035.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45439",
+  restore: [50,60,70,80,100],
   cost:420,
   time:720,
   rarity: [true,true,true,true,true],
@@ -3380,8 +3219,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1036.PNG",
-  restore: [26,31,36,42,52], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45440",
+  restore: [26,31,36,42,52],
   cost:110,
   time:60,
   rarity: [true,true,true,true,true],
@@ -3403,8 +3241,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1037.PNG",
-  restore: [95,114,133,152,190], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45441",
+  restore: [95,114,133,152,190],
   cost:580,
   time:720,
   rarity: [true,true,true,true,true],
@@ -3426,8 +3263,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1038.PNG",
-  restore: [90,108,126,144,180], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45442",
+  restore: [90,108,126,144,180],
   cost:530,
   time:720,
   rarity: [true,true,true,true,true],
@@ -3449,8 +3285,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1039.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45443",
+  restore: [30,36,42,48,60],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3472,8 +3307,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1040.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45444",
+  restore: [35,42,49,56,70],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3495,8 +3329,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1041.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45445",
+  restore: [35,42,49,56,70],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3518,8 +3351,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1042.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45446",
+  restore: [35,42,49,56,70],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3541,8 +3373,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1043.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45447",
+  restore: [35,42,49,56,70],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3564,8 +3395,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1044.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45448",
+  restore: [35,42,49,56,70],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3587,8 +3417,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1045.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45449",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -3611,8 +3440,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1046.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45450",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -3634,8 +3462,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1047.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45451",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -3657,8 +3484,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1048.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45452",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -3680,8 +3506,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1049.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45453",
+  restore: [45,54,63,72,90],
   cost:350,
   time:0,
   rarity: [true,true,true,true,true],
@@ -3703,8 +3528,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1050.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45454",
+  restore: [60,72,84,96,120],
   cost:475,
   time:360,
   rarity: [true,true,true,true,true],
@@ -3726,8 +3550,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1051.PNG",
-  restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45455",
+  restore: [65,78,91,104,130],
   cost:510,
   time:600,
   rarity: [true,true,true,true,true],
@@ -3749,8 +3572,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1052.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45456",
+  restore: [45,54,63,72,90],
   cost:365,
   time:30,
   rarity: [true,true,true,true,true],
@@ -3772,8 +3594,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1053.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45460",
+  restore: [60,72,84,96,120],
   cost:1000,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3795,8 +3616,7 @@ const foodsData = [
   fes:true,
   ended:true,
   image:"./images/foods/1054.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45461",
+  restore: [60,72,84,96,120],
   cost:1170,
   time:780,
   rarity: [true,true,true,true,true],
@@ -3818,8 +3638,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1055.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45532",
+  restore: [20,24,28,32,40],
   cost:120,
   time:15,
   rarity: [true,true,true,true,true],
@@ -3841,8 +3660,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1056.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45533",
+  restore: [40,48,56,64,80],
   cost:105,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3864,8 +3682,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1057.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45534",
+  restore: [45,54,63,72,90],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3887,8 +3704,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1058.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45535",
+  restore: [45,54,63,72,90],
   cost:155,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3911,8 +3727,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1059.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45536",
+  restore: [45,54,63,72,90],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3934,8 +3749,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1060.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45537",
+  restore: [45,54,63,72,90],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3957,8 +3771,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1061.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45538",
+  restore: [45,54,63,72,90],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -3980,8 +3793,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1062.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45539",
+  restore: [45,54,63,72,90],
   cost:145,
   time:240,
   rarity: [true,true,true,true,true],
@@ -4003,8 +3815,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1063.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45540",
+  restore: [40,48,56,64,80],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4026,8 +3837,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1064.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45541",
+  restore: [45,54,63,72,90],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4049,8 +3859,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1065.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45542",
+  restore: [40,48,56,64,80],
   cost:0,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4072,8 +3881,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1066.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45543",
+  restore: [40,48,56,64,80],
   cost:40,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4095,8 +3903,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1067.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45544",
+  restore: [45,54,63,72,90],
   cost:60,
   time:30,
   rarity: [true,true,true,true,true],
@@ -4118,8 +3925,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1068.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45545",
+  restore: [100,120,140,160,200],
   cost:500,
   time:360,
   rarity: [true,true,true,true,true],
@@ -4141,8 +3947,7 @@ const foodsData = [
   season:true,
   ended:true,
   image:"./images/foods/1069.PNG",
-  restore: [45,54,63,72,90], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45546",
+  restore: [45,54,63,72,90],
   cost:370,
   time:240,
   rarity: [true,true,true,true,true],
@@ -4164,8 +3969,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1070.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45505",
+  restore: [20,24,28,32,40],
   cost:60,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4188,8 +3992,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1071.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45506",
+  restore: [25,30,35,40,50],
   cost:60,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4212,8 +4015,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1072.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45507",
+  restore: [25,30,35,40,50],
   cost:60,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4236,8 +4038,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1073.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45508",
+  restore: [20,24,28,32,40],
   cost:60,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4260,8 +4061,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1074.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45509",
+  restore: [25,30,35,40,50],
   cost:60,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4284,8 +4084,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1075.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45510",
+  restore: [100,120,140,160,200],
   cost:310,
   time:360,
   rarity: [true,true,true,true,true],
@@ -4308,8 +4107,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1076.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45511",
+  restore: [100,120,140,160,200],
   cost:380,
   time:600,
   rarity: [true,true,true,true,true],
@@ -4332,8 +4130,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1077.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45512",
+  restore: [25,30,35,40,50],
   cost:90,
   time:30,
   rarity: [true,true,true,true,true],
@@ -4356,8 +4153,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1078.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45516",
+  restore: [50,60,70,80,100],
   cost:450,
   time:0,
   rarity: [true,true,true,true,true],
@@ -4380,8 +4176,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1079.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45517",
+  restore: [60,72,84,96,120],
   cost:480,
   time:60,
   rarity: [true,true,true,true,true],
@@ -4404,8 +4199,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1080.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45518",
+  restore: [100,120,140,160,200],
   cost:620,
   time:720,
   rarity: [true,true,true,true,true],
@@ -4428,8 +4222,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1081.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45519",
+  restore: [50,60,70,80,100],
   cost:460,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4452,8 +4245,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1082.PNG",
-  restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45520",
+  restore: [70,84,98,112,140],
   cost:475,
   time:120,
   rarity: [true,true,true,true,true],
@@ -4476,8 +4268,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1083.PNG",
-  restore: [100,120,140,160,200], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45521",
+  restore: [100,120,140,160,200],
   cost:585,
   time:420,
   rarity: [true,true,true,true,true],
@@ -4500,8 +4291,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1084.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45524",
+  restore: [20,24,28,32,40],
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4524,8 +4314,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1085.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45525",
+  restore: [40,48,56,64,80],
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4548,8 +4337,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1086.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45526",
+  restore: [40,48,56,64,80],
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4572,8 +4360,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1087.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45527",
+  restore: [40,48,56,64,80],
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4596,8 +4383,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1088.PNG",
-  restore: [40,48,56,64,80], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45528",
+  restore: [40,48,56,64,80],
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4620,8 +4406,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1089.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45529",
+  restore: [50,60,70,80,100],
   cost:110,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4644,8 +4429,7 @@ const foodsData = [
   fes:true,
   ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
   image:"./images/foods/1090.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45530",
+  restore: [35,42,49,56,70],
   cost:0,
   time:15,
   rarity: [true,true,true,true,true],
@@ -4664,7 +4448,6 @@ const foodsData = [
 },
 
 // ── 2026/10/10開始フェス料理（19品）──
-// 出典: https://heartopia.th.gl/db/cooking （素材名・★1〜5売価・画像）
 // 正式な日本語名・フェスコイン価格はユーザー確認済み。調理時間・開放レベル・
 // 素材個数は引き続き未確認（null）。判明次第更新すること。
 {
@@ -4673,8 +4456,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1091.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45556",
+  restore: [25,30,35,40,50],
   cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+果物0（ワイルドカード枠は最安のブルーベリー等0円を採用）
   time:15, // 素材の成長時間から算出：ホオズキ15分（フェス限定作物の標準値、果物枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
@@ -4698,8 +4480,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1092.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45557",
+  restore: [25,30,35,40,50],
   cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+リンゴ0（リンゴは種がなく購入費がかからないため0。シナモンココアパウダーの価格50はユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・リンゴは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
@@ -4723,8 +4504,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1093.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45558",
+  restore: [25,30,35,40,50],
   cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+オレンジ0（オレンジは種がなく購入費がかからないため0。いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・オレンジは作物timerなし（対象外、他レシピでも(@価格)表記なし）→15分
   rarity: [true,true,true,true,true],
@@ -4748,8 +4528,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1094.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45559",
+  restore: [25,30,35,40,50],
   cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+ブルーベリー0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・ブルーベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
@@ -4773,8 +4552,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1095.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45560",
+  restore: [25,30,35,40,50],
   cost:110, // ホオズキ10+シナモンココアパウダー50+牛乳50+ラズベリー0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：ホオズキ15分・ラズベリーは作物timerなし（対象外）→15分
   rarity: [true,true,true,true,true],
@@ -4798,8 +4576,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1096.PNG",
-  restore: [50,60,70,80,100], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45561",
+  restore: [50,60,70,80,100],
   cost:235, // ホオズキ10+シナモンココアパウダー50+牛乳50+イチゴ125（シナモンココアパウダーの価格50はユーザー確認済み）
   time:360, // 素材の成長時間から算出：ホオズキ15分・いちご360分（6時間）→長い方の360分
   rarity: [true,true,true,true,true],
@@ -4823,8 +4600,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1097.PNG",
-  restore: [65,78,91,104,130], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45562",
+  restore: [65,78,91,104,130],
   cost:270, // ホオズキ10+シナモンココアパウダー50+牛乳50+ブドウ160（シナモンココアパウダーの価格50はユーザー確認済み）
   time:600, // 素材の成長時間から算出：ホオズキ15分・ブドウ600分（10時間）→長い方の600分
   rarity: [true,true,true,true,true],
@@ -4848,8 +4624,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1098.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45563",
+  restore: [25,30,35,40,50],
   cost:125, // ホオズキ10+シナモンココアパウダー50+牛乳50+パイナップル15（シナモンココアパウダーの価格50はユーザー確認済み）
   time:30, // 素材の成長時間から算出：ホオズキ15分・パイナップル30分→長い方の30分
   rarity: [true,true,true,true,true],
@@ -4873,8 +4648,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1099.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45567",
+  restore: [20,24,28,32,40],
   cost:60, // ナラタケ0+かぼちゃ10+牛乳50+野菜0（ワイルドカード枠は最安の野菜0円を採用）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、野菜枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
@@ -4898,8 +4672,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1100.PNG",
-  restore: [25,30,35,40,50], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45568",
+  restore: [25,30,35,40,50],
   cost:90, // ナラタケ0+かぼちゃ10+牛乳50+ジャガイモ30（いずれもユーザー確認済み）
   time:60, // 素材の成長時間から算出：かぼちゃ15分・ジャガイモ60分→長い方の60分
   rarity: [true,true,true,true,true],
@@ -4923,8 +4696,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1101.PNG",
-  restore: [70,84,98,112,140], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45569",
+  restore: [70,84,98,112,140],
   cost:230, // ナラタケ0+かぼちゃ10+牛乳50+トウモロコシ170（いずれもユーザー確認済み）
   time:720, // 素材の成長時間から算出：かぼちゃ15分・トウモロコシ720分（12時間）→長い方の720分
   rarity: [true,true,true,true,true],
@@ -4948,8 +4720,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1102.PNG",
-  restore: [20,24,28,32,40], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45570",
+  restore: [20,24,28,32,40],
   cost:70, // ナラタケ0+かぼちゃ10+牛乳50+トマト10（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分・トマト15分→どちらも15分
   rarity: [true,true,true,true,true],
@@ -4973,8 +4744,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1103.PNG",
-  restore: [35,42,49,56,70], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45571",
+  restore: [35,42,49,56,70],
   cost:85, // ナラタケ0+かぼちゃ10+牛乳50+ニンジン25（いずれもユーザー確認済み）
   time:120, // 素材の成長時間から算出：かぼちゃ15分・ニンジン120分（2時間）→長い方の120分
   rarity: [true,true,true,true,true],
@@ -4998,8 +4768,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1104.PNG",
-  restore: [60,72,84,96,120], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45572",
+  restore: [60,72,84,96,120],
   cost:195, // ナラタケ0+かぼちゃ10+牛乳50+ナス135（いずれもユーザー確認済み）
   time:420, // 素材の成長時間から算出：かぼちゃ15分・ナス420分（7時間）→長い方の420分
   rarity: [true,true,true,true,true],
@@ -5023,8 +4792,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1105.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45575",
+  restore: [30,36,42,48,60],
   cost:60, // トムヤムペースト50+かぼちゃ10+イカ0（ワイルドカード枠は最安のイカ0円を採用）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（フェス限定作物の標準値、イカ枠はワイルドカードのため対象外）
   rarity: [true,true,true,true,true],
@@ -5047,8 +4815,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1106.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45576",
+  restore: [30,36,42,48,60],
   cost:60, // トムヤムペースト50+かぼちゃ10+シリヤケイカ0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（シリヤケイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
@@ -5071,8 +4838,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1107.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45577",
+  restore: [30,36,42,48,60],
   cost:60, // トムヤムペースト50+かぼちゃ10+トラフコウイカ0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（トラフコウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
@@ -5095,8 +4861,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1108.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45578",
+  restore: [30,36,42,48,60],
   cost:60, // トムヤムペースト50+かぼちゃ10+コウイカ0（いずれもユーザー確認済み）
   time:15, // 素材の成長時間から算出：かぼちゃ15分（コウイカは作物ではないため対象外）
   rarity: [true,true,true,true,true],
@@ -5119,8 +4884,7 @@ const foodsData = [
   fes:true,
   ended:false, // 2026/10/10 原始の呼び声フェス開始
   image:"./images/foods/1109.PNG",
-  restore: [30,36,42,48,60], // TH.GL掲載の★1〜5回復量
-  restoreSourceId: "cooking-45579",
+  restore: [30,36,42,48,60],
   cost:340, // ホオズキ香るホットココア110×2+かぼちゃとキノコのクリームポタージュ60+イカのトムヤムクンヌードル60（各ワイルドカード枠は最安の料理の材料費を採用）
   time:15, // 材料費計算と同じ各ワイルドカード枠の採用レシピ（ホオズキ香るホットココア・かぼちゃとキノコのクリームポタージュ・イカのトムヤムクンヌードル、いずれも15分）のうち最も長いものを採用
   rarity: [true,true,true,true,true],

@@ -1296,7 +1296,7 @@ function renderModal(){
   const hasFesField = f.fesCoinPrice !== undefined;
   const fesPrices5 = f.fesCoinPrice != null ? derivePrices(f.fesCoinPrice, "food", f.rarity) : [null,null,null,null,null];
 
-  // TH.GL掲載の回復量をそのまま表示する（★1の値から倍率計算はしない）
+  // 回復量はデータの値をそのまま表示する（★1の値から倍率計算はしない）
   const kaifukuText = v => `${currencyIcon("kaifuku")}${v.toLocaleString()}`;
 
   const priceRows = [0,1,2,3,4].map(i => {
