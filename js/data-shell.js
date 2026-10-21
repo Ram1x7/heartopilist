@@ -201,6 +201,18 @@ const shellData = [
  auth:true
 },
 {
+ name:"オオベニシボリ",
+ nameI18n:{"ja":"オオベニシボリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:null,
+ weather:["晴れ","雨","虹"],
+ time:["0-6","6-12","12-18"],
+ location:"海洋清掃",
+ locationI18n:{"ja":"海洋清掃","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"./images/000.PNG",
+ auth:true
+},
+{
  name:"ミズスイ",
  nameI18n:{"ja":"ミズスイ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  level:5,
