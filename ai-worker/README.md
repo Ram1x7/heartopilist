@@ -1,42 +1,43 @@
-# 建築AI試験版の接続
+# 本人専用・建築AI試験版
 
-既存の `build.html` に文章から支柱の立体物を作る入口を追加する。
-Cloudflare Workers Free + SQLite Durable Object + Gemini Developer APIの無料枠を使う構成。
-初期状態は無効。APIキー・クラウド接続・有料化はこの変更では実施していない。
+一般公開は保留。Gemini APIの年齢要件を確認したため、運営者本人のみが利用できる認証付きの試験に限定する。既存の画像変換は従来どおりブラウザ内で利用可能。
 
-## 接続手順
+## 接続
 
-1. Geminiの専用プロジェクトを作成。AI Studio上で対象モデルが無料枠対象で、プロジェクトのPlanがFreeであることを確認する。課金を有効にしない。Google Cloudや他用途の有料プロジェクトのキーを流用しない。
-2. CloudflareのWorkers FreeアカウントとTurnstileウィジェットを用意。許可ホストは `ram1x7.github.io`。Workers Paidへ切り替えない。
-3. このディレクトリで `npx wrangler secret put GEMINI_API_KEY`、`TURNSTILE_SECRET`、`CLIENT_HASH_SECRET` をそれぞれ設定。CLIENT_HASH_SECRETは十分長いランダム値にする。秘密値はGitに保存しない。
-4. `wrangler.toml` のOrigin/hostnameと無料枠を再確認。確認後のみ `FREE_TIER_CONFIRMED = "true"`、`ENABLED = "true"` にする。`npx wrangler deploy` で公開する。
-5. `js/build-ai-config.mjs` に公開Workerの `/generate` URLとTurnstileの公開site keyを設定する。秘密のAPIキーは書かない。
-6. 実際のAI出力で形・サイズ・建材数・エラー時の表示を検証してから一般公開する。
+1. AI Studioで専用プロジェクトの請求階層が「無料枠」であることを確認する。課金を有効にしない。現在のモデルは gemini-2.5-flash。利用可能性・無料枠は接続時に再確認する。
+2. Cloudflare Workers FreeでSQLite Durable Objectを使う。Workers Paidへ切り替えない。
+3. Workerの秘密値に GEMINI_API_KEY、CLIENT_HASH_SECRET、PRIVATE_TRIAL_TOKEN を設定する。PRIVATE_TRIAL_TOKENは32文字以上のランダムな本人専用キー。GeminiのAPIキーとは別にする。これらはソースやGitHubに保存しない。
+4. wrangler.tomlのALLOWED_ORIGINを試験画面のOriginに合わせる。PRIVATE_TRIAL_ONLYはtrueのまま維持する。
+5. 無料枠確認後にFREE_TIER_CONFIRMED、ENABLEDをtrueにし、npx wrangler deployで配備する。
+6. js/build-ai-config.mjsのendpointにWorkerの /generate URLを設定する。フロント側に秘密値は書かない。試験画面も一般公開への導線を設けず運用する。
+7. 本人専用キーを画面で入力して生成する。キーはブラウザ保存領域に記録せず、Authorizationヘッダーで接続先Workerへ送信する。入力文はGeminiへ送信する。
 
-初期の自主制限は全体20回/日、同一接続元2回/日、全体2回/分。これらはGeminiの保証された無料枠の数値ではない。実際の利用枠に合わせて減らす。1回の出力は最大6000トークン。全体制限は最大100回/日までの設定のみ受け付ける。
+コードのFREE_TIER_CONFIRMEDは運営者の確認フラグであり、プロバイダーの課金状態を検証しない。有料プロジェクトのAPIキーを設定すると料金が発生し得る。無料枠のみの運用はプロバイダーのFree設定を維持することで担保する。モデルの自動切替・有料フォールバック・自動再試行はない。
 
-「無料枠のみ」はプロバイダー側のFree設定で担保する。コードの `FREE_TIER_CONFIRMED` は運営者の確認フラグであり、APIから課金状態を検証するものではない。有料プロジェクトのキーを設定すると、このコードでも従量料金が発生し得る。自動モデル変更・有料フォールバック・自動再試行は実装しない。
+## 制限
 
-## 設計と制限
-
-- AIは40個までの箱・楕円体・円錐を返す。ブラウザが建材配置に展開し、指定サイズ・支柱17段・敷地24×30床マスを検査する。外れたAI出力は自動で隠して切り詰めず、エラーを表示する。
-- まずは支柱による外形のみ。画像入力AI、通常の壁・扉・階段・屋根を使った建築や動線の検証は未実装。床モードは従来どおり支柱の地上絵であり、床材の自動配置は未実装。
-- 生成後の3D編集・保存・JSON書き出しを既存機能と共有する。
-- 高さ0.5床マス、低い壁の厚さ0.05床マスは推定。壁は13枚、支柱は17本、床設置高さは低い壁12枚分まで。
-- 低い壁の現在のパレットは板張り1模様のみ。色違いを模様追加として数えない。新しい模様を導入するときはpatternIdを必須にする。
-- 耐荷重は設計図単体が対象。既存建築との初回加算共有は未対応。床・壁は模様加算を別々に数える。
-- IPを日替わりHMAC化して利用制限に使用。ログインによる個人識別ではない。家族・共有回線は枠を共有し、回線変更で迂回され得る。全体上限は別に維持する。
-- カウンターの日付はUTC（日本時間9:00切替）。当日データのみ保持。生IPと入力文を保存しない。文章はGemini、認証情報はTurnstileへ送信する。
-- Turnstileはサーバーで検証し、ホスト・actionを確認。カウンターはDurable Object内のトランザクションで予約する。予約後の失敗・タイムアウトも回数を消費する。
-- APIキーはWorker側のみ。無効設定・秘密値不足・無料枠超過時は生成を止める。画像変換は引き続きブラウザ内で動く。
-- Workerが返すプランの検証はサーバーとクライアント両方で実施。展開後30,000本を超える設計はクライアントで拒否する。
+- 本人専用認証が必須。PRIVATE_TRIAL_ONLYがtrueでない場合、または秘密値不足の場合は503で停止。認証失敗時は外部AIを呼ぶ前に401で拒否する。
+- 初期自主制限：全体20回/日、接続元2回/日、全体2回/分。実際のGemini無料枠の保証値ではない。無料枠がより少なければ自主制限も下げる。
+- 1回の出力は6000トークンまで。失敗後も利用回数を消費する。Durable Objectのトランザクションで同時予約を管理。
+- 接続元IPを日替わりHMAC化して当日分のみ保持。生IP・入力文を保存しない。日付切替はUTC（日本時間9時）。
+- 初期構成のTurnstile認証は本人専用試験では使わず、強い専用キーに置き換えている。匿名公開には対応していない。
+- AIは40個までの箱・楕円体・円錐を返す。ブラウザで支柱に展開し、指定範囲・支柱17段・敷地24×30床マス・最大30,000本を検査。元の画像や建物に一致する保証はない。
+- 支柱による外形の提案のみ。画像入力AI、床材の自動配置、通常の壁・扉・階段・屋根による入れる建物は未実装。既存の平面変換は支柱の地上絵。
+- 生成後の編集・保存・施工表示は既存ページを共有。保存データが現行上限を超える場合、削除せず読込を止める。
+- 高さ0.5床マス、低い壁厚さ0.05床マスは推定。壁13枚、支柱17本、床の設置高さは低い壁12枚分まで。
+- 耐荷重は設計図単体。既存建築との初回加算の共有は未対応。低い壁の現在のパレットは板張り1模様のみとして計算する。
 
 ## 確認
 
-`node --test tests/build-rules.test.mjs tests/build-ai-worker.test.mjs tests/build-editor.test.mjs`（リポジトリルートで実行）。クラウドへの実配備、実API課金状態、実AI生成品質は別途確認が必要。
+リポジトリルートで実行：
 
-参照：
+node --test tests/build-rules.test.mjs tests/build-ai-worker.test.mjs tests/build-editor.test.mjs
+
+実API生成、クラウド配備、画面の実ブラウザ確認は別途必要。
+
+## 参照
+
+- https://ai.google.dev/gemini-api/terms
 - https://ai.google.dev/gemini-api/docs/pricing
 - https://ai.google.dev/gemini-api/docs/structured-output
 - https://developers.cloudflare.com/durable-objects/platform/pricing/
-- https://developers.cloudflare.com/turnstile/get-started/server-side-validation/

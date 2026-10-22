@@ -36,12 +36,20 @@ export default {
     const cors = {'Access-Control-Allow-Origin':origin,'Vary':'Origin','Cache-Control':'no-store'};
     const reply = (body,status=200) => json(body,status,cors);
     if (new URL(request.url).pathname !== '/generate') return reply({error:'Not found'},404);
-    if (request.method === 'OPTIONS') return new Response(null,{status:204,headers:{...cors,'Access-Control-Allow-Methods':'POST','Access-Control-Allow-Headers':'Content-Type'}});
+    if (request.method === 'OPTIONS') return new Response(null,{status:204,headers:{...cors,'Access-Control-Allow-Methods':'POST','Access-Control-Allow-Headers':'Content-Type, Authorization'}});
     if (request.method !== 'POST') return reply({error:'Method not allowed'},405);
     if (env.ENABLED !== 'true' || env.FREE_TIER_CONFIRMED !== 'true'
-        || !env.GEMINI_API_KEY || !env.TURNSTILE_SECRET || !env.CLIENT_HASH_SECRET || !env.QUOTA) {
+        || !env.GEMINI_API_KEY || !env.CLIENT_HASH_SECRET || !env.QUOTA
+        || env.PRIVATE_TRIAL_ONLY !== 'true' || !env.PRIVATE_TRIAL_TOKEN || env.PRIVATE_TRIAL_TOKEN.length < 32) {
       return reply({error:'AI設計は接続準備中です。画像からの変換をご利用ください。'},503);
     }
+    const supplied = request.headers.get('Authorization') || '';
+    const expected = 'Bearer ' + env.PRIVATE_TRIAL_TOKEN;
+    const encoder = new TextEncoder();
+    const a = new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(supplied)));
+    const b = new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(expected)));
+    let mismatch = 0; for(let i=0;i<a.length;i++) mismatch |= a[i] ^ b[i];
+    if (mismatch) return reply({error:'本人専用の試験キーを確認してください'},401);
     // No model chosen by client, no paid fallback, no search/image-generation tools.
     if (env.GEMINI_MODEL !== 'gemini-2.5-flash') return reply({error:'AIモデルの設定を確認してください'},503);
     let body;
@@ -60,20 +68,13 @@ export default {
       const bytes = new Uint8Array(length); let offset=0;
       for (const c of chunks) { bytes.set(c,offset); offset+=c.length; }
       body = JSON.parse(new TextDecoder().decode(bytes));
-      if (typeof body.prompt !== 'string' || body.prompt.trim().length < 3 || body.prompt.length > 1200
-          || typeof body.token !== 'string' || body.token.length > 2048) throw new Error();
+      if (typeof body.prompt !== 'string' || body.prompt.trim().length < 3 || body.prompt.length > 1200) throw new Error();
       validatePlan({title:'check',shapes:[{shape:'box',op:'add',x:0,y:0,z:0,w:1,h:1,d:1,materialId:'006',hex:'#ffffff'}]},body.limits);
     } catch { return reply({error:'文章・サイズ・認証情報を確認してください'},400); }
     try {
       const ip = request.headers.get('CF-Connecting-IP');
       if (!ip) return reply({error:'利用元を確認できません'},403);
-      const verification = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({secret:env.TURNSTILE_SECRET,response:body.token,remoteip:ip}),
-        signal:AbortSignal.timeout(10000),
-      });
-      const verified = await verification.json();
-      if (!verified.success || verified.hostname !== env.TURNSTILE_HOSTNAME || verified.action !== 'build-generate') return reply({error:'認証をやり直してください'},403);
+      // Owner-only trial: require a strong private token on every call.
       const globalLimit=boundedLimit(env.DAILY_GLOBAL_LIMIT,100);
       const clientLimit=boundedLimit(env.DAILY_CLIENT_LIMIT,5);
       const minuteLimit=boundedLimit(env.MINUTE_GLOBAL_LIMIT,5);

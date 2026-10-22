@@ -4,31 +4,19 @@ export async function initAIForm(onPlan) {
   const form = document.getElementById('buildAIForm');
   const status = document.getElementById('buildAIStatus');
   const button = document.getElementById('buildAIGenerate');
-  let widget, token = '', busy = false;
-  if (!config.endpoint || !config.turnstileSiteKey) return;
+  let busy = false;
+  if (!config.endpoint) return;
   try {
-    if (new URL(config.endpoint).protocol !== 'https:') throw new Error('接続先はHTTPSで指定してください');
-    await new Promise((resolve, reject) => {
-      if (window.turnstile) return resolve();
-      const script = document.createElement('script');
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
-      script.onload = resolve; script.onerror = reject;
-      document.head.append(script);
-    });
-    widget = window.turnstile.render('#buildAIChallenge', {
-      sitekey: config.turnstileSiteKey, action: 'build-generate',
-      callback: value => { token = value; if(!busy) button.disabled = false; },
-      'expired-callback': () => { token = ''; button.disabled = true; },
-      'error-callback': () => { token = ''; button.disabled = true; status.textContent = '認証を読み込めません。ページを開き直してください。'; },
-    });
-    status.textContent = '認証後に生成できます。無料枠の上限に達すると受付を停止します。';
+    if (new URL(config.endpoint).protocol !== 'https:') throw new Error();
+    button.disabled = false;
+    status.textContent = '本人専用の試験キーで生成できます。無料枠の上限で受付を停止します。';
   } catch {
-    status.textContent = 'AIへの接続を準備できませんでした。画像からの変換は利用できます。';
+    status.textContent = 'AI接続先の設定を確認してください。';
     return;
   }
   form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (busy || !token || !form.reportValidity()) return;
+    if (busy || !form.reportValidity()) return;
     busy = true; button.disabled = true;
     status.textContent = 'AIが形を考えています…';
     const limits = {
@@ -38,8 +26,8 @@ export async function initAIForm(onPlan) {
     };
     try {
       const response = await fetch(config.endpoint, {
-        method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({prompt: document.getElementById('buildAIPrompt').value.trim(), limits, token}),
+        method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + document.getElementById('buildAIPrivateKey').value},
+        body: JSON.stringify({prompt: document.getElementById('buildAIPrompt').value.trim(), limits}),
         signal: AbortSignal.timeout(65000),
       });
       const body = await response.json();
@@ -49,8 +37,7 @@ export async function initAIForm(onPlan) {
     } catch (error) {
       status.textContent = error.name === 'TimeoutError' ? '時間内に生成できませんでした。再試行も利用回数に数えられます。' : error.message;
     } finally {
-      busy = false; token = ''; button.disabled = true;
-      window.turnstile.reset(widget);
+      busy = false; button.disabled = false;
     }
   });
 }

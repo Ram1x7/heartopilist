@@ -3,6 +3,7 @@ main = "worker.mjs"
 compatibility_date = "2026-10-01"
 
 [vars]
+PRIVATE_TRIAL_ONLY = "true"
 ENABLED = "false"
 FREE_TIER_CONFIRMED = "false"
 ALLOWED_ORIGIN = "https://ram1x7.github.io"

@@ -549,6 +549,10 @@ body.dark .build-library-item{
   <p>文章から、支柱を組み合わせた立体物を考えます。画像の自動変換は、下の「画像を選ぶ」から利用できます。</p>
   <p class="art-step-hint">試験版は支柱のみを使う外形の提案です。部屋・扉・階段を備えた建物設計や、画像からのAI生成は今後追加します。</p>
   <form id="buildAIForm">
+    <p><strong>本人専用の非公開試験です。</strong>専用の試験キーが必要です。一般向けのAI生成は受け付けていません。</p>
+    <label for="buildAIPrivateKey">本人専用の試験キー</label>
+    <input id="buildAIPrivateKey" type="password" minlength="32" maxlength="256" autocomplete="off" required style="display:block;box-sizing:border-box;width:100%;padding:10px;margin:8px 0;">
+    <p class="art-step-hint">GeminiのAPIキーではありません。試験キーは保存せず、AI接続先の認証にだけ使用します。</p>
     <label for="buildAIPrompt">作りたいもの</label>
     <textarea id="buildAIPrompt" required minlength="3" maxlength="1200" rows="3" placeholder="例：中央に門があり、左右に丸い塔がある小さなお城" style="display:block;box-sizing:border-box;width:100%;padding:12px;margin:8px 0;background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:8px;"></textarea>
     <div style="display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;">
