@@ -90,4 +90,5 @@ const videoData = [
   { category:"meteor_shower", date:"2026-10-08", videoId:"CQ1MHTd7AzY", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-10-09", videoId:"7phPN7aiZlU", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-10-21", videoId:"GkAfEDTu_a4", note:"18:00~24:00" },
+  { category:"meteor_shower", date:"2026-10-22", videoId:"PDeBMDtUynw", note:"18:00~24:00" },
 ];
