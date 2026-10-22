@@ -1,0 +1,21 @@
+name = "hatopi-build-ai"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+
+[vars]
+ENABLED = "false"
+FREE_TIER_CONFIRMED = "false"
+ALLOWED_ORIGIN = "https://ram1x7.github.io"
+TURNSTILE_HOSTNAME = "ram1x7.github.io"
+GEMINI_MODEL = "gemini-2.5-flash"
+DAILY_GLOBAL_LIMIT = "20"
+DAILY_CLIENT_LIMIT = "2"
+MINUTE_GLOBAL_LIMIT = "2"
+
+[[durable_objects.bindings]]
+name = "QUOTA"
+class_name = "Quota"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Quota"]

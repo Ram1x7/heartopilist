@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import worker,{Quota} from '../ai-worker/worker.mjs';
+
+test('quota reservations serialize concurrent clients and never exceed limits',async()=>{
+  let record, tail=Promise.resolve();
+  const quota=new Quota({storage:{transaction(fn){
+    const task=tail.then(()=>fn({get:async()=>structuredClone(record),put:async(_,v)=>{record=structuredClone(v);}}));
+    tail=task.catch(()=>{});return task;
+  }}});
+  const reserve=client=>quota.fetch(new Request('https://quota/reserve',{method:'POST',body:JSON.stringify({client,globalLimit:4,clientLimit:2,minuteLimit:4})})).then(r=>r.json());
+  assert.equal((await Promise.all(Array.from({length:8},()=>reserve('same')))).filter(x=>x.allowed).length,2);
+  assert.equal((await Promise.all(Array.from({length:8},(_,i)=>reserve('other'+i)))).filter(x=>x.allowed).length,2);
+});
+test('unconfigured deployment fails closed; origin and method are checked',async()=>{
+  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io'};
+  const req=(origin,method='POST')=>new Request('https://worker/generate',{method,headers:{Origin:origin}});
+  assert.equal((await worker.fetch(req(env.ALLOWED_ORIGIN),env)).status,503);
+  assert.equal((await worker.fetch(req('https://attacker.example'),env)).status,403);
+  assert.equal((await worker.fetch(req(env.ALLOWED_ORIGIN,'GET'),env)).status,405);
+  assert.equal((await worker.fetch(req(env.ALLOWED_ORIGIN,'OPTIONS'),env)).status,204);
+});
+
+test('verified generation reserves quota and makes one bounded model call',async()=>{
+  const originalFetch=globalThis.fetch;
+  let apiCalls=0,reservations=0;
+  const plan={title:'試験',shapes:[{shape:'box',op:'add',x:0,y:0,z:0,w:2,h:2,d:2,materialId:'006',hex:'#ffffff'}]};
+  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',TURNSTILE_HOSTNAME:'ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_MODEL:'gemini-2.5-flash',GEMINI_API_KEY:'test',TURNSTILE_SECRET:'test',CLIENT_HASH_SECRET:'test',DAILY_GLOBAL_LIMIT:'20',DAILY_CLIENT_LIMIT:'2',MINUTE_GLOBAL_LIMIT:'2',QUOTA:{idFromName:n=>n,get:()=>({fetch:async()=>{reservations++;return Response.json({allowed:true});}})}};
+  globalThis.fetch=async(url,init)=>{
+    if(url.includes('siteverify')) return Response.json({success:true,hostname:env.TURNSTILE_HOSTNAME,action:'build-generate'});
+    apiCalls++;
+    const sent=JSON.parse(init.body);
+    assert.equal(sent.generationConfig.maxOutputTokens,6000);
+    assert.equal(init.headers['x-goog-api-key'],'test');
+    return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(plan)}]}}]});
+  };
+  try{
+    const response=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'},body:JSON.stringify({prompt:'小さなお城',token:'test',limits:{w:8,h:4,d:8}})}),env);
+    assert.equal(response.status,200); assert.deepEqual((await response.json()).plan,plan);
+    assert.equal(apiCalls,1);assert.equal(reservations,1);
+  }finally{globalThis.fetch=originalFetch;}
+});

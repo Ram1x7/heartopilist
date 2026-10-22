@@ -5,7 +5,7 @@
 // 色→建材のマッチングは支柱系（grid_cell配置）のみを対象にし、Lab色空間での
 // 誤差拡散ディザリング＋輪郭保持（旧・壁画モードから流用）を行う。3D描画・
 // クリック編集の当たり判定はjs/build3d-scene.js（Three.js・InstancedMesh）に
-// 委譲する。すべてブラウザ内で完結し、画像を外部に送信しない。
+// 委譲する。通常の画像変換はブラウザ内で完結。AI設計は同意後に文章を送信する。
 //
 // 【このバージョンでの既知の未実装（次のフェーズ予定）】
 // ・範囲選択（ドラッグで囲んでの一括編集）
@@ -13,23 +13,16 @@
 // ・共有リンク(URL)機能
 
 import * as Build3D from "./build3d-scene.js";
+import { BUILD_RULES, calculateLoad, validateGrid } from "./build-rules.mjs";
+import { expandPlan } from "./build-ai-plan.mjs";
+import { initAIForm } from "./build-ai-ui.mjs";
 
-// ── 敷地の座標上限（ボクセル換算、幅×奥行き×高さ） ──
-const SITE_MAX_WIDTH = 96;
-const SITE_MAX_DEPTH = 120;
-// ゲーム内では支柱を最大17本（=積み上げ高さ34マス分）までしか積めないため、
-// それに合わせて上限を17本（bounds.hは支柱の本数単位）とする
-const SITE_MAX_HEIGHT = 17;
-
-// 低い壁は幅4のパネルなので、支柱換算での敷地幅上限（SITE_MAX_WIDTH＝96マス分）
-// をそのまま「列数」の上限にすると、実際の物理幅は4倍（384マス分）になって
-// しまい敷地からはみ出す。横一列に敷き詰められる最大数は 96 ÷ 4 = 24枚
-const WALL_MAX_WIDTH = Math.floor(SITE_MAX_WIDTH / 4);
-
-// 低い壁は高さ2のパネルで、ゲーム内では地面から16枚分（実際の高さ32マス分）
-// までしか積み上げられない。支柱用のSITE_MAX_HEIGHT（68）をそのまま流用すると
-// 実際には置けない段数まで指定できてしまうため、低い壁専用の上限を別に持つ
-const WALL_MAX_HEIGHT_TIERS = 16;
+// Internal X/Z unit = one pillar width (0.25 floor tile); Y = one pillar height.
+const SITE_MAX_WIDTH = BUILD_RULES.widthTiles * 4;
+const SITE_MAX_DEPTH = BUILD_RULES.depthTiles * 4;
+const SITE_MAX_HEIGHT = BUILD_RULES.pillarLayers;
+const WALL_MAX_WIDTH = BUILD_RULES.widthTiles;
+const WALL_MAX_HEIGHT_TIERS = BUILD_RULES.wallLayers;
 
 // 現在のモードにおける「幅」スライダーの上限マス数
 function currentWidthMax(){
@@ -61,13 +54,13 @@ let settings = {
   // "height"＝積む段数を指定して幅を自動算出）。どちらを選んでも画像の縦横比に
   // 合わせてもう一方の軸が自動計算される
   wallSizeBasis: "width",
-  wallHeight: 16,       // 高さ基準時に使う段数（低い壁を積む段数）
+  wallHeight: WALL_MAX_HEIGHT_TIERS,       // 高さ基準時に使う段数（低い壁を積む段数）
 };
 
 let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]（solid/flat用）
 let resultDims = null;     // {w,h,d}（solid/flat用）
 
-// 低い壁（壁画）モード専用の結果データ。低い壁は幅4×奥行き0.5×高さ2という
+// 低い壁（壁画）モード専用の結果データ。低い壁は幅4×奥行き約0.2×高さ約2という
 // 支柱とは全く異なる実寸のパネルで、押し出し・起伏を持たない単層の壁画なので、
 // resultVoxels/resultDimsとは別に持つ（x:列, y:行。行y=0が壁画の最上段）
 let resultWallSegments = null; // [{x,y,materialId,hex,name}]
@@ -932,7 +925,7 @@ function readOptionInputs(){
     settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
     document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
   }
-  settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
+  settings.thickness = Math.min(settings.mode === "flat" ? SITE_MAX_HEIGHT : 40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
   settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
   settings.limitColors = document.getElementById("buildLimitColorsCheckbox").checked;
@@ -975,7 +968,7 @@ function handleOptionInputChange(){
 // 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き / wall:行数）のマス数
 // 実際の支柱建材は1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの2倍の高さがある
 // （立方体の建材を前提にした換算ではない）。そのため立体モードで画像の縦横比
-// から高さのマス数を決めるときは、ボクセル1段＝実際の支柱2個ぶんの高さに
+// から高さのマス数を決めるときは、ボクセル1段＝実際の支柱1個ぶんの高さに
 // 相当することを踏まえ、単純な比率の半分のマス数にする。これにより、実際に
 // 支柱で建てた完成物が、1×1×1の立方体で作った場合と同じ見た目の比率になる
 // （平面モードのotherDimは奥行き軸で、この高さの特性とは無関係なので対象外）
@@ -984,13 +977,13 @@ const SOLID_HEIGHT_ASPECT_COMPENSATION = 2;
 // グリッドを敷くと横に間延びして見える。1行あたりの物理的な高さが1列あたりの
 // 物理的な幅の半分しかない分、同じ縦横比に見せるには行数を2倍にする必要がある
 const WALL_ROW_ASPECT_COMPENSATION = 0.5;
-// 1マスあたりの実際の物理縦横比（幅÷高さ）。solid/flatは支柱1本分＝正方形
-// なので1:1だが、wallは低い壁1枚が幅4×高さ2で正方形ではない（2:1）ため、
+// 画像調整の幅÷高さ。支柱の正面は1:2、平面は1:1、低い壁は2:1。
+// 建材の見かけの縦横比に合わせるため、
 // 位置調整画面のプレビュー（切り抜きビューポート・マス目オーバーレイ）の
 // 縦横比をこの値で補正しないと、実際に建てたときと違う比率で表示されてしまう
 const WALL_CELL_ASPECT = 2; // 低い壁1枚の幅4 ÷ 高さ2
 function cellAspectRatio(){
-  return settings.mode === "wall" ? WALL_CELL_ASPECT : 1;
+  return settings.mode === "wall" ? WALL_CELL_ASPECT : settings.mode === "solid" ? 0.5 : 1;
 }
 
 function computeOtherDim(){
@@ -1492,6 +1485,7 @@ function buildWallMuralSegments(grid, w, h){
 // ══════════════════════════════════════
 function runBuildGeneration(){
   if(!frontImage) return;
+  document.getElementById("buildAdjustBtn").disabled = false;
   const rect = manualCropRect || coverCropRect(frontImage.naturalWidth, frontImage.naturalHeight, settings.width, settings.width);
   const otherDim = computeOtherDim();
   const backRect = backImage ? coverCropRect(backImage.naturalWidth, backImage.naturalHeight, settings.width, otherDim) : null;
@@ -1575,10 +1569,7 @@ function ensureSceneInitialized(){
 }
 
 // ══════════════════════════════════════
-// 建材一覧（列＝(x,z)ごとに、縦方向へ同じ建材が続く区間を1本の支柱として
-// まとめる。支柱は1マス×1マスの設置面に対して高さ方向へ伸縮するため、この
-// 数え方が実際の建て方に最も近い）
-// ══════════════════════════════════════
+// 建材一覧：固定サイズの支柱は、縦に連続しても1個ずつ数える。
 // 建材ID＋色hexから、その建材内での色番号（1始まり）を求める。ゲーム内の
 // ペイント選択画面も同じ並び順で表示される想定のもと、data-materials.jsの
 // colors配列の並び＝ゲーム内パレットの並びをそのまま番号として使う
@@ -1600,28 +1591,8 @@ function buildColorNumberLabel(materialId, hex){
 }
 
 function computeBuildPillarSegments(){
-  if(!resultVoxels || !resultDims) return [];
-  const map = new Map();
-  resultVoxels.forEach(v => map.set(`${v.x},${v.y},${v.z}`, v));
-
-  const segments = [];
-  for(let z = 0; z < resultDims.d; z++){
-    for(let x = 0; x < resultDims.w; x++){
-      let run = null;
-      for(let y = 0; y < resultDims.h; y++){
-        const v = map.get(`${x},${y},${z}`);
-        const key = v ? v.materialId + "_" + v.hex : null;
-        if(run && run.key === key){
-          run.height++;
-        }else{
-          if(run && run.key) segments.push(run);
-          run = key ? { key, materialId: v.materialId, name: v.name, hex: v.hex, height: 1 } : null;
-        }
-      }
-      if(run && run.key) segments.push(run);
-    }
-  }
-  return segments;
+  // Fixed-height pieces: a vertical stack of N pillars requires N pieces.
+  return (resultVoxels || []).map(v => ({...v, key: v.materialId + "_" + v.hex, height: 1}));
 }
 
 // 低い壁は支柱と違って高さ方向に伸縮する単位ではなく、1マス＝1枚の
@@ -1639,6 +1610,16 @@ function computeWallSegmentCounts(){
 }
 
 function renderBuildMaterialList(){
+  const items = currentResultList() || [];
+  const loadItems = settings.mode === "wall"
+    ? items.map(v => ({...v, kind: "wall", patternId: "board"})) : items;
+  const loadEl = document.getElementById("buildLoadValue");
+  if(loadEl) loadEl.textContent = calculateLoad(loadItems).toLocaleString();
+  const dims = currentResultDims();
+  const sizeEl = document.getElementById("buildPhysicalSize");
+  if(sizeEl && dims) sizeEl.textContent = settings.mode === "wall"
+    ? `幅${dims.w}床マス・高さ${dims.h}段（低い壁1枚＝1段）`
+    : `幅${dims.w / 4}×奥行き${dims.d / 4}床マス・高さ${dims.h}段（支柱1本＝1段）`;
   const pillarCountLabel = document.getElementById("buildPillarCountLabel");
   if(settings.mode === "wall"){
     if(pillarCountLabel) pillarCountLabel.textContent = T("build_wall_count_label", "必要な壁の枚数");
@@ -1678,7 +1659,7 @@ function renderBuildMaterialList(){
   document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
     <div class="art-result-color-row">
       <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-      <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
+      <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}</span>
       <span class="art-result-color-count">${e.count}${T("build_unit_pillars", "本")}</span>
     </div>
   `).join("");
@@ -1800,10 +1781,13 @@ function saveBuildDesign(){
 function loadDesign(id){
   const design = savedDesigns.find(d => d.id === id);
   if(!design || design.formatVersion !== BUILD_DESIGN_FORMAT_VERSION) return;
+  try { validateGrid(design.voxels, design.dims, design.mode); }
+  catch(e) { alert(e.message + "。保存データは変更していません。"); return; }
   frontImage = null;
   backImage = null;
   manualCropRect = null;
   settings.mode = design.mode;
+  document.getElementById("buildAdjustBtn").disabled = true;
   if(design.mode === "wall"){
     resultWallDims = design.dims;
     resultWallSegments = design.voxels.map(v => ({ ...v }));
@@ -1902,7 +1886,30 @@ const BUILD_TUTORIAL_STEPS = [
   { selector: "#helpBtn", titleKey: "tutorial_build_step3_title", titleFallback: "③ 使い方をもっと見る", textKey: "tutorial_build_step3_body", textFallback: "変換の流れなど、詳しい使い方はこのボタンから見返せます。" },
 ];
 
+function acceptAIPlan(plan, limits){
+  // Validate and expand before replacing any current result.
+  const voxels = expandPlan(plan, limits, MATERIALS.support_pillars.items);
+  validateGrid(voxels, limits, "solid");
+  closeFlatGuide();
+  frontImage = null; backImage = null; manualCropRect = null;
+  settings.mode = "solid";
+  resultVoxels = voxels; resultDims = {...limits};
+  resultWallSegments = null; resultWallDims = null;
+  document.getElementById("buildUploadArea").style.display = "none";
+  document.getElementById("buildCropStage").style.display = "none";
+  document.getElementById("buildResultStage").style.display = "block";
+  document.getElementById("buildAdjustBtn").disabled = true;
+  document.getElementById("buildDesignNameInput").value = plan.title;
+  ensureSceneInitialized(); setupProgressSlider();
+  blockGuideSize = 0; completedGuideBlocks = new Set();
+  updateGuideRow(); applyBlockGuide(); renderBuildBlockList(); applyFloorGrid();
+  updateEditToolbarVisibility(); Build3D.setBoundaryBoxVisible(true);
+  refreshResultView(); renderBuildMaterialList(); clearHistory();
+  updateBuildStepProgress("finish");
+}
+
 function initBuildPage(){
+  initAIForm(acceptAIPlan);
   loadSavedDesigns();
   renderBuildLibraryList();
   bindBuildStepProgress();

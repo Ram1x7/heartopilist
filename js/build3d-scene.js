@@ -13,11 +13,11 @@ import * as THREE from "./three.module.min.js";
 // する（データ上のy座標そのものは段数のまま、描画時にだけ2倍の間隔を空ける）
 const Y_UNIT_SCALE = 2;
 
-// 低い壁は実寸で幅4×奥行き0.5×高さ2（支柱のような換算不要で、そのまま
+// 低い壁は実寸で幅4×奥行き約0.2×高さ約2（支柱のような換算不要で、そのまま
 // ワールド座標の単位として使う）
 const WALL_PANEL_W = 4;
 const WALL_PANEL_H = 2;
-const WALL_PANEL_D = 0.5;
+const WALL_PANEL_D = 0.2; // Estimated 0.05 floor tile; 1 world unit = 0.25 floor tile.
 
 let canvasEl, stageEl, scene, camera, renderer, mesh, wallMesh, boundBox;
 let blockGuide = null;
@@ -217,7 +217,7 @@ function fitToVoxels(voxels){
   updateCamera();
 }
 
-// 低い壁（壁画）モード専用の描画。低い壁は幅4×奥行き0.5×高さ2の実寸パネルで、
+// 低い壁（壁画）モード専用の描画。低い壁は幅4×奥行き約0.2×高さ約2の実寸パネルで、
 // 支柱のようなbounds/Y_UNIT_SCALE換算は不要（そのままワールド座標の単位として
 // 使う）。手動編集・当たり判定（raycastVoxelAt）には未対応（このバージョンの
 // 低い壁モードはペン/消しゴム編集を提供しないため）
@@ -277,7 +277,7 @@ function fitToWallSegments(segments, dims){
 
 // solid/flatモードの外枠ワイヤーフレーム（サイト最大の建築可能範囲の目安）の
 // 表示・非表示を切り替える。低い壁モードは単位系が全く異なる（ボクセル単位
-// ではなく実寸4×0.5×2）ため、この枠は意味を持たず邪魔になるので隠す
+// ではなく表示単位4×約0.2×約2）ため、この枠は意味を持たず邪魔になるので隠す
 function setBoundaryBoxVisible(visible){
   if(boundBox) boundBox.visible = visible;
 }
