@@ -41,3 +41,18 @@ node --test tests/build-rules.test.mjs tests/build-ai-worker.test.mjs tests/buil
 - https://ai.google.dev/gemini-api/docs/pricing
 - https://ai.google.dev/gemini-api/docs/structured-output
 - https://developers.cloudflare.com/durable-objects/platform/pricing/
+
+## Cloudflareダッシュボードからの初回配備
+
+作成画面でブランチを選べない場合は、Hello Worldで hatopi-build-ai を作成し、設定のビルドから既存WorkerへGitHubリポジトリを接続する。
+
+- リポジトリ: Ram1x7/heartopilist
+- プロダクションブランチ: codex/build-ai-free-trial
+- ビルドコマンド: 空欄
+- デプロイコマンド: npx wrangler deploy --config ai-worker/wrangler.toml
+- パス: /
+- プレビュービルド: 無効
+
+接続後、上記ブランチへのコミットのプッシュで最初のビルドを開始する。接続時のビルド変数にはGeminiの秘密値を入れない。実行時の秘密値はWorkerの「変数とシークレット」に設定する。
+
+初回配備ではENABLEDとFREE_TIER_CONFIRMEDをfalseのままにする。この段階ではAI生成を有効化しない。ビルドログで配備結果を確認後、無料枠・本人専用認証・実行時シークレットを確認してから有効化する。mainへのマージは不要。
