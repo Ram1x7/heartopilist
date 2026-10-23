@@ -134,6 +134,7 @@ function currentResultDims(){
 // 3Dビューの再描画。wallモードは低い壁専用の描画関数（Build3D.setWallSegments）
 // を使う。それ以外（solid/flat）は従来通り支柱用のsetVoxelsを使う
 function refreshResultView(opts){
+  if(sceneUnavailable) return;
   if(settings.mode === "wall"){
     Build3D.setWallSegments(getVisibleVoxels(), resultWallDims, opts);
   }else{
@@ -1566,13 +1567,23 @@ function runBuildGeneration(){
 // 3Dビューア初期化
 // ══════════════════════════════════════
 let sceneInitialized = false;
+let sceneUnavailable = false;
 function ensureSceneInitialized(){
   const canvas = document.getElementById("buildCanvas");
   if(!canvas) return;
   if(!sceneInitialized){
-    Build3D.init(canvas, { w: SITE_MAX_WIDTH, h: SITE_MAX_HEIGHT, d: SITE_MAX_DEPTH });
-    Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
-    Build3D.setEditClickCallback(handleEditClick);
+    try {
+      Build3D.init(canvas, { w: SITE_MAX_WIDTH, h: SITE_MAX_HEIGHT, d: SITE_MAX_DEPTH });
+      Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+      Build3D.setEditClickCallback(handleEditClick);
+    } catch(error) {
+      sceneUnavailable = true;
+      canvas.parentElement.style.display = "none";
+      const message=document.createElement("p");
+      message.id="build3DFallback"; message.setAttribute("role","status");
+      message.textContent="この環境では3D表示を起動できません。建材数の確認・自由配置の数値入力・保存は利用できます。3D表示はWebGL対応のブラウザで開いてください。";
+      canvas.parentElement.before(message);
+    }
     sceneInitialized = true;
   }
 }
