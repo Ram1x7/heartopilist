@@ -29,7 +29,7 @@ export function calculateLoad(items) {
 }
 
 export function validateGrid(items, dims, mode) {
-  if (!['solid','flat','wall'].includes(mode)) throw new Error('未対応の建築モードです');
+  if (!['solid','flat','wall','pillar-wall'].includes(mode)) throw new Error('未対応の建築モードです');
   const wall = mode === 'wall';
   const maxW = wall ? BUILD_RULES.widthTiles : BUILD_RULES.widthTiles * 4;
   const maxH = wall ? BUILD_RULES.wallLayers : BUILD_RULES.pillarLayers;
@@ -38,9 +38,10 @@ export function validateGrid(items, dims, mode) {
   if (!dims || !integerBetween(dims.w, maxW) || !integerBetween(dims.h, maxH)
       || (!wall && !integerBetween(dims.d, maxD))) throw new Error('設計図の寸法が建築範囲を超えています');
   if (!Array.isArray(items) || items.length > maxW * maxH * maxD) throw new Error('配置データの個数が不正です');
+  if(mode === 'pillar-wall' && dims.d !== 1) throw new Error('支柱の壁画は奥行き1本分です');
   const seen = new Set();
   for (const v of items) {
-    if (v?.freePlacement === true && mode === 'solid') {
+    if (v?.freePlacement === true && ['solid','pillar-wall'].includes(mode)) {
       if (!/^#[0-9a-f]{6}$/i.test(v.hex) || !['005','006','007'].includes(v.materialId)) throw new Error('未対応の建材です');
       validateFreePillar(v,dims);
       continue; // Intentional overlaps each count as a separate piece.

@@ -25,7 +25,7 @@ export function initFreePlacement({getState,commit,chooseTool}) {
   const status=panel.querySelector('#buildFreeStatus');
   const buttons=[...panel.querySelectorAll('button')];
   function refresh() {
-    const state=getState(), visible=state.mode==='solid' && !!state.items;
+    const state=getState(), visible=['solid','pillar-wall'].includes(state.mode) && !!state.items;
     panel.style.display=visible?'':'none'; selectButton.style.display=visible?'':'none'; selectButton.disabled=!state.editable;
     if(!state.items?.includes(selected)) selected=null;
     panel.querySelector('#buildFreeSelected').textContent=selected?'選択中：'+selected.name:'未選択：選択中の建材を追加できます';
@@ -38,7 +38,7 @@ export function initFreePlacement({getState,commit,chooseTool}) {
     refresh();
   }
   function apply(add) {
-    const state=getState(); if(!state.editable || state.mode!=='solid' || !state.items || (!add && !selected)) return;
+    const state=getState(); if(!state.editable || !['solid','pillar-wall'].includes(state.mode) || !state.items || (!add && !selected)) return;
     try {
       const values=Object.fromEntries(keys.map(k=>{
         if(!field(k).value.trim()) throw new Error('位置と角度をすべて入力してください');

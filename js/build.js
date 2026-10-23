@@ -15,6 +15,7 @@
 import * as Build3D from "./build3d-scene.js";
 import { BUILD_RULES, calculateLoad, validateGrid } from "./build-rules.mjs";
 import { expandPlan } from "./build-ai-plan.mjs";
+import { buildPillarMural, pillarMuralDimensions } from "./build-mural.mjs";
 import { initAIForm } from "./build-ai-ui.mjs";
 import { initFreePlacement } from "./build-free-placement.mjs";
 
@@ -245,7 +246,7 @@ let blockGuideSize = 0; // 0＝オフ
 // あるため、このバージョンでは配置図の自動生成のみ対応する）ので、
 // 編集ツールバー自体を隠す
 function updateEditToolbarVisibility(){
-  if(settings.mode!=="solid" && editTool==="select") setEditTool("pen");
+  if(!["solid","pillar-wall"].includes(settings.mode) && editTool==="select") setEditTool("pen");
   freePlacementEditor?.refresh();
   const toolbar = document.getElementById("buildEditToolbar");
   if(toolbar) toolbar.style.display = settings.mode === "wall" ? "none" : "flex";
@@ -859,6 +860,9 @@ function updateBackImageVisibility(){
 // ══════════════════════════════════════
 // モード・オプション（画像アップロード直後の設定ステップ）
 // ══════════════════════════════════════
+function isMuralMode(){return settings.mode === "wall" || settings.mode === "pillar-wall";}
+function muralHeightMax(){return settings.mode === "wall" ? WALL_MAX_HEIGHT_TIERS : SITE_MAX_HEIGHT;}
+
 function setBuildMode(mode){
   settings.mode = mode;
   document.querySelectorAll(".build-mode-btn").forEach(btn => {
@@ -870,9 +874,10 @@ function setBuildMode(mode){
       : T("build_thickness_label_flat", "厚さ（起伏の最大高さ）");
   document.getElementById("buildHollowRow").style.display = mode === "solid" ? "flex" : "none";
   // 低い壁モードは常に1層の壁画のため、厚さ（押し出し・起伏）の概念がない
-  document.getElementById("buildThicknessRow").style.display = mode === "wall" ? "none" : "block";
-  document.getElementById("buildResolutionTip").style.display = mode === "wall" ? "none" : "block";
+  document.getElementById("buildThicknessRow").style.display = (mode === "wall" || mode === "pillar-wall") ? "none" : "block";
+  document.getElementById("buildResolutionTip").style.display = (mode === "wall" || mode === "pillar-wall") ? "none" : "block";
   document.getElementById("buildWallModeTip").style.display = mode === "wall" ? "block" : "none";
+  document.getElementById("buildPillarWallTip").style.display = mode === "pillar-wall" ? "block" : "none";
   updateBackImageVisibility();
   updateColorCountMax();
   updateWidthMax();
@@ -888,7 +893,11 @@ function updateWallSizeBasisUI(){
   const widthRow = document.getElementById("buildWidthRow");
   const heightRow = document.getElementById("buildWallHeightRow");
   if(!basisRow || !widthRow || !heightRow) return;
-  const isWall = settings.mode === "wall";
+  const isWall = isMuralMode();
+  const heightInput=document.getElementById("buildWallHeightInput");
+  heightInput.max=String(muralHeightMax());
+  heightInput.min=settings.mode === "pillar-wall" ? "1" : "2";
+  if(Number(heightInput.value)>muralHeightMax()) heightInput.value=String(muralHeightMax());
   basisRow.style.display = isWall ? "flex" : "none";
   const heightBasis = isWall && settings.wallSizeBasis === "height";
   widthRow.style.display = heightBasis ? "none" : "block";
@@ -913,6 +922,7 @@ function updateWidthMax(){
   if(!widthInput) return;
   const max = currentWidthMax();
   widthInput.max = String(max);
+  widthInput.min = settings.mode === "pillar-wall" ? "1" : "4";
   if(Number(widthInput.value) > max) widthInput.value = String(max);
 }
 
@@ -927,13 +937,21 @@ function updateColorCountMax(){
 }
 
 function readOptionInputs(){
-  if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
-    settings.wallHeight = Math.min(WALL_MAX_HEIGHT_TIERS, Math.max(2, Number(document.getElementById("buildWallHeightInput").value) || 2));
+  if(isMuralMode() && settings.wallSizeBasis === "height"){
+    settings.wallHeight = Math.min(muralHeightMax(), Math.max(settings.mode === "pillar-wall" ? 1 : 2, Number(document.getElementById("buildWallHeightInput").value) || 2));
     document.getElementById("buildWallHeightOutput").textContent = `${settings.wallHeight}${T("build_unit_masu", "マス")}`;
     syncWallWidthFromHeight(); // 指定された段数から幅を逆算してsettings.widthへ書き戻す
   }else{
     settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
     document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
+  }
+  if(settings.mode === "pillar-wall" && frontImage){
+    const fitted=pillarMuralDimensions(settings.wallSizeBasis === "height" ? settings.wallHeight : settings.width,frontImage.naturalWidth/frontImage.naturalHeight,settings.wallSizeBasis);
+    settings.width=fitted.w; settings.wallHeight=fitted.h;
+    document.getElementById("buildWidthInput").value=String(fitted.w);
+    document.getElementById("buildWidthOutput").textContent=`${fitted.w}本分（床${fitted.w/4}マス）`;
+    document.getElementById("buildWallHeightInput").value=String(fitted.h);
+    document.getElementById("buildWallHeightOutput").textContent=`${fitted.h}段`;
   }
   settings.thickness = Math.min(settings.mode === "flat" ? SITE_MAX_HEIGHT : 40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
@@ -953,9 +971,13 @@ function readOptionInputs(){
 function updateWallAutoDimHint(){
   const hint = document.getElementById("buildWallAutoDimHint");
   if(!hint) return;
-  if(settings.mode !== "wall" || !frontImage){
+  if(!isMuralMode() || !frontImage){
     hint.style.display = "none";
     return;
+  }
+  if(settings.mode === "pillar-wall"){
+    hint.textContent=`幅${settings.width}本（床${settings.width/4}マス）×高さ${computeOtherDim()}段・奥行き1本分。画像の縦横比に合わせ、上限内に自動調整します。`;
+    hint.style.display="block"; return;
   }
   const unit = T("build_unit_masu", "マス");
   if(settings.wallSizeBasis === "height"){
@@ -993,15 +1015,16 @@ const WALL_ROW_ASPECT_COMPENSATION = 0.5;
 // 縦横比をこの値で補正しないと、実際に建てたときと違う比率で表示されてしまう
 const WALL_CELL_ASPECT = 2; // 低い壁1枚の幅4 ÷ 高さ2
 function cellAspectRatio(){
-  return settings.mode === "wall" ? WALL_CELL_ASPECT : settings.mode === "solid" ? 0.5 : 1;
+  return settings.mode === "wall" ? WALL_CELL_ASPECT : (settings.mode === "solid" || settings.mode === "pillar-wall") ? 0.5 : 1;
 }
 
 function computeOtherDim(){
   if(!frontImage) return settings.width;
+  if(settings.mode === "pillar-wall") return pillarMuralDimensions(settings.width,frontImage.naturalWidth/frontImage.naturalHeight).h;
   // 低い壁モードで「高さを基準にする」を選んでいる場合は、ユーザーが指定した
   // 段数をそのまま使う（幅はsyncWallWidthFromHeight()で別途逆算してsettings.width
   // に書き戻し済みなので、他の全コードは従来通りsettings.widthを見るだけでよい）
-  if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
+  if(isMuralMode() && settings.wallSizeBasis === "height"){
     return Math.min(WALL_MAX_HEIGHT_TIERS, Math.max(2, settings.wallHeight));
   }
   // 常に元画像そのものの縦横比を使う（切り抜き範囲＝manualCropRectは、
@@ -1025,7 +1048,8 @@ function computeOtherDim(){
 // を直接参照しているため、こうして同期しておけば他のコードを一切変更せずに
 // 「高さ基準」の指定方法をそのまま使い回せる
 function syncWallWidthFromHeight(){
-  if(!frontImage || settings.mode !== "wall" || settings.wallSizeBasis !== "height") return;
+  if(!frontImage || !isMuralMode() || settings.wallSizeBasis !== "height") return;
+  if(settings.mode === "pillar-wall") return; // Dimensions are fitted together in readOptionInputs().
   const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
   const derivedWidth = Math.round(settings.wallHeight * aspect * WALL_ROW_ASPECT_COMPENSATION);
   settings.width = Math.min(WALL_MAX_WIDTH, Math.max(2, derivedWidth));
@@ -1524,7 +1548,11 @@ function runBuildGeneration(){
     rect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex, materialItems
   );
 
-  if(settings.mode === "solid"){
+  if(settings.mode === "pillar-wall"){
+    resultVoxels = buildPillarMural(frontGrid,settings.width,otherDim);
+    resultDims = {w:settings.width,h:otherDim,d:1};
+    resultWallSegments=null; resultWallDims=null;
+  }else if(settings.mode === "solid"){
     let backGrid = null;
     if(backImage){
       backGrid = computeMatchedGrid(
