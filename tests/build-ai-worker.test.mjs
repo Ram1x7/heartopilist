@@ -53,7 +53,7 @@ test('private trial refuses missing keys before external calls', async()=>{
 
  test('upstream failures identify HTTP status without exposing upstream secrets or prompts',async()=>{
   for (const status of [400,401,403,404,429,500]) {
-    const result=await modelFailure(Response.json({error:{message:'SECRET_KEY private prompt',details:[{reason:'unsafe SECRET_KEY'}]}},{status}));
+    const result=await modelFailure(Response.json({error:{message:'SECRET_KEY private prompt',details:[{reason:'unsafe SECRET_KEY'}]}},{status}),['SECRET_KEY','private prompt']);
     assert.match(result.error,new RegExp('Gemini HTTP '+status));
     assert.doesNotMatch(result.error,/SECRET_KEY|private prompt/);
   }
@@ -63,4 +63,14 @@ test('private trial refuses missing keys before external calls', async()=>{
   const plain=await modelFailure(new Response('sensitive upstream text',{status:502}));
   assert.match(plain.error,/HTTP 502/);
   assert.doesNotMatch(plain.error,/sensitive/);
+});
+
+test('400 diagnostics show provider explanation but redact configured secrets and escaped prompts',async()=>{
+ const key='AIza'+'a'.repeat(35), token='owner-token-20-chars!', prompt='my \"private\" design';
+ const response=Response.json({error:{message:`Invalid JSON payload: Unknown name responseJsonSchema. ${key} ${token} ${JSON.stringify(prompt)} Bearer unlisted-secret`}}, {status:400});
+ const result=await modelFailure(response,[key,token,prompt]);
+ assert.match(result.error,/Unknown name responseJsonSchema/);
+ for(const value of [key,token,'private','unlisted-secret']) assert.ok(!result.error.includes(value));
+ const long=await modelFailure(Response.json({error:{message:'x'.repeat(10000)}},{status:400}));
+ assert.ok(long.error.length<850);
 });

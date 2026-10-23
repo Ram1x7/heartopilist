@@ -29,8 +29,8 @@ export class Quota {
   }
 }
 
-// Never expose upstream messages: they can contain API keys or user content.
-export async function modelFailure(response) {
+// Only expose bounded, redacted provider messages; never serialize raw error objects.
+export async function modelFailure(response, sensitive = []) {
   let data;
   try { data = await response.json(); } catch {}
   const reasons = new Set(['API_KEY_INVALID','API_KEY_EXPIRED','API_KEY_SERVICE_BLOCKED','API_KEY_HTTP_REFERRER_BLOCKED','API_KEY_IP_ADDRESS_BLOCKED','SERVICE_DISABLED','CONSUMER_INVALID']);
@@ -46,7 +46,18 @@ export async function modelFailure(response) {
   const message = reason === 'API_KEY_INVALID' || reason === 'API_KEY_EXPIRED'
     ? 'Gemini APIキーが無効または期限切れです。CloudflareのGEMINI_API_KEYを確認してください'
     : messages[status] || 'Gemini側でエラーが発生しました。時間をおいてご利用ください';
-  return {error:`${message}（Gemini HTTP ${status}${reason ? ' / '+reason : ''}）。この送信は試験版の利用回数に含まれます。`};
+  let detail = '';
+  if (status === 400 && typeof data?.error?.message === 'string') {
+    detail = data.error.message;
+    for (const value of sensitive.filter(v=>typeof v==='string' && v.length).sort((a,b)=>b.length-a.length)) {
+      detail = detail.split(value).join('[非表示]');
+      const escaped = JSON.stringify(value).slice(1,-1);
+      detail = detail.split(escaped).join('[非表示]');
+    }
+    detail = detail.replace(/AIza[\w-]+/g,'[キー非表示]').replace(/Bearer\s+[^\s"']+/gi,'Bearer [非表示]')
+      .replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,600);
+  }
+  return {error:`${message}（Gemini HTTP ${status}${reason ? ' / '+reason : ''}）。${detail ? '詳細: '+detail+'。' : ''}この送信は試験版の利用回数に含まれます。`};
 }
 
 export default {
@@ -116,7 +127,7 @@ export default {
           generationConfig:{responseMimeType:'application/json',responseJsonSchema:PLAN_SCHEMA,maxOutputTokens:6000,thinkingConfig:{thinkingLevel:'minimal'}},
         }), signal:AbortSignal.timeout(50000),
       });
-      if (!response.ok) return reply(await modelFailure(response),response.status===429?429:502);
+      if (!response.ok) return reply(await modelFailure(response,[env.GEMINI_API_KEY,env.PRIVATE_TRIAL_TOKEN,env.CLIENT_HASH_SECRET,body.prompt,body.prompt.trim()]),response.status===429?429:502);
       const result=await response.json();
       const candidate=result.candidates?.[0];
       if (candidate?.finishReason !== 'STOP') return reply({error:'設計を完了できませんでした。利用回数は消費されています。'},502);
