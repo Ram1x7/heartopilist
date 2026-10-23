@@ -5,6 +5,7 @@
 // js/build.jsからESモジュールとしてimportして使う。生成ロジック・保存等は
 // 一切持たず、「渡されたボクセル配列を描画する」ことだけに責任を絞る。
 import * as THREE from "./three.module.min.js";
+import {pillarBounds} from "./build-placement.mjs";
 
 // ハートピアの支柱建材は実際には1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの
 // 2倍の高さがある（参考にしたRibo's Game Labが前提とする1×1×1の立方体とは
@@ -13,11 +14,11 @@ import * as THREE from "./three.module.min.js";
 // する（データ上のy座標そのものは段数のまま、描画時にだけ2倍の間隔を空ける）
 const Y_UNIT_SCALE = 2;
 
-// 低い壁は実寸で幅4×奥行き0.5×高さ2（支柱のような換算不要で、そのまま
+// 低い壁は実寸で幅4×奥行き約0.2×高さ約2（支柱のような換算不要で、そのまま
 // ワールド座標の単位として使う）
 const WALL_PANEL_W = 4;
 const WALL_PANEL_H = 2;
-const WALL_PANEL_D = 0.5;
+const WALL_PANEL_D = 0.2; // Estimated 0.05 floor tile; 1 world unit = 0.25 floor tile.
 
 let canvasEl, stageEl, scene, camera, renderer, mesh, wallMesh, boundBox;
 let blockGuide = null;
@@ -186,6 +187,7 @@ function setVoxels(voxels, opts = {}){
   const color = new THREE.Color();
   voxels.forEach((v, i) => {
     dummy.position.set(v.x - bounds.w / 2 + 0.5, v.y * Y_UNIT_SCALE + Y_UNIT_SCALE / 2, v.z - bounds.d / 2 + 0.5);
+    dummy.rotation.set((v.rx||0)*Math.PI/180,(v.ry||0)*Math.PI/180,(v.rz||0)*Math.PI/180,'XYZ');
     dummy.updateMatrix();
     mesh.setMatrixAt(i, dummy.matrix);
     color.set(v.hex);
@@ -202,9 +204,10 @@ function setVoxels(voxels, opts = {}){
 function fitToVoxels(voxels){
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity, minZ = Infinity, maxZ = -Infinity;
   voxels.forEach((v) => {
-    if(v.x < minX) minX = v.x; if(v.x > maxX) maxX = v.x;
-    if(v.y < minY) minY = v.y; if(v.y > maxY) maxY = v.y;
-    if(v.z < minZ) minZ = v.z; if(v.z > maxZ) maxZ = v.z;
+    const b=pillarBounds(v);
+    minX=Math.min(minX,b.minX); maxX=Math.max(maxX,b.maxX-1);
+    minY=Math.min(minY,b.minY); maxY=Math.max(maxY,b.maxY-1);
+    minZ=Math.min(minZ,b.minZ); maxZ=Math.max(maxZ,b.maxZ-1);
   });
   camTarget.set(
     (minX + maxX) / 2 - bounds.w / 2 + 0.5,
@@ -217,7 +220,7 @@ function fitToVoxels(voxels){
   updateCamera();
 }
 
-// 低い壁（壁画）モード専用の描画。低い壁は幅4×奥行き0.5×高さ2の実寸パネルで、
+// 低い壁（壁画）モード専用の描画。低い壁は幅4×奥行き約0.2×高さ約2の実寸パネルで、
 // 支柱のようなbounds/Y_UNIT_SCALE換算は不要（そのままワールド座標の単位として
 // 使う）。手動編集・当たり判定（raycastVoxelAt）には未対応（このバージョンの
 // 低い壁モードはペン/消しゴム編集を提供しないため）
@@ -277,7 +280,7 @@ function fitToWallSegments(segments, dims){
 
 // solid/flatモードの外枠ワイヤーフレーム（サイト最大の建築可能範囲の目安）の
 // 表示・非表示を切り替える。低い壁モードは単位系が全く異なる（ボクセル単位
-// ではなく実寸4×0.5×2）ため、この枠は意味を持たず邪魔になるので隠す
+// ではなく表示単位4×約0.2×約2）ため、この枠は意味を持たず邪魔になるので隠す
 function setBoundaryBoxVisible(visible){
   if(boundBox) boundBox.visible = visible;
 }
@@ -300,7 +303,7 @@ function raycastVoxelAt(clientX, clientY){
   if(!hit.length) return null;
   const voxel = currentVoxels[hit[0].instanceId];
   const n = hit[0].face ? hit[0].face.normal : null;
-  const adjacent = n && voxel
+  const adjacent = n && voxel && !voxel.freePlacement
     ? { x: voxel.x + Math.round(n.x), y: voxel.y + Math.round(n.y), z: voxel.z + Math.round(n.z) }
     : null;
   return { instanceId: hit[0].instanceId, voxel, adjacent };
