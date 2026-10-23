@@ -42,7 +42,7 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
     assert.equal(response.status,200); assert.deepEqual((await response.json()).plan,plan);
     assert.equal(apiCalls,1);assert.equal(reservations,1);
     // JSON mode is not a trust boundary: reject malformed, out-of-bounds and unknown-material output.
-    for (const changed of [{w:999},{materialId:'999'},{x:-1}]) {
+    for (const changed of [{w:1.5},{materialId:'999'},{x:NaN}]) {
       modelPlan={...plan,shapes:[{...plan.shapes[0],...changed}]};
       const rejected=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(20)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
       assert.equal(rejected.status,502);
@@ -51,6 +51,12 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
       assert.match(failure.error,/処理: validation/);
     }
     assert.equal(apiCalls,4);assert.equal(reservations,4);
+    modelPlan={...plan,shapes:[{...plan.shapes[0],x:20,w:20}]};
+    const fitted=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(20)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
+    assert.equal(fitted.status,200);
+    const fittedBody=await fitted.json();
+    assert.ok(fittedBody.adjustment.scale<1);
+    assert.ok(fittedBody.plan.shapes[0].x+fittedBody.plan.shapes[0].w<=8);
     const failures=[
       [async()=>{throw new DOMException('sensitive provider detail','TimeoutError');},/50秒.*network/],
       [async()=>new Response('non-JSON provider body'),/処理: response/],

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calculateLoad, validateGrid } from '../js/build-rules.mjs';
-import { expandPlan, validatePlan } from '../js/build-ai-plan.mjs';
+import { expandPlan, validatePlan, fitPlanToLimits } from '../js/build-ai-plan.mjs';
 const pillar = (materialId='006',hex='#ffffff') => ({materialId,hex});
 const wall = patternId => ({materialId:'008',patternId});
 const floor = patternId => ({kind:'floor',patternId});
@@ -52,4 +52,38 @@ test('round shapes and overlapping unions remain in bounds without duplicates',(
   const result=expandPlan(plan,limits,materials);
   assert.ok(result.length>0 && result.length<=48);
   validateGrid(result,limits,'solid');
+});
+
+test('oversized AI plans scale uniformly, keep material and order, and do not mutate the source',()=>{
+ const plan={title:'門',shapes:[{...box,w:16,h:8,d:16},{...box,op:'subtract',x:4,w:8,h:4,d:16}]};
+ const before=structuredClone(plan);
+ const result=fitPlanToLimits(plan,limits);
+ assert.equal(result.adjustment.scale,0.5);
+ assert.deepEqual(result.plan.shapes[0],{...box,w:8,h:4,d:8});
+ assert.equal(result.plan.shapes[1].op,'subtract');
+ assert.equal(result.plan.shapes[1].x,2);
+ assert.equal(result.plan.shapes[1].w,4);
+ assert.deepEqual(plan,before);
+ assert.ok(expandPlan(result.plan,limits,materials).length>0);
+ validateGrid(expandPlan(result.plan,limits,materials),limits,'solid');
+});
+test('fit translates negative and offset coordinates; keeps valid plans unchanged and rejects malformed data',()=>{
+ const valid={title:'箱',shapes:[box]};
+ assert.equal(fitPlanToLimits(valid,limits).plan,valid);
+ assert.equal(fitPlanToLimits(valid,limits).adjustment,null);
+ const moved=fitPlanToLimits({title:'移動',shapes:[{...box,x:-3,z:20}]},limits);
+ assert.equal(moved.adjustment.scale,1);
+ assert.equal(moved.plan.shapes[0].x,0);
+ assert.equal(moved.plan.shapes[0].z,4);
+ for(const changed of [{w:0},{x:0.5},{h:NaN},{materialId:'999'}]) assert.throws(()=>fitPlanToLimits({title:'不正',shapes:[{...box,...changed}]},limits));
+ assert.throws(()=>fitPlanToLimits({title:'null',shapes:[null]},limits));
+});
+test('fit remains in bounds for thin pieces and extreme integer extents',()=>{
+ for(let i=1;i<=60;i++) {
+  const plan={title:'試験',shapes:[{...box,x:-i*17,y:-i,z:i,w:i*31,h:i*13,d:i*29},{...box,x:i*34,y:i*12,z:i*20,w:1,h:1,d:1}]};
+  const fitted=fitPlanToLimits(plan,limits);
+  validatePlan(fitted.plan,limits);
+  assert.ok(fitted.plan.shapes.every(s=>s.w>=1 && s.h>=1 && s.d>=1));
+  assert.equal(fitPlanToLimits(fitted.plan,limits).adjustment,null);
+ }
 });

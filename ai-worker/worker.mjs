@@ -1,4 +1,4 @@
-import { PLAN_SCHEMA, validatePlan } from '../js/build-ai-plan.mjs';
+import { PLAN_SCHEMA, validatePlan, fitPlanToLimits } from '../js/build-ai-plan.mjs';
 
 const json = (body, status=200, headers={}) => Response.json(body,{status,headers});
 const boundedLimit = (value, max) => {
@@ -123,8 +123,8 @@ export default {
       const key = await crypto.subtle.importKey('raw',new TextEncoder().encode(env.CLIENT_HASH_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']);
       const hash = await crypto.subtle.sign('HMAC',key,new TextEncoder().encode(`${day}:${ip}`));
       const client = [...new Uint8Array(hash)].map(n=>n.toString(16).padStart(2,'0')).join('');
-      // Counter migration after rejected legacy output settings; all clients share one object.
-      const quota = env.QUOTA.get(env.QUOTA.idFromName('global-structured-format-v4'));
+      // Counter migration after trial bounds failures; all clients share one object.
+      const quota = env.QUOTA.get(env.QUOTA.idFromName('global-fitted-plan-v5'));
       const reserved = await quota.fetch(new Request('https://quota/reserve',{
         method:'POST',body:JSON.stringify({client,globalLimit,clientLimit,minuteLimit}),
       }));
@@ -148,10 +148,10 @@ export default {
       stage = 'json';
       const decoded=decodePlanText(text);
       stage = 'validation';
-      const plan=validatePlan(decoded,body.limits);
-      return reply({plan});
+      const fitted=fitPlanToLimits(decoded,body.limits);
+      return reply(fitted);
     } catch (error) {
-      const knownValidation = new Set(['AIの設計形式が不正です','AIの建材指定が不正です','AIの設計が指定範囲を超えています']);
+      const knownValidation = new Set(['AIの設計形式が不正です','AIの座標またはサイズが不正です','AIの建材指定が不正です','AIの設計が指定範囲を超えています']);
       const messages = {
         quota:'試験受付の処理に失敗しました',
         network:'Geminiとの通信に失敗しました',

@@ -18,21 +18,61 @@ export const PLAN_SCHEMA = {
   },
 };
 
-export function validatePlan(plan, limits) {
+function validateLimits(limits) {
   if (!limits || !Number.isInteger(limits.w) || limits.w < 4 || limits.w > 96
       || !Number.isInteger(limits.h) || limits.h < 2 || limits.h > 17
       || !Number.isInteger(limits.d) || limits.d < 4 || limits.d > 120) throw new Error('生成サイズが不正です');
+}
+
+function validateStructure(plan) {
   if (!plan || typeof plan.title !== 'string' || plan.title.length > 80
       || !Array.isArray(plan.shapes) || plan.shapes.length < 1 || plan.shapes.length > 40) throw new Error('AIの設計形式が不正です');
   for (const s of plan.shapes) {
-    if (!['box','ellipsoid','cone'].includes(s.shape) || !['add','subtract'].includes(s.op)
+    if (!s || !['box','ellipsoid','cone'].includes(s.shape) || !['add','subtract'].includes(s.op)
         || !['005','006','007'].includes(s.materialId) || !/^#[0-9a-f]{6}$/i.test(s.hex)) throw new Error('AIの建材指定が不正です');
+    for (const [pos,size] of [['x','w'],['y','h'],['z','d']]) {
+      if (!Number.isSafeInteger(s[pos]) || !Number.isSafeInteger(s[size]) || Math.abs(s[pos]) > 1000000
+          || s[size] < 1 || s[size] > 1000000) throw new Error('AIの座標またはサイズが不正です');
+    }
+  }
+}
+
+export function validatePlan(plan, limits) {
+  validateLimits(limits);
+  validateStructure(plan);
+  for (const s of plan.shapes) {
     for (const [pos, size, max] of [['x','w',limits.w],['y','h',limits.h],['z','d',limits.d]]) {
-      if (!Number.isInteger(s[pos]) || !Number.isInteger(s[size]) || s[pos] < 0
-          || s[size] < 1 || s[pos] + s[size] > max) throw new Error('AIの設計が指定範囲を超えています');
+      if (s[pos] < 0 || s[pos] + s[size] > max) throw new Error('AIの設計が指定範囲を超えています');
     }
   }
   return plan;
+}
+
+export function fitPlanToLimits(plan, limits) {
+  validateLimits(limits);
+  validateStructure(plan);
+  const axes = [['x','w',limits.w],['y','h',limits.h],['z','d',limits.d]];
+  const bounds = axes.map(([pos,size,max])=>({pos,size,max,
+    min:Math.min(...plan.shapes.map(s=>s[pos])),
+    end:Math.max(...plan.shapes.map(s=>s[pos]+s[size])),
+  }));
+  if (bounds.every(b=>b.min >= 0 && b.end <= b.max)) return {plan,adjustment:null};
+  const scale = Math.min(1,...bounds.map(b=>b.max/(b.end-b.min)));
+  const shapes = plan.shapes.map(s=>({...s}));
+  for (const b of bounds) {
+    // Scale all axes by one factor. Snap shared edges consistently to pillar units.
+    const span = Math.round((b.end-b.min)*scale);
+    const offset = Math.max(0,Math.min(b.max-span,Math.round(b.min*scale)));
+    for (let i=0;i<shapes.length;i++) {
+      const start = Math.min(b.max-1,Math.round((plan.shapes[i][b.pos]-b.min)*scale)+offset);
+      const end = Math.min(b.max,Math.round((plan.shapes[i][b.pos]+plan.shapes[i][b.size]-b.min)*scale)+offset);
+      shapes[i][b.pos] = start;
+      shapes[i][b.size] = Math.max(1,end-start);
+    }
+  }
+  const fitted = {...plan,shapes};
+  validatePlan(fitted,limits);
+  return {plan:fitted,adjustment:{scale}};
 }
 
 export function expandPlan(plan, limits, materials) {
