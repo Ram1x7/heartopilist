@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import worker,{Quota} from '../ai-worker/worker.mjs';
+import worker,{Quota,modelFailure} from '../ai-worker/worker.mjs';
 
 test('quota reservations serialize concurrent clients and never exceed limits',async()=>{
   let record, tail=Promise.resolve();
@@ -47,4 +47,18 @@ test('private trial refuses missing keys before external calls', async()=>{
   assert.equal((await worker.fetch(request,env)).status,401);
   assert.equal((await worker.fetch(request,{...env,PRIVATE_TRIAL_ONLY:'false'})).status,503);
   assert.equal((await worker.fetch(request,{...env,PRIVATE_TRIAL_TOKEN:'t'.repeat(19)})).status,503);
+});
+
+ test('upstream failures identify HTTP status without exposing upstream secrets or prompts',async()=>{
+  for (const status of [400,401,403,404,429,500]) {
+    const result=await modelFailure(Response.json({error:{message:'SECRET_KEY private prompt',details:[{reason:'unsafe SECRET_KEY'}]}},{status}));
+    assert.match(result.error,new RegExp('Gemini HTTP '+status));
+    assert.doesNotMatch(result.error,/SECRET_KEY|private prompt/);
+  }
+  const invalid=await modelFailure(Response.json({error:{details:[{reason:'API_KEY_INVALID'}]}},{status:400}));
+  assert.match(invalid.error,/GEMINI_API_KEY/);
+  assert.match(invalid.error,/API_KEY_INVALID/);
+  const plain=await modelFailure(new Response('sensitive upstream text',{status:502}));
+  assert.match(plain.error,/HTTP 502/);
+  assert.doesNotMatch(plain.error,/sensitive/);
 });

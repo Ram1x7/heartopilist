@@ -29,6 +29,26 @@ export class Quota {
   }
 }
 
+// Never expose upstream messages: they can contain API keys or user content.
+export async function modelFailure(response) {
+  let data;
+  try { data = await response.json(); } catch {}
+  const reasons = new Set(['API_KEY_INVALID','API_KEY_EXPIRED','API_KEY_SERVICE_BLOCKED','API_KEY_HTTP_REFERRER_BLOCKED','API_KEY_IP_ADDRESS_BLOCKED','SERVICE_DISABLED','CONSUMER_INVALID']);
+  const reason = data?.error?.details?.map(d=>d.reason).find(r=>reasons.has(r));
+  const status = response.status;
+  const messages = {
+    400:'AIへの送信内容またはGemini APIキーが拒否されました',
+    401:'Gemini APIキーの認証に失敗しました',
+    403:'Gemini APIの利用権限・キーの制限・利用地域を確認してください',
+    404:'指定したAIモデルを利用できません',
+    429:'AIの無料枠または受付上限に達しました。時間をおいてご利用ください',
+  };
+  const message = reason === 'API_KEY_INVALID' || reason === 'API_KEY_EXPIRED'
+    ? 'Gemini APIキーが無効または期限切れです。CloudflareのGEMINI_API_KEYを確認してください'
+    : messages[status] || 'Gemini側でエラーが発生しました。時間をおいてご利用ください';
+  return {error:`${message}（Gemini HTTP ${status}${reason ? ' / '+reason : ''}）。この送信は試験版の利用回数に含まれます。`};
+}
+
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin');
@@ -95,7 +115,7 @@ export default {
           generationConfig:{responseMimeType:'application/json',responseJsonSchema:PLAN_SCHEMA,maxOutputTokens:6000,thinkingConfig:{thinkingBudget:0}},
         }), signal:AbortSignal.timeout(50000),
       });
-      if (!response.ok) return reply({error:response.status===429?'AIの無料枠または受付上限に達しました。時間をおいてご利用ください。':'AIが応答できませんでした。利用回数は消費されています。'},response.status===429?429:502);
+      if (!response.ok) return reply(await modelFailure(response),response.status===429?429:502);
       const result=await response.json();
       const candidate=result.candidates?.[0];
       if (candidate?.finishReason !== 'STOP') return reply({error:'設計を完了できませんでした。利用回数は消費されています。'},502);
