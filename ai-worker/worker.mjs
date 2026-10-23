@@ -40,7 +40,7 @@ export default {
     if (request.method !== 'POST') return reply({error:'Method not allowed'},405);
     if (env.ENABLED !== 'true' || env.FREE_TIER_CONFIRMED !== 'true'
         || !env.GEMINI_API_KEY || !env.CLIENT_HASH_SECRET || !env.QUOTA
-        || env.PRIVATE_TRIAL_ONLY !== 'true' || !env.PRIVATE_TRIAL_TOKEN || env.PRIVATE_TRIAL_TOKEN.length < 32) {
+        || env.PRIVATE_TRIAL_ONLY !== 'true' || !env.PRIVATE_TRIAL_TOKEN || env.PRIVATE_TRIAL_TOKEN.length < 20) {
       return reply({error:'AI設計は接続準備中です。画像からの変換をご利用ください。'},503);
     }
     const supplied = request.headers.get('Authorization') || '';

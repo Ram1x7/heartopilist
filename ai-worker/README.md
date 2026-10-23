@@ -6,7 +6,7 @@
 
 1. AI Studioで専用プロジェクトの請求階層が「無料枠」であることを確認する。課金を有効にしない。現在のモデルは gemini-2.5-flash。利用可能性・無料枠は接続時に再確認する。
 2. Cloudflare Workers FreeでSQLite Durable Objectを使う。Workers Paidへ切り替えない。
-3. Workerの秘密値に GEMINI_API_KEY、CLIENT_HASH_SECRET、PRIVATE_TRIAL_TOKEN を設定する。PRIVATE_TRIAL_TOKENは32文字以上のランダムな本人専用キー。GeminiのAPIキーとは別にする。これらはソースやGitHubに保存しない。
+3. Workerの秘密値に GEMINI_API_KEY、CLIENT_HASH_SECRET、PRIVATE_TRIAL_TOKEN を設定する。PRIVATE_TRIAL_TOKENは20文字以上のランダムな本人専用キー。GeminiのAPIキーとは別にする。これらはソースやGitHubに保存しない。
 4. wrangler.tomlのALLOWED_ORIGINを試験画面のOriginに合わせる。PRIVATE_TRIAL_ONLYはtrueのまま維持する。
 5. 無料枠確認後にFREE_TIER_CONFIRMED、ENABLEDをtrueにし、npx wrangler deployで配備する。
 6. js/build-ai-config.mjsのendpointにWorkerの /generate URLを設定する。フロント側に秘密値は書かない。試験画面も一般公開への導線を設けず運用する。

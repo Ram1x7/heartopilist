@@ -25,7 +25,7 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
   const originalFetch=globalThis.fetch;
   let apiCalls=0,reservations=0;
   const plan={title:'試験',shapes:[{shape:'box',op:'add',x:0,y:0,z:0,w:2,h:2,d:2,materialId:'006',hex:'#ffffff'}]};
-  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_MODEL:'gemini-2.5-flash',GEMINI_API_KEY:'test',PRIVATE_TRIAL_ONLY:'true',PRIVATE_TRIAL_TOKEN:'t'.repeat(32),CLIENT_HASH_SECRET:'test',DAILY_GLOBAL_LIMIT:'20',DAILY_CLIENT_LIMIT:'2',MINUTE_GLOBAL_LIMIT:'2',QUOTA:{idFromName:n=>n,get:()=>({fetch:async()=>{reservations++;return Response.json({allowed:true});}})}};
+  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_MODEL:'gemini-2.5-flash',GEMINI_API_KEY:'test',PRIVATE_TRIAL_ONLY:'true',PRIVATE_TRIAL_TOKEN:'t'.repeat(20),CLIENT_HASH_SECRET:'test',DAILY_GLOBAL_LIMIT:'20',DAILY_CLIENT_LIMIT:'2',MINUTE_GLOBAL_LIMIT:'2',QUOTA:{idFromName:n=>n,get:()=>({fetch:async()=>{reservations++;return Response.json({allowed:true});}})}};
   globalThis.fetch=async(url,init)=>{
     apiCalls++;
     const sent=JSON.parse(init.body);
@@ -34,7 +34,7 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
     return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(plan)}]}}]});
   };
   try{
-    const response=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(32)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
+    const response=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(20)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
     assert.equal(response.status,200); assert.deepEqual((await response.json()).plan,plan);
     assert.equal(apiCalls,1);assert.equal(reservations,1);
   }finally{globalThis.fetch=originalFetch;}
@@ -42,8 +42,9 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
 
 
 test('private trial refuses missing keys before external calls', async()=>{
-  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_API_KEY:'test',CLIENT_HASH_SECRET:'test',QUOTA:{},PRIVATE_TRIAL_ONLY:'true',PRIVATE_TRIAL_TOKEN:'t'.repeat(32)};
+  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_API_KEY:'test',CLIENT_HASH_SECRET:'test',QUOTA:{},PRIVATE_TRIAL_ONLY:'true',PRIVATE_TRIAL_TOKEN:'t'.repeat(20)};
   const request=new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN}});
   assert.equal((await worker.fetch(request,env)).status,401);
   assert.equal((await worker.fetch(request,{...env,PRIVATE_TRIAL_ONLY:'false'})).status,503);
+  assert.equal((await worker.fetch(request,{...env,PRIVATE_TRIAL_TOKEN:'t'.repeat(19)})).status,503);
 });
