@@ -67,4 +67,6 @@ Wranglerのカスタムビルドで `prepare-trial.mjs` を実行し、既存の
 
 2026-10-23: 新規プロジェクトで制限される2.5系から、無料枠のある gemini-3.5-flash-lite に切替。RESTの現行 responseFormat を使用。接続不備で消費した試験受付枠は修正時のカウンター名変更で更新（通常の各上限は維持）。自動再試行・他モデルへのフォールバックは行わない。
 
-HTTP 400の切り分け・修正: RESTの旧 responseMimeType/responseJsonSchema と thinkingConfig の指定を送らず、現行 responseFormat.text.mimeType=APPLICATION_JSON を使用。設計形式はプロンプトに記載し、受信後に validatePlan で必須項目・整数・寸法・建材・色を検査する。不正な出力は採用せず、自動再試行もしない。変更後の受付カウンターは global-json-format-v3（各上限は維持）。実APIでの生成成功は未確認。
+接続形式: 旧 responseMimeType/responseJsonSchema は使わず、現行 responseFormat.text に mimeType=APPLICATION_JSON と schema を指定する。スキーマには指定寸法に対応する座標・サイズの上限を含める。受信後も validatePlan で整数・寸法の合計・建材・色を独立検証する。完全なJSONコードフェンスのみ除去できるが、不正JSONの補修・不正寸法の黙った変更・自動再試行は行わない。受付カウンターは global-structured-format-v4（各上限は維持）。
+
+失敗は quota / network / response / json / validation の段階で区別する。タイムアウトや建築ルール違反は具体的な固定文言で通知し、AI出力本文や例外の生メッセージは公開しない。実APIでの生成成功は未確認。

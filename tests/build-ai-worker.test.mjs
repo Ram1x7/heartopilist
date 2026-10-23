@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import worker,{Quota,modelFailure} from '../ai-worker/worker.mjs';
+import worker,{Quota,modelFailure,modelPlanSchema,decodePlanText} from '../ai-worker/worker.mjs';
 
 test('quota reservations serialize concurrent clients and never exceed limits',async()=>{
   let record, tail=Promise.resolve();
@@ -31,7 +31,7 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
     apiCalls++;
     const sent=JSON.parse(init.body);
     assert.equal(url,'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
-    assert.deepEqual(sent.generationConfig,{responseFormat:{text:{mimeType:'APPLICATION_JSON'}},maxOutputTokens:6000});
+    assert.deepEqual(sent.generationConfig,{responseFormat:{text:{mimeType:'APPLICATION_JSON',schema:modelPlanSchema({w:8,h:4,d:8})}},maxOutputTokens:6000});
     assert.match(sent.systemInstruction.parts[0].text,/\"materialId\"/);
     assert.equal(sent.generationConfig.maxOutputTokens,6000);
     assert.equal(init.headers['x-goog-api-key'],'test');
@@ -46,9 +46,24 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
       modelPlan={...plan,shapes:[{...plan.shapes[0],...changed}]};
       const rejected=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(20)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
       assert.equal(rejected.status,502);
-      assert.ok(!(await rejected.json()).plan);
+      const failure=await rejected.json();
+      assert.ok(!failure.plan);
+      assert.match(failure.error,/処理: validation/);
     }
     assert.equal(apiCalls,4);assert.equal(reservations,4);
+    const failures=[
+      [async()=>{throw new DOMException('sensitive provider detail','TimeoutError');},/50秒.*network/],
+      [async()=>new Response('non-JSON provider body'),/処理: response/],
+      [async()=>Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:'invalid JSON sensitive'}]}}]}),/処理: json/],
+    ];
+    for (const [mock,expected] of failures) {
+      globalThis.fetch=mock;
+      const rejected=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(20)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
+      assert.equal(rejected.status,502);
+      const failure=await rejected.json();
+      assert.match(failure.error,expected);
+      assert.doesNotMatch(failure.error,/sensitive|provider body/);
+    }
   }finally{globalThis.fetch=originalFetch;}
 });
 
@@ -83,4 +98,15 @@ test('400 diagnostics show provider explanation but redact configured secrets an
  for(const value of [key,token,'private','unlisted-secret']) assert.ok(!result.error.includes(value));
  const long=await modelFailure(Response.json({error:{message:'x'.repeat(10000)}},{status:400}));
  assert.ok(long.error.length<850);
+});
+
+test('model JSON decoder tolerates a complete fence, but never repairs invalid documents',()=>{
+ const plan={title:'test',shapes:[]};
+ assert.deepEqual(decodePlanText('```json\n'+JSON.stringify(plan)+'\n```'),plan);
+ assert.deepEqual(decodePlanText('\ufeff '+JSON.stringify(plan)),plan);
+ assert.throws(()=>decodePlanText('{"title":"unfinished"'));
+ assert.throws(()=>decodePlanText('explanation '+JSON.stringify(plan)));
+ const schema=modelPlanSchema({w:8,h:4,d:12});
+ assert.equal(schema.properties.shapes.items.properties.y.maximum,3);
+ assert.equal(schema.properties.shapes.items.properties.d.maximum,12);
 });
