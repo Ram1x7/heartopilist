@@ -35,6 +35,14 @@ node --test tests/build-rules.test.mjs tests/build-ai-worker.test.mjs tests/buil
 
 実API生成、クラウド配備、画面の実ブラウザ確認は別途必要。
 
+## 試験画面の配信
+
+Wranglerのカスタムビルドで `prepare-trial.mjs` を実行し、既存の `build.html` と必要な公開スクリプト・CSS・翻訳だけを `.trial-public` にまとめる。生成物はGitへ保存しない。WorkerのStatic Assetsで `/build` を配信する。解析・更新通知・Service Workerは試験画面では読み込まない。ほかの図鑑ページへのリンクは既存のGitHub Pagesへ向ける。
+
+現在の試験画面は `https://hatopi-build-ai.saiyowa0517.workers.dev/build`。Workerの `ALLOWED_ORIGIN` も同じOriginに固定する。ページ自体は閲覧可能で検索対象外、AI生成は引き続き本人専用キーを必須とする。秘密値は生成物やHTMLへ埋め込まない。GitHub Pagesの公開済みページは変更しない。
+
+ローカルでの梱包確認: `node ai-worker/prepare-trial.mjs`。配備後は画面表示、シークレット不足時の停止、本人専用キーによる実生成を別途確認する。
+
 ## 参照
 
 - https://ai.google.dev/gemini-api/terms
