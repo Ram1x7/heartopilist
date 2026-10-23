@@ -4,8 +4,8 @@ compatibility_date = "2026-10-01"
 
 [vars]
 PRIVATE_TRIAL_ONLY = "true"
-ENABLED = "false"
-FREE_TIER_CONFIRMED = "false"
+ENABLED = "true"
+FREE_TIER_CONFIRMED = "true"
 ALLOWED_ORIGIN = "https://ram1x7.github.io"
 TURNSTILE_HOSTNAME = "ram1x7.github.io"
 GEMINI_MODEL = "gemini-2.5-flash"
