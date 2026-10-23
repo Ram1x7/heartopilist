@@ -25,10 +25,12 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
   const originalFetch=globalThis.fetch;
   let apiCalls=0,reservations=0;
   const plan={title:'試験',shapes:[{shape:'box',op:'add',x:0,y:0,z:0,w:2,h:2,d:2,materialId:'006',hex:'#ffffff'}]};
-  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_MODEL:'gemini-2.5-flash',GEMINI_API_KEY:'test',PRIVATE_TRIAL_ONLY:'true',PRIVATE_TRIAL_TOKEN:'t'.repeat(20),CLIENT_HASH_SECRET:'test',DAILY_GLOBAL_LIMIT:'20',DAILY_CLIENT_LIMIT:'2',MINUTE_GLOBAL_LIMIT:'2',QUOTA:{idFromName:n=>n,get:()=>({fetch:async()=>{reservations++;return Response.json({allowed:true});}})}};
+  const env={ALLOWED_ORIGIN:'https://ram1x7.github.io',ENABLED:'true',FREE_TIER_CONFIRMED:'true',GEMINI_MODEL:'gemini-3.5-flash-lite',GEMINI_API_KEY:'test',PRIVATE_TRIAL_ONLY:'true',PRIVATE_TRIAL_TOKEN:'t'.repeat(20),CLIENT_HASH_SECRET:'test',DAILY_GLOBAL_LIMIT:'20',DAILY_CLIENT_LIMIT:'2',MINUTE_GLOBAL_LIMIT:'2',QUOTA:{idFromName:n=>n,get:()=>({fetch:async()=>{reservations++;return Response.json({allowed:true});}})}};
   globalThis.fetch=async(url,init)=>{
     apiCalls++;
     const sent=JSON.parse(init.body);
+    assert.equal(url,'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
+    assert.deepEqual(sent.generationConfig.thinkingConfig,{thinkingLevel:'minimal'});
     assert.equal(sent.generationConfig.maxOutputTokens,6000);
     assert.equal(init.headers['x-goog-api-key'],'test');
     return Response.json({candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(plan)}]}}]});

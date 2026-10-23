@@ -4,7 +4,7 @@
 
 ## 接続
 
-1. AI Studioで専用プロジェクトの請求階層が「無料枠」であることを確認する。課金を有効にしない。現在のモデルは gemini-2.5-flash。利用可能性・無料枠は接続時に再確認する。
+1. AI Studioで専用プロジェクトの請求階層が「無料枠」であることを確認する。課金を有効にしない。現在のモデルは gemini-3.5-flash-lite。利用可能性・無料枠は接続時に再確認する。
 2. Cloudflare Workers FreeでSQLite Durable Objectを使う。Workers Paidへ切り替えない。
 3. Workerの秘密値に GEMINI_API_KEY、CLIENT_HASH_SECRET、PRIVATE_TRIAL_TOKEN を設定する。PRIVATE_TRIAL_TOKENは20文字以上のランダムな本人専用キー。GeminiのAPIキーとは別にする。これらはソースやGitHubに保存しない。
 4. wrangler.tomlのALLOWED_ORIGINを試験画面のOriginに合わせる。PRIVATE_TRIAL_ONLYはtrueのまま維持する。
@@ -64,3 +64,5 @@ Wranglerのカスタムビルドで `prepare-trial.mjs` を実行し、既存の
 接続後、上記ブランチへのコミットのプッシュで最初のビルドを開始する。接続時のビルド変数にはGeminiの秘密値を入れない。実行時の秘密値はWorkerの「変数とシークレット」に設定する。
 
 初回配備ではENABLEDとFREE_TIER_CONFIRMEDをfalseのままにする。この段階ではAI生成を有効化しない。ビルドログで配備結果を確認後、無料枠・本人専用認証・実行時シークレットを確認してから有効化する。mainへのマージは不要。
+
+2026-10-23: 新規プロジェクトで制限される2.5系から、無料枠のある gemini-3.5-flash-lite に切替。Gemini 3対応の thinkingLevel=minimal を指定。旧モデル404で消費した試験受付枠はカウンター名の一度限りの変更で更新（通常の各上限は維持）。自動再試行・他モデルへのフォールバックは行わない。
