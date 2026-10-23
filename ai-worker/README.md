@@ -65,4 +65,6 @@ Wranglerのカスタムビルドで `prepare-trial.mjs` を実行し、既存の
 
 初回配備ではENABLEDとFREE_TIER_CONFIRMEDをfalseのままにする。この段階ではAI生成を有効化しない。ビルドログで配備結果を確認後、無料枠・本人専用認証・実行時シークレットを確認してから有効化する。mainへのマージは不要。
 
-2026-10-23: 新規プロジェクトで制限される2.5系から、無料枠のある gemini-3.5-flash-lite に切替。Gemini 3対応の thinkingLevel=minimal を指定。旧モデル404で消費した試験受付枠はカウンター名の一度限りの変更で更新（通常の各上限は維持）。自動再試行・他モデルへのフォールバックは行わない。
+2026-10-23: 新規プロジェクトで制限される2.5系から、無料枠のある gemini-3.5-flash-lite に切替。RESTの現行 responseFormat を使用。接続不備で消費した試験受付枠は修正時のカウンター名変更で更新（通常の各上限は維持）。自動再試行・他モデルへのフォールバックは行わない。
+
+HTTP 400の切り分け・修正: RESTの旧 responseMimeType/responseJsonSchema と thinkingConfig の指定を送らず、現行 responseFormat.text.mimeType=APPLICATION_JSON を使用。設計形式はプロンプトに記載し、受信後に validatePlan で必須項目・整数・寸法・建材・色を検査する。不正な出力は採用せず、自動再試行もしない。変更後の受付カウンターは global-json-format-v3（各上限は維持）。実APIでの生成成功は未確認。
