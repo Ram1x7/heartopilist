@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import worker,{Quota,modelFailure,modelPlanSchema,decodePlanText} from '../ai-worker/worker.mjs';
+import worker,{Quota,modelFailure,decodePlanText} from '../ai-worker/worker.mjs';
 
 test('quota reservations serialize concurrent clients and never exceed limits',async()=>{
   let record, tail=Promise.resolve();
@@ -31,7 +31,7 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
     apiCalls++;
     const sent=JSON.parse(init.body);
     assert.equal(url,'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
-    assert.deepEqual(sent.generationConfig,{responseFormat:{text:{mimeType:'APPLICATION_JSON',schema:modelPlanSchema({w:8,h:4,d:8})}},maxOutputTokens:6000});
+    assert.deepEqual(sent.generationConfig,{responseFormat:{text:{mimeType:'APPLICATION_JSON'}},maxOutputTokens:6000});
     assert.match(sent.systemInstruction.parts[0].text,/\"materialId\"/);
     assert.equal(sent.generationConfig.maxOutputTokens,6000);
     assert.equal(init.headers['x-goog-api-key'],'test');
@@ -106,7 +106,4 @@ test('model JSON decoder tolerates a complete fence, but never repairs invalid d
  assert.deepEqual(decodePlanText('\ufeff '+JSON.stringify(plan)),plan);
  assert.throws(()=>decodePlanText('{"title":"unfinished"'));
  assert.throws(()=>decodePlanText('explanation '+JSON.stringify(plan)));
- const schema=modelPlanSchema({w:8,h:4,d:12});
- assert.equal(schema.properties.shapes.items.properties.y.maximum,3);
- assert.equal(schema.properties.shapes.items.properties.d.maximum,12);
 });
