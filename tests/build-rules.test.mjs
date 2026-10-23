@@ -94,3 +94,17 @@ test('fractional model coordinates snap to valid pillar units with an explicit a
  validatePlan(fitted.plan,limits);
  assert.ok(fitted.plan.shapes[0].h>=1);
 });
+
+test('free pillars allow fractions, floating and intentional duplicates, preserving exact transforms in JSON',()=>{
+ const piece={...pillar(),x:2.25,y:2.5,z:3.125,rx:0,ry:35,rz:25,freePlacement:true};
+ const dims={w:12,h:10,d:12};
+ const saved=JSON.parse(JSON.stringify([piece,piece]));
+ validateGrid(saved,dims,'solid');
+ assert.equal(calculateLoad(saved),210);
+ assert.deepEqual(saved[0],piece);
+ assert.throws(()=>validateGrid([{...piece,freePlacement:false}],dims,'solid'));
+ assert.throws(()=>validateGrid([{...piece,rx:Infinity}],dims,'solid'));
+ assert.throws(()=>validateGrid([{...piece,rx:361}],dims,'solid'));
+ assert.throws(()=>validateGrid([{...piece,x:0,y:0,rz:90}],dims,'solid'));
+ assert.throws(()=>validateGrid([{...piece,x:11.5}],dims,'solid'));
+});

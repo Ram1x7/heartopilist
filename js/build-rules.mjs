@@ -1,3 +1,4 @@
+import {validateFreePillar} from './build-placement.mjs';
 // Confirmed by in-game measurements, 2026-10-22. Floor width = 1 tile.
 export const BUILD_RULES = Object.freeze({
   widthTiles: 24, depthTiles: 30, pillarWidth: 0.25,
@@ -39,7 +40,12 @@ export function validateGrid(items, dims, mode) {
   if (!Array.isArray(items) || items.length > maxW * maxH * maxD) throw new Error('配置データの個数が不正です');
   const seen = new Set();
   for (const v of items) {
-    if (!Number.isInteger(v.x) || v.x < 0 || v.x >= dims.w
+    if (v?.freePlacement === true && mode === 'solid') {
+      if (!/^#[0-9a-f]{6}$/i.test(v.hex) || !['005','006','007'].includes(v.materialId)) throw new Error('未対応の建材です');
+      validateFreePillar(v,dims);
+      continue; // Intentional overlaps each count as a separate piece.
+    }
+    if (!v || v.freePlacement === true || ['rx','ry','rz'].some(k=>v[k] !== undefined && v[k] !== 0) || !Number.isInteger(v.x) || v.x < 0 || v.x >= dims.w
         || !Number.isInteger(v.y) || v.y < 0 || v.y >= dims.h
         || (!wall && (!Number.isInteger(v.z) || v.z < 0 || v.z >= dims.d))
         || !/^#[0-9a-f]{6}$/i.test(v.hex)

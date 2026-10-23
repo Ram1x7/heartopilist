@@ -16,6 +16,7 @@ import * as Build3D from "./build3d-scene.js";
 import { BUILD_RULES, calculateLoad, validateGrid } from "./build-rules.mjs";
 import { expandPlan } from "./build-ai-plan.mjs";
 import { initAIForm } from "./build-ai-ui.mjs";
+import { initFreePlacement } from "./build-free-placement.mjs";
 
 // Internal X/Z unit = one pillar width (0.25 floor tile); Y = one pillar height.
 const SITE_MAX_WIDTH = BUILD_RULES.widthTiles * 4;
@@ -72,6 +73,7 @@ let savedDesigns = [];
 // ══════════════════════════════════════
 // 手動編集（ペン/消しゴム・Undo/Redo）
 // ══════════════════════════════════════
+let freePlacementEditor = null;
 let editTool = "pen"; // "pen" | "eraser"
 let selectedMaterial = null; // {materialId, hex, name}（パレットから選んだ、ペンで使う建材）
 const EDIT_HISTORY_LIMIT = 50;
@@ -91,6 +93,7 @@ function pushHistory(){
 }
 
 function clearHistory(){
+  freePlacementEditor?.clear();
   undoStack = [];
   redoStack = [];
   updateUndoRedoButtons();
@@ -139,6 +142,7 @@ function refreshResultView(opts){
 }
 
 function refreshVoxelView(){
+  freePlacementEditor?.refresh();
   refreshResultView({ fit: false });
   renderBuildMaterialList();
   renderBuildBlockList();
@@ -191,6 +195,7 @@ function setupProgressSlider(){
 }
 
 function updateProgressUI(){
+  freePlacementEditor?.refresh();
   const output = document.getElementById("buildProgressOutput");
   const hint = document.getElementById("buildProgressHint");
   const full = isProgressFull();
@@ -239,6 +244,8 @@ let blockGuideSize = 0; // 0＝オフ
 // あるため、このバージョンでは配置図の自動生成のみ対応する）ので、
 // 編集ツールバー自体を隠す
 function updateEditToolbarVisibility(){
+  if(settings.mode!=="solid" && editTool==="select") setEditTool("pen");
+  freePlacementEditor?.refresh();
   const toolbar = document.getElementById("buildEditToolbar");
   if(toolbar) toolbar.style.display = settings.mode === "wall" ? "none" : "flex";
   // 低い壁モードはペン/消しゴム編集に対応していないため、案内文からも触れない
@@ -598,10 +605,11 @@ function applyFloorGrid(){
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
 function handleEditClick(hit){
   if(!hit || !resultVoxels || !isProgressFull()) return;
+  if(editTool === "select"){ freePlacementEditor?.select(hit.voxel || null); return; }
   if(editTool === "eraser"){
     if(!hit.voxel) return;
     pushHistory();
-    resultVoxels = resultVoxels.filter(v => !(v.x === hit.voxel.x && v.y === hit.voxel.y && v.z === hit.voxel.z));
+    resultVoxels = resultVoxels.filter(v => v !== hit.voxel);
     refreshVoxelView();
     return;
   }
@@ -618,6 +626,7 @@ function handleEditClick(hit){
 
 function setEditTool(tool){
   editTool = tool;
+  document.getElementById("buildToolSelectBtn")?.classList.toggle("active",tool === "select");
   document.getElementById("buildToolPenBtn").classList.toggle("active", tool === "pen");
   document.getElementById("buildToolEraserBtn").classList.toggle("active", tool === "eraser");
 }
@@ -1975,6 +1984,13 @@ function initBuildPage(){
   document.getElementById("buildExportBtn").addEventListener("click", exportBuildDesigns);
   document.getElementById("buildImportBtn").addEventListener("click", () => document.getElementById("buildImportInput").click());
   document.getElementById("buildImportInput").addEventListener("change", importBuildDesigns);
+
+  // Manual placement preserves each piece's transform through undo/save/export.
+  freePlacementEditor = initFreePlacement({
+    getState:()=>({mode:settings.mode,items:resultVoxels,dims:resultDims,material:selectedMaterial,editable:isProgressFull()}),
+    chooseTool:setEditTool,
+    commit:items=>{pushHistory();resultVoxels=items;refreshVoxelView();},
+  });
 
   // 手動編集ツールバー
   const firstMaterial = MATERIALS.support_pillars.items[0];

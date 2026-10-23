@@ -70,3 +70,5 @@ Wranglerのカスタムビルドで `prepare-trial.mjs` を実行し、既存の
 接続形式: 旧 responseMimeType/responseJsonSchema は使わず、現行 responseFormat.text に mimeType=APPLICATION_JSON のみを指定する。追加の schema 指定で HTTP 400 が再発したため、APIへのschema送信は行わない。設計形式はシステム指示に記載する。受信後も validatePlan で整数・寸法の合計・建材・色を独立検証する。完全なJSONコードフェンスのみ除去できるが、不正JSONの補修・自動再試行は行わない。有限の数値と建材が有効な設計の範囲超過・小数座標は、全軸共通の縮小率と位置補正で指定範囲に収め、支柱単位に丸める。調整時は画面で明示し、調整後も validatePlan で検証する。受付カウンターは global-fitted-plan-v5（各上限は維持）。
 
 失敗は quota / network / response / json / validation の段階で区別する。タイムアウトや建築ルール違反は具体的な固定文言で通知し、AI出力本文や例外の生メッセージは公開しない。実APIでの生成成功は未確認。
+
+自由配置編集: 立体モードの支柱は freePlacement=true と x/y/z, rx/ry/rz（XYZ順・度）を保存する。X/Z内部単位は支柱幅、Yは支柱高さで、UIのX/Zは床マスへ換算する。回転後の外接範囲全体が設計寸法内に収まることを検証。重複・重なり・浮遊を許可し、1本ずつ承重に計上する。画像変換・AIの初期生成は従来のマス配置、床・低い壁の自由配置は未対応。AIにはシルエット・実寸比率・部位・顔のコントラスト・形状の重ね順を指示する。
