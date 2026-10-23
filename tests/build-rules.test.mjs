@@ -75,7 +75,7 @@ test('fit translates negative and offset coordinates; keeps valid plans unchange
  assert.equal(moved.adjustment.scale,1);
  assert.equal(moved.plan.shapes[0].x,0);
  assert.equal(moved.plan.shapes[0].z,4);
- for(const changed of [{w:0},{x:0.5},{h:NaN},{materialId:'999'}]) assert.throws(()=>fitPlanToLimits({title:'不正',shapes:[{...box,...changed}]},limits));
+ for(const changed of [{w:0},{x:'0.5'},{h:NaN},{materialId:'999'}]) assert.throws(()=>fitPlanToLimits({title:'不正',shapes:[{...box,...changed}]},limits));
  assert.throws(()=>fitPlanToLimits({title:'null',shapes:[null]},limits));
 });
 test('fit remains in bounds for thin pieces and extreme integer extents',()=>{
@@ -86,4 +86,11 @@ test('fit remains in bounds for thin pieces and extreme integer extents',()=>{
   assert.ok(fitted.plan.shapes.every(s=>s.w>=1 && s.h>=1 && s.d>=1));
   assert.equal(fitPlanToLimits(fitted.plan,limits).adjustment,null);
  }
+});
+
+test('fractional model coordinates snap to valid pillar units with an explicit adjustment',()=>{
+ const fitted=fitPlanToLimits({title:'小数',shapes:[{...box,x:0.5,y:0.5,w:2.5,h:0.25}]},limits);
+ assert.equal(fitted.adjustment.quantized,true);
+ validatePlan(fitted.plan,limits);
+ assert.ok(fitted.plan.shapes[0].h>=1);
 });

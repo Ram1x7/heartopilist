@@ -24,15 +24,16 @@ function validateLimits(limits) {
       || !Number.isInteger(limits.d) || limits.d < 4 || limits.d > 120) throw new Error('生成サイズが不正です');
 }
 
-function validateStructure(plan) {
+function validateStructure(plan, allowFractional = false) {
   if (!plan || typeof plan.title !== 'string' || plan.title.length > 80
       || !Array.isArray(plan.shapes) || plan.shapes.length < 1 || plan.shapes.length > 40) throw new Error('AIの設計形式が不正です');
   for (const s of plan.shapes) {
     if (!s || !['box','ellipsoid','cone'].includes(s.shape) || !['add','subtract'].includes(s.op)
         || !['005','006','007'].includes(s.materialId) || !/^#[0-9a-f]{6}$/i.test(s.hex)) throw new Error('AIの建材指定が不正です');
     for (const [pos,size] of [['x','w'],['y','h'],['z','d']]) {
-      if (!Number.isSafeInteger(s[pos]) || !Number.isSafeInteger(s[size]) || Math.abs(s[pos]) > 1000000
-          || s[size] < 1 || s[size] > 1000000) throw new Error('AIの座標またはサイズが不正です');
+      const numeric = allowFractional ? Number.isFinite : Number.isSafeInteger;
+      if (!numeric(s[pos]) || !numeric(s[size]) || Math.abs(s[pos]) > 1000000
+          || s[size] <= 0 || (!allowFractional && s[size] < 1) || s[size] > 1000000) throw new Error('AIの座標またはサイズが不正です');
     }
   }
 }
@@ -50,13 +51,14 @@ export function validatePlan(plan, limits) {
 
 export function fitPlanToLimits(plan, limits) {
   validateLimits(limits);
-  validateStructure(plan);
+  validateStructure(plan,true);
   const axes = [['x','w',limits.w],['y','h',limits.h],['z','d',limits.d]];
   const bounds = axes.map(([pos,size,max])=>({pos,size,max,
     min:Math.min(...plan.shapes.map(s=>s[pos])),
     end:Math.max(...plan.shapes.map(s=>s[pos]+s[size])),
   }));
-  if (bounds.every(b=>b.min >= 0 && b.end <= b.max)) return {plan,adjustment:null};
+  const quantized = plan.shapes.some(s=>axes.some(([pos,size])=>!Number.isInteger(s[pos]) || !Number.isInteger(s[size])));
+  if (!quantized && bounds.every(b=>b.min >= 0 && b.end <= b.max)) return {plan,adjustment:null};
   const scale = Math.min(1,...bounds.map(b=>b.max/(b.end-b.min)));
   const shapes = plan.shapes.map(s=>({...s}));
   for (const b of bounds) {
@@ -72,7 +74,7 @@ export function fitPlanToLimits(plan, limits) {
   }
   const fitted = {...plan,shapes};
   validatePlan(fitted,limits);
-  return {plan:fitted,adjustment:{scale}};
+  return {plan:fitted,adjustment:{scale,quantized}};
 }
 
 export function expandPlan(plan, limits, materials) {

@@ -42,7 +42,7 @@ test('owner-authenticated generation reserves quota and makes one bounded model 
     assert.equal(response.status,200); assert.deepEqual((await response.json()).plan,plan);
     assert.equal(apiCalls,1);assert.equal(reservations,1);
     // JSON mode is not a trust boundary: reject malformed, out-of-bounds and unknown-material output.
-    for (const changed of [{w:1.5},{materialId:'999'},{x:NaN}]) {
+    for (const changed of [{w:0},{materialId:'999'},{x:NaN}]) {
       modelPlan={...plan,shapes:[{...plan.shapes[0],...changed}]};
       const rejected=await worker.fetch(new Request('https://worker/generate',{method:'POST',headers:{Origin:env.ALLOWED_ORIGIN,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1','Authorization':'Bearer '+'t'.repeat(20)},body:JSON.stringify({prompt:'小さなお城',limits:{w:8,h:4,d:8}})}),env);
       assert.equal(rejected.status,502);

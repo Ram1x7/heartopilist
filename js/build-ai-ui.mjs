@@ -33,7 +33,7 @@ export async function initAIForm(onPlan) {
       const body = await response.json();
       if (!response.ok) throw new Error(body.error || '生成できませんでした');
       onPlan(body.plan, limits);
-      const fitted = body.adjustment ? (body.adjustment.scale < 1 ? '指定範囲に収まるよう全体を縮小しました。細部は支柱のマスに合わせて調整しています。' : '指定範囲に収まるよう位置を調整しました。') : '';
+      const fitted = body.adjustment ? (body.adjustment.scale < 1 ? '指定範囲に収まるよう全体を縮小しました。細部は支柱のマスに合わせて調整しています。' : body.adjustment.quantized ? '寸法と位置を支柱のマスに合わせて調整しました。' : '指定範囲に収まるよう位置を調整しました。') : '';
       status.textContent = '生成しました。' + fitted + '形を確認して編集・保存できます。推定した形は元の作品と一致しない場合があります。';
     } catch (error) {
       status.textContent = error.name === 'TimeoutError' ? '時間内に生成できませんでした。再試行も利用回数に数えられます。' : error.message;
