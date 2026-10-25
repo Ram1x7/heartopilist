@@ -739,10 +739,10 @@ body.dark .footer{ color:var(--dark-text-sub); }
     <h3 class="help-modal-title" style="text-align:center;" data-i18n="map_help_title">マップの使い方</h3>
 
     <p><strong data-i18n="map_help_move_title">移動・拡大縮小</strong><br>
-    <span data-i18n="map_help_move_body">ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。</span></p>
+    <span data-i18n="map_help_move_body">ドラッグでマップを動かせます。拡大・縮小は、2本指でのピンチ操作、マウスのホイール、右下の拡大・縮小ボタンのいずれかで行えます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_cat_title">カテゴリで絞り込み</strong><br>
-    <span data-i18n="map_help_cat_body">NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。</span></p>
+    <span data-i18n="map_help_cat_body">キャラクター（NPC）・ショップ・バス停・動物・イベントの表示・非表示を切り替えられます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_pin_title">ピンをタップ</strong><br>
     <span data-i18n="map_help_pin_body">ピンやエリアをタップすると、その名前が下に表示されます。</span></p>
@@ -811,8 +811,9 @@ function forceRepaint(){
 // ── 初回チュートリアル ──
 const MAP_TUTORIAL_DONE_KEY = "hatopiMap_tutorialDone";
 const MAP_TUTORIAL_STEPS = [
-  { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。" },
-  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。" },
+  { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを動かせます。拡大・縮小は、2本指でのピンチ操作、マウスのホイール、右下の拡大・縮小ボタンのいずれかで行えます。" },
+  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "キャラクター（NPC）・ショップ・バス停・動物・イベントの表示・非表示を切り替えられます。" },
+  { selector: "#mapPinsLayer", titleKey: "tutorial_map_step3_title", titleFallback: "③ ピンをタップ", textKey: "tutorial_map_step3_body", textFallback: "地図上のピンやエリアをタップすると、その名前が下に表示されます。" },
 ];
 document.getElementById("helpBtn").innerHTML = icon("help");
 function openHelpModal(){ document.getElementById("helpModal").style.display = "block"; }
