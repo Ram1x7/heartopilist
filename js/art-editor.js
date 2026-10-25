@@ -2404,12 +2404,12 @@ function importFromPastedCode(){
 }
 
 // 編集中に共有コードを読み込んだ場合：ライブの状態を直接置き換えて再描画する
-function applyImportedDesign(design){
+function applyImportedDesign(design, options = {}){
   gridWidth = design.width;
   gridHeight = design.height;
   pixels = design.pixelData.slice();
   blockStatus = {};
-  currentDesignId = null;
+  currentDesignId = options.designId || null;
   activeFrameId = design.frameId;
   activePartId = design.partId;
   window.HatopiArtProject.reset(design);
@@ -2425,7 +2425,21 @@ function applyImportedDesign(design){
   updateColorUsage();
   renderBlockList();
   renderLockUI();
-  saveDraft();
+  if(!options.skipDraft)saveDraft();
+}
+
+// Commit the complete draft before changing live editor state. Never reload into a stale pagehide save.
+function applyScreenshotToEditor(design){
+  const frame=DESIGN_FRAME_PRESETS.find(f=>f.id===design.frameId),part=frame?.parts.find(p=>p.id===design.partId);
+  if(!part || !window.HatopiArtProject.valid(design,part))return false;
+  const same=activeFrameId===design.frameId;
+  const parts=same?window.HatopiArtProject.snapshot():{};
+  parts[part.id]={width:part.width,height:part.height,pixelData:design.pixelData.slice(),blockStatus:{},locked:false};
+  const record={width:part.width,height:part.height,pixelData:design.pixelData.slice(),frameId:frame.id,partId:part.id,parts,blockStatus:{},designId:same?currentDesignId:null,locked:false};
+  try{localStorage.setItem(DRAFT_KEY,JSON.stringify(record));}catch(error){return false;}
+  clearTimeout(saveTimer);cancelPendingTouchPaint();
+  applyImportedDesign(record,{designId:record.designId,skipDraft:true});
+  return true;
 }
 
 // 起動時：URLの?d=を検知して読み込む（上書き確認付き）。initArtEditor()内、通常の下書き

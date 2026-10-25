@@ -268,7 +268,7 @@
     <h3 data-i18n="art_ssi_title">スクショから取り込む</h3>
 
     <div id="artSsiStepUpload">
-      <p class="art-step-hint" data-i18n="art_ssi_upload_hint">ゲーム内で衣装を表示した状態のスクリーンショットを選んでください</p>
+      <p class="art-step-hint" data-i18n="art_ssi_upload_hint">ゲーム内のデザイン編集画面で、型紙全体と補助線が見えるスクリーンショットを選んでください。衣装・家具・本に対応しています。</p>
       <div class="art-panel-btn-row">
         <label class="art-header-btn" for="artSsiFileInput" data-i18n="art_ssi_upload_btn">画像を選ぶ</label>
       </div>
@@ -281,7 +281,7 @@
         <span id="artSsiCandidatesBackIcon"></span>
         <span data-i18n="art_gridsize_back">戻る</span>
       </a>
-      <p class="art-step-hint" data-i18n="art_ssi_auto_detect_hint">スクショに写っている補助線を照合し、キャンバスと位置を自動判定しました（補助線がはっきり写っているほど精度が上がります）</p>
+      <p class="art-step-hint" data-i18n="art_ssi_auto_detect_hint">補助線から候補を探しました。型紙と切り取り位置を確認してください。一致の目安は正解率を表すものではありません。</p>
       <div id="artSsiCandidateAutoWrap">
         <p class="art-step-hint" data-i18n="art_ssi_candidate_hint">このキャンバスで合っていますか？</p>
         <div class="art-ssi-candidate-list" id="artSsiCandidateList"></div>
@@ -310,7 +310,10 @@
         <img id="artSsiAdjustImg" alt="" draggable="false">
         <canvas id="artSsiAdjustOverlay"></canvas>
       </div>
+      <label class="art-toggle-row"><span data-i18n="art_ssi_grid_label">マス目を表示</span><input type="checkbox" id="artSsiGridToggle" checked></label>
+      <p class="art-step-hint" id="artSsiAlignInfo" role="status"></p>
       <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSsiAutoAlignBtn" data-i18n="art_ssi_auto_align">マス位置を自動補正</button>
         <button class="art-header-btn" id="artSsiAdjustConfirmBtn" data-i18n="art_ssi_adjust_confirm">この範囲で次へ</button>
       </div>
     </div>
@@ -320,7 +323,7 @@
         <span id="artSsiSettingsBackIcon"></span>
         <span data-i18n="art_gridsize_back">戻る</span>
       </a>
-      <p class="art-step-hint" data-i18n="art_ssi_settings_hint">色数などを調整してから取り込めます</p>
+      <p class="art-step-hint" data-i18n="art_ssi_settings_hint">色数を制限せず、マスごとの色を復元します。減色やディザリングは必要な場合だけ使用してください。</p>
       <div class="art-ssi-preview-row">
         <div class="art-ssi-preview-col">
           <div class="art-ssi-preview-label" data-i18n="art_ssi_preview_original">元の範囲</div>
@@ -335,10 +338,15 @@
       <div class="art-gridsize-options" id="artSsiColorOptions"></div>
       <label class="art-toggle-row">
         <span data-i18n="art_ssi_dither_label">ディザリング</span>
-        <input type="checkbox" id="artSsiDitherToggle" checked>
+        <input type="checkbox" id="artSsiDitherToggle">
       </label>
       <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ssi_bg_label">背景の扱い</div>
       <div class="art-gridsize-options" id="artSsiBgOptions"></div>
+      <label class="art-toggle-row"><span data-i18n="art_ssi_guide_label">補助線の影響を抑える</span><input type="checkbox" id="artSsiGuideToggle" checked></label>
+      <p class="art-step-hint" data-i18n="art_ssi_guide_hint">補助線を避け、同じマス内の色を読み取ります。読み取れないマスは透明になります。細部が変わる場合はOFFにして比較してください。</p>
+      <label class="art-toggle-row"><span data-i18n="art_ssi_stability_label">圧縮による色のばらつきを抑える</span><input type="checkbox" id="artSsiColorStabilityToggle" checked></label>
+      <p class="art-step-hint" data-i18n="art_ssi_stability_hint">繰り返し使われる色を参考に、近い色を補正します。細かな色の違いが消える場合はOFFにしてください。</p>
+      <p class="art-step-hint" id="artSsiRecoveryInfo" role="status"></p>
       <div class="art-ssi-error" id="artSsiSettingsError"></div>
       <div class="art-panel-btn-row">
         <button class="art-header-btn" id="artSsiApplyBtn" data-i18n="art_ssi_apply_btn">この内容で取り込む</button>
@@ -626,15 +634,16 @@ function T(key, fallback, vars){
 <script src="js/art-config.js"></script>
 <script src="js/art-masks.js"></script>
 <script src="js/art-pixelate.js"></script>
+<script src="js/art-screenshot-recovery.js?v=1"></script>
 <script src="js/art-template-match.js"></script>
 <script src="js/lz-string.min.js"></script>
 <script src="js/qrcode.js"></script>
 <script src="js/art-share-code.js?v=2"></script>
 <script src="js/art-project.js?v=1"></script>
 <script src="js/art-3d-adapter.js?v=7"></script>
-<script src="js/art-editor.js?v=2"></script>
+<script src="js/art-editor.js?v=3"></script>
 <script src="js/art-paint-guide.js"></script>
-<script src="js/art-screenshot-import.js"></script>
+<script src="js/art-screenshot-import.js?v=2"></script>
 <script>
 </script>
 <script src="js/sw-register.js"></script>
