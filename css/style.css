@@ -1746,6 +1746,30 @@ body.dark .update-popup-box h3{
   white-space:pre-line;
 }
 
+/* 使い方モーダル系の段落間の余白を詰める（ブラウザ既定の段落マージンに
+   他の要素のマージンと混ざって想定より大きな空白になっていたのを解消） */
+.help-modal-box p,
+.art-help-box p,
+.music-help-box p,
+#helpModal .modal-box p,
+#modalBox p{
+  margin:0 0 14px;
+}
+
+.help-modal-box p:last-child,
+.art-help-box p:last-child,
+.music-help-box p:last-child,
+#helpModal .modal-box p:last-child,
+#modalBox p:last-child{
+  margin-bottom:0;
+}
+
+.help-modal-box h3,
+.art-help-box h3,
+.music-help-box h3{
+  margin:0 0 16px;
+}
+
 /* ダークモード */
 body.dark .help-modal-box{
   background:var(--dark-card);
