@@ -40,6 +40,14 @@ const HatopiScreenshotRecovery = (() => {
   function refineGuide(field,paths,rect,width,height){
     const points=pathPoints(paths),initial=fitScore(field,points,rect,width,height);let best={...rect},score=initial;
     const pitch=(rect.w/width+rect.h/height)/2;
+    // Joint scale/translation seeds avoid getting trapped on a neighboring grid
+    // line when coordinate descent changes one parameter at a time.
+    for(let si=-4;si<=4;si++)for(let dx=-2;dx<=2;dx++)for(let dy=-2;dy<=2;dy++){
+      const w=rect.w*(1+si*.01),h=rect.h*(1+si*.01);
+      const next={x:rect.x+(rect.w-w)/2+dx*pitch*.5,y:rect.y+(rect.h-h)/2+dy*pitch*.5,w,h};
+      const value=fitScore(field,points,next,width,height);
+      if(value>score){best=next;score=value;}
+    }
     for(const step of [Math.min(5,pitch),1,.25])for(let iter=0;iter<12;iter++){
       let improved=false;
       for(const [dx,dy,ds] of [[step,0,0],[-step,0,0],[0,step,0],[0,-step,0],[0,0,step/Math.max(width,height)],[0,0,-step/Math.max(width,height)]]){

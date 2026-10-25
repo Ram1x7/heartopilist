@@ -41,6 +41,16 @@ stored as zlib-compressed RGBA. Its 432 cells recover as 412/432 (95.37%) with c
 stabilization disabled and 432/432 with stabilization enabled. These measurements
 use the known rectangle; they do not measure end-to-end auto-detection accuracy.
 
+`fixtures/generated-outline-jpeg.json` is a separate generated T-shirt outline
+encoded at JPEG quality 88 with 4:2:0 subsampling. It verifies combined edge/ridge
+seeds, preset ranking, and full-resolution alignment after a browser test exposed
+a grid-line local minimum in single-parameter refinement. This deliberately dense
+4.2-pixel-per-cell image aligns geometrically but only 1125/3138 active cells
+(35.85%) retain the exact source palette color; even the known rectangle recovers
+only 1201/3138 (38.27%). Almost all active cells are flagged as mixed colors.
+JPEG chroma loss at this size is not solved by correct outline matching. Prefer
+a larger, original PNG and review the color preview before applying.
+
 These inputs are **not actual game screenshots**. Real-game accuracy, heavily
 occluded outlines, camera perspective, and device-specific image decoding remain
 unmeasured. Passing fixtures does not guarantee identical colors for every upload.
