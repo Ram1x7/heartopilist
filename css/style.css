@@ -646,6 +646,29 @@ body.dark #clearBtn{
   min-width:60px;
 }
 
+/* 売却額順のサブ選択（高い順/安い順・★1〜5） */
+.price-sort-sub{
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+
+.price-sort-sub button{
+  padding:6px 10px;
+  font-size:11px;
+  flex:0 0 auto;
+}
+
+.price-sort-sep{
+  width:1px;
+  align-self:stretch;
+  background:var(--border);
+  margin:2px 2px;
+}
+
+body.dark .price-sort-sep{
+  background:var(--dark-border);
+}
+
 /* 作り方セクション（砂像など） */
 .modal-make-steps{
   display:none;

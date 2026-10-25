@@ -50,7 +50,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=37">
+<link rel="stylesheet" href="css/style.css?v=38">
 <link rel="stylesheet" href="css/design-system.css?v=5">
 
 <link rel="prefetch" href="./foods.html">
@@ -254,11 +254,22 @@
 
       <div class="filter-group">
         <div class="filter-group-label" data-i18n="group_sort">並び替え</div>
-        <div class="filter filter-4">
+        <div class="filter filter-4 filter-wrap">
           <button onclick="setSort('book')" id="s_book"><span class="btn-icon" data-icon="sortBook"></span><span data-i18n="sort_book">図鑑順</span></button>
           <button onclick="setSort('level')" id="s_level"><span class="btn-icon" data-icon="sortLevel"></span><span data-i18n="sort_level">レベル順</span></button>
           <button onclick="setSort('unchecked')" id="s_unchecked"><span class="btn-icon" data-icon="sortStar"></span><span data-i18n="sort_unchecked">未コンプ順</span></button>
           <button onclick="setSort('unauth')" id="s_unauth"><span class="btn-icon" data-icon="sortMedal"></span><span data-i18n="sort_unauth">未認証順</span></button>
+          <button onclick="setSort('price')" id="s_price"><span class="btn-icon" data-icon="coin"></span><span data-i18n="sort_price">売却額順</span></button>
+        </div>
+        <div class="filter price-sort-sub" id="priceSortRow" style="display:none;">
+          <button onclick="setPriceSortOrder('desc')" id="po_desc" data-i18n="price_sort_high">高い順</button>
+          <button onclick="setPriceSortOrder('asc')" id="po_asc" data-i18n="price_sort_low">安い順</button>
+          <span class="price-sort-sep"></span>
+          <button onclick="setPriceSortStar(1)" id="ps_1">★1</button>
+          <button onclick="setPriceSortStar(2)" id="ps_2">★2</button>
+          <button onclick="setPriceSortStar(3)" id="ps_3">★3</button>
+          <button onclick="setPriceSortStar(4)" id="ps_4">★4</button>
+          <button onclick="setPriceSortStar(5)" id="ps_5">★5</button>
         </div>
       </div>
 
@@ -468,7 +479,7 @@ text-align:left;
 ・今は出現しない</span></p>
 
 <p><strong><span class="help-icon" data-icon="sortBook"></span><span data-i18n="help_sort_title">並び替え</span></strong><br>
-<span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。</span></p>
+<span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。</span></p>
 
 <p><strong><span class="help-icon" data-icon="globe"></span><span data-i18n="help_server_title">サーバー・表示時間</span></strong><br>
 <span data-i18n="help_server_body">上部のサーバー選択で表示時刻を切り替えられます。出現判定自体は常に日本時間（JST）基準で、表示のみ選んだサーバーの時間帯に変換されます。</span></p>

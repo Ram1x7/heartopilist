@@ -178,6 +178,8 @@
   "garden_help_title": "使い方",
   "garden_help_tabs_title": "作物・花の切替",
   "garden_help_tabs_body": "画面上部の「作物」「花」タブで表示を切り替えられます。成長時間・種の値段・売却額の一覧を確認できます。",
+  "garden_help_sort_title": "並び替え",
+  "garden_help_sort_body": "図鑑順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。",
   "garden_help_detail_title": "詳しい情報を見る",
   "garden_help_detail_body": "カードをタップすると、レア度（☆1〜☆5）ごとの売却額を確認できます。花の場合は交配で作れる色の一覧も表示されます。",
   "garden_help_check_title": "コンプリート・認証マスターチェック",
@@ -236,7 +238,7 @@
   "help_mode_title": "出現モード",
   "help_mode_body": "・今出現するもの全て\n・今の天気でしか出現しない\n・今は出現しない",
   "help_sort_title": "並び替え",
-  "help_sort_body": "図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。",
+  "help_sort_body": "図鑑順・レベル順・未コンプ順・未認証順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。",
   "help_server_title": "サーバー・表示時間",
   "help_server_body": "上部のサーバー選択で表示時刻を切り替えられます。出現判定自体は常に日本時間（JST）基準で、表示のみ選んだサーバーの時間帯に変換されます。",
   "help_spot_title": "今日の場所",
@@ -1305,5 +1307,8 @@
   "forecast_day_label": "{y}年{m}月{d}日（{wk}）",
   "forecast_prev_month": "前の月",
   "forecast_next_month": "次の月",
-  "forecast_no_data_month": "この月に表示できる日付はありません"
+  "forecast_no_data_month": "この月に表示できる日付はありません",
+  "sort_price": "売却額順",
+  "price_sort_high": "高い順",
+  "price_sort_low": "安い順"
 }

@@ -27,7 +27,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=37">
+<link rel="stylesheet" href="./css/style.css?v=38">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
@@ -560,6 +560,21 @@ body.dark .garden-footer{
   <button class="ds-tab ds-tab-grow" id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
 </div>
 
+<div class="filter filter-wrap" id="sortRow">
+  <button class="ds-tab ds-tab-grow active" id="s_book" onclick="setSort('book')" data-i18n="sort_book">図鑑順</button>
+  <button class="ds-tab ds-tab-grow" id="s_price" onclick="setSort('price')" data-i18n="sort_price">売却額順</button>
+</div>
+<div class="filter price-sort-sub" id="priceSortRow" style="display:none;">
+  <button onclick="setPriceSortOrder('desc')" id="po_desc" data-i18n="price_sort_high">高い順</button>
+  <button onclick="setPriceSortOrder('asc')" id="po_asc" data-i18n="price_sort_low">安い順</button>
+  <span class="price-sort-sep"></span>
+  <button onclick="setPriceSortStar(1)" id="ps_1">★1</button>
+  <button onclick="setPriceSortStar(2)" id="ps_2">★2</button>
+  <button onclick="setPriceSortStar(3)" id="ps_3">★3</button>
+  <button onclick="setPriceSortStar(4)" id="ps_4">★4</button>
+  <button onclick="setPriceSortStar(5)" id="ps_5">★5</button>
+</div>
+
 <div id="gardenContent"></div>
 
 <div class="garden-footer" data-i18n="garden_footer">※本サイトは非公式のファンツールです</div>  
@@ -1001,6 +1016,59 @@ function setTab(tab){
   renderContent();
 }
 
+// ── 並び替え ──
+let currentSort = "book";
+let priceSortStar = Math.min(5, Math.max(1, parseInt(localStorage.getItem("priceSortStar"), 10) || 1));
+let priceSortOrder = localStorage.getItem("priceSortOrder") === "asc" ? "asc" : "desc";
+
+function setSort(type){
+  currentSort = type;
+  ["book","price"].forEach(x=>{
+    document.getElementById("s_"+x).classList.toggle("active", x === type);
+  });
+  const priceSortRow = document.getElementById("priceSortRow");
+  if(priceSortRow) priceSortRow.style.display = type === "price" ? "" : "none";
+  renderContent();
+}
+
+// 売却額順のサブ選択（高い順/安い順）
+function setPriceSortOrder(order){
+  priceSortOrder = order;
+  localStorage.setItem("priceSortOrder", order);
+  ["desc","asc"].forEach(x=>{
+    document.getElementById("po_"+x).classList.toggle("active", x === order);
+  });
+  renderContent();
+}
+
+// 売却額順のサブ選択（★1〜5）
+function setPriceSortStar(star){
+  priceSortStar = star;
+  localStorage.setItem("priceSortStar", star);
+  [1,2,3,4,5].forEach(n=>{
+    document.getElementById("ps_"+n).classList.toggle("active", n === star);
+  });
+  renderContent();
+}
+
+// 指定した★（1〜5）での売価を返す（存在しない場合はnull）
+function priceAtStar(item, star){
+  if(!item.prices) return null;
+  const prices5 = derivePrices(item.prices[0], currentTab === "crop" ? "crop" : "flower");
+  return prices5[star - 1] ?? null;
+}
+
+function sortByPrice(list){
+  return list.slice().sort((a,b) => {
+    const pa = priceAtStar(a, priceSortStar);
+    const pb = priceAtStar(b, priceSortStar);
+    if(pa == null && pb == null) return 0;
+    if(pa == null) return 1;
+    if(pb == null) return -1;
+    return priceSortOrder === "asc" ? pa - pb : pb - pa;
+  });
+}
+
 // ── グリッド描画 ──
 // ★ season / fes に対応
 function renderContent(){
@@ -1009,7 +1077,8 @@ function renderContent(){
 
   const data  = currentTab === "crop" ? cropData : flowerData;
 
-  const normalList       = data.filter(d => !d.season && !d.fes);
+  let normalList = data.filter(d => !d.season && !d.fes);
+  if(currentSort === "price") normalList = sortByPrice(normalList);
   const seasonActiveList = data.filter(d => d.season && !d.ended);
   const seasonEndedList  = data.filter(d => d.season && d.ended);
   const fesActiveList    = data.filter(d => d.fes && !d.ended);
@@ -1340,6 +1409,9 @@ document.getElementById("helpBtn").onclick = () => {
       <p><strong>${icon("crop",{size:13})} ${T("garden_help_tabs_title","作物・花の切替")}</strong><br>
       ${T("garden_help_tabs_body","画面上部の「作物」「花」タブで表示を切り替えられます。成長時間・種の値段・売却額の一覧を確認できます。")}</p>
 
+      <p><strong>${icon("coin",{size:13})} ${T("garden_help_sort_title","並び替え")}</strong><br>
+      ${T("garden_help_sort_body","図鑑順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。")}</p>
+
       <p><strong>${icon("info",{size:13})} ${T("garden_help_detail_title","詳しい情報を見る")}</strong><br>
       ${T("garden_help_detail_body","カードをタップすると、レア度（☆1〜☆5）ごとの売却額を確認できます。花の場合は交配で作れる色の一覧も表示されます。")}</p>
 
@@ -1372,6 +1444,8 @@ const GARDEN_TUTORIAL_STEPS = [
 ];
 
 // 初期化
+document.getElementById("po_"+priceSortOrder).classList.add("active");
+document.getElementById("ps_"+priceSortStar).classList.add("active");
 cleanExpiredTimers();
 renderContent();
 maybeStartPageTutorial(GARDEN_TUTORIAL_DONE_KEY, GARDEN_TUTORIAL_STEPS);

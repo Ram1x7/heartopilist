@@ -79,7 +79,7 @@
   "help_mode_title": "출현 모드",
   "help_mode_body": "· 현재 출현 중인 전체\n· 현재 날씨에서만 출현\n· 현재 출현하지 않음",
   "help_sort_title": "정렬",
-  "help_sort_body": "도감 순서・레벨 순서・미완성 우선・미인증 우선으로 정렬할 수 있습니다.",
+  "help_sort_body": "도감 순서・레벨 순서・미완성 우선・미인증 우선・판매가 순으로 정렬할 수 있습니다. 판매가 순을 선택하면 높은 순/낮은 순과 ★1〜5 기준을 선택할 수 있습니다.",
   "help_server_title": "서버・표시 시간",
   "help_server_body": "상단의 서버 선택으로 표시 시각을 전환할 수 있습니다. 출현 판정 자체는 항상 일본 시간(JST) 기준이며, 표시만 선택한 서버의 시간대로 변환됩니다.",
   "help_spot_title": "오늘의 장소",
@@ -172,6 +172,8 @@
   "garden_help_title": "이용 방법",
   "garden_help_tabs_title": "작물・꽃 전환",
   "garden_help_tabs_body": "화면 상단의 \"작물\", \"꽃\" 탭으로 화면을 전환할 수 있습니다. 성장 시간, 씨앗 가격, 판매 가격을 한눈에 확인할 수 있습니다.",
+  "garden_help_sort_title": "정렬",
+  "garden_help_sort_body": "도감 순서・판매가 순으로 정렬할 수 있습니다. 판매가 순을 선택하면 높은 순/낮은 순과 ★1〜5 기준을 선택할 수 있습니다.",
   "garden_help_detail_title": "자세한 정보 보기",
   "garden_help_detail_body": "카드를 탭하면 등급(☆1~☆5)별 판매 가격을 확인할 수 있습니다. 꽃의 경우 교배로 만들 수 있는 색상 목록도 표시됩니다.",
   "garden_help_check_title": "컴플리트・인증 마스터 체크",
@@ -1184,5 +1186,8 @@
   "pc_toggle_date": "작성일 표시",
   "pc_section_save": "저장・공유",
   "pc_save_hint": "입력 내용은 이 기기에 자동 저장됩니다. 미리보기 위쪽 버튼에서 PNG 저장・SNS 공유를 할 수 있습니다.",
-  "pc_reset_all": "입력 내용 초기화"
+  "pc_reset_all": "입력 내용 초기화",
+  "sort_price": "판매가 순",
+  "price_sort_high": "높은 순",
+  "price_sort_low": "낮은 순"
 }

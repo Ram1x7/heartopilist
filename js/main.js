@@ -16,6 +16,8 @@ if(!SERVERS[currentServer]) currentServer = "asia";
 
 let currentFilter="all";
 let currentSort = "book";
+let priceSortStar = Math.min(5, Math.max(1, parseInt(localStorage.getItem("priceSortStar"), 10) || 1));
+let priceSortOrder = localStorage.getItem("priceSortOrder") === "asc" ? "asc" : "desc";
 let limitedOnly = false;
 let weatherMode = "current";
 // "current" = 今の天気で出るやつ全部
@@ -520,6 +522,23 @@ function sortList(arr){
     });
   }
 
+  if(currentSort === "price"){
+    out = out
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => {
+        const pa = priceAtStar(a.c, priceSortStar);
+        const pb = priceAtStar(b.c, priceSortStar);
+
+        // 価格が無いものは常に後ろへ
+        if(pa == null && pb == null) return a.i - b.i;
+        if(pa == null) return 1;
+        if(pb == null) return -1;
+
+        return priceSortOrder === "asc" ? pa - pb : pb - pa;
+      })
+      .map(x => x.c);
+  }
+
   if(currentSort === "unauth"){
     out = out
       .map((c, i) => ({ c, i }))
@@ -621,6 +640,7 @@ const SORT_LABEL_FALLBACKS = {
   level: "レベル順",
   unchecked: "未コンプ順",
   unauth: "未認証順",
+  price: "売却額順",
 };
 // 絞り込みチップ・結果件数・現在の並び替えを表示する（絞り込みパネルを閉じていても常に見える）
 function renderFilterSummary(activeChips, resultCount){
@@ -1075,10 +1095,32 @@ function setFilter(t){
 function setSort(type){
   currentSort = type;
   localStorage.setItem("currentSort", type);
-  ["book","level","unchecked","unauth"].forEach(x=>{
+  ["book","level","unchecked","unauth","price"].forEach(x=>{
     document.getElementById("s_"+x).classList.remove("active");
   });
   document.getElementById("s_"+type).classList.add("active");
+  const priceSortRow = document.getElementById("priceSortRow");
+  if(priceSortRow) priceSortRow.style.display = type === "price" ? "" : "none";
+  render();
+}
+
+// 売却額順のサブ選択（高い順/安い順）
+function setPriceSortOrder(order){
+  priceSortOrder = order;
+  localStorage.setItem("priceSortOrder", order);
+  ["desc","asc"].forEach(x=>{
+    document.getElementById("po_"+x).classList.toggle("active", x === order);
+  });
+  render();
+}
+
+// 売却額順のサブ選択（★1〜5）
+function setPriceSortStar(star){
+  priceSortStar = star;
+  localStorage.setItem("priceSortStar", star);
+  [1,2,3,4,5].forEach(n=>{
+    document.getElementById("ps_"+n).classList.toggle("active", n === star);
+  });
   render();
 }
 
@@ -1156,6 +1198,35 @@ function forceRepaint(){
 // マップ機能（map.html）を一般公開
 const MAP_FEATURE_PUBLIC = true;
 
+// 野鳥だけ特殊計算
+function birdStar2(base){
+  const value = base * 4;
+  // 小さい値はそのまま
+  if(value <= 16){
+    return value;
+  }
+  // 10単位切り上げ
+  return Math.ceil(value / 10) * 10;
+}
+
+function calcStars(base, isBird){
+  if(!base) return [null,null,null,null,null];
+  if(isBird){
+    const star2 = birdStar2(base);
+    return [base, star2, star2 * 2, star2 * 4, star2 * 8];
+  }
+  return [base, Math.floor(base * 1.5), Math.floor(base * 2), Math.floor(base * 4), Math.floor(base * 8)];
+}
+
+// 売却額順ソート用：指定した★（1〜5）での売価を返す（存在しない場合はnull）
+function priceAtStar(c, star){
+  if(c.star1Only === true && star > 1) return null;
+  const basePrice = c.price ?? 0;
+  const isBird = c.type === "bird";
+  const prices = Array.isArray(c.prices) ? c.prices : calcStars(basePrice, isBird);
+  return prices[star - 1] ?? null;
+}
+
 // モーダル
 function openModal(c){
  modal.style.display="block";
@@ -1188,26 +1259,6 @@ function openModal(c){
  // 売価セルの表示（コイン/フェスコインどちらも文字は出さずアイコン＋数字のみ）
  function fmtCell(value, currencyType){
    return value != null ? `${currencyIcon(currencyType)}${value.toLocaleString()}` : "-";
- }
-
- // 野鳥だけ特殊計算
- function birdStar2(base){
-   const value = base * 4;
-   // 小さい値はそのまま
-   if(value <= 16){
-     return value;
-   }
-   // 10単位切り上げ
-   return Math.ceil(value / 10) * 10;
- }
-
- function calcStars(base, isBird){
-   if(!base) return [null,null,null,null,null];
-   if(isBird){
-     const star2 = birdStar2(base);
-     return [base, star2, star2 * 2, star2 * 4, star2 * 8];
-   }
-   return [base, Math.floor(base * 1.5), Math.floor(base * 2), Math.floor(base * 4), Math.floor(base * 8)];
  }
 
  const isBird = c.type === "bird";
@@ -1711,6 +1762,8 @@ setFilter(
 setSort(
   localStorage.getItem("currentSort") || "book"
 );
+setPriceSortOrder(priceSortOrder);
+setPriceSortStar(priceSortStar);
 setWeatherMode(
   localStorage.getItem("weatherMode") || "current"
 );
