@@ -423,61 +423,65 @@
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-help-box">
-    <h3 class="help-modal-title" style="text-align:center;">使い方</h3>
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="art_create_help_title">使い方</h3>
 
     <ul class="art-help-quickstart">
-      <li><strong>タップ</strong>：マスを塗る（ペン/消しゴム/バケツ選択中）</li>
-      <li><strong>ドラッグ</strong>：連続して塗る</li>
-      <li><strong>ピンチ</strong>：拡大・縮小</li>
-      <li><strong>長押し</strong>：そのマスの色・座標を確認</li>
-      <li><strong>Undo/Redo</strong>：直前の操作を取り消す/やり直す</li>
+      <li><strong data-i18n="art_create_quick_tap_title">タップ</strong>：<span data-i18n="art_create_quick_tap_body">マスを塗る（ペン・消しゴム・バケツ選択中）</span></li>
+      <li><strong data-i18n="art_create_quick_drag_title">ドラッグ</strong>：<span data-i18n="art_create_quick_drag_body">連続して塗る</span></li>
+      <li><strong data-i18n="art_create_quick_pinch_title">ピンチ</strong>：<span data-i18n="art_create_quick_pinch_body">拡大・縮小</span></li>
+      <li><strong data-i18n="art_create_quick_hold_title">長押し</strong>：<span data-i18n="art_create_quick_hold_body">そのマスの色・座標を確認</span></li>
+      <li><strong data-i18n="art_create_quick_undo_title">元に戻す・やり直す</strong>：<span data-i18n="art_create_quick_undo_body">直前の操作を取り消す・再実行する</span></li>
     </ul>
 
     <details class="art-help-details">
     <summary data-i18n="art_help_details_summary">すべての機能を見る</summary>
 
-    <p><strong>ぬり方ガイド（おすすめ）</strong><br>
-    「効率のいい順番を見る」を押すと、「10×10ブロック表示」と同じ番号のブロックを1つずつ順番にめぐりながら、そのブロックの中で色ごとに手順をまとめて案内します。画面は常にその時案内しているブロックへ自動でズームするので、全体図の中の遠い場所を探す必要はありません（右上のボタンでいつでも全体表示にも切り替えられます）。ゲーム内のバケツ（塗りつぶし）ツールは隙間なく囲まれた範囲を全部塗るため、斜めも含めた周囲8マスのどこかに違う色・未着色・キャンバスの外があるマスは先に塗って壁を作らないと、その隙間から意図した範囲を越えて塗り広がってしまいます（キャンバスの一番外側も特別扱いせず、同じように壁が必要な場所として扱います）。そのため、境目のマスは丸印で個別にタップする場所として、周囲8マス全てが同じ色のマスで埋まっている「内側のマス」は境目を塗ったあとバケツでまとめて塗れる場所として示します。画面上部には残り時間の目安が表示され、実際に進めるペースに合わせて自動で更新されます。ブロックを塗り終えるたびに軽い通知（振動含む）でお知らせし、最後まで塗り終えると、かかった時間と塗ったマス数のまとめ画面が表示され、そのままPNGでの保存や共有コードの発行に進めます。</p>
+    <p><strong data-i18n="art_create_help_guide_title">ぬり方ガイド（おすすめ）</strong><br>
+    <span data-i18n="art_create_help_guide_body">「効率のいい順番を見る」を押すと、「10×10ブロック表示」と同じ番号のブロックを1つずつ順番にめぐり、ブロックごとに色別の塗り方を案内します。<br>
+    画面は案内中のブロックへ自動でズームするので、全体図の中から探す必要はありません（右上のボタンでいつでも全体表示に戻せます）。<br>
+    ゲーム内のバケツ（塗りつぶし）ツールは、隙間なく囲まれた範囲をまとめて塗る仕組みです。そのため、周囲8マス（斜めを含む）のどこかに違う色・未着色・キャンバスの外があるマスを先に塗って「壁」を作っておかないと、バケツで塗った色がその隙間から意図した範囲の外まで広がってしまいます（キャンバスの一番外側も同じように壁が必要です）。<br>
+    このガイドでは、そうした境目のマスを丸印で示し、1マスずつ個別にタップする場所として案内します。周囲8マスが全て同じ色で埋まっている「内側のマス」は、境目を塗り終えたあとバケツでまとめて塗れる場所として示します。<br>
+    画面上部には残り時間の目安が表示され、実際に進めるペースに合わせて自動で更新されます。ブロックを塗り終えるたびに軽い通知（振動を含む）でお知らせし、最後まで塗り終えると、かかった時間と塗ったマス数をまとめた画面が表示されます。そのままPNGでの保存や共有コードの発行に進むこともできます。</span></p>
 
-    <p style="margin-top:10px;"><strong>編集する・固定する</strong><br>
-    「編集する」をONにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をONにすると、編集モードに関わらず一切の描画を受け付けなくなり、「編集する」ボタンもグレーアウトして押せなくなります。固定を解除すればまた編集できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_edit_title">編集する・固定する</strong><br>
+    <span data-i18n="art_create_help_edit_body">「編集する」をオンにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をオンにすると、編集モードに関わらず一切の描画を受け付けなくなり、「編集する」ボタンもグレーアウトして押せなくなります。固定を解除すればまた編集できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>ツール</strong><br>
-    ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）が使えます。ペン・消しゴムは「太さ」欄で1〜4マスの太さに変更できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_tools_title">ツール</strong><br>
+    <span data-i18n="art_create_help_tools_body">ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）が使えます。ペン・消しゴムは「太さ」欄で1〜4マスの太さに変更できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>カラー</strong><br>
-    ゲーム内で実際に選べる色と完全に一致したパレットから選びます。メインカラーをタップすると、さらに詳しいサブカラーが表示されます。現在選んでいる色は、パレット上に枠付きでマークされます。直近に選んだ色は「最近使った色」にも並ぶので、切り替えたい時はそこからワンタップで選べます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_color_title">カラー</strong><br>
+    <span data-i18n="art_create_help_color_body">ゲーム内で実際に選べる色と完全に一致したパレットから選びます。メインカラーをタップすると、さらに詳しいサブカラーが表示されます。現在選んでいる色は、パレット上に枠付きでマークされます。直近に選んだ色は「最近使った色」にも並ぶので、切り替えたい時はそこからワンタップで選べます。</span></p>
 
-    <p style="margin-top:10px;"><strong>使用色</strong><br>
-    今のキャンバスで使われている色の一覧です。行をタップするとその色のマスがキャンバス上でハイライトされます。色の四角い部分だけをタップすると、ハイライトではなくその色をすぐに選択できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_usedcolor_title">使用色</strong><br>
+    <span data-i18n="art_create_help_usedcolor_body">今のキャンバスで使われている色の一覧です。行をタップするとその色のマスがキャンバス上でハイライトされます。色の四角い部分だけをタップすると、ハイライトではなくその色をすぐに選択できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>マスを調べる</strong><br>
-    キャンバス上のマスをタップすると、そのマスがハイライト表示され、左上に座標と使用色（色番号）が表示されます。編集モードがOFFでも確認だけならいつでもできます。編集モードONのままでも、マスを動かさずに長押しすると、塗らずにそのマスだけ確認できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_inspect_title">マスを調べる</strong><br>
+    <span data-i18n="art_create_help_inspect_body">キャンバス上のマスをタップすると、そのマスがハイライト表示され、左上に座標と使用色（色番号）が表示されます。編集モードがオフでも確認だけならいつでもできます。編集モードがオンのままでも、マスを動かさずに長押しすると、塗らずにそのマスだけ確認できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>拡大率</strong><br>
-    スライダーで自由に拡大・縮小できます。タッチ操作の場合は2本指のピンチでも拡大縮小できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_zoom_title">拡大率</strong><br>
+    <span data-i18n="art_create_help_zoom_body">スライダーで自由に拡大・縮小できます。タッチ操作の場合は2本指でつまむ操作でも拡大縮小できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>デザイン枠の輪郭線</strong><br>
-    デザイン枠（衣装・家具など）で作成すると、実際に使われる部分を示す輪郭線が表示されます。輪郭線の外側もゲーム内の仕様どおり塗ることができます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_outline_title">デザイン枠の輪郭線</strong><br>
+    <span data-i18n="art_create_help_outline_body">デザイン枠（衣装・家具など）で作成すると、実際に使われる部分を示す輪郭線が表示されます。輪郭線の外側もゲーム内の仕様どおり塗ることができます。</span></p>
 
-    <p style="margin-top:10px;"><strong>マイデザイン</strong><br>
-    「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。一覧では未着手・作業中・完了で絞り込め、進捗（%）も表示されます。作業中のデザインは常に一覧の上に固定されるので、続きから再開しやすくなっています。「新規作成」から別サイズのキャンバスも作成できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_mydesign_title">マイデザイン</strong><br>
+    <span data-i18n="art_create_help_mydesign_body">「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。一覧では未着手・作業中・完了で絞り込め、進捗（%）も表示されます。作業中のデザインは常に一覧の上に固定されるので、続きから再開しやすくなっています。「新規作成」から別サイズのキャンバスも作成できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>オフライン・データの保存について</strong><br>
-    「アート」機能はアカウント登録・ログインが一切不要です。作成したデザインはサーバーには送信されず、この端末のブラウザ内だけに保存されます。一度開いたページはオフラインでも引き続き使えるので、電波の弱い場所でも安心して作業を続けられます。ただし、ブラウザのデータを消去したり機種変更をしたりすると、保存したデザインも一緒に失われてしまいます。大事なデザインは「共有コード」を使ってバックアップしておくことをおすすめします。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_offline_title">オフライン・データの保存について</strong><br>
+    <span data-i18n="art_create_help_offline_body">「アート」機能はアカウント登録・ログインが一切不要です。作成したデザインはサーバーには送信されず、この端末のブラウザ内だけに保存されます。一度開いたページはオフラインでも引き続き使えるので、電波の弱い場所でも安心して作業を続けられます。ただし、ブラウザのデータを消去したり機種変更をしたりすると、保存したデザインも一緒に失われてしまいます。大事なデザインは「共有コード」を使ってバックアップしておくことをおすすめします。</span></p>
 
-    <p style="margin-top:10px;"><strong>エクスポート・共有</strong><br>
-    完成したデザインをPNG画像として保存したり、共有したりできます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_export_title">エクスポート・共有</strong><br>
+    <span data-i18n="art_create_help_export_body">完成したデザインをPNG画像として保存したり、共有したりできます。</span></p>
 
-    <p style="margin-top:10px;"><strong>共有コード</strong><br>
-    アカウント登録なしで、デザインを短い文字列（コード）やURL、QRコードとしてやり取りできます。「コードを発行する」で作った文字列は、Discordやメモアプリなどにそのまま貼り付けられます。「コードを読み込む」から貼り付ければ、いつでも同じデザインを復元できます。機種変更前のバックアップとしてもお使いください（この機能はサーバーに一切データを送信せず、ブラウザの中だけで完結します）。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_sharecode_title">共有コード</strong><br>
+    <span data-i18n="art_create_help_sharecode_body">アカウント登録なしで、デザインを短い文字列（コード）やURL、QRコードとしてやり取りできます。「コードを発行する」で作った文字列は、Discordやメモアプリなどにそのまま貼り付けられます。「コードを読み込む」から貼り付ければ、いつでも同じデザインを復元できます。機種変更前のバックアップとしてもお使いください（この機能はサーバーに一切データを送信せず、ブラウザの中だけで完結します）。</span></p>
 
-    <p style="margin-top:10px;"><strong>10×10ブロック表示</strong><br>
-    10×10マスごとの区切り線は、このOFF/ONに関わらず常に薄く表示されます。ONにすると各ブロックに色分けと番号が付き、タップすると未着手・作業中・完了の3段階で進捗を記録できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_block_title">10×10ブロック表示</strong><br>
+    <span data-i18n="art_create_help_block_body">10×10マスごとの区切り線は、オン・オフに関わらず常に薄く表示されます。オンにすると各ブロックに色分けと番号が付き、タップすると未着手・作業中・完了の3段階で進捗を記録できます。</span></p>
 
     </details>
 
-    <button class="modal-close-btn" onclick="replayTutorial()" style="margin-top:14px;">チュートリアルをもう一度見る</button>
+    <button class="modal-close-btn" onclick="replayTutorial()" style="margin-top:14px;" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
   </div>
 </div>
@@ -488,7 +492,7 @@
   <div class="art-tutorial-step" id="artTutorialStepLabel"></div>
   <div class="art-tutorial-text" id="artTutorialText"></div>
   <div class="art-tutorial-actions">
-    <button class="art-tutorial-skip" id="artTutorialSkipBtn">スキップ</button>
+    <button class="art-tutorial-skip" id="artTutorialSkipBtn" data-i18n="tutorial_skip">スキップ</button>
     <button class="art-tutorial-next" id="artTutorialNextBtn">次へ</button>
   </div>
 </div>
