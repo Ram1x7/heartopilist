@@ -146,7 +146,7 @@ const foodsData = [
   nameI18n:{"ja":"不気味な食べ物","en":"Creepy Food","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/009.PNG",
   restore: null, // 未確認
-  cost:0,
+  cost:null, // 未確認（何の料理の失敗作かで材料費が変わるため固定値にできない）
   time:0,
   rarity: [true,false,false,false,false],
   prices:[30],
@@ -166,7 +166,7 @@ const foodsData = [
   nameI18n:{"ja":"不気味な飲み物","en":"Creepy Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/010.PNG",
   restore: null, // 未確認
-  cost:0,
+  cost:null, // 未確認（何の料理の失敗作かで材料費が変わるため固定値にできない）
   time:0,
   rarity: [true,false,false,false,false],
   prices:[30],
