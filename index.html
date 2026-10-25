@@ -238,10 +238,11 @@
 
       <div class="filter-group">
         <div class="filter-group-label" data-i18n="group_weather_mode">出現モード</div>
-        <div class="filter">
+        <div class="filter filter-wrap">
           <button onclick="setWeatherMode('current')" id="w_current"><span class="btn-icon" data-icon="weatherSun"></span><span data-i18n="weather_current">今出現するもの全て</span></button>
           <button onclick="setWeatherMode('only')" id="w_only"><span class="btn-icon" data-icon="weatherRainbow"></span><span data-i18n="weather_only">今の天気限定</span></button>
           <button onclick="setWeatherMode('hidden')" id="w_hidden"><span class="btn-icon" data-icon="close"></span><span data-i18n="weather_hidden">今は出現しない</span></button>
+          <button onclick="setWeatherMode('all')" id="w_all"><span class="btn-icon" data-icon="book"></span><span data-i18n="weather_mode_all">すべて</span></button>
         </div>
       </div>
 
@@ -476,7 +477,8 @@ text-align:left;
 <p><strong><span class="help-icon" data-icon="weatherSun"></span><span data-i18n="help_mode_title">出現モード</span></strong><br>
 <span data-i18n="help_mode_body">・今出現するもの全て<br>
 ・今の天気でしか出現しない<br>
-・今は出現しない</span></p>
+・今は出現しない<br>
+・すべて（出現状況に関わらず全部）</span></p>
 
 <p><strong><span class="help-icon" data-icon="sortBook"></span><span data-i18n="help_sort_title">並び替え</span></strong><br>
 <span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。</span></p>

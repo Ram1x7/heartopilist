@@ -588,7 +588,9 @@ function getActiveFilterChips(){
   if(weatherMode !== "current"){
     const modeLabel = weatherMode === "only"
       ? T("weather_only","今の天気限定")
-      : T("weather_hidden","今は出現しない");
+      : weatherMode === "hidden"
+      ? T("weather_hidden","今は出現しない")
+      : T("weather_mode_all","すべて");
     chips.push({ label: modeLabel, onClear: () => setWeatherMode("current") });
   }
 
@@ -882,6 +884,11 @@ function render(){
     return !isNow;
   }
 
+  if (weatherMode === "all") {
+    // 出現状況に関わらず全部
+    return true;
+  }
+
   return false;
 });
  list = applyCommonFilters(list);
@@ -921,11 +928,11 @@ function render(){
  renderFilterSummary(activeChips, list.length);
  updateBulkStatusBar();
 
- // 終了したフェス・シーズン限定（「今は出現しない」表示時のみ、最下部に表示）
+ // 終了したフェス・シーズン限定（「今は出現しない」「すべて」表示時のみ、最下部に表示）
  const endedEl = document.getElementById("endedList");
  endedEl.innerHTML = "";
 
- if(weatherMode === "hidden"){
+ if(weatherMode === "hidden" || weatherMode === "all"){
   let ended = creatures.filter(c => c.ended === true);
   ended = applyCommonFilters(ended);
   ended = sortList(ended);
@@ -1072,7 +1079,7 @@ function getDateKey(offset=0){
 function setWeatherMode(mode){
   weatherMode = mode;
   localStorage.setItem("weatherMode", mode);
-  ["current","only","hidden"].forEach(x=>{
+  ["current","only","hidden","all"].forEach(x=>{
     document.getElementById("w_"+x).classList.remove("active");
   });
 
