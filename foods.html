@@ -27,7 +27,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=37">
+<link rel="stylesheet" href="./css/style.css?v=38">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
@@ -873,6 +873,19 @@ body.dark .calc-freeform-add{ color:var(--dark-accent); border-color:#7a6030; }
   <button class="ds-tab ds-tab-grow" id="s_level" onclick="setSort('level')">レベル順</button>
   <button class="ds-tab ds-tab-grow" id="s_unchecked" onclick="setSort('unchecked')">未コンプ順</button>
   <button class="ds-tab ds-tab-grow" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
+  <button class="ds-tab ds-tab-grow" id="s_price" onclick="setSort('price')" data-i18n="sort_price">売却額順</button>
+  <button class="ds-tab ds-tab-grow" id="s_profit" onclick="setSort('profit')" data-i18n="sort_profit">利益順</button>
+</div>
+
+<div class="filter price-sort-sub" id="priceSortRow" style="display:none;">
+  <button onclick="setPriceSortOrder('desc')" id="po_desc" data-i18n="price_sort_high">高い順</button>
+  <button onclick="setPriceSortOrder('asc')" id="po_asc" data-i18n="price_sort_low">安い順</button>
+  <span class="price-sort-sep"></span>
+  <button onclick="setPriceSortStar(1)" id="ps_1">★1</button>
+  <button onclick="setPriceSortStar(2)" id="ps_2">★2</button>
+  <button onclick="setPriceSortStar(3)" id="ps_3">★3</button>
+  <button onclick="setPriceSortStar(4)" id="ps_4">★4</button>
+  <button onclick="setPriceSortStar(5)" id="ps_5">★5</button>
 </div>
 
 <div class="f-sort">
@@ -907,7 +920,7 @@ body.dark .calc-freeform-add{ color:var(--dark-accent); border-color:#7a6030; }
     <span data-i18n="food_help_search_body">料理名や素材名で検索できます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="food_help_sort_title">並び替え</strong><br>
-    <span data-i18n="food_help_sort_body">図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。</span></p>
+    <span data-i18n="food_help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順・利益順で並び替えできます。売却額順/利益順を選ぶと、高い順/安い順と★1〜5の基準を選べます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="food_help_calc_title">認証マスター計算</strong><br>
     <span data-i18n="food_help_calc_body">上部のボタンから、認証マスターに必要な素材の数を自動計算できます。手持ちの数を入力すると、不足している分だけ表示されます。</span></p>
@@ -980,7 +993,7 @@ updateDarkButton();
 const FOODS_TUTORIAL_DONE_KEY = "hatopiFoods_tutorialDone";
 const FOODS_TUTORIAL_STEPS = [
   { selector: "#search", titleKey: "tutorial_foods_step1_title", titleFallback: "① 検索する", textKey: "tutorial_foods_step1_body", textFallback: "料理名や素材名のキーワードで検索できます。" },
-  { selector: "#sortRow", titleKey: "tutorial_foods_step2_title", titleFallback: "② 並び替え", textKey: "tutorial_foods_step2_body", textFallback: "図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。" },
+  { selector: "#sortRow", titleKey: "tutorial_foods_step2_title", titleFallback: "② 並び替え", textKey: "tutorial_foods_step2_body", textFallback: "図鑑順・レベル順・未コンプ順・未認証順・売却額順・利益順で並び替えできます。" },
   { selector: "#calcOpenBtn", titleKey: "tutorial_foods_step3_title", titleFallback: "③ 認証マスター計算", textKey: "tutorial_foods_step3_body", textFallback: "必要な素材数を自動計算できます。手持ちの数を入力すれば不足分だけ表示されます。" },
   { selector: "#list", titleKey: "tutorial_foods_step4_title", titleFallback: "④ 一覧をタップ", textKey: "tutorial_foods_step4_body", textFallback: "気になる料理をタップすると、レシピや必要な素材の詳細が確認できます。" },
 ];
@@ -1055,6 +1068,22 @@ function T(key, fallback, vars){
 // ── 状態 ──
 let currentSort        = "book";
 let currentModalFood   = null;
+let priceSortStar = Math.min(5, Math.max(1, parseInt(localStorage.getItem("priceSortStar"), 10) || 1));
+let priceSortOrder = localStorage.getItem("priceSortOrder") === "asc" ? "asc" : "desc";
+
+// 売却額順ソート用：指定した★（1〜5）での売価を返す（存在しない場合はnull）
+function priceAtStar(f, star){
+  if(!f.prices) return null;
+  const prices5 = derivePrices(f.prices[0], "food", f.rarity);
+  return prices5[star - 1] ?? null;
+}
+
+// 利益順ソート用：指定した★（1〜5）での利益（売価-材料費）を返す（売価・材料費が未確認の場合はnull）
+function profitAtStar(f, star){
+  const p = priceAtStar(f, star);
+  if(p == null || f.cost == null) return null;
+  return p - f.cost;
+}
 
 // ── 画像プリロード（IntersectionObserver方式） ──
 const foodImgObserver = new IntersectionObserver((entries, obs) => {
@@ -1093,8 +1122,30 @@ clearBtn.onclick = ()=>{
 // ── 並び替え ──
 function setSort(type){
   currentSort = type;
-  ["book","level","unchecked","unauth"].forEach(x=>{
+  ["book","level","unchecked","unauth","price","profit"].forEach(x=>{
     document.getElementById("s_"+x).classList.toggle("active", x === type);
+  });
+  const priceSortRow = document.getElementById("priceSortRow");
+  if(priceSortRow) priceSortRow.style.display = (type === "price" || type === "profit") ? "" : "none";
+  render();
+}
+
+// 売却額順のサブ選択（高い順/安い順）
+function setPriceSortOrder(order){
+  priceSortOrder = order;
+  localStorage.setItem("priceSortOrder", order);
+  ["desc","asc"].forEach(x=>{
+    document.getElementById("po_"+x).classList.toggle("active", x === order);
+  });
+  render();
+}
+
+// 売却額順のサブ選択（★1〜5）
+function setPriceSortStar(star){
+  priceSortStar = star;
+  localStorage.setItem("priceSortStar", star);
+  [1,2,3,4,5].forEach(n=>{
+    document.getElementById("ps_"+n).classList.toggle("active", n === star);
   });
   render();
 }
@@ -1247,6 +1298,19 @@ function render(){
         if(aa !== ba) return aa - ba;
         return foodsData.indexOf(a) - foodsData.indexOf(b);
       });
+    } else if(currentSort === "price" || currentSort === "profit"){
+      const valueFn = currentSort === "price" ? priceAtStar : profitAtStar;
+      return list.slice().sort((a,b) => {
+        const pa = valueFn(a, priceSortStar);
+        const pb = valueFn(b, priceSortStar);
+
+        // 値が無いものは常に後ろへ
+        if(pa == null && pb == null) return foodsData.indexOf(a) - foodsData.indexOf(b);
+        if(pa == null) return 1;
+        if(pb == null) return -1;
+
+        return priceSortOrder === "asc" ? pa - pb : pb - pa;
+      });
     }
     return list;
   };
@@ -1291,7 +1355,7 @@ function renderModal(){
 
   // 星1〜5の売価・利益を切り替えなしで一度に見られるよう、全星分をまとめて算出する
   const prices5 = f.prices ? derivePrices(f.prices[0], "food", f.rarity) : [null,null,null,null,null];
-  const costVal = f.cost || 0;
+  const costVal = f.cost; // 材料費未確認の場合はnullのまま（0円と区別する）
   // フェスコイン二重価格を持つデータのみフェスコイン列を表示する
   const hasFesField = f.fesCoinPrice !== undefined;
   const fesPrices5 = f.fesCoinPrice != null ? derivePrices(f.fesCoinPrice, "food", f.rarity) : [null,null,null,null,null];
@@ -1302,9 +1366,9 @@ function renderModal(){
   const priceRows = [0,1,2,3,4].map(i => {
     const p = prices5[i];
     if(p == null) return ""; // その星が存在しない場合は行ごと省略
-    const profit = p - costVal;
-    const profitClass = profit >= 0 ? "profit-plus" : "profit-minus";
-    const profitText = (profit >= 0 ? "+" : "-") + coinText(Math.abs(profit));
+    const profit = costVal != null ? p - costVal : null;
+    const profitClass = profit == null ? "" : (profit >= 0 ? "profit-plus" : "profit-minus");
+    const profitText = profit == null ? T("food_unconfirmed","未確認") : (profit >= 0 ? "+" : "-") + coinText(Math.abs(profit));
     // フェスコイン列はhas-fesが無い料理でもCSS側のnth-child指定で正しく隠れるよう、
     // 中身が無くても必ずtdを出力する（省略すると後続の回復量列が1つ前に詰まってずれる）
     const fesCell = `<td>${hasFesField ? (fesPrices5[i] != null ? fesCoinText(fesPrices5[i]) : "-") : ""}</td>`;
@@ -1704,6 +1768,8 @@ function bindShortageEvents(food, listEl){
 }
 
 // 初期化
+document.getElementById("po_"+priceSortOrder).classList.add("active");
+document.getElementById("ps_"+priceSortStar).classList.add("active");
 render();
 maybeStartPageTutorial(FOODS_TUTORIAL_DONE_KEY, FOODS_TUTORIAL_STEPS);
 
