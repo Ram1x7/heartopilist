@@ -6,24 +6,16 @@
 // 同じ形のもの）を検出し、各テンプレートパーツの輪郭線データと照合してキャンバス判定＋
 // 位置合わせを同時に行う → 候補キャンバスを提示（ユーザーが確認、または一覧から手動選択）
 // → パーツ選択 → 色数・背景処理を調整しながらプレビュー →
-// 既存のhatopiArt_currentDraft経由でart-editorへ引き渡す。
+// 編集画面の状態と下書きをまとめて更新する。
 //
-// 重要：外部AI APIには一切依存しない。テンプレート照合はjs/art-template-match.js
-// （エッジ検出→距離変換→チャンファーマッチングという古典的な画像処理のみ）、
-// 画像処理・パレット変換はjs/art-pixelate.js（元々js/art-converter.jsにあった処理を
-// 共通化したもの）をそのまま利用する。
-//
-// キャンバス判定・位置合わせについて（正直な制約の開示）：
-// スクショに実際に補助線がはっきり写っている（背景・キャラクターに隠れていない、
-// 極端に暗い/ぼやけていない）ことを前提にした精度になる。補助線が写っていない、
-// または不明瞭な通常の写真等では自動判定の精度は低くなるため、自信度が低い場合は
-// 「自動判定できませんでした」として手動でのテンプレート選択を促す
-// （間違ったテンプレートを自動適用するより、候補を提示して確認してもらうことを優先）。
+// 画像処理は端末内で行う。補助線向けの照合、マス位置の補正、マス中央の代表色取得を
+// js/art-screenshot-recovery.jsへ分離。通常の写真変換は従来のart-pixelate.jsを使う。
+// 減色とディザリングは任意。型紙や格子が見えない画像は手動の範囲調整が必要になる。
 
 const SSI_MAX_WORKING_DIM = 1600; // iPad等でのメモリ超過を避けるための内部処理用画像の最大辺（最終的な切り抜き用）
 const SSI_SEARCH_MAX_DIM = 360; // テンプレート照合（エッジ検出・チャンファーマッチング）専用の、さらに縮小した探索用画像の最大辺
 const SSI_MIN_IMAGE_DIM = 64; // これより小さい画像はエラーにする
-const SSI_COLOR_COUNTS = [4, 8, 16, 32, 64, 128];
+const SSI_COLOR_COUNTS = [0, 4, 8, 16, 32, 64, 128];
 const SSI_BG_MODES = [
   { id: "auto", labelKey: "art_ssi_bg_auto", labelFallback: "自動" },
   { id: "keep", labelKey: "art_ssi_bg_keep", labelFallback: "そのまま" },
@@ -49,7 +41,8 @@ let ssiSelectedPartId = null;
 // 直接位置合わせされるため、そのままauto背景除去をかけると単色の衣装（例：無地Tシャツ）が
 // 丸ごと「背景」と誤認されて消えてしまうことがある。背景の写り込みが残る場合のために
 // "auto"/"white"は選べるようにしておくが、既定はユーザーが明示的に選ぶまで安全側の"keep"とする
-let ssiSettings = { colors: 32, dither: true, bg: "keep" };
+let ssiSettings = { colors: 0, dither: false, bg: "keep", removeGuides: true, stabilizeColors: true };
+let ssiWorkingData = null, ssiGuideField = null, ssiRecoveryInfo = null, ssiLoadGeneration = 0;
 let ssiLastComputedPixels = null;
 
 // 手動調整ステップ（自動検出がずれていた場合の補正用）の状態。
@@ -60,14 +53,16 @@ let ssiAdjustDragMode = null; // "move" | "resize" | null
 let ssiAdjustHandleIndex = null; // 0:左上 1:右上 2:右下 3:左下
 let ssiAdjustDragStart = null; // {x,y,rect}
 let ssiAdjustResizeObserver = null;
+let ssiAdjustDisplaySize = null;
 const SSI_ADJUST_HANDLE_RADIUS = 16; // iPadでも指で掴みやすいよう大きめに
 
 function ssiT(key, fallback){
-  return (typeof T === "function") ? T(key, fallback) : (typeof i18n !== "undefined" ? i18n.t(key) : fallback) || fallback;
+  const value=typeof T==='function'?T(key,fallback):typeof i18n!=='undefined'?i18n.t(key):fallback;
+  return !value||value===key?fallback:value;
 }
 
-function ssiClothesFrames(){
-  return DESIGN_FRAME_PRESETS.filter(f => f.category === "clothes");
+function ssiImportFrames(){
+  return DESIGN_FRAME_PRESETS.filter(f => f.parts.some(p => PRESET_MASKS[f.id]?.[p.id]?.maskLines?.length));
 }
 
 // ── モーダルの開閉・ステップ切り替え ──
@@ -79,11 +74,15 @@ function openScreenshotImportModal(){
 }
 
 function closeScreenshotImportModal(){
+  ssiLoadGeneration++;clearTimeout(ssiPreviewTimer);
   document.getElementById("artSsiModal").style.display = "none";
 }
 
 function ssiResetState(){
-  ssiWorkingCanvas = null;
+  ssiLoadGeneration++;clearTimeout(ssiPreviewTimer);
+  ssiSettings = { colors: 0, dither: false, bg: "keep", removeGuides: true, stabilizeColors: true };
+  ssiWorkingData = null;ssiGuideField = null;ssiRecoveryInfo = null;ssiLastComputedPixels = null;
+  ssiWorkingCanvas = null;ssiAdjustDisplaySize=null;
   ssiMatchResults = [];
   ssiRegionRect = null;
   ssiSelectedFrameId = null;
@@ -97,6 +96,8 @@ function ssiResetState(){
   document.getElementById("artSsiFileInput").value = "";
   document.getElementById("artSsiUploadError").textContent = "";
   document.getElementById("artSsiSettingsError").textContent = "";
+  document.getElementById("artSsiAlignInfo").textContent="";
+  document.getElementById("artSsiRecoveryInfo").textContent="";
   document.getElementById("artSsiManualFrameOptions").style.display = "none";
 }
 
@@ -113,20 +114,25 @@ function ssiHandleFileSelect(file){
   const errorEl = document.getElementById("artSsiUploadError");
   errorEl.textContent = "";
   if(!file) return;
+  const ticket=++ssiLoadGeneration;ssiLastComputedPixels=null;
   if(!/^image\//.test(file.type)){
     errorEl.textContent = ssiT("art_ssi_error_unsupported_file", "この形式の画像には対応していません。スクリーンショット画像（JPEG/PNG等）を選んでください");
     return;
   }
   const reader = new FileReader();
   reader.onerror = () => {
+    if(ticket!==ssiLoadGeneration)return;
     errorEl.textContent = ssiT("art_ssi_error_load_failed", "画像を読み込めませんでした。別の画像でお試しください");
   };
   reader.onload = () => {
+    if(ticket!==ssiLoadGeneration)return;
     const img = new Image();
     img.onerror = () => {
+      if(ticket!==ssiLoadGeneration)return;
       errorEl.textContent = ssiT("art_ssi_error_load_failed", "画像を読み込めませんでした。別の画像でお試しください");
     };
     img.onload = () => {
+      if(ticket!==ssiLoadGeneration)return;
       if(img.naturalWidth < SSI_MIN_IMAGE_DIM || img.naturalHeight < SSI_MIN_IMAGE_DIM){
         errorEl.textContent = ssiT("art_ssi_error_too_small", "画像が小さすぎます。もっと大きいスクリーンショットでお試しください");
         return;
@@ -142,9 +148,11 @@ function ssiHandleFileSelect(file){
       // 進捗表示を実際に描画させてから重い同期処理を実行する
       document.getElementById("artSsiProgress").textContent = ssiT("art_ssi_matching", "補助線を照合中…");
       document.getElementById("artSsiProgress").style.display = "";
-      setTimeout(() => {
+      setTimeout(async () => {
+        if(ticket!==ssiLoadGeneration)return;
         try{
-          ssiRunTemplateMatching();
+          const complete=await ssiRunTemplateMatching(ticket);
+          if(!complete||ticket!==ssiLoadGeneration)return;
         }catch(e){
           console.error(e);
           errorEl.textContent = ssiT("art_ssi_error_processing", "この端末では画像の処理に失敗しました。別の画像や端末でお試しください");
@@ -170,14 +178,16 @@ function ssiPrepareWorkingCanvas(img){
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
+  ctx.imageSmoothingEnabled=false;
   ctx.drawImage(img, 0, 0, w, h);
   ssiWorkingCanvas = canvas;
+  ssiWorkingData=ctx.getImageData(0,0,w,h);ssiGuideField=null;
 }
 
 // ── 補助線照合（テンプレート判定＋位置合わせ） ──
 // js/art-template-match.jsのアルゴリズム（エッジ検出→距離変換→チャンファーマッチング）を
-// 使い、衣装カテゴリの全パーツについて、スクショ内の補助線との当てはまりを評価する
-function ssiRunTemplateMatching(){
+// 使い、対応する型紙の全パーツについて、スクショ内の補助線との当てはまりを評価する
+async function ssiRunTemplateMatching(ticket=ssiLoadGeneration){
   // 探索はssiWorkingCanvasよりさらに縮小した専用の画像で行う（速度優先。最終的な
   // 切り抜き自体はssiWorkingCanvas側の座標へスケールし直すため、精度への影響は小さい）
   const searchScale = Math.min(1, SSI_SEARCH_MAX_DIM / Math.max(ssiWorkingCanvas.width, ssiWorkingCanvas.height));
@@ -195,7 +205,7 @@ function ssiRunTemplateMatching(){
   const distField = computeDistanceTransform(edgeMask, sw, sh);
 
   const candidateParts = [];
-  ssiClothesFrames().forEach(frame => {
+  ssiImportFrames().forEach(frame => {
     frame.parts.forEach(part => {
       const maskEntry = (typeof PRESET_MASKS !== "undefined" && PRESET_MASKS[frame.id]) ? PRESET_MASKS[frame.id][part.id] : null;
       if(!maskEntry || !maskEntry.maskLines || !maskEntry.maskLines.length) return;
@@ -203,15 +213,29 @@ function ssiRunTemplateMatching(){
     });
   });
 
-  const scored = scoreAllTemplateMatches(distField, sw, sh, candidateParts, SSI_MATCH_OPTIONS, edgeMask);
-  ssiMatchResults = scored.map(r => ({
-    frameId: r.entry.frameId,
-    partId: r.entry.partId,
-    frame: r.entry.frame,
-    part: r.entry.part,
-    match: r.match,
-    score: chamferCostToScore(r.match.cost, SSI_SCORE_NORMALIZER),
-  }));
+  const ridge=HatopiScreenshotRecovery.guideField(imgData),ridgeMask=new Uint8Array(sw*sh);
+  let ridgeCount=0;for(let i=0;i<ridgeMask.length;i++)if(ridge.data[i]>.2){ridgeMask[i]=1;ridgeCount++;}
+  const fallback=[],primary=[],ridgeDistance=ridgeCount>=8?computeDistanceTransform(ridgeMask,sw,sh):null;
+  const fallbackOptions={...SSI_MATCH_OPTIONS,integral:computeIntegralImage(edgeMask,sw,sh),totalEdgeCount:edgeMask.reduce((sum,n)=>sum+n,0)};
+  for(let start=0;start<candidateParts.length;start+=2){
+    if(ticket!==ssiLoadGeneration)return false;
+    const batch=candidateParts.slice(start,start+2);
+    fallback.push(...scoreAllTemplateMatches(distField,sw,sh,batch,fallbackOptions));
+    if(ridgeDistance)primary.push(...scoreAllTemplateMatches(ridgeDistance,sw,sh,batch,SSI_MATCH_OPTIONS));
+    const progress=document.getElementById('artSsiProgress');if(progress)progress.textContent=ssiT('art_ssi_matching','補助線を照合中…')+' '+Math.min(start+2,candidateParts.length)+'/'+candidateParts.length;
+    await new Promise(resolve=>setTimeout(resolve,0));
+  }
+  if(ticket!==ssiLoadGeneration)return false;
+  const byPart=new Map();
+  for(const r of fallback)byPart.set(r.entry.frameId+':'+r.entry.partId,{...r,score:Math.min(.3,chamferCostToScore(r.match.cost,SSI_SCORE_NORMALIZER)),method:'edges'});
+  for(const r of primary){
+    const rect={x:r.match.offsetX,y:r.match.offsetY,w:r.entry.width*r.match.scale,h:r.entry.height*r.match.scale};
+    const support=HatopiScreenshotRecovery.fitScore(ridge,HatopiScreenshotRecovery.pathPoints(r.entry.maskLines),rect,r.entry.width,r.entry.height);
+    const score=support/(1+r.match.cost*.35),key=r.entry.frameId+':'+r.entry.partId;
+    if(score>(byPart.get(key)?.score||0))byPart.set(key,{...r,score,method:'guides'});
+  }
+  ssiMatchResults=[...byPart.values()].map(r=>({frameId:r.entry.frameId,partId:r.entry.partId,frame:r.entry.frame,part:r.entry.part,match:r.match,score:r.score,method:r.method})).sort((a,b)=>b.score-a.score);
+  return true;
 }
 
 function ssiFindMatchResult(frameId, partId){
@@ -225,12 +249,8 @@ function ssiResolveRegionRect(frameId, partId){
   const result = ssiFindMatchResult(frameId, partId);
   if(result && result.score >= SSI_CONFIDENCE_THRESHOLD){
     const m = result.match;
-    return {
-      x: Math.round(m.offsetX * ssiSearchScaleToWorking),
-      y: Math.round(m.offsetY * ssiSearchScaleToWorking),
-      w: Math.max(1, Math.round(result.part.width * m.scale * ssiSearchScaleToWorking)),
-      h: Math.max(1, Math.round(result.part.height * m.scale * ssiSearchScaleToWorking)),
-    };
+    const rect={x:m.offsetX*ssiSearchScaleToWorking,y:m.offsetY*ssiSearchScaleToWorking,w:result.part.width*m.scale*ssiSearchScaleToWorking,h:result.part.height*m.scale*ssiSearchScaleToWorking};
+    return ssiAlignRect(rect,result.part,frameId).rect;
   }
   return { x: 0, y: 0, w: ssiWorkingCanvas.width, h: ssiWorkingCanvas.height };
 }
@@ -255,7 +275,7 @@ function ssiRenderCandidates(){
       <div class="art-ssi-candidate-info">
         <div class="art-ssi-candidate-name">${frameName(c.frame, lang)}</div>
         <div class="art-ssi-candidate-score-bar"><div class="art-ssi-candidate-score-fill" style="width:${Math.round(c.score * 100)}%"></div></div>
-        <div class="art-ssi-candidate-score-label">${Math.round(c.score * 100)}%</div>
+        <div class="art-ssi-candidate-score-label">${ssiT("art_ssi_match_hint", "一致の目安")} ${Math.round(c.score * 100)}%</div>
       </div>
       <button class="art-header-btn art-ssi-candidate-use-btn" data-frame="${c.frameId}">${ssiT("art_ssi_use_canvas_btn", "このキャンバスを使用")}</button>
     </div>
@@ -264,7 +284,7 @@ function ssiRenderCandidates(){
     btn.addEventListener("click", () => ssiSelectFrame(btn.dataset.frame));
   });
 
-  const lowConfidence = top.length === 0 || top[0].score < SSI_CONFIDENCE_THRESHOLD;
+  const lowConfidence = top.length === 0 || top[0].score < SSI_CONFIDENCE_THRESHOLD || (top.length>1 && top[0].score-top[1].score<.07);
   document.getElementById("artSsiLowConfidenceHint").style.display = lowConfidence ? "" : "none";
   const manualFrameOptions = document.getElementById("artSsiManualFrameOptions");
   ssiRenderManualFrameOptions();
@@ -274,7 +294,7 @@ function ssiRenderCandidates(){
 function ssiRenderManualFrameOptions(){
   const lang = (typeof currentLang === "function") ? currentLang() : "ja";
   const el = document.getElementById("artSsiManualFrameOptions");
-  el.innerHTML = ssiClothesFrames().map(f => `
+  el.innerHTML = ssiImportFrames().map(f => `
     <button class="art-frame-btn" data-value="${f.id}">
       <img class="art-frame-icon" src="${f.icon}" alt="" width="29" height="29">
       <span>${frameName(f, lang)}</span>
@@ -323,8 +343,10 @@ function ssiRenderPartOptions(frame){
 // 矩形を重ねて、ドラッグでの移動・四隅ドラッグでのリサイズができるようにする
 function ssiSetupAdjustStage(){
   const img = document.getElementById("artSsiAdjustImg");
-  const seedRect = ssiResolveRegionRect(ssiSelectedFrameId, ssiSelectedPartId);
+  const seedRect = ssiResolveRegionRect(ssiSelectedFrameId, ssiSelectedPartId),ticket=ssiLoadGeneration;
   img.onload = () => {
+    if(ticket!==ssiLoadGeneration)return;
+    ssiAdjustDisplaySize=null;
     ssiAdjustRect = ssiWorkingRectToCss(seedRect);
     ssiDrawAdjustOverlay();
     ssiBindAdjustResize();
@@ -351,10 +373,10 @@ function ssiCssRectToWorking(rect){
   const img = document.getElementById("artSsiAdjustImg");
   const scale = ssiWorkingCanvas.width / (img.clientWidth || ssiWorkingCanvas.width);
   return {
-    x: Math.round(rect.x * scale),
-    y: Math.round(rect.y * scale),
-    w: Math.round(rect.w * scale),
-    h: Math.round(rect.h * scale),
+    x: rect.x * scale,
+    y: rect.y * scale,
+    w: rect.w * scale,
+    h: rect.h * scale,
   };
 }
 
@@ -374,6 +396,11 @@ function ssiDrawAdjustOverlay(){
   const w = img.clientWidth;
   const h = img.clientHeight;
   if(!w || !h || !ssiAdjustRect) return;
+  if(ssiAdjustDisplaySize){
+    const sx=w/ssiAdjustDisplaySize.w,sy=h/ssiAdjustDisplaySize.h;
+    ssiAdjustRect={x:ssiAdjustRect.x*sx,y:ssiAdjustRect.y*sy,w:ssiAdjustRect.w*sx,h:ssiAdjustRect.h*sy};
+  }
+  ssiAdjustDisplaySize={w,h};
   canvas.width = w;
   canvas.height = h;
   // 画面回転等で表示サイズが変わった場合も矩形が枠内に収まるよう補正する
@@ -386,10 +413,19 @@ function ssiDrawAdjustOverlay(){
   ctx.fillStyle = "rgba(0,0,0,0.45)";
   ctx.fillRect(0, 0, w, h);
   ctx.clearRect(ssiAdjustRect.x, ssiAdjustRect.y, ssiAdjustRect.w, ssiAdjustRect.h);
-  ctx.strokeStyle = "#4dd0e1";
+  const part=ssiCurrentPart();
+  if(part && document.getElementById('artSsiGridToggle').checked){
+    ctx.save();ctx.beginPath();ctx.rect(ssiAdjustRect.x,ssiAdjustRect.y,ssiAdjustRect.w,ssiAdjustRect.h);ctx.clip();
+    ctx.strokeStyle='rgba(60,90,110,.3)';ctx.lineWidth=.6;ctx.beginPath();
+    const step=Math.min(ssiAdjustRect.w/part.width,ssiAdjustRect.h/part.height)<3?5:1;
+    for(let x=0;x<=part.width;x+=step){const px=ssiAdjustRect.x+x*ssiAdjustRect.w/part.width;ctx.moveTo(px,ssiAdjustRect.y);ctx.lineTo(px,ssiAdjustRect.y+ssiAdjustRect.h);}
+    for(let y=0;y<=part.height;y+=step){const py=ssiAdjustRect.y+y*ssiAdjustRect.h/part.height;ctx.moveTo(ssiAdjustRect.x,py);ctx.lineTo(ssiAdjustRect.x+ssiAdjustRect.w,py);}
+    ctx.stroke();ctx.restore();
+  }
+  ctx.strokeStyle = "#3c5a6e";
   ctx.lineWidth = 2;
   ctx.strokeRect(ssiAdjustRect.x, ssiAdjustRect.y, ssiAdjustRect.w, ssiAdjustRect.h);
-  ctx.fillStyle = "#4dd0e1";
+  ctx.fillStyle = "#3c5a6e";
   ssiAdjustHandlePoints().forEach(pt => {
     ctx.beginPath();
     ctx.arc(pt.x, pt.y, SSI_ADJUST_HANDLE_RADIUS / 2, 0, Math.PI * 2);
@@ -485,7 +521,7 @@ function ssiCurrentPart(){
 
 function ssiSetupSettingsStage(){
   // ssiRegionRectは手動調整ステップ（STEP3）で確定済みのためここでは再計算しない
-  renderOptionGroup("artSsiColorOptions", SSI_COLOR_COUNTS.map(n => ({ id: n, label: String(n) })), ssiSettings.colors, (v) => {
+  renderOptionGroup("artSsiColorOptions", SSI_COLOR_COUNTS.map(n => ({ id: n, label: n ? String(n) : ssiT("art_ssi_keep_colors", "色数を制限しない") })), ssiSettings.colors, (v) => {
     ssiSettings.colors = Number(v);
     ssiScheduleUpdatePreview();
   });
@@ -496,6 +532,8 @@ function ssiSetupSettingsStage(){
     (v) => { ssiSettings.bg = v; ssiScheduleUpdatePreview(); }
   );
   document.getElementById("artSsiDitherToggle").checked = ssiSettings.dither;
+  document.getElementById("artSsiGuideToggle").checked = ssiSettings.removeGuides;
+  document.getElementById("artSsiColorStabilityToggle").checked = ssiSettings.stabilizeColors;
   ssiUpdatePreview();
 }
 
@@ -504,12 +542,14 @@ let ssiPreviewTimer = null;
 // art-converter.jsのscheduleConvert()と同じ150msのデバウンスをかける
 function ssiScheduleUpdatePreview(){
   clearTimeout(ssiPreviewTimer);
+  ssiLastComputedPixels=null;
   ssiPreviewTimer = setTimeout(ssiUpdatePreview, 150);
 }
 
 function ssiUpdatePreview(){
   const errorEl = document.getElementById("artSsiSettingsError");
   errorEl.textContent = "";
+  ssiLastComputedPixels=null;
   const part = ssiCurrentPart();
   if(!part || !ssiRegionRect) return;
   try{
@@ -534,51 +574,45 @@ function ssiUpdatePreview(){
   }
 }
 
-function ssiComputePixels(width, height){
-  const off = document.createElement("canvas");
-  off.width = width;
-  off.height = height;
-  const octx = off.getContext("2d");
-  octx.drawImage(
-    ssiWorkingCanvas,
-    ssiRegionRect.x, ssiRegionRect.y, ssiRegionRect.w, ssiRegionRect.h,
-    0, 0, width, height
-  );
-  const imgData = octx.getImageData(0, 0, width, height);
-  const bgMask = computeBackgroundMask(imgData, ssiSettings.bg);
-  const palette = buildPalette(imgData, ssiSettings.colors, bgMask);
-  return ssiSettings.dither ? ditherToPalette(imgData, palette, bgMask) : mapToPalette(imgData, palette, bgMask);
+function ssiGetGuideField(){
+  if(!ssiWorkingData)ssiWorkingData=ssiWorkingCanvas.getContext('2d').getImageData(0,0,ssiWorkingCanvas.width,ssiWorkingCanvas.height);
+  if(!ssiGuideField)ssiGuideField=HatopiScreenshotRecovery.guideField(ssiWorkingData);
+  return ssiGuideField;
 }
-
+function ssiAlignRect(rect,part,frameId=ssiSelectedFrameId){
+  const mask=PRESET_MASKS[frameId]?.[part.id];if(!mask)return {rect,improved:false};
+  const field=ssiGetGuideField(),guide=HatopiScreenshotRecovery.refineGuide(field,mask.maskLines,rect,part.width,part.height);
+  const grid=HatopiScreenshotRecovery.alignGrid(ssiWorkingData,guide.rect,part.width,part.height,HatopiScreenshotRecovery.cellMask(part.width,part.height,mask.maskLines,mask.disabledRanges));
+  return {rect:grid.rect,improved:guide.improved||grid.improved};
+}
+function ssiComputePixels(width,height){
+  const part=ssiCurrentPart(),mask=PRESET_MASKS[ssiSelectedFrameId]?.[part.id];
+  ssiGetGuideField();
+  const result=HatopiScreenshotRecovery.recover(ssiWorkingData,ssiRegionRect,width,height,{...mask,field:ssiGuideField,removeGuides:ssiSettings.removeGuides,stabilizeColors:ssiSettings.stabilizeColors});
+  ssiRecoveryInfo=result;
+  const bgMask=computeBackgroundMask(result.image,ssiSettings.bg);
+  for(let i=0;i<bgMask.length;i++)if(!result.pixels[i])bgMask[i]=true;
+  let output;
+  if(!ssiSettings.colors && !ssiSettings.dither)output=result.pixels.map((hex,i)=>bgMask[i]?null:hex);
+  else{
+    const palette=ssiSettings.colors?buildPalette(result.image,ssiSettings.colors,bgMask):GAME_PALETTE_FLAT.map(p=>hexToRgb(p.hex));
+    output=ssiSettings.dither?ditherToPalette(result.image,palette,bgMask):mapToPalette(result.image,palette,bgMask);
+  }
+  const info=document.getElementById('artSsiRecoveryInfo'),count=new Set(output.filter(Boolean)).size;
+  info.textContent=count+' '+ssiT('art_ssi_recovered_colors','色を復元しました。')+' '+(result.smallCells?ssiT('art_ssi_small_cells','マスが小さいため、大きなスクショを使ってください。'):'')+(result.unreadable?' '+ssiT('art_ssi_unreadable_cells','読み取れないマス（未着色）')+': '+result.unreadable:'')+(result.weak?' '+ssiT('art_ssi_mixed_cells','色の混ざるマス（位置合わせを確認）')+': '+result.weak:'');
+  return output;
+}
 function ssiApplyToEditor(){
-  const part = ssiCurrentPart();
-  const errorEl = document.getElementById("artSsiSettingsError");
-  if(!part || !ssiLastComputedPixels){
-    errorEl.textContent = ssiT("art_ssi_error_extract_failed", "デザインの抽出に失敗しました。別の画像でお試しください");
-    return;
-  }
-  const existing = localStorage.getItem("hatopiArt_currentDraft");
-  if(existing){
-    const proceed = confirm(ssiT("art_overwrite_draft_confirm", "編集中の下書きがあります。変換結果で上書きしますか？"));
-    if(!proceed) return;
-  }
-  document.getElementById("artSsiProgress").style.display = "";
+  const part=ssiCurrentPart(),errorEl=document.getElementById('artSsiSettingsError');
+  if(!part||!ssiLastComputedPixels){errorEl.textContent=ssiT('art_ssi_error_extract_failed','取り込み結果を確認してください。');return;}
+  const same=typeof activeFrameId!=='undefined' && activeFrameId===ssiSelectedFrameId;
+  if(localStorage.getItem('hatopiArt_currentDraft')&&!confirm(same?ssiT('art_ssi_replace_part','このパーツの内容をスクショで置き換えます。他のパーツは残ります。よろしいですか？'):ssiT('art_overwrite_draft_confirm','編集中の下書きを置き換えますか？')))return;
   try{
-    localStorage.setItem("hatopiArt_currentDraft", JSON.stringify({
-      width: part.width,
-      height: part.height,
-      pixelData: ssiLastComputedPixels,
-      frameId: ssiSelectedFrameId,
-      partId: ssiSelectedPartId,
-      justCreated: true,
-    }));
-  }catch(e){
-    console.error(e);
-    document.getElementById("artSsiProgress").style.display = "none";
-    errorEl.textContent = ssiT("art_ssi_error_processing", "この端末では画像の処理に失敗しました。別の画像や端末でお試しください");
-    return;
-  }
-  location.reload();
+    const success=applyScreenshotToEditor({width:part.width,height:part.height,pixelData:ssiLastComputedPixels,frameId:ssiSelectedFrameId,partId:ssiSelectedPartId});
+    if(!success){errorEl.textContent=ssiT('art_ssi_save_failed','保存できませんでした。端末の空き容量を確認してください。元の作品は変更していません。');return;}
+    closeScreenshotImportModal();document.getElementById('gridSizeModal').style.display='none';
+    if(typeof showModeWizard==='function')showModeWizard();
+  }catch(error){console.error(error);errorEl.textContent=ssiT('art_ssi_error_processing','取り込めませんでした。もう一度お試しください。');}
 }
 
 // ── 初期化 ──
@@ -598,8 +632,17 @@ function bindScreenshotImportControls(){
   document.getElementById("artSsiApplyBtn").addEventListener("click", ssiApplyToEditor);
   document.getElementById("artSsiAdjustConfirmBtn").addEventListener("click", () => {
     ssiRegionRect = ssiCssRectToWorking(ssiAdjustRect);
+    ssiLastComputedPixels=null;
     ssiGoToStep("settings");
     ssiSetupSettingsStage();
+  });
+  document.getElementById('artSsiGridToggle').addEventListener('change',ssiDrawAdjustOverlay);
+  document.getElementById('artSsiColorStabilityToggle').addEventListener('change',e=>{ssiSettings.stabilizeColors=e.target.checked;ssiScheduleUpdatePreview();});
+  document.getElementById('artSsiGuideToggle').addEventListener('change',e=>{ssiSettings.removeGuides=e.target.checked;ssiScheduleUpdatePreview();});
+  document.getElementById('artSsiAutoAlignBtn').addEventListener('click',()=>{
+    const part=ssiCurrentPart();if(!part||!ssiAdjustRect)return;
+    const result=ssiAlignRect(ssiCssRectToWorking(ssiAdjustRect),part);ssiAdjustRect=ssiWorkingRectToCss(result.rect);ssiDrawAdjustOverlay();
+    document.getElementById('artSsiAlignInfo').textContent=result.improved?ssiT('art_ssi_align_done','補助線とマス位置を補正しました。枠を確認してください。'):ssiT('art_ssi_align_uncertain','確かな補正位置を見つけられませんでした。枠を手動で調整してください。');
   });
   ssiBindAdjustInteractions();
 }

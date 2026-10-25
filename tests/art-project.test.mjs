@@ -72,3 +72,31 @@ test('version-1 codes still decode and project codes retain every part with stri
   assert.ok(e.run("decodeShareCode(wrap([2,'pants',activePartId,'bad',[[activePartId,single]]])).error"));
   assert.ok(e.run("decodeShareCode(wrap([2,'t_shirt',activePartId,'nested',[[activePartId,code]]])).error"));
 });
+
+test('screenshot commit preserves sibling parts and survives the former reload/pagehide overwrite',()=>{
+  const e=editor();e.activate('t_shirt');
+  e.run(`pixels[0]='#EF6E72';saveCurrentAsDesign();var owner=currentDesignId;`);
+  const savedBefore=e.storage.get('hatopiArt_savedDesigns');
+  e.run(`var incoming={frameId:'t_shirt',partId:'canvas-1777194719606',width:64,height:80,pixelData:new Array(5120).fill('#0599BA')};var success=applyScreenshotToEditor(incoming);`);
+  assert.equal(e.run('success'),true);assert.equal(e.run('currentDesignId===owner'),true);
+  assert.equal(e.run('pixels[0]'),'#0599BA');
+  assert.equal(e.run("window.HatopiArtProject.snapshot().default.pixelData[0]"),'#EF6E72');
+  e.run('saveDraft()'); // Same operation used by pagehide after the import.
+  const draft=JSON.parse(e.storage.get('hatopiArt_currentDraft'));
+  assert.equal(draft.pixelData[0],'#0599BA');assert.equal(draft.parts.default.pixelData[0],'#EF6E72');
+  assert.equal(e.storage.get('hatopiArt_savedDesigns'),savedBefore);
+});
+test('a failed screenshot commit leaves live editor, saved records and the previous draft unchanged',()=>{
+  const e=editor();e.activate('t_shirt');e.run("pixels[0]='#EF6E72';saveDraft();saveCurrentAsDesign();");
+  const draft=e.storage.get('hatopiArt_currentDraft'),saved=e.storage.get('hatopiArt_savedDesigns');e.quota(true);
+  assert.equal(e.run("applyScreenshotToEditor({frameId:'tank_top',partId:'default',width:64,height:64,pixelData:new Array(4096).fill('#0599BA')})"),false);
+  assert.equal(e.run('pixels[0]'),'#EF6E72');assert.equal(e.run('activeFrameId'),'t_shirt');
+  assert.equal(e.storage.get('hatopiArt_currentDraft'),draft);assert.equal(e.storage.get('hatopiArt_savedDesigns'),saved);
+});
+test('screenshot import to a different item starts a new project and malformed pixels are rejected',()=>{
+  const e=editor();e.activate('t_shirt');e.run("pixels[0]='#EF6E72';saveCurrentAsDesign();");
+  assert.equal(e.run("applyScreenshotToEditor({frameId:'tank_top',partId:'default',width:64,height:64,pixelData:['#0599BA']})"),false);
+  assert.equal(e.run("applyScreenshotToEditor({frameId:'tank_top',partId:'default',width:64,height:64,pixelData:new Array(4096).fill('#0599BA')})"),true);
+  assert.equal(e.run('currentDesignId'),null);assert.equal(e.run('Object.keys(window.HatopiArtProject.snapshot()).length'),1);
+  assert.equal(e.run('activeFrameId'),'tank_top');assert.equal(e.run('savedDesigns.length'),1);
+});
