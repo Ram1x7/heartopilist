@@ -1003,7 +1003,7 @@
   "tutorial_foods_step1_title": "① 検索する",
   "tutorial_foods_step1_body": "料理名や素材名のキーワードで検索できます。",
   "tutorial_foods_step2_title": "② 並び替え",
-  "tutorial_foods_step2_body": "図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。",
+  "tutorial_foods_step2_body": "図鑑順・レベル順・未コンプ順・未認証順・売却額順・利益順で並び替えできます。",
   "tutorial_foods_step3_title": "③ 認証マスター計算",
   "tutorial_foods_step3_body": "必要な素材数を自動計算できます。手持ちの数を入力すれば不足分だけ表示されます。",
   "tutorial_foods_step4_title": "④ 一覧をタップ",
@@ -1060,7 +1060,7 @@
   "food_help_search_title": "検索",
   "food_help_search_body": "料理名や素材名で検索できます。",
   "food_help_sort_title": "並び替え",
-  "food_help_sort_body": "図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。",
+  "food_help_sort_body": "図鑑順・レベル順・未コンプ順・未認証順・売却額順・利益順で並び替えできます。売却額順/利益順を選ぶと、高い順/安い順と★1〜5の基準を選べます。",
   "food_help_calc_title": "認証マスター計算",
   "food_help_calc_body": "上部のボタンから、認証マスターに必要な素材の数を自動計算できます。手持ちの数を入力すると、不足している分だけ表示されます。",
   "food_help_detail_title": "詳しい情報を見る",
@@ -1309,6 +1309,7 @@
   "forecast_next_month": "次の月",
   "forecast_no_data_month": "この月に表示できる日付はありません",
   "sort_price": "売却額順",
+  "sort_profit": "利益順",
   "price_sort_high": "高い順",
   "price_sort_low": "安い順"
 }

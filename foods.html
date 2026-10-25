@@ -874,6 +874,7 @@ body.dark .calc-freeform-add{ color:var(--dark-accent); border-color:#7a6030; }
   <button class="ds-tab ds-tab-grow" id="s_unchecked" onclick="setSort('unchecked')">未コンプ順</button>
   <button class="ds-tab ds-tab-grow" id="s_unauth" onclick="setSort('unauth')">未認証順</button>
   <button class="ds-tab ds-tab-grow" id="s_price" onclick="setSort('price')" data-i18n="sort_price">売却額順</button>
+  <button class="ds-tab ds-tab-grow" id="s_profit" onclick="setSort('profit')" data-i18n="sort_profit">利益順</button>
 </div>
 
 <div class="filter price-sort-sub" id="priceSortRow" style="display:none;">
@@ -919,7 +920,7 @@ body.dark .calc-freeform-add{ color:var(--dark-accent); border-color:#7a6030; }
     <span data-i18n="food_help_search_body">料理名や素材名で検索できます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="food_help_sort_title">並び替え</strong><br>
-    <span data-i18n="food_help_sort_body">図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。</span></p>
+    <span data-i18n="food_help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順・利益順で並び替えできます。売却額順/利益順を選ぶと、高い順/安い順と★1〜5の基準を選べます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="food_help_calc_title">認証マスター計算</strong><br>
     <span data-i18n="food_help_calc_body">上部のボタンから、認証マスターに必要な素材の数を自動計算できます。手持ちの数を入力すると、不足している分だけ表示されます。</span></p>
@@ -992,7 +993,7 @@ updateDarkButton();
 const FOODS_TUTORIAL_DONE_KEY = "hatopiFoods_tutorialDone";
 const FOODS_TUTORIAL_STEPS = [
   { selector: "#search", titleKey: "tutorial_foods_step1_title", titleFallback: "① 検索する", textKey: "tutorial_foods_step1_body", textFallback: "料理名や素材名のキーワードで検索できます。" },
-  { selector: "#sortRow", titleKey: "tutorial_foods_step2_title", titleFallback: "② 並び替え", textKey: "tutorial_foods_step2_body", textFallback: "図鑑順・レベル順・未コンプ順・未認証順で並び替えできます。" },
+  { selector: "#sortRow", titleKey: "tutorial_foods_step2_title", titleFallback: "② 並び替え", textKey: "tutorial_foods_step2_body", textFallback: "図鑑順・レベル順・未コンプ順・未認証順・売却額順・利益順で並び替えできます。" },
   { selector: "#calcOpenBtn", titleKey: "tutorial_foods_step3_title", titleFallback: "③ 認証マスター計算", textKey: "tutorial_foods_step3_body", textFallback: "必要な素材数を自動計算できます。手持ちの数を入力すれば不足分だけ表示されます。" },
   { selector: "#list", titleKey: "tutorial_foods_step4_title", titleFallback: "④ 一覧をタップ", textKey: "tutorial_foods_step4_body", textFallback: "気になる料理をタップすると、レシピや必要な素材の詳細が確認できます。" },
 ];
@@ -1077,6 +1078,13 @@ function priceAtStar(f, star){
   return prices5[star - 1] ?? null;
 }
 
+// 利益順ソート用：指定した★（1〜5）での利益（売価-材料費）を返す（売価が存在しない場合はnull）
+function profitAtStar(f, star){
+  const p = priceAtStar(f, star);
+  if(p == null) return null;
+  return p - (f.cost || 0);
+}
+
 // ── 画像プリロード（IntersectionObserver方式） ──
 const foodImgObserver = new IntersectionObserver((entries, obs) => {
   entries.forEach(entry => {
@@ -1114,11 +1122,11 @@ clearBtn.onclick = ()=>{
 // ── 並び替え ──
 function setSort(type){
   currentSort = type;
-  ["book","level","unchecked","unauth","price"].forEach(x=>{
+  ["book","level","unchecked","unauth","price","profit"].forEach(x=>{
     document.getElementById("s_"+x).classList.toggle("active", x === type);
   });
   const priceSortRow = document.getElementById("priceSortRow");
-  if(priceSortRow) priceSortRow.style.display = type === "price" ? "" : "none";
+  if(priceSortRow) priceSortRow.style.display = (type === "price" || type === "profit") ? "" : "none";
   render();
 }
 
@@ -1290,12 +1298,13 @@ function render(){
         if(aa !== ba) return aa - ba;
         return foodsData.indexOf(a) - foodsData.indexOf(b);
       });
-    } else if(currentSort === "price"){
+    } else if(currentSort === "price" || currentSort === "profit"){
+      const valueFn = currentSort === "price" ? priceAtStar : profitAtStar;
       return list.slice().sort((a,b) => {
-        const pa = priceAtStar(a, priceSortStar);
-        const pb = priceAtStar(b, priceSortStar);
+        const pa = valueFn(a, priceSortStar);
+        const pb = valueFn(b, priceSortStar);
 
-        // 価格が無いものは常に後ろへ
+        // 値が無いものは常に後ろへ
         if(pa == null && pb == null) return foodsData.indexOf(a) - foodsData.indexOf(b);
         if(pa == null) return 1;
         if(pb == null) return -1;

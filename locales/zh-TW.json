@@ -954,7 +954,7 @@
   "tutorial_foods_step1_title": "①搜尋",
   "tutorial_foods_step1_body": "可依料理名稱或素材名稱關鍵字搜尋。",
   "tutorial_foods_step2_title": "②排序",
-  "tutorial_foods_step2_body": "可依圖鑑順序、等級順序、未收集優先、未認證優先排序。",
+  "tutorial_foods_step2_body": "可依圖鑑順序、等級順序、未收集優先、未認證優先、售價或利潤排序。",
   "tutorial_foods_step3_title": "③認證大師計算",
   "tutorial_foods_step3_body": "自動計算所需素材數量。輸入已有數量即可只顯示缺少的部分。",
   "tutorial_foods_step4_title": "④點擊列表",
@@ -1011,7 +1011,7 @@
   "food_help_search_title": "搜尋",
   "food_help_search_body": "可依料理名稱或素材名稱搜尋。",
   "food_help_sort_title": "排序",
-  "food_help_sort_body": "可依圖鑑順序、等級順序、未收集優先、未認證優先排序。",
+  "food_help_sort_body": "可依圖鑑順序、等級順序、未收集優先、未認證優先、售價或利潤排序。選擇按售價/利潤排序後，可選擇由高到低/由低到高，以及使用★1〜5中哪個等級的數值作為基準。",
   "food_help_calc_title": "認證大師計算",
   "food_help_calc_body": "點擊上方按鈕，可自動計算認證大師所需的素材數量。輸入已有數量即可只顯示缺少的部分。",
   "food_help_detail_title": "查看詳細資訊",
@@ -1188,6 +1188,7 @@
   "pc_save_hint": "輸入內容將自動儲存在本裝置。可透過預覽區上方按鈕儲存PNG或分享到社群媒體。",
   "pc_reset_all": "重設所有輸入內容",
   "sort_price": "按售價排序",
+  "sort_profit": "按利潤排序",
   "price_sort_high": "由高到低",
   "price_sort_low": "由低到高"
 }

@@ -1003,7 +1003,7 @@
   "tutorial_foods_step1_title": "① Search",
   "tutorial_foods_step1_body": "Search by dish name or ingredient name.",
   "tutorial_foods_step2_title": "② Sort",
-  "tutorial_foods_step2_body": "Sort by dex order, level, uncompleted first, or unauthenticated first.",
+  "tutorial_foods_step2_body": "Sort by dex order, level, uncompleted first, unauthenticated first, sell price, or profit.",
   "tutorial_foods_step3_title": "③ Auth master calculator",
   "tutorial_foods_step3_body": "Automatically calculates the ingredients you need. Enter what you already have to see only what's missing.",
   "tutorial_foods_step4_title": "④ Tap an entry",
@@ -1060,7 +1060,7 @@
   "food_help_search_title": "Search",
   "food_help_search_body": "Search by dish name or ingredient name.",
   "food_help_sort_title": "Sort",
-  "food_help_sort_body": "Sort by dex order, level, uncompleted first, or unauthenticated first.",
+  "food_help_sort_body": "Sort by dex order, level, uncompleted first, unauthenticated first, sell price, or profit. When sorting by sell price/profit, you can choose highest/lowest first and which star rank (1-5) to use.",
   "food_help_calc_title": "Auth master calculator",
   "food_help_calc_body": "The button at the top automatically calculates the ingredients you need for authentication mastery. Enter what you already have to see only what's missing.",
   "food_help_detail_title": "See more detail",
@@ -1309,6 +1309,7 @@
   "forecast_next_month": "Next month",
   "forecast_no_data_month": "No dates to show for this month",
   "sort_price": "Sort by sell price",
+  "sort_profit": "Sort by profit",
   "price_sort_high": "Highest first",
   "price_sort_low": "Lowest first"
 }
