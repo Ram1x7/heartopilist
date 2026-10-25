@@ -1460,7 +1460,7 @@
   "art_ssi_recovered_colors": "色を復元しました。",
   "art_ssi_small_cells": "1マスの写りが小さいため、大きなスクショを使うと確認しやすくなります。",
   "art_ssi_unreadable_cells": "読み取れないマス（未着色）",
-  "art_ssi_mixed_cells": "色の混ざるマス（位置合わせを確認）",
+  "art_ssi_mixed_cells": "色の判別が難しいマス（位置・画質を確認）",
   "art_ssi_stability_label": "圧縮による色のばらつきを抑える",
   "art_ssi_stability_hint": "繰り返し使われる色を参考に、近い色を補正します。細かな色の違いが消える場合はOFFにしてください。"
 }

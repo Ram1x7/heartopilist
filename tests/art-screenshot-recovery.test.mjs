@@ -95,3 +95,28 @@ test('closing an import cancels matching without publishing stale candidates',as
   vm.runInContext('closeScreenshotImportModal()',c);
   assert.equal(await running,false);assert.equal(vm.runInContext('ssiMatchResults.length',c),0);
 });
+
+test('JPEG outline detection combines edge and ridge seeds before subpixel grid recovery',async()=>{
+  const {inflateSync}=await import('node:zlib');
+  const f=JSON.parse(fs.readFileSync(new URL('fixtures/generated-outline-jpeg.json',import.meta.url),'utf8'));
+  const c=vm.createContext({console,setTimeout,clearTimeout,document:{getElementById:()=>({style:{}}),createElement:()=>({getContext:()=>({drawImage(){},getImageData:()=>c.fixtureImage})})}});
+  for(const name of ['art-config','art-masks','art-pixelate','art-template-match','art-screenshot-recovery'])vm.runInContext(fs.readFileSync(new URL('../js/'+name+'.js',import.meta.url),'utf8'),c);
+  vm.runInContext(fs.readFileSync(new URL('../js/art-screenshot-import.js',import.meta.url),'utf8').replace(/bindScreenshotImportControls\(\);\s*$/,''),c);
+  c.fixtureImage={width:f.imageWidth,height:f.imageHeight,data:new Uint8ClampedArray(inflateSync(Buffer.from(f.rgbaZlib,'base64')))};
+  await vm.runInContext('ssiWorkingCanvas={width:fixtureImage.width,height:fixtureImage.height};ssiRunTemplateMatching()',c);
+  const best=vm.runInContext('ssiMatchResults[0]',c);
+  assert.equal(best.frameId,'t_shirt');assert.equal(best.partId,'default');assert.ok(best.score>.5);
+  assert.ok(Math.abs(best.match.offsetX-f.rect.x)<1.5);assert.ok(Math.abs(best.match.scale-4.2)<.03);
+  const aligned=vm.runInContext("ssiSelectedFrameId='t_shirt';ssiSelectedPartId='default';ssiWorkingData=fixtureImage;ssiResolveRegionRect('t_shirt','default')",c);
+  assert.ok(Math.abs(aligned.x-f.rect.x)<1.5);assert.ok(Math.abs(aligned.y-f.rect.y)<1.5);
+  c.aligned=aligned;
+  const result=vm.runInContext("HatopiScreenshotRecovery.recover(fixtureImage,aligned,64,80,{...PRESET_MASKS.t_shirt.default})",c);
+  const valid=result.mask.reduce((n,m)=>n+m,0),correct=result.pixels.filter((p,i)=>result.mask[i]&&p===colors[i%3]).length;
+  // This deliberately dense, 4.2-pixel JPEG loses chroma information. Its
+  // geometry must align, while noisy colors must be flagged rather than
+  // claiming exact recovery from a successful outline match.
+  assert.ok(result.weak/valid>.8);
+  const known=vm.runInContext("HatopiScreenshotRecovery.recover(fixtureImage,{x:12.3,y:9.2,w:268.8,h:336},64,80,{...PRESET_MASKS.t_shirt.default})",c);
+  const knownCorrect=known.pixels.filter((p,i)=>known.mask[i]&&p===colors[i%3]).length;
+  assert.ok(correct>=knownCorrect-valid*.05,'alignment must retain recovery quality close to the known rectangle');
+});
