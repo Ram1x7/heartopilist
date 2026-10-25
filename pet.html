@@ -663,33 +663,33 @@ body.dark .footer {
 <div class="modal" id="helpModal">
   <div class="modal-box">
     <button class="modal-close" onclick="closeModal('helpModal')"><span class="btn-icon" data-icon="close"></span></button>
-    <div class="modal-title help-modal-title"><span class="btn-icon" data-icon="info"></span> 使い方</div>
+    <div class="modal-title help-modal-title"><span class="btn-icon" data-icon="info"></span> <span data-i18n="pet_help_title">使い方</span></div>
 
-    <p><strong>ペットの追加・切替</strong><br>
-    種類（犬・猫）を選んで「追加」ボタンを押すとペットを登録できます。<br>
-    上部のタブをタップでペットを切り替え、ダブルタップで名前変更、長押しで削除できます。</p>
+    <p><strong data-i18n="pet_help_add_title">ペットの追加・切替</strong><br>
+    <span data-i18n="pet_help_add_body">種類（犬・猫）を選んで「追加」ボタンを押すとペットを登録できます。<br>
+    上部のタブをタップでペットを切り替え、ダブルタップで名前変更、長押しで削除できます。</span></p>
 
-    <p style="margin-top:10px;"><strong>エサの検索</strong><br>
-    検索欄にエサの名前を入力すると絞り込めます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="pet_help_search_title">エサの検索</strong><br>
+    <span data-i18n="pet_help_search_body">検索欄にエサの名前を入力すると絞り込めます。</span></p>
 
-    <p style="margin-top:10px;"><strong>エサの記録</strong><br>
-    画像をタップするとあげた記録になります（画像が暗転表示）。<br>
-    好きなエサは緑枠、嫌いなエサは朱色枠で表示されます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="pet_help_record_title">エサの記録</strong><br>
+    <span data-i18n="pet_help_record_body">画像をタップするとあげた記録になります（画像が暗く表示されます）。<br>
+    好きなエサは緑色の枠、嫌いなエサは朱色の枠で表示されます。</span></p>
 
-    <p style="margin-top:10px;"><strong>並び順</strong><br>
-    好き・嫌い・未記録・あげた済み、の順に自動で並び替わります。</p>
+    <p style="margin-top:10px;"><strong data-i18n="pet_help_order_title">並び順</strong><br>
+    <span data-i18n="pet_help_order_body">好き・嫌い・未記録・あげた済み、の順に自動で並び替わります。</span></p>
 
-    <p style="margin-top:10px;"><strong>進捗表示</strong><br>
-    コントロールカード下部に、あげた記録の件数が表示されます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="pet_help_progress_title">進捗表示</strong><br>
+    <span data-i18n="pet_help_progress_body">コントロールカード下部に、あげた記録の件数が表示されます。</span></p>
 
-    <p style="margin-top:10px;"><strong>データ管理</strong><br>
-    データ管理ボタンから、現在のペットデータをファイルとして書き出したり、バックアップファイルを読み込んだりできます。機種変更やブラウザの変更時にご利用ください。</p>
+    <p style="margin-top:10px;"><strong data-i18n="pet_help_sync_title">データ管理</strong><br>
+    <span data-i18n="pet_help_sync_body">データ管理ボタンから、現在のペットデータをファイルとして書き出したり、バックアップファイルを読み込んだりできます。機種変更やブラウザの変更時にご利用ください。</span></p>
 
-    <p style="margin-top:10px;"><strong>リセット</strong><br>
-    リセットボタンで、選択中のペットのエサ記録をすべて消去します。元に戻せないのでご注意ください。</p>
+    <p style="margin-top:10px;"><strong data-i18n="pet_help_reset_title">リセット</strong><br>
+    <span data-i18n="pet_help_reset_body">リセットボタンを押すと、選択中のペットのエサ記録をすべて消去します。元に戻せないのでご注意ください。</span></p>
 
     <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal'); replayPageTutorial(PET_TUTORIAL_DONE_KEY, PET_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
-    <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal')">閉じる</button>
+    <button class="full-btn secondary" style="margin-top:16px;" onclick="closeModal('helpModal')" data-i18n="pet_help_close">閉じる</button>
   </div>
 </div>
 
