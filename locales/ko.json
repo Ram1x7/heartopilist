@@ -173,7 +173,7 @@
   "garden_help_tabs_title": "작물・꽃 전환",
   "garden_help_tabs_body": "화면 상단의 \"작물\", \"꽃\" 탭으로 화면을 전환할 수 있습니다. 성장 시간, 씨앗 가격, 판매 가격을 한눈에 확인할 수 있습니다.",
   "garden_help_sort_title": "정렬",
-  "garden_help_sort_body": "도감 순서・판매가 순으로 정렬할 수 있습니다. 판매가 순을 선택하면 높은 순/낮은 순과 ★1〜5 기준을 선택할 수 있습니다.",
+  "garden_help_sort_body": "도감 순서・판매가 순・이익 순으로 정렬할 수 있습니다. 판매가 순/이익 순을 선택하면 높은 순/낮은 순과 ★1〜5 기준을 선택할 수 있습니다.",
   "garden_help_detail_title": "자세한 정보 보기",
   "garden_help_detail_body": "카드를 탭하면 등급(☆1~☆5)별 판매 가격을 확인할 수 있습니다. 꽃의 경우 교배로 만들 수 있는 색상 목록도 표시됩니다.",
   "garden_help_check_title": "컴플리트・인증 마스터 체크",

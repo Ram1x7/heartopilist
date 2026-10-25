@@ -173,7 +173,7 @@
   "garden_help_tabs_title": "切換作物・花卉",
   "garden_help_tabs_body": "透過頁面上方的「作物」「花卉」分頁切換顯示內容，可查看生長時間、種子價格與售價一覽。",
   "garden_help_sort_title": "排序",
-  "garden_help_sort_body": "可依圖鑑順序或售價排序。選擇按售價排序後，可選擇由高到低/由低到高，以及使用★1〜5中哪個等級的售價作為基準。",
+  "garden_help_sort_body": "可依圖鑑順序、售價或利潤排序。選擇按售價/利潤排序後，可選擇由高到低/由低到高，以及使用★1〜5中哪個等級的數值作為基準。",
   "garden_help_detail_title": "查看詳細資訊",
   "garden_help_detail_body": "點擊卡片可查看各稀有度（☆1～☆5）的售價。花卉還會顯示可透過雜交獲得的顏色清單。",
   "garden_help_check_title": "收集打勾・認證大師打勾",
