@@ -1790,14 +1790,6 @@ h3{
   letter-spacing:0.06em;
 }
 
-/* 使い方モーダルのタイトルは、読みやすさを優先し本文と同じ標準フォントにする */
-.help-modal-title,
-.g-modal-name.help-modal-title,
-.modal-title.help-modal-title{
-  font-family:'Zen Maru Gothic', sans-serif;
-  letter-spacing:normal;
-}
-
 body.dark h3{
   color:var(--dark-accent);
 }
