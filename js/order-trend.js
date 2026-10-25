@@ -35,7 +35,7 @@ function forceRepaint(){
 // ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
 const ORDER_TREND_TUTORIAL_DONE_KEY = "hatopiOrderTrend_tutorialDone";
 const ORDER_TREND_TUTORIAL_STEPS = [
-  { selector: "#otSearch", titleKey: "tutorial_ordertrend_step1_title", titleFallback: "① 検索する", textKey: "tutorial_ordertrend_step1_body", textFallback: "アイテム名で検索できます(名称未確認のアイテムは検索対象外です)。" },
+  { selector: "#otSearch", titleKey: "tutorial_ordertrend_step1_title", titleFallback: "① 検索する", textKey: "tutorial_ordertrend_step1_body", textFallback: "アイテム名で検索できます（名称未確認のアイテムは検索対象外です）。" },
   { selector: "#otSeasonRow", titleKey: "tutorial_ordertrend_step2_title", titleFallback: "② シーズンで絞り込む", textKey: "tutorial_ordertrend_step2_body", textFallback: "トレンドシーズンごとに絞り込みできます。横にスクロールすると他のシーズンも選べます。" },
   { selector: "#otCategoryRow", titleKey: "tutorial_ordertrend_step3_title", titleFallback: "③ カテゴリで絞り込む", textKey: "tutorial_ordertrend_step3_body", textFallback: "服・家具・その他で絞り込みできます。" },
   { selector: "#otContent", titleKey: "tutorial_ordertrend_step4_title", titleFallback: "④ 入手済みチェック", textKey: "tutorial_ordertrend_step4_body", textFallback: "画像左上のボタンをタップすると入手済みとしてチェックできます。チェックしたアイテムは薄暗く表示され、自動的に一覧の最後に移動します。誤ってタップしてしまっても、もう一度タップすればすぐに元へ戻せます。" },

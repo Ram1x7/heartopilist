@@ -155,7 +155,10 @@ function initArtConverter(){
   document.getElementById("artResultZoomIcon").innerHTML = icon("search", { size: 16 });
 
   bindConvertTutorialControls();
-  maybeStartConvertTutorialPhase("upload");
+  // i18nの言語データ読み込み（非同期）が終わる前にチュートリアル文言を描画してしまうと、
+  // T()がまだ日本語フォールバックしか返せず、他言語選択時に一瞬だけ日本語が出てしまうため、
+  // 他のフェーズ遷移と同様に少し遅らせて開始する
+  setTimeout(() => maybeStartConvertTutorialPhase("upload"), 400);
 
   bindConvertStepProgress();
   updateConvertStepProgress("upload");
@@ -790,14 +793,14 @@ function useResultInEditor(){
 // はいつでも再生できる） ──
 const CONVERT_TUTORIAL_DONE_KEY = "hatopiArt_convertTutorialDone";
 const CONVERT_TUTORIAL_STEPS = [
-  { phase: "upload", selector: "#artUploadBtn", title: "① 画像を選ぶ", text: "変換したい画像をアップロードします。JPG・PNG・WebPに対応しています。" },
-  { phase: "size", selector: "#artConvertSizeStep1", title: "② キャンバスサイズ", text: "比率、またはゲーム内のデザイン枠（衣装・家具など）に合わせてサイズを選びます。先にサイズを決めておくと、次の位置調整をやり直さずに済みます。" },
-  { phase: "crop", selector: "#artCropViewport", title: "③ 位置とサイズを調整", text: "ドラッグで位置を、下のスライダーで拡大縮小して、切り抜く範囲を決めます。決まったら「この位置で決定」で次に進みます。" },
-  { phase: "panel", selector: "#artConvertPresetOptions", title: "④ 変換方式", text: "写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。" },
-  { phase: "panel", selector: "#artNoiseRange", title: "⑤ ノイズ除去", text: "写真のザラつきが気になる場合に調整します。色数を減らす前に整えるのがおすすめです。" },
-  { phase: "panel", selector: "#artConvertColorOptions", title: "⑥ 色数", text: "少ないほどゲーム内で塗りやすくなります。まずは16色前後から試してみてください。" },
-  { phase: "panel", selector: "#artAdvancedToggle", title: "⑦ 詳細設定", text: "配置方法・明るさ・コントラストなど、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。" },
-  { phase: "panel", selector: "#artUseInEditorBtn", title: "⑧ エディターで編集する", text: "納得のいく結果になったら、このボタンでアートエディターに移動して、続きを手描きで仕上げられます。" },
+  { phase: "upload", selector: "#artUploadBtn", titleKey: "art_convert_tutorial_step1_title", titleFallback: "① 画像を選ぶ", textKey: "art_convert_tutorial_step1_body", textFallback: "変換したい画像をアップロードします。対応する画像形式はJPG・PNG・WebPです。" },
+  { phase: "size", selector: "#artConvertSizeStep1", titleKey: "art_convert_tutorial_step2_title", titleFallback: "② キャンバスサイズ", textKey: "art_convert_tutorial_step2_body", textFallback: "比率、またはゲーム内のデザイン枠（衣装・家具など）に合わせてサイズを選びます。先にサイズを決めておくと、次の位置調整をやり直さずに済みます。" },
+  { phase: "crop", selector: "#artCropViewport", titleKey: "art_convert_tutorial_step3_title", titleFallback: "③ 位置とサイズを調整", textKey: "art_convert_tutorial_step3_body", textFallback: "ドラッグで位置を、下のスライダーで拡大縮小して、切り抜く範囲を決めます。決まったら「この位置で決定」を押すと次に進みます。" },
+  { phase: "panel", selector: "#artConvertPresetOptions", titleKey: "art_convert_tutorial_step4_title", titleFallback: "④ 変換方式", textKey: "art_convert_tutorial_step4_body", textFallback: "画像の質感を選びます。写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。" },
+  { phase: "panel", selector: "#artNoiseRange", titleKey: "art_convert_tutorial_step5_title", titleFallback: "⑤ ノイズ除去", textKey: "art_convert_tutorial_step5_body", textFallback: "写真のザラつきが気になる場合に調整します。色数を減らす前に、まずこちらを整えるのがおすすめです。" },
+  { phase: "panel", selector: "#artConvertColorOptions", titleKey: "art_convert_tutorial_step6_title", titleFallback: "⑥ 色数", textKey: "art_convert_tutorial_step6_body", textFallback: "使用する色の数を制限します。少ないほどゲーム内で塗りやすくなるので、まずは16色前後から試してみてください。" },
+  { phase: "panel", selector: "#artAdvancedToggle", titleKey: "art_convert_tutorial_step7_title", titleFallback: "⑦ 詳細設定", textKey: "art_convert_tutorial_step7_body", textFallback: "配置方法・明るさ・コントラストなど、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。" },
+  { phase: "panel", selector: "#artUseInEditorBtn", titleKey: "art_convert_tutorial_step8_title", titleFallback: "⑧ エディターで編集する", textKey: "art_convert_tutorial_step8_body", textFallback: "納得のいく結果になったら、このボタンを押すとアートエディターに移動し、続きを手描きで仕上げられます。" },
 ];
 let convertTutorialStep = 0;
 let convertTutorialActive = false;
@@ -827,8 +830,8 @@ function renderConvertTutorialStep(){
     return;
   }
   document.getElementById("artTutorialStepLabel").textContent = `${convertTutorialStep + 1} / ${CONVERT_TUTORIAL_STEPS.length}`;
-  document.getElementById("artTutorialText").innerHTML = `<strong>${step.title}</strong><br>${step.text}`;
-  document.getElementById("artTutorialNextBtn").textContent = convertTutorialStep === CONVERT_TUTORIAL_STEPS.length - 1 ? "はじめる" : "次へ";
+  document.getElementById("artTutorialText").innerHTML = `<strong>${T(step.titleKey, step.titleFallback)}</strong><br>${T(step.textKey, step.textFallback)}`;
+  document.getElementById("artTutorialNextBtn").textContent = convertTutorialStep === CONVERT_TUTORIAL_STEPS.length - 1 ? T("tutorial_start", "はじめる") : T("tutorial_next", "次へ");
   target.scrollIntoView({ block: "center", behavior: "auto" });
   requestAnimationFrame(() => requestAnimationFrame(() => positionConvertTutorialElements(target)));
 }

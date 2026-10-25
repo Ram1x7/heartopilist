@@ -50,7 +50,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 
 
-<link rel="stylesheet" href="css/style.css?v=38">
+<link rel="stylesheet" href="css/style.css?v=39">
 <link rel="stylesheet" href="css/design-system.css?v=5">
 
 <link rel="prefetch" href="./foods.html">
@@ -62,9 +62,7 @@
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
-<link rel="prefetch" href="./build.html">
 <link rel="prefetch" href="./art-create.html">
-<link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./updates.html">
 <link rel="prefetch" href="./faq.html">
 <!-- Google Analytics -->
@@ -105,9 +103,7 @@
   <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
   <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
   <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
-  <a href="./build.html" class="site-nav-item" data-i18n="nav_build">建築</a>
   <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
-  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
@@ -466,7 +462,7 @@ overflow-y:auto;
 text-align:left;
 ">
 
-<h3 style="text-align:center;"><span id="helpTitleIcon" class="help-title-icon"></span><span data-i18n="help_title">はとぴ図鑑の使い方</span></h3>
+<h3 class="help-modal-title" style="text-align:center;"><span id="helpTitleIcon" class="help-title-icon"></span><span data-i18n="help_title">はとぴ図鑑の使い方</span></h3>
 
 <p><strong><span class="help-icon" data-icon="search"></span><span data-i18n="help_search_title">検索</span></strong><br>
 <span data-i18n="help_search_body">名前や場所で検索できます。</span></p>
@@ -475,13 +471,13 @@ text-align:left;
 <span data-i18n="help_type_body">魚・虫・野鳥に加えて、季節限定の砂像・雪像・貝殻の表示にも切り替えられます。</span></p>
 
 <p><strong><span class="help-icon" data-icon="weatherSun"></span><span data-i18n="help_mode_title">出現モード</span></strong><br>
-<span data-i18n="help_mode_body">・今出現するもの全て<br>
-・今の天気でしか出現しない<br>
-・今は出現しない<br>
-・すべて（出現状況に関わらず全部）</span></p>
+<span data-i18n="help_mode_body">「今出現するもの全て」は、今の天気・時間に出現する生き物だけを表示します。<br>
+「今の天気でしか出現しない」は、普段は出ない天気限定の生き物だけに絞り込みます。<br>
+「今は出現しない」は、今は見られない生き物を確認できます。<br>
+「すべて」は、出現状況に関係なく図鑑の全品目を表示します。</span></p>
 
 <p><strong><span class="help-icon" data-icon="sortBook"></span><span data-i18n="help_sort_title">並び替え</span></strong><br>
-<span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。</span></p>
+<span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順の5種類から選べます。売却額順を選ぶと、金額が高い順か安い順か、★1〜★5のどのレア度の金額を基準にするかも選べます。</span></p>
 
 <p><strong><span class="help-icon" data-icon="globe"></span><span data-i18n="help_server_title">サーバー・表示時間</span></strong><br>
 <span data-i18n="help_server_body">上部のサーバー選択で表示時刻を切り替えられます。出現判定自体は常に日本時間（JST）基準で、表示のみ選んだサーバーの時間帯に変換されます。</span></p>
@@ -494,11 +490,11 @@ text-align:left;
 
 <p><strong><span class="help-icon" data-icon="star"></span><span data-i18n="help_star_title">星5チェック機能</span></strong><br>
 <span data-i18n="help_star_body">右上の〇ボタンをタップでチェックできます。<br>
-複数選択→一括チェックも可能です。</span></p>
+複数選択モードを使えば、まとめてチェックすることもできます（詳しくは下記の「複数選択機能」をご覧ください）。</span></p>
 
 <p><strong><span class="help-icon" data-icon="medal"></span><span data-i18n="help_auth_title">マスターチェック機能</span></strong><br>
 <span data-i18n="help_auth_body">右下の〇ボタンをタップでチェックできます。<br>
-複数選択→一括チェックも可能です。</span></p>
+複数選択モードを使えば、まとめてチェックすることもできます（詳しくは下記の「複数選択機能」をご覧ください）。</span></p>
 
 <p><strong><span class="help-icon" data-icon="checkSquare"></span><span data-i18n="help_multi_title">複数選択機能</span></strong><br>
 <span data-i18n="help_multi_body_1">複数選択機能の使い方を説明します。</span><br>
@@ -531,7 +527,7 @@ text-align:left;
 <p><strong><span class="help-icon" data-icon="mail"></span><span data-i18n="help_contact_title">お問い合わせ</span></strong><br>
 <span data-i18n="help_contact_body">ページ最下部にてお問い合わせが可能です。<br>
 完全匿名で送信できますのでご利用ください。</span></p>
-<span data-i18n="help_contact_note">(回答掲載用のQ&Aページ追加予定です。)</span>
+<span data-i18n="help_contact_note">（回答掲載用のQ&Aページ追加予定です。）</span>
 
 <p><strong><span class="help-icon" data-icon="warning"></span><span data-i18n="help_notice_title">注意</span></strong><br>
 <span data-i18n="help_notice_body">こちらのサイトでは、サイトを閉じる時の状態が保存されます。<br>

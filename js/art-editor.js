@@ -2484,13 +2484,13 @@ function closeHelpModal(){
 // 一度最後まで見る／スキップすると再表示しない（ヘルプモーダルの「もう一度見る」からはいつでも再生できる）
 const TUTORIAL_DONE_KEY = "hatopiArt_tutorialDone";
 const TUTORIAL_STEPS = [
-  { selector: "#artEditModeBtn", title: "① 編集する", text: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
-  { selector: "#artToolbar", title: "② ツール", text: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから。" },
-  { selector: "#artBrushSizeSection", title: "③ 太さ", text: "ペン・消しゴムの太さを1〜4マスから選べます。" },
-  { selector: "#artPaletteToggleBtn", title: "④ カラー", text: "タップするとカラーパレットが開きます。上のバーをドラッグすると好きな位置に動かせるので、開いたままキャンバスを描き進められます。" },
-  { selector: "#artZoomControls", title: "⑤ 拡大率", text: "スライダーで自由に拡大・縮小できます。スマホなら2本指のピンチ操作でも変更できます。" },
-  { selector: "#artLockBtn", title: "⑥ 固定する", text: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
-  { selector: "#artSaveBtn", title: "⑦ 保存する", text: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG保存・共有もできます。" },
+  { selector: "#artEditModeBtn", titleKey: "art_create_tutorial_step1_title", titleFallback: "① 編集する", textKey: "art_create_tutorial_step1_body", textFallback: "まずはこのボタンをONにしてください。ONの間だけキャンバスに描き込めます（誤タップ防止のためです）。" },
+  { selector: "#artToolbar", titleKey: "art_create_tutorial_step2_title", titleFallback: "② ツール", textKey: "art_create_tutorial_step2_body", textFallback: "ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）を切り替えられます。元に戻す・やり直す・全消去もここから行えます。" },
+  { selector: "#artBrushSizeSection", titleKey: "art_create_tutorial_step3_title", titleFallback: "③ 太さ", textKey: "art_create_tutorial_step3_body", textFallback: "ペン・消しゴムの太さを1〜4マスから選べます。" },
+  { selector: "#artPaletteToggleBtn", titleKey: "art_create_tutorial_step4_title", titleFallback: "④ カラー", textKey: "art_create_tutorial_step4_body", textFallback: "タップするとカラーパレットが開きます。上のバーをドラッグすると好きな位置に動かせるので、開いたままキャンバスを描き進められます。" },
+  { selector: "#artZoomControls", titleKey: "art_create_tutorial_step5_title", titleFallback: "⑤ 拡大率", textKey: "art_create_tutorial_step5_body", textFallback: "スライダーで自由に拡大・縮小できます。スマートフォンなら2本指でつまむ操作でも変更できます。" },
+  { selector: "#artLockBtn", titleKey: "art_create_tutorial_step6_title", titleFallback: "⑥ 固定する", textKey: "art_create_tutorial_step6_body", textFallback: "描き終えたら固定しておくと、誤って上書きしてしまうのを防げます。" },
+  { selector: "#artSaveBtn", titleKey: "art_create_tutorial_step7_title", titleFallback: "⑦ 保存する", textKey: "art_create_tutorial_step7_body", textFallback: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG画像として保存したり、共有したりすることもできます。" },
 ];
 let tutorialStep = 0;
 
@@ -2528,8 +2528,8 @@ function renderTutorialStep(){
     return;
   }
   document.getElementById("artTutorialStepLabel").textContent = `${tutorialStep + 1} / ${TUTORIAL_STEPS.length}`;
-  document.getElementById("artTutorialText").innerHTML = `<strong>${step.title}</strong><br>${step.text}`;
-  document.getElementById("artTutorialNextBtn").textContent = tutorialStep === TUTORIAL_STEPS.length - 1 ? "はじめる" : "次へ";
+  document.getElementById("artTutorialText").innerHTML = `<strong>${T(step.titleKey, step.titleFallback)}</strong><br>${T(step.textKey, step.textFallback)}`;
+  document.getElementById("artTutorialNextBtn").textContent = tutorialStep === TUTORIAL_STEPS.length - 1 ? T("tutorial_start", "はじめる") : T("tutorial_next", "次へ");
   // スムーススクロールだとアニメーション完了前に位置を確定してしまい枠がズレるため、
   // 即座にジャンプさせてからレイアウト確定後（次の描画フレーム）に位置を合わせる
   target.scrollIntoView({ block: "center", behavior: "auto" });

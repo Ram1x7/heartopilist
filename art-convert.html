@@ -27,12 +27,11 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=38">
+<link rel="stylesheet" href="./css/style.css?v=39">
 <link rel="stylesheet" href="./css/art.css?v=68">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./art-create.html">
-<link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./updates.html">
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -44,7 +43,6 @@
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
-<link rel="prefetch" href="./build.html">
 <link rel="prefetch" href="./faq.html">
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
@@ -79,9 +77,7 @@
   <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
   <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
   <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
-  <a href="./build.html" class="site-nav-item" data-i18n="nav_build">建築</a>
   <a href="./art-create.html" class="site-nav-item active" data-i18n="nav_art">アート</a>
-  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
@@ -279,7 +275,7 @@
   <div class="art-tutorial-step" id="artTutorialStepLabel"></div>
   <div class="art-tutorial-text" id="artTutorialText"></div>
   <div class="art-tutorial-actions">
-    <button class="art-tutorial-skip" id="artTutorialSkipBtn">スキップ</button>
+    <button class="art-tutorial-skip" id="artTutorialSkipBtn" data-i18n="tutorial_skip">スキップ</button>
     <button class="art-tutorial-next" id="artTutorialNextBtn">次へ</button>
   </div>
 </div>
@@ -296,33 +292,33 @@
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-help-box">
-    <h3 style="text-align:center;">使い方</h3>
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="art_convert_help_title">使い方</h3>
 
-    <p><strong>① 画像を選ぶ</strong><br>
-    JPG・PNG・WebP形式の画像をアップロードします。</p>
+    <p><strong data-i18n="art_convert_help_1_title">① 画像を選ぶ</strong><br>
+    <span data-i18n="art_convert_help_1_body">JPG・PNG・WebP形式の画像をアップロードします。</span></p>
 
-    <p style="margin-top:10px;"><strong>② キャンバスサイズ</strong><br>
-    「比率」からキャンバスの縦横比を、「サイズ」から実際のマス数を選びます。ゲーム内のデザイン枠（衣装・家具など）に合わせて変換したい場合は、比率の一覧からアイテムを選んでください。先にサイズを決めておくことで、次の位置調整をやり直さずに済みます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_2_title">② キャンバスサイズ</strong><br>
+    <span data-i18n="art_convert_help_2_body">「比率」からキャンバスの縦横比を、「サイズ」から実際のマス数を選びます。ゲーム内のデザイン枠（衣装・家具など）に合わせて変換したい場合は、比率の一覧からアイテムを選んでください。先にサイズを決めておくことで、次の位置調整をやり直さずに済みます。</span></p>
 
-    <p style="margin-top:10px;"><strong>③ 位置とサイズを調整</strong><br>
-    ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を目で見ながら決められます。あとから「位置を調整する」「サイズを変更する」ボタンでいつでもやり直せます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_3_title">③ 位置とサイズを調整</strong><br>
+    <span data-i18n="art_convert_help_3_body">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を目で見ながら決められます。あとから「位置を調整する」「サイズを変更する」ボタンでいつでもやり直せます。</span></p>
 
-    <p style="margin-top:10px;"><strong>④ 変換方式</strong><br>
-    画像の質感を選びます。写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_4_title">④ 変換方式</strong><br>
+    <span data-i18n="art_convert_help_4_body">画像の質感を選びます。写真には「標準」、イラストには「なめらか」、線画やアイコンには「くっきり」がおすすめです。</span></p>
 
-    <p style="margin-top:10px;"><strong>⑤ ノイズ除去</strong><br>
-    写真のザラつきが気になる場合に調整します。色数を減らす前に、まずこちらを整えるのがおすすめです。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_5_title">⑤ ノイズ除去</strong><br>
+    <span data-i18n="art_convert_help_5_body">写真のザラつきが気になる場合に調整します。色数を減らす前に、まずこちらを整えるのがおすすめです。</span></p>
 
-    <p style="margin-top:10px;"><strong>⑥ 色数</strong><br>
-    使用する色数を制限します。多いほど元画像に近づきますが、ゲーム内で塗る手間も増えるため、まずは16色前後から試すのがおすすめです。ディザリング（色の粒を混ぜてグラデーションを表現する処理）も合わせて調整できます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_6_title">⑥ 色数</strong><br>
+    <span data-i18n="art_convert_help_6_body">使用する色数を制限します。多いほど元画像に近づきますが、ゲーム内で塗る手間も増えるため、まずは16色前後から試すのがおすすめです。あわせて調整できる「ディザリング」は、色の粒を混ぜてグラデーションのように見せる処理です。</span></p>
 
-    <p style="margin-top:10px;"><strong>⑦ 詳細設定</strong><br>
-    配置方法・余白の色・輪郭強調・明るさ・コントラスト・背景など、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_7_title">⑦ 詳細設定</strong><br>
+    <span data-i18n="art_convert_help_7_body">配置方法・余白の色・輪郭強調・明るさ・コントラスト・背景など、必須ではない細かい調整はここにまとめています。必要な時だけ開いてください。</span></p>
 
-    <p style="margin-top:10px;"><strong>エディターで編集する</strong><br>
-    変換結果に納得したら、このボタンでアートエディターに移動し、続きを手描きで仕上げられます。</p>
+    <p style="margin-top:10px;"><strong data-i18n="art_convert_help_editor_title">エディターで編集する</strong><br>
+    <span data-i18n="art_convert_help_editor_body">変換結果に納得したら、このボタンでアートエディターに移動し、続きを手描きで仕上げられます。</span></p>
 
-    <button class="modal-close-btn" onclick="replayConvertTutorial()" style="margin-top:14px;">チュートリアルをもう一度見る</button>
+    <button class="modal-close-btn" onclick="replayConvertTutorial()" style="margin-top:14px;" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
     <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
   </div>
 </div>

@@ -1897,7 +1897,7 @@ async function importBuildDesigns(event){
 // チュートリアルを一度表示したい）
 const BUILD_TUTORIAL_DONE_KEY = "hatopiBuild_tutorialDone_v2";
 const BUILD_TUTORIAL_STEPS = [
-  { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "画像をアップロードし、立体(像)か平面(床)かを選んでサイズ・厚さを指定します。" },
+  { selector: "#buildUploadBtn", titleKey: "tutorial_build_step1_title", titleFallback: "① 画像を選ぶ", textKey: "tutorial_build_step1_body", textFallback: "画像をアップロードし、「立体（像）」か「平面（床）」かを選んでサイズ・厚さを指定します。" },
   { selector: "#buildLibraryPanel", titleKey: "tutorial_build_step2_title", titleFallback: "② 設計図を保存・管理", textKey: "tutorial_build_step2_body", textFallback: "保存した設計図はここから呼び出せます。JSON形式での書き出し・読み込みも可能です。" },
   { selector: "#helpBtn", titleKey: "tutorial_build_step3_title", titleFallback: "③ 使い方をもっと見る", textKey: "tutorial_build_step3_body", textFallback: "変換の流れなど、詳しい使い方はこのボタンから見返せます。" },
 ];

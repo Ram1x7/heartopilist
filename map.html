@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=38">
+<link rel="stylesheet" href="./css/style.css?v=39">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
@@ -41,9 +41,7 @@
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
-<link rel="prefetch" href="./build.html">
 <link rel="prefetch" href="./art-create.html">
-<link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./faq.html">
 <link rel="prefetch" href="./updates.html">
 <!-- Google Analytics -->
@@ -652,9 +650,7 @@ body.dark .footer{ color:var(--dark-text-sub); }
   <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
   <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
   <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
-  <a href="./build.html" class="site-nav-item" data-i18n="nav_build">建築</a>
   <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
-  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
@@ -736,13 +732,13 @@ body.dark .footer{ color:var(--dark-text-sub); }
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
-    <h3 style="text-align:center;" data-i18n="map_help_title">マップの使い方</h3>
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="map_help_title">マップの使い方</h3>
 
     <p><strong data-i18n="map_help_move_title">移動・拡大縮小</strong><br>
-    <span data-i18n="map_help_move_body">ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。</span></p>
+    <span data-i18n="map_help_move_body">ドラッグでマップを動かせます。拡大・縮小は、2本指でのピンチ操作、マウスのホイール、右下の拡大・縮小ボタンのいずれかで行えます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_cat_title">カテゴリで絞り込み</strong><br>
-    <span data-i18n="map_help_cat_body">NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。</span></p>
+    <span data-i18n="map_help_cat_body">キャラクター（NPC）・ショップ・バス停・動物・イベントの表示・非表示を切り替えられます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="map_help_pin_title">ピンをタップ</strong><br>
     <span data-i18n="map_help_pin_body">ピンやエリアをタップすると、その名前が下に表示されます。</span></p>
@@ -811,8 +807,9 @@ function forceRepaint(){
 // ── 初回チュートリアル ──
 const MAP_TUTORIAL_DONE_KEY = "hatopiMap_tutorialDone";
 const MAP_TUTORIAL_STEPS = [
-  { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを移動、ピンチ操作やホイール、右下の＋－ボタンで拡大縮小できます。" },
-  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "NPC・ショップ・バス停・動物・イベントの表示をオン/オフできます。" },
+  { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを動かせます。拡大・縮小は、2本指でのピンチ操作、マウスのホイール、右下の拡大・縮小ボタンのいずれかで行えます。" },
+  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "キャラクター（NPC）・ショップ・バス停・動物・イベントの表示・非表示を切り替えられます。" },
+  { selector: "#mapPinsLayer", titleKey: "tutorial_map_step3_title", titleFallback: "③ ピンをタップ", textKey: "tutorial_map_step3_body", textFallback: "地図上のピンやエリアをタップすると、その名前が下に表示されます。" },
 ];
 document.getElementById("helpBtn").innerHTML = icon("help");
 function openHelpModal(){ document.getElementById("helpModal").style.display = "block"; }

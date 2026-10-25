@@ -27,7 +27,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=38">
+<link rel="stylesheet" href="./css/style.css?v=39">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
 <link rel="prefetch" href="./index.html">
@@ -39,9 +39,7 @@
 <link rel="prefetch" href="./codes.html">
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
-<link rel="prefetch" href="./build.html">
 <link rel="prefetch" href="./art-create.html">
-<link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./updates.html">
 <link rel="prefetch" href="./faq.html">
 <!-- Google Analytics -->
@@ -534,9 +532,7 @@ body.dark .garden-footer{
   <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
   <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
   <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
-  <a href="./build.html" class="site-nav-item" data-i18n="nav_build">建築</a>
   <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
-  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
@@ -1422,17 +1418,17 @@ setInterval(updateTimers, 1000);
 document.getElementById("helpBtn").innerHTML = icon("help");
 document.getElementById("helpBtn").onclick = () => {
   document.getElementById("modalBox").innerHTML = `
-    <div class="g-modal-name">${T("garden_help_title","使い方")}</div>
+    <div class="g-modal-name help-modal-title">${T("garden_help_title","使い方")}</div>
     <div style="text-align:left;">
 
       <p><strong>${icon("crop",{size:13})} ${T("garden_help_tabs_title","作物・花の切替")}</strong><br>
       ${T("garden_help_tabs_body","画面上部の「作物」「花」タブで表示を切り替えられます。成長時間・種の値段・売却額の一覧を確認できます。")}</p>
 
       <p><strong>${icon("coin",{size:13})} ${T("garden_help_sort_title","並び替え")}</strong><br>
-      ${T("garden_help_sort_body","図鑑順・売却額順・利益順で並び替えできます。売却額順/利益順を選ぶと、高い順/安い順と★1〜5の基準を選べます。")}</p>
+      ${T("garden_help_sort_body","図鑑順・売却額順・利益順の3種類から選べます。売却額順か利益順を選ぶと、金額が高い順か安い順か、★1〜★5のどのレア度の金額を基準にするかも選べます。")}</p>
 
       <p><strong>${icon("info",{size:13})} ${T("garden_help_detail_title","詳しい情報を見る")}</strong><br>
-      ${T("garden_help_detail_body","カードをタップすると、レア度（☆1〜☆5）ごとの売却額を確認できます。花の場合は交配で作れる色の一覧も表示されます。")}</p>
+      ${T("garden_help_detail_body","カードをタップすると、★1〜★5それぞれの売却額を確認できます。花の場合は交配で作れる色の一覧も表示されます。")}</p>
 
       <p><strong>${icon("star",{size:13})} ${T("garden_help_check_title","コンプリート・認証マスターチェック")}</strong><br>
       ${T("garden_help_check_body","カード右上の丸ボタンでコンプリート状況、右下の丸ボタン（対象のみ表示）で認証マスター取得状況を記録できます。")}</p>
@@ -1441,7 +1437,7 @@ document.getElementById("helpBtn").onclick = () => {
       ${T("garden_help_breeding_body","花の詳細画面では、その花で作れる色の一覧と組み合わせ例を確認できます。交配は毎朝6時に行われ、同じ色の花を2株隣り合わせて植えると、1つ上のレア度の色の種ができます。組み合わせ例には、その花で実際に作れる色のみを表示しています。")}</p>
 
       <p><strong>${icon("bell",{size:13})} ${T("garden_help_notif_title","収穫通知")}</strong><br>
-      ${T("garden_help_notif_body","作物の詳細画面から通知を登録できます。<br>通常モード：収穫タイミングで1回通知<br>草抜きモード：草抜きタイミング3回＋収穫タイミングで通知<br>登録した作物にはベルアイコンが表示され、カード上にタイマーと進行バーが表示されます。")}</p>
+      ${T("garden_help_notif_body","作物の詳細画面から通知を登録できます。<br>通常モードを選ぶと、収穫のタイミングで1回通知します。<br>草抜きモードを選ぶと、草抜きのタイミングで3回、収穫のタイミングで1回、合わせて4回通知します。<br>登録した作物にはベルのアイコンが表示され、カード上にタイマーと進み具合を示すバーも表示されます。")}</p>
 
       <p><strong>${icon("warning",{size:13})} ${T("garden_help_notice_title","ご利用にあたって")}</strong><br>
       ${T("garden_help_notice_body","収穫通知は、ホーム画面に追加し、通知を許可した状態でのみ利用できます。<br>通知には最大1分程度の誤差があります。草抜きモードでは、1〜2回目は成長時間の3分の1ごとのタイミング前後、3回目は収穫時刻の1〜2分前に通知されます。<br>不具合が発生した場合、通知機能を予告なく一時停止する場合があります。あらかじめご了承ください。")}</p>

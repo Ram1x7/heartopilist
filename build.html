@@ -28,7 +28,7 @@
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./css/style.css?v=38">
+<link rel="stylesheet" href="./css/style.css?v=39">
 <link rel="stylesheet" href="./css/art.css?v=68">
 <link rel="stylesheet" href="./css/design-system.css?v=5">
 
@@ -43,7 +43,6 @@
 <link rel="prefetch" href="./events.html">
 <link rel="prefetch" href="./videos.html">
 <link rel="prefetch" href="./art-create.html">
-<link rel="prefetch" href="./music.html">
 <link rel="prefetch" href="./updates.html">
 <link rel="prefetch" href="./faq.html">
 <!-- Google Analytics -->
@@ -527,9 +526,7 @@ body.dark .build-library-item{
   <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
   <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
   <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
-  <a href="./build.html" class="site-nav-item active" data-i18n="nav_build">建築</a>
   <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
-  <a href="./music.html" class="site-nav-item" data-i18n="nav_music">楽譜</a>
   <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
   <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
 </nav>
@@ -829,7 +826,7 @@ body.dark .build-library-item{
 
 <div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
   <div class="modal-box art-help-box">
-    <h3 style="text-align:center;" data-i18n="build_help_title">使い方</h3>
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="build_help_title">使い方</h3>
 
     <p><strong data-i18n="build_help_1_title">① 画像を選ぶ・建築モードを決める</strong><br>
     <span data-i18n="build_help_1_body">画像をアップロードし、「立体（像）」か「平面（床）」かを選びます。幅サイズ・厚さ、空洞化、背景の自動透明化、色数を絞るオプションもここで指定します。立体モードでは背面画像も指定できます（任意）。実際の支柱建材は幅・奥行きの2倍の高さがあるため、立体モードの高さは自動的に補正され、3Dプレビューも実際に建てたときと同じ縦横比で表示されます。</span></p>
@@ -838,10 +835,10 @@ body.dark .build-library-item{
     <span data-i18n="build_help_2_body">ドラッグして位置を、スライダーで拡大縮小して正面画像の切り抜き範囲を決めます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 3D配置図・建材一覧</strong><br>
-    <span data-i18n="build_help_3_body">色ごとに最も近い建材（支柱系）が自動で割り当てられ、その場でドラッグ回転・ズームして確認できます。必要な建材の種類・支柱の本数は一覧で確認できます。</span></p>
+    <span data-i18n="build_help_3_body">色ごとに最も近い建材（柱状の「支柱系」建材）が自動で割り当てられ、その場でドラッグ回転・ズームして確認できます。必要な建材の種類・支柱の本数は一覧で確認できます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_edit_title">④ 手動で編集する</strong><br>
-    <span data-i18n="build_help_edit_body">「ペン」を選んで面をタップすると、その面に接する形で選択中の建材を1つ追加できます。「消しゴム」を選んでタップすると、そのボクセルを削除できます。「建材を選ぶ」でペンに使う建材を切り替えられます。「元に戻す」「やり直す」で編集を取り消し・再実行できます。</span></p>
+    <span data-i18n="build_help_edit_body">「ペン」を選んで面をタップすると、その面に接する形で選択中の建材を1つ追加できます。「消しゴム」を選んでタップすると、そのブロック（1マス分の建材）を削除できます。「建材を選ぶ」でペンに使う建材を切り替えられます。「元に戻す」「やり直す」で編集を取り消し・再実行できます。</span></p>
 
     <p style="margin-top:10px;"><strong data-i18n="build_help_progress_title">⑤ 施工ステージを確認する</strong><br>
     <span data-i18n="build_help_progress_body">「施工ステージ」のスライダーを動かすと、下から何段目まで積み上げた状態かを確認できます。「全て」以外を選んでいる間は編集できません。</span></p>
