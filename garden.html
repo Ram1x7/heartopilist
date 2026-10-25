@@ -380,6 +380,10 @@ body.dark .g-price-table th{ background:var(--dark-card-alt); }
 
 body.dark .g-price-table td{ color:var(--dark-text); border-color:var(--dark-border); }
 .g-price-null{ color:var(--border); font-size:10px; }
+.g-price-table td.profit-plus{ color:var(--green); font-weight:700; }
+body.dark .g-price-table td.profit-plus{ color:var(--green-dark-text); }
+.g-price-table td.profit-minus{ color:var(--vermillion); font-weight:700; }
+body.dark .g-price-table td.profit-minus{ color:var(--dark-highlight); }
 
 .g-section-title{
   font-family:'Shippori Mincho', serif;
@@ -563,6 +567,7 @@ body.dark .garden-footer{
 <div class="filter filter-wrap" id="sortRow">
   <button class="ds-tab ds-tab-grow active" id="s_book" onclick="setSort('book')" data-i18n="sort_book">図鑑順</button>
   <button class="ds-tab ds-tab-grow" id="s_price" onclick="setSort('price')" data-i18n="sort_price">売却額順</button>
+  <button class="ds-tab ds-tab-grow" id="s_profit" onclick="setSort('profit')" data-i18n="sort_profit">利益順</button>
 </div>
 <div class="filter price-sort-sub" id="priceSortRow" style="display:none;">
   <button onclick="setPriceSortOrder('desc')" id="po_desc" data-i18n="price_sort_high">高い順</button>
@@ -1023,11 +1028,11 @@ let priceSortOrder = localStorage.getItem("priceSortOrder") === "asc" ? "asc" : 
 
 function setSort(type){
   currentSort = type;
-  ["book","price"].forEach(x=>{
+  ["book","price","profit"].forEach(x=>{
     document.getElementById("s_"+x).classList.toggle("active", x === type);
   });
   const priceSortRow = document.getElementById("priceSortRow");
-  if(priceSortRow) priceSortRow.style.display = type === "price" ? "" : "none";
+  if(priceSortRow) priceSortRow.style.display = (type === "price" || type === "profit") ? "" : "none";
   renderContent();
 }
 
@@ -1058,10 +1063,17 @@ function priceAtStar(item, star){
   return prices5[star - 1] ?? null;
 }
 
-function sortByPrice(list){
+// 指定した★（1〜5）での利益（売価-種の値段）を返す（存在しない場合はnull）
+function profitAtStar(item, star){
+  const p = priceAtStar(item, star);
+  if(p == null) return null;
+  return p - item.seedPrice;
+}
+
+function sortByValue(list, valueFn){
   return list.slice().sort((a,b) => {
-    const pa = priceAtStar(a, priceSortStar);
-    const pb = priceAtStar(b, priceSortStar);
+    const pa = valueFn(a, priceSortStar);
+    const pb = valueFn(b, priceSortStar);
     if(pa == null && pb == null) return 0;
     if(pa == null) return 1;
     if(pb == null) return -1;
@@ -1078,7 +1090,8 @@ function renderContent(){
   const data  = currentTab === "crop" ? cropData : flowerData;
 
   let normalList = data.filter(d => !d.season && !d.fes);
-  if(currentSort === "price") normalList = sortByPrice(normalList);
+  if(currentSort === "price") normalList = sortByValue(normalList, priceAtStar);
+  if(currentSort === "profit") normalList = sortByValue(normalList, profitAtStar);
   const seasonActiveList = data.filter(d => d.season && !d.ended);
   const seasonEndedList  = data.filter(d => d.season && d.ended);
   const fesActiveList    = data.filter(d => d.fes && !d.ended);
@@ -1214,12 +1227,18 @@ function renderModal(item){
   // 指定されていればそれを使う（未指定時は従来通り共通の"fescoin"）
   const fesCoinText = v => `${currencyIcon(item.fesCoinIcon || "fescoin")}${v.toLocaleString()}`;
 
-  const priceRows = stars.map((s,i) => `
+  const profit = derivedPrices.map(p => p - item.seedPrice);
+  const priceRows = stars.map((s,i) => {
+    const profitClass = profit[i] >= 0 ? "profit-plus" : "profit-minus";
+    const profitText = (profit[i] >= 0 ? "+" : "-") + coinText(Math.abs(profit[i]));
+    return `
     <tr>
       <td>${s}</td>
       <td>${coinText(derivedPrices[i])}</td>
+      <td class="${profitClass}">${profitText}</td>
       ${hasFesField ? `<td>${derivedFesPrices && derivedFesPrices[i] != null ? fesCoinText(derivedFesPrices[i]) : "-"}</td>` : ""}
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 
   let breedingHTML = "";
   if(isFlower && item.colors && item.colors.length > 0){
@@ -1323,7 +1342,7 @@ function renderModal(item){
       </div>` : ""}
     </div>
     <table class="g-price-table">
-      <tr><th>${T("garden_rarity","レア度")}</th><th>${T("garden_price","売価")}</th>${hasFesField ? `<th>${T("garden_fes_price","フェスコイン")}</th>` : ""}</tr>
+      <tr><th>${T("garden_rarity","レア度")}</th><th>${T("garden_price","売価")}</th><th>${T("garden_profit","利益")}</th>${hasFesField ? `<th>${T("garden_fes_price","フェスコイン")}</th>` : ""}</tr>
       ${priceRows}
     </table>
     ${breedingHTML}
@@ -1410,7 +1429,7 @@ document.getElementById("helpBtn").onclick = () => {
       ${T("garden_help_tabs_body","画面上部の「作物」「花」タブで表示を切り替えられます。成長時間・種の値段・売却額の一覧を確認できます。")}</p>
 
       <p><strong>${icon("coin",{size:13})} ${T("garden_help_sort_title","並び替え")}</strong><br>
-      ${T("garden_help_sort_body","図鑑順・売却額順で並び替えできます。売却額順を選ぶと、高い順/安い順と★1〜5の基準を選べます。")}</p>
+      ${T("garden_help_sort_body","図鑑順・売却額順・利益順で並び替えできます。売却額順/利益順を選ぶと、高い順/安い順と★1〜5の基準を選べます。")}</p>
 
       <p><strong>${icon("info",{size:13})} ${T("garden_help_detail_title","詳しい情報を見る")}</strong><br>
       ${T("garden_help_detail_body","カードをタップすると、レア度（☆1〜☆5）ごとの売却額を確認できます。花の場合は交配で作れる色の一覧も表示されます。")}</p>
