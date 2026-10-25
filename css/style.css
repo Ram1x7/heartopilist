@@ -317,10 +317,10 @@ body.dark h3{
 h1{
   text-align:center;
   font-size:23px;
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-weight:700;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.18em;
   text-shadow:none;
   margin-bottom:10px;
 }
@@ -338,10 +338,10 @@ body.dark h1{
 }
 
 .page-header h1{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:22px;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.14em;
   margin-bottom:4px;
 }
 
@@ -415,7 +415,7 @@ body.dark .page-tutorial-hint{
 /* 今の天気（狭い画面で「晴れ」等が文字単位で折り返されるのを防ぐ） */
 .weather-now{
   font-size:18px;
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   color:var(--indigo);
   white-space:nowrap;
   flex-shrink:0;
@@ -486,8 +486,8 @@ body.dark .server-select{
 .time{
   text-align:center;
   font-size:28px;
-  font-family:'Zen Maru Gothic', sans-serif;
-  letter-spacing:normal;
+  font-family:'Shippori Mincho', serif;
+  letter-spacing:0.06em;
   margin-bottom:10px;
   color:var(--indigo);
 }
@@ -938,7 +938,7 @@ body.dark .weather-spot-row-nodata{ color:var(--dark-text-sub); }
 
 /* ── 日別1時間ごと詳細（天気タブの行をタップすると表示） ── */
 .weather-day-detail-title{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:14px;
   font-weight:700;
   color:var(--indigo);
@@ -1070,7 +1070,7 @@ body.dark .weather-hour-chip-time{ color:var(--dark-text-sub); }
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:12.5px;
   color:var(--indigo);
   margin-bottom:6px;
@@ -1267,7 +1267,7 @@ body.dark .daily-cal-month-btn{
   color:var(--dark-accent);
 }
 .daily-cal-month-label{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:13px;
   font-weight:700;
   color:var(--indigo);
@@ -1431,10 +1431,10 @@ body[data-icon-size="large"] .grid{
 
 /* 終了フェス・シーズン セクション(図鑑「今は出現しない」用) */
 .section-label{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:13px;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.08em;
   margin:18px 0 8px;
   padding-left:10px;
   border-left:3px solid var(--gold);
@@ -1604,9 +1604,9 @@ body.dark .map-embed-close{
 }
 
 #m_name{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.08em;
 }
 
 body.dark #m_name{
@@ -1785,11 +1785,18 @@ body.dark .help-modal-box strong{
 }
 
 h3{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.06em;
 }
 
+/* 使い方モーダルのタイトルは、読みやすさを優先し本文と同じ標準フォントにする */
+.help-modal-title,
+.g-modal-name.help-modal-title,
+.modal-title.help-modal-title{
+  font-family:'Zen Maru Gothic', sans-serif;
+  letter-spacing:normal;
+}
 
 body.dark h3{
   color:var(--dark-accent);
@@ -1855,7 +1862,7 @@ body.dark .mini-status{
 
 #miniTime{
   font-size:14px;
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   color:var(--indigo);
 }
 

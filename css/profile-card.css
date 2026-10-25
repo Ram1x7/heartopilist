@@ -10,10 +10,10 @@
   margin-bottom:10px;
 }
 .pc-page-header h2{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:20px;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.1em;
 }
 body.dark .pc-page-header h2{ color:var(--dark-accent); }
 
@@ -161,7 +161,7 @@ body.dark .pc-section{ background:var(--dark-card); border-color:var(--dark-bord
   padding:14px 16px;
   background:none;
   border:none;
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:15px;
   color:var(--indigo);
   cursor:pointer;

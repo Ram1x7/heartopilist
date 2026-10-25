@@ -2472,11 +2472,11 @@ body.dark .music-hum-pitch-row{
 }
 
 .music-hum-pitch-value{
-  font-family:'Zen Maru Gothic', sans-serif;
+  font-family:'Shippori Mincho', serif;
   font-size:20px;
   font-weight:700;
   color:var(--indigo);
-  letter-spacing:normal;
+  letter-spacing:0.04em;
 }
 
 body.dark .music-hum-pitch-value{
