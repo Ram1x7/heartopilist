@@ -1460,7 +1460,7 @@
   "art_ssi_recovered_colors": "colors recovered.",
   "art_ssi_small_cells": "Cells appear small. A larger screenshot may improve recovery.",
   "art_ssi_unreadable_cells": "Unreadable cells (left unpainted)",
-  "art_ssi_mixed_cells": "Mixed-color cells (check alignment)",
+  "art_ssi_mixed_cells": "Uncertain-color cells (check alignment and image quality)",
   "art_ssi_stability_label": "Reduce compression color variations",
   "art_ssi_stability_hint": "Use repeated colors to correct nearby compression artifacts. Turn this off if subtle color differences disappear."
 }

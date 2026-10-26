@@ -228,11 +228,15 @@ async function ssiRunTemplateMatching(ticket=ssiLoadGeneration){
   if(ticket!==ssiLoadGeneration)return false;
   const byPart=new Map();
   for(const r of fallback)byPart.set(r.entry.frameId+':'+r.entry.partId,{...r,score:Math.min(.3,chamferCostToScore(r.match.cost,SSI_SCORE_NORMALIZER)),method:'edges'});
-  for(const r of primary){
-    const rect={x:r.match.offsetX,y:r.match.offsetY,w:r.entry.width*r.match.scale,h:r.entry.height*r.match.scale};
-    const support=HatopiScreenshotRecovery.fitScore(ridge,HatopiScreenshotRecovery.pathPoints(r.entry.maskLines),rect,r.entry.width,r.entry.height);
-    const score=support/(1+r.match.cost*.35),key=r.entry.frameId+':'+r.entry.partId;
-    if(score>(byPart.get(key)?.score||0))byPart.set(key,{...r,score,method:'guides'});
+  // Edge matches can provide a better starting point when JPEG artifacts create
+  // extra ridges. Validate both seeds against the actual guide support.
+  if(ridgeDistance)for(const r of [...primary,...fallback]){
+    const seed={x:r.match.offsetX,y:r.match.offsetY,w:r.entry.width*r.match.scale,h:r.entry.height*r.match.scale};
+    const guide=HatopiScreenshotRecovery.refineGuide(ridge,r.entry.maskLines,seed,r.entry.width,r.entry.height),rect=guide.rect;
+    const match={scale:rect.w/r.entry.width,offsetX:rect.x,offsetY:rect.y};
+    match.cost=chamferCost(sampleMaskLinePoints(r.entry.maskLines,4),ridgeDistance,sw,sh,match.scale,match.offsetX,match.offsetY,null);
+    const score=guide.score/(1+match.cost*.35),key=r.entry.frameId+':'+r.entry.partId;
+    if(score>(byPart.get(key)?.score||0))byPart.set(key,{...r,match,score,method:'guides'});
   }
   ssiMatchResults=[...byPart.values()].map(r=>({frameId:r.entry.frameId,partId:r.entry.partId,frame:r.entry.frame,part:r.entry.part,match:r.match,score:r.score,method:r.method})).sort((a,b)=>b.score-a.score);
   return true;
@@ -599,7 +603,7 @@ function ssiComputePixels(width,height){
     output=ssiSettings.dither?ditherToPalette(result.image,palette,bgMask):mapToPalette(result.image,palette,bgMask);
   }
   const info=document.getElementById('artSsiRecoveryInfo'),count=new Set(output.filter(Boolean)).size;
-  info.textContent=count+' '+ssiT('art_ssi_recovered_colors','色を復元しました。')+' '+(result.smallCells?ssiT('art_ssi_small_cells','マスが小さいため、大きなスクショを使ってください。'):'')+(result.unreadable?' '+ssiT('art_ssi_unreadable_cells','読み取れないマス（未着色）')+': '+result.unreadable:'')+(result.weak?' '+ssiT('art_ssi_mixed_cells','色の混ざるマス（位置合わせを確認）')+': '+result.weak:'');
+  info.textContent=count+' '+ssiT('art_ssi_recovered_colors','色を復元しました。')+' '+(result.smallCells?ssiT('art_ssi_small_cells','マスが小さいため、大きなスクショを使ってください。'):'')+(result.unreadable?' '+ssiT('art_ssi_unreadable_cells','読み取れないマス（未着色）')+': '+result.unreadable:'')+(result.weak?' '+ssiT('art_ssi_mixed_cells','色の判別が難しいマス（位置・画質を確認）')+': '+result.weak:'');
   return output;
 }
 function ssiApplyToEditor(){

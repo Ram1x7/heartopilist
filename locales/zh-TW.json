@@ -1336,7 +1336,7 @@
   "art_ssi_recovered_colors": "種顏色已還原。",
   "art_ssi_small_cells": "格子較小，使用更大的截圖可能改善還原效果。",
   "art_ssi_unreadable_cells": "無法讀取的格子（保持未上色）",
-  "art_ssi_mixed_cells": "混色格子（請確認對齊位置）",
+  "art_ssi_mixed_cells": "難以辨色的格子（請確認對齊位置和畫質）",
   "art_ssi_stability_label": "減少壓縮造成的顏色波動",
   "art_ssi_stability_hint": "參考重複使用的顏色，校正相近色。若細微色差消失，請關閉此選項。"
 }
