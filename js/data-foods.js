@@ -1104,16 +1104,16 @@ const foodsData = [
   auth:false
 },
 {
-  // 白い包帯ドリンクを一度調理した後、砂糖を紫色の砂糖に変更して調理すると作成可能。名称は仮訳
+  // 白い包帯ドリンクを一度調理した後、キャンディを紫のキャンディに変更して調理すると作成可能。名称は仮訳
   name:"黒い包帯ドリンク",
   nameI18n:{"ja":"黒い包帯ドリンク","en":"Black Bandage Grimkin Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1115.PNG",
   restore: [20,24,28,32,40],
-  cost:200, // 牛乳50+紫色の砂糖150（紫のロールケーキで使う紫のキャンディと同額と仮定）
+  cost:200, // 牛乳50+紫のキャンディ150
   time:0,
   rarity: [true,true,true,true,true],
   prices:[280],
-  materials:["牛乳(@50)","紫色の砂糖(@150)","",""],
+  materials:["牛乳(@50)","紫のキャンディ(@150)","",""],
   level:1,
   materials_image:[
     { image:"./images/materials/milk.jpg" },
@@ -1125,16 +1125,16 @@ const foodsData = [
   auth:false
 },
 {
-  // 白い包帯ドリンクを一度調理した後、砂糖を黄色の砂糖に変更して調理すると作成可能。名称は仮訳
+  // 白い包帯ドリンクを一度調理した後、キャンディを黄色いキャンディに変更して調理すると作成可能。名称は仮訳
   name:"ミイラ猫ドリンク",
   nameI18n:{"ja":"ミイラ猫ドリンク","en":"Mummy Cat Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1116.PNG",
   restore: [26,31,36,42,52],
-  cost:250, // 牛乳50+黄色の砂糖200（黄色いロールケーキで使う黄色いキャンディと同額と仮定）
+  cost:250, // 牛乳50+黄色いキャンディ200
   time:0,
   rarity: [true,true,true,true,true],
   prices:[330],
-  materials:["牛乳(@50)","黄色の砂糖(@200)","",""],
+  materials:["牛乳(@50)","黄色いキャンディ(@200)","",""],
   level:1,
   materials_image:[
     { image:"./images/materials/milk.jpg" },
