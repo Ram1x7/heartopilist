@@ -1088,7 +1088,7 @@ const foodsData = [
   nameI18n:{"ja":"白い包帯ドリンク","en":"White Bandage Grimkin Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1114.PNG",
   restore: [20,24,28,32,40],
-  cost:null, // 未確認（レインボーシュガー系＝キャンディならなんでもOKのため、使う色によって材料費が変わり固定値にできない）
+  cost:200, // 牛乳50+キャンディ(最安値150：紫/ブルー/青のキャンディ)
   time:0,
   rarity: [true,true,true,true,true],
   prices:[280],
