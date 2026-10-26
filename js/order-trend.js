@@ -120,9 +120,21 @@ function setOtCategory(cat){
   renderOtContent();
 }
 
+// ── 必要アイテム（通貨）絞り込み ──
+let otCurrency = "all";
+function setOtCurrency(cur){
+  otCurrency = cur;
+  ["all","coin","heart_ishi","negaiboshi"].forEach((c)=>{
+    const btn = document.getElementById("otCur_" + c);
+    if(btn) btn.classList.toggle("active", c === cur);
+  });
+  renderOtContent();
+}
+
 function otMatchesFilters(item){
   if(otSeason !== "all" && item.season !== otSeason) return false;
   if(otCategory !== "all" && item.category !== otCategory) return false;
+  if(otCurrency !== "all" && item.currency !== otCurrency) return false;
   if(otSearchKeyword){
     if(!item.name) return false;
     if(item.name.toLowerCase().indexOf(otSearchKeyword.toLowerCase()) === -1) return false;

@@ -298,6 +298,13 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
     <button id="otCat_other" onclick="setOtCategory('other')" data-i18n="order_trend_cat_other">その他</button>
   </div>
 
+  <div class="filter" id="otCurrencyRow">
+    <button id="otCur_all" class="active" onclick="setOtCurrency('all')" data-i18n="order_trend_currency_all">すべて</button>
+    <button id="otCur_coin" onclick="setOtCurrency('coin')" data-i18n="order_trend_currency_coin">コイン</button>
+    <button id="otCur_heart_ishi" onclick="setOtCurrency('heart_ishi')" data-i18n="order_trend_currency_heart">ハート石</button>
+    <button id="otCur_negaiboshi" onclick="setOtCurrency('negaiboshi')" data-i18n="order_trend_currency_negaiboshi">願い星</button>
+  </div>
+
   <div class="filter">
     <button id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
     <button id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
@@ -323,6 +330,9 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
     <p style="margin-top:10px;"><strong data-i18n="order_trend_help_filter_title">カテゴリ絞り込み</strong>
     <span data-i18n="order_trend_help_filter_body">服・家具・その他で絞り込みできます。「すべて」選択時は服→家具→その他の順にまとまります。</span></p>
 
+    <p style="margin-top:10px;"><strong data-i18n="order_trend_help_currency_title">必要アイテム絞り込み</strong>
+    <span data-i18n="order_trend_help_currency_body">コイン・ハート石・願い星のどれで購入するアイテムかで絞り込みできます。</span></p>
+
     <p style="margin-top:10px;"><strong data-i18n="order_trend_help_check_title">入手済みチェック</strong>
     <span data-i18n="order_trend_help_check_body">画像左上のボタンをタップすると入手済みとしてチェックできます。チェックしたアイテムは薄暗く表示され、自動的に一覧の最後に移動します。もう一度タップすると解除できます。</span></p>
 
@@ -345,7 +355,7 @@ body.dark .ot-season-title{ color:var(--dark-accent); }
 <script src="js/icon-size.js"></script>
 <script src="js/tutorial.js"></script>
 <script src="js/data-order-trend.js"></script>
-<script src="js/order-trend.js?v=2"></script>
+<script src="js/order-trend.js?v=3"></script>
 
 <script src="js/sw-register.js"></script>
 </body>
