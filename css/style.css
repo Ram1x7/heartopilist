@@ -1742,7 +1742,10 @@ body.dark .update-popup-box h3{
   border:1px solid var(--gold);
 }
 
-.help-modal-box p{
+.help-modal-box p,
+.art-help-box p,
+.music-help-box p,
+#helpModal .modal-box p{
   white-space:pre-line;
 }
 
