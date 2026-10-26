@@ -105,7 +105,7 @@ const orderTrendData = [
     originalPrice: 340,
     discountPercent: 50,
     currency: "heart_ishi",
-    stampsRequired: 2,
+    stampsRequired: 3,
     arrivalDays: 14,
     // IMG_4552
   },
