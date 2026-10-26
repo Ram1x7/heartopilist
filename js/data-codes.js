@@ -358,6 +358,13 @@ const codesData = [
     expiry: "2026-12-04 00:59",
     active: true,
   },
+  {
+    code: "p7k5a3n9r2m8",
+    reward: "願い星×3，マーメイドの魚寄せ装置×3，肥料×10",
+    rewardI18n:{"ja":"願い星×3，マーメイドの魚寄せ装置×3，肥料×10","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-12-04 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
