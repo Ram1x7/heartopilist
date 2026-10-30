@@ -1083,9 +1083,9 @@ const foodsData = [
   auth:false
 },
 {
-  // ハロウィンイベント「Trick or Treat」交換ショップでキャンディ500個と交換して入手予定のレシピ。名称は仮訳
-  name:"白い包帯ドリンク",
-  nameI18n:{"ja":"白い包帯ドリンク","en":"White Bandage Grimkin Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
+  // ハロウィンイベント「Trick or Treat」交換ショップでキャンディ500個と交換して入手予定のレシピ
+  name:"白包帯ゴースト・飲み物",
+  nameI18n:{"ja":"白包帯ゴースト・飲み物","en":"White Bandage Grimkin Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1114.PNG",
   restore: [20,24,28,32,40],
   cost:200, // 牛乳50+キャンディ(最安値150：紫/ブルー/青のキャンディ)
@@ -1104,9 +1104,9 @@ const foodsData = [
   auth:false
 },
 {
-  // 白い包帯ドリンクを一度調理した後、キャンディを紫のキャンディに変更して調理すると作成可能。名称は仮訳
-  name:"黒い包帯ドリンク",
-  nameI18n:{"ja":"黒い包帯ドリンク","en":"Black Bandage Grimkin Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
+  // 白包帯ゴースト・飲み物を一度調理した後、キャンディを紫のキャンディに変更して調理すると作成可能
+  name:"黒包帯ゴースト・飲み物",
+  nameI18n:{"ja":"黒包帯ゴースト・飲み物","en":"Black Bandage Grimkin Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1115.PNG",
   restore: [20,24,28,32,40],
   cost:200, // 牛乳50+紫のキャンディ150
@@ -1125,9 +1125,9 @@ const foodsData = [
   auth:false
 },
 {
-  // 白い包帯ドリンクを一度調理した後、キャンディを黄色いキャンディに変更して調理すると作成可能。名称は仮訳
-  name:"ミイラ猫ドリンク",
-  nameI18n:{"ja":"ミイラ猫ドリンク","en":"Mummy Cat Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
+  // 白包帯ゴースト・飲み物を一度調理した後、キャンディを黄色いキャンディに変更して調理すると作成可能
+  name:"ミイラの猫の飲み物",
+  nameI18n:{"ja":"ミイラの猫の飲み物","en":"Mummy Cat Drink","zh-CN":"","zh-TW":"","ko":"","th":""},
   image:"./images/foods/1116.PNG",
   restore: [26,31,36,42,52],
   cost:250, // 牛乳50+黄色いキャンディ200
