@@ -26,6 +26,8 @@ const CURRENCY_ICON_SRC = {
   tsuki_houseki: "images/currency/tsuki_houseki.png",
   tsurutsuru_oak: "images/currency/tsurutsuru_oak.png",
   seed_wheat: "images/currency/seed_wheat.png",
+  seed_kabotya: "images/currency/seed_kabotya.png",
+  ryoshitsu_hiryo: "images/currency/ryoshitsu_hiryo.png",
   milk: "images/currency/milk.png",
   mermaid_shippo: "images/currency/mermaid_shippo.png",
   kaifuku: "images/currency/kaifuku.png",
@@ -50,6 +52,8 @@ function injectCurrencyIcons(text) {
     .replace(/ハート石/g, `${currencyIcon("heart_ishi")}ハート石`)
     .replace(/稲の種/g, `${currencyIcon("ine_seed")}稲の種`)
     .replace(/小麦の種/g, `${currencyIcon("seed_wheat")}小麦の種`)
+    .replace(/かぼちゃの種/g, `${currencyIcon("seed_kabotya")}かぼちゃの種`)
+    .replace(/良質肥料/g, `${currencyIcon("ryoshitsu_hiryo")}良質肥料`)
     .replace(/牛乳/g, `${currencyIcon("milk")}牛乳`)
     .replace(/可愛いパンダのシャボン玉液/g, `${currencyIcon("kawaii_panda")}可愛いパンダのシャボン玉液`)
     .replace(/黒顔パンダのシャボン玉液/g, `${currencyIcon("kuro_panda")}黒顔パンダのシャボン玉液`)
@@ -63,7 +67,7 @@ function injectCurrencyIcons(text) {
     .replace(/月の水晶/g, `${currencyIcon("tsuki_houseki")}月の水晶`)
     .replace(/ツルツルオーク/g, `${currencyIcon("tsurutsuru_oak")}ツルツルオーク`)
     .replace(/あずき/g, `${currencyIcon("azuki")}あずき`)
-    .replace(/肥料/g, `${currencyIcon("hiryo")}肥料`)
+    .replace(/(?<!良質)肥料/g, `${currencyIcon("hiryo")}肥料`)
     .replace(/肉/g, `${currencyIcon("niku")}肉`)
     .replace(/りんご/g, `${currencyIcon("ringo")}りんご`);
 }
