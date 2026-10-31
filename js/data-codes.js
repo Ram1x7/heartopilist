@@ -365,6 +365,13 @@ const codesData = [
     expiry: "2026-12-04 00:59",
     active: true,
   },
+  {
+    code: "pumpkin2026",
+    reward: "かぼちゃの種×10，ツルツルオーク×2，良質木材×5，良質肥料×10",
+    rewardI18n:{"ja":"かぼちゃの種×10，ツルツルオーク×2，良質木材×5，良質肥料×10","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2026-12-01 00:59",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
