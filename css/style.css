@@ -636,13 +636,23 @@ body.dark #clearBtn{
   font-size:10px;
 }
 
-/* 8種タブ用（全部/魚/虫/野鳥/砂像/雪像/貝殻/かぼちゃ）：4列×2行の均等グリッドに整列 */
+/* 出現モード・並び替えなど、ラベル長が不揃いなタブ用：折り返し対応 */
 .filter-wrap{
+  flex-wrap:wrap;
+}
+
+.filter-wrap button{
+  flex:1 1 auto;
+  min-width:60px;
+}
+
+/* 種類タブ専用（全部/魚/虫/野鳥/砂像/雪像/貝殻/かぼちゃ）：4列×2行の均等グリッドに整列 */
+#typeFilterRow{
   display:grid;
   grid-template-columns:repeat(4, 1fr);
 }
 
-.filter-wrap button{
+#typeFilterRow button{
   flex:none;
   min-width:0;
   padding:8px 4px;
@@ -650,7 +660,7 @@ body.dark #clearBtn{
   font-size:10.5px;
 }
 
-.filter-wrap button span:not(.btn-icon){
+#typeFilterRow button span:not(.btn-icon){
   white-space:nowrap;
 }
 
