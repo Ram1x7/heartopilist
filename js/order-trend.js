@@ -121,6 +121,10 @@ function setOtCategory(cat){
 }
 
 // ── 必要アイテム（通貨）絞り込み ──
+document.querySelectorAll(".ot-currency-icon[data-currency-icon]").forEach(el=>{
+  el.innerHTML = currencyIcon(el.dataset.currencyIcon);
+});
+
 let otCurrency = "all";
 function setOtCurrency(cur){
   otCurrency = cur;
