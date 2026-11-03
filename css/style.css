@@ -678,6 +678,17 @@ body.dark #clearBtn{
   white-space:nowrap;
 }
 
+/* オーダーチケットの通貨絞り込み（すべて/コイン/ハート石/願い星）：
+   アイコン追加後も元の1行レイアウトを保つため、余白を詰めて折り返しを防ぐ */
+#otCurrencyRow button{
+  padding:10px 4px;
+  gap:3px;
+}
+
+#otCurrencyRow button span:not(.ot-currency-icon){
+  white-space:nowrap;
+}
+
 /* 売却額順のサブ選択（高い順/安い順・★1〜5） */
 .price-sort-sub{
   flex-wrap:wrap;
