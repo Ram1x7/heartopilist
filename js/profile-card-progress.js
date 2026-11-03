@@ -3,7 +3,7 @@
 // js/main.jsのgetStats()と同じlocalStorageキー・同じ集計ルールを、
 // このページ単体（main.js非読み込み）でも成立するよう独立実装している。
 // 依存データ配列（このページのHTMLで読み込み済みが前提）：
-//   fishData, bugData, birdData, sandData, snowData, shellData,
+//   fishData, bugData, birdData, sandData, snowData, shellData, kabotyaData,
 //   foodsData, cropData, flowerData, achievementsData
 
 // カテゴリ定義（表示候補の全量。並び順はUIの選択肢表示順にも使う）
@@ -14,6 +14,7 @@ const PROFILE_CARD_CATEGORIES = [
   { id: "shell",       label: "貝殻",     icon: "shell",       kind: "creature", type: "shell" },
   { id: "sand",        label: "砂像",     icon: "sand",        kind: "creature", type: "sand" },
   { id: "snow",        label: "雪像",     icon: "snow",        kind: "creature", type: "snow" },
+  { id: "pumpkin",     label: "かぼちゃ", icon: "pumpkin",     kind: "creature", type: "pumpkin" },
   { id: "food",        label: "料理",     icon: "ingredient",  kind: "food" },
   { id: "garden",      label: "園芸",     icon: "sprout",      kind: "garden" },
   { id: "achievement", label: "実績",     icon: "trophy",      kind: "achievement", starLabel: "獲得数" },
@@ -68,6 +69,7 @@ function collectProfileCardSourceData() {
       sand:  typeof sandData  !== "undefined" ? sandData  : [],
       snow:  typeof snowData  !== "undefined" ? snowData  : [],
       shell: typeof shellData !== "undefined" ? shellData : [],
+      pumpkin: typeof kabotyaData !== "undefined" ? kabotyaData : [],
     },
     foodAll: typeof foodsData !== "undefined" ? foodsData : [],
     cropAll: typeof cropData !== "undefined" ? cropData : [],
