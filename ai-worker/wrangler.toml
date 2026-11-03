@@ -1,0 +1,29 @@
+name = "hatopi-build-ai"
+main = "worker.mjs"
+compatibility_date = "2026-10-01"
+
+[build]
+command = "node ai-worker/prepare-trial.mjs"
+
+[assets]
+directory = ".trial-public"
+not_found_handling = "none"
+
+[vars]
+PRIVATE_TRIAL_ONLY = "true"
+ENABLED = "true"
+FREE_TIER_CONFIRMED = "true"
+ALLOWED_ORIGIN = "https://hatopi-build-ai.saiyowa0517.workers.dev"
+TURNSTILE_HOSTNAME = "ram1x7.github.io"
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+DAILY_GLOBAL_LIMIT = "20"
+DAILY_CLIENT_LIMIT = "2"
+MINUTE_GLOBAL_LIMIT = "2"
+
+[[durable_objects.bindings]]
+name = "QUOTA"
+class_name = "Quota"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Quota"]

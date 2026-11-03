@@ -5,7 +5,7 @@
 // 色→建材のマッチングは支柱系（grid_cell配置）のみを対象にし、Lab色空間での
 // 誤差拡散ディザリング＋輪郭保持（旧・壁画モードから流用）を行う。3D描画・
 // クリック編集の当たり判定はjs/build3d-scene.js（Three.js・InstancedMesh）に
-// 委譲する。すべてブラウザ内で完結し、画像を外部に送信しない。
+// 委譲する。通常の画像変換はブラウザ内で完結。AI設計は同意後に文章を送信する。
 //
 // 【このバージョンでの既知の未実装（次のフェーズ予定）】
 // ・範囲選択（ドラッグで囲んでの一括編集）
@@ -13,23 +13,18 @@
 // ・共有リンク(URL)機能
 
 import * as Build3D from "./build3d-scene.js";
+import { BUILD_RULES, calculateLoad, validateGrid } from "./build-rules.mjs";
+import { expandPlan } from "./build-ai-plan.mjs";
+import { buildPillarMural, pillarMuralDimensions } from "./build-mural.mjs";
+import { initAIForm } from "./build-ai-ui.mjs";
+import { initFreePlacement } from "./build-free-placement.mjs";
 
-// ── 敷地の座標上限（ボクセル換算、幅×奥行き×高さ） ──
-const SITE_MAX_WIDTH = 96;
-const SITE_MAX_DEPTH = 120;
-// ゲーム内では支柱を最大17本（=積み上げ高さ34マス分）までしか積めないため、
-// それに合わせて上限を17本（bounds.hは支柱の本数単位）とする
-const SITE_MAX_HEIGHT = 17;
-
-// 低い壁は幅4のパネルなので、支柱換算での敷地幅上限（SITE_MAX_WIDTH＝96マス分）
-// をそのまま「列数」の上限にすると、実際の物理幅は4倍（384マス分）になって
-// しまい敷地からはみ出す。横一列に敷き詰められる最大数は 96 ÷ 4 = 24枚
-const WALL_MAX_WIDTH = Math.floor(SITE_MAX_WIDTH / 4);
-
-// 低い壁は高さ2のパネルで、ゲーム内では地面から16枚分（実際の高さ32マス分）
-// までしか積み上げられない。支柱用のSITE_MAX_HEIGHT（68）をそのまま流用すると
-// 実際には置けない段数まで指定できてしまうため、低い壁専用の上限を別に持つ
-const WALL_MAX_HEIGHT_TIERS = 16;
+// Internal X/Z unit = one pillar width (0.25 floor tile); Y = one pillar height.
+const SITE_MAX_WIDTH = BUILD_RULES.widthTiles * 4;
+const SITE_MAX_DEPTH = BUILD_RULES.depthTiles * 4;
+const SITE_MAX_HEIGHT = BUILD_RULES.pillarLayers;
+const WALL_MAX_WIDTH = BUILD_RULES.widthTiles;
+const WALL_MAX_HEIGHT_TIERS = BUILD_RULES.wallLayers;
 
 // 現在のモードにおける「幅」スライダーの上限マス数
 function currentWidthMax(){
@@ -61,13 +56,13 @@ let settings = {
   // "height"＝積む段数を指定して幅を自動算出）。どちらを選んでも画像の縦横比に
   // 合わせてもう一方の軸が自動計算される
   wallSizeBasis: "width",
-  wallHeight: 16,       // 高さ基準時に使う段数（低い壁を積む段数）
+  wallHeight: WALL_MAX_HEIGHT_TIERS,       // 高さ基準時に使う段数（低い壁を積む段数）
 };
 
 let resultVoxels = null;   // [{x,y,z,materialId,hex,name}]（solid/flat用）
 let resultDims = null;     // {w,h,d}（solid/flat用）
 
-// 低い壁（壁画）モード専用の結果データ。低い壁は幅4×奥行き0.5×高さ2という
+// 低い壁（壁画）モード専用の結果データ。低い壁は幅4×奥行き約0.2×高さ約2という
 // 支柱とは全く異なる実寸のパネルで、押し出し・起伏を持たない単層の壁画なので、
 // resultVoxels/resultDimsとは別に持つ（x:列, y:行。行y=0が壁画の最上段）
 let resultWallSegments = null; // [{x,y,materialId,hex,name}]
@@ -79,6 +74,7 @@ let savedDesigns = [];
 // ══════════════════════════════════════
 // 手動編集（ペン/消しゴム・Undo/Redo）
 // ══════════════════════════════════════
+let freePlacementEditor = null;
 let editTool = "pen"; // "pen" | "eraser"
 let selectedMaterial = null; // {materialId, hex, name}（パレットから選んだ、ペンで使う建材）
 const EDIT_HISTORY_LIMIT = 50;
@@ -98,6 +94,7 @@ function pushHistory(){
 }
 
 function clearHistory(){
+  freePlacementEditor?.clear();
   undoStack = [];
   redoStack = [];
   updateUndoRedoButtons();
@@ -138,6 +135,7 @@ function currentResultDims(){
 // 3Dビューの再描画。wallモードは低い壁専用の描画関数（Build3D.setWallSegments）
 // を使う。それ以外（solid/flat）は従来通り支柱用のsetVoxelsを使う
 function refreshResultView(opts){
+  if(sceneUnavailable) return;
   if(settings.mode === "wall"){
     Build3D.setWallSegments(getVisibleVoxels(), resultWallDims, opts);
   }else{
@@ -146,6 +144,7 @@ function refreshResultView(opts){
 }
 
 function refreshVoxelView(){
+  freePlacementEditor?.refresh();
   refreshResultView({ fit: false });
   renderBuildMaterialList();
   renderBuildBlockList();
@@ -198,6 +197,7 @@ function setupProgressSlider(){
 }
 
 function updateProgressUI(){
+  freePlacementEditor?.refresh();
   const output = document.getElementById("buildProgressOutput");
   const hint = document.getElementById("buildProgressHint");
   const full = isProgressFull();
@@ -246,6 +246,8 @@ let blockGuideSize = 0; // 0＝オフ
 // あるため、このバージョンでは配置図の自動生成のみ対応する）ので、
 // 編集ツールバー自体を隠す
 function updateEditToolbarVisibility(){
+  if(!["solid","pillar-wall"].includes(settings.mode) && editTool==="select") setEditTool("pen");
+  freePlacementEditor?.refresh();
   const toolbar = document.getElementById("buildEditToolbar");
   if(toolbar) toolbar.style.display = settings.mode === "wall" ? "none" : "flex";
   // 低い壁モードはペン/消しゴム編集に対応していないため、案内文からも触れない
@@ -605,10 +607,11 @@ function applyFloorGrid(){
 // build3d-scene.jsからの「編集クリック」通知（ドラッグを伴わないクリック/タップ）
 function handleEditClick(hit){
   if(!hit || !resultVoxels || !isProgressFull()) return;
+  if(editTool === "select"){ freePlacementEditor?.select(hit.voxel || null); return; }
   if(editTool === "eraser"){
     if(!hit.voxel) return;
     pushHistory();
-    resultVoxels = resultVoxels.filter(v => !(v.x === hit.voxel.x && v.y === hit.voxel.y && v.z === hit.voxel.z));
+    resultVoxels = resultVoxels.filter(v => v !== hit.voxel);
     refreshVoxelView();
     return;
   }
@@ -625,6 +628,7 @@ function handleEditClick(hit){
 
 function setEditTool(tool){
   editTool = tool;
+  document.getElementById("buildToolSelectBtn")?.classList.toggle("active",tool === "select");
   document.getElementById("buildToolPenBtn").classList.toggle("active", tool === "pen");
   document.getElementById("buildToolEraserBtn").classList.toggle("active", tool === "eraser");
 }
@@ -856,6 +860,9 @@ function updateBackImageVisibility(){
 // ══════════════════════════════════════
 // モード・オプション（画像アップロード直後の設定ステップ）
 // ══════════════════════════════════════
+function isMuralMode(){return settings.mode === "wall" || settings.mode === "pillar-wall";}
+function muralHeightMax(){return settings.mode === "wall" ? WALL_MAX_HEIGHT_TIERS : SITE_MAX_HEIGHT;}
+
 function setBuildMode(mode){
   settings.mode = mode;
   document.querySelectorAll(".build-mode-btn").forEach(btn => {
@@ -867,9 +874,10 @@ function setBuildMode(mode){
       : T("build_thickness_label_flat", "厚さ（起伏の最大高さ）");
   document.getElementById("buildHollowRow").style.display = mode === "solid" ? "flex" : "none";
   // 低い壁モードは常に1層の壁画のため、厚さ（押し出し・起伏）の概念がない
-  document.getElementById("buildThicknessRow").style.display = mode === "wall" ? "none" : "block";
-  document.getElementById("buildResolutionTip").style.display = mode === "wall" ? "none" : "block";
+  document.getElementById("buildThicknessRow").style.display = (mode === "wall" || mode === "pillar-wall") ? "none" : "block";
+  document.getElementById("buildResolutionTip").style.display = (mode === "wall" || mode === "pillar-wall") ? "none" : "block";
   document.getElementById("buildWallModeTip").style.display = mode === "wall" ? "block" : "none";
+  document.getElementById("buildPillarWallTip").style.display = mode === "pillar-wall" ? "block" : "none";
   updateBackImageVisibility();
   updateColorCountMax();
   updateWidthMax();
@@ -885,7 +893,11 @@ function updateWallSizeBasisUI(){
   const widthRow = document.getElementById("buildWidthRow");
   const heightRow = document.getElementById("buildWallHeightRow");
   if(!basisRow || !widthRow || !heightRow) return;
-  const isWall = settings.mode === "wall";
+  const isWall = isMuralMode();
+  const heightInput=document.getElementById("buildWallHeightInput");
+  heightInput.max=String(muralHeightMax());
+  heightInput.min=settings.mode === "pillar-wall" ? "1" : "2";
+  if(Number(heightInput.value)>muralHeightMax()) heightInput.value=String(muralHeightMax());
   basisRow.style.display = isWall ? "flex" : "none";
   const heightBasis = isWall && settings.wallSizeBasis === "height";
   widthRow.style.display = heightBasis ? "none" : "block";
@@ -910,6 +922,7 @@ function updateWidthMax(){
   if(!widthInput) return;
   const max = currentWidthMax();
   widthInput.max = String(max);
+  widthInput.min = settings.mode === "pillar-wall" ? "1" : "4";
   if(Number(widthInput.value) > max) widthInput.value = String(max);
 }
 
@@ -924,15 +937,23 @@ function updateColorCountMax(){
 }
 
 function readOptionInputs(){
-  if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
-    settings.wallHeight = Math.min(WALL_MAX_HEIGHT_TIERS, Math.max(2, Number(document.getElementById("buildWallHeightInput").value) || 2));
+  if(isMuralMode() && settings.wallSizeBasis === "height"){
+    settings.wallHeight = Math.min(muralHeightMax(), Math.max(settings.mode === "pillar-wall" ? 1 : 2, Number(document.getElementById("buildWallHeightInput").value) || 2));
     document.getElementById("buildWallHeightOutput").textContent = `${settings.wallHeight}${T("build_unit_masu", "マス")}`;
     syncWallWidthFromHeight(); // 指定された段数から幅を逆算してsettings.widthへ書き戻す
   }else{
     settings.width = Math.min(currentWidthMax(), Math.max(2, Number(document.getElementById("buildWidthInput").value) || 2));
     document.getElementById("buildWidthOutput").textContent = `${settings.width}${T("build_unit_masu", "マス")}`;
   }
-  settings.thickness = Math.min(40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
+  if(settings.mode === "pillar-wall" && frontImage){
+    const fitted=pillarMuralDimensions(settings.wallSizeBasis === "height" ? settings.wallHeight : settings.width,frontImage.naturalWidth/frontImage.naturalHeight,settings.wallSizeBasis);
+    settings.width=fitted.w; settings.wallHeight=fitted.h;
+    document.getElementById("buildWidthInput").value=String(fitted.w);
+    document.getElementById("buildWidthOutput").textContent=`${fitted.w}本分（床${fitted.w/4}マス）`;
+    document.getElementById("buildWallHeightInput").value=String(fitted.h);
+    document.getElementById("buildWallHeightOutput").textContent=`${fitted.h}段`;
+  }
+  settings.thickness = Math.min(settings.mode === "flat" ? SITE_MAX_HEIGHT : 40, Math.max(1, Number(document.getElementById("buildThicknessInput").value) || 1));
   settings.hollow = document.getElementById("buildHollowCheckbox").checked;
   settings.autoTransparentBg = document.getElementById("buildAutoTransparentCheckbox").checked;
   settings.limitColors = document.getElementById("buildLimitColorsCheckbox").checked;
@@ -950,9 +971,13 @@ function readOptionInputs(){
 function updateWallAutoDimHint(){
   const hint = document.getElementById("buildWallAutoDimHint");
   if(!hint) return;
-  if(settings.mode !== "wall" || !frontImage){
+  if(!isMuralMode() || !frontImage){
     hint.style.display = "none";
     return;
+  }
+  if(settings.mode === "pillar-wall"){
+    hint.textContent=`幅${settings.width}本（床${settings.width/4}マス）×高さ${computeOtherDim()}段・奥行き1本分。画像の縦横比に合わせ、上限内に自動調整します。`;
+    hint.style.display="block"; return;
   }
   const unit = T("build_unit_masu", "マス");
   if(settings.wallSizeBasis === "height"){
@@ -975,7 +1000,7 @@ function handleOptionInputChange(){
 // 画像から求まる、幅に対するもう一方の軸（solid:高さ / flat:奥行き / wall:行数）のマス数
 // 実際の支柱建材は1(幅)×1(奥行き)×2(高さ)で、幅・奥行きの2倍の高さがある
 // （立方体の建材を前提にした換算ではない）。そのため立体モードで画像の縦横比
-// から高さのマス数を決めるときは、ボクセル1段＝実際の支柱2個ぶんの高さに
+// から高さのマス数を決めるときは、ボクセル1段＝実際の支柱1個ぶんの高さに
 // 相当することを踏まえ、単純な比率の半分のマス数にする。これにより、実際に
 // 支柱で建てた完成物が、1×1×1の立方体で作った場合と同じ見た目の比率になる
 // （平面モードのotherDimは奥行き軸で、この高さの特性とは無関係なので対象外）
@@ -984,21 +1009,22 @@ const SOLID_HEIGHT_ASPECT_COMPENSATION = 2;
 // グリッドを敷くと横に間延びして見える。1行あたりの物理的な高さが1列あたりの
 // 物理的な幅の半分しかない分、同じ縦横比に見せるには行数を2倍にする必要がある
 const WALL_ROW_ASPECT_COMPENSATION = 0.5;
-// 1マスあたりの実際の物理縦横比（幅÷高さ）。solid/flatは支柱1本分＝正方形
-// なので1:1だが、wallは低い壁1枚が幅4×高さ2で正方形ではない（2:1）ため、
+// 画像調整の幅÷高さ。支柱の正面は1:2、平面は1:1、低い壁は2:1。
+// 建材の見かけの縦横比に合わせるため、
 // 位置調整画面のプレビュー（切り抜きビューポート・マス目オーバーレイ）の
 // 縦横比をこの値で補正しないと、実際に建てたときと違う比率で表示されてしまう
 const WALL_CELL_ASPECT = 2; // 低い壁1枚の幅4 ÷ 高さ2
 function cellAspectRatio(){
-  return settings.mode === "wall" ? WALL_CELL_ASPECT : 1;
+  return settings.mode === "wall" ? WALL_CELL_ASPECT : (settings.mode === "solid" || settings.mode === "pillar-wall") ? 0.5 : 1;
 }
 
 function computeOtherDim(){
   if(!frontImage) return settings.width;
+  if(settings.mode === "pillar-wall") return pillarMuralDimensions(settings.width,frontImage.naturalWidth/frontImage.naturalHeight).h;
   // 低い壁モードで「高さを基準にする」を選んでいる場合は、ユーザーが指定した
   // 段数をそのまま使う（幅はsyncWallWidthFromHeight()で別途逆算してsettings.width
   // に書き戻し済みなので、他の全コードは従来通りsettings.widthを見るだけでよい）
-  if(settings.mode === "wall" && settings.wallSizeBasis === "height"){
+  if(isMuralMode() && settings.wallSizeBasis === "height"){
     return Math.min(WALL_MAX_HEIGHT_TIERS, Math.max(2, settings.wallHeight));
   }
   // 常に元画像そのものの縦横比を使う（切り抜き範囲＝manualCropRectは、
@@ -1022,7 +1048,8 @@ function computeOtherDim(){
 // を直接参照しているため、こうして同期しておけば他のコードを一切変更せずに
 // 「高さ基準」の指定方法をそのまま使い回せる
 function syncWallWidthFromHeight(){
-  if(!frontImage || settings.mode !== "wall" || settings.wallSizeBasis !== "height") return;
+  if(!frontImage || !isMuralMode() || settings.wallSizeBasis !== "height") return;
+  if(settings.mode === "pillar-wall") return; // Dimensions are fitted together in readOptionInputs().
   const aspect = frontImage.naturalWidth / frontImage.naturalHeight; // 幅/高さ
   const derivedWidth = Math.round(settings.wallHeight * aspect * WALL_ROW_ASPECT_COMPENSATION);
   settings.width = Math.min(WALL_MAX_WIDTH, Math.max(2, derivedWidth));
@@ -1492,6 +1519,7 @@ function buildWallMuralSegments(grid, w, h){
 // ══════════════════════════════════════
 function runBuildGeneration(){
   if(!frontImage) return;
+  document.getElementById("buildAdjustBtn").disabled = false;
   const rect = manualCropRect || coverCropRect(frontImage.naturalWidth, frontImage.naturalHeight, settings.width, settings.width);
   const otherDim = computeOtherDim();
   const backRect = backImage ? coverCropRect(backImage.naturalWidth, backImage.naturalHeight, settings.width, otherDim) : null;
@@ -1520,7 +1548,11 @@ function runBuildGeneration(){
     rect, settings.width, otherDim, settings.autoTransparentBg, paletteIndex, materialItems
   );
 
-  if(settings.mode === "solid"){
+  if(settings.mode === "pillar-wall"){
+    resultVoxels = buildPillarMural(frontGrid,settings.width,otherDim);
+    resultDims = {w:settings.width,h:otherDim,d:1};
+    resultWallSegments=null; resultWallDims=null;
+  }else if(settings.mode === "solid"){
     let backGrid = null;
     if(backImage){
       backGrid = computeMatchedGrid(
@@ -1563,22 +1595,29 @@ function runBuildGeneration(){
 // 3Dビューア初期化
 // ══════════════════════════════════════
 let sceneInitialized = false;
+let sceneUnavailable = false;
 function ensureSceneInitialized(){
   const canvas = document.getElementById("buildCanvas");
   if(!canvas) return;
   if(!sceneInitialized){
-    Build3D.init(canvas, { w: SITE_MAX_WIDTH, h: SITE_MAX_HEIGHT, d: SITE_MAX_DEPTH });
-    Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
-    Build3D.setEditClickCallback(handleEditClick);
+    try {
+      Build3D.init(canvas, { w: SITE_MAX_WIDTH, h: SITE_MAX_HEIGHT, d: SITE_MAX_DEPTH });
+      Build3D.setBackgroundColor(document.body.classList.contains("dark") ? 0x2c2823 : 0xf3ecdc);
+      Build3D.setEditClickCallback(handleEditClick);
+    } catch(error) {
+      sceneUnavailable = true;
+      canvas.parentElement.style.display = "none";
+      const message=document.createElement("p");
+      message.id="build3DFallback"; message.setAttribute("role","status");
+      message.textContent="この環境では3D表示を起動できません。建材数の確認・自由配置の数値入力・保存は利用できます。3D表示はWebGL対応のブラウザで開いてください。";
+      canvas.parentElement.before(message);
+    }
     sceneInitialized = true;
   }
 }
 
 // ══════════════════════════════════════
-// 建材一覧（列＝(x,z)ごとに、縦方向へ同じ建材が続く区間を1本の支柱として
-// まとめる。支柱は1マス×1マスの設置面に対して高さ方向へ伸縮するため、この
-// 数え方が実際の建て方に最も近い）
-// ══════════════════════════════════════
+// 建材一覧：固定サイズの支柱は、縦に連続しても1個ずつ数える。
 // 建材ID＋色hexから、その建材内での色番号（1始まり）を求める。ゲーム内の
 // ペイント選択画面も同じ並び順で表示される想定のもと、data-materials.jsの
 // colors配列の並び＝ゲーム内パレットの並びをそのまま番号として使う
@@ -1600,28 +1639,8 @@ function buildColorNumberLabel(materialId, hex){
 }
 
 function computeBuildPillarSegments(){
-  if(!resultVoxels || !resultDims) return [];
-  const map = new Map();
-  resultVoxels.forEach(v => map.set(`${v.x},${v.y},${v.z}`, v));
-
-  const segments = [];
-  for(let z = 0; z < resultDims.d; z++){
-    for(let x = 0; x < resultDims.w; x++){
-      let run = null;
-      for(let y = 0; y < resultDims.h; y++){
-        const v = map.get(`${x},${y},${z}`);
-        const key = v ? v.materialId + "_" + v.hex : null;
-        if(run && run.key === key){
-          run.height++;
-        }else{
-          if(run && run.key) segments.push(run);
-          run = key ? { key, materialId: v.materialId, name: v.name, hex: v.hex, height: 1 } : null;
-        }
-      }
-      if(run && run.key) segments.push(run);
-    }
-  }
-  return segments;
+  // Fixed-height pieces: a vertical stack of N pillars requires N pieces.
+  return (resultVoxels || []).map(v => ({...v, key: v.materialId + "_" + v.hex, height: 1}));
 }
 
 // 低い壁は支柱と違って高さ方向に伸縮する単位ではなく、1マス＝1枚の
@@ -1639,6 +1658,16 @@ function computeWallSegmentCounts(){
 }
 
 function renderBuildMaterialList(){
+  const items = currentResultList() || [];
+  const loadItems = settings.mode === "wall"
+    ? items.map(v => ({...v, kind: "wall", patternId: "board"})) : items;
+  const loadEl = document.getElementById("buildLoadValue");
+  if(loadEl) loadEl.textContent = calculateLoad(loadItems).toLocaleString();
+  const dims = currentResultDims();
+  const sizeEl = document.getElementById("buildPhysicalSize");
+  if(sizeEl && dims) sizeEl.textContent = settings.mode === "wall"
+    ? `幅${dims.w}床マス・高さ${dims.h}段（低い壁1枚＝1段）`
+    : `幅${dims.w / 4}×奥行き${dims.d / 4}床マス・高さ${dims.h}段（支柱1本＝1段）`;
   const pillarCountLabel = document.getElementById("buildPillarCountLabel");
   if(settings.mode === "wall"){
     if(pillarCountLabel) pillarCountLabel.textContent = T("build_wall_count_label", "必要な壁の枚数");
@@ -1678,7 +1707,7 @@ function renderBuildMaterialList(){
   document.getElementById("buildMaterialRows").innerHTML = entries.map(e => `
     <div class="art-result-color-row">
       <span class="art-result-color-swatch" style="background:${e.hex}"></span>
-      <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}${T("build_pillar_height_suffix", "（高さ{n}マス）").replace("{n}", e.height)}</span>
+      <span class="art-result-color-code">${buildColorNumberLabel(e.materialId, e.hex)}${e.name}</span>
       <span class="art-result-color-count">${e.count}${T("build_unit_pillars", "本")}</span>
     </div>
   `).join("");
@@ -1800,10 +1829,13 @@ function saveBuildDesign(){
 function loadDesign(id){
   const design = savedDesigns.find(d => d.id === id);
   if(!design || design.formatVersion !== BUILD_DESIGN_FORMAT_VERSION) return;
+  try { validateGrid(design.voxels, design.dims, design.mode); }
+  catch(e) { alert(e.message + "。保存データは変更していません。"); return; }
   frontImage = null;
   backImage = null;
   manualCropRect = null;
   settings.mode = design.mode;
+  document.getElementById("buildAdjustBtn").disabled = true;
   if(design.mode === "wall"){
     resultWallDims = design.dims;
     resultWallSegments = design.voxels.map(v => ({ ...v }));
@@ -1902,7 +1934,30 @@ const BUILD_TUTORIAL_STEPS = [
   { selector: "#helpBtn", titleKey: "tutorial_build_step3_title", titleFallback: "③ 使い方をもっと見る", textKey: "tutorial_build_step3_body", textFallback: "変換の流れなど、詳しい使い方はこのボタンから見返せます。" },
 ];
 
+function acceptAIPlan(plan, limits){
+  // Validate and expand before replacing any current result.
+  const voxels = expandPlan(plan, limits, MATERIALS.support_pillars.items);
+  validateGrid(voxels, limits, "solid");
+  closeFlatGuide();
+  frontImage = null; backImage = null; manualCropRect = null;
+  settings.mode = "solid";
+  resultVoxels = voxels; resultDims = {...limits};
+  resultWallSegments = null; resultWallDims = null;
+  document.getElementById("buildUploadArea").style.display = "none";
+  document.getElementById("buildCropStage").style.display = "none";
+  document.getElementById("buildResultStage").style.display = "block";
+  document.getElementById("buildAdjustBtn").disabled = true;
+  document.getElementById("buildDesignNameInput").value = plan.title;
+  ensureSceneInitialized(); setupProgressSlider();
+  blockGuideSize = 0; completedGuideBlocks = new Set();
+  updateGuideRow(); applyBlockGuide(); renderBuildBlockList(); applyFloorGrid();
+  updateEditToolbarVisibility(); Build3D.setBoundaryBoxVisible(true);
+  refreshResultView(); renderBuildMaterialList(); clearHistory();
+  updateBuildStepProgress("finish");
+}
+
 function initBuildPage(){
+  initAIForm(acceptAIPlan);
   loadSavedDesigns();
   renderBuildLibraryList();
   bindBuildStepProgress();
@@ -1968,6 +2023,13 @@ function initBuildPage(){
   document.getElementById("buildExportBtn").addEventListener("click", exportBuildDesigns);
   document.getElementById("buildImportBtn").addEventListener("click", () => document.getElementById("buildImportInput").click());
   document.getElementById("buildImportInput").addEventListener("change", importBuildDesigns);
+
+  // Manual placement preserves each piece's transform through undo/save/export.
+  freePlacementEditor = initFreePlacement({
+    getState:()=>({mode:settings.mode,items:resultVoxels,dims:resultDims,material:selectedMaterial,editable:isProgressFull()}),
+    chooseTool:setEditTool,
+    commit:items=>{pushHistory();resultVoxels=items;refreshVoxelView();},
+  });
 
   // 手動編集ツールバー
   const firstMaterial = MATERIALS.support_pillars.items[0];
