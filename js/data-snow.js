@@ -1,7 +1,6 @@
 // 雪像
 // star1Only : true の場合、★1価格のみ持ち★2〜5は非表示にする（失敗作など）
-// season    : シーズン限定表示のバッジを出すが、endedは付けないため
-//             期間終了後も通常通り出現し続ける（一覧から消えない）
+// location  : 「彫刻台で彫刻」固定。シーズンのバッジ表記は行わない
 
 const snowData = [
 {
@@ -11,8 +10,8 @@ const snowData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/001.PNG",
  auth:true
 },
@@ -23,8 +22,8 @@ const snowData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/002.PNG",
  auth:true
 },
@@ -35,8 +34,8 @@ const snowData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/003.PNG",
  auth:true
 },
@@ -48,8 +47,8 @@ const snowData = [
  star1Only:true,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/004.PNG",
  auth:false
 },
@@ -60,8 +59,8 @@ const snowData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/005.PNG",
  auth:true
 },
@@ -72,8 +71,8 @@ const snowData = [
  price:165,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/006.PNG",
  auth:true
 },
@@ -84,8 +83,8 @@ const snowData = [
  price:165,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/007.PNG",
  auth:true
 },
@@ -96,8 +95,8 @@ const snowData = [
  price:190,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/008.PNG",
  auth:true
 },
@@ -108,8 +107,8 @@ const snowData = [
  price:190,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/009.PNG",
  auth:true
 },
@@ -120,8 +119,8 @@ const snowData = [
  price:225,
  weather:["晴れ","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/010.PNG",
  auth:true
 },
@@ -132,8 +131,8 @@ const snowData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/011.PNG",
  auth:true
 },
@@ -144,8 +143,8 @@ const snowData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/012.PNG",
  auth:true
 },
@@ -156,8 +155,8 @@ const snowData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/013.PNG",
  auth:true
 },
@@ -168,8 +167,8 @@ const snowData = [
  price:280,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/014.PNG",
  auth:true
 },
@@ -180,8 +179,8 @@ const snowData = [
  price:280,
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
- season:true,
- seasonName:"スノーシーズン",
+ location:"彫刻台で彫刻",
+ locationI18n:{"ja":"彫刻台で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"./images/snows/015.PNG",
  auth:true
 }
