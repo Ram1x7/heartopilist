@@ -32,6 +32,9 @@ const CURRENCY_ICON_SRC = {
   mermaid_shippo: "images/currency/mermaid_shippo.png",
   kaifuku: "images/currency/kaifuku.png",
   yuuyafes_coin: "images/currency/yuuyafes_coin.png",
+  tenjikaipass: "images/currency/tenjikaipass.png",
+  waribiki_5: "images/currency/waribiki_5.png",
+  waribiki_30: "images/currency/waribiki_30.png",
 };
 
 function currencyIcon(type) {
@@ -43,6 +46,7 @@ function currencyIcon(type) {
 function injectCurrencyIcons(text) {
   if (!text) return text;
   return text
+    .replace(/展示会パス/g, `${currencyIcon("tenjikaipass")}展示会パス`)
     .replace(/フェスコイン/g, `${currencyIcon("fescoin")}フェスコイン`)
     .replace(/マーメイドの魚寄せ装置/g, `${currencyIcon("mermaid_shippo")}マーメイドの魚寄せ装置`)
     .replace(/(?<!トレンド)(?<!フェス)コイン/g, `${currencyIcon("coin")}コイン`)
