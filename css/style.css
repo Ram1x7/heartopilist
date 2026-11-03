@@ -645,6 +645,13 @@ body.dark #clearBtn{
 .filter-wrap button{
   flex:none;
   min-width:0;
+  padding:8px 4px;
+  gap:4px;
+  font-size:10.5px;
+}
+
+.filter-wrap button span:not(.btn-icon){
+  white-space:nowrap;
 }
 
 /* 売却額順のサブ選択（高い順/安い順・★1〜5） */
