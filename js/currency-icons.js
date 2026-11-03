@@ -33,6 +33,7 @@ const CURRENCY_ICON_SRC = {
   kaifuku: "images/currency/kaifuku.png",
   yuuyafes_coin: "images/currency/yuuyafes_coin.png",
   tenjikaipass: "images/currency/tenjikaipass.png",
+  orderticket: "images/currency/orderticket.png",
   waribiki_5: "images/currency/waribiki_5.png",
   waribiki_30: "images/currency/waribiki_30.png",
 };
