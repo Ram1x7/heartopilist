@@ -11,12 +11,12 @@ const PROFILE_CARD_CATEGORIES = [
   { id: "fish",        label: "魚",       icon: "fish",       kind: "creature", type: "fish" },
   { id: "bug",         label: "虫",       icon: "bug",         kind: "creature", type: "bug" },
   { id: "bird",        label: "野鳥",     icon: "bird",        kind: "creature", type: "bird" },
-  { id: "shell",       label: "貝殻",     icon: "shell",       kind: "creature", type: "shell" },
-  { id: "sand",        label: "砂像",     icon: "sand",        kind: "creature", type: "sand" },
-  { id: "snow",        label: "雪像",     icon: "snow",        kind: "creature", type: "snow" },
-  { id: "pumpkin",     label: "かぼちゃ", icon: "pumpkin",     kind: "creature", type: "pumpkin" },
   { id: "food",        label: "料理",     icon: "ingredient",  kind: "food" },
   { id: "garden",      label: "園芸",     icon: "sprout",      kind: "garden" },
+  { id: "shell",       label: "貝殻",     icon: "shell",       kind: "creature", type: "shell" },
+  { id: "snow",        label: "雪像",     icon: "snow",        kind: "creature", type: "snow" },
+  { id: "sand",        label: "砂像",     icon: "sand",        kind: "creature", type: "sand" },
+  { id: "pumpkin",     label: "かぼちゃ", icon: "pumpkin",     kind: "creature", type: "pumpkin" },
   { id: "achievement", label: "実績",     icon: "trophy",      kind: "achievement", starLabel: "獲得数" },
 ];
 const PROFILE_CARD_DEFAULT_CATEGORY_IDS = ["fish", "bug", "bird", "shell", "food", "garden", "snow", "sand"];
