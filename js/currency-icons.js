@@ -32,6 +32,9 @@ const CURRENCY_ICON_SRC = {
   mermaid_shippo: "images/currency/mermaid_shippo.png",
   kaifuku: "images/currency/kaifuku.png",
   yuuyafes_coin: "images/currency/yuuyafes_coin.png",
+  tenjikaipass: "images/currency/tenjikaipass.png",
+  waribiki_5: "images/currency/waribiki_5.png",
+  waribiki_30: "images/currency/waribiki_30.png",
 };
 
 function currencyIcon(type) {
