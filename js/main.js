@@ -131,7 +131,8 @@ const creatures = [
  ...birdData,
  ...(typeof sandData  !== "undefined" ? sandData  : []),
  ...(typeof snowData  !== "undefined" ? snowData  : []),
- ...(typeof shellData !== "undefined" ? shellData : [])
+ ...(typeof shellData !== "undefined" ? shellData : []),
+ ...(typeof kabotyaData !== "undefined" ? kabotyaData : [])
 ];
 
 // サーバーのUTCオフセット（時間）
@@ -451,15 +452,18 @@ function applyCommonFilters(arr){
 
   if(currentFilter !== "all"){
     out = out.filter(c => c.type === currentFilter);
+  } else {
+    // かぼちゃの彫刻は「かぼちゃ」タブ選択時のみ表示し、「全部」タブには出さない
+    out = out.filter(c => c.type !== "pumpkin");
   }
 
   if(limitedOnly){
     // 「開催中のシーズン・フェス限定のみ」の絞り込みなので、
     // ・season/fesが終了済み（ended:true）のものは除外する
-    // ・砂像・雪像はseason/fesフラグをバッジ表示用に持つが、過去シーズンの
-    //   ものでも常時入手可能でendedも付けない仕様のため（data-sand.js/
-    //   data-snow.js参照）、この絞り込みからは対象外にする
-    out = out.filter(c => (c.season || c.fes) && !c.ended && c.type !== "sand" && c.type !== "snow");
+    // ・砂像・雪像・かぼちゃの彫刻はseason/fesフラグをバッジ表示用に持つが、
+    //   過去シーズンのものでも常時入手可能でendedも付けない仕様のため
+    //   （data-sand.js/data-snow.js/data-kabotya.js参照）、この絞り込みからは対象外にする
+    out = out.filter(c => (c.season || c.fes) && !c.ended && c.type !== "sand" && c.type !== "snow" && c.type !== "pumpkin");
   }
 
   const keyword = document.getElementById("search").value;
@@ -574,7 +578,7 @@ function sortList(arr){
 
 // 現在適用中の絞り込み条件を、解除可能なチップのリストとして返す。
 // 並び替え・サーバー・言語・テーマ・表示サイズ・進捗記録は対象外（既定値のまま個別解除しない）
-const TYPE_FILTER_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥", sand:"砂像", snow:"雪像", shell:"貝殻" };
+const TYPE_FILTER_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥", sand:"砂像", snow:"雪像", shell:"貝殻", pumpkin:"かぼちゃ" };
 function getActiveFilterChips(){
   const chips = [];
 
@@ -819,6 +823,10 @@ function render(){
 
   // 終了したフェス・シーズン限定は別セクションで表示するためここでは除外
   if (c.ended) return false;
+
+  // かぼちゃの彫刻は出現時間帯・出現天気の概念が無いため、出現モード
+  // （今出現するもの全て／今の天気限定／今は出現しない／すべて）の影響を受けず常に表示する
+  if (c.type === "pumpkin") return true;
 
   // 天気名(晴れ/くもり/小雨/流星雨1など)を出現判定用の粗いカテゴリ(晴れ/雨/虹)へ変換する
   // （js/weather-master.js。流星雨・オーロラ・雪・猛暑・花吹雪等は晴れ扱い）。

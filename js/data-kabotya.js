@@ -1,0 +1,290 @@
+// かぼちゃの彫刻（「幽夜の集い」イベントの収集コンテンツ）
+// 出現時間帯・出現天気の概念が無いため、weather/timeは常時出現扱いの値を入れている。
+// 図鑑ページでは「かぼちゃ」タブ選択時のみ表示し、出現モード（今出現するもの全て／
+// 今の天気限定／今は出現しない／すべて）の影響を受けない特別扱いをjs/main.js側で行う。
+//
+// authCount: 認証マスター（彫刻マスター）に必要な獲得数
+// star1Only: 失敗作（★1のみ）のため★2〜5は非表示
+
+const kabotyaData = [
+{
+ name:"巨大かぼちゃオーバーオール",
+ nameI18n:{"ja":"巨大かぼちゃオーバーオール","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:170,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/001.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"かぼちゃオーバーオール",
+ nameI18n:{"ja":"かぼちゃオーバーオール","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:170,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/002.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"巨大ブランクかぼちゃ",
+ nameI18n:{"ja":"巨大ブランクかぼちゃ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:230,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/003.PNG",
+ authCount:140,
+ auth:true
+},
+{
+ name:"ブランクかぼちゃ",
+ nameI18n:{"ja":"ブランクかぼちゃ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:230,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/004.PNG",
+ authCount:140,
+ auth:true
+},
+{
+ name:"精巧なかぼちゃの足",
+ nameI18n:{"ja":"精巧なかぼちゃの足","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:5,
+ price:230,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/005.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"巨大かぼちゃヘッド（猫）",
+ nameI18n:{"ja":"巨大かぼちゃヘッド（猫）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/006.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"かぼちゃヘッド（猫）",
+ nameI18n:{"ja":"かぼちゃヘッド（猫）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/007.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"かぼちゃベスト",
+ nameI18n:{"ja":"かぼちゃベスト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/008.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"かぼちゃヘッド（クマ）",
+ nameI18n:{"ja":"かぼちゃヘッド（クマ）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:4,
+ price:170,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/009.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"巨大くつろぎかぼちゃの足",
+ nameI18n:{"ja":"巨大くつろぎかぼちゃの足","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/010.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"くつろぎかぼちゃの足",
+ nameI18n:{"ja":"くつろぎかぼちゃの足","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/011.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"かぼちゃヘッド（うさちゃん）",
+ nameI18n:{"ja":"かぼちゃヘッド（うさちゃん）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/012.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ // 巨大かぼちゃオーバーオールの失敗作。★1のみ・認証マスター対象外
+ name:"巨大かぼちゃヘッド（気絶）",
+ nameI18n:{"ja":"巨大かぼちゃヘッド（気絶）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:10,
+ star1Only:true,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/013.PNG",
+ auth:false
+},
+{
+ // かぼちゃの失敗作。★1のみ・認証マスター対象外
+ name:"かぼちゃヘッド（気絶）",
+ nameI18n:{"ja":"かぼちゃヘッド（気絶）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:10,
+ star1Only:true,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/014.PNG",
+ auth:false
+},
+{
+ name:"真面目なかぼちゃの足",
+ nameI18n:{"ja":"真面目なかぼちゃの足","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/015.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"かぼちゃワンピース",
+ nameI18n:{"ja":"かぼちゃワンピース","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/016.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"巨大かぼちゃマント",
+ nameI18n:{"ja":"巨大かぼちゃマント","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/017.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"かぼちゃマント",
+ nameI18n:{"ja":"かぼちゃマント","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:3,
+ price:120,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/018.PNG",
+ authCount:175,
+ auth:true
+},
+{
+ name:"かぼちゃヘッド（萌え）",
+ nameI18n:{"ja":"かぼちゃヘッド（萌え）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:2,
+ price:90,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/019.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"かぼちゃヘッド（怒り）",
+ nameI18n:{"ja":"かぼちゃヘッド（怒り）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/020.PNG",
+ authCount:210,
+ auth:true
+},
+{
+ name:"かぼちゃヘッド（ぼんやり）",
+ nameI18n:{"ja":"かぼちゃヘッド（ぼんやり）","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ level:1,
+ price:75,
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ season:true,
+ seasonName:"幽夜の集い",
+ img:"./images/kabotya/021.PNG",
+ authCount:210,
+ auth:true
+}
+  // ここに追加していく
+].map((c,i) => ({
+  ...c,
+  type:"pumpkin",
+  bookIndex:i
+}));
