@@ -660,6 +660,20 @@ body.dark #clearBtn{
   font-size:10.5px;
 }
 
+/* 出現モード専用（今出現するもの全て/今の天気限定/今は出現しない/すべて）：
+   ラベルの長さが不揃いなので、4分割ではなく2列×2行にして折り返しを安定させる */
+#weatherModeRow{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+}
+
+#weatherModeRow button{
+  flex:none;
+  min-width:0;
+  padding:10px 8px;
+  line-height:1.35;
+}
+
 #typeFilterRow button span:not(.btn-icon){
   white-space:nowrap;
 }
