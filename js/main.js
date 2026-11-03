@@ -1100,7 +1100,7 @@ function setWeatherMode(mode){
 function setFilter(t){
  currentFilter=t;
  localStorage.setItem("currentFilter", t);
- ["all","fish","bug","bird","sand","snow","shell"].forEach(x=>{
+ ["all","fish","bug","bird","sand","snow","shell","pumpkin"].forEach(x=>{
   document.getElementById("f_"+x).classList.remove("active");
  });
  document.getElementById("f_"+t).classList.add("active");

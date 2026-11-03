@@ -636,14 +636,15 @@ body.dark #clearBtn{
   font-size:10px;
 }
 
-/* 8種タブ用（全部/魚/虫/野鳥/砂像/雪像/貝殻/かぼちゃ）：折り返し対応 */
+/* 8種タブ用（全部/魚/虫/野鳥/砂像/雪像/貝殻/かぼちゃ）：4列×2行の均等グリッドに整列 */
 .filter-wrap{
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
 }
 
 .filter-wrap button{
-  flex:1 1 auto;
-  min-width:60px;
+  flex:none;
+  min-width:0;
 }
 
 /* 売却額順のサブ選択（高い順/安い順・★1〜5） */
