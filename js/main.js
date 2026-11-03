@@ -458,12 +458,10 @@ function applyCommonFilters(arr){
   }
 
   if(limitedOnly){
-    // 「開催中のシーズン・フェス限定のみ」の絞り込みなので、
-    // ・season/fesが終了済み（ended:true）のものは除外する
-    // ・砂像・雪像・かぼちゃの彫刻はseason/fesフラグをバッジ表示用に持つが、
-    //   過去シーズンのものでも常時入手可能でendedも付けない仕様のため
-    //   （data-sand.js/data-snow.js/data-kabotya.js参照）、この絞り込みからは対象外にする
-    out = out.filter(c => (c.season || c.fes) && !c.ended && c.type !== "sand" && c.type !== "snow" && c.type !== "pumpkin");
+    // 「開催中のシーズン・フェス限定のみ」の絞り込み。
+    // season/fesが終了済み（ended:true）のものは除外する
+    // （砂像・雪像・かぼちゃの彫刻はseason/fesフラグを持たないため、この絞り込みには元から出てこない）
+    out = out.filter(c => (c.season || c.fes) && !c.ended);
   }
 
   const keyword = document.getElementById("search").value;

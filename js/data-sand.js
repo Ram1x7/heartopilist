@@ -1,8 +1,7 @@
 // 砂像
 // design/answer : 作り方情報（デザイン形状・三択回答）としてモーダルに表示
 // star1Only     : true の場合、★1価格のみ持ち★2〜5は非表示にする（失敗作など）
-// season/fes    : シーズン・フェス限定表示のバッジを出すが、endedは付けないため
-//                 期間終了後も通常通り出現し続ける（一覧から消えない）
+// location      : 「台座で彫刻」固定。シーズン・フェスのバッジ表記は行わない
 
 const sandData = [
 {
@@ -12,10 +11,10 @@ const sandData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"小さい四角柱",
  craftAnswer:"アヒル",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/001.PNG",
  auth:true
 },
@@ -26,10 +25,10 @@ const sandData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"小さい四角柱",
  craftAnswer:"小型車",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/002.PNG",
  auth:true
 },
@@ -40,10 +39,10 @@ const sandData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"小さい四角柱",
  craftAnswer:"カエル",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/003.PNG",
  auth:true
 },
@@ -54,10 +53,10 @@ const sandData = [
  price:155,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"低い円柱",
  craftAnswer:"座り込んでいるウサギ",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/004.PNG",
  auth:true
 },
@@ -68,10 +67,10 @@ const sandData = [
  price:165,
  weather:["晴れ","雨","虹"],
  time:["12-18","18-0"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"小さい四角柱",
  craftAnswer:"カニ",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/005.PNG",
  auth:true
 },
@@ -83,10 +82,10 @@ const sandData = [
  star1Only:true,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"全てのデザイン案",
  craftAnswer:"不正解の回答",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/006.PNG",
  auth:false
 },
@@ -97,10 +96,10 @@ const sandData = [
  price:165,
  weather:["晴れ","雨","虹"],
  time:["0-6","18-0"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"低い円柱",
  craftAnswer:"灯台",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/016.PNG",
  auth:true
 },
@@ -111,10 +110,10 @@ const sandData = [
  price:190,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"角が出た四角柱",
  craftAnswer:"漁船",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/008.PNG",
  auth:true
 },
@@ -125,10 +124,10 @@ const sandData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"大きい四角柱",
  craftAnswer:"クジラ",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/009.PNG",
  auth:true
 },
@@ -139,10 +138,10 @@ const sandData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"高い円柱",
  craftAnswer:"ホッキョクグマ",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/010.PNG",
  auth:true
 },
@@ -153,10 +152,10 @@ const sandData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"高い円柱",
  craftAnswer:"石像",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/011.PNG",
  auth:true
 },
@@ -167,10 +166,10 @@ const sandData = [
  price:190,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"角が出た四角柱",
  craftAnswer:"クマ",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/012.PNG",
  auth:true
 },
@@ -181,10 +180,10 @@ const sandData = [
  price:225,
  weather:["晴れ","雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"大きい四角柱",
  craftAnswer:"カモメ",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/013.PNG",
  auth:true
 },
@@ -195,10 +194,10 @@ const sandData = [
  price:280,
  weather:["虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"大きい四角柱",
  craftAnswer:"猫",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/014.PNG",
  auth:true
 },
@@ -209,10 +208,10 @@ const sandData = [
  price:280,
  weather:["雨","虹"],
  time:["6-12","12-18","18-0","0-6"],
+ location:"台座で彫刻",
+ locationI18n:{"ja":"台座で彫刻","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
  designShape:"高い円柱",
  craftAnswer:"植物",
- season:true,
- seasonName:"ホエールシーズン",
  img:"./images/sands/015.PNG",
  auth:true
 }
