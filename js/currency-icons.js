@@ -36,6 +36,7 @@ const CURRENCY_ICON_SRC = {
   orderticket: "images/currency/orderticket.png",
   waribiki_5: "images/currency/waribiki_5.png",
   waribiki_30: "images/currency/waribiki_30.png",
+  eiyouzai: "images/currency/eiyouzai.png",
 };
 
 function currencyIcon(type) {
@@ -74,7 +75,8 @@ function injectCurrencyIcons(text) {
     .replace(/あずき/g, `${currencyIcon("azuki")}あずき`)
     .replace(/(?<!良質)肥料/g, `${currencyIcon("hiryo")}肥料`)
     .replace(/肉/g, `${currencyIcon("niku")}肉`)
-    .replace(/りんご/g, `${currencyIcon("ringo")}りんご`);
+    .replace(/りんご/g, `${currencyIcon("ringo")}りんご`)
+    .replace(/栄養剤/g, `${currencyIcon("eiyouzai")}栄養剤`);
 }
 
 window.currencyIcon = currencyIcon;
