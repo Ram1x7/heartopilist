@@ -37,6 +37,7 @@ const CURRENCY_ICON_SRC = {
   waribiki_5: "images/currency/waribiki_5.png",
   waribiki_30: "images/currency/waribiki_30.png",
   eiyouzai: "images/currency/eiyouzai.png",
+  r_hiryo: "images/currency/r_hiryo.png",
 };
 
 function currencyIcon(type) {
@@ -45,8 +46,9 @@ function currencyIcon(type) {
   return `<img src="${src}" class="currency-icon" alt="" loading="lazy">`;
 }
 
-function injectCurrencyIcons(text) {
+function injectCurrencyIcons(text, overrides) {
   if (!text) return text;
+  overrides = overrides || {};
   return text
     .replace(/展示会パス/g, `${currencyIcon("tenjikaipass")}展示会パス`)
     .replace(/フェスコイン/g, `${currencyIcon("fescoin")}フェスコイン`)
@@ -59,7 +61,7 @@ function injectCurrencyIcons(text) {
     .replace(/稲の種/g, `${currencyIcon("ine_seed")}稲の種`)
     .replace(/小麦の種/g, `${currencyIcon("seed_wheat")}小麦の種`)
     .replace(/かぼちゃの種/g, `${currencyIcon("seed_kabotya")}かぼちゃの種`)
-    .replace(/良質肥料/g, `${currencyIcon("ryoshitsu_hiryo")}良質肥料`)
+    .replace(/良質肥料/g, `${currencyIcon(overrides.ryoshitsu_hiryo || "ryoshitsu_hiryo")}良質肥料`)
     .replace(/牛乳/g, `${currencyIcon("milk")}牛乳`)
     .replace(/可愛いパンダのシャボン玉液/g, `${currencyIcon("kawaii_panda")}可愛いパンダのシャボン玉液`)
     .replace(/黒顔パンダのシャボン玉液/g, `${currencyIcon("kuro_panda")}黒顔パンダのシャボン玉液`)

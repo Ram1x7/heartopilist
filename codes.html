@@ -457,7 +457,7 @@ function T(key, fallback, vars){
 function displayReward(c){
   const lang = currentLang();
   const text = (c.rewardI18n && c.rewardI18n[lang]) || c.reward;
-  return injectCurrencyIcons(text);
+  return injectCurrencyIcons(text, { ryoshitsu_hiryo: "r_hiryo" });
 }
 
 
