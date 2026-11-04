@@ -6,7 +6,7 @@
 const sandData = [
 {
  name:"アヒルの砂像",
- nameI18n:{"ja":"アヒルの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アヒルの砂像","en":"Yellow Duck Sand Sculpture","zh-CN":"小黄鸭沙雕","zh-TW":"小黃鴨沙雕","ko":"꽥꽥이 모래 조각","th":"ประติมากรรมทรายเป็ดเหลืองเล็ก"},
  level:1,
  price:155,
  weather:["晴れ","雨","虹"],
@@ -20,7 +20,7 @@ const sandData = [
 },
 {
  name:"自動車の砂像",
- nameI18n:{"ja":"自動車の砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"自動車の砂像","en":"Car Sand Sculpture","zh-CN":"汽车沙雕","zh-TW":"汽車沙雕","ko":"자동차 모래 조각","th":"ประติมากรรมทรายรถยนต์"},
  level:1,
  price:155,
  weather:["晴れ","雨","虹"],
@@ -34,7 +34,7 @@ const sandData = [
 },
 {
  name:"カエルの砂像",
- nameI18n:{"ja":"カエルの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カエルの砂像","en":"Frog Sand Sculpture","zh-CN":"青蛙沙雕","zh-TW":"青蛙沙雕","ko":"청개구리 모래 조각","th":"ประติมากรรมทรายกบ"},
  level:1,
  price:155,
  weather:["晴れ","雨","虹"],
@@ -48,7 +48,7 @@ const sandData = [
 },
 {
  name:"ウサギの砂像",
- nameI18n:{"ja":"ウサギの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ウサギの砂像","en":"Bunny Sand Sculpture","zh-CN":"兔子沙雕","zh-TW":"兔子沙雕","ko":"토끼 모래 조각","th":"ประติมากรรมทรายกระต่าย"},
  level:1,
  price:155,
  weather:["晴れ","雨","虹"],
@@ -62,7 +62,7 @@ const sandData = [
 },
 {
  name:"ヤドカリの砂像",
- nameI18n:{"ja":"ヤドカリの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヤドカリの砂像","en":"Hermit Crab Sand Sculpture","zh-CN":"寄居蟹沙雕","zh-TW":"寄居蟹沙雕","ko":"소라게 모래 조각","th":"ประติมากรรมทรายปูเสฉวน"},
  level:1,
  price:165,
  weather:["晴れ","雨","虹"],
@@ -76,7 +76,7 @@ const sandData = [
 },
 {
  name:"失敗した砂像",
- nameI18n:{"ja":"失敗した砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"失敗した砂像","en":"Failed Sand Sculpture","zh-CN":"制作失误的沙雕","zh-TW":"製作失誤的沙雕","ko":"실패한 모래 조각","th":"ประติมากรรมทรายที่ผิดพลาด"},
  level:1,
  price:140,
  star1Only:true,
@@ -91,7 +91,7 @@ const sandData = [
 },
 {
  name:"灯台の砂像",
- nameI18n:{"ja":"灯台の砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"灯台の砂像","en":"Lighthouse Sand Sculpture","zh-CN":"灯塔沙雕","zh-TW":"燈塔沙雕","ko":"등대 모래 조각","th":"ประติมากรรมทรายประภาคาร"},
  level:1,
  price:165,
  weather:["晴れ","雨","虹"],
@@ -105,7 +105,7 @@ const sandData = [
 },
 {
  name:"船の砂像",
- nameI18n:{"ja":"船の砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"船の砂像","en":"Ship Sand Sculpture","zh-CN":"轮船沙雕","zh-TW":"輪船沙雕","ko":"유람선 모래 조각","th":"ประติมากรรมทรายเรือ"},
  level:2,
  price:190,
  weather:["晴れ","雨","虹"],
@@ -119,7 +119,7 @@ const sandData = [
 },
 {
  name:"クジラの砂像",
- nameI18n:{"ja":"クジラの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クジラの砂像","en":"Whale Sand Sculpture","zh-CN":"鲸鱼沙雕","zh-TW":"鯨魚沙雕","ko":"고래 모래 조각","th":"ประติมากรรมทรายวาฬ"},
  level:3,
  price:225,
  weather:["晴れ","雨","虹"],
@@ -133,7 +133,7 @@ const sandData = [
 },
 {
  name:"ホッキョクグマの砂像",
- nameI18n:{"ja":"ホッキョクグマの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ホッキョクグマの砂像","en":"Polar Bear Sand Sculpture","zh-CN":"北极熊沙雕","zh-TW":"北極熊沙雕","ko":"북극곰 모래 조각","th":"ประติมากรรมทรายหมีขั้วโลก"},
  level:4,
  price:225,
  weather:["晴れ","雨","虹"],
@@ -161,7 +161,7 @@ const sandData = [
 },
 {
  name:"クマの砂像",
- nameI18n:{"ja":"クマの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クマの砂像","en":"Bear Sand Sculpture","zh-CN":"小熊沙雕","zh-TW":"小熊沙雕","ko":"아기곰 모래 조각","th":"ประติมากรรมทรายแบร์"},
  level:2,
  price:190,
  weather:["晴れ","雨","虹"],
@@ -175,7 +175,7 @@ const sandData = [
 },
 {
  name:"カモメの砂像",
- nameI18n:{"ja":"カモメの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カモメの砂像","en":"Seagull Sand Sculpture","zh-CN":"海鸥沙雕","zh-TW":"海鷗沙雕","ko":"바다갈매기 모래 조각","th":"ประติมากรรมทรายนกนางนวล"},
  level:3,
  price:225,
  weather:["晴れ","雨","虹"],
@@ -189,7 +189,7 @@ const sandData = [
 },
 {
  name:"マッチョ猫の砂像",
- nameI18n:{"ja":"マッチョ猫の砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"マッチョ猫の砂像","en":"Muscle Cat Sand Sculpture","zh-CN":"肌肉猫沙雕","zh-TW":"肌肉貓沙雕","ko":"머슬캣 모래 조각","th":"ประติมากรรมทรายแมวกล้าม"},
  level:5,
  price:280,
  weather:["虹"],
@@ -203,7 +203,7 @@ const sandData = [
 },
 {
  name:"サボテンの砂像",
- nameI18n:{"ja":"サボテンの砂像","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"サボテンの砂像","en":"Cactus Sand Sculpture","zh-CN":"仙人掌沙雕","zh-TW":"仙人掌沙雕","ko":"선인장 모래 조각","th":"ประติมากรรมทรายกระบองเพชร"},
  level:5,
  price:280,
  weather:["雨","虹"],

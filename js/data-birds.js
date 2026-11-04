@@ -2,7 +2,7 @@
 const birdData = [
 {
  name:"コマドリ",
- nameI18n:{"ja":"コマドリ","en":"Japanese Robin","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コマドリ","en":"Japanese Robin","zh-CN":"知更鸟","zh-TW":"知更鳥","ko":"꼬까울새","th":"นกโรบิน"},
  level:1,
  authCount:2400,
  price:7,
@@ -15,7 +15,7 @@ const birdData = [
 },
 {
  name:"シジュウカラ",
- nameI18n:{"ja":"シジュウカラ","en":"Japanese Tit","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シジュウカラ","en":"Japanese Tit","zh-CN":"大山雀","zh-TW":"大山雀","ko":"노랑배박새","th":"นกติ๊ดใหญ่"},
  level:1,
  authCount:2400,
  price:7,
@@ -28,7 +28,7 @@ const birdData = [
 },
 {
  name:"ミソサザイ",
- nameI18n:{"ja":"ミソサザイ","en":"Eurasian Wren","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミソサザイ","en":"Eurasian Wren","zh-CN":"鹪鹩","zh-TW":"鷦鷯","ko":"굴뚝새","th":"นกกระจิบ"},
  level:1,
  authCount:2400,
  price:7,
@@ -41,7 +41,7 @@ const birdData = [
 },
 {
  name:"ウソ",
- nameI18n:{"ja":"ウソ","en":"Eurasian Bullfinch","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ウソ","en":"Eurasian Bullfinch","zh-CN":"红腹灰雀","zh-TW":"紅腹灰雀","ko":"멋쟁이새","th":"นกกระจอกท้องแดง"},
  level:1,
  authCount:2400,
  price:7,
@@ -54,7 +54,7 @@ const birdData = [
 },
 {
  name:"ズアオアトリ",
- nameI18n:{"ja":"ズアオアトリ","en":"Common Chaffinch","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ズアオアトリ","en":"Common Chaffinch","zh-CN":"苍头燕雀","zh-TW":"蒼頭燕雀","ko":"푸른머리되새","th":"นกจาบปีกอ่อนหัวเทาอกชมพู"},
  level:1,
  authCount:2400,
  price:7,
@@ -67,7 +67,7 @@ const birdData = [
 },
 {
  name:"ルリコンゴウインコ",
- nameI18n:{"ja":"ルリコンゴウインコ","en":"Blue-and-yellow Macaw","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ルリコンゴウインコ","en":"Blue-and-yellow Macaw","zh-CN":"琉璃金刚鹦鹉","zh-TW":"琉璃金剛鸚鵡","ko":"청금강앵무","th":"นกมาคอว์สีน้ำเงินและ เหลือง"},
  level:1,
  authCount:2400,
  price:7,
@@ -80,7 +80,7 @@ const birdData = [
 },
 {
  name:"ヒメモリバト",
- nameI18n:{"ja":"ヒメモリバト","en":"Stock Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヒメモリバト","en":"Stock Dove","zh-CN":"欧鸽","zh-TW":"歐鴿","ko":"분홍가슴비둘기","th":"นกพิราบยุโรป"},
  level:1,
  authCount:2400,
  price:10,
@@ -93,7 +93,7 @@ const birdData = [
 },
 {
  name:"シラコバト",
- nameI18n:{"ja":"シラコバト","en":"Eurasian Collared Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シラコバト","en":"Eurasian Collared Dove","zh-CN":"灰斑鸠","zh-TW":"灰斑鳩","ko":"염주비둘기","th":"นกเขาไฟ"},
  level:1,
  authCount:2400,
  price:10,
@@ -106,7 +106,7 @@ const birdData = [
 },
 {
  name:"ソデグロバト",
- nameI18n:{"ja":"ソデグロバト","en":"White-winged Pigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ソデグロバト","en":"White-winged Pigeon","zh-CN":"斑皇鸠","zh-TW":"斑皇鳩","ko":"얼룩비둘기","th":"นกลุมพูขาว"},
  level:1,
  authCount:2400,
  price:10,
@@ -119,7 +119,7 @@ const birdData = [
 },
 {
  name:"オオフラミンゴ",
- nameI18n:{"ja":"オオフラミンゴ","en":"Greater Flamingo","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オオフラミンゴ","en":"Greater Flamingo","zh-CN":"大火烈鸟","zh-TW":"大火烈鳥","ko":"큰홍학","th":"นกฟลามิงโก้ใหญ่"},
  level:1,
  authCount:2400,
  price:15,
@@ -132,7 +132,7 @@ const birdData = [
 },
 {
  name:"インドクジャク",
- nameI18n:{"ja":"インドクジャク","en":"Indian Peafowl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"インドクジャク","en":"Indian Peafowl","zh-CN":"蓝孔雀","zh-TW":"藍孔雀","ko":"청공작","th":"นกยูงสีน้ำเงิน"},
  level:1,
  authCount:2400,
  price:10,
@@ -145,7 +145,7 @@ const birdData = [
 },
 {
  name:"マガモ",
- nameI18n:{"ja":"マガモ","en":"Mallard","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"マガモ","en":"Mallard","zh-CN":"绿头鸭","zh-TW":"綠頭鴨","ko":"청둥오리","th":"เป็ดหัวเขียว"},
  level:1,
  authCount:2400,
  price:12,
@@ -158,7 +158,7 @@ const birdData = [
 },
 {
  name:"エナガ",
- nameI18n:{"ja":"エナガ","en":"Long-tailed Tit","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"エナガ","en":"Long-tailed Tit","zh-CN":"北长尾山雀","zh-TW":"北長尾山雀","ko":"오목눈이","th":"นกชิมาเอนากะ"},
  level:2,
  price:2,
  star5:"全天気 / 全時間",
@@ -171,7 +171,7 @@ const birdData = [
 },
 {
  name:"ゴジュウカラ",
- nameI18n:{"ja":"ゴジュウカラ","en":"Eurasian Nuthatch","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ゴジュウカラ","en":"Eurasian Nuthatch","zh-CN":"五子雀","zh-TW":"五子雀","ko":"동고비","th":"นกกระจอกห้าสี"},
  level:2,
  authCount:2400,
  price:10,
@@ -184,7 +184,7 @@ const birdData = [
 },
 {
  name:"ヒゲガラ",
- nameI18n:{"ja":"ヒゲガラ","en":"Bearded Reedling","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヒゲガラ","en":"Bearded Reedling","zh-CN":"文须雀","zh-TW":"文鬚雀","ko":"수염오목눈이","th":"นกอีแอ่นเครา"},
  level:2,
  authCount:2400,
  price:10,
@@ -197,7 +197,7 @@ const birdData = [
 },
 {
  name:"ズアカモズ",
- nameI18n:{"ja":"ズアカモズ","en":"Woodchat Shrike","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ズアカモズ","en":"Woodchat Shrike","zh-CN":"林䳭伯劳","zh-TW":"林䳭伯勞","ko":"빨간머리때까치","th":"นกอีเสือเล็กน้ำตาล"},
  level:2,
  authCount:2400,
  price:10,
@@ -210,7 +210,7 @@ const birdData = [
 },
 {
  name:"ウォンガバト",
- nameI18n:{"ja":"ウォンガバト","en":"Wonga Pigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ウォンガバト","en":"Wonga Pigeon","zh-CN":"巨地鸠","zh-TW":"巨地鳩","ko":"웡가비둘기","th":"นกพิราบยักษ์"},
  level:2,
  authCount:2400,
  price:15,
@@ -223,7 +223,7 @@ const birdData = [
 },
 {
  name:"コアオバト",
- nameI18n:{"ja":"コアオバト","en":"Little Green Pigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コアオバト","en":"Little Green Pigeon","zh-CN":"红颈绿鸠","zh-TW":"紅頸綠鳩","ko":"분홍목녹색비둘기","th":"นกเปล้าคอสีม่วง"},
  level:2,
  authCount:2400,
  price:15,
@@ -236,7 +236,7 @@ const birdData = [
 },
 {
  name:"ヒドリガモ",
- nameI18n:{"ja":"ヒドリガモ","en":"Eurasian Wigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヒドリガモ","en":"Eurasian Wigeon","zh-CN":"赤颈鸭","zh-TW":"赤頸鴨","ko":"홍머리오리","th":"เป็ดปากสั้น"},
  level:2,
  authCount:2400,
  price:17,
@@ -249,7 +249,7 @@ const birdData = [
 },
 {
  name:"カモメ",
- nameI18n:{"ja":"カモメ","en":"Common Gull","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カモメ","en":"Common Gull","zh-CN":"海鸥","zh-TW":"海鷗","ko":"바다갈매기","th":"นกนางนวล"},
  level:2,
  authCount:2400,
  price:17,
@@ -262,7 +262,7 @@ const birdData = [
 },
 {
  name:"ニシコウライウグイス",
- nameI18n:{"ja":"ニシコウライウグイス","en":"Eurasian Golden Oriole","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ニシコウライウグイス","en":"Eurasian Golden Oriole","zh-CN":"金黄鹂","zh-TW":"金黃鸝","ko":"유럽꾀꼬리","th":"นกขมิ้นเหลืองอ่อน"},
  level:3,
  authCount:1440,
  price:15,
@@ -275,7 +275,7 @@ const birdData = [
 },
 {
  name:"カノコスズメ",
- nameI18n:{"ja":"カノコスズメ","en":"Scaly-breasted Munia","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カノコスズメ","en":"Scaly-breasted Munia","zh-CN":"双斑草雀","zh-TW":"雙斑草雀","ko":"녹자작","th":"นกกระจิบหญ้าสองจุด"},
  level:3,
  authCount:2400,
  price:10,
@@ -288,7 +288,7 @@ const birdData = [
 },
 {
  name:"シマエナガ",
- nameI18n:{"ja":"シマエナガ","en":"Japanese Long-tailed Tit","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シマエナガ","en":"Japanese Long-tailed Tit","zh-CN":"银喉山雀","zh-TW":"銀喉山雀","ko":"검은턱오목눈이","th":"นกติ๊ดหางยาว"},
  level:3,
  authCount:2400,
  price:10,
@@ -301,7 +301,7 @@ const birdData = [
 },
 {
  name:"ベニコンゴウインコ",
- nameI18n:{"ja":"ベニコンゴウインコ","en":"Scarlet Macaw","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ベニコンゴウインコ","en":"Scarlet Macaw","zh-CN":"红绿金刚鹦鹉","zh-TW":"紅綠金剛鸚鵡","ko":"홍금강앵무","th":"นกมาคอว์สีแดงและเขียว"},
  level:3,
  authCount:2400,
  price:10,
@@ -314,7 +314,7 @@ const birdData = [
 },
 {
  name:"アカツクシガモ",
- nameI18n:{"ja":"アカツクシガモ","en":"Ruddy Shelduck","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アカツクシガモ","en":"Ruddy Shelduck","zh-CN":"赤麻鸭","zh-TW":"赤麻鴨","ko":"황오리","th":"เป็ดพม่า"},
  level:3,
  authCount:2400,
  price:17,
@@ -327,7 +327,7 @@ const birdData = [
 },
 {
  name:"ケワタガモ",
- nameI18n:{"ja":"ケワタガモ","en":"Common Eider","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ケワタガモ","en":"Common Eider","zh-CN":"王绒鸭","zh-TW":"王絨鴨","ko":"호사북방오리","th":"เป็ดทะเลคิงอีเดอร์"},
  level:3,
  authCount:2400,
  price:17,
@@ -340,7 +340,7 @@ const birdData = [
 },
 {
  name:"オデュアンカモメ",
- nameI18n:{"ja":"オデュアンカモメ","en":"Audouin's Gull","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オデュアンカモメ","en":"Audouin's Gull","zh-CN":"奥杜安海鸥","zh-TW":"奧杜安海鷗","ko":"오두앵갈매기","th":"นกนางนวลออดูแอน"},
  level:3,
  authCount:2400,
  price:17,
@@ -353,7 +353,7 @@ const birdData = [
 },
 {
  name:"ヨーロッパヒメウ",
- nameI18n:{"ja":"ヨーロッパヒメウ","en":"European Shag","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨーロッパヒメウ","en":"European Shag","zh-CN":"欧洲绿鸬鹚","zh-TW":"歐洲綠鸕鶿","ko":"유럽가마우지","th":"นกกระทุงเขียวยุโรป"},
  level:3,
  authCount:2400,
  price:17,
@@ -366,7 +366,7 @@ const birdData = [
 },
 {
  name:"タイリクハクセキレイ",
- nameI18n:{"ja":"タイリクハクセキレイ","en":"White Wagtail","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"タイリクハクセキレイ","en":"White Wagtail","zh-CN":"白鹡鸰","zh-TW":"白鶺鴒","ko":"알락할미새","th":"นกอุ้มบาตร"},
  level:4,
  authCount:1440,
  price:15,
@@ -379,7 +379,7 @@ const birdData = [
 },
 {
  name:"ハイズキンダルマエナガ",
- nameI18n:{"ja":"ハイズキンダルマエナガ","en":"Gray-hooded Bushtit","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ハイズキンダルマエナガ","en":"Gray-hooded Bushtit","zh-CN":"灰冠红雀","zh-TW":"灰冠紅雀","ko":"회색머리붉은참새","th":"นกคาร์ดินัลหัวเทา"},
  level:4,
  authCount:1440,
  price:15,
@@ -392,7 +392,7 @@ const birdData = [
 },
 {
  name:"ギンザンマシコ",
- nameI18n:{"ja":"ギンザンマシコ","en":"Pine Grosbeak","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ギンザンマシコ","en":"Pine Grosbeak","zh-CN":"松雀","zh-TW":"松雀","ko":"솔양진이","th":"นกไพน์กรอสบีค"},
  level:4,
  authCount:1440,
  price:15,
@@ -405,7 +405,7 @@ const birdData = [
 },
 {
  name:"フウチョウモドキ",
- nameI18n:{"ja":"フウチョウモドキ","en":"Bowerbird","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"フウチョウモドキ","en":"Bowerbird","zh-CN":"黄头辉亭鸟","zh-TW":"黃頭輝亭鳥","ko":"노란머리바우어새","th":"นกไพรหัวเหลือง"},
  level:4,
  authCount:1440,
  price:15,
@@ -418,7 +418,7 @@ const birdData = [
 },
 {
  name:"キンミノヒメアオバト",
- nameI18n:{"ja":"キンミノヒメアオバト","en":"Golden-mantled Green Pigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キンミノヒメアオバト","en":"Golden-mantled Green Pigeon","zh-CN":"金果鸠","zh-TW":"金果鳩","ko":"황금과일비둘기","th":"นกพิราบผลไม้สีทอง"},
  level:4,
  authCount:1440,
  price:17,
@@ -431,7 +431,7 @@ const birdData = [
 },
 {
  name:"ギンケイ",
- nameI18n:{"ja":"ギンケイ","en":"Silver Pheasant","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ギンケイ","en":"Silver Pheasant","zh-CN":"白腹锦鸡","zh-TW":"白腹錦雞","ko":"은계","th":"ไก่ฟ้าท้องขาว"},
  level:4,
  authCount:1440,
  price:17,
@@ -444,7 +444,7 @@ const birdData = [
 },
 {
  name:"ミコアイサ",
- nameI18n:{"ja":"ミコアイサ","en":"Smew","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミコアイサ","en":"Smew","zh-CN":"白秋沙鸭","zh-TW":"白秋沙鴨","ko":"흰비오리","th":"เป็ดสมูว์"},
  level:4,
  authCount:1440,
  price:22,
@@ -457,7 +457,7 @@ const birdData = [
 },
 {
  name:"キバラメジロハエトリ",
- nameI18n:{"ja":"キバラメジロハエトリ","en":"Yellow-bellied Flycatcher","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キバラメジロハエトリ","en":"Yellow-bellied Flycatcher","zh-CN":"黄腹纹霸鹟","zh-TW":"黃腹紋霸鶲","ko":"노랑배딱새","th":"นกจับแมลงท้องเหลือง"},
  level:5,
  authCount:1440,
  price:15,
@@ -470,7 +470,7 @@ const birdData = [
 },
 {
  name:"ヨーロッパハチクイ",
- nameI18n:{"ja":"ヨーロッパハチクイ","en":"European Bee-eater","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨーロッパハチクイ","en":"European Bee-eater","zh-CN":"黄喉蜂虎","zh-TW":"黃喉蜂虎","ko":"유럽벌잡이새","th":"นกจาบคาหัวทอง"},
  level:5,
  authCount:1080,
  price:22,
@@ -483,7 +483,7 @@ const birdData = [
 },
 {
  name:"ヒワコンゴウインコ",
- nameI18n:{"ja":"ヒワコンゴウインコ","en":"Green-winged Macaw","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヒワコンゴウインコ","en":"Green-winged Macaw","zh-CN":"大绿金刚鹦鹉","zh-TW":"大綠金剛鸚鵡","ko":"초록금강앵무","th":"นกแก้วมาคอว์สีเขียวใหญ่"},
  level:5,
  authCount:1440,
  price:15,
@@ -496,7 +496,7 @@ const birdData = [
 },
 {
  name:"オリーブバト",
- nameI18n:{"ja":"オリーブバト","en":"Olive Pigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オリーブバト","en":"Olive Pigeon","zh-CN":"黄眼鸽","zh-TW":"黃眼鴿","ko":"올리브비둘기","th":"นกพิราบตาเหลือง"},
  level:5,
  authCount:1080,
  price:27,
@@ -509,7 +509,7 @@ const birdData = [
 },
 {
  name:"コフラミンゴ",
- nameI18n:{"ja":"コフラミンゴ","en":"Lesser Flamingo","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コフラミンゴ","en":"Lesser Flamingo","zh-CN":"小火烈鸟","zh-TW":"小火烈鳥","ko":"작은홍학","th":"นกฟลามิงโก้น้อย"},
  level:5,
  authCount:1440,
  price:27,
@@ -522,7 +522,7 @@ const birdData = [
 },
 {
  name:"クロアジサシ",
- nameI18n:{"ja":"クロアジサシ","en":"Sooty Tern","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クロアジサシ","en":"Sooty Tern","zh-CN":"白顶玄燕鸥","zh-TW":"白頂玄燕鷗","ko":"검정제비갈매기","th":"นกน็อดดี้"},
  level:5,
  authCount:1440,
  price:22,
@@ -535,7 +535,7 @@ const birdData = [
 },
 {
  name:"シメ",
- nameI18n:{"ja":"シメ","en":"Hawfinch","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シメ","en":"Hawfinch","zh-CN":"锡嘴雀","zh-TW":"錫嘴雀","ko":"콩새","th":"นกฮอว์ฟินช์"},
  level:6,
  authCount:1440,
  price:15,
@@ -548,7 +548,7 @@ const birdData = [
 },
 {
  name:"キンムネバト",
- nameI18n:{"ja":"キンムネバト","en":"Golden-breasted Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キンムネバト","en":"Golden-breasted Dove","zh-CN":"红喉鸡鸠","zh-TW":"紅喉雞鳩","ko":"황금가슴비둘기","th":"นกเขาสีชาด"},
  level:6,
  authCount:1080,
  price:27,
@@ -561,7 +561,7 @@ const birdData = [
 },
 {
  name:"チシマウガラス",
- nameI18n:{"ja":"チシマウガラス","en":"Red-faced Cormorant","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"チシマウガラス","en":"Red-faced Cormorant","zh-CN":"红脸鸬鹚","zh-TW":"紅臉鸕鶿","ko":"붉은뺨가마우지","th":"นกกระทุงหน้าแดง"},
  level:6,
  authCount:1440,
  price:22,
@@ -574,7 +574,7 @@ const birdData = [
 },
 {
  name:"トラフズク",
- nameI18n:{"ja":"トラフズク","en":"Long-eared Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トラフズク","en":"Long-eared Owl","zh-CN":"长耳鸮","zh-TW":"長耳鴞","ko":"칡부엉이","th":"นกเค้าแมวหูยาว"},
  level:6,
  authCount:1080,
  price:47,
@@ -587,7 +587,7 @@ const birdData = [
 },
 {
  name:"ルリガラ",
- nameI18n:{"ja":"ルリガラ","en":"Azure Tit","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ルリガラ","en":"Azure Tit","zh-CN":"灰蓝山雀","zh-TW":"灰藍山雀","ko":"푸른박새","th":"นกติ๊ดสีเทา"},
  level:7,
  authCount:1080,
  price:22,
@@ -600,7 +600,7 @@ const birdData = [
 },
 {
  name:"スミレコンゴウインコ",
- nameI18n:{"ja":"スミレコンゴウインコ","en":"Hyacinth Macaw","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"スミレコンゴウインコ","en":"Hyacinth Macaw","zh-CN":"靛蓝金刚鹦鹉","zh-TW":"靛藍金剛鸚鵡","ko":"히아신스금강앵무","th":"นกแก้วมาคอว์ไฮยาซินธ์"},
  level:7,
  authCount:1080,
  price:22,
@@ -613,7 +613,7 @@ const birdData = [
 },
 {
  name:"ボタンバト",
- nameI18n:{"ja":"ボタンバト","en":"Diamond Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ボタンバト","en":"Diamond Dove","zh-CN":"粉头果鸠","zh-TW":"粉頭果鳩","ko":"잠부과일비둘기","th":"นกเปล้าหน้าแดง"},
  level:7,
  authCount:1080,
  price:27,
@@ -626,7 +626,7 @@ const birdData = [
 },
 {
  name:"アジサシ",
- nameI18n:{"ja":"アジサシ","en":"Common Tern","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アジサシ","en":"Common Tern","zh-CN":"燕鸥","zh-TW":"燕鷗","ko":"제비갈매기","th":"นกนางนวลแกลบ"},
  level:7,
  authCount:1080,
  price:35,
@@ -639,7 +639,7 @@ const birdData = [
 },
 {
  name:"チョウゲンボウ",
- nameI18n:{"ja":"チョウゲンボウ","en":"Common Kestrel","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"チョウゲンボウ","en":"Common Kestrel","zh-CN":"红隼","zh-TW":"紅隼","ko":"황조롱이","th":"เหยี่ยวเคสเตรล"},
  level:7,
  authCount:1080,
  price:47,
@@ -652,7 +652,7 @@ const birdData = [
 },
 {
  name:"ルリツグミ",
- nameI18n:{"ja":"ルリツグミ","en":"Siberian Blue Robin","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ルリツグミ","en":"Siberian Blue Robin","zh-CN":"东蓝鸲","zh-TW":"東藍鴝","ko":"동부 파랑새","th":"นกบลูเบิร์ดตะวันออก"},
  level:8,
  authCount:600,
  price:30,
@@ -665,7 +665,7 @@ const birdData = [
 },
 {
  name:"ベニヒワ",
- nameI18n:{"ja":"ベニヒワ","en":"Common Redpoll","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ベニヒワ","en":"Common Redpoll","zh-CN":"白腰朱顶雀","zh-TW":"白腰朱頂雀","ko":"홍방울새","th":"นกเรดโพลล์"},
  level:8,
  authCount:1080,
  price:22,
@@ -678,7 +678,7 @@ const birdData = [
 },
 {
  name:"モモイロバト",
- nameI18n:{"ja":"モモイロバト","en":"Pink Pigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"モモイロバト","en":"Pink Pigeon","zh-CN":"粉鸽","zh-TW":"粉鴿","ko":"분홍비둘기","th":"นกพิราบสีชมพู"},
  level:8,
  authCount:1080,
  price:27,
@@ -691,7 +691,7 @@ const birdData = [
 },
 {
  name:"ハヤブサ",
- nameI18n:{"ja":"ハヤブサ","en":"Peregrine Falcon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ハヤブサ","en":"Peregrine Falcon","zh-CN":"游隼","zh-TW":"遊隼","ko":"매","th":"เหยี่ยวเพเรกริน"},
  level:8,
  authCount:600,
  price:65,
@@ -704,7 +704,7 @@ const birdData = [
 },
 {
  name:"ナナイロフウキンチョウ",
- nameI18n:{"ja":"ナナイロフウキンチョウ","en":"Paradise Tanager","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ナナイロフウキンチョウ","en":"Paradise Tanager","zh-CN":"仙靓唐纳雀","zh-TW":"仙靚唐納雀","ko":"극락풍금조","th":"นกนางแอ่นสวรรค์"},
  level:9,
  authCount:600,
  price:30,
@@ -717,7 +717,7 @@ const birdData = [
 },
 {
  name:"ベニイロフラミンゴ",
- nameI18n:{"ja":"ベニイロフラミンゴ","en":"American Flamingo","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ベニイロフラミンゴ","en":"American Flamingo","zh-CN":"美洲火烈鸟","zh-TW":"美洲火烈鳥","ko":"아메리카홍학","th":"นกฟลามิงโกอเมริกา"},
  level:9,
  authCount:600,
  price:55,
@@ -730,7 +730,7 @@ const birdData = [
 },
 {
  name:"マクジャク",
- nameI18n:{"ja":"マクジャク","en":"Green Peafowl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"マクジャク","en":"Green Peafowl","zh-CN":"绿孔雀","zh-TW":"綠孔雀","ko":"녹공작","th":"นกยูงสีเขียว"},
  level:9,
  authCount:600,
  price:37,
@@ -743,7 +743,7 @@ const birdData = [
 },
 {
  name:"カオジロオタテガモ",
- nameI18n:{"ja":"カオジロオタテガモ","en":"White-headed Duck","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カオジロオタテガモ","en":"White-headed Duck","zh-CN":"白头硬尾鸭","zh-TW":"白頭硬尾鴨","ko":"흰머리오리","th":"เป็ดหัวขาว"},
  level:9,
  authCount:600,
  price:45,
@@ -756,7 +756,7 @@ const birdData = [
 },
 {
  name:"インペリアルシャグ",
- nameI18n:{"ja":"インペリアルシャグ","en":"Imperial Shag","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"インペリアルシャグ","en":"Imperial Shag","zh-CN":"皇帝鸬鹚","zh-TW":"皇帝鸕鶿","ko":"황제가마우지","th":"นกกระทุงจักรพรรดิ"},
  level:9,
  authCount:600,
  price:45,
@@ -769,7 +769,7 @@ const birdData = [
 },
 {
  name:"アゾレスウソ",
- nameI18n:{"ja":"アゾレスウソ","en":"Azores Bullfinch","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アゾレスウソ","en":"Azores Bullfinch","zh-CN":"圣米格尔雀","zh-TW":"聖米格爾雀","ko":"아조레스멋쟁이새","th":"นกกระจอกเซนต์มิเกล"},
  level:10,
  authCount:600,
  price:30,
@@ -782,7 +782,7 @@ const birdData = [
 },
 {
  name:"ロクショウヒタキ",
- nameI18n:{"ja":"ロクショウヒタキ","en":"Verditer Flycatcher","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ロクショウヒタキ","en":"Verditer Flycatcher","zh-CN":"铜蓝鹟","zh-TW":"銅藍鶲","ko":"파랑딱새","th":"นกจับแมลงสีฟ้า"},
  level:10,
  authCount:600,
  price:30,
@@ -795,7 +795,7 @@ const birdData = [
 },
 {
  name:"アカアシチョウゲンボウ",
- nameI18n:{"ja":"アカアシチョウゲンボウ","en":"Red-footed Falcon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アカアシチョウゲンボウ","en":"Red-footed Falcon","zh-CN":"红脚隼","zh-TW":"紅腳隼","ko":"비둘기조롱이","th":"เหยี่ยวตีนแดง"},
  level:10,
  authCount:600,
  price:65,
@@ -808,7 +808,7 @@ const birdData = [
 },
 {
  name:"ワシミミズク",
- nameI18n:{"ja":"ワシミミズク","en":"Eurasian Eagle-Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ワシミミズク","en":"Eurasian Eagle-Owl","zh-CN":"雕鸮","zh-TW":"雕鴞","ko":"수리부엉이","th":"นกเค้าอินทรียูเรเซีย"},
  level:10,
  authCount:600,
  price:65,
@@ -821,7 +821,7 @@ const birdData = [
 }, 
 {
  name:"シロハラムクドリ",
- nameI18n:{"ja":"シロハラムクドリ","en":"White-shouldered Starling","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シロハラムクドリ","en":"White-shouldered Starling","zh-CN":"白腹紫椋鸟","zh-TW":"白腹紫椋鳥","ko":"보라등찌르레기","th":"นกกิ้งโครงหลังม่วง"},
  level:11,
  authCount:600,
  price:30,
@@ -834,7 +834,7 @@ const birdData = [
 }, 
 {
  name:"クロヒゲバト",
- nameI18n:{"ja":"クロヒゲバト","en":"Black-collared Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クロヒゲバト","en":"Black-collared Dove","zh-CN":"蓝头鹑鸠","zh-TW":"藍頭鶉鳩","ko":"푸른머리비둘기","th":"นกคุ่มอกลายหัวน้ำเงิน"},
  level:11,
  authCount:600,
  price:37,
@@ -847,7 +847,7 @@ const birdData = [
 }, 
 {
  name:"シロクジャク",
- nameI18n:{"ja":"シロクジャク","en":"White Peafowl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シロクジャク","en":"White Peafowl","zh-CN":"白孔雀","zh-TW":"白孔雀","ko":"백공작","th":"นกยูงสีขาว"},
  level:11,
  authCount:600,
  price:37,
@@ -860,7 +860,7 @@ const birdData = [
 }, 
 {
  name:"トモエガモ",
- nameI18n:{"ja":"トモエガモ","en":"Baikal Teal","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トモエガモ","en":"Baikal Teal","zh-CN":"花脸鸭","zh-TW":"花臉鴨","ko":"가창오리","th":"เป็ดหน้าลาย"},
  level:11,
  authCount:600,
  price:45,
@@ -873,7 +873,7 @@ const birdData = [
 }, 
 {
  name:"インカアジサシ",
- nameI18n:{"ja":"インカアジサシ","en":"Inca Tern","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"インカアジサシ","en":"Inca Tern","zh-CN":"印加燕鸥","zh-TW":"印加燕鷗","ko":"잉카제비갈매기","th":"นกนางนวลอินคา"},
  level:11,
  authCount:600,
  price:45,
@@ -886,7 +886,7 @@ const birdData = [
 },
 {
  name:"フヨウチョウ",
- nameI18n:{"ja":"フヨウチョウ","en":"Bird-of-Paradise","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"フヨウチョウ","en":"Bird-of-Paradise","zh-CN":"红眉火尾雀","zh-TW":"紅眉火尾雀","ko":"붉은눈썹핀치","th":"นกฟินช์คิ้วแดง"},
  level:12,
  authCount:600,
  price:30,
@@ -899,7 +899,7 @@ const birdData = [
 },
 {
  name:"ニシツノメドリ",
- nameI18n:{"ja":"ニシツノメドリ","en":"Atlantic Puffin","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ニシツノメドリ","en":"Atlantic Puffin","zh-CN":"北极海鹦","zh-TW":"北極海鸚","ko":"코뿔바다오리","th":"นกพัฟฟินแอตแลนติก"},
  level:12,
  authCount:600,
  price:45,
@@ -912,7 +912,7 @@ const birdData = [
 },
 {
  name:"アオアシカツオドリ",
- nameI18n:{"ja":"アオアシカツオドリ","en":"Blue-footed Booby","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アオアシカツオドリ","en":"Blue-footed Booby","zh-CN":"蓝脚鲣鸟","zh-TW":"藍腳鰹鳥","ko":"푸른발얼가니새","th":"นกบูบีตีนฟ้า"},
  level:12,
  authCount:600,
  price:45,
@@ -925,7 +925,7 @@ const birdData = [
 },
 {
  name:"シロフクロウ",
- nameI18n:{"ja":"シロフクロウ","en":"Snowy Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シロフクロウ","en":"Snowy Owl","zh-CN":"雪鸮","zh-TW":"雪鴞","ko":"흰올빼미","th":"นกฮูกหิมะ"},
  level:12,
  authCount:600,
  price:65,
@@ -938,7 +938,7 @@ const birdData = [
 },
 {
  name:"クロクジャク",
- nameI18n:{"ja":"クロクジャク","en":"Black-shouldered Peafowl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クロクジャク","en":"Black-shouldered Peafowl","zh-CN":"黑孔雀","zh-TW":"黑孔雀","ko":"흑공작","th":"นกยูงสีดำ"},
  level:13,
  authCount:600,
  price:37,
@@ -951,7 +951,7 @@ const birdData = [
 },
 {
  name:"オオハクチョウ",
- nameI18n:{"ja":"オオハクチョウ","en":"Whooper Swan","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オオハクチョウ","en":"Whooper Swan","zh-CN":"大天鹅","zh-TW":"大天鵝","ko":"큰고니","th":"หงส์ขาว"},
  level:13,
  authCount:600,
  price:45,
@@ -964,7 +964,7 @@ const birdData = [
 },
 {
  name:"コクチョウ",
- nameI18n:{"ja":"コクチョウ","en":"Black Swan","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コクチョウ","en":"Black Swan","zh-CN":"黑天鹅","zh-TW":"黑天鵝","ko":"흑고니","th":"หงส์ดำ"},
  level:13,
  authCount:600,
  price:45,
@@ -977,7 +977,7 @@ const birdData = [
 },
 {
  name:"ナベコウ",
- nameI18n:{"ja":"ナベコウ","en":"Black Stork","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ナベコウ","en":"Black Stork","zh-CN":"黑鹳","zh-TW":"黑鸛","ko":"먹황새","th":"นกกาบบัว"},
  level:14,
  authCount:600,
  price:55,
@@ -990,7 +990,7 @@ const birdData = [
 },
 {
  name:"メガネフクロウ",
- nameI18n:{"ja":"メガネフクロウ","en":"Spectacled Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"メガネフクロウ","en":"Spectacled Owl","zh-CN":"眼镜鸮","zh-TW":"眼鏡鴞","ko":"안경올빼미","th":"นกฮูกแว่น"},
  level:14,
  authCount:600,
  price:65,
@@ -1004,7 +1004,7 @@ const birdData = [
 
 {
  name:"冬服・オオフラミンゴ",
- nameI18n:{"ja":"冬服・オオフラミンゴ","en":"Winter Coat Greater Flamingo","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・オオフラミンゴ","en":"Winter Coat Greater Flamingo","zh-CN":"冬装大火烈鸟","zh-TW":"冬裝大火烈鳥","ko":"겨울 옷 큰홍학","th":"นกฟลามิงโก้ชุดฤดูหนาว"},
  season:true,
  ended:true,
  level:1,
@@ -1019,7 +1019,7 @@ const birdData = [
 },
 {
  name:"冬服・マガモ",
- nameI18n:{"ja":"冬服・マガモ","en":"Winter Coat Mallard","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・マガモ","en":"Winter Coat Mallard","zh-CN":"冬装绿头鸭","zh-TW":"冬裝綠頭鴨","ko":"겨울 옷 청둥오리","th":"เป็ดหัวเขียวชุดฤดูหนาว"},
  season:true,
  ended:true,
  level:1,
@@ -1035,7 +1035,7 @@ const birdData = [
 
 {
  name:"冬服・ミコアイサ",
- nameI18n:{"ja":"冬服・ミコアイサ","en":"Winter Coat Smew","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・ミコアイサ","en":"Winter Coat Smew","zh-CN":"冬装白秋沙鸭","zh-TW":"冬裝白秋沙鴨","ko":"겨울 옷 흰비오리","th":"เป็ดสมูว์ชุดฤดูหนาว"},
  season:true,
  ended:true,
  level:1,
@@ -1051,7 +1051,7 @@ const birdData = [
 
 {
  name:"冬服・ヒドリガモ",
- nameI18n:{"ja":"冬服・ヒドリガモ","en":"Winter Coat Eurasian Wigeon","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・ヒドリガモ","en":"Winter Coat Eurasian Wigeon","zh-CN":"冬装赤颈鸭","zh-TW":"冬裝赤頸鴨","ko":"겨울 옷 홍머리오리","th":"เป็ดปากสั้นชุดฤดูหนาว"},
  season:true,
  ended:true,
  level:1,
@@ -1067,7 +1067,7 @@ const birdData = [
 
 {
  name:"冬服・オシドリ",
- nameI18n:{"ja":"冬服・オシドリ","en":"Winter Coat Mandarin Duck","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"冬服・オシドリ","en":"Winter Coat Mandarin Duck","zh-CN":"冬装鸳鸯","zh-TW":"冬裝鴛鴦","ko":"겨울 옷 원앙","th":"เป็ดแมนดารินชุดฤดูหนาว"},
  season:true,
  ended:true,
  level:1,
@@ -1083,7 +1083,7 @@ const birdData = [
 
 {
  name:"紳士チビアオバト",
- nameI18n:{"ja":"紳士チビアオバト","en":"Gentleman Chibi Green Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビアオバト","en":"Gentleman Chibi Green Dove","zh-CN":"绅士小绿鸽","zh-TW":"紳士小綠鴿","ko":"신사 초록 비둘기","th":"พิราบมาดแมนสีเขียว"},
  fes:true,
  ended:true,
  level:1,
@@ -1099,7 +1099,7 @@ const birdData = [
 
 {
  name:"紳士チビアイバト",
- nameI18n:{"ja":"紳士チビアイバト","en":"Gentleman Chibi Indigo Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビアイバト","en":"Gentleman Chibi Indigo Dove","zh-CN":"绅士小蓝鸽","zh-TW":"紳士小藍鴿","ko":"신사 파랑 비둘기","th":"พิราบมาดแมนสีน้ำเงิน"},
  fes:true,
  ended:true,
  level:1,
@@ -1115,7 +1115,7 @@ const birdData = [
 
 {
  name:"紳士チビハイバト",
- nameI18n:{"ja":"紳士チビハイバト","en":"Gentleman Chibi Gray Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビハイバト","en":"Gentleman Chibi Gray Dove","zh-CN":"绅士小灰鸽","zh-TW":"紳士小灰鴿","ko":"신사 회색 비둘기","th":"พิราบมาดแมนสีเทา"},
  fes:true,
  ended:true,
  level:1,
@@ -1131,7 +1131,7 @@ const birdData = [
 
 {
  name:"紳士チビアカバト",
- nameI18n:{"ja":"紳士チビアカバト","en":"Gentleman Chibi Red Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビアカバト","en":"Gentleman Chibi Red Dove","zh-CN":"绅士小红鸽","zh-TW":"紳士小紅鴿","ko":"신사 빨강 비둘기","th":"พิราบมาดแมนสีแดง"},
  fes:true,
  ended:true,
  level:1,
@@ -1147,7 +1147,7 @@ const birdData = [
 
 {
  name:"紳士チビハナバト",
- nameI18n:{"ja":"紳士チビハナバト","en":"Gentleman Chibi Blossom Dove","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"紳士チビハナバト","en":"Gentleman Chibi Blossom Dove","zh-CN":"绅士小花鸽","zh-TW":"紳士小花鴿","ko":"신사 무늬 비둘기","th":"พิราบมาดแมนสีลาย"},
  fes:true,
  ended:true,
  level:1,
@@ -1237,7 +1237,7 @@ const birdData = [
 },
 {
  name:"ハジロクロハラアジサシ",
- nameI18n:{"ja":"ハジロクロハラアジサシ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ハジロクロハラアジサシ","en":"White-Winged Tern","zh-CN":"白翅浮鸥","zh-TW":"白翅浮鷗","ko":"흰죽지제비갈매기","th":"นกนางนวลแกลบดำปีกขาว"},
  season:true,
  ended:true,
  level:1,
@@ -1252,7 +1252,7 @@ const birdData = [
 },
 {
  name:"トウゾクカモメ",
- nameI18n:{"ja":"トウゾクカモメ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トウゾクカモメ","en":"Pomarine Skua","zh-CN":"中贼鸥","zh-TW":"中賊鷗","ko":"도둑갈매기","th":"นกสกัว"},
  season:true,
  ended:true,
  level:1,
@@ -1267,7 +1267,7 @@ const birdData = [
 },
 {
  name:"ヘラサギ",
- nameI18n:{"ja":"ヘラサギ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヘラサギ","en":"White Spoonbill","zh-CN":"白琵鹭","zh-TW":"白琵鷺","ko":"흰 저어새","th":"นกปากช้อน"},
  season:true,
  ended:true,
  level:1,
@@ -1282,7 +1282,7 @@ const birdData = [
 },
 {
  name:"ワタリアホウドリ",
- nameI18n:{"ja":"ワタリアホウドリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ワタリアホウドリ","en":"Wandering Albatross","zh-CN":"漂泊信天翁","zh-TW":"漂泊信天翁","ko":"나그네알바트로스","th":"นกอัลบาทรอสพเนจร"},
  season:true,
  ended:true,
  level:1,
@@ -1297,7 +1297,7 @@ const birdData = [
 },
 {
  name:"ハイイロアホウドリ",
- nameI18n:{"ja":"ハイイロアホウドリ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ハイイロアホウドリ","en":"Grey-mantled Albatross","zh-CN":"灰背信天翁","zh-TW":"灰背信天翁","ko":"검은등알바트로스","th":"นกอัลบาทรอสหลังเทา"},
  season:true,
  ended:true,
  level:1,
@@ -1312,7 +1312,7 @@ const birdData = [
 },
 {
  name:"オレンジ羽のヤツガシラ",
- nameI18n:{"ja":"オレンジ羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オレンジ羽のヤツガシラ","en":"Orange Hoopoe","zh-CN":"橙羽戴胜","zh-TW":"橙羽戴勝","ko":"주황깃 후투티","th":"นกกะรางหัวขวานขนสีส้ม"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1328,7 +1328,7 @@ const birdData = [
 },
 {
  name:"青い羽のヤツガシラ",
- nameI18n:{"ja":"青い羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"青い羽のヤツガシラ","en":"Blue Hoopoe","zh-CN":"蓝羽戴胜","zh-TW":"藍羽戴勝","ko":"파랑깃 후투티","th":"นกกะรางหัวขวานขนสีฟ้า"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1344,7 +1344,7 @@ const birdData = [
 },
 {
  name:"緑羽のヤツガシラ",
- nameI18n:{"ja":"緑羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"緑羽のヤツガシラ","en":"Green Hoopoe","zh-CN":"绿羽戴胜","zh-TW":"綠羽戴勝","ko":"초록깃 후투티","th":"นกกะรางหัวขวานขนสีเขียว"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1360,7 +1360,7 @@ const birdData = [
 },
 {
  name:"赤い羽のヤツガシラ",
- nameI18n:{"ja":"赤い羽のヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"赤い羽のヤツガシラ","en":"Red Hoopoe","zh-CN":"红羽戴胜","zh-TW":"紅羽戴勝","ko":"빨강깃 후투티","th":"นกกะรางหัวขวานขนสีแดง"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1376,7 +1376,7 @@ const birdData = [
 },
 {
  name:"カラフルなヤツガシラ",
- nameI18n:{"ja":"カラフルなヤツガシラ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カラフルなヤツガシラ","en":"Colorful Hoopoe","zh-CN":"彩羽戴胜","zh-TW":"彩羽戴勝","ko":"무지개깃 후투티","th":"นกกะรางหัวขวานขนหลากสี"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1393,7 +1393,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"リンゴワタリガラス",
- nameI18n:{"ja":"リンゴワタリガラス","en":"Apple Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"リンゴワタリガラス","en":"Apple Raven","zh-CN":"苹果渡鸦","zh-TW":"蘋果渡鴉","ko":"사과 큰까마귀","th":"นกเรเวนแอปเปิล"},
  fes:true,
  level:1,
  price:10,
@@ -1411,7 +1411,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"ミカンワタリガラス",
- nameI18n:{"ja":"ミカンワタリガラス","en":"Mandarin Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミカンワタリガラス","en":"Mandarin Raven","zh-CN":"橘子渡鸦","zh-TW":"橘子渡鴉","ko":"오렌지 큰까마귀","th":"นกเรเวนส้ม"},
  fes:true,
  level:1,
  price:10,
@@ -1429,7 +1429,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"イチゴワタリガラス",
- nameI18n:{"ja":"イチゴワタリガラス","en":"Strawberry Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イチゴワタリガラス","en":"Strawberry Raven","zh-CN":"草莓渡鸦","zh-TW":"草莓渡鴉","ko":"딸기 큰까마귀","th":"นกเรเวนสตรอว์เบอร์รี่"},
  fes:true,
  level:1,
  price:10,
@@ -1447,7 +1447,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"カボチャワタリガラス",
- nameI18n:{"ja":"カボチャワタリガラス","en":"Pumpkin Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カボチャワタリガラス","en":"Pumpkin Raven","zh-CN":"南瓜渡鸦","zh-TW":"南瓜渡鴉","ko":"호박 큰까마귀","th":"นกเรเวนฟักทอง"},
  fes:true,
  level:1,
  price:10,
@@ -1466,7 +1466,7 @@ const birdData = [
  // イベント「幽夜の集い」2026-10-17出現開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"トリュフワタリガラス",
- nameI18n:{"ja":"トリュフワタリガラス","en":"Truffle Raven","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トリュフワタリガラス","en":"Truffle Raven","zh-CN":"松露渡鸦","zh-TW":"松露渡鴉","ko":"트러플 큰까마귀","th":"นกเรเวนทรัฟเฟิล"},
  fes:true,
  level:1,
  price:15,
@@ -1481,7 +1481,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"タンザニアウーリーコウモリ",
- nameI18n:{"ja":"タンザニアウーリーコウモリ","en":"Tanzanian Woolly Bat","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"タンザニアウーリーコウモリ","en":"Tanzanian Woolly Bat","zh-CN":"绒彩蝠","zh-TW":"絨彩蝠","ko":"양털박쥐","th":"ค้างคาวขนปุยหลากสี"},
  fes:true,
  level:1,
  price:2,
@@ -1498,7 +1498,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"シロヘラコウモリ",
- nameI18n:{"ja":"シロヘラコウモリ","en":"Honduran White Bat","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シロヘラコウモリ","en":"Honduran White Bat","zh-CN":"洪都拉斯白蝙蝠","zh-TW":"洪都拉斯白蝙蝠","ko":"온두라스흰박쥐","th":"ค้างคาวขาวฮอนดูรัส"},
  fes:true,
  level:1,
  price:2,
@@ -1515,7 +1515,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"パナイスンダオオコウモリ",
- nameI18n:{"ja":"パナイスンダオオコウモリ","en":"Long-Toothed Fruit Bat","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"パナイスンダオオコウモリ","en":"Long-Toothed Fruit Bat","zh-CN":"利齿狐蝠","zh-TW":"利齒狐蝠","ko":"황금볏과일박쥐","th":"ค้างคาวแม่ไก่ฟันแหลม"},
  fes:true,
  level:1,
  price:2,
@@ -1532,7 +1532,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"アメリカオオコノハズク",
- nameI18n:{"ja":"アメリカオオコノハズク","en":"Eastern Screech Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アメリカオオコノハズク","en":"Eastern Screech Owl","zh-CN":"东美角鸮","zh-TW":"東美角鴞","ko":"동부소쩍새","th":"นกฮูกสกรีชตะวันออก"},
  fes:true,
  level:1,
  price:2,
@@ -1549,7 +1549,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"アフリカオオコノハズク",
- nameI18n:{"ja":"アフリカオオコノハズク","en":"Northern White-Faced Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アフリカオオコノハズク","en":"Northern White-Faced Owl","zh-CN":"白脸角鸮","zh-TW":"白臉角鴞","ko":"흰얼굴소쩍새","th":"นกเค้าหน้าขาวแอฟริกาเหนือ"},
  fes:true,
  level:1,
  price:2,
@@ -1566,7 +1566,7 @@ const birdData = [
 {
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"カキイロコノハズク",
- nameI18n:{"ja":"カキイロコノハズク","en":"Palau Scops Owl","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カキイロコノハズク","en":"Palau Scops Owl","zh-CN":"帕劳角鸮","zh-TW":"帛琉角鴞","ko":"팔라우소쩍새","th":"นกฮูกพาเลา"},
  fes:true,
  level:1,
  price:2,
