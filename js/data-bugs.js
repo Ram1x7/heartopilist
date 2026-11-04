@@ -2,7 +2,7 @@
 const bugData = [
 {
  name:"キアゲハ",
- nameI18n:{"ja":"キアゲハ","en":"Old World Swallowtail","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キアゲハ","en":"Old World Swallowtail","zh-CN":"金凤蝶","zh-TW":"金鳳蝶","ko":"호랑나비","th":"ผีเสื้อหางติ่งทอง"},
  level:1,
  authCount:1200,
  price:30,
@@ -14,7 +14,7 @@ const bugData = [
 },
 {
  name:"クモマツマキチョウ",
- nameI18n:{"ja":"クモマツマキチョウ","en":"Orange Tip","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クモマツマキチョウ","en":"Orange Tip","zh-CN":"红襟粉蝶","zh-TW":"紅襟粉蝶","ko":"유럽갈고리나비","th":"ผีเสื้อปลายส้ม"},
  level:1,
  authCount:1200,
  price:30,
@@ -26,7 +26,7 @@ const bugData = [
 },
 {
  name:"ヤマキチョウ",
- nameI18n:{"ja":"ヤマキチョウ","en":"Brimstone Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヤマキチョウ","en":"Brimstone Butterfly","zh-CN":"钩粉蝶","zh-TW":"鉤粉蝶","ko":"멧노랑나비","th":"ผีเสื้อหนอนกะหล่ำ"},
  level:1,
  authCount:1200,
  price:30,
@@ -38,7 +38,7 @@ const bugData = [
 },
 {
  name:"モンシロチョウ",
- nameI18n:{"ja":"モンシロチョウ","en":"Cabbage White","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"モンシロチョウ","en":"Cabbage White","zh-CN":"菜粉蝶","zh-TW":"菜粉蝶","ko":"배추흰나비","th":"ผีเสื้อสมอลไวท์"},
  level:1,
  authCount:1200,
  price:30,
@@ -50,7 +50,7 @@ const bugData = [
 },
 {
  name:"アポロウスバシロチョウ",
- nameI18n:{"ja":"アポロウスバシロチョウ","en":"Apollo Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アポロウスバシロチョウ","en":"Apollo Butterfly","zh-CN":"阿波罗绢蝶","zh-TW":"阿波羅絹蝶","ko":"아폴로모시나비","th":"ผีเสื้ออะพอลโล"},
  level:1,
  authCount:1200,
  price:30,
@@ -62,7 +62,7 @@ const bugData = [
 },
 {
  name:"ベニモンアゲハ",
- nameI18n:{"ja":"ベニモンアゲハ","en":"Crimson Rose Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ベニモンアゲハ","en":"Crimson Rose Butterfly","zh-CN":"红环凤蝶","zh-TW":"紅環鳳蝶","ko":"붉은고리호랑나비","th":"ผีเสื้อหางติ่งแดง"},
  level:1,
  authCount:1200,
  price:30,
@@ -74,7 +74,7 @@ const bugData = [
 },
 {
  name:"スルコウスキーモルフォ",
- nameI18n:{"ja":"スルコウスキーモルフォ","en":"Sulkowsky's Morpho","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"スルコウスキーモルフォ","en":"Sulkowsky's Morpho","zh-CN":"夜明珠闪蝶","zh-TW":"夜明珠閃蝶","ko":"슬코스키몰포나비","th":"ผีเสื้อแสงจันทร์"},
  level:1,
  authCount:1200,
  price:90,
@@ -86,7 +86,7 @@ const bugData = [
 },
 {
  name:"アスバラカズハムシ",
- nameI18n:{"ja":"アスバラカズハムシ","en":"Asparagus Beetle","zh-CN":"","zh-TW":"","ko":"","th":""}, 
+ nameI18n:{"ja":"アスバラカズハムシ","en":"Asparagus Beetle","zh-CN":"芦笋叶甲","zh-TW":"蘆筍葉甲","ko":"아스파라거스벌레","th":"ด้วงหน่อไม้ฝรั่ง"}, 
  level:1,
  authCount:1200,
  price:55,
@@ -98,7 +98,7 @@ const bugData = [
 },
 {
  name:"クリソクラオン",
- nameI18n:{"ja":"クリソクラオン","en":"Chrysochroa Jewel Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クリソクラオン","en":"Chrysochroa Jewel Beetle","zh-CN":"绿洲蝗","zh-TW":"綠洲蝗","ko":"오아시스메뚜기","th":"ตั๊กแตนโอเอซิส"},
  level:1,
  authCount:1200,
  price:45,
@@ -110,7 +110,7 @@ const bugData = [
 },
 {
  name:"コバネアカホシカメムシ",
- nameI18n:{"ja":"コバネアカホシカメムシ","en":"Red-spotted Stink Bug","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コバネアカホシカメムシ","en":"Red-spotted Stink Bug","zh-CN":"始红蝽","zh-TW":"始紅蝽","ko":"별노린재","th":"แมลงไฟ"},
  level:1,
  authCount:1200,
  price:35,
@@ -122,7 +122,7 @@ const bugData = [
 },
 {
  name:"アカイトトンボ",
- nameI18n:{"ja":"アカイトトンボ","en":"Small Red Damselfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アカイトトンボ","en":"Small Red Damselfly","zh-CN":"大红豆娘","zh-TW":"大紅豆娘","ko":"큰고추잠자리","th":"แมลงปอเข็มแดง"},
  level:1,
  authCount:1200,
  price:35,
@@ -134,7 +134,7 @@ const bugData = [
 },
 {
  name:"イカルスヒメシジミ",
- nameI18n:{"ja":"イカルスヒメシジミ","en":"Common Blue Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イカルスヒメシジミ","en":"Common Blue Butterfly","zh-CN":"普蓝眼灰蝶","zh-TW":"普藍眼灰蝶","ko":"연푸른부전나비","th":"ผีเสื้อน้ำเงินทั่วไป"},
  level:2,
  authCount:1200,
  price:105,
@@ -146,7 +146,7 @@ const bugData = [
 },
 {
  name:"ミドリニワハンミョウ",
- nameI18n:{"ja":"ミドリニワハンミョウ","en":"Green Tiger Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミドリニワハンミョウ","en":"Green Tiger Beetle","zh-CN":"绿虎甲","zh-TW":"綠虎甲","ko":"녹색호랑풍뎅이","th":"ด้วงเสือเขียว"},
  level:2,
  authCount:1200,
  price:110,
@@ -158,7 +158,7 @@ const bugData = [
 },
 {
  name:"コウホウトラカミキリ",
- nameI18n:{"ja":"コウホウトラカミキリ","en":"Tiger Longhorn Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"コウホウトラカミキリ","en":"Tiger Longhorn Beetle","zh-CN":"黄蜂虎天牛","zh-TW":"黃蜂虎天牛","ko":"말벌호랑하늘소","th":"ด้วงเสือลายต่อ"},
  level:2,
  authCount:1200,
  price:110,
@@ -170,7 +170,7 @@ const bugData = [
 },
 {
  name:"アオホシハナムグリ",
- nameI18n:{"ja":"アオホシハナムグリ","en":"Blue-spotted Flower Chafer","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アオホシハナムグリ","en":"Blue-spotted Flower Chafer","zh-CN":"蓝星花金龟","zh-TW":"藍星花金龜","ko":"파란꽃풍뎅이","th":"ด้วงม่วงแฟนซี"},
  level:2,
  authCount:1200,
  price:165,
@@ -182,7 +182,7 @@ const bugData = [
 },
 {
  name:"シベリアヒナバッタ",
- nameI18n:{"ja":"シベリアヒナバッタ","en":"Siberian Grasshopper","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シベリアヒナバッタ","en":"Siberian Grasshopper","zh-CN":"锤腿蝗","zh-TW":"錘腿蝗","ko":"망치다리메뚜기","th":"ตั๊กแตนโวลคาโรน่า"},
  level:2,
  authCount:1200,
  price:90,
@@ -194,7 +194,7 @@ const bugData = [
 },
 {
  name:"ナナホシテントウ",
- nameI18n:{"ja":"ナナホシテントウ","en":"Seven-spot Ladybird","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ナナホシテントウ","en":"Seven-spot Ladybird","zh-CN":"七星瓢虫","zh-TW":"七星瓢蟲","ko":"칠성 무당벌레","th":"เต่าทองเจ็ดจุด"},
  level:2,
  authCount:1200,
  price:110,
@@ -206,7 +206,7 @@ const bugData = [
 },
 {
  name:"ヨツボシトンボ",
- nameI18n:{"ja":"ヨツボシトンボ","en":"Four-spotted Chaser","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨツボシトンボ","en":"Four-spotted Chaser","zh-CN":"小斑蜻","zh-TW":"小斑蜻","ko":"넉점박이잠자리","th":"แมลงปอเล็ก"},
  level:2,
  authCount:1200,
  price:75,
@@ -218,7 +218,7 @@ const bugData = [
 },
 {
  name:"クマバチ",
- nameI18n:{"ja":"クマバチ","en":"Carpenter Bee","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クマバチ","en":"Carpenter Bee","zh-CN":"熊蜂","zh-TW":"熊蜂","ko":"호박벌","th":"บัมเบิลบี"},
  level:2,
  authCount:1200,
  price:110,
@@ -230,7 +230,7 @@ const bugData = [
 },
 {
  name:"イリスコムラサキ",
- nameI18n:{"ja":"イリスコムラサキ","en":"Purple Emperor","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イリスコムラサキ","en":"Purple Emperor","zh-CN":"紫闪蛱蝶","zh-TW":"紫閃蛺蝶","ko":"보라네발나비","th":"ผีเสื้อสีม่วง"},
  level:3,
  authCount:720,
  price:90,
@@ -242,7 +242,7 @@ const bugData = [
 },
 {
  name:"アカエリトリバネアゲハ",
- nameI18n:{"ja":"アカエリトリバネアゲハ","en":"Red-collared Birdwing","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アカエリトリバネアゲハ","en":"Red-collared Birdwing","zh-CN":"翠叶红颈凤蝶","zh-TW":"翠葉紅頸鳳蝶","ko":"붉은목제비나비","th":"ผีเสื้อราชาถุงทองบรุค"},
  level:3,
  authCount:720,
  price:90,
@@ -254,7 +254,7 @@ const bugData = [
 },
 {
  name:"ヒメオナガミズアオ",
- nameI18n:{"ja":"ヒメオナガミズアオ","en":"Small Luna Moth","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヒメオナガミズアオ","en":"Small Luna Moth","zh-CN":"姬长尾水青蛾","zh-TW":"姬長尾水青蛾","ko":"긴꼬리산누에나방","th":"ผีเสื้อหางยาวฮิเมะ"},
  level:3,
  authCount:1200,
  price:105,
@@ -266,7 +266,7 @@ const bugData = [
 },
 {
  name:"アカハネムシ",
- nameI18n:{"ja":"アカハネムシ","en":"Red Net-winged Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アカハネムシ","en":"Red Net-winged Beetle","zh-CN":"赤翅甲","zh-TW":"赤翅甲","ko":"홍날개","th":"ด้วงปีกแดง"},
  level:3,
  authCount:1200,
  price:110,
@@ -278,7 +278,7 @@ const bugData = [
 },
 {
  name:"ピンクタイワンクツワムシ",
- nameI18n:{"ja":"ピンクタイワンクツワムシ","en":"Pink Taiwan Katydid","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ピンクタイワンクツワムシ","en":"Pink Taiwan Katydid","zh-CN":"粉色纺织娘","zh-TW":"粉色紡織娘","ko":"분홍색 철써기","th":"แมลงทอผ้าสีชมพู"},
  level:3,
  authCount:1200,
  price:90,
@@ -290,7 +290,7 @@ const bugData = [
 },
 {
  name:"キリギリス",
- nameI18n:{"ja":"キリギリス","en":"Bush Cricket","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キリギリス","en":"Bush Cricket","zh-CN":"蝈蝈","zh-TW":"蟈蟈","ko":"여치","th":"จิ้งหรีด"},
  level:3,
  authCount:1200,
  price:180,
@@ -302,7 +302,7 @@ const bugData = [
 },
 {
  name:"シロマダラオバチ",
- nameI18n:{"ja":"シロマダラオバチ","en":"White-spotted Giant Wasp","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シロマダラオバチ","en":"White-spotted Giant Wasp","zh-CN":"白斑尾梳蜂","zh-TW":"白斑尾梳蜂","ko":"흰점꼬리털벌","th":"ผึ้งหางหวีจุดขาว"},
  level:3,
  authCount:720,
  price:165,
@@ -314,7 +314,7 @@ const bugData = [
 },
 {
  name:"アリ",
- nameI18n:{"ja":"アリ","en":"Ant","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アリ","en":"Ant","zh-CN":"蚂蚁","zh-TW":"螞蟻","ko":"개미","th":"มด"},
  level:3,
  authCount:1200,
  price:220,
@@ -326,7 +326,7 @@ const bugData = [
 },
 {
  name:"ツマグロヒョウモン",
- nameI18n:{"ja":"ツマグロヒョウモン","en":"Indian Fritillary","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ツマグロヒョウモン","en":"Indian Fritillary","zh-CN":"豹纹网蛱蝶","zh-TW":"豹紋網蛺蝶","ko":"표범무늬네발나비","th":"ผีเสื้อดวงตาเสือดาว"},
  level:4,
  authCount:720,
  price:90,
@@ -338,7 +338,7 @@ const bugData = [
 },
 {
  name:"アルキプテラフスカ",
- nameI18n:{"ja":"アルキプテラフスカ","en":"Arcyptera Grasshopper","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アルキプテラフスカ","en":"Arcyptera Grasshopper","zh-CN":"网翅蝗","zh-TW":"網翅蝗","ko":"큰줄무늬메뚜기","th":"ตั๊กแตนปีกตาข่าย"},
  level:4,
  authCount:720,
  price:140,
@@ -350,7 +350,7 @@ const bugData = [
 },
 {
  name:"ヨツボシテントウ",
- nameI18n:{"ja":"ヨツボシテントウ","en":"Four-spotted Ladybird","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨツボシテントウ","en":"Four-spotted Ladybird","zh-CN":"四星瓢虫","zh-TW":"四星瓢蟲","ko":"사성 무당벌레","th":"เต่าทองสี่จุด"},
  level:4,
  authCount:720,
  price:165,
@@ -362,7 +362,7 @@ const bugData = [
 },
 {
  name:"セミ",
- nameI18n:{"ja":"セミ","en":"Cicada","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"セミ","en":"Cicada","zh-CN":"蝉","zh-TW":"蟬","ko":"매미","th":"จักจั่น"},
  level:4,
  authCount:720,
  price:220,
@@ -374,7 +374,7 @@ const bugData = [
 },
 {
  name:"シオカラトンボ",
- nameI18n:{"ja":"シオカラトンボ","en":"White-tailed Skimmer","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シオカラトンボ","en":"White-tailed Skimmer","zh-CN":"白尾蜻蜓","zh-TW":"白尾蜻蜓","ko":"밀잠자리","th":"แมลงปอหางขาว"},
  level:4,
  authCount:1200,
  price:75,
@@ -386,7 +386,7 @@ const bugData = [
 },
 {
  name:"ニジイロカマキリ",
- nameI18n:{"ja":"ニジイロカマキリ","en":"Rainbow Mantis","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ニジイロカマキリ","en":"Rainbow Mantis","zh-CN":"虹螳","zh-TW":"虹螳","ko":"무지개사마귀","th":"ตั๊กแตนรุ้ง"},
  level:4,
  authCount:720,
  price:195,
@@ -398,7 +398,7 @@ const bugData = [
 },
 {
  name:"クジャクチョウ",
- nameI18n:{"ja":"クジャクチョウ","en":"Peacock Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クジャクチョウ","en":"Peacock Butterfly","zh-CN":"孔雀蛱蝶","zh-TW":"孔雀蛺蝶","ko":"공작나비","th":"ผีเสื้อนกยูง"},
  level:5,
  authCount:720,
  price:90,
@@ -410,7 +410,7 @@ const bugData = [
 },
 {
  name:"キベリタテハ",
- nameI18n:{"ja":"キベリタテハ","en":"Camberwell Beauty","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キベリタテハ","en":"Camberwell Beauty","zh-CN":"黄缘螯蛱蝶","zh-TW":"黃緣螯蛺蝶","ko":"신선나비","th":"ผีเสื้อขอบเหลือง"},
  level:5,
  authCount:720,
  price:90,
@@ -422,7 +422,7 @@ const bugData = [
 },
 {
  name:"ナンベイオオヤガ",
- nameI18n:{"ja":"ナンベイオオヤガ","en":"South American Owlet Moth","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ナンベイオオヤガ","en":"South American Owlet Moth","zh-CN":"白女巫蛾","zh-TW":"白女巫蛾","ko":"흰마녀밤나방","th":"ผีเสื้อกลางคืนแม่มดขาว"},
  level:5,
  authCount:720,
  price:90,
@@ -434,7 +434,7 @@ const bugData = [
 },
 {
  name:"タケウチトゲムネカミキリ",
- nameI18n:{"ja":"タケウチトゲムネカミキリ","en":"Takeuchi's Spiny Longhorn Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"タケウチトゲムネカミキリ","en":"Takeuchi's Spiny Longhorn Beetle","zh-CN":"高山长角天牛","zh-TW":"高山長角天牛","ko":"고산수염하늘소","th":"ด้วงเขายาว"},
  level:5,
  authCount:720,
  price:165,
@@ -446,7 +446,7 @@ const bugData = [
 },
 {
  name:"ナミテントウ",
- nameI18n:{"ja":"ナミテントウ","en":"Asian Lady Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ナミテントウ","en":"Asian Lady Beetle","zh-CN":"异色瓢虫","zh-TW":"異色瓢蟲","ko":"이색무당벌레","th":"เต่าทองหลากสี"},
  level:5,
  authCount:720,
  price:165,
@@ -458,7 +458,7 @@ const bugData = [
 },
 {
  name:"パプアハラビロカマキリ",
- nameI18n:{"ja":"パプアハラビロカマキリ","en":"Papua Broad-winged Mantis","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"パプアハラビロカマキリ","en":"Papua Broad-winged Mantis","zh-CN":"巴布亚斧螳","zh-TW":"巴布亞斧螳","ko":"파푸아사마귀","th":"ตั๊กแตนตำข้าวปาปัว"},
  level:5,
  authCount:720,
  price:390,
@@ -470,7 +470,7 @@ const bugData = [
 },
 {
  name:"ムラサキクマバチ",
- nameI18n:{"ja":"ムラサキクマバチ","en":"Violet Carpenter Bee","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ムラサキクマバチ","en":"Violet Carpenter Bee","zh-CN":"紫木蜂","zh-TW":"紫木蜂","ko":"보라벌","th":"ผึ้งไม้"},
  level:5,
  authCount:720,
  price:165,
@@ -482,7 +482,7 @@ const bugData = [
 },
 {
  name:"オオミドリトリバネアゲハ",
- nameI18n:{"ja":"オオミドリトリバネアゲハ","en":"Green Birdwing","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オオミドリトリバネアゲハ","en":"Green Birdwing","zh-CN":"绿鸟翼凤蝶","zh-TW":"綠鳥翼鳳蝶","ko":"녹색날개호랑나비","th":"ผีเสื้อปีกนกสีเขียว"},
  level:6,
  authCount:480,
  price:150,
@@ -494,7 +494,7 @@ const bugData = [
 },
 {
  name:"ミヤマクワガタ",
- nameI18n:{"ja":"ミヤマクワガタ","en":"Miyama Stag Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミヤマクワガタ","en":"Miyama Stag Beetle","zh-CN":"深山锹形虫","zh-TW":"深山鍬形蟲","ko":"산악사슴벌레","th":"ด้วงภูเขาลึก"},
  level:6,
  authCount:480,
  price:275,
@@ -506,7 +506,7 @@ const bugData = [
 },
 {
  name:"シルバージュエルコガネ",
- nameI18n:{"ja":"シルバージュエルコガネ","en":"Silver Jewel Scarab","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シルバージュエルコガネ","en":"Silver Jewel Scarab","zh-CN":"银光宝石丽金龟","zh-TW":"銀光寶石麗金龜","ko":"은빛보석풍뎅이","th":"เต่าทอง Silver Zoom"},
  level:6,
  authCount:720,
  price:165,
@@ -518,7 +518,7 @@ const bugData = [
 },
 {
  name:"ルリクチブトカメムシ",
- nameI18n:{"ja":"ルリクチブトカメムシ","en":"Blue Shield Bug","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ルリクチブトカメムシ","en":"Blue Shield Bug","zh-CN":"蓝蝽","zh-TW":"藍蝽","ko":"파란노린재","th":"เพลี้ยสีน้ำเงิน"},
  level:6,
  authCount:720,
  price:110,
@@ -530,7 +530,7 @@ const bugData = [
 },
 {
  name:"アオハダトンボ",
- nameI18n:{"ja":"アオハダトンボ","en":"Blue-winged Demoiselle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アオハダトンボ","en":"Blue-winged Demoiselle","zh-CN":"阔翅豆娘","zh-TW":"闊翅豆娘","ko":"물잠자리","th":"แมลงปอเข็มปีกกว้าง"},
  level:6,
  authCount:720,
  price:110,
@@ -542,7 +542,7 @@ const bugData = [
 },
 {
  name:"メネラウスモルフォ",
- nameI18n:{"ja":"メネラウスモルフォ","en":"Menelaus Blue Morpho","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"メネラウスモルフォ","en":"Menelaus Blue Morpho","zh-CN":"大蓝闪蝶","zh-TW":"大藍閃蝶","ko":"메넬라우스나비","th":"ผีเสื้อฟ้าใหญ่"},
  level:7,
  authCount:480,
  price:150,
@@ -554,7 +554,7 @@ const bugData = [
 },
 {
  name:"アサギマダラ",
- nameI18n:{"ja":"アサギマダラ","en":"Chestnut Tiger Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アサギマダラ","en":"Chestnut Tiger Butterfly","zh-CN":"大绢斑蝶","zh-TW":"大絹斑蝶","ko":"왕나비","th":"ผีเสื้อจรกาใหญ่"},
  level:7,
  authCount:480,
  price:150,
@@ -566,7 +566,7 @@ const bugData = [
 },
 {
  name:"ミノタウロスコガネ",
- nameI18n:{"ja":"ミノタウロスコガネ","en":"Minotaur Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミノタウロスコガネ","en":"Minotaur Beetle","zh-CN":"蒂菲粪金龟","zh-TW":"蒂菲糞金龜","ko":"티폰쇠똥구리","th":"ด้วงทิฟฟี่"},
  level:7,
  authCount:480,
  price:275,
@@ -578,7 +578,7 @@ const bugData = [
 },
 {
  name:"ビューティースペキオーサ",
- nameI18n:{"ja":"ビューティースペキオーサ","en":"Speciosa Jewel Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ビューティースペキオーサ","en":"Speciosa Jewel Beetle","zh-CN":"美丽星花金龟","zh-TW":"美麗星花金龜","ko":"보석꽃풍뎅이","th":"ด้วงดอกไม้แฟนซีแสนสวน"},
  level:7,
  authCount:480,
  price:275,
@@ -590,7 +590,7 @@ const bugData = [
 },
 {
  name:"ゴールドジュエルコガネ",
- nameI18n:{"ja":"ゴールドジュエルコガネ","en":"Gold Jewel Scarab","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ゴールドジュエルコガネ","en":"Gold Jewel Scarab","zh-CN":"金光宝石丽金龟","zh-TW":"金光寶石麗金龜","ko":"황금보석풍뎅이","th":"ด้วงอัญมณีสีทอง"},
  level:7,
  authCount:480,
  price:275,
@@ -602,7 +602,7 @@ const bugData = [
 },
 {
  name:"ロサトンボ",
- nameI18n:{"ja":"ロサトンボ","en":"Rosa Dragonfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ロサトンボ","en":"Rosa Dragonfly","zh-CN":"蔷薇蜻蜓","zh-TW":"薔薇蜻蜓","ko":"찔레잠자리","th":"แมลงปอกุหลาบเฉียงเวย"},
  level:7,
  authCount:480,
  price:185,
@@ -614,7 +614,7 @@ const bugData = [
 },
 {
  name:"イザベラミズアオ",
- nameI18n:{"ja":"イザベラミズアオ","en":"Isabella Moon Moth","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イザベラミズアオ","en":"Isabella Moon Moth","zh-CN":"伊莎贝拉蛾","zh-TW":"伊莎貝拉蛾","ko":"이사벨라나방","th":"ผีเสื้อกลางคืนอิซาเบลลา"},
  level:8,
  authCount:480,
  price:150,
@@ -626,7 +626,7 @@ const bugData = [
 },
 {
  name:"マダガスカルムーンモス",
- nameI18n:{"ja":"マダガスカルムーンモス","en":"Madagascan Moon Moth","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"マダガスカルムーンモス","en":"Madagascan Moon Moth","zh-CN":"彗星飞蛾","zh-TW":"彗星飛蛾","ko":"혜성꼬리나방","th":"ผีเสื้อดาวหาง"},
  level:8,
  authCount:300,
  price:240,
@@ -638,7 +638,7 @@ const bugData = [
 },
 {
  name:"カブトムシ",
- nameI18n:{"ja":"カブトムシ","en":"Japanese Rhinoceros Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"カブトムシ","en":"Japanese Rhinoceros Beetle","zh-CN":"独角仙","zh-TW":"獨角仙","ko":"장수풍뎅이","th":"ด้วงกว่างญี่ปุ่น"},
  level:8,
  authCount:480,
  price:275,
@@ -650,7 +650,7 @@ const bugData = [
 },
 {
  name:"ピカソバグ",
- nameI18n:{"ja":"ピカソバグ","en":"Picasso Bug","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ピカソバグ","en":"Picasso Bug","zh-CN":"毕加索盾蝽","zh-TW":"畢卡索盾蝽","ko":"피카소노린재","th":"มวนปิกาซโซ่"},
  level:8,
  authCount:480,
  price:185,
@@ -662,7 +662,7 @@ const bugData = [
 },
 {
  name:"シンジュタテハ",
- nameI18n:{"ja":"シンジュタテハ","en":"Pearl Nymph Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シンジュタテハ","en":"Pearl Nymph Butterfly","zh-CN":"绿贝矩蛱蝶","zh-TW":"綠貝矩蛺蝶","ko":"진주네발나비","th":"ผีเสื้อหางติ่งเขียว"},
  level:9,
  authCount:300,
  price:240,
@@ -674,7 +674,7 @@ const bugData = [
 },
 {
  name:"オウゴンオニクワガタ",
- nameI18n:{"ja":"オウゴンオニクワガタ","en":"Golden Ogre Stag Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オウゴンオニクワガタ","en":"Golden Ogre Stag Beetle","zh-CN":"黄金鬼锹","zh-TW":"黃金鬼鍬","ko":"황금귀신사슴벌레","th":"ด้วงคีมทอง"},
  level:9,
  authCount:300,
  price:440,
@@ -686,7 +686,7 @@ const bugData = [
 },
 {
  name:"ニジイロクワガタ",
- nameI18n:{"ja":"ニジイロクワガタ","en":"Rainbow Stag Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ニジイロクワガタ","en":"Rainbow Stag Beetle","zh-CN":"彩虹锹甲","zh-TW":"彩虹鍬甲","ko":"무지개사슴벌레","th":"ด้วงคีมสายรุ้ง"},
  level:9,
  authCount:300,
  price:440,
@@ -698,7 +698,7 @@ const bugData = [
 },
 {
  name:"ヨウカイカマキリ",
- nameI18n:{"ja":"ヨウカイカマキリ","en":"Ghost Mantis","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヨウカイカマキリ","en":"Ghost Mantis","zh-CN":"锥头螳","zh-TW":"錐頭螳","ko":"악마꽃사마귀","th":"ตั๊กแตนกิ่งไม้"},
  level:9,
  authCount:300,
  price:515,
@@ -710,7 +710,7 @@ const bugData = [
 },
 {
  name:"青いクマバチ",
- nameI18n:{"ja":"青いクマバチ","en":"Blue Carpenter Bee","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"青いクマバチ","en":"Blue Carpenter Bee","zh-CN":"蓝胸木蜂","zh-TW":"藍胸木蜂","ko":"푸른목수벌","th":"ผึ้งไม้อกฟ้า"},
  level:9,
  authCount:300,
  price:440,
@@ -722,7 +722,7 @@ const bugData = [
 },
 {
  name:"ヘレナモルフォ",
- nameI18n:{"ja":"ヘレナモルフォ","en":"Helena Morpho","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヘレナモルフォ","en":"Helena Morpho","zh-CN":"光明女神闪蝶","zh-TW":"光明女神閃蝶","ko":"헬레나몰포나비","th":"ผีเสื้อเฮเลน่าบลูมอร์โฟ"},
  level:10,
  authCount:300,
  price:240,
@@ -734,7 +734,7 @@ const bugData = [
 },
 {
  name:"タイヨウモルフォ",
- nameI18n:{"ja":"タイヨウモルフォ","en":"Sun Morpho","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"タイヨウモルフォ","en":"Sun Morpho","zh-CN":"太阳闪蝶","zh-TW":"太陽閃蝶","ko":"헤쿠바몰포나비","th":"ผีเสื้อแสงอาทิตย์"},
  level:10,
  authCount:300,
  price:240,
@@ -746,7 +746,7 @@ const bugData = [
 },
 {
  name:"ヘラクレスオオカブト",
- nameI18n:{"ja":"ヘラクレスオオカブト","en":"Hercules Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ヘラクレスオオカブト","en":"Hercules Beetle","zh-CN":"长戟大兜虫","zh-TW":"長戟大兜蟲","ko":"헤라클레스풍뎅이","th":"ด้วงกว่าง"},
  level:10,
  authCount:300,
  price:440,
@@ -758,7 +758,7 @@ const bugData = [
 },
 {
  name:"クロツヤミノガ",
- nameI18n:{"ja":"クロツヤミノガ","en":"Black Bagworm Moth","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"クロツヤミノガ","en":"Black Bagworm Moth","zh-CN":"螺纹蓑蛾","zh-TW":"螺紋蓑蛾","ko":"나선주머니나방","th":"มอดเกลียว"},
  level:10,
  authCount:300,
  price:440,
@@ -770,7 +770,7 @@ const bugData = [
 },
 {
  name:"アレクサンドラトリバネアゲハ",
- nameI18n:{"ja":"アレクサンドラトリバネアゲハ","en":"Queen Alexandra's Birdwing","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アレクサンドラトリバネアゲハ","en":"Queen Alexandra's Birdwing","zh-CN":"亚历山大凤蝶","zh-TW":"亞歷山大鳳蝶","ko":"알렉산더비단나비","th":"ผีเสื้อปีกนกราชินีอเล็กซานดรา"},
  level:11,
  authCount:300,
  price:240,
@@ -782,7 +782,7 @@ const bugData = [
 }, 
 {
  name:"アトラスオオカブト",
- nameI18n:{"ja":"アトラスオオカブト","en":"Atlas Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アトラスオオカブト","en":"Atlas Beetle","zh-CN":"南洋大兜虫","zh-TW":"南洋大兜蟲","ko":"아틀라스풍뎅이","th":"ด้วงกว่างแอตลัส"},
  level:11,
  authCount:300,
  price:240,
@@ -794,7 +794,7 @@ const bugData = [
 }, 
 {
  name:"ジュウサンホシテントウ",
- nameI18n:{"ja":"ジュウサンホシテントウ","en":"Thirteen-spot Ladybird","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ジュウサンホシテントウ","en":"Thirteen-spot Ladybird","zh-CN":"小十三星瓢虫","zh-TW":"小十三星瓢蟲","ko":"십삼성 무당벌레","th":"เต่าทองสิบสามจุด"},
  level:11,
  authCount:300,
  price:440,
@@ -806,7 +806,7 @@ const bugData = [
 }, 
 {
  name:"ハナカマキリ",
- nameI18n:{"ja":"ハナカマキリ","en":"Orchid Mantis","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ハナカマキリ","en":"Orchid Mantis","zh-CN":"兰花螳螂","zh-TW":"蘭花螳螂","ko":"난초사마귀","th":"ตั๊กแตนกล้วยไม้"},
  level:11,
  authCount:300,
  price:515,
@@ -818,7 +818,7 @@ const bugData = [
 }, 
 {
  name:"ミイロタイマイ",
- nameI18n:{"ja":"ミイロタイマイ","en":"Tricolor Swallowtail","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミイロタイマイ","en":"Tricolor Swallowtail","zh-CN":"玫瑰青凤蝶","zh-TW":"玫瑰青鳳蝶","ko":"삼색청띠제비나비","th":"ผีเสื้อกุหลาบ"},
  level:12,
  authCount:300,
  price:240,
@@ -830,7 +830,7 @@ const bugData = [
 },
 {
  name:"オオサマゴライアス",
- nameI18n:{"ja":"オオサマゴライアス","en":"Goliath Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オオサマゴライアス","en":"Goliath Beetle","zh-CN":"歌利亚大王花金龟","zh-TW":"歌利亞大王花金龜","ko":"골리앗대왕꽃무지","th":"ด้วงโกลิอัท"},
  level:12,
  authCount:300,
  price:440,
@@ -842,7 +842,7 @@ const bugData = [
 },
 {
  name:"トウワタバッタ",
- nameI18n:{"ja":"トウワタバッタ","en":"Milkweed Grasshopper","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トウワタバッタ","en":"Milkweed Grasshopper","zh-CN":"乳草蝗虫","zh-TW":"乳草蝗蟲","ko":"박주가리메뚜기","th":"ตั๊กแตนหญ้าน้ำนม"},
  level:12,
  authCount:300,
  price:370,
@@ -854,7 +854,7 @@ const bugData = [
 },
 {
  name:"ベニトンボ",
- nameI18n:{"ja":"ベニトンボ","en":"Crimson Darter","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ベニトンボ","en":"Crimson Darter","zh-CN":"火焰蜻蜓","zh-TW":"火焰蜻蜓","ko":"불꽃날개잠자리","th":"แมลงปอเพลิง"},
  level:12,
  authCount:300,
  price:295,
@@ -866,7 +866,7 @@ const bugData = [
 },
 {
  name:"デイダミアモルフォ",
- nameI18n:{"ja":"デイダミアモルフォ","en":"Deidamia Morpho","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"デイダミアモルフォ","en":"Deidamia Morpho","zh-CN":"梦幻闪蝶","zh-TW":"夢幻閃蝶","ko":"데이다미아몰포나비","th":"ผีเสื้อมอร์โฟ"},
  level:13,
  authCount:300,
  price:480,
@@ -878,7 +878,7 @@ const bugData = [
 },
 {
  name:"ミドリカワトンボ",
- nameI18n:{"ja":"ミドリカワトンボ","en":"Green River Damselfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミドリカワトンボ","en":"Green River Damselfly","zh-CN":"华艳色蟌","zh-TW":"華艷色蟌","ko":"차이넨시스물잠자리","th":"แมลงปอสีรุ้ง"},
  level:13,
  authCount:300,
  price:590,
@@ -890,7 +890,7 @@ const bugData = [
 },
 {
  name:"グラスウィングバタフライ",
- nameI18n:{"ja":"グラスウィングバタフライ","en":"Glasswing Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"グラスウィングバタフライ","en":"Glasswing Butterfly","zh-CN":"透翅蝶","zh-TW":"透翅蝶","ko":"유리날개나비","th":"ผีเสื้อปีกใส"},
  level:14,
  authCount:300,
  price:480,
@@ -902,7 +902,7 @@ const bugData = [
 },
 {
  name:"アオミオカタニシ",
- nameI18n:{"ja":"アオミオカタニシ","en":"Blue Land Snail","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アオミオカタニシ","en":"Blue Land Snail","zh-CN":"绿蜗牛","zh-TW":"綠蝸牛","ko":"푸른민달팽이","th":"หอยทากเขียว"},
  level:14,
  authCount:300,
  price:590,
@@ -914,7 +914,7 @@ const bugData = [
 },
 {
  name:"氷晶・シンジュタテハ",
- nameI18n:{"ja":"氷晶・シンジュタテハ","en":"Ice Crystal Pearl Nymph Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶・シンジュタテハ","en":"Ice Crystal Pearl Nymph Butterfly","zh-CN":"冰晶绿贝矩蛱蝶","zh-TW":"冰晶綠貝矩蛺蝶","ko":"얼음 결정 진주네발나비","th":"ผีเสื้อหางติ่งเขียวคริสตัล"},
  season:true,
  ended:true,
  level:1,
@@ -928,7 +928,7 @@ const bugData = [
 },
 {
  name:"氷晶・ミイロタイマイ",
- nameI18n:{"ja":"氷晶・ミイロタイマイ","en":"Ice Crystal Tricolor Swallowtail","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶・ミイロタイマイ","en":"Ice Crystal Tricolor Swallowtail","zh-CN":"冰晶玫瑰青凤蝶","zh-TW":"冰晶玫瑰青鳳蝶","ko":"얼음 결정 삼색청띠제비나비","th":"ผีเสื้อกุหลาบคริสตัล"},
  season:true,
  ended:true,
  level:1,
@@ -942,7 +942,7 @@ const bugData = [
 },
 {
  name:"氷晶・アレクサンドラトリバネアゲハ",
- nameI18n:{"ja":"氷晶・アレクサンドラトリバネアゲハ","en":"Ice Crystal Queen Alexandra's Birdwing","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶・アレクサンドラトリバネアゲハ","en":"Ice Crystal Queen Alexandra's Birdwing","zh-CN":"冰晶亚历山大凤蝶","zh-TW":"冰晶亞歷山大鳳蝶","ko":"얼음 결정 알렉산더비단나비","th":"ผีเสื้อปีกนกราชินีอเล็กซานดราคริสตัล"},
  season:true,
  ended:true,
  level:1,
@@ -956,7 +956,7 @@ const bugData = [
 },
 {
  name:"氷晶・スルコウスキーモルフォ",
- nameI18n:{"ja":"氷晶・スルコウスキーモルフォ","en":"Ice Crystal Sulkowsky's Morpho","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶・スルコウスキーモルフォ","en":"Ice Crystal Sulkowsky's Morpho","zh-CN":"冰晶夜明珠闪蝶","zh-TW":"冰晶夜明珠閃蝶","ko":"얼음 결정 슬코스키몰포나비","th":"ผีเสื้อแสงจันทร์คริสตัล"},
  season:true,
  ended:true,
  level:1,
@@ -970,7 +970,7 @@ const bugData = [
 },
 {
  name:"氷晶・メルポメネドクチョウ",
- nameI18n:{"ja":"氷晶・メルポメネドクチョウ","en":"Ice Crystal Postman Butterfly","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"氷晶・メルポメネドクチョウ","en":"Ice Crystal Postman Butterfly","zh-CN":"冰晶红带袖蝶","zh-TW":"冰晶紅帶袖蝶","ko":"얼음 결정 멜포메네길쭉나비","th":"ผีเสื้อแถบแดงคริสตัล"},
  season:true,
  ended:true,
  level:1,
@@ -984,7 +984,7 @@ const bugData = [
 },
 {
  name:"スクリプター・ピンククマバチ",
- nameI18n:{"ja":"スクリプター・ピンククマバチ","en":"Scripter Pink Carpenter Bee","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"スクリプター・ピンククマバチ","en":"Scripter Pink Carpenter Bee","zh-CN":"场记粉熊蜂","zh-TW":"場記粉熊蜂","ko":"스크립터 분홍 호박벌","th":"บัมเบิลบีสเลทสีชมพู"},
  fes:true,
  ended:true,
  level:1,
@@ -998,7 +998,7 @@ const bugData = [
 },
 {
  name:"スクリプター・赤クマバチ",
- nameI18n:{"ja":"スクリプター・赤クマバチ","en":"Scripter Red Carpenter Bee","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"スクリプター・赤クマバチ","en":"Scripter Red Carpenter Bee","zh-CN":"场记红熊蜂","zh-TW":"場記紅熊蜂","ko":"스크립터 빨강 호박벌","th":"บัมเบิลบีสเลทสีแดง"},
  fes:true,
  ended:true,
  level:1,
@@ -1124,7 +1124,7 @@ const bugData = [
 },
 {
  name:"アオカナブン",
- nameI18n:{"ja":"アオカナブン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"アオカナブン","en":"Green Flower Chafer","zh-CN":"绿罗花金龟","zh-TW":"綠羅花金龜","ko":"초록 꽃무지","th":"ด้วงดอกไม้สีเขียว"},
  season:true,
  ended:true,
  level:1,
@@ -1138,7 +1138,7 @@ const bugData = [
 },
 {
  name:"オオサルハムシ",
- nameI18n:{"ja":"オオサルハムシ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オオサルハムシ","en":"Blue Milkweed Beetle","zh-CN":"萝藦肖叶甲","zh-TW":"蘿藦肖葉甲","ko":"청남색잎벌레","th":"ด้วงคริโซคัส"},
  season:true,
  ended:true,
  level:1,
@@ -1152,7 +1152,7 @@ const bugData = [
 },
 {
  name:"ミイロタテハ",
- nameI18n:{"ja":"ミイロタテハ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ミイロタテハ","en":"Agrias Butterfly","zh-CN":"彩袄蛱蝶","zh-TW":"彩襖蛺蝶","ko":"클라우디나아그리아스나비","th":"ผีเสื้ออาเกรียส"},
  season:true,
  ended:true,
  level:1,
@@ -1166,7 +1166,7 @@ const bugData = [
 },
 {
  name:"タマフチマガンヤガ",
- nameI18n:{"ja":"タマフチマガンヤガ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"タマフチマガンヤガ","en":"White-banded Erebus Moth","zh-CN":"玉边魔目夜蛾","zh-TW":"玉邊魔目夜蛾","ko":"흰줄눈무늬밤나방","th":"ผีเสื้อเอเรบุส"},
  season:true,
  ended:true,
  level:1,
@@ -1180,7 +1180,7 @@ const bugData = [
 },
 {
  name:"キセイスモルフォ",
- nameI18n:{"ja":"キセイスモルフォ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"キセイスモルフォ","en":"Morpho Luna","zh-CN":"月神闪蝶","zh-TW":"月神閃蝶","ko":"키세이스태양모르포나비","th":"ผีเสื้อมอร์โฟ"},
  season:true,
  ended:true,
  level:1,
@@ -1194,7 +1194,7 @@ const bugData = [
 },
 {
  name:"ムラサキツノホタル",
- nameI18n:{"ja":"ムラサキツノホタル","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ムラサキツノホタル","en":"Purple-horned Firefly","zh-CN":"紫角熠萤","zh-TW":"紫角熠螢","ko":"보라더듬이 반딧불이","th":"หิ่งห้อยเรืองแสงเขาสีม่วง"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1209,7 +1209,7 @@ const bugData = [
 },
 {
  name:"ハイイロツノホタル",
- nameI18n:{"ja":"ハイイロツノホタル","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ハイイロツノホタル","en":"Grey-horned Firefly","zh-CN":"灰角熠萤","zh-TW":"灰角熠螢","ko":"회색더듬이 반딧불이","th":"หิ่งห้อยเรืองแสงเขาสีเทา"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1224,7 +1224,7 @@ const bugData = [
 },
 {
  name:"モモイロツノホタル",
- nameI18n:{"ja":"モモイロツノホタル","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"モモイロツノホタル","en":"Pink-horned Firefly","zh-CN":"粉角熠萤","zh-TW":"粉角熠螢","ko":"분홍더듬이 반딧불이","th":"หิ่งห้อยเรืองแสงเขาสีชมพู"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1239,7 +1239,7 @@ const bugData = [
 },
 {
  name:"ブラウンカブト",
- nameI18n:{"ja":"ブラウンカブト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"ブラウンカブト","en":"Brown Rhinoceros Beetle","zh-CN":"棕纹犀金龟","zh-TW":"棕紋犀金龜","ko":"갈색 무늬 코뿔소딱정벌레","th":"ด้วงแรดลายสีน้ำตาล"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1254,7 +1254,7 @@ const bugData = [
 },
 {
  name:"レインボーカブト",
- nameI18n:{"ja":"レインボーカブト","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"レインボーカブト","en":"Iridescent Rhinoceros Beetle","zh-CN":"彩纹犀金龟","zh-TW":"彩紋犀金龜","ko":"오색 코뿔소딱정벌레","th":"ด้วงแรดลายหลากสี"},
  fes:true,
  ended:true, // 2026/10/10 6:00 原始の呼び声フェス終了
  level:1,
@@ -1270,7 +1270,7 @@ const bugData = [
 {
  // イベント「幽夜の集い」2026-10-10開始
  name:"シイタケフンチュウ",
- nameI18n:{"ja":"シイタケフンチュウ","en":"Shiitake Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"シイタケフンチュウ","en":"Shiitake Dung Beetle","zh-CN":"香菇粪金龟","zh-TW":"香菇糞金龜","ko":"표고버섯 쇠똥구리","th":"ด้วงมูลสัตว์ชิตาเกะ"},
  fes:true,
  level:1,
  price:110,
@@ -1286,7 +1286,7 @@ const bugData = [
 {
  // イベント「幽夜の集い」2026-10-10開始
  name:"オレンジフンチュウ",
- nameI18n:{"ja":"オレンジフンチュウ","en":"Mandarin Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"オレンジフンチュウ","en":"Mandarin Dung Beetle","zh-CN":"橘子粪金龟","zh-TW":"橘子糞金龜","ko":"오렌지 쇠똥구리","th":"ด้วงมูลสัตว์ส้ม"},
  fes:true,
  level:1,
  price:110,
@@ -1302,7 +1302,7 @@ const bugData = [
 {
  // イベント「幽夜の集い」2026-10-10開始
  name:"イチゴフンチュウ",
- nameI18n:{"ja":"イチゴフンチュウ","en":"Strawberry Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"イチゴフンチュウ","en":"Strawberry Dung Beetle","zh-CN":"草莓粪金龟","zh-TW":"草莓糞金龜","ko":"딸기 쇠똥구리","th":"ด้วงมูลสัตว์สตรอว์เบอร์รี่"},
  fes:true,
  level:1,
  price:110,
@@ -1318,7 +1318,7 @@ const bugData = [
 {
  // イベント「幽夜の集い」2026-10-10開始
  name:"かぼちゃフンチュウ",
- nameI18n:{"ja":"かぼちゃフンチュウ","en":"Pumpkin Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"かぼちゃフンチュウ","en":"Pumpkin Dung Beetle","zh-CN":"南瓜粪金龟","zh-TW":"南瓜糞金龜","ko":"호박 쇠똥구리","th":"ด้วงมูลสัตว์ฟักทอง"},
  fes:true,
  level:1,
  price:110,
@@ -1336,7 +1336,7 @@ const bugData = [
  // 特殊入手イベント名（ユーザー確認済み）
  // ☆2売価は標準倍率(floor×1.5=247)と異なりユーザー確認済みの248を個別指定（prices参照）
  name:"トリュフフンチュウ",
- nameI18n:{"ja":"トリュフフンチュウ","en":"Truffle Dung Beetle","zh-CN":"","zh-TW":"","ko":"","th":""},
+ nameI18n:{"ja":"トリュフフンチュウ","en":"Truffle Dung Beetle","zh-CN":"松露粪金龟","zh-TW":"松露糞金龜","ko":"트러플 쇠똥구리","th":"ด้วงมูลสัตว์ทรัฟเฟิล"},
  fes:true,
  level:1,
  price:165,

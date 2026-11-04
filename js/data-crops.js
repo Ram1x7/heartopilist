@@ -11,7 +11,7 @@ const cropData = [
   // ── 通常作物 ────────────────────────
   {
     name: "トマト",
-    nameI18n:{"ja":"トマト","en":"Tomato","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"トマト","en":"Tomato","zh-CN":"番茄","zh-TW":"番茄","ko":"토마토","th":"มะเขือเทศ"},
     img: "./images/crops/tomato.PNG",
     seedImg: "./images/crops/seed_tomato.jpg",
     level: 1,
@@ -26,7 +26,7 @@ const cropData = [
   },
   {
     name: "ジャガイモ",
-    nameI18n:{"ja":"ジャガイモ","en":"Potato","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ジャガイモ","en":"Potato","zh-CN":"土豆","zh-TW":"馬鈴薯","ko":"감자","th":"มันฝรั่ง"},
     img: "./images/crops/potato.PNG",
     seedImg: "./images/crops/seed_potato.jpg",
     level: 1,
@@ -41,7 +41,7 @@ const cropData = [
   },
   {
     name: "稲",
-    nameI18n:{"ja":"稲","en":"Rice","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"稲","en":"Rice","zh-CN":"稻谷","zh-TW":"稻穀","ko":"벼","th":"ข้าวเปลือก"},
     img: "./images/crops/ine.PNG",
     seedImg: "./images/crops/seed_ine.jpg",
     level: 1,
@@ -56,7 +56,7 @@ const cropData = [
   },
   {
     name: "小麦",
-    nameI18n:{"ja":"小麦","en":"Wheat","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"小麦","en":"Wheat","zh-CN":"小麦","zh-TW":"小麥","ko":"밀","th":"ข้าวสาลี"},
     img: "./images/crops/wheat.PNG",
     seedImg: "./images/crops/seed_wheat.jpg",
     level: 2,
@@ -71,7 +71,7 @@ const cropData = [
   },
   {
     name: "レタス",
-    nameI18n:{"ja":"レタス","en":"Lettuce","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"レタス","en":"Lettuce","zh-CN":"生菜","zh-TW":"生菜","ko":"양상추","th":"ผักกาดหอม"},
     img: "./images/crops/lettuce.PNG",
     seedImg: "./images/crops/seed_lettuce.jpg",
     level: 3,
@@ -86,7 +86,7 @@ const cropData = [
   },
   {
     name: "パイナップル",
-    nameI18n:{"ja":"パイナップル","en":"Pineapple","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"パイナップル","en":"Pineapple","zh-CN":"菠萝","zh-TW":"鳳梨","ko":"파인애플","th":"สับปะรด"},
     img: "./images/crops/pineapple.PNG",
     seedImg: "./images/crops/seed_pineapple.jpg",
     level: 4,
@@ -101,7 +101,7 @@ const cropData = [
   },
   {
     name: "ニンジン",
-    nameI18n:{"ja":"ニンジン","en":"Carrot","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ニンジン","en":"Carrot","zh-CN":"胡萝卜","zh-TW":"胡蘿蔔","ko":"당근","th":"แครอท"},
     img: "./images/crops/carrot.PNG",
     seedImg: "./images/crops/seed_carrot.jpg",
     level: 5,
@@ -116,7 +116,7 @@ const cropData = [
   },
   {
     name: "いちご",
-    nameI18n:{"ja":"いちご","en":"Strawberry","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"いちご","en":"Strawberry","zh-CN":"草莓","zh-TW":"草莓","ko":"딸기","th":"สตรอว์เบอร์รี่"},
     img: "./images/crops/strawberry.PNG",
     seedImg: "./images/crops/seed_strawberry.jpg",
     level: 6,
@@ -131,7 +131,7 @@ const cropData = [
   },
   {
     name: "トウモロコシ",
-    nameI18n:{"ja":"トウモロコシ","en":"Corn","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"トウモロコシ","en":"Corn","zh-CN":"玉米","zh-TW":"玉米","ko":"옥수수","th":"ข้าวโพด"},
     img: "./images/crops/corn.PNG",
     seedImg: "./images/crops/seed_corn.jpg",
     level: 6,
@@ -146,7 +146,7 @@ const cropData = [
   },
   {
     name: "ブドウ",
-    nameI18n:{"ja":"ブドウ","en":"Grape","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ブドウ","en":"Grape","zh-CN":"葡萄","zh-TW":"葡萄","ko":"포도","th":"องุ่น"},
     img: "./images/crops/grape.PNG",
     seedImg: "./images/crops/seed_grape.jpg",
     level: 7,
@@ -161,7 +161,7 @@ const cropData = [
   },
   {
     name: "ナス",
-    nameI18n:{"ja":"ナス","en":"Eggplant","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ナス","en":"Eggplant","zh-CN":"茄子","zh-TW":"茄子","ko":"가지","th":"มะเขือม่วง"},
     img: "./images/crops/eggplant.PNG",
     seedImg: "./images/crops/seed_eggplant.jpg",
     level: 8,
@@ -176,7 +176,7 @@ const cropData = [
   },
   {
     name: "茶葉",
-    nameI18n:{"ja":"茶葉","en":"Tea Leaves","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"茶葉","en":"Tea Leaves","zh-CN":"茶叶","zh-TW":"茶葉","ko":"찻잎","th":"ใบชา"},
     img: "./images/crops/tea.PNG",
     seedImg: "./images/crops/seed_tea.jpg",
     level: 11,
@@ -191,7 +191,7 @@ const cropData = [
   },
   {
     name: "カカオ豆",
-    nameI18n:{"ja":"カカオ豆","en":"Cacao Beans","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"カカオ豆","en":"Cacao Beans","zh-CN":"可可豆","zh-TW":"可可豆","ko":"카카오","th":"เมล็ดโกโก้"},
     img: "./images/crops/cacao.PNG",
     seedImg: "./images/crops/seed_cacao.jpg",
     level: 12,
@@ -206,7 +206,7 @@ const cropData = [
   },
   {
     name: "アボカド",
-    nameI18n:{"ja":"アボカド","en":"Avocado","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"アボカド","en":"Avocado","zh-CN":"牛油果","zh-TW":"酪梨","ko":"아보카도","th":"อะโวคาโด"},
     img: "./images/crops/avocado.PNG",
     seedImg: "./images/crops/seed_avocado.jpg",
     level: 13,
@@ -221,7 +221,7 @@ const cropData = [
   },
   {
     name: "かぼちゃ",
-    nameI18n:{"ja":"かぼちゃ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"かぼちゃ","en":"Pumpkin","zh-CN":"南瓜","zh-TW":"南瓜","ko":"호박","th":"ฟักทอง"},
     img: "./images/crops/kabotya.PNG",
     seedImg: "./images/crops/seed_kabotya.jpg",
     level: 1,
@@ -238,7 +238,7 @@ const cropData = [
   // ── イベント作物 ────────────────────────
   {
     name: "ダイコン",
-    nameI18n:{"ja":"ダイコン","en":"Daikon Radish","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ダイコン","en":"Daikon Radish","zh-CN":"白萝卜","zh-TW":"白蘿蔔","ko":"무","th":"หัวไชเท้า"},
     img: "./images/crops/daikon.PNG",
     seedImg: "./images/crops/seed_daikon.jpg",
     level: 1,
@@ -254,7 +254,7 @@ const cropData = [
   },
   {
     name: "ロメインレタス",
-    nameI18n:{"ja":"ロメインレタス","en":"Romaine Lettuce","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ロメインレタス","en":"Romaine Lettuce","zh-CN":"萝蔓莴苣","zh-TW":"蘿蔓萵苣","ko":"로메인","th":"ผักกาดโรเมน"},
     img: "./images/crops/romaine.PNG",
     seedImg: "./images/crops/seed_romaine.jpg",
     level: 1,
@@ -270,7 +270,7 @@ const cropData = [
   },
   {
     name: "レモンバーベナ",
-    nameI18n:{"ja":"レモンバーベナ","en":"Lemon Verbena","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"レモンバーベナ","en":"Lemon Verbena","zh-CN":"柠檬马鞭草","zh-TW":"檸檬馬鞭草","ko":"레몬 버베나","th":"เลมอนเวอร์บีน่า"},
     img: "./images/crops/lemon_verbena.PNG",
     seedImg: "./images/crops/seed_lemon_verbena.jpg",
     level: 1,
@@ -286,7 +286,7 @@ const cropData = [
   },
   {
     name: "スターフルーツ",
-    nameI18n:{"ja":"スターフルーツ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"スターフルーツ","en":"Starfruit","zh-CN":"杨桃","zh-TW":"楊桃","ko":"스타프루트","th":"มะเฟือง"},
     img: "./images/crops/star_fruit.PNG",
     seedImg: "./images/crops/seed_star_fruit.jpg",
     level: 1,
@@ -302,7 +302,7 @@ const cropData = [
   },
   {
     name: "ウチワサボテン",
-    nameI18n:{"ja":"ウチワサボテン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ウチワサボテン","en":"Prickly Pear","zh-CN":"梨果仙人掌","zh-TW":"梨果仙人掌","ko":"보검선인장","th":"กระบองเพชรโอพันเทีย"},
     img: "./images/crops/saboten.PNG",
     seedImg: "./images/crops/seed_saboten.jpg",
     level: 1,
@@ -319,7 +319,7 @@ const cropData = [
   },
   {
     name: "ホオズキ",
-    nameI18n:{"ja":"ホオズキ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    nameI18n:{"ja":"ホオズキ","en":"Cape Gooseberry","zh-CN":"灯笼果","zh-TW":"燈籠果","ko":"꽈리","th":"เคพกูสเบอร์รี่"},
     img: "./images/crops/hozuki.PNG",
     seedImg: "./images/crops/seed_hozuki.jpg",
     level: 1,
