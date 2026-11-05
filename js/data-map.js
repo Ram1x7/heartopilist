@@ -1,4 +1,4 @@
-// マップデータ（heartopia.guide/map より許可を得て移植、座標はmap.webp基準の%位置）
+// マップデータ（座標はmap.webp基準の%位置）
 // x/y は画像に対する左上原点のパーセント位置（0-100）
 
 const mapImage = "images/map/map.webp";
@@ -40,7 +40,7 @@ const mapLandmarks = [
   { key:"Forest Lake", name:"森の湖", nameI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:76.1, y:49.66 },
   { key:"Meadow Lake", name:"草原の湖", nameI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:23.43, y:53.36 },
   { key:"Onsen Mountain Lake", name:"温泉山の湖", nameI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""}, x:53.76, y:25.99 },
-  // 以下4件は heartopia.guide のデータには無い広域ゾーン名（ユーザーがゲーム内マップの実機画像で確認）。
+  // 以下4件は他の地名とは別枠の広域ゾーン名（ユーザーがゲーム内マップの実機画像で確認）。
   // 座標はユーザー提供のゲーム内スクリーンショットの表記位置に合わせている（大エリアの
   // 重心＝ズーム時の移動先はdata-map-areas.js側で別途管理、この文字表示位置とは必ずしも一致しない）。
   { key:"Forest", name:"森林", nameI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""}, x:79.4, y:51.5 },
