@@ -1025,6 +1025,10 @@ function updateTime(){
  const ss = String(now.getUTCSeconds()).padStart(2,"0");
 
  document.getElementById("time").innerText = `${hh}:${mm}:${ss}`;
+ // リポップタイマー（js/bug-timer.js）の時計・カウントダウンは、ここでの更新と
+ // 同じタイミングで同期させる（独立したsetIntervalだと発火順序がズレて
+ // 表示上の秒数がズレて見えることがあるため、ここから直接呼び出す）
+ if(typeof tickBugTimer === "function") tickBugTimer();
  document.getElementById("weatherNow").innerText =
   `${T("weather_now_label","今：")}${translateWeatherWord(weather)}${currentWeatherIsManual ? T("weather_manual_suffix","（手動入力）") : ""}`;
  document.getElementById("weatherNext").innerText =
