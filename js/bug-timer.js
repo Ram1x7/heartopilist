@@ -131,7 +131,9 @@ function initBugTimer(){
   document.getElementById("bugTimerResetBtn").addEventListener("click", resetBugTimer);
 
   renderBugTimer();
-  setInterval(tickBugTimer, 1000);
+  // 1秒ごとの更新は、js/main.jsのupdateTime()からtickBugTimer()を直接呼ぶ形で行う
+  // （ここで独立したsetIntervalを持つと、2つのタイマーの発火順序がズレて
+  // メイン時計とリポップタイマーの秒数表示がズレて見えることがあったため）
 }
 
 initBugTimer();
