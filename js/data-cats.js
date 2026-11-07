@@ -102,5 +102,7 @@ const catFoods = [
 {id:"151",name:{jp:"コウイカ",en:"Golden Cuttlefish",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/151.PNG"},
 {id:"152",name:{jp:"ブルークリオネ",en:"Blue Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/152.PNG"},
 {id:"153",name:{jp:"グリーンクリオネ",en:"Green Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/153.PNG"},
-{id:"154",name:{jp:"パープルクリオネ",en:"Purple Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/154.PNG"}
+{id:"154",name:{jp:"パープルクリオネ",en:"Purple Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/154.PNG"},
+{id:"155",name:{jp:"ミノカサゴ",en:"Lionfish",zh_cn:"狮子鱼",zh_tw:"獅子魚",ko:"쏠배감펭",th:"ปลาสิงโต",tl:""},img:"./images/petfoods/155.PNG"},
+{id:"156",name:{jp:"レナーズラス",en:"Rainbow Wrasse",zh_cn:"西澳梦幻龙鱼",zh_tw:"西澳夢幻龍魚",ko:"레나르디놀래기",th:"ปลาหมอทะเลเลนนาร์ด",tl:""},img:"./images/petfoods/156.PNG"}
 ];
