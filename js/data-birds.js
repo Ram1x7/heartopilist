@@ -1266,6 +1266,21 @@ const birdData = [
  auth:false
 },
 {
+ name:"ベニヘラサギ",
+ nameI18n:{"ja":"ベニヘラサギ","en":"Roseate Spoonbill","zh-CN":"","zh-TW":"","ko":"","th":""},
+ season:true,
+ ended:true,
+ level:1,
+ price:27,
+ fesCoinPrice:15, // 別イベントのフェスコイン（専用アイコン画像は未入手のため汎用fescoinアイコンにフォールバック）
+ weather:["晴れ","雨","虹"],
+ time:["6-12","12-18","18-0","0-6"],
+ location:"迷子鳥クエストの追加段階",
+ locationI18n:{"ja":"迷子鳥クエストの追加段階","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/birds/1021.PNG",
+ auth:false
+},
+{
  name:"ヘラサギ",
  nameI18n:{"ja":"ヘラサギ","en":"White Spoonbill","zh-CN":"白琵鹭","zh-TW":"白琵鷺","ko":"흰 저어새","th":"นกปากช้อน"},
  season:true,
