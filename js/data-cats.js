@@ -104,5 +104,7 @@ const catFoods = [
 {id:"153",name:{jp:"グリーンクリオネ",en:"Green Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/153.PNG"},
 {id:"154",name:{jp:"パープルクリオネ",en:"Purple Sea Angel",zh_cn:"",zh_tw:"",ko:"",th:"",tl:""},img:"./images/petfoods/154.PNG"},
 {id:"155",name:{jp:"ミノカサゴ",en:"Lionfish",zh_cn:"狮子鱼",zh_tw:"獅子魚",ko:"쏠배감펭",th:"ปลาสิงโต",tl:""},img:"./images/petfoods/155.PNG"},
-{id:"156",name:{jp:"レナーズラス",en:"Rainbow Wrasse",zh_cn:"西澳梦幻龙鱼",zh_tw:"西澳夢幻龍魚",ko:"레나르디놀래기",th:"ปลาหมอทะเลเลนนาร์ด",tl:""},img:"./images/petfoods/156.PNG"}
+{id:"156",name:{jp:"レナーズラス",en:"Rainbow Wrasse",zh_cn:"西澳梦幻龙鱼",zh_tw:"西澳夢幻龍魚",ko:"레나르디놀래기",th:"ปลาหมอทะเลเลนนาร์ด",tl:""},img:"./images/petfoods/156.PNG"},
+{id:"157",name:{jp:"タツノオトシゴ",en:"Seahorse",zh_cn:"海马",zh_tw:"海馬",ko:"해마",th:"ม้าน้ำ",tl:""},img:"./images/petfoods/062.PNG"},
+{id:"158",name:{jp:"シンジュガイ",en:"Large Pearl Mussel",zh_cn:"大珍珠蚌",zh_tw:"大珍珠蚌",ko:"큰진주조개",th:"หอยมุกยักษ์",tl:""},img:"./images/petfoods/088.PNG"}
 ];
