@@ -69,6 +69,21 @@ const DESIGN_FRAME_PRESETS = [
     ],
   },
   {
+    id: "dance_notation",
+    icon: "images/art-frames/dance_notation.webp",
+    category: "other",
+    name: "ダンス・ノーテーション", nameI18n: {"ja": "ダンス・ノーテーション", "en": "Dance Notation", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""},
+    confirmed: true,
+    parts: [
+      // 表紙は16:9・精度最大（本の(16:9)パーツと同じ150×84）だが、実際に反映される
+      // のは中央44マス分（左右各22マス、線対称ツールで中央から数えた値）のみ。
+      // 左右各53マスを塗り不可にする設定はjs/art-masks.jsのPRESET_MASKS側
+      // （disabledRanges）で行う（part自体のdisabledRangesはrebuildActiveMask()で
+      // 参照されないため、ここに書いても効果がない）
+      { id: "default", name: "(16:9)", nameI18n: {"ja": "(16:9)", "en": "(16:9)", "zh-CN": "", "zh-TW": "", "ko": "", "th": ""}, width: 150, height: 84 },
+    ],
+  },
+  {
     id: "t_shirt",
     icon: "images/art-frames/t_shirt.webp",
     category: "clothes",
