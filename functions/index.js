@@ -1,5 +1,6 @@
 // functions/index.js
 // Firebase Cloud Functionsにデプロイするファイルです
+// (リポジトリ再作成後のデプロイ用シークレット動作確認)
 
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
