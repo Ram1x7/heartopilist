@@ -1,0 +1,3147 @@
+/* art-*.html 専用CSS（共通の見た目はcss/style.cssを参照。既存ページのスタイルには一切影響しない） */
+
+/* フッター（他ページと同じ見た目に揃える） */
+.footer{
+  text-align:center;
+  padding:28px 16px 20px;
+  font-size:11px;
+  color:var(--text-sub);
+  border-top:1px solid var(--border);
+  margin-top:30px;
+}
+
+.footer a{ color:var(--vermillion); text-decoration:none; }
+
+body.dark .footer{
+  color:#b3a89a;
+  border-top-color:#46423b;
+}
+
+/* 開発中バナー */
+.art-notice{
+  margin:10px 0 16px;
+  padding:10px 14px;
+  border-radius:14px;
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  color:var(--text-sub);
+  font-size:12px;
+  line-height:1.6;
+  text-align:center;
+}
+
+body.dark .art-notice{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+/* 「ログイン不要・オフラインでも使える」バナー（初回のみ、閉じるまで表示） */
+.art-offline-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 16px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(60,90,110,0.1);
+  border:1px solid var(--indigo);
+}
+
+.art-offline-banner-icon{
+  flex-shrink:0;
+  color:var(--indigo);
+  display:flex;
+}
+
+.art-offline-banner p{
+  flex:1;
+  margin:0;
+  font-size:12px;
+  line-height:1.6;
+  color:var(--text);
+}
+
+.art-offline-banner-close{
+  flex-shrink:0;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+body.dark .art-offline-banner{
+  background:rgba(90,125,146,0.14);
+  border-color:var(--indigo-soft);
+}
+
+body.dark .art-offline-banner-icon{
+  color:var(--indigo-soft);
+}
+
+body.dark .art-offline-banner p{
+  color:#ece4d4;
+}
+
+body.dark .art-offline-banner-close{
+  color:#b3a89a;
+}
+
+/* 編集モード・固定（ロック）バー（常時表示。誤タップ防止のための明確なON/OFF表示） */
+.art-canvas-status-bar{
+  display:flex;
+  gap:8px;
+  margin-top:4px;
+  flex-wrap:wrap;
+}
+
+.art-edit-mode-btn, .art-lock-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 16px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-edit-mode-btn, body.dark .art-lock-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-edit-mode-btn.is-active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .art-edit-mode-btn.is-active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.art-lock-btn.is-locked{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
+}
+
+body.dark .art-lock-btn.is-locked{
+  background:var(--vermillion-soft);
+  border-color:var(--vermillion-soft);
+}
+
+/* 固定中は「編集する」を非表示にせずグレーアウトし、上書き関係（固定中は編集不可）
+   が視覚的に分かるようにする */
+.art-edit-mode-btn:disabled{
+  opacity:0.45;
+  cursor:not-allowed;
+}
+
+/* レイアウト（モバイル：縦積み） */
+.art-layout{
+  display:grid;
+  grid-template-areas:
+    "toolbar"
+    "canvas"
+    "panel";
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:4px;
+}
+
+.art-toolbar{
+  grid-area:toolbar;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-height:52px;
+  padding:10px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
+}
+
+.art-canvas-area{
+  position:relative;
+  grid-area:canvas;
+  display:flex;
+  /* align-items/justify-content:centerは使わない。ズームでcanvasがコンテナより
+     大きくなった時、中央寄せのflexは overflow を左右/上下対称にクリップしてしまい、
+     一部の領域にスクロールで到達できなくなる（ブラウザの既知の挙動）。
+     代わりにcanvas側のmargin:autoで中央寄せする（overflow時も正しくスクロールできる） */
+  padding:16px;
+  /* 高さはビューポートに応じて決まる固定値にする（min/maxの範囲で内容に合わせて
+     伸び縮みさせない）。ズームで中の見え方が変わっても、この「窓」自体は動かない */
+  height:clamp(280px, 60vh, 560px);
+  overflow:auto;
+  /* キャンバス本体だけでなく、周りの余白から指を置いてもピンチズーム/パンを
+     開始できるようにするため、この余白側もブラウザ標準のタッチ操作を無効化し、
+     js/art-editor.js側のジェスチャー処理に委ねる */
+  touch-action:none;
+  background-color:var(--card);
+  /* 和紙のような繊維の質感を、極薄い藍色・朱色の細かいクロスハッチで表現する
+     （実際の描画マス目やキャンバスの視認性を妨げない濃度に抑える） */
+  background-image:
+    repeating-linear-gradient(23deg, rgba(60,90,110,0.035) 0px, rgba(60,90,110,0.035) 1px, transparent 1px, transparent 7px),
+    repeating-linear-gradient(-64deg, rgba(177,80,59,0.025) 0px, rgba(177,80,59,0.025) 1px, transparent 1px, transparent 9px);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.art-panel{
+  grid-area:panel;
+  /* グリッドアイテムの自動最小幅（内容物のmax-content幅）を解除する。
+     これがないと、中の横スクロール一覧（.art-palette-mains-strip等）の
+     内容幅にパネル自体が引っ張られて広がり、横スクロールにならずページが
+     はみ出してしまう */
+  min-width:0;
+  min-height:120px;
+  padding:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .art-toolbar,
+body.dark .art-panel{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+body.dark .art-canvas-area{
+  background-color:#2c2823;
+  background-image:
+    repeating-linear-gradient(23deg, rgba(139,169,201,0.045) 0px, rgba(139,169,201,0.045) 1px, transparent 1px, transparent 7px),
+    repeating-linear-gradient(-64deg, rgba(226,140,110,0.03) 0px, rgba(226,140,110,0.03) 1px, transparent 1px, transparent 9px);
+  border-color:#46423b;
+}
+
+#artCanvas{
+  margin:auto;
+  /* max-width:100%は付けない。ズーム時にcanvasが実寸で親要素より大きくなることで
+     .art-canvas-areaのoverflow:autoによる横/縦スクロールが機能する（拡大の要） */
+  border-radius:8px;
+  touch-action:none;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  background:
+    linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    linear-gradient(-45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    var(--card);
+}
+
+body.dark #artCanvas{
+  background:
+    linear-gradient(45deg, #383329 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, #383329 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(45deg, transparent 75%, #383329 75%) -8px 0/16px 16px,
+    linear-gradient(-45deg, transparent 75%, #383329 75%) -8px 0/16px 16px,
+    #2c2823;
+}
+
+/* スマートフォン（767px以下）：主要ツール（ペン/消しゴム/バケツ/スポイト/Undo/Redo等）は
+   グリッド上の配置（DOM順・グリッドエリア）どおり、キャンバスより上の通常の位置に表示する
+   （以前は画面下端にposition:fixedで固定していたが、ドット絵より上に置いてほしいという
+   要望を受けて撤廃。通常のドキュメントフローに戻ったことで、キャンバス表示領域の高さ計算も
+   「固定ツールバーとの重なり回避」を考える必要がなくなった） */
+@media (max-width:767px){
+  /* キャンバス表示領域の高さは、js/art-editor.jsのadjustMobileCanvasAreaHeight()が
+     「実際に画面上でヘッダー・オフラインバナー・編集モードバー・ツールバー等が占めている高さ」を
+     都度getBoundingClientRect()で測り、--art-canvas-area-mobile-heightとして動的に設定する。
+     バナーの有無や言語切替による文言の長さの違いなど、CSSだけでは正確に把握できない要素を
+     実測するのが目的で、推測値で二重に見積もることを避けている。
+     以下のclamp(...)は、JS実行前の一瞬・JS無効時にのみ使われるフォールバック値 */
+  .art-canvas-area{
+    box-sizing:border-box;
+    height:clamp(110px, 34vh, 380px);
+    height:var(--art-canvas-area-mobile-height, clamp(110px, 34dvh, 380px));
+  }
+}
+
+/* iPad（768px〜）：ツールバー上／Canvas中央／パネル下、余白を広めに */
+@media (min-width:768px){
+  .art-canvas-area{
+    padding:28px;
+    height:clamp(380px, 60vh, 640px);
+  }
+}
+
+/* PC（1200px〜）：ツールバー左／Canvas中央／パネル右の3カラム */
+@media (min-width:1200px){
+  .art-layout{
+    grid-template-areas:"toolbar canvas panel";
+    grid-template-columns:180px 1fr 280px;
+    align-items:start;
+  }
+  .art-toolbar{
+    flex-direction:column;
+    align-items:stretch;
+    overflow-x:visible;
+    overflow-y:auto;
+    max-height:70vh;
+  }
+}
+
+/* ツールバーのボタン */
+.art-tool-btn{
+  position:relative;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:38px;
+  height:38px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.art-tool-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+/* 色だけに頼らず、選択中かどうかをバッジの有無でも示す */
+.art-tool-btn.active::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
+}
+
+.art-tool-btn:disabled{
+  opacity:0.35;
+  cursor:not-allowed;
+}
+
+body.dark .art-tool-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-tool-btn.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* 設定パネル */
+.art-panel-section{
+  margin-bottom:16px;
+}
+
+.art-panel-section:last-child{
+  margin-bottom:0;
+}
+
+.art-panel-title{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:8px;
+  letter-spacing:0.04em;
+}
+
+body.dark .art-panel-title{
+  color:#b3a89a;
+}
+
+/* ズームコントロール */
+.art-zoom-controls{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.art-zoom-controls button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  height:30px;
+  padding:0 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+}
+
+body.dark .art-zoom-controls button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.art-zoom-label{
+  min-width:44px;
+  text-align:center;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .art-zoom-label{
+  color:#ece4d4;
+}
+
+/* ズームスライダー */
+.art-zoom-slider{
+  flex:1 1 100%;
+  width:100%;
+  accent-color:var(--indigo);
+}
+
+body.dark .art-zoom-slider{
+  accent-color:var(--indigo-soft);
+}
+
+/* ペン・消しゴムの太さ選択 */
+.art-brush-size-options{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.art-brush-size-options button{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:30px;
+  padding:0 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.art-brush-size-options button.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.art-brush-size-options button.active::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:9px;
+  height:9px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
+}
+
+body.dark .art-brush-size-options button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-brush-size-options button.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* カラーパレット */
+.art-palette{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px 9px;
+  margin-bottom:10px;
+}
+
+/* メインカラー：参考ツールの「四角」のスウォッチ（.art-chip）で表す */
+.art-chip{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid var(--border);
+  border-radius:10px;
+  background:var(--card);
+  box-shadow:0 1px 3px rgba(60,40,20,0.12);
+  cursor:pointer;
+  padding:0;
+}
+
+/* ドット絵変換・色番号表示（Display＞色番号）と同じ色番号を、メインカラーの
+   中央に薄く表示する。「薄く」なので白フチはつけず、半透明の単色のみにする */
+.art-chip-main-code{
+  position:relative;
+  z-index:1;
+  font-size:8px;
+  font-weight:700;
+  line-height:1;
+  color:rgba(255,255,255,0.75);
+  mix-blend-mode:difference;
+  pointer-events:none;
+}
+
+.art-chip-main{
+  width:32px;
+  height:32px;
+}
+
+/* 2列8個のグリッド（.art-palette-mains-strip）の中では、隙間なく並べられる
+   短冊状にする。枠・角丸・影は個々のチップではなく帯（ストリップ）側で
+   まとめて表現し、選択状態は外側にリングを置くスペースがないため内側の
+   金色の縁取りで示す（帯を跨いだドットバッジは省略） */
+.art-palette-mains-strip .art-chip-main{
+  width:auto;
+  height:26px;
+  border:none;
+  border-radius:0;
+  box-shadow:none;
+}
+
+.art-palette-mains-strip .art-chip-main.is-selected{
+  box-shadow:inset 0 0 0 2px var(--card), inset 0 0 0 4px var(--gold);
+}
+
+.art-palette-mains-strip .art-chip-main.is-selected::after{
+  display:none;
+}
+
+.art-palette-mains-strip .art-chip-main.is-inspected{
+  box-shadow:inset 0 0 0 2px var(--card), inset 0 0 0 4px var(--vermillion);
+}
+
+body.dark .art-palette-mains-strip .art-chip-main.is-selected{
+  box-shadow:inset 0 0 0 2px #2c2823, inset 0 0 0 4px var(--gold);
+}
+
+body.dark .art-palette-mains-strip .art-chip-main.is-inspected{
+  box-shadow:inset 0 0 0 2px #2c2823, inset 0 0 0 4px var(--vermillion-soft);
+}
+
+/* "active"は汎用クラス(*{background:var(--indigo)!important})と衝突するため
+   スウォッチの選択状態は"is-selected"を使う（背景色は上書きせず枠のみで表現）。
+   金色のリング＋小さなドットバッジで、キャンバス選択画面等と同じ選択状態の
+   見せ方に揃える（.art-tool-btn.activeのバッジと同じ意匠） */
+.art-chip.is-selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold), 0 1px 3px rgba(60,40,20,0.12);
+}
+
+.art-chip.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
+}
+
+body.dark .art-chip{
+  background:#2c2823;
+  border-color:#46423b;
+  box-shadow:0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark .art-chip.is-selected{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark .art-chip.is-selected::after{
+  border-color:#2c2823;
+}
+
+/* タップして調べたマスの色がパレット上のどこにあるかを示すハイライト。
+   「今の描画色」を示すis-selected（金色）と混同しないよう朱色にする */
+.art-chip.is-inspected{
+  border-color:var(--vermillion);
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion), 0 1px 3px rgba(60,40,20,0.12);
+}
+
+body.dark .art-chip.is-inspected{
+  border-color:var(--vermillion-soft);
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft), 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* サブカラー：参考ツールの「絵の具を垂らしたパレット」のような、有機的なブロブ形状＋
+   段差の影を持つ小石スウォッチ（.art-swatch）で表す。スウォッチごとに角丸の値を
+   少しずらし（nth-child）、手作りの小石が並んだようなゆらぎを出す。
+   影はJSが設定する背景色に関わらず常に一定の半透明色にすることで、
+   色データや配色ロジックには一切手を加えていない */
+.art-swatch{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:24px;
+  height:24px;
+  border-radius:60% 40% 55% 45% / 50% 45% 55% 50%;
+  border:none;
+  cursor:pointer;
+  padding:0;
+  z-index:1;
+}
+
+/* サブカラー内の番号ラベル（例:"05-3"の"3"）。マス番号・色番号表示と同じ
+   「白フチ＋濃い文字」の組み合わせにすることで、スウォッチの色に関わらず判読できる */
+.art-swatch-code{
+  position:relative;
+  z-index:1;
+  font-size:9px;
+  font-weight:700;
+  line-height:1;
+  color:#1a1814;
+  text-shadow:
+    -1px -1px 0 rgba(255,255,255,0.9),
+    1px -1px 0 rgba(255,255,255,0.9),
+    -1px 1px 0 rgba(255,255,255,0.9),
+    1px 1px 0 rgba(255,255,255,0.9);
+  pointer-events:none;
+}
+
+.art-swatch::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:rgba(60,40,20,0.3);
+  transform:translate(3px,4px);
+  z-index:-1;
+}
+
+.art-palette-subs-row .art-swatch:nth-child(3n+2){
+  border-radius:45% 55% 60% 40% / 55% 45% 65% 35%;
+}
+
+.art-palette-subs-row .art-swatch:nth-child(3n+3){
+  border-radius:55% 45% 40% 60% / 60% 40% 50% 55%;
+}
+
+.art-swatch.is-selected{
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--gold);
+}
+
+.art-swatch.is-selected::after{
+  content:"";
+  position:absolute;
+  top:-3px;
+  right:-3px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:var(--gold);
+  border:1.5px solid var(--card);
+  z-index:2;
+}
+
+body.dark .art-swatch::before{
+  background:rgba(0,0,0,0.45);
+}
+
+body.dark .art-swatch.is-selected{
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--gold);
+}
+
+body.dark .art-swatch.is-selected::after{
+  border-color:#2c2823;
+}
+
+.art-swatch.is-inspected{
+  box-shadow:0 0 0 2px var(--card), 0 0 0 4px var(--vermillion);
+}
+
+body.dark .art-swatch.is-inspected{
+  box-shadow:0 0 0 2px #2c2823, 0 0 0 4px var(--vermillion-soft);
+}
+
+/* メインカラー一覧のグリッド（.art-palette-mains-strip）を収めるエリア */
+.art-palette-current{
+  margin-bottom:10px;
+}
+
+/* メインカラーは16種と数が多いため、横スクロールではなく8列×2段の
+   グリッドに折り返して、パレット全体の横幅を抑える。各チップは隙間なく
+   詰めて並べ、帯全体をひとつの枠で囲む（枠・角丸は.art-chip-main側では
+   なくこちらでまとめて表現する） */
+.art-palette-mains-strip{
+  display:grid;
+  grid-template-columns:repeat(8, 1fr);
+  gap:0;
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+}
+
+body.dark .art-palette-mains-strip{
+  border-color:#46423b;
+}
+
+/* 参考画像（実際のゲームの配色ツール）に合わせ、サブカラーは横一列ではなく
+   2列のグリッドで並べる（小石を積んだような見せ方） */
+.art-palette-subs-row{
+  display:grid;
+  grid-template-columns:repeat(2, 24px);
+  gap:8px 10px;
+  flex:0 0 auto;
+}
+
+/* カラーパレット（ツールバーの専用ボタンから開閉する、自由に動かせるフローティングパネル）。
+   モーダルではないため背景の暗幕は敷かず、開いたままキャンバスのタップ・パン・ズームを
+   邪魔しない。ハンドル部分をドラッグして好きな位置へ動かせる */
+.art-floating-palette{
+  position:fixed;
+  top:90px;
+  right:10px;
+  z-index:1500;
+  display:flex;
+  flex-direction:column;
+  width:min(190px, calc(100vw - 20px));
+  max-height:min(70vh, 520px);
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(52,48,43,0.22);
+  overflow:hidden;
+}
+
+.art-floating-palette-handle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px 8px 9px 14px;
+  background:var(--card-sub);
+  border-bottom:1px solid var(--border);
+  font-weight:700;
+  font-size:13px;
+  color:var(--indigo);
+  cursor:grab;
+  touch-action:none;
+  user-select:none;
+}
+
+.art-floating-palette-handle:active{
+  cursor:grabbing;
+}
+
+.art-floating-palette-close{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  height:26px;
+  padding:0;
+  border:none;
+  border-radius:50%;
+  background:transparent;
+  color:var(--text-sub);
+  cursor:pointer;
+}
+
+/* fill="none"のアイコンSVGは、線の描かれていない部分（グリフの内側の余白）で
+   ヒットテストがボタン自身ではなくSVG要素側に取られてしまうことがあるため、
+   SVG自体はポインターイベントを無視させ、必ず親のボタンでクリックを拾わせる */
+.art-floating-palette-close svg{
+  pointer-events:none;
+}
+
+.art-floating-palette-close:hover{
+  background:rgba(60,90,110,0.1);
+}
+
+.art-floating-palette-body{
+  padding:12px;
+  overflow-y:auto;
+}
+
+.art-floating-palette-body .art-panel-section{
+  margin-bottom:10px;
+}
+
+body.dark .art-floating-palette{
+  background:#2c2823;
+  border-color:#46423b;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+}
+
+body.dark .art-floating-palette-handle{
+  background:#383329;
+  border-bottom-color:#46423b;
+  color:#8fbdc9;
+}
+
+body.dark .art-floating-palette-close:hover{
+  background:rgba(255,255,255,0.08);
+}
+
+/* 04：透明/なしスロット（市松模様で「色なし」を表す） */
+.art-swatch-none{
+  background-color:var(--card);
+  background-image:
+    linear-gradient(45deg, var(--card-sub) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--card-sub) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--card-sub) 75%);
+  background-size:8px 8px;
+  background-position:0 0, 0 4px, 4px -4px, -4px 0;
+}
+
+/* 使用色リスト */
+.art-color-usage{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  max-height:180px;
+  overflow-y:auto;
+}
+
+.art-usage-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 8px;
+  border-radius:8px;
+  background:var(--card-sub);
+  cursor:pointer;
+}
+
+.art-usage-row.active{
+  outline:2px solid var(--indigo);
+}
+
+body.dark .art-usage-row{
+  background:#383329;
+}
+
+body.dark .art-usage-row.active{
+  outline-color:var(--indigo-soft);
+}
+
+.art-usage-swatch{
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  flex-shrink:0;
+  padding:0;
+  cursor:pointer;
+}
+
+body.dark .art-usage-swatch{
+  border-color:#46423b;
+}
+
+.art-usage-count{
+  font-size:12px;
+  color:var(--text);
+}
+
+body.dark .art-usage-count{
+  color:#ece4d4;
+}
+
+.art-usage-empty{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:10px 0;
+}
+
+body.dark .art-usage-empty{
+  color:#b3a89a;
+}
+
+/* 使用色一覧の「置き換え」ボタン（行の右端。色そのものではなく、置き換え操作を始める用） */
+.art-usage-replace-btn{
+  flex-shrink:0;
+  margin-left:auto;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:none;
+  background:transparent;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.art-usage-replace-btn:hover{
+  background:rgba(60,90,110,0.12);
+  color:var(--indigo);
+}
+
+body.dark .art-usage-replace-btn{
+  color:#b3a89a;
+}
+
+body.dark .art-usage-replace-btn:hover{
+  background:rgba(90,125,146,0.18);
+  color:var(--indigo-soft);
+}
+
+/* 色の置き換えバナー：パレットの直前に表示し、次のパレットタップが置き換え先の指定に
+   なることを示す。朱色を使い、確認待ちの通常状態（藍色）と見分けやすくする */
+.art-color-replace-banner{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+  padding:9px 10px;
+  border-radius:12px;
+  background:rgba(177,80,59,0.1);
+  border:1px solid var(--vermillion);
+}
+
+.art-color-replace-banner-swatch{
+  flex-shrink:0;
+  width:22px;
+  height:22px;
+  border-radius:6px;
+  border:1px solid var(--border);
+}
+
+.art-color-replace-banner-text{
+  flex:1;
+  font-size:11.5px;
+  line-height:1.5;
+  color:var(--text);
+}
+
+.art-color-replace-banner-cancel{
+  flex-shrink:0;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--vermillion);
+  background:transparent;
+  color:var(--vermillion);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-color-replace-banner{
+  background:rgba(201,112,88,0.14);
+  border-color:var(--vermillion-soft);
+}
+
+body.dark .art-color-replace-banner-swatch{
+  border-color:#46423b;
+}
+
+body.dark .art-color-replace-banner-text{
+  color:#ece4d4;
+}
+
+body.dark .art-color-replace-banner-cancel{
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
+}
+
+/* キャンバスサイズ選択（モーダル・変換パネル共通） */
+.art-gridsize-options{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:14px;
+}
+
+.art-panel-section .art-gridsize-options{
+  margin-top:0;
+}
+
+/* 比率選択（項目数が5種で固定のため、折り返さず均等な列幅で並べる。
+   最後の1個だけ幅が伸びて不自然に見えるのを防ぐ） */
+.art-ratio-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:6px;
+}
+
+.art-ratio-grid button.art-ratio-btn{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  height:66px;
+  padding:8px 2px;
+  border-radius:14px;
+}
+
+.art-ratio-shape{
+  display:block;
+  flex-shrink:0;
+  border:2px solid var(--text-sub);
+  border-radius:3px;
+  background:var(--card);
+}
+
+.art-ratio-label{
+  font-size:11px;
+}
+
+.art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
+  border-color:var(--gold);
+  background:rgba(200,168,107,0.18);
+}
+
+body.dark .art-ratio-shape{
+  border-color:#b3a89a;
+  background:#2c2823;
+}
+
+body.dark .art-ratio-grid button.art-ratio-btn.active .art-ratio-shape{
+  border-color:var(--gold);
+  background:rgba(200,168,107,0.22);
+}
+
+/* デザイン枠アイテムのアイコン付き一覧（5列グリッド。比率選択と合わせてモーダル全体で一緒にスクロールする） */
+.art-frame-grid{
+  display:grid;
+  grid-template-columns:repeat(5, 1fr);
+  gap:6px;
+  /* 比率グリッドの直後に続くため、大枠の上余白(14px)を打ち消して同じ6pxの間隔で連続させる */
+  margin-top:6px;
+}
+
+.art-frame-grid button.art-frame-btn{
+  flex:none;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  height:66px;
+  padding:6px 2px;
+  border-radius:12px;
+  font-size:9.5px;
+  line-height:1.2;
+}
+
+/* .modal-box img（他のモーダルの写真用）のpadding/background等を打ち消す必要があるため、
+   詳細度を上げるためあえて2クラスのセレクタにしている */
+.art-frame-btn .art-frame-icon{
+  width:29px;
+  height:29px;
+  object-fit:contain;
+  padding:0;
+  margin-bottom:0;
+  background:none;
+  border-radius:0;
+}
+
+body.dark .art-frame-btn .art-frame-icon{
+  filter:brightness(0.72);
+  background:none;
+}
+
+/* パーツ選択ボタンの輪郭線サムネイル（実物写真の代わりに背景無地で形だけを見せる） */
+.art-frame-btn .art-part-thumb{
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .art-frame-btn .art-part-thumb{
+  color:#b3a89a;
+}
+
+.art-frame-btn.active .art-part-thumb{
+  color:var(--gold);
+}
+
+/* サイズ（精細度）選択：常に4段階固定のため、5列の.art-frame-gridではなく
+   専用の4列グリッドを使い、比率選択の行と同じく列いっぱいに均等配置する */
+.art-level-grid{
+  grid-template-columns:repeat(4, 1fr);
+}
+
+/* サイズ（精細度）選択ボタンのアイコン（levelDensitySvg。実物写真アイコンと同じ29px枠を共有） */
+.art-frame-btn .art-level-icon{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-sub);
+}
+
+body.dark .art-frame-btn .art-level-icon{
+  color:#b3a89a;
+}
+
+.art-frame-btn.active .art-level-icon{
+  color:var(--gold);
+}
+
+/* パーツ選択画面（フロント/バック/袖など）専用の大きめレイアウト。アイテム選択より
+   個数が少ないことが多いため、列数を減らして1つあたりの輪郭線サムネイルを大きくし、
+   選ぶ前にどんな形のパーツか把握しやすくする */
+.art-part-grid{
+  grid-template-columns:repeat(3, 1fr);
+}
+
+.art-part-grid button.art-frame-btn{
+  height:108px;
+  gap:6px;
+  padding:8px 4px;
+  font-size:10.5px;
+}
+
+.art-gridsize-options button{
+  position:relative;
+  flex:1 1 40%;
+  border:1.5px solid var(--border);
+  border-radius:999px;
+  padding:8px 10px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+}
+
+/* 選択中はソリッド塗りつぶしではなく、金色のリング＋チェックバッジで強調する
+   （アイコン付きボタン内の写真・図形の視認性を保つため、地の色は明るいまま）。
+   css/style.cssの汎用.activeルール（!important）を上書きする必要があるため、
+   ここでも!importantを使う */
+.art-gridsize-options button.active{
+  background:var(--card) !important;
+  border-color:var(--gold) !important;
+  color:var(--indigo) !important;
+  font-weight:700;
+  box-shadow:0 0 0 3px rgba(200,168,107,0.28), 0 3px 8px rgba(0,0,0,0.12);
+}
+
+.art-gridsize-options button.active::after{
+  content:"✓";
+  position:absolute;
+  top:-6px;
+  right:-6px;
+  width:16px;
+  height:16px;
+  line-height:16px;
+  border-radius:50%;
+  background:var(--gold);
+  color:#fff;
+  font-size:10px;
+  font-weight:700;
+  text-align:center;
+  box-shadow:0 1px 3px rgba(0,0,0,0.25);
+}
+
+body.dark .art-gridsize-options button{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-gridsize-options button.active{
+  background:#2c2823 !important;
+  border-color:var(--gold) !important;
+  color:#fdf9ef !important;
+  box-shadow:0 0 0 3px rgba(200,168,107,0.22), 0 3px 8px rgba(0,0,0,0.4);
+}
+
+/* 作業モード選択ウィザード（制作開始時の一度きりの導線） */
+.art-mode-wizard-box{
+  max-width:360px;
+  text-align:center;
+}
+
+.art-mode-wizard-options{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:16px;
+}
+
+button.art-mode-wizard-option{
+  position:relative;
+  flex:none;
+  width:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:16px 14px;
+  border-radius:14px;
+  border:1.5px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  text-align:left;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+button.art-mode-wizard-option:hover{
+  border-color:var(--indigo);
+}
+
+button.art-mode-wizard-option.is-recommended{
+  border-color:var(--indigo);
+  background:rgba(60,90,110,0.08);
+}
+
+.art-mode-wizard-badge{
+  align-self:flex-start;
+  padding:2px 9px;
+  border-radius:999px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:10px;
+  font-weight:700;
+}
+
+.art-mode-wizard-option-title{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-weight:700;
+  font-size:14px;
+}
+
+.art-mode-wizard-option-desc{
+  font-size:11.5px;
+  line-height:1.6;
+  color:var(--text-sub);
+}
+
+body.dark button.art-mode-wizard-option{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark button.art-mode-wizard-option:hover{
+  border-color:var(--indigo-soft);
+}
+
+body.dark button.art-mode-wizard-option.is-recommended{
+  border-color:var(--indigo-soft);
+  background:rgba(90,125,146,0.14);
+}
+
+body.dark .art-mode-wizard-badge{
+  background:var(--indigo-soft);
+}
+
+body.dark .art-mode-wizard-option-desc{
+  color:#b3a89a;
+}
+
+/* 変換方式プレビュー（標準／なめらか／くっきり） */
+.art-preset-preview-row{
+  display:flex;
+  gap:8px;
+  margin-top:12px;
+}
+
+.art-preset-preview-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  padding:8px;
+  border:2px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.art-preset-preview-btn.active{
+  border-color:var(--indigo);
+  color:var(--text);
+  font-weight:700;
+}
+
+.art-preset-preview-canvas{
+  width:100%;
+  aspect-ratio:1;
+  border-radius:6px;
+  background-image:linear-gradient(45deg, #d8d0bf 25%, transparent 25%), linear-gradient(-45deg, #d8d0bf 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #d8d0bf 75%), linear-gradient(-45deg, transparent 75%, #d8d0bf 75%);
+  background-size:8px 8px;
+  background-position:0 0, 0 4px, 4px -4px, -4px 0;
+  image-rendering:pixelated;
+}
+
+body.dark .art-preset-preview-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-preset-preview-btn.active{
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* ヘッダーアクション（画像から作る／エディターに戻る） */
+.art-header-actions{
+  margin:-6px 0 14px;
+}
+
+.art-header-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 16px;
+  border-radius:999px;
+  border:1px solid var(--indigo);
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:12px;
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+body.dark .art-header-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* 変換フローの現在地表示（4段階：画像/サイズ/位置/仕上げ）。
+   参考ツールの「Select Size / Upload Image / Generate」のような、角丸の
+   セグメント型タブバーの見た目に合わせる（段階数・遷移ロジックは変更なし。
+   番号の丸と区切り線は使わず、選択中タブの背景と文字色だけで現在地を示す） */
+.art-convert-progress{
+  display:flex;
+  align-items:center;
+  gap:2px;
+  margin-bottom:14px;
+  padding:3px;
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:999px;
+}
+
+.art-convert-progress-step{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px 4px;
+  border:none;
+  border-radius:999px;
+  background:none;
+  cursor:default;
+  transition:0.15s;
+}
+
+.art-convert-progress-step[data-clickable="true"]{
+  cursor:pointer;
+}
+
+.art-convert-progress-num{
+  display:none;
+}
+
+.art-convert-progress-label{
+  font-size:10.5px;
+  font-weight:600;
+  color:var(--text-sub);
+  white-space:nowrap;
+}
+
+/* css/style.cssの汎用.activeルール（!important）を上書きする必要があるため、
+   ここでも!importantを使う */
+.art-convert-progress-step.active{
+  background:var(--card) !important;
+  color:var(--indigo) !important;
+  border-color:transparent !important;
+  box-shadow:0 1px 4px rgba(0,0,0,0.12);
+}
+
+.art-convert-progress-step.active .art-convert-progress-label{
+  color:var(--indigo);
+  font-weight:700;
+}
+
+.art-convert-progress-step.completed .art-convert-progress-label{
+  color:var(--gold);
+}
+
+.art-convert-progress-step.completed .art-convert-progress-label::before{
+  content:"✓ ";
+}
+
+.art-convert-progress-line{
+  display:none;
+}
+
+body.dark .art-convert-progress{
+  background:#383329;
+  border-color:#46423b;
+}
+
+body.dark .art-convert-progress-label{
+  color:#b3a89a;
+}
+
+body.dark .art-convert-progress-step.active{
+  background:#2c2823 !important;
+  color:#8fbdc9 !important;
+  border-color:transparent !important;
+}
+
+body.dark .art-convert-progress-step.active .art-convert-progress-label{
+  color:#8fbdc9;
+}
+
+body.dark .art-convert-progress-step.completed .art-convert-progress-label{
+  color:var(--gold);
+}
+
+.art-back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-bottom:14px;
+  font-size:12px;
+  color:var(--text-sub);
+  text-decoration:none;
+}
+
+body.dark .art-back-link{
+  color:#b3a89a;
+}
+
+.art-back-icon{
+  transform:rotate(90deg);
+}
+
+/* 画像から作るページ */
+.art-convert-layout{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.art-convert-upload{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  padding:36px 16px;
+  background:var(--card);
+  border:1px dashed var(--border);
+  border-radius:16px;
+  text-align:center;
+}
+
+body.dark .art-convert-upload{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.art-upload-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:11px 20px;
+  border-radius:999px;
+  border:1px solid var(--indigo);
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .art-upload-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.art-upload-hint{
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+body.dark .art-upload-hint{
+  color:#b3a89a;
+}
+
+.art-preview-pair{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.art-preview-box{
+  flex:1 1 140px;
+  min-width:0;
+}
+
+.art-preview-label{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+body.dark .art-preview-label{
+  color:#b3a89a;
+}
+
+.art-preview-frame{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+.art-preview-zoom-btn{
+  position:absolute;
+  right:6px;
+  bottom:6px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 2px 8px rgba(52,48,43,0.15);
+}
+
+.art-preview-zoom-btn:active{
+  transform:scale(0.92);
+}
+
+body.dark .art-preview-zoom-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#e8d2a8;
+}
+
+body.dark .art-preview-frame{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.art-preview-frame img{
+  max-width:100%;
+  max-height:220px;
+  border-radius:8px;
+  display:block;
+}
+
+.art-preview-frame canvas{
+  max-width:100%;
+  height:auto;
+  border-radius:8px;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+}
+
+.art-use-btn{
+  justify-content:center;
+}
+
+/* 変換結果：使用色数・使用マス数・作業量の目安 */
+.art-convert-result-info{
+  margin-top:12px;
+  padding:12px 14px;
+  background:var(--card-sub);
+  border-radius:14px;
+}
+
+body.dark .art-convert-result-info{
+  background:#383329;
+}
+
+.art-result-stats{
+  display:flex;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+.art-result-stat{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  text-align:center;
+}
+
+.art-result-stat-label{
+  font-size:10px;
+  color:var(--text-sub);
+}
+
+body.dark .art-result-stat-label{
+  color:#b3a89a;
+}
+
+.art-result-stat-value{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .art-result-stat-value{
+  color:#ece4d4;
+}
+
+.art-work-tier-low{ color:var(--indigo); }
+.art-work-tier-mid{ color:var(--gold); }
+.art-work-tier-high{ color:var(--vermillion); }
+body.dark .art-work-tier-low{ color:#8fbdc9; }
+body.dark .art-work-tier-mid{ color:#e8d2a8; }
+body.dark .art-work-tier-high{ color:#e07060; }
+
+.art-result-color-list{
+  font-size:12px;
+}
+
+.art-result-color-list summary{
+  cursor:pointer;
+  color:var(--indigo);
+  font-weight:700;
+  padding:4px 0;
+}
+
+body.dark .art-result-color-list summary{
+  color:#8fbdc9;
+}
+
+.art-result-color-rows{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(90px, 1fr));
+  gap:6px;
+  margin-top:8px;
+}
+
+.art-result-color-row{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:5px 7px;
+  border-radius:8px;
+  background:var(--card);
+}
+
+body.dark .art-result-color-row{
+  background:#2c2823;
+}
+
+.art-result-color-swatch{
+  width:16px;
+  height:16px;
+  border-radius:4px;
+  border:1px solid var(--border);
+  flex-shrink:0;
+}
+
+body.dark .art-result-color-swatch{
+  border-color:#46423b;
+}
+
+.art-result-color-code{
+  font-size:10px;
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .art-result-color-code{
+  color:#b3a89a;
+}
+
+.art-result-color-count{
+  font-size:10px;
+  color:var(--text);
+  margin-left:auto;
+}
+
+body.dark .art-result-color-count{
+  color:#ece4d4;
+}
+
+/* 変換結果の拡大表示モーダル */
+.art-result-zoom-box{
+  max-width:90vw;
+  width:auto;
+  text-align:center;
+}
+
+.art-result-zoom-frame{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:8px 0;
+}
+
+.art-result-zoom-frame canvas{
+  max-width:100%;
+  height:auto;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+  border-radius:8px;
+}
+
+.art-preview-actions{
+  margin-top:12px;
+}
+
+/* 画像アップロード直後の位置・拡大縮小の調整ステップ */
+.art-crop-stage{
+  padding:14px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .art-crop-stage{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.art-crop-hint{
+  font-size:11px;
+  line-height:1.5;
+  color:var(--text-sub);
+  margin:4px 0 12px;
+}
+
+body.dark .art-crop-hint{
+  color:#b3a89a;
+}
+
+.art-crop-viewport{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  max-width:280px;
+  aspect-ratio:1/1;
+  margin:0 auto;
+  border-radius:10px;
+  /* 「ここが切り抜き範囲そのもの」だと一目で伝わるよう、単なるカード枠ではなく
+     はっきりした藍色の実線にする（比率を変えるとaspect-ratioに合わせて枠自体が変形する） */
+  border:2.5px solid var(--indigo);
+  background:
+    linear-gradient(45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(-45deg, var(--card-sub) 25%, transparent 25%) -8px 0/16px 16px,
+    linear-gradient(45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    linear-gradient(-45deg, transparent 75%, var(--card-sub) 75%) -8px 0/16px 16px,
+    var(--card);
+  touch-action:none;
+  cursor:grab;
+}
+
+.art-crop-viewport:active{
+  cursor:grabbing;
+}
+
+body.dark .art-crop-viewport{
+  border-color:var(--indigo-soft);
+}
+
+#artCropImg{
+  position:absolute;
+  top:0;
+  left:0;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+}
+
+/* アイテム別プリセットの輪郭線（襟ぐり・パーツ境界など）を切り抜きプレビュー上に重ねる。
+   キャンバス編集画面側と同じmaskLinesデータをそのまま再利用する */
+#artCropOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+
+.art-crop-mask-hint{
+  text-align:center;
+  margin-top:8px;
+}
+
+.art-crop-zoom-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  max-width:280px;
+  margin:12px auto 0;
+}
+
+.art-crop-zoom-row input[type=range]{
+  flex:1;
+  accent-color:var(--indigo);
+}
+
+body.dark .art-crop-zoom-row input[type=range]{
+  accent-color:var(--indigo-soft);
+}
+
+.art-crop-zoom-icon{
+  font-size:14px;
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .art-crop-zoom-icon{
+  color:#b3a89a;
+}
+
+.art-crop-actions{
+  margin-top:14px;
+}
+
+.art-crop-reset-btn{
+  flex:1 1 auto;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-radius:999px;
+  padding:9px 16px;
+  font-size:12px;
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  cursor:pointer;
+}
+
+body.dark .art-crop-reset-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+/* 変換設定の主要3ステップ（変換方式・ノイズ除去・色数） */
+.art-convert-step{
+  padding:12px 14px;
+  background:var(--card-sub);
+  border-radius:14px;
+}
+
+body.dark .art-convert-step{
+  background:#383329;
+}
+
+.art-step-title{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:6px;
+}
+
+body.dark .art-step-title{
+  color:#ece4d4;
+}
+
+.art-step-num{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  min-width:19px;
+  height:19px;
+  padding:0 6px;
+  border-radius:999px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:10px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+body.dark .art-step-num{
+  background:var(--indigo-soft);
+}
+
+.art-step-hint{
+  font-size:11px;
+  line-height:1.5;
+  color:var(--text-sub);
+  margin:0 0 10px;
+}
+
+body.dark .art-step-hint{
+  color:#b3a89a;
+}
+
+/* 詳細設定（配置方法・輪郭強調・明るさ・コントラスト・背景など）のアコーディオン */
+.art-accordion-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  width:100%;
+  padding:11px 14px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  cursor:pointer;
+}
+
+body.dark .art-accordion-toggle{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-accordion-icon{
+  display:inline-flex;
+  transition:transform 0.2s;
+}
+
+.art-accordion-toggle[aria-expanded="true"] .art-accordion-icon{
+  transform:rotate(180deg);
+}
+
+.art-accordion-body{
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.art-toggle-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--text);
+  cursor:pointer;
+}
+
+body.dark .art-toggle-row{
+  color:#ece4d4;
+}
+
+/* 新規キャンバス作成モーダル */
+.art-newcanvas-box{
+  max-width:360px;
+  max-height:85vh;
+  overflow-y:auto;
+  text-align:left;
+}
+
+.art-newcanvas-section-title{
+  margin-top:16px;
+}
+
+/* 初回モーダルの主な入口（画像から作る／保存済みを開く／使い方） */
+.art-entry-options{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:4px;
+}
+
+.art-entry-card{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:64px;
+  padding:10px 6px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--card-sub);
+  color:var(--text);
+  text-decoration:none;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.art-entry-card:active{
+  transform:scale(0.97);
+}
+
+.art-entry-card-primary{
+  grid-column:1 / -1;
+  flex-direction:row;
+  min-height:48px;
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-size:13px;
+  font-weight:700;
+}
+
+.art-entry-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+
+body.dark .art-entry-card{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-entry-card-primary{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+.art-newcanvas-box h3{
+  text-align:center;
+}
+
+.art-gridsize-options button:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
+.art-preset-badge{
+  display:inline-block;
+  margin-top:2px;
+  font-size:9px;
+  color:var(--vermillion);
+}
+
+body.dark .art-preset-badge{
+  color:#e07060;
+}
+
+/* スクショから取り込む */
+.art-ssi-box{
+  max-width:420px;
+}
+
+.art-ssi-entry-row{
+  margin-bottom:14px;
+}
+
+.art-ssi-entry-btn{
+  width:100%;
+  justify-content:center;
+}
+
+.art-ssi-error{
+  color:var(--vermillion);
+  font-size:12px;
+  margin-top:8px;
+  min-height:14px;
+}
+
+body.dark .art-ssi-error{
+  color:#e07060;
+}
+
+
+.art-ssi-candidate-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.art-ssi-candidate-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid var(--border, #ddd);
+}
+
+.art-ssi-candidate-top{
+  border-color:var(--indigo);
+}
+
+.art-ssi-candidate-icon{
+  width:36px;
+  height:36px;
+  object-fit:contain;
+  flex-shrink:0;
+}
+
+.art-ssi-candidate-info{
+  flex:1;
+  min-width:0;
+}
+
+.art-ssi-candidate-name{
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:3px;
+}
+
+.art-ssi-candidate-score-bar{
+  width:100%;
+  height:6px;
+  border-radius:3px;
+  background:rgba(0,0,0,0.08);
+  overflow:hidden;
+}
+
+body.dark .art-ssi-candidate-score-bar{
+  background:rgba(255,255,255,0.12);
+}
+
+.art-ssi-candidate-score-fill{
+  height:100%;
+  background:var(--indigo);
+  border-radius:3px;
+}
+
+.art-ssi-candidate-score-label{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-top:2px;
+}
+
+.art-ssi-candidate-use-btn{
+  flex-shrink:0;
+  font-size:11px;
+  padding:7px 12px;
+}
+
+.art-ssi-preview-row{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  margin-bottom:14px;
+}
+
+.art-ssi-preview-col{
+  text-align:center;
+}
+
+.art-ssi-preview-label{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+.art-ssi-preview-col canvas{
+  border-radius:6px;
+  border:1px solid var(--border, #ddd);
+  image-rendering:pixelated;
+}
+
+.art-ssi-adjust-wrap{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  border-radius:8px;
+  border:1px solid var(--border, #ddd);
+  margin-bottom:12px;
+  line-height:0;
+}
+
+.art-ssi-adjust-wrap img{
+  display:block;
+  width:100%;
+  height:auto;
+  pointer-events:none;
+  user-select:none;
+}
+
+.art-ssi-adjust-wrap canvas{
+  position:absolute;
+  top:0;
+  left:0;
+  cursor:move;
+  touch-action:none;
+}
+
+/* 座標表示 */
+.art-coord-readout{
+  display:none;
+  position:absolute;
+  top:8px;
+  left:8px;
+  padding:4px 8px;
+  border-radius:8px;
+  background:rgba(52,48,43,0.72);
+  color:#fdf9ef;
+  font-size:10px;
+  font-family:monospace;
+  white-space:pre;
+  pointer-events:none;
+  z-index:2;
+}
+
+/* ブロック表示中はツールバーを無効化した見た目にする */
+.art-toolbar-disabled{
+  opacity:0.4;
+  pointer-events:none;
+}
+
+/* 使用色リストの色番号バッジ（例："05-3"） */
+.art-usage-number{
+  flex-shrink:0;
+  min-width:30px;
+  text-align:center;
+  font-size:10px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+body.dark .art-usage-number{
+  color:#b3a89a;
+}
+
+/* 表示切替トグルの間隔 */
+.art-toggle-row{
+  margin-bottom:10px;
+}
+
+.art-toggle-row:last-of-type{
+  margin-bottom:0;
+}
+
+/* ブロック一覧（実際のキャンバス配置=横blocksX×縦blocksYと同じ並びのグリッド。
+   grid-template-columnsはJS側でブロック数に応じて設定する） */
+.art-block-list{
+  display:grid;
+  gap:4px;
+  margin-top:10px;
+}
+
+.art-block-btn{
+  aspect-ratio:1;
+  min-width:0;
+  padding:2px;
+  border:1px solid var(--border);
+  border-radius:6px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:10px;
+  line-height:1;
+  cursor:pointer;
+}
+
+body.dark .art-block-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.art-block-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
+.art-block-status-1{
+  background:rgba(232,201,60,0.25);
+  border-color:#e8c93c;
+}
+
+/* 完了ブロックは、ただの緑塗りではなく「朱印（判子）」を押したような丸い印にする */
+.art-block-status-2{
+  background:rgba(90,158,74,0.16);
+  border:1.6px solid var(--vermillion);
+  border-radius:50%;
+  color:var(--vermillion);
+  font-weight:700;
+}
+
+body.dark .art-block-status-2{
+  background:rgba(90,158,74,0.2);
+  border-color:var(--vermillion-soft);
+  color:var(--vermillion-soft);
+}
+
+/* パネル内に並べるヘッダー風ボタン（保存・エクスポートなど） */
+.art-panel-btn-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.art-panel-btn-row .art-header-btn{
+  flex:1 1 auto;
+  justify-content:center;
+}
+
+/* 移動（ずらす）用の十字パッド。上下左右の4方向ボタンだけを中央に集めた
+   コンパクトな配置にする（マス目のような正方形グリッドではなく、視覚的に
+   「押した方向へ動く」ことが直感的に伝わる十字型を採用） */
+.art-nudge-pad{
+  display:grid;
+  grid-template-columns:repeat(3, 40px);
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  gap:4px;
+  justify-content:center;
+  margin-top:10px;
+}
+
+.art-nudge-btn{
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  cursor:pointer;
+}
+
+.art-nudge-btn:hover{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.art-nudge-up{ grid-area:up; }
+.art-nudge-down{ grid-area:down; }
+.art-nudge-left{ grid-area:left; }
+.art-nudge-right{ grid-area:right; }
+
+body.dark .art-nudge-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-nudge-btn:hover{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* トースト通知（保存完了などの短い確認表示） */
+#artToast{
+  position:fixed;
+  bottom:24px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--indigo);
+  color:#fdf9ef;
+  padding:10px 22px;
+  border-radius:999px;
+  font-size:13px;
+  opacity:0;
+  transition:opacity 0.25s, transform 0.25s;
+  pointer-events:none;
+  z-index:2100;
+  white-space:nowrap;
+}
+
+#artToast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* マイデザイン一覧 */
+.art-mydesigns-box{
+  max-width:400px;
+  max-height:80vh;
+  display:flex;
+  flex-direction:column;
+}
+
+.art-mydesigns-list{
+  overflow-y:auto;
+  margin:12px 0;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.art-mydesigns-empty{
+  text-align:center;
+  padding:24px 0;
+  color:var(--text-sub);
+  font-size:13px;
+}
+
+.art-mydesign-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  border-radius:12px;
+  background:var(--card-sub);
+}
+
+.art-mydesign-item.current{
+  outline:2px solid var(--indigo);
+}
+
+.art-mydesign-thumb{
+  flex-shrink:0;
+  width:48px;
+  height:48px;
+  border-radius:8px;
+  background-image:linear-gradient(45deg, #d8d0bf 25%, transparent 25%), linear-gradient(-45deg, #d8d0bf 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #d8d0bf 75%), linear-gradient(-45deg, transparent 75%, #d8d0bf 75%);
+  background-size:8px 8px;
+  background-position:0 0, 0 4px, 4px -4px, -4px 0;
+  image-rendering:pixelated;
+  object-fit:contain;
+}
+
+.art-mydesign-info{
+  flex:1;
+  min-width:0;
+}
+
+.art-mydesign-name{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.art-mydesign-meta{
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+.art-mydesign-actions{
+  flex-shrink:0;
+  display:flex;
+  gap:6px;
+}
+
+.art-mydesign-actions button{
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+}
+
+body.dark .art-mydesign-item{
+  background:#383329;
+}
+
+body.dark .art-mydesign-actions button{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+/* 共有コード（発行・読み込み）モーダル */
+.art-share-code-box{
+  max-width:400px;
+  max-height:85vh;
+  overflow-y:auto;
+  text-align:left;
+}
+
+.art-share-code-field{
+  margin-top:12px;
+}
+
+.art-share-code-field .art-panel-title{
+  margin-bottom:6px;
+}
+
+.art-share-code-textarea{
+  width:100%;
+  box-sizing:border-box;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-family:monospace;
+  font-size:12px;
+  line-height:1.5;
+  resize:vertical;
+  margin-bottom:8px;
+}
+
+body.dark .art-share-code-textarea{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+.art-share-qr{
+  display:flex;
+  justify-content:center;
+  margin-top:14px;
+}
+
+.art-share-qr-img{
+  width:180px;
+  height:180px;
+  border-radius:12px;
+  background:#fff;
+  padding:8px;
+  box-sizing:border-box;
+}
+
+.art-share-qr-fallback{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+}
+
+body.dark .art-share-qr-fallback{
+  color:#b3a89a;
+}
+
+.art-share-code-error{
+  min-height:1.4em;
+  margin:6px 0 0;
+  font-size:12px;
+  color:var(--vermillion);
+}
+
+body.dark .art-share-code-error{
+  color:var(--vermillion-soft);
+}
+
+/* ヘルプモーダル */
+.art-help-box{
+  max-width:380px;
+  max-height:85vh;
+  overflow-y:auto;
+  text-align:left;
+}
+
+/* 初めて使う人向けの要点（詳細説明の前に短く表示） */
+.art-help-quickstart{
+  margin:10px 0;
+  padding:10px 14px;
+  background:var(--card-sub);
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.9;
+  list-style:none;
+}
+
+body.dark .art-help-quickstart{
+  background:#383329;
+}
+
+.art-help-details{
+  margin-top:12px;
+}
+
+.art-help-details summary{
+  font-size:12px;
+  font-weight:700;
+  color:var(--indigo);
+  cursor:pointer;
+  list-style:none;
+}
+
+.art-help-details summary::-webkit-details-marker{
+  display:none;
+}
+
+.art-help-details summary::before{
+  content:"▸ ";
+}
+
+.art-help-details[open] summary::before{
+  content:"▾ ";
+}
+
+body.dark .art-help-details summary{
+  color:#8fbdc9;
+}
+
+/* 初回チュートリアル（関連ボタンを順番に吹き出しで案内する） */
+.art-tutorial-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(26,24,20,0.55);
+  z-index:2200;
+}
+
+.art-tutorial-highlight{
+  position:fixed;
+  border-radius:14px;
+  box-shadow:0 0 0 4px var(--indigo);
+  z-index:2201;
+  pointer-events:none;
+}
+
+body.dark .art-tutorial-highlight{
+  box-shadow:0 0 0 4px var(--indigo-soft);
+}
+
+.art-tutorial-popup{
+  position:fixed;
+  width:240px;
+  max-width:calc(100vw - 24px);
+  background:var(--card);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  z-index:2202;
+}
+
+body.dark .art-tutorial-popup{
+  background:#2c2823;
+  border:1px solid #46423b;
+}
+
+.art-tutorial-step{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:6px;
+}
+
+body.dark .art-tutorial-step{
+  color:#e8d2a8;
+}
+
+.art-tutorial-text{
+  font-size:12px;
+  line-height:1.6;
+  color:var(--text);
+  margin-bottom:12px;
+}
+
+body.dark .art-tutorial-text{
+  color:#ece4d4;
+}
+
+.art-tutorial-actions{
+  display:flex;
+  gap:8px;
+}
+
+.art-tutorial-actions button{
+  flex:1;
+  padding:8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  font-size:12px;
+  cursor:pointer;
+}
+
+.art-tutorial-skip{
+  background:var(--card-sub);
+  color:var(--text-sub);
+}
+
+.art-tutorial-next{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .art-tutorial-skip{
+  background:#383329;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-tutorial-next{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* ぬり方ガイド（バケツツール前提の効率的な塗り順を、音楽練習モードのような対話形式で案内する） */
+.art-guide-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2400;
+  background:var(--card);
+  display:flex;
+  flex-direction:column;
+}
+
+body.dark .art-guide-overlay{
+  background:#171512;
+}
+
+.art-guide-topbar{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+}
+
+.art-guide-progress-wrap{
+  flex:1;
+  min-width:0;
+}
+
+.art-guide-progress-label{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:4px;
+}
+
+body.dark .art-guide-progress-label{
+  color:#b3a89a;
+}
+
+.art-guide-progress-bar{
+  height:6px;
+  border-radius:999px;
+  background:var(--card-sub);
+  overflow:hidden;
+}
+
+body.dark .art-guide-progress-bar{
+  background:#383329;
+}
+
+.art-guide-progress-fill{
+  height:100%;
+  background:var(--indigo);
+  border-radius:999px;
+  transition:width 0.2s;
+}
+
+body.dark .art-guide-progress-fill{
+  background:var(--indigo-soft);
+}
+
+.art-guide-zoom-btn{
+  flex-shrink:0;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text-sub);
+  font-size:12px;
+  font-weight:700;
+  white-space:nowrap;
+  cursor:pointer;
+}
+
+body.dark .art-guide-zoom-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.art-guide-close-btn{
+  flex-shrink:0;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+body.dark .art-guide-close-btn{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+.art-guide-canvas-wrap{
+  flex:1;
+  min-height:0;
+  display:flex;
+  padding:8px;
+  /* 2本指ズームでキャンバスが表示枠より大きくなった時にスクロールできるようにする。
+     align-items/justify-content:centerは使わない（.art-canvas-areaと同じ理由で、
+     overflow時に一部の領域へスクロールで到達できなくなるため）。中央寄せは
+     下のcanvas側のmargin:autoで行う */
+  overflow:auto;
+  touch-action:none;
+}
+
+.art-guide-canvas-wrap canvas{
+  margin:auto;
+  border-radius:10px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.18);
+  image-rendering:pixelated;
+  touch-action:none;
+}
+
+.art-guide-instruction{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+}
+
+.art-guide-color-chip{
+  flex-shrink:0;
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  border:2px solid var(--border);
+}
+
+body.dark .art-guide-color-chip{
+  border-color:#46423b;
+}
+
+.art-guide-info{
+  flex:1;
+  min-width:0;
+}
+
+.art-guide-method-badges{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:4px;
+}
+
+.art-guide-method-badge{
+  display:inline-block;
+  font-size:12px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:999px;
+}
+
+.art-guide-method-badge.is-bucket{
+  background:rgba(90,158,74,0.2);
+  color:#3f7a33;
+}
+
+.art-guide-method-badge.is-tap{
+  background:rgba(43,131,193,0.18);
+  color:#2373a8;
+}
+
+body.dark .art-guide-method-badge.is-bucket{
+  background:rgba(90,158,74,0.28);
+  color:#a8dd9a;
+}
+
+body.dark .art-guide-method-badge.is-tap{
+  background:rgba(43,131,193,0.28);
+  color:#9ad0f0;
+}
+
+.art-guide-detail{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .art-guide-detail{
+  color:#ece4d4;
+}
+
+.art-guide-controls{
+  flex-shrink:0;
+  display:flex;
+  gap:10px;
+  padding:0 16px 16px;
+}
+
+.art-guide-nav-btn{
+  flex:1;
+  padding:12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.art-guide-nav-btn:disabled{
+  opacity:0.4;
+  cursor:default;
+}
+
+.art-guide-nav-btn-primary{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .art-guide-nav-btn{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+body.dark .art-guide-nav-btn-primary{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#2c2823;
+}
+
+.art-guide-estimate{
+  margin-top:4px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+body.dark .art-guide-estimate{
+  color:#b3a89a;
+}
+
+/* ブロック完了の軽い通知（フェードイン/アウトするだけの控えめな表示） */
+.art-guide-block-flash{
+  position:absolute;
+  top:14px;
+  left:50%;
+  transform:translateX(-50%) translateY(-8px);
+  z-index:2410;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 16px;
+  border-radius:999px;
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 4px 14px rgba(0,0,0,0.22);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.25s, transform 0.25s;
+}
+
+.art-guide-block-flash.is-visible{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+body.dark .art-guide-block-flash{
+  background:var(--indigo-soft);
+  color:#2c2823;
+}
+
+/* ぬり方ガイドの完了まとめ画面 */
+.art-guide-complete-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2500;
+  background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(4px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.art-guide-complete-box{
+  width:min(340px, 88vw);
+  max-height:85vh;
+  overflow-y:auto;
+  padding:26px 22px;
+  border-radius:20px;
+  background:var(--card);
+  text-align:center;
+}
+
+body.dark .art-guide-complete-box{
+  background:#211e19;
+}
+
+.art-guide-complete-icon{
+  display:flex;
+  justify-content:center;
+  color:var(--gold);
+  margin-bottom:6px;
+}
+
+.art-guide-complete-stats{
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  margin:16px 0 18px;
+}
+
+.art-guide-complete-stat-value{
+  font-size:22px;
+  font-weight:700;
+  color:var(--indigo);
+}
+
+body.dark .art-guide-complete-stat-value{
+  color:var(--indigo-soft);
+}
+
+.art-guide-complete-stat-label{
+  margin-top:2px;
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+body.dark .art-guide-complete-stat-label{
+  color:#b3a89a;
+}
+
+/* マイデザイン一覧の絞り込みチップ・進捗表示 */
+.art-mydesigns-storage-note{
+  margin:0 0 10px;
+  font-size:11px;
+  line-height:1.6;
+  color:var(--text-sub);
+}
+
+body.dark .art-mydesigns-storage-note{
+  color:#b3a89a;
+}
+
+.art-mydesigns-filters{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:10px;
+}
+
+.art-mydesigns-filter-chip{
+  padding:5px 12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text-sub);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.art-mydesigns-filter-chip.is-active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .art-mydesigns-filter-chip{
+  background:#2c2823;
+  border-color:#46423b;
+  color:#b3a89a;
+}
+
+body.dark .art-mydesigns-filter-chip.is-active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#2c2823;
+}
+
+.art-mydesign-progress-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:4px;
+}
+
+.art-mydesign-progress-bar{
+  flex:1;
+  height:5px;
+  border-radius:999px;
+  background:var(--border);
+  overflow:hidden;
+}
+
+.art-mydesign-progress-fill{
+  height:100%;
+  border-radius:999px;
+}
+
+.art-mydesign-progress-fill.is-notStarted{
+  background:transparent;
+}
+
+.art-mydesign-progress-fill.is-inProgress{
+  background:var(--indigo);
+}
+
+.art-mydesign-progress-fill.is-done{
+  background:#5a9e4a;
+}
+
+.art-mydesign-progress-label{
+  flex-shrink:0;
+  font-size:10px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+.art-mydesign-progress-label.is-done{
+  color:#3f7a33;
+}
+
+body.dark .art-mydesign-progress-bar{
+  background:#46423b;
+}
+
+body.dark .art-mydesign-progress-label{
+  color:#b3a89a;
+}
+
+body.dark .art-mydesign-progress-label.is-done{
+  color:#a8dd9a;
+}
+

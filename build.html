@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<meta name="robots" content="noindex, nofollow">
+<title>建築サポート｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）向けに、画像を3Dボクセルの建材配置図に変換して建築を支援するツールです。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | 建築サポート">
+<meta property="og:description" content="画像を3Dボクセルの建材配置図に変換して建築を支援します。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/build.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | 建築サポート">
+<meta name="twitter:description" content="画像を3Dボクセルの建材配置図に変換して建築を支援します。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/art.css?v=68">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./updates.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* 建築ページ専用（他ページには影響しない） */
+
+.build-size-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.build-size-row label{
+  font-size:12px;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.build-size-row input[type="number"],
+.build-size-row input[type="text"]{
+  width:64px;
+  padding:6px 8px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--card);
+  color:var(--text);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:13px;
+}
+
+body.dark .build-size-row input[type="number"],
+body.dark .build-size-row input[type="text"]{
+  background:#383329;
+  border-color:#46423b;
+  color:#ece4d4;
+}
+
+/* 建築モード（立体/平面）トグル */
+.build-mode-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:14px;
+}
+
+.build-mode-btn{
+  flex:1;
+  padding:12px 8px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  transition:0.15s;
+}
+
+.build-mode-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+body.dark .build-mode-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
+body.dark .build-mode-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
+
+/* 数値スライダー行（幅・厚さ） */
+.build-slider-field{
+  margin-bottom:14px;
+}
+
+.build-slider-field-label{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  font-size:12px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+.build-slider-field-label output{
+  font-weight:700;
+  color:var(--indigo);
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark .build-slider-field-label output{ color:#e8d2a8; }
+
+.build-slider-field input[type="range"]{
+  width:100%;
+  accent-color:var(--indigo);
+}
+
+/* 空洞化・背景自動透明化チェックボックス */
+.build-checkbox-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:12px;
+  color:var(--text-sub);
+  margin-bottom:10px;
+  cursor:pointer;
+}
+
+.build-checkbox-row input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  accent-color:var(--indigo);
+  cursor:pointer;
+}
+
+/* 背面画像（任意・立体モードのみ） */
+.build-back-image-row{
+  border-top:1px dashed var(--border);
+  padding-top:12px;
+  margin-top:4px;
+  margin-bottom:14px;
+}
+
+body.dark .build-back-image-row{ border-color:#46423b; }
+
+.build-back-upload-btn{
+  padding:8px 14px;
+  border:1px dashed var(--border);
+  border-radius:10px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  cursor:pointer;
+}
+
+body.dark .build-back-upload-btn{ background:#383329; border-color:#46423b; color:#b3a89a; }
+
+.build-back-preview{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:8px;
+}
+
+.build-back-preview img{
+  width:44px;
+  height:44px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+
+.build-back-preview button{
+  padding:5px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:11px;
+  cursor:pointer;
+}
+
+/* 3Dビューア */
+.build-stage-wrap{
+  margin:14px 0;
+}
+
+.build-stage{
+  position:relative;
+  width:100%;
+  aspect-ratio:4/3;
+  max-height:60vh;
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+}
+
+body.dark .build-stage{ background:#383329; border-color:#46423b; }
+
+.build-stage canvas{
+  display:block;
+  width:100%;
+  height:100%;
+  cursor:grab;
+  touch-action:none;
+}
+
+.build-stage canvas:active{ cursor:grabbing; }
+
+.build-stage-hint{
+  position:absolute;
+  bottom:8px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:10px;
+  color:var(--text-sub);
+  background:rgba(0,0,0,0.08);
+  padding:4px 10px;
+  border-radius:999px;
+  pointer-events:none;
+}
+
+body.dark .build-stage-hint{ color:#ece4d4; background:rgba(255,255,255,0.08); }
+
+#buildProceedBtn:disabled{
+  opacity:0.4;
+  cursor:default;
+}
+
+/* 編集ツールバー（ペン/消しゴム・パレット・Undo/Redo） */
+.build-edit-toolbar{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.build-guide-picker{
+  margin:-4px 0 10px;
+}
+
+.build-guide-all-btn{
+  width:100%;
+  justify-content:center;
+  margin-bottom:8px;
+}
+
+.build-guide-picker .art-step-hint{
+  margin:0 0 6px;
+}
+
+.build-tool-btn{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  padding:8px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.build-tool-btn.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+}
+
+.build-tool-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
+body.dark .build-tool-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
+body.dark .build-tool-btn.active{ background:var(--indigo-soft); border-color:var(--indigo-soft); color:#fdf9ef; }
+
+.build-progress-slider-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
+}
+
+.build-progress-slider-label{
+  font-size:11px;
+  color:var(--text-sub);
+  white-space:nowrap;
+}
+
+.build-progress-slider-row input[type="range"]{
+  flex:1;
+  accent-color:var(--indigo);
+}
+
+.build-progress-slider-row output{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  font-family:'Zen Maru Gothic', sans-serif;
+  min-width:44px;
+  text-align:right;
+}
+
+body.dark .build-progress-slider-row output{ color:#e8d2a8; }
+
+.build-progress-step-btn{
+  flex-shrink:0;
+  width:26px;
+  height:26px;
+  border:1px solid var(--border);
+  border-radius:50%;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+}
+
+.build-progress-step-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+
+body.dark .build-progress-step-btn{ background:#383329; color:#b3a89a; border-color:#46423b; }
+
+.build-toolbar-divider{
+  width:1px;
+  height:20px;
+  background:var(--border);
+  margin:0 2px;
+}
+
+body.dark .build-toolbar-divider{ background:#46423b; }
+
+.build-selected-swatch{
+  display:inline-block;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  border:1px solid rgba(0,0,0,0.2);
+}
+
+/* 建材パレットモーダル（ペンで使う建材を選ぶ） */
+.build-material-picker-box{
+  width:90%;
+  max-width:360px;
+  max-height:80vh;
+  overflow-y:auto;
+}
+
+.build-material-group-title{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin:14px 0 6px;
+}
+
+.build-material-swatches{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(34px, 1fr));
+  gap:6px;
+}
+
+.build-material-swatch{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:8px;
+  border:2px solid var(--border);
+  cursor:pointer;
+  padding:0;
+}
+
+.build-material-swatch.active{
+  border-color:var(--indigo);
+  box-shadow:0 0 0 2px var(--indigo) inset;
+}
+
+.build-library-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:10px;
+}
+
+.build-library-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px 12px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:12px;
+}
+
+body.dark .build-library-item{
+  background:#2c2823;
+  border-color:#46423b;
+}
+
+.build-library-item-name{
+  font-weight:700;
+  flex:1;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.build-library-item-actions{
+  display:flex;
+  gap:6px;
+}
+
+.build-library-item-actions button{
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border-radius:999px;
+  padding:5px 10px;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.build-io-row{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+
+/* 位置調整ステージの画像・グリッド線オーバーレイ
+   （css/art.cssの#artCropImg/#artCropOverlayと同じ役割。IDが異なるため
+   このページ側で個別に指定する必要がある） */
+#buildCropImg{
+  position:absolute;
+  top:0;
+  left:0;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+}
+
+#buildCropOverlay{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h1 data-i18n="build_page_title">建築サポート</h1>
+  <p class="page-subtitle" data-i18n="build_page_subtitle">画像を3Dボクセルの建材配置図に変換します</p>
+</div>
+
+<div class="art-notice" data-i18n="build_notice">
+  現在は試験公開中です。範囲選択での一括編集・施工ステージの自動再生・共有リンク機能は準備中です。
+</div>
+
+<div class="art-convert-progress" id="buildProgress">
+  <button type="button" class="art-convert-progress-step" data-stage="upload">
+    <span class="art-convert-progress-num">1</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_upload">画像</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="adjust">
+    <span class="art-convert-progress-num">2</span>
+    <span class="art-convert-progress-label" data-i18n="build_step_progress_adjust">調整</span>
+  </button>
+  <span class="art-convert-progress-line"></span>
+  <button type="button" class="art-convert-progress-step" data-stage="finish">
+    <span class="art-convert-progress-num">3</span>
+    <span class="art-convert-progress-label" data-i18n="art_step_progress_finish">仕上げ</span>
+  </button>
+</div>
+
+<div class="art-convert-layout">
+  <div class="art-convert-upload" id="buildUploadArea">
+    <div class="art-step-title"><span class="art-step-num">1/3</span><span data-i18n="art_choose_image">画像を選ぶ</span></div>
+    <input type="file" id="buildFileInput" accept="image/jpeg,image/png,image/webp" hidden>
+    <button class="art-upload-btn" id="buildUploadBtn">
+      <span id="buildUploadIcon"></span>
+      <span id="buildUploadBtnLabel" data-i18n="art_choose_image">画像を選ぶ</span>
+    </button>
+    <p class="art-upload-hint" data-i18n="art_upload_hint">JPG・PNG・WebPに対応</p>
+    <div class="build-back-preview" id="buildFrontPreviewWrap" style="display:none; justify-content:center;">
+      <img id="buildFrontPreviewImg" alt="">
+    </div>
+
+    <div class="art-panel-section" style="margin-top:18px;">
+      <div class="art-panel-title" data-i18n="build_mode_title">建築モード</div>
+      <div class="build-mode-row">
+        <button type="button" class="build-mode-btn active" data-mode="solid">
+          <span class="btn-icon" data-icon="build3dSolid"></span>
+          <span data-i18n="build_mode_solid">立体（像）</span>
+        </button>
+        <button type="button" class="build-mode-btn" data-mode="flat">
+          <span class="btn-icon" data-icon="build3dFlat"></span>
+          <span data-i18n="build_mode_flat">平面（床）</span>
+        </button>
+        <button type="button" class="build-mode-btn" data-mode="wall">
+          <span class="btn-icon" data-icon="build3dWall"></span>
+          <span data-i18n="build_mode_wall">低い壁（壁画）</span>
+        </button>
+      </div>
+
+      <div class="build-edit-toolbar" id="buildWallSizeBasisRow" style="display:none;">
+        <span class="build-progress-slider-label" data-i18n="build_wall_size_basis_label">サイズの基準</span>
+        <button type="button" class="build-tool-btn build-wall-basis-btn active" data-basis="width" data-i18n="build_wall_basis_width">幅</button>
+        <button type="button" class="build-tool-btn build-wall-basis-btn" data-basis="height" data-i18n="build_wall_basis_height">高さ</button>
+      </div>
+
+      <div class="build-slider-field" id="buildWidthRow">
+        <div class="build-slider-field-label">
+          <span data-i18n="build_width_label">幅サイズ</span>
+          <output id="buildWidthOutput">24マス</output>
+        </div>
+        <input type="range" id="buildWidthInput" min="4" max="96" value="24">
+      </div>
+
+      <div class="build-slider-field" id="buildWallHeightRow" style="display:none;">
+        <div class="build-slider-field-label">
+          <span data-i18n="build_wall_height_label">高さ（積む段数）</span>
+          <output id="buildWallHeightOutput">16マス</output>
+        </div>
+        <input type="range" id="buildWallHeightInput" min="2" max="16" value="16">
+      </div>
+
+      <p class="art-step-hint" id="buildWallAutoDimHint" style="display:none;"></p>
+
+      <div class="build-slider-field" id="buildThicknessRow">
+        <div class="build-slider-field-label">
+          <span id="buildThicknessLabel" data-i18n="build_thickness_label_solid">厚さ（奥行きの押し出し量）</span>
+          <output id="buildThicknessOutput">6マス</output>
+        </div>
+        <input type="range" id="buildThicknessInput" min="1" max="40" value="6">
+      </div>
+
+      <p class="art-step-hint" id="buildResolutionTip" data-i18n="build_resolution_tip">輪郭がはっきりした単色に近いイラストほど再現しやすく、細かい顔立ちや淡いグラデーションは省略されやすい点にご注意ください。</p>
+      <p class="art-step-hint" id="buildWallModeTip" style="display:none;" data-i18n="build_wall_mode_tip">低い壁を敷き詰めた壁画として配置します（実際の板目模様はゲーム内でこの建材のペイント機能から選んでください）。</p>
+
+      <label class="build-checkbox-row" id="buildHollowRow">
+        <input type="checkbox" id="buildHollowCheckbox" checked>
+        <span data-i18n="build_hollow_label">空洞化する（外から見えない内部を間引いて建材数を節約）</span>
+      </label>
+      <label class="build-checkbox-row">
+        <input type="checkbox" id="buildAutoTransparentCheckbox">
+        <span data-i18n="build_autotransparent_label">背景を自動で透明化する</span>
+      </label>
+      <label class="build-checkbox-row">
+        <input type="checkbox" id="buildLimitColorsCheckbox">
+        <span data-i18n="build_limit_colors_label">色数を絞る</span>
+      </label>
+      <div class="build-slider-field" id="buildColorCountRow" style="display:none;">
+        <div class="build-slider-field-label">
+          <span data-i18n="build_color_count_label">使用する色数</span>
+          <output id="buildColorCountOutput">16色</output>
+        </div>
+        <input type="range" id="buildColorCountInput" min="2" max="74" value="16">
+        <p class="art-step-hint" data-i18n="build_color_count_hint">よく使われている色から優先して残します。少ないほどシンプルな配色になり、建材の種類も減ります。</p>
+      </div>
+
+      <div class="build-back-image-row" id="buildBackImageRow">
+        <div class="art-panel-title" data-i18n="build_back_image_title">背面画像（任意）</div>
+        <p class="art-step-hint" data-i18n="build_back_image_hint">指定すると、立体の裏面に別の見た目を割り当てられます。指定がない場合、裏面は正面と同じ建材で塗りつぶされます。</p>
+        <input type="file" id="buildBackFileInput" accept="image/jpeg,image/png,image/webp" hidden>
+        <button type="button" class="build-back-upload-btn" id="buildBackUploadBtn" data-i18n="build_back_image_choose">背面画像を選ぶ</button>
+        <div class="build-back-preview" id="buildBackPreviewWrap" style="display:none;">
+          <img id="buildBackPreviewImg" alt="">
+          <button type="button" id="buildBackRemoveBtn" data-i18n="build_back_image_remove">削除</button>
+        </div>
+      </div>
+
+      <button type="button" class="art-header-btn" id="buildProceedBtn" style="width:100%; margin-top:6px;" disabled data-i18n="build_proceed_btn">この設定で位置調整へ進む</button>
+    </div>
+  </div>
+
+  <div class="art-crop-stage" id="buildCropStage" style="display:none;">
+    <div class="art-step-title"><span class="art-step-num">2/3</span><span data-i18n="build_crop_title">位置を調整</span></div>
+
+    <p class="art-crop-hint" data-i18n="art_crop_hint">ドラッグして位置を、スライダーで拡大縮小して切り抜き範囲を調整してください</p>
+    <div class="art-crop-viewport" id="buildCropViewport">
+      <img id="buildCropImg" alt="" draggable="false">
+      <canvas id="buildCropOverlay"></canvas>
+    </div>
+    <p class="art-crop-hint" data-i18n="build_crop_grid_hint">白い線は実際にマス目で区切られる位置の目安です</p>
+    <div class="art-crop-zoom-row">
+      <span class="art-crop-zoom-icon">－</span>
+      <input type="range" id="buildCropZoomSlider" min="10" max="300" value="100">
+      <span class="art-crop-zoom-icon">＋</span>
+    </div>
+    <div class="art-panel-btn-row art-crop-actions">
+      <button class="art-crop-reset-btn" id="buildCropResetBtn" data-i18n="art_crop_reset">位置をリセット</button>
+      <button class="art-header-btn" id="buildCropConfirmBtn" data-i18n="art_crop_confirm">この位置で決定して変換結果を確認する</button>
+    </div>
+  </div>
+
+  <div class="art-convert-preview" id="buildResultStage" style="display:none;">
+    <div class="art-step-title"><span class="art-step-num">3/3</span><span data-i18n="build_result_label">配置図</span></div>
+    <p class="art-step-hint" data-i18n="build_result_hint">ドラッグで回転、ホイール（2本指ピンチ）で拡大縮小できます</p>
+    <a class="art-back-link" href="javascript:void(0)" id="buildNewImageBtn">
+      <span id="buildNewImageIcon"></span>
+      <span data-i18n="build_new_image">新しい画像から作り直す</span>
+    </a>
+
+    <div class="build-edit-toolbar" id="buildEditToolbar">
+      <button type="button" class="build-tool-btn active" id="buildToolPenBtn" data-tool="pen">
+        <span class="btn-icon" data-icon="pen"></span>
+        <span data-i18n="build_tool_pen">ペン</span>
+      </button>
+      <button type="button" class="build-tool-btn" id="buildToolEraserBtn" data-tool="eraser">
+        <span class="btn-icon" data-icon="eraser"></span>
+        <span data-i18n="build_tool_eraser">消しゴム</span>
+      </button>
+      <button type="button" class="build-tool-btn" id="buildPaletteBtn">
+        <span class="build-selected-swatch" id="buildSelectedSwatch"></span>
+        <span data-i18n="build_tool_palette">建材を選ぶ</span>
+      </button>
+      <span class="build-toolbar-divider"></span>
+      <button type="button" class="build-tool-btn" id="buildUndoBtn" disabled>
+        <span class="btn-icon" data-icon="undo"></span>
+        <span data-i18n="build_tool_undo">元に戻す</span>
+      </button>
+      <button type="button" class="build-tool-btn" id="buildRedoBtn" disabled>
+        <span class="btn-icon" data-icon="redo"></span>
+        <span data-i18n="build_tool_redo">やり直す</span>
+      </button>
+    </div>
+
+    <div class="build-progress-slider-row">
+      <span class="build-progress-slider-label" data-i18n="build_progress_slider_label">施工ステージ</span>
+      <button type="button" class="build-progress-step-btn" id="buildProgressMinusBtn" aria-label="-1">－</button>
+      <input type="range" id="buildProgressSlider" min="1" max="1" value="1">
+      <button type="button" class="build-progress-step-btn" id="buildProgressPlusBtn" aria-label="+1">＋</button>
+      <output id="buildProgressOutput" data-i18n="build_progress_all">全て</output>
+    </div>
+    <p class="art-step-hint" id="buildProgressHint" style="display:none;" data-i18n="build_progress_edit_disabled_hint">施工ステージ表示中は編集できません。「全て」に戻すと編集を再開できます</p>
+
+    <div class="build-edit-toolbar" id="buildGuideRow" style="display:none;">
+      <span class="build-progress-slider-label" data-i18n="build_guide_label">配置ガイド</span>
+      <button type="button" class="build-tool-btn build-guide-size-btn active" data-size="0" data-i18n="build_guide_off">オフ</button>
+      <button type="button" class="build-tool-btn build-guide-size-btn" data-size="4">4×4</button>
+      <button type="button" class="build-tool-btn build-guide-size-btn" data-size="8">8×8</button>
+      <button type="button" class="build-tool-btn build-guide-size-btn" data-size="16">16×16</button>
+    </div>
+
+    <div class="build-guide-picker" id="buildGuidePickerWrap" style="display:none;">
+      <button type="button" class="art-header-btn build-guide-all-btn" id="buildGuideAllBtn" data-i18n="build_guide_all_btn">効率のいい置き方を見る</button>
+      <p class="art-step-hint" data-i18n="build_guide_picker_hint">ブロックを1つだけ選んで、そのマスに何を置くか確認することもできます</p>
+      <div class="art-block-list" id="buildBlockList"></div>
+    </div>
+
+    <div class="build-stage-wrap">
+      <div class="build-stage">
+        <canvas id="buildCanvas"></canvas>
+        <div class="build-stage-hint" id="buildStageHint" data-i18n="build_stage_hint">ドラッグ：回転 / ホイール：ズーム / タップ：ペンで追加・消しゴムで削除</div>
+      </div>
+    </div>
+
+    <div class="art-convert-result-info" id="buildMaterialListWrap">
+      <div class="art-result-stats">
+        <div class="art-result-stat">
+          <span class="art-result-stat-label" data-i18n="build_used_materials_label">使用建材数</span>
+          <span class="art-result-stat-value" id="buildMaterialCount">0</span>
+        </div>
+        <div class="art-result-stat">
+          <span class="art-result-stat-label" data-i18n="art_used_cells_label">使用マス数</span>
+          <span class="art-result-stat-value" id="buildCellCount">0</span>
+        </div>
+        <div class="art-result-stat">
+          <span class="art-result-stat-label" id="buildPillarCountLabel" data-i18n="build_pillar_count_label">必要な支柱の本数</span>
+          <span class="art-result-stat-value" id="buildPillarCount">0</span>
+        </div>
+      </div>
+      <details class="art-result-color-list" open>
+        <summary data-i18n="build_material_list_label">必要な建材一覧</summary>
+        <div class="art-result-color-rows" id="buildMaterialRows"></div>
+      </details>
+    </div>
+
+    <div class="art-panel-btn-row art-preview-actions">
+      <button class="art-crop-reset-btn" id="buildAdjustBtn" data-i18n="build_adjust_btn">位置を調整する</button>
+    </div>
+
+    <div class="art-panel-section" style="margin-top:16px;">
+      <div class="art-panel-title" data-i18n="build_save_label">設計図の保存</div>
+      <div class="build-size-row">
+        <input type="text" id="buildDesignNameInput" placeholder="設計図の名前" data-i18n-placeholder="build_design_name_placeholder" style="flex:1; padding:8px 10px; border:1px solid var(--border); border-radius:8px; background:var(--card); color:var(--text); font-family:'Zen Maru Gothic', sans-serif; font-size:13px;">
+        <button class="art-header-btn" id="buildSaveDesignBtn" data-i18n="build_save_btn">保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="art-panel" id="buildLibraryPanel">
+    <div class="art-panel-title" data-i18n="build_library_label">保存した設計図</div>
+    <div class="build-library-list" id="buildLibraryList"></div>
+    <div class="build-io-row">
+      <button class="art-crop-reset-btn" id="buildExportBtn" data-i18n="build_export_btn">書き出し（JSON）</button>
+      <button class="art-crop-reset-btn" id="buildImportBtn" data-i18n="build_import_btn">読み込み（JSON）</button>
+      <input type="file" id="buildImportInput" accept="application/json" hidden>
+    </div>
+  </div>
+</div>
+
+<div class="art-guide-overlay" id="buildGuideOverlay" style="display:none;">
+  <div class="art-guide-block-flash" id="buildGuideBlockFlash">
+    <span class="btn-icon" data-icon="check"></span>
+    <span id="buildGuideBlockFlashText"></span>
+  </div>
+  <div class="art-guide-topbar">
+    <div class="art-guide-progress-wrap">
+      <div class="art-guide-progress-label" id="buildGuideProgressLabel"></div>
+      <div class="art-guide-progress-bar"><div class="art-guide-progress-fill" id="buildGuideProgressFill"></div></div>
+    </div>
+    <button type="button" class="art-guide-close-btn" id="buildGuideCloseBtn" aria-label="close">
+      <span class="btn-icon" data-icon="close"></span>
+    </button>
+  </div>
+  <div class="art-guide-canvas-wrap">
+    <canvas id="buildGuideCanvas"></canvas>
+  </div>
+  <div class="art-guide-instruction">
+    <div class="art-guide-color-chip" id="buildGuideColorChip"></div>
+    <div class="art-guide-info">
+      <div class="art-guide-method-badges" id="buildGuideMethodBadges"></div>
+      <div class="art-guide-detail" id="buildGuideDetail"></div>
+    </div>
+  </div>
+  <div class="art-guide-controls">
+    <button type="button" class="art-guide-nav-btn" id="buildGuidePrevBtn" data-i18n="build_guide_prev">戻る</button>
+    <button type="button" class="art-guide-nav-btn art-guide-nav-btn-primary" id="buildGuideNextBtn" data-i18n="build_guide_next">次へ</button>
+  </div>
+</div>
+
+<div id="buildMaterialPickerModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box build-material-picker-box">
+    <h3 style="text-align:center;" data-i18n="build_picker_title">使う建材を選ぶ</h3>
+    <div id="buildMaterialPickerBody"></div>
+    <button class="modal-close-btn" id="buildMaterialPickerCloseBtn" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-help-box">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="build_help_title">使い方</h3>
+
+    <p><strong data-i18n="build_help_1_title">① 画像を選ぶ・建築モードを決める</strong>
+    <span data-i18n="build_help_1_body">画像をアップロードし、「立体（像）」か「平面（床）」かを選びます。幅サイズ・厚さ、空洞化、背景の自動透明化、色数を絞るオプションもここで指定します。立体モードでは背面画像も指定できます（任意）。実際の支柱建材は幅・奥行きの2倍の高さがあるため、立体モードの高さは自動的に補正され、3Dプレビューも実際に建てたときと同じ縦横比で表示されます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_2_title">② 位置を調整</strong>
+    <span data-i18n="build_help_2_body">ドラッグして位置を、スライダーで拡大縮小して正面画像の切り抜き範囲を決めます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_3_title">③ 3D配置図・建材一覧</strong>
+    <span data-i18n="build_help_3_body">色ごとに最も近い建材（柱状の「支柱系」建材）が自動で割り当てられ、その場でドラッグ回転・ズームして確認できます。必要な建材の種類・支柱の本数は一覧で確認できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_edit_title">④ 手動で編集する</strong>
+    <span data-i18n="build_help_edit_body">「ペン」を選んで面をタップすると、その面に接する形で選択中の建材を1つ追加できます。「消しゴム」を選んでタップすると、そのブロック（1マス分の建材）を削除できます。「建材を選ぶ」でペンに使う建材を切り替えられます。「元に戻す」「やり直す」で編集を取り消し・再実行できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_progress_title">⑤ 施工ステージを確認する</strong>
+    <span data-i18n="build_help_progress_body">「施工ステージ」のスライダーを動かすと、下から何段目まで積み上げた状態かを確認できます。「全て」以外を選んでいる間は編集できません。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="build_help_4_title">⑥ 保存・書き出し</strong>
+    <span data-i18n="build_help_4_body">設計図に名前を付けて保存すると、下の「保存した設計図」からいつでも呼び出せます。JSON形式で書き出し・読み込みもできます（他の端末への引き継ぎや、バックアップにご利用ください）。</span></p>
+
+    <p style="margin-top:10px; font-size:11px; color:var(--text-sub);" data-i18n="build_help_note_wip">※ 範囲選択での一括編集・施工ステージの自動再生・共有リンク機能は現在準備中です。</p>
+
+    <button class="modal-close-btn" id="buildTutorialReplayBtn" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
+<script>
+
+document.getElementById("buildUploadIcon").innerHTML = icon("upload", { size: 18 });
+document.getElementById("buildNewImageIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("helpBtn").innerHTML = icon("help");
+document.querySelectorAll(".btn-icon[data-icon]").forEach(el => {
+  el.innerHTML = icon(el.dataset.icon, { size: 15 });
+});
+
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+  document.dispatchEvent(new Event("darkmodechange"));
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+
+</script>
+<script src="js/data-materials.js"></script>
+<script src="js/art-pixelate.js"></script>
+<script type="module" src="js/build.js?v=30"></script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

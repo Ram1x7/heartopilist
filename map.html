@@ -1,0 +1,2017 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<meta name="robots" content="noindex, nofollow">
+<title>マップ｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）のワールドマップ。地名・NPC・ショップ・出現場所を確認できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | マップ">
+<meta property="og:description" content="Heartopiaのワールドマップ。地名・NPC・ショップ・出現場所を確認できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/map.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | マップ">
+<meta name="twitter:description" content="Heartopiaのワールドマップ。地名・NPC・ショップ・出現場所を確認できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./faq.html">
+<link rel="prefetch" href="./updates.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* map.html 専用CSS（共通の見た目はcss/style.cssを参照） */
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{ min-height:100vh; }
+
+/* ?embed=1（図鑑ページの埋め込みモーダル用iframe）では、サイト共通の
+   ヘッダー・ナビ・フッターを隠し、マップ本体だけを表示する。
+   限られた高さを最大限マップ表示に使えるようにする */
+body.embed-mode .title-bar,
+body.embed-mode .site-nav,
+body.embed-mode .page-header,
+body.embed-mode .footer{
+  display:none;
+}
+body.embed-mode{ padding:8px; }
+
+.page-header{ margin-bottom:14px; }
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{ color:var(--dark-accent); }
+
+.page-header p{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
+
+body.dark .page-header p{ color:var(--dark-text-sub); }
+
+/* カテゴリタブ */
+.map-cat-tabs{
+  display:flex;
+  gap:6px;
+  margin:12px 0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  touch-action:pan-x pan-y;
+}
+
+.map-cat-tabs::-webkit-scrollbar{ display:none; }
+
+/* マップビューポート */
+.map-viewport{
+  position:relative;
+  width:100%;
+  height:min(70vh, 560px);
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:#7fa8c9;
+  touch-action:none;
+  cursor:grab;
+}
+
+.map-viewport.dragging{ cursor:grabbing; }
+
+body.dark .map-viewport{ border-color:var(--dark-border); }
+
+.map-stage{
+  position:absolute;
+  top:0;
+  left:0;
+  transform-origin:0 0;
+  will-change:transform;
+}
+
+.map-stage img{
+  display:block;
+  max-width:none;
+  pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+#mapAreasLayer{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  overflow:visible;
+}
+
+/* エリアは常時タップ可能だが、選択されるまで見た目には出さない（形だけの透明なタップ領域） */
+.map-area-shape{
+  fill:transparent;
+  stroke:none;
+  vector-effect:non-scaling-stroke;
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+/* タップして選択中のエリア：赤枠＋斜線塗り */
+.map-area-shape.selected{
+  fill:url(#mapAreaHatch);
+  fill-opacity:0.65;
+  stroke:var(--vermillion);
+  stroke-width:0.5;
+}
+
+/* 大エリア（4件）：小エリアの単純集約による近似形状のため、選択時は点線で区別する */
+.map-area-shape.selected.approx{
+  stroke-dasharray:1.2,0.8;
+}
+
+body.dark .map-area-shape.selected{ stroke:var(--dark-highlight); }
+
+/* 実際のゲームと同様、縮小表示している時だけ大エリアの範囲を見せる */
+.map-viewport.show-bigarea .map-area-shape.approx:not(.selected){
+  fill:#c1955a;
+  fill-opacity:0.16;
+  stroke:#a97c3f;
+  stroke-width:0.2;
+  stroke-dasharray:1.2,0.8;
+}
+
+/* 縮小表示時は、重なっている小エリアをタップ対象から外し、
+   下にある大エリア側がタップされるようにする（ホームなど大エリア／小エリアの
+   区別が無いエリアは keep-tappable クラスで対象外にし、常にタップ可能にする） */
+.map-viewport.show-bigarea .map-area-shape:not(.approx):not(.keep-tappable){
+  pointer-events:none;
+}
+
+/* 大エリア（概略・粗い形状）は、単純集約のため小エリア間の隙間（道路など、
+   本来どのエリアにも属さない場所）まで大きくカバーしてしまっている。
+   拡大表示時にまでこれをタップ対象にしてしまうと、小エリアに属さない
+   何でもない場所をタップした時にも大エリアが選択され「ランダムにエリアが
+   選ばれる」ように見えてしまうため、大エリアは縮小表示時のみタップ可能にする
+   （ホームは例外的に常時タップ可能のため keep-tappable を優先する） */
+.map-area-shape.approx{ pointer-events:none; }
+.map-area-shape.approx.keep-tappable{ pointer-events:auto; }
+.map-viewport.show-bigarea .map-area-shape.approx{ pointer-events:auto; }
+
+.map-area-hatch-line{
+  stroke:var(--vermillion);
+  stroke-width:0.5;
+}
+
+body.dark .map-area-hatch-line{ stroke:var(--dark-highlight); }
+
+/* ピン・地名ラベルは.map-stage（パン・ズームのCSS transformがかかる）の外側に
+   独立したレイヤーとして配置し、位置はJS側でtx/ty/scaleから計算したピクセル値を
+   直接指定する。以前は.map-stage内に置いて逆数スケール（--pin-scale）で見た目の
+   拡大を打ち消す方式だったが、ズーム用のCSS transformとの二重変換がブラウザの
+   合成処理で文字の再描画を伴い、拡大時に文字がボヤけて見える問題があったため */
+#mapPinsLayer{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  pointer-events:none;
+}
+
+.map-pin{
+  position:absolute;
+  transform:translate(-50%,-100%);
+  transform-origin:50% 100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:pointer;
+  pointer-events:auto;
+}
+
+/* NPC・ショップ・イベント：白枠の丸バッジ */
+.map-pin-dot{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid #fff;
+  box-shadow:0 2px 6px rgba(0,0,0,0.35);
+}
+
+.map-pin-dot span{
+  font-size:12px;
+  line-height:1;
+}
+
+.map-pin.cat-npc .map-pin-dot{ background:var(--gold); }
+.map-pin.cat-shop .map-pin-dot{ background:#4a8c5f; }
+.map-pin.cat-event .map-pin-dot{ background:#c15a7a; }
+
+/* 実画像がある場合は、画像自体が完成されたバッジ（丸縁取り済み）のため、
+   絵文字用の色付き丸背景は付けずそのまま表示する */
+.map-pin.has-img .map-pin-dot{
+  background:none;
+  border:none;
+  box-shadow:none;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,0.45));
+}
+.map-pin-dot img{
+  width:32px;
+  height:32px;
+  object-fit:contain;
+  display:block;
+}
+
+/* バス停・動物：バッジ無しでアイコンだけを大きめに表示 */
+.map-pin.cat-busstop .map-pin-dot,
+.map-pin.cat-animal .map-pin-dot{
+  width:auto;
+  height:auto;
+  background:none;
+  border:none;
+  box-shadow:none;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.55));
+}
+
+.map-pin.cat-busstop .map-pin-dot span,
+.map-pin.cat-animal .map-pin-dot span{
+  font-size:20px;
+}
+
+/* 地名：アイコン無し、白文字＋縁取りのみ（元サイトと同じ表示）。
+   タップ対象にはせず、下にあるエリアのタップを妨げないようにする */
+.map-pin.cat-landmark{
+  pointer-events:none;
+  padding:3px 4px;
+}
+
+.map-pin.cat-landmark .map-pin-label{
+  font-size:11px;
+  font-weight:700;
+  color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,0.7), 0 0 5px rgba(0,0,0,0.45);
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+/* 対応する小エリアが無い広域ゾーン名（森林・花畑・温泉山・漁村）は、
+   大エリアの形と同じく縮小表示時のみ表示し、他の地名と紛らわしくならないようにする。
+   また、これらは対応する大エリアのポリゴン範囲とラベル位置が完全には重ならない
+   ことがあるため、ラベル自体もタップ対象にして大エリアの範囲が確実に表示されるようにする */
+.map-pin.cat-landmark.bigarea-only{ display:none; pointer-events:auto; cursor:pointer; }
+.map-pin.cat-landmark.bigarea-only .map-pin-label{ pointer-events:auto; }
+.map-viewport.show-bigarea .map-pin.cat-landmark.bigarea-only{ display:flex; }
+
+/* 実際のゲームと同様、縮小表示時は大エリアの範囲・名前だけを見せ、
+   それ以外の地名ラベルは隠す（NPC・ショップ・動物・バス停・イベントのピンは表示したまま。
+   海・川・湖の地名とホームは位置把握に役立つため引き続き表示する） */
+.map-viewport.show-bigarea .map-pin.cat-landmark:not(.bigarea-only):not(.water):not(.keep-visible){ display:none; }
+
+/* ズームボタン */
+.map-zoom-controls{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  z-index:5;
+}
+
+.map-zoom-btn{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text);
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+}
+
+body.dark .map-zoom-btn{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-text);
+}
+
+/* タップしたピンの情報カード */
+.map-info-card{
+  margin-top:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px 16px;
+  display:none;
+  align-items:center;
+  gap:10px;
+}
+
+.map-info-card.show{ display:flex; }
+
+body.dark .map-info-card{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.map-info-card-body{
+  flex:1;
+  min-width:0;
+}
+
+.map-info-card-name{
+  font-size:14px;
+  font-weight:700;
+  color:var(--text);
+}
+
+body.dark .map-info-card-name{ color:var(--dark-text); }
+
+.map-info-card-cat{
+  font-size:10.5px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--text-sub);
+  margin-bottom:2px;
+}
+
+body.dark .map-info-card-cat{ color:var(--dark-text-sub); }
+
+/* エリアのカテゴリ表示（「エリア」「大エリア」）は元サイトの「MAP AREA」ラベルに合わせて色を付ける */
+.map-info-card-cat.is-area{ color:var(--vermillion); }
+
+.map-info-card-action{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  background:var(--indigo);
+  color:#fff;
+  border:none;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+body.dark .map-info-card-action{ background:var(--indigo-soft); }
+
+/* エリアをここで拡大表示するボタン（アイコンのみ、控えめな見た目） */
+.map-info-card-zoom{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border:1px solid var(--border);
+  border-radius:50%;
+  background:transparent;
+  color:var(--text-sub);
+  cursor:pointer;
+  padding:0;
+}
+
+body.dark .map-info-card-zoom{ border-color:var(--dark-border); color:var(--dark-text-sub); }
+
+.map-info-card-close{
+  flex-shrink:0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:28px;
+  height:28px;
+  border:none;
+  border-radius:50%;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  padding:0;
+}
+
+body.dark .map-info-card-close{ background:var(--dark-card-alt); color:var(--dark-text-sub); }
+
+/* エリア詳細モーダル（元サイトの「View location」先のページを参考にした簡易版） */
+.area-detail-cat{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--vermillion);
+  margin-bottom:4px;
+}
+
+.area-detail-name{
+  margin:0 0 14px;
+  font-size:20px;
+}
+
+.area-detail-zoom-btn{
+  display:inline-flex !important;
+  flex:none !important;
+  width:100% !important;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin-bottom:18px;
+}
+
+.area-detail-section-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:10px;
+}
+
+body.dark .area-detail-section-title{ color:var(--dark-text-sub); }
+
+/* 現在のリアルタイム図鑑の判定基準（天気・時間帯）の表示 */
+.area-detail-now-context{
+  font-size:11.5px;
+  color:var(--text-sub);
+  background:var(--card-sub);
+  border-radius:10px;
+  padding:6px 10px;
+  margin-bottom:14px;
+  display:inline-block;
+}
+
+body.dark .area-detail-now-context{ background:var(--dark-card-alt); color:var(--dark-text-sub); }
+
+/* 「今出現中」「今は出現していない」の見出し */
+.area-detail-availability-title{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:12.5px;
+  font-weight:700;
+  margin:14px 0 8px;
+}
+
+.area-detail-availability-title:first-of-type{ margin-top:0; }
+
+.area-detail-availability-title.is-now{ color:#4a8c5f; }
+.area-detail-availability-title.is-not-now{ color:var(--text-sub); }
+
+body.dark .area-detail-availability-title.is-not-now{ color:var(--dark-text-sub); }
+
+/* 今出現していないものは控えめな見た目にする */
+.area-detail-notnow{ opacity:0.55; }
+
+.area-detail-empty{
+  background:var(--card-sub);
+  border-radius:14px;
+  padding:20px 14px;
+  text-align:center;
+  font-size:13px;
+  color:var(--text-sub);
+}
+
+body.dark .area-detail-empty{ background:var(--dark-card-alt); color:var(--dark-text-sub); }
+
+.area-detail-group{ margin-bottom:14px; }
+.area-detail-group:last-child{ margin-bottom:0; }
+
+.area-detail-group-title{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+body.dark .area-detail-group-title{ color:var(--dark-text-sub); }
+
+.area-detail-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:7px 0;
+  border-top:1px solid var(--border);
+}
+
+.area-detail-group-title + .area-detail-row{ border-top:none; }
+
+body.dark .area-detail-row{ border-color:var(--dark-border); }
+
+.area-detail-row img{
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  object-fit:cover;
+  background:var(--card-sub);
+  flex-shrink:0;
+}
+
+body.dark .area-detail-row img{ background:var(--dark-card-alt); }
+
+.area-detail-row-name{
+  flex:1;
+  min-width:0;
+  font-size:13px;
+  color:var(--text);
+}
+
+body.dark .area-detail-row-name{ color:var(--dark-text); }
+
+.area-detail-row-level{
+  flex-shrink:0;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+}
+
+body.dark .area-detail-row-level{ color:var(--dark-text-sub); }
+
+/* 座標登録ツール（?edit=1 でのみ表示） */
+.map-edit-panel{
+  display:none;
+  margin-top:10px;
+  background:var(--card);
+  border:1px solid var(--gold);
+  border-radius:16px;
+  padding:14px 16px;
+  font-size:12px;
+  color:var(--text);
+}
+
+.map-edit-panel.show{ display:block; }
+
+body.dark .map-edit-panel{
+  background:var(--dark-card);
+  color:var(--dark-text);
+}
+
+.map-edit-panel select, .map-edit-panel textarea{
+  width:100%;
+  margin-top:8px;
+  padding:8px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text);
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+body.dark .map-edit-panel select, body.dark .map-edit-panel textarea{
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text);
+}
+
+.map-edit-panel textarea{ height:180px; resize:vertical; font-family:monospace; font-size:10.5px; }
+
+.map-edit-coord{
+  font-weight:700;
+  margin-top:8px;
+}
+
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+body.dark .footer{ color:var(--dark-text-sub); }
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item active" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h2 data-i18n="map_page_title">マップ</h2>
+  <p data-i18n="map_page_subtitle">ドラッグで移動・ピンチ／ホイールで拡大縮小できます</p>
+</div>
+
+<div class="scroll-hint-wrap">
+<div class="map-cat-tabs">
+  <button class="ds-tab active" id="mapcat-npc" onclick="toggleMapCat('npc')" data-i18n="map_cat_npc">NPC</button>
+  <button class="ds-tab active" id="mapcat-shop" onclick="toggleMapCat('shop')" data-i18n="map_cat_shop">ショップ</button>
+  <button class="ds-tab active" id="mapcat-busstop" onclick="toggleMapCat('busstop')" data-i18n="map_cat_busstop">バス停</button>
+  <button class="ds-tab active" id="mapcat-animal" onclick="toggleMapCat('animal')" data-i18n="map_cat_animal">動物</button>
+  <button class="ds-tab active" id="mapcat-event" onclick="toggleMapCat('event')" data-i18n="map_cat_event">イベント</button>
+</div>
+</div>
+
+<div class="map-viewport" id="mapViewport">
+  <div class="map-stage" id="mapStage">
+    <img id="mapImg" src="" alt="Heartopia map">
+    <svg id="mapAreasLayer" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <defs>
+        <pattern id="mapAreaHatch" width="1.4" height="1.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line class="map-area-hatch-line" x1="0" y1="0" x2="0" y2="1.4"></line>
+        </pattern>
+      </defs>
+      <g id="mapAreasGroup"></g>
+    </svg>
+  </div>
+  <div id="mapPinsLayer"></div>
+  <div class="map-zoom-controls">
+    <button class="map-zoom-btn" onclick="mapZoomStep(1.3)" aria-label="zoom in">＋</button>
+    <button class="map-zoom-btn" onclick="mapZoomStep(1/1.3)" aria-label="zoom out">－</button>
+  </div>
+</div>
+
+<div class="map-info-card" id="mapInfoCard">
+  <div class="map-info-card-body">
+    <div class="map-info-card-cat" id="mapInfoCat"></div>
+    <div class="map-info-card-name" id="mapInfoName"></div>
+  </div>
+  <button class="map-info-card-zoom" id="mapInfoZoom" style="display:none;" aria-label="zoom"></button>
+  <button class="map-info-card-action" id="mapInfoAction" style="display:none;"></button>
+  <button class="map-info-card-close" id="mapInfoClose" aria-label="close"></button>
+</div>
+
+<div id="areaDetailModal" onclick="if(event.target.id==='areaDetailModal') closeAreaDetailModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:380px; margin:40px auto; padding:20px; border-radius:28px; max-height:85vh; overflow-y:auto; text-align:left;">
+    <div class="area-detail-cat" id="areaDetailCat"></div>
+    <h3 class="area-detail-name" id="areaDetailName"></h3>
+    <button class="modal-close-btn area-detail-zoom-btn" id="areaDetailZoomBtn"></button>
+    <div class="area-detail-section-title" data-i18n="map_detail_found_here">ここで見つかる生き物</div>
+    <div class="area-detail-now-context" id="areaDetailNowContext"></div>
+    <div id="areaDetailList"></div>
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeAreaDetailModal()" data-i18n="map_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="map-edit-panel" id="mapEditPanel">
+  <strong>座標登録ツール（?edit=1 でのみ表示）</strong>
+  <p style="margin-top:6px;">生き物の出現場所（location文字列）を選んでからマップをタップすると、その座標がここに表示されます。全部選び終わったら下のテキストをコピーして送ってください。</p>
+  <select id="mapEditLocationSelect"></select>
+  <div class="map-edit-coord" id="mapEditCoord"></div>
+  <textarea id="mapEditOutput" readonly></textarea>
+
+  <hr style="margin:14px 0; border:none; border-top:1px solid var(--border);">
+
+  <strong>既存ピンの位置修正</strong>
+  <p style="margin-top:6px;">位置がズレているNPC・バス停・ショップ・動物・イベントを選んでから、正しい位置をマップでタップしてください。修正結果が下に追記されます。</p>
+  <select id="mapEditFixSelect"></select>
+  <div class="map-edit-coord" id="mapEditFixCoord"></div>
+  <textarea id="mapEditFixOutput" readonly></textarea>
+</div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="map_help_title">マップの使い方</h3>
+
+    <p><strong data-i18n="map_help_move_title">移動・拡大縮小</strong>
+    <span data-i18n="map_help_move_body">ドラッグでマップを動かせます。拡大・縮小は、2本指でのピンチ操作、マウスのホイール、右下の拡大・縮小ボタンのいずれかで行えます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="map_help_cat_title">カテゴリで絞り込み</strong>
+    <span data-i18n="map_help_cat_body">キャラクター（NPC）・ショップ・バス停・動物・イベントの表示・非表示を切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="map_help_pin_title">ピンをタップ</strong>
+    <span data-i18n="map_help_pin_body">ピンやエリアをタップすると、その名前が下に表示されます。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(MAP_TUTORIAL_DONE_KEY, MAP_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="map_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/data-map.js"></script>
+<script src="js/data-map-locations.js"></script>
+<script src="js/data-map-areas.js"></script>
+<script src="js/data-fish.js"></script>
+<script src="js/data-bugs.js"></script>
+<script src="js/data-birds.js"></script>
+<script src="js/weather-master.js"></script>
+<script src="js/data-weather.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// ── 初回チュートリアル ──
+const MAP_TUTORIAL_DONE_KEY = "hatopiMap_tutorialDone";
+const MAP_TUTORIAL_STEPS = [
+  { selector: "#mapViewport", titleKey: "tutorial_map_step1_title", titleFallback: "① 移動・拡大縮小", textKey: "tutorial_map_step1_body", textFallback: "ドラッグでマップを動かせます。拡大・縮小は、2本指でのピンチ操作、マウスのホイール、右下の拡大・縮小ボタンのいずれかで行えます。" },
+  { selector: ".map-cat-tabs", titleKey: "tutorial_map_step2_title", titleFallback: "② カテゴリで絞り込み", textKey: "tutorial_map_step2_body", textFallback: "キャラクター（NPC）・ショップ・バス停・動物・イベントの表示・非表示を切り替えられます。" },
+  { selector: "#mapPinsLayer", titleKey: "tutorial_map_step3_title", titleFallback: "③ ピンをタップ", textKey: "tutorial_map_step3_body", textFallback: "地図上のピンやエリアをタップすると、その名前が下に表示されます。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){ document.getElementById("helpModal").style.display = "block"; }
+function closeHelpModal(){ document.getElementById("helpModal").style.display = "none"; }
+
+// 多言語ヘルパー
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+function displayName(obj){
+  if(!obj.nameI18n) return obj.name;
+  const lang = currentLang();
+  return obj.nameI18n[lang] || obj.name;
+}
+
+// ── カテゴリ表示状態 ──
+let activeCats = new Set(["npc","shop","busstop","animal","event"]);
+
+function toggleMapCat(cat){
+  if(activeCats.has(cat)) activeCats.delete(cat); else activeCats.add(cat);
+  document.getElementById("mapcat-"+cat).classList.toggle("active", activeCats.has(cat));
+  renderPins();
+}
+
+// ── ピン一覧の組み立て ──
+// ショップ・動物は種類ごとに見た目で区別できるよう、個別の絵文字を割り当てる
+// （実画像が無いキーのみ、ここでのフォールバック絵文字が使われる）
+const SHOP_ICONS = {
+  "clothes-store": "👕",
+  "furniture-store": "🛋️",
+  "pets-store": "🐾",
+  "books-store": "📚",
+};
+const ANIMAL_ICONS = {
+  "panda": "🐼",
+  "capybara": "🦫",
+  "bunny": "🐰",
+  "fox": "🦊",
+  "sea-otter": "🦦",
+  "ferret": "🦡",
+  "silka-deer": "🦌",
+  "llama": "🦙",
+};
+
+// ゲーム内画像が入手できたキーのみ実画像を使用し、それ以外は上記の絵文字にフォールバックする
+const NPC_IMAGES = {
+  "azure": "images/map/npc/azure.png",
+  "mrs-joan": "images/map/npc/mrs-joan.png",
+  "vernie": "images/map/npc/vernie.png",
+  "patty": "images/map/npc/patty.png",
+  "blanc": "images/map/npc/blanc.png",
+  "will": "images/map/npc/will.png",
+  "atara": "images/map/npc/atara.png",
+  "massimo": "images/map/npc/massimo.png",
+  "naniwa": "images/map/npc/naniwa.png",
+  "eric": "images/map/npc/eric.png",
+  "bob": "images/map/npc/bob.png",
+  "annie": "images/map/npc/annie.png",
+  "collector": "images/map/npc/collector.png",
+  "bailey-j": "images/map/npc/bailey-j.png",
+  "andrew": "images/map/npc/andrew.png",
+  "dorothee": "images/map/npc/dorothee.png",
+  "ka-ching": "images/map/npc/ka-ching.png",
+  "albart": "images/map/npc/albart.png",
+  "doris": "images/map/npc/doris.webp",
+  "vanya": "images/map/npc/vanya.png",
+  "bill": "images/map/npc/bill.webp",
+  "shonen": "images/map/npc/shonen.png",
+};
+const SHOP_IMAGES = {
+  "clothes-store": "images/map/shops/clothes-store.png",
+  "furniture-store": "images/map/shops/furniture-store.png",
+  "pets-store": "images/map/shops/pets-store.png",
+  "books-store": "images/map/shops/books-store.png",
+};
+const ANIMAL_IMAGES = {
+  "panda": "images/map/animals/panda.webp",
+  "sea-otter": "images/map/animals/sea-otter.webp",
+  "llama": "images/map/animals/llama.webp",
+  "fox": "images/map/animals/fox.webp",
+  "silka-deer": "images/map/animals/silka-deer.webp",
+  "capybara": "images/map/animals/capybara.webp",
+  "ferret": "images/map/animals/ferret.webp",
+  "bunny": "images/map/animals/bunny.webp",
+};
+const EVENT_IMAGES = {
+  "sea-fishing": "images/map/events/sea-fishing.webp",
+  "bait-the-insects": "images/map/events/bait-the-insects.webp",
+  "nest-of-hundreds": "images/map/events/nest-of-hundreds.png",
+  "bubble-machine-challenge": "images/map/events/bubble-machine-challenge.webp",
+  "yellow-duck-jump-puzzle": "images/map/events/yellow-duck-jump-puzzle.webp",
+  "hot-air-balloon": "images/map/events/hot-air-balloon.png",
+};
+const BUSSTOP_IMAGE = "images/map/bus-stop.webp";
+
+// 対応する小エリアが無く、大エリア（概略・広域ゾーン）としてのみ存在する地名。
+// 大エリアの形と同じく、縮小表示している時だけ表示する（常時表示だと他の地名と
+// 紛らわしいため）。
+const BIGAREA_ONLY_LANDMARKS = new Set(["Forest", "Flower Field", "Onsen Mountain", "Fishing Village"]);
+
+// 海・川・湖の地名は、縮小表示時に他の地名ラベルを隠す場合でも
+// 引き続き表示したままにする（大エリアの名前と同様、位置把握に役立つため）
+const WATER_LANDMARK_KEYS = new Set([
+  "Whale Sea", "Zephyr Sea", "East Sea", "Old Sea",
+  "Rosy River", "Tranquil River", "Giantwood River", "Shallow River",
+  "Suburban Lake", "Forest Lake", "Meadow Lake", "Onsen Mountain Lake",
+]);
+
+// ホームも同様に、縮小表示時も常に表示したままにする
+const ALWAYS_VISIBLE_LANDMARK_KEYS = new Set(["Home Plots"]);
+
+function buildAllPins(){
+  const list = [];
+  mapLandmarks.forEach(p => list.push({ cat:"landmark", key:p.key, name:displayName(p), x:p.x, y:p.y, bigareaOnly:BIGAREA_ONLY_LANDMARKS.has(p.key), water:WATER_LANDMARK_KEYS.has(p.key), alwaysVisible:ALWAYS_VISIBLE_LANDMARK_KEYS.has(p.key) }));
+  if(typeof mapPois !== "undefined"){
+    mapPois.forEach(p => list.push({ cat:"poi", img:p.icon, name:displayName(p), x:p.x, y:p.y }));
+  }
+  mapNpcs.forEach(p => list.push({ cat:"npc", img:NPC_IMAGES[p.key], icon:"🧑", name:p.name, x:p.x, y:p.y }));
+  mapShops.forEach(p => list.push({ cat:"shop", img:SHOP_IMAGES[p.key], icon:SHOP_ICONS[p.key] || "🛍️", name:p.name, x:p.x, y:p.y }));
+  mapBusStops.forEach(p => list.push({ cat:"busstop", img:BUSSTOP_IMAGE, icon:"🚌", name:T("map_cat_busstop","バス停"), x:p.x, y:p.y }));
+  mapAnimals.forEach(p => list.push({ cat:"animal", img:ANIMAL_IMAGES[p.key], icon:ANIMAL_ICONS[p.key] || "🐾", name:p.name, x:p.x, y:p.y }));
+  mapEvents.forEach(p => list.push({ cat:"event", key:p.key, img:EVENT_IMAGES[p.key], icon:"⭐", name:p.name, x:p.x, y:p.y }));
+  return list;
+}
+const allPins = buildAllPins();
+
+// クエリパラメータ ?embed=1 のときは、図鑑ページの埋め込みモーダル（iframe）内での
+// 表示のため、サイト共通のヘッダー・ナビ・フッターを隠してマップ本体だけを表示する
+const urlParams = new URLSearchParams(location.search);
+if(urlParams.get("embed") === "1"){
+  document.body.classList.add("embed-mode");
+}
+
+// クエリパラメータ ?loc= で指定された地点を、マップ上でエリアをタップした時と
+// 同じ見た目（赤枠+斜線の選択表示、下部の情報カード）で示す。ピンは表示しない
+const highlightLocKey = urlParams.get("loc");
+
+// 指定した地図上の座標（%）を含むエリアの図形要素を返す（小エリア優先、
+// 見つからなければ大エリア）。endPointer()のフォールバック判定と同じロジック
+function findAreaForWorldPoint(px, py){
+  const svg = document.getElementById("mapAreasLayer");
+  if(!svg || !svg.createSVGPoint) return null;
+  const pt = svg.createSVGPoint();
+  pt.x = px;
+  pt.y = py;
+  const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
+  // 小エリアは面積の大きい順に描画されており、入れ子・重なりがある場合は
+  // 後から描画された（＝画面上で手前に来る）小さい方を優先する必要がある。
+  // そのため「最初に一致した要素」ではなく「最後に一致した要素」を採用する
+  // （タップ時のfindAreaShapeAtPointと同じ考え方）
+  let smallMatch = null, bigMatch = null;
+  shapes.forEach(el => {
+    try{
+      if(el.isPointInFill(pt)){
+        if(el._areaKind === "big"){ bigMatch = el; }
+        else smallMatch = el;
+      }
+    }catch(e){ /* 非対応環境では無視 */ }
+  });
+  return smallMatch || bigMatch;
+}
+
+function renderPins(){
+  const layer = document.getElementById("mapPinsLayer");
+  layer.innerHTML = "";
+  // 地名・アイコン付き地点はタブでの切り替え対象ではなく、常に表示する
+  const list = allPins.filter(p => p.cat === "landmark" || p.cat === "poi" || activeCats.has(p.cat));
+  list.forEach(p => {
+    const el = document.createElement("div");
+    el.className = "map-pin cat-" + p.cat + (p.bigareaOnly ? " bigarea-only" : "") + (p.water ? " water" : "") + (p.alwaysVisible ? " keep-visible" : "") + (p.img ? " has-img" : "");
+    // 地名は元サイトと同じくアイコン無しの文字のみ。それ以外は、実画像があれば
+    // その画像を、無ければ絵文字アイコンを使う（常時ラベルは出さず、タップ時の
+    // カードで名前を確認する形にしている）。
+    el.innerHTML = (p.cat === "landmark")
+      ? `<div class="map-pin-label">${p.name}</div>`
+      : (p.img
+        ? `<div class="map-pin-dot"><img src="${p.img}" alt="" loading="lazy"></div>`
+        : `<div class="map-pin-dot"><span>${p.icon}</span></div>`);
+    el._pinData = p;
+    el.onclick = (e) => { e.stopPropagation(); handlePinTap(p); };
+    layer.appendChild(el);
+  });
+  updatePinPositions();
+}
+
+// ピン・地名ラベルの画面上の位置（px）をtx/ty/scaleから計算して反映する。
+// .map-pinは.map-stageのCSS transformの外側にあるため、パン・ズーム操作の
+// たびにこの関数を呼んで位置を合わせ直す必要がある
+function updatePinPositions(){
+  document.querySelectorAll("#mapPinsLayer .map-pin").forEach(el => {
+    const p = el._pinData;
+    if(!p) return;
+    const worldX = p.x / 100 * naturalW;
+    const worldY = p.y / 100 * naturalH;
+    el.style.left = (worldX * scale + tx) + "px";
+    el.style.top = (worldY * scale + ty) + "px";
+  });
+}
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// エリア境界の描画。小エリア（全33件、元サイトで個別確認済み）と大エリア（4件、近似・
+// 粗い形状）の形（ポリゴン）のみを描画する。タブでの表示切り替えは無く常に存在し、
+// 選択（タップ）されるまでは透明でタップ領域としてのみ機能する。名前は文字ラベルとしては
+// 出さず、タップ時の情報カードで確認する形にしている。
+// 複数リングは<path>のサブパスとしてまとめ、fill-rule:evenoddで描画する。
+// これにより「他の小エリアを内包する穴」（郊外から中心街エリア群を除いた形など）も
+// 正しく表現できる（穴でなく単に離れた別々の区画が複数あるだけの場合も、重なりが
+// 無ければevenoddは従来のpolygon個別描画と同じ見た目になる）。
+// ホームは大エリア／小エリアの区別が無く常に同じ範囲を指すため、
+// 縮小表示時も他の大エリアと同様にタップできるようにする
+const ALWAYS_TAPPABLE_AREA_KEYS = new Set(["Home Plots"]);
+
+function drawAreaShape(container, area, kind){
+  const d = area.polygons
+    .map(ring => "M" + ring.map(([x,y]) => `${x},${y}`).join("L") + "Z")
+    .join(" ");
+  const path = document.createElementNS(SVG_NS, "path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill-rule", "evenodd");
+  path.setAttribute("class", "map-area-shape" + (kind === "big" ? " approx" : "") + (!area.name ? " unnamed" : "") + (ALWAYS_TAPPABLE_AREA_KEYS.has(area.key) ? " keep-tappable" : ""));
+  path._areaData = area;
+  path._areaKind = kind;
+  container.appendChild(path);
+}
+
+// ポリゴンの面積（シューレース公式、複数リングは合算）。
+// 郊外のように他の小エリア（郊外の湖・中心街エリア群）を内包するケースがあるため、
+// 面積の大きい順に描画して、内包された小さいエリアが常にタップ判定の手前に来るようにする。
+function polygonArea(polygons){
+  let total = 0;
+  polygons.forEach(ring => {
+    let a = 0;
+    for(let i=0;i<ring.length;i++){
+      const [x1,y1] = ring[i];
+      const [x2,y2] = ring[(i+1) % ring.length];
+      a += x1*y2 - x2*y1;
+    }
+    total += Math.abs(a) / 2;
+  });
+  return total;
+}
+
+// エリアはタブ切り替え無しで常に（見た目は非表示のまま）タップできるようにしている。
+// 大エリア（概略）を先に描画し、小エリア（確定済み・より精度が高い）を後に描画することで、
+// 重なっている場所をタップした時は常に小エリア側が優先されるようにする。
+function renderAreas(){
+  const group = document.getElementById("mapAreasGroup");
+  group.innerHTML = "";
+  if(typeof mapAreasBig !== "undefined"){
+    mapAreasBig.forEach(a => drawAreaShape(group, a, "big"));
+  }
+  if(typeof mapAreasSmall !== "undefined"){
+    const sorted = [...mapAreasSmall].sort((a,b) => polygonArea(b.polygons) - polygonArea(a.polygons));
+    sorted.forEach(a => drawAreaShape(group, a, "small"));
+  }
+  applyAreaSelection();
+}
+
+// 縮小表示時に小エリアのpointer-eventsを無効化しているせいでelementFromPointが
+// 何も拾えなかった場合のフォールバック。SVGのisPointInFill（fill-rule評価込みで
+// ジオメトリを直接判定できる）を使い、CSSのpointer-eventsに関係なく実際に
+// クリック位置を含む図形を探す。小エリア→大エリアの順に探し、見つかった方を返す
+// （対応する大エリアが存在しないクジラ海などの小エリアも、これで従来通り
+// タップできるようになる）
+function findAreaShapeAtPoint(clientX, clientY){
+  const svg = document.getElementById("mapAreasLayer");
+  if(!svg || !svg.createSVGPoint) return null;
+  // svg.getScreenCTM()は祖先要素(.map-stage)のCSS transform（パン・ズーム）を
+  // 含めて計算する必要があり、ブラウザ（特にSafari/WebKit）によって解釈が
+  // ズレることがあり、無関係なエリアが選ばれる不具合の原因になっていた。
+  // そのため、既に他の座標変換（screenToPct等）で使っている自前のtx/ty/scale
+  // 計算に統一し、getScreenCTMへの依存を無くす
+  const rect = viewport.getBoundingClientRect();
+  const worldX = (clientX - rect.left - tx) / scale;
+  const worldY = (clientY - rect.top - ty) / scale;
+  const pt = svg.createSVGPoint();
+  pt.x = (worldX / naturalW) * 100;
+  pt.y = (worldY / naturalH) * 100;
+  const shapes = document.querySelectorAll("#mapAreasGroup .map-area-shape");
+  // 小エリアは面積の大きい順に描画されており、入れ子・重なりがある場合は
+  // 後から描画された（＝画面上で手前に来る）小さい方を優先する必要がある。
+  // そのため「最初に一致した要素」ではなく「最後に一致した要素」を採用する
+  let smallMatch = null, bigMatch = null;
+  shapes.forEach(el => {
+    try{
+      if(el.isPointInFill(pt)){
+        if(el._areaKind === "big"){ bigMatch = el; }
+        else smallMatch = el;
+      }
+    }catch(e){ /* 非対応環境では無視 */ }
+  });
+  // 大エリアは縮小表示時のみタップ対象とする（CSSのpointer-events設定と揃える。
+  // 揃えないと、拡大表示中に小エリアに属さない場所をタップした時、本来タップ
+  // 対象外の大エリア（概略・粗い形状）が「ランダムに」選ばれてしまう）
+  const bigAreaTappable = viewport.classList.contains("show-bigarea");
+  return smallMatch || (bigAreaTappable ? bigMatch : null);
+}
+
+// タップされたエリアの赤枠＋斜線ハイライト表示
+let selectedArea = null;
+// 「湖」「川」「海」等、複数エリアにまたがる汎用locationのハイライト用。
+// 通常のタップ選択（selectedArea）とは別に、複数エリアのkeyを保持する
+let selectedAreaMultiKeys = null;
+function applyAreaSelection(){
+  document.querySelectorAll("#mapAreasGroup .map-area-shape.selected").forEach(el => el.classList.remove("selected"));
+  if(selectedAreaMultiKeys){
+    document.querySelectorAll("#mapAreasGroup .map-area-shape").forEach(el => {
+      if(el._areaData && selectedAreaMultiKeys.has(el._areaData.key)) el.classList.add("selected");
+    });
+    return;
+  }
+  if(!selectedArea) return;
+  document.querySelectorAll("#mapAreasGroup .map-area-shape").forEach(el => {
+    if(el._areaData === selectedArea.area) el.classList.add("selected");
+  });
+}
+
+// data-map-locations.js の座標は、多くの場合対応する地名（mapLandmarks）の座標をそのまま
+// 使っている（同ファイルの `// landmarks:KEY` コメント参照）。同じ座標を持つ地名からエリアの
+// keyを逆引きして、エリアごとに「ここで見つかる生き物」のlocation文字列一覧を求める。
+// （エリアのポリゴン形状は川のように複数リングに分かれ、中心点が自身の形状の外に出る場合も
+// あるため、ポリゴンの内外判定ではなく座標の一致で判定する）
+// 図鑑データには「川」「湖」「海」という特定の地名を持たない汎用locationも存在する
+// （どの川・湖・海でも出現するという意味）。該当する地名すべてに紐づける。
+// 汎用location（川/湖/海）を紐づける対象は、ユーザー確認済みの以下の地名(mapLandmarksのkey)のみ。
+// 例えば「火山湖」は名前に「湖」を含むが対象外（生き物の出現ロジック上、他の湖とは別扱いのため）。
+const GENERIC_LOCATION_LANDMARK_KEYS = {
+  "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
+  "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
+  "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  // 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象。「水辺」は海辺を除いた
+  // 水辺（湖＋川）が対象（ユーザー確認済み）
+  "川辺": ["Giantwood River", "Tranquil River", "Shallow River", "Rosy River"],
+  "海辺": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  "水辺": [
+    "Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake",
+    "Giantwood River", "Tranquil River", "Shallow River", "Rosy River",
+  ],
+  // 中心街＝大広場・住宅街・花園街・アート街をまとめたエリアのため、
+  // location「中心街」の生き物はこの4エリアすべてに出現する扱いにする
+  "中心街": ["Central Square", "Residential Street", "Garden Street", "Art Street"],
+  // 森林・漁村・花畑・温泉山も同様に、複数の小エリアをまとめた広域ゾーン名のため、
+  // その名前だけのlocationはこれらを構成する小エリア全てに出現する扱いにする
+  "森林": ["Jump Puzzle", "Spirit Oak Pine Forest", "Forest Island", "Deer Tower", "Giantwood River"],
+  "漁村": ["Lighthouse", "Wharf", "Fishing Village Square", "East Pier Fishing Village"],
+  "花畑": ["Whale Mountain", "Meadow Lake", "Windmill Flower Field", "Purple Light Beach"],
+  "温泉山": ["Onsen", "Onsen Mountain Lake", "Ruins", "Crater Lake", "Stone Cliff"],
+};
+
+// 上記の広域locationは、それを構成する各小エリアだけでなく、
+// 大エリア（概略）自体をタップした時にも表示されるようにする
+// （「花畑」全体で出現するものは、大エリア「花畑」をタップした時にも見えるべきのため）。
+// 「中心街」は対応する広域ゾーンの地名ピンが無く（対応する小エリアの1つ「大広場」の
+// 座標と偶然一致した場合のみ紐づく仕組みのため）、大エリア「Central District」には
+// 上記の仕組みでは紐づかない。また「郊外」は小エリア「Suburbs」には紐づくが、
+// 別key扱いの大エリア「Suburbs Big Area」には紐づかない。そのため、ここで
+// 大エリアのkeyへ直接対応付けている
+const GENERIC_LOCATION_BIGAREA_KEYS = {
+  "森林": "Forest",
+  "漁村": "Fishing Village",
+  "花畑": "Flower Field",
+  "温泉山": "Onsen Mountain",
+  "中心街": "Central District",
+  "郊外": "Suburbs Big Area",
+};
+
+// 地名(mapLandmarks)に対応するエリアを探す。基本はkeyで対応するが、"Rosy River"の
+// 地名に対して該当エリア側のkeyが"Rozy River"表記になっているなど、稀にkeyの綴りが
+// 一致しないケースがあるため、その場合は名前（日本語）の一致でフォールバックする。
+function findAreaForLandmark(lm, allAreas){
+  return allAreas.find(a => a.key === lm.key) || allAreas.find(a => a.name === lm.name);
+}
+
+function buildLocationsByAreaKey(){
+  const result = new Map();
+  if(typeof mapLandmarks === "undefined" || typeof mapLocationLinks === "undefined") return result;
+  const allAreas = [
+    ...(typeof mapAreasSmall !== "undefined" ? mapAreasSmall : []),
+    ...(typeof mapAreasBig !== "undefined" ? mapAreasBig : []),
+  ];
+  mapLandmarks.forEach(lm => {
+    const area = findAreaForLandmark(lm, allAreas);
+    if(!area) return;
+    if(!result.has(area.key)) result.set(area.key, new Set());
+    const set = result.get(area.key);
+    // 地名自体は必ず自分のエリアに含める。mapLocationLinks側の座標は
+    // ポリゴン内に収めるため個別に補正されていることがあり（例：静川）、
+    // その場合lm.x/yとズレて下の座標一致判定だけでは拾えなくなるため
+    set.add(lm.name);
+    Object.entries(mapLocationLinks).forEach(([locName, pt]) => {
+      if(pt && Math.abs(pt.x - lm.x) < 0.01 && Math.abs(pt.y - lm.y) < 0.01) set.add(locName);
+    });
+    Object.entries(GENERIC_LOCATION_LANDMARK_KEYS).forEach(([genericLoc, keys]) => {
+      if(keys.includes(lm.key)) set.add(genericLoc);
+    });
+  });
+  Object.entries(GENERIC_LOCATION_BIGAREA_KEYS).forEach(([genericLoc, bigKey]) => {
+    if(!result.has(bigKey)) result.set(bigKey, new Set());
+    result.get(bigKey).add(genericLoc);
+  });
+  return result;
+}
+const locationsByAreaKey = buildLocationsByAreaKey();
+function getLocationsForArea(area){
+  return locationsByAreaKey.get(area.key) || new Set();
+}
+
+// 指定したlocation文字列の集合に一致する魚・虫・野鳥を、図鑑データから逆引きする
+function getCreaturesForLocations(locs){
+  const groups = { fish:[], bug:[], bird:[] };
+  const sources = [
+    { cat:"fish", data: typeof fishData !== "undefined" ? fishData : [] },
+    { cat:"bug", data: typeof bugData !== "undefined" ? bugData : [] },
+    { cat:"bird", data: typeof birdData !== "undefined" ? birdData : [] },
+  ];
+  sources.forEach(({ cat, data }) => {
+    // 終了済みのシーズン・フェス限定（ended:true）はここでも表示しない
+    data.forEach(c => { if(locs.has(c.location) && !c.ended) groups[cat].push(c); });
+  });
+  return groups;
+}
+
+// エリア内で見つかる魚・虫・野鳥を、図鑑データのlocation文字列で逆引きする
+function getCreaturesForArea(area){
+  return getCreaturesForLocations(getLocationsForArea(area));
+}
+
+// mapEventQuestNamePrefixes（クエスト名プレフィックス -> イベントキー）を使って、
+// 図鑑データに実際に登場する出現場所名を前方一致で振り分ける。
+// 「虫コイコイクエスト-遺跡(追加段階)」のような派生locationも同じクエストとして
+// まとめて扱うことで、イベントマーカーの「くわしく見る」一覧に含まれるようにする
+const mapEventLocationNames = (() => {
+  const map = {};
+  if(typeof mapEventQuestNamePrefixes !== "undefined"){
+    const allLocs = new Set();
+    [typeof fishData !== "undefined" ? fishData : [], typeof bugData !== "undefined" ? bugData : [], typeof birdData !== "undefined" ? birdData : []]
+      .forEach(data => data.forEach(c => { if(c.location) allLocs.add(c.location); }));
+    Object.entries(mapEventQuestNamePrefixes).forEach(([prefix, key]) => {
+      allLocs.forEach(loc => {
+        if(loc.startsWith(prefix)) (map[key] = map[key] || []).push(loc);
+      });
+    });
+  }
+  return map;
+})();
+
+// イベントマーカー（クエスト）に対応する魚・虫・野鳥を逆引きする。
+// 対応するlocation文字列が無いイベント（ミニゲーム等）はnullを返す
+function getCreaturesForEventKey(eventKey){
+  const names = mapEventLocationNames[eventKey];
+  if(!names || !names.length) return null;
+  return getCreaturesForLocations(new Set(names));
+}
+
+// ── リアルタイム図鑑（js/main.jsの天気・出現判定ロジックと同じもの。
+//    DOM依存の無い部分だけをこのページ用に抜き出している）──
+const ALL_WEATHER = ["晴れ","雨","虹"];
+const ALL_TIME = ["6-12","12-18","18-0","0-6"];
+const ZONE_LABELS = { "6-12":"6:00〜12:00", "12-18":"12:00〜18:00", "18-0":"18:00〜24:00", "0-6":"0:00〜6:00" };
+
+// 天気判定・出現判定は常にJST(UTC+9)基準（js/main.jsのgetJstDateと同じ）
+function getJstDate(){
+  return new Date(Date.now() + 9 * 3600 * 1000);
+}
+function getZone(){
+  const h = getJstDate().getUTCHours();
+  if(h>=6&&h<12) return "6-12";
+  if(h>=12&&h<18) return "12-18";
+  if(h>=18&&h<24) return "18-0";
+  return "0-6";
+}
+// weatherData[date].windowsのキー形式（"00-06"等）。js/main.jsのweatherWindowKeyForHourと同じ
+function weatherWindowKeyForHour(h){
+  if(h < 6) return "00-06";
+  if(h < 12) return "06-12";
+  if(h < 18) return "12-18";
+  return "18-24";
+}
+function getDateKey(offset=0){
+  const d = getJstDate();
+  d.setUTCDate(d.getUTCDate() + offset);
+  return d.toISOString().slice(0,10);
+}
+
+// 天気の手動入力（js/main.jsと同じlocalStorageキーを参照し、公式データ未入力時のみ使う）
+const MANUAL_WEATHER_KEY = "manualWeatherOverrides";
+function getManualWeatherOverride(dateKey, zone){
+  try{
+    const overrides = JSON.parse(localStorage.getItem(MANUAL_WEATHER_KEY) || "{}");
+    return overrides[`${dateKey}_${zone}`] || null;
+  }catch(e){
+    return null;
+  }
+}
+
+// 天気は6時間ウィンドウの天気（晴れ/雨/虹/流星雨の4択）で判定する。ルックアップは常にJST基準
+// （js/main.jsのupdateTimeと同じロジック。weatherWindowCategory()でくもり等を畳み込む）
+function getCurrentWeatherAndZone(){
+  const zone = getZone();
+  const todayKey = getDateKey(0);
+  const jstHour = getJstDate().getUTCHours();
+  const windowKey = weatherWindowKeyForHour(jstHour);
+  const todayData = typeof weatherData !== "undefined" ? weatherData[todayKey] : null;
+  const todayWindows = (todayData && todayData.windows) || {};
+  const rawOfficialWindow = todayWindows[windowKey];
+  const officialWeather = rawOfficialWindow ? weatherWindowCategory(rawOfficialWindow) : null;
+  const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
+  const weather = officialWeather || manualWeather || "不明";
+  return { zone, weather };
+}
+
+// js/main.jsのrender()内の判定式と同じロジック（js/weather-master.jsのカテゴリ変換を使う）
+function isCreatureAvailableNow(c, weather, zone){
+  const weatherForCheck = weather === "不明" ? weather : weatherDexCategory(weather);
+  const weatherMatch = c.weather.length === ALL_WEATHER.length || c.weather.includes(weatherForCheck);
+  const timeMatch = c.time.length === ALL_TIME.length || c.time.includes(zone);
+  return weatherMatch && timeMatch;
+}
+
+// 天気名(晴れ/くもり/小雨/流星雨1など)をi18n翻訳する（js/weather-master.js参照。js/main.jsと同じロジック）
+function translateWeatherWord(w){
+  if(w === "不明") return T("weather_unknown", w);
+  const key = typeof weatherI18nKey === "function" ? weatherI18nKey(w) : null;
+  return key ? T(key, w) : w;
+}
+
+// 一覧カード用の軽量サムネイル画像パスを返す
+function mapThumbSrc(path){
+  if(!path) return path;
+  const normalized = path.startsWith("./") ? path.slice(2) : path;
+  if(!normalized.startsWith("images/")) return path;
+  return normalized.replace(/^images\//, "images/thumb/").replace(/\.[^./]+$/, ".jpg");
+}
+
+function zoomToArea(area){
+  const targetScale = 2.0;
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const px = area.centroid.x / 100 * naturalW;
+  const py = area.centroid.y / 100 * naturalH;
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - px * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - py * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 320);
+}
+
+// 複数エリア（「湖」「川」「海」等の汎用location）を全て画面内に収まるようにズームする
+function zoomToAreas(areas){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  areas.forEach(area => {
+    area.polygons.forEach(ring => {
+      ring.forEach(([x,y]) => {
+        const px = x / 100 * naturalW, py = y / 100 * naturalH;
+        if(px < minX) minX = px;
+        if(px > maxX) maxX = px;
+        if(py < minY) minY = py;
+        if(py > maxY) maxY = py;
+      });
+    });
+  });
+  const boxW = Math.max(1, maxX - minX), boxH = Math.max(1, maxY - minY);
+  const FIT_PADDING = 0.85; // 端に少し余白を持たせる
+  const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(vw / boxW, vh / boxH) * FIT_PADDING));
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - cx * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - cy * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 320);
+}
+
+// クエストのイベントマーカー（⭐）1つ、または同じキーを持つ複数のピン
+// （例：「海釣り1号」「海釣り2号」）を全て画面内に収まるようにズームする
+function zoomToEventPins(points){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  points.forEach(p => {
+    const px = p.x / 100 * naturalW, py = p.y / 100 * naturalH;
+    if(px < minX) minX = px;
+    if(px > maxX) maxX = px;
+    if(py < minY) minY = py;
+    if(py > maxY) maxY = py;
+  });
+  const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+  if(points.length === 1){
+    const targetScale = 2.0;
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+    const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - cx * targetScale));
+    const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - cy * targetScale));
+    animateTo(targetTx, targetTy, targetScale, 320);
+    return;
+  }
+  const boxW = Math.max(1, maxX - minX), boxH = Math.max(1, maxY - minY);
+  const FIT_PADDING = 0.85;
+  const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, Math.min(vw / boxW, vh / boxH) * FIT_PADDING));
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, vw / 2 - cx * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, vh / 2 - cy * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 320);
+}
+
+const CREATURE_CAT_LABELS = { fish:"filter_fish", bug:"filter_bug", bird:"filter_bird" };
+const CREATURE_CAT_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥" };
+const CREATURE_CAT_ICONS = { fish:"fish", bug:"bug", bird:"bird" };
+
+// エリア／イベント共通：出現する魚・虫・野鳥の一覧モーダルを組み立てる
+function renderDetailModal(catLabel, name, groups, onZoom){
+  document.getElementById("areaDetailCat").textContent = catLabel;
+  document.getElementById("areaDetailName").textContent = name;
+
+  const zoomBtn = document.getElementById("areaDetailZoomBtn");
+  zoomBtn.innerHTML = `${icon("search",{size:13})}<span>${T("map_view_location","ここを拡大表示")}</span>`;
+  zoomBtn.onclick = () => {
+    onZoom();
+    closeAreaDetailModal();
+    document.getElementById("mapInfoCard").classList.remove("show");
+  };
+
+  const catOrder = ["fish","bug","bird"];
+  const { zone, weather } = getCurrentWeatherAndZone();
+  document.getElementById("areaDetailNowContext").textContent =
+    `${T("map_detail_now_context_prefix","現在の判定：")}${translateWeatherWord(weather)}・${ZONE_LABELS[zone] || zone}`;
+
+  // カテゴリごとに「今出現中」「今は出現していない」に振り分ける
+  const nowByCat = { fish:[], bug:[], bird:[] };
+  const notNowByCat = { fish:[], bug:[], bird:[] };
+  catOrder.forEach(cat => {
+    groups[cat].forEach(c => {
+      (isCreatureAvailableNow(c, weather, zone) ? nowByCat : notNowByCat)[cat].push(c);
+    });
+  });
+
+  const rowsHtml = (arr) => arr.map(c => `
+    <div class="area-detail-row">
+      <img src="${mapThumbSrc(c.img)}" alt="" loading="lazy">
+      <div class="area-detail-row-name">${displayName(c)}</div>
+      <div class="area-detail-row-level">Lv.${c.level ?? "-"}</div>
+    </div>
+  `).join("");
+
+  const groupsHtml = (byCat) => catOrder.filter(cat => byCat[cat].length).map(cat => `
+    <div class="area-detail-group">
+      <div class="area-detail-group-title">${icon(CREATURE_CAT_ICONS[cat],{size:13})}<span>${T(CREATURE_CAT_LABELS[cat], CREATURE_CAT_FALLBACKS[cat])}</span></div>
+      ${rowsHtml(byCat[cat])}
+    </div>
+  `).join("");
+
+  const totalCount = catOrder.reduce((n,cat) => n + groups[cat].length, 0);
+  const list = document.getElementById("areaDetailList");
+  if(!totalCount){
+    list.innerHTML = `<div class="area-detail-empty">${T("map_detail_empty","まだ情報がありません")}</div>`;
+  }else{
+    const nowHtml = groupsHtml(nowByCat);
+    const notNowHtml = groupsHtml(notNowByCat);
+    list.innerHTML =
+      (nowHtml ? `<div class="area-detail-availability-title is-now">${icon("check",{size:13})}<span>${T("map_detail_now","今出現中")}</span></div>${nowHtml}`
+        : `<div class="area-detail-empty">${T("map_detail_none_now","今は出現しているものがありません")}</div>`) +
+      (notNowHtml ? `<div class="area-detail-availability-title is-not-now">${icon("close",{size:11})}<span>${T("map_detail_not_now","今は出現していない")}</span></div><div class="area-detail-notnow">${notNowHtml}</div>` : "");
+  }
+
+  document.getElementById("areaDetailModal").style.display = "block";
+}
+
+function openAreaDetail(area, kind){
+  renderDetailModal(
+    kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア"),
+    area.name ? area.name : `${area.key}？`,
+    getCreaturesForArea(area),
+    () => zoomToArea(area)
+  );
+}
+
+// クエストのイベントマーカーに対応する出現一覧モーダル
+function openEventDetail(eventKey, name, groups, pins){
+  renderDetailModal(
+    T("map_cat_event","イベント"),
+    name,
+    groups,
+    () => zoomToEventPins(pins)
+  );
+}
+
+function closeAreaDetailModal(){
+  document.getElementById("areaDetailModal").style.display = "none";
+}
+
+function showPinInfo(p){
+  const catLabelMap = {
+    landmark: T("map_cat_landmark","地名"), poi: T("map_cat_landmark","地名"), npc: T("map_cat_npc","NPC"), shop: T("map_cat_shop","ショップ"),
+    busstop: T("map_cat_busstop","バス停"), animal: T("map_cat_animal","動物"), event: T("map_cat_event","イベント"),
+  };
+  document.getElementById("mapInfoName").textContent = p.name;
+  document.getElementById("mapInfoCat").textContent = catLabelMap[p.cat] || "";
+  document.getElementById("mapInfoCat").classList.remove("is-area");
+  document.getElementById("mapInfoZoom").style.display = "none";
+
+  // クエストのイベントマーカーのうち、図鑑データのlocationと紐づくもの
+  // （海釣り・虫コイコイ・巣ごもり等）は、エリアと同様に「くわしく見る」から
+  // 出現中の魚・虫・野鳥の一覧を見られるようにする
+  const actionBtn = document.getElementById("mapInfoAction");
+  const eventGroups = p.cat === "event" && p.key ? getCreaturesForEventKey(p.key) : null;
+  if(eventGroups){
+    const pins = typeof mapEvents !== "undefined" ? mapEvents.filter(e => e.key === p.key) : [];
+    actionBtn.style.display = "";
+    actionBtn.innerHTML = `<span>${T("map_view_details","くわしく見る")}</span>`;
+    actionBtn.onclick = () => openEventDetail(p.key, p.name, eventGroups, pins);
+  }else{
+    actionBtn.style.display = "none";
+  }
+
+  document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = null;
+  selectedAreaMultiKeys = null;
+  applyAreaSelection();
+}
+
+function showAreaInfo(area, kind){
+  document.getElementById("mapInfoCat").textContent = kind === "big" ? T("map_cat_bigarea","大エリア") : T("map_cat_area","エリア");
+  document.getElementById("mapInfoCat").classList.add("is-area");
+  document.getElementById("mapInfoName").textContent = area.name
+    ? area.name
+    : `${area.key}？`;
+
+  const zoomBtn = document.getElementById("mapInfoZoom");
+  zoomBtn.style.display = "";
+  zoomBtn.innerHTML = icon("search",{size:15});
+  zoomBtn.setAttribute("aria-label", T("map_view_location","ここを拡大表示"));
+  zoomBtn.onclick = () => zoomToArea(area);
+
+  const actionBtn = document.getElementById("mapInfoAction");
+  actionBtn.style.display = "";
+  actionBtn.innerHTML = `<span>${T("map_view_details","くわしく見る")}</span>`;
+  actionBtn.onclick = () => openAreaDetail(area, kind);
+
+  document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = { area, kind };
+  selectedAreaMultiKeys = null;
+  applyAreaSelection();
+}
+
+// 「湖」「川」「海」等、複数エリアにまたがる汎用location用の情報カード表示。
+// 単一エリアの「くわしく見る」は該当エリアが1つに定まらないため非表示にする
+function showMultiAreaInfo(areas){
+  document.getElementById("mapInfoCat").textContent = T("map_cat_multi_area","登場エリア");
+  document.getElementById("mapInfoCat").classList.add("is-area");
+  document.getElementById("mapInfoName").textContent = areas.map(a => a.name || a.key).join("・");
+
+  const zoomBtn = document.getElementById("mapInfoZoom");
+  zoomBtn.style.display = "";
+  zoomBtn.innerHTML = icon("search",{size:15});
+  zoomBtn.setAttribute("aria-label", T("map_view_location","ここを拡大表示"));
+  zoomBtn.onclick = () => zoomToAreas(areas);
+
+  document.getElementById("mapInfoAction").style.display = "none";
+
+  document.getElementById("mapInfoCard").classList.add("show");
+  selectedArea = null;
+  selectedAreaMultiKeys = new Set(areas.map(a => a.key));
+  applyAreaSelection();
+}
+
+// 地名ピンがタップされた時の処理。大エリアのみの地名（森林・花畑・温泉山・漁村）は、
+// 対応する大エリアの範囲そのものをタップした時と同じ挙動にする（ラベルの表示位置が
+// 大エリアのポリゴン形状と完全には重ならないことがあり、ラベルをタップしても
+// 反応しない問題を防ぐため）
+function handlePinTap(p){
+  const bigArea = p.bigareaOnly && typeof mapAreasBig !== "undefined"
+    ? mapAreasBig.find(a => a.key === p.key)
+    : null;
+  if(bigArea) showAreaInfo(bigArea, "big");
+  else showPinInfo(p);
+}
+
+document.getElementById("mapInfoClose").innerHTML = icon("close",{size:14});
+document.getElementById("mapInfoClose").onclick = () => {
+  document.getElementById("mapInfoCard").classList.remove("show");
+  selectedArea = null;
+  selectedAreaMultiKeys = null;
+  applyAreaSelection();
+};
+
+// ── パン/ズーム ──
+const viewport = document.getElementById("mapViewport");
+const stage = document.getElementById("mapStage");
+const mapImg = document.getElementById("mapImg");
+mapImg.src = mapImage;
+
+let scale = 1, tx = 0, ty = 0;
+let naturalW = 1200, naturalH = 1200;
+const MIN_SCALE = 0.4, MAX_SCALE = 5;
+const PAN_MARGIN = 120;
+const RUBBER_BAND = 0.35; // ドラッグ中に範囲外へ出た時の伸び具合（iOS風の抵抗）
+// 実際のゲームと同様、縮小表示している時だけ大エリア（概略）を見せる。
+// これ以上ズームインしたら非表示（タップは常に可能）に切り替える境界値。
+const BIGAREA_VISIBLE_MAX_SCALE = 1.0;
+
+function applyTransform(){
+  stage.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  viewport.classList.toggle("show-bigarea", scale <= BIGAREA_VISIBLE_MAX_SCALE);
+  updatePinPositions();
+}
+
+// 指定scaleでの許容パン範囲。ズーム後の着地点を先に計算する際にも使うため引数化している。
+function panBoundsAt(s){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const contentW = naturalW * s, contentH = naturalH * s;
+  const minTx = Math.min(vw - contentW - PAN_MARGIN, 0);
+  const maxTx = PAN_MARGIN;
+  const minTy = Math.min(vh - contentH - PAN_MARGIN, 0);
+  const maxTy = PAN_MARGIN;
+  return { minTx, maxTx, minTy, maxTy };
+}
+
+function clampPan(){
+  // ある程度自由に動かせるが、画像が完全に画面外に消えないよう緩く制限
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+  tx = Math.min(maxTx, Math.max(minTx, tx));
+  ty = Math.min(maxTy, Math.max(minTy, ty));
+}
+
+// ドラッグ中に範囲外に出た場合、ゴムのように伸びる抵抗をかける（急な跳ね返りを防ぐ）
+function rubberBand(value, min, max){
+  if(value < min) return min - (min - value) * RUBBER_BAND;
+  if(value > max) return max + (value - max) * RUBBER_BAND;
+  return value;
+}
+
+function fitToViewport(){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  scale = Math.max(vw / naturalW, vh / naturalH) * 1.02;
+  tx = (vw - naturalW * scale) / 2;
+  ty = (vh - naturalH * scale) / 2;
+  applyTransform();
+}
+
+function centerOn(px, py, targetScale){
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  scale = targetScale;
+  tx = vw / 2 - px * scale;
+  ty = vh / 2 - py * scale;
+  clampPan();
+  applyTransform();
+}
+
+mapImg.onload = () => {
+  naturalW = mapImg.naturalWidth;
+  naturalH = mapImg.naturalHeight;
+  stage.style.width = naturalW + "px";
+  stage.style.height = naturalH + "px";
+  fitToViewport();
+  renderPins();
+  renderAreas();
+  // ?loc= で指定された地点を含むエリアを、タップした時と同じ見た目で選択表示する。
+  // 「森林」「温泉山」等、複数の小エリアをまとめた大エリア名そのもののlocationは
+  // 特定の小エリアには絞れないため、対応する大エリアをそのままハイライトする
+  if(highlightLocKey && typeof mapGenericBigAreaLocations !== "undefined" && mapGenericBigAreaLocations[highlightLocKey] && typeof mapAreasBig !== "undefined"){
+    const bigArea = mapAreasBig.find(a => a.key === mapGenericBigAreaLocations[highlightLocKey]);
+    if(bigArea){
+      zoomToArea(bigArea);
+      showAreaInfo(bigArea, "big");
+    }
+  // 「湖」「川」「海」等の汎用locationは複数エリアにまたがるため、まずそちらを判定する
+  }else if(highlightLocKey && typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[highlightLocKey] && typeof mapAreasSmall !== "undefined"){
+    const areas = mapMultiAreaLocations[highlightLocKey]
+      .map(key => mapAreasSmall.find(a => a.key === key))
+      .filter(Boolean);
+    if(areas.length){
+      zoomToAreas(areas);
+      showMultiAreaInfo(areas);
+    }
+  // 「海釣りクエスト」等、固定の場所を持たないがイベントマーカー（⭐）が
+  // 存在するクエストは、周辺のランドマーク/エリアではなく、そのイベントの
+  // ピンそのものをハイライトする
+  }else if(highlightLocKey && typeof mapLocationEventLinks !== "undefined" && mapLocationEventLinks[highlightLocKey] && typeof mapEvents !== "undefined"){
+    const eventKey = mapLocationEventLinks[highlightLocKey];
+    const matches = mapEvents.filter(e => e.key === eventKey);
+    if(matches.length){
+      zoomToEventPins(matches);
+      showPinInfo({ name:highlightLocKey, cat:"event", key:eventKey, x:matches[0].x, y:matches[0].y });
+    }
+  }else if(highlightLocKey && typeof mapLocationLinks !== "undefined"){
+    const coord = mapLocationLinks[highlightLocKey];
+    const areaEl = coord ? findAreaForWorldPoint(coord.x, coord.y) : null;
+    if(areaEl && areaEl._areaData){
+      zoomToArea(areaEl._areaData);
+      showAreaInfo(areaEl._areaData, areaEl._areaKind);
+    }
+  }
+};
+
+// ── アニメーション（ズームボタン・エリアの「ここを拡大表示」・ラバーバンドの戻り） ──
+let animRAF = null;
+function stopAnim(){
+  if(animRAF){ cancelAnimationFrame(animRAF); animRAF = null; }
+}
+function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+function animateTo(targetTx, targetTy, targetScale, duration){
+  stopAnim();
+  stopMomentum();
+  const startTx = tx, startTy = ty, startScale = scale;
+  const startTime = performance.now();
+  function step(now){
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = easeOutCubic(t);
+    tx = startTx + (targetTx - startTx) * eased;
+    ty = startTy + (targetTy - startTy) * eased;
+    scale = startScale + (targetScale - startScale) * eased;
+    applyTransform();
+    animRAF = t < 1 ? requestAnimationFrame(step) : null;
+  }
+  animRAF = requestAnimationFrame(step);
+}
+
+// ── 慣性スクロール（指を離した後も勢いで動き、徐々に減速する） ──
+let momentumRAF = null;
+let velTrack = []; // 直近の { x, y, t } 履歴（速度計算用）
+function stopMomentum(){
+  if(momentumRAF){ cancelAnimationFrame(momentumRAF); momentumRAF = null; }
+}
+function trackVelocity(x, y){
+  const t = performance.now();
+  velTrack.push({ x, y, t });
+  while(velTrack.length > 6) velTrack.shift();
+  velTrack = velTrack.filter(p => t - p.t < 120); // 古すぎるサンプルは捨てる
+}
+function getVelocity(){
+  if(velTrack.length < 2) return { vx:0, vy:0 };
+  const first = velTrack[0], last = velTrack[velTrack.length - 1];
+  const dt = last.t - first.t;
+  if(dt <= 0) return { vx:0, vy:0 };
+  return { vx:(last.x - first.x) / dt, vy:(last.y - first.y) / dt }; // px/ms
+}
+function startMomentum(vx, vy){
+  stopMomentum();
+  if(Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02) return;
+  let lastT = performance.now();
+  function step(now){
+    const dt = Math.min(now - lastT, 48);
+    lastT = now;
+    tx += vx * dt;
+    ty += vy * dt;
+    const decay = Math.pow(0.0025, dt / 1000);
+    vx *= decay;
+    vy *= decay;
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+    if(tx < minTx || tx > maxTx) vx = 0;
+    if(ty < minTy || ty > maxTy) vy = 0;
+    clampPan();
+    applyTransform();
+    if(Math.abs(vx) < 0.02 && Math.abs(vy) < 0.02){
+      momentumRAF = null;
+      return;
+    }
+    momentumRAF = requestAnimationFrame(step);
+  }
+  momentumRAF = requestAnimationFrame(step);
+}
+
+function mapZoomStep(factor){
+  stopAnim();
+  stopMomentum();
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  const cx = vw / 2, cy = vh / 2;
+  const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
+  const targetScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  const { minTx, maxTx, minTy, maxTy } = panBoundsAt(targetScale);
+  const targetTx = Math.min(maxTx, Math.max(minTx, cx - worldX * targetScale));
+  const targetTy = Math.min(maxTy, Math.max(minTy, cy - worldY * targetScale));
+  animateTo(targetTx, targetTy, targetScale, 220);
+}
+
+// ポインターイベントで統一的にドラッグ・ピンチズームを処理
+const activePointers = new Map();
+let dragStart = null;
+let pinchStartDist = null;
+let pinchStartScale = 1;
+
+function distanceBetween(a, b){
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// タップ（ドラッグなしのクリック）判定用
+let tapCandidate = null; // { target, x, y }
+let gestureMoved = false;
+const TAP_MOVE_THRESHOLD = 6;
+// 座標登録ツール（?edit=1）が使う、タップ位置を受け取るコールバック
+let mapEditTapCallback = null;
+
+viewport.addEventListener("pointerdown", (e) => {
+  // ズームボタンはネイティブのボタン挙動に任せる（pan/captureの対象外）
+  if(e.target.closest(".map-zoom-btn")) return;
+
+  stopAnim();
+  stopMomentum();
+  viewport.setPointerCapture(e.pointerId);
+  activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+  if(activePointers.size === 1){
+    dragStart = { x:e.clientX, y:e.clientY, tx, ty };
+    viewport.classList.add("dragging");
+    tapCandidate = { target:e.target, x:e.clientX, y:e.clientY };
+    gestureMoved = false;
+    velTrack = [{ x:e.clientX, y:e.clientY, t:performance.now() }];
+  }else if(activePointers.size === 2){
+    const pts = [...activePointers.values()];
+    pinchStartDist = distanceBetween(pts[0], pts[1]);
+    pinchStartScale = scale;
+    tapCandidate = null;
+  }
+});
+
+viewport.addEventListener("pointermove", (e) => {
+  if(!activePointers.has(e.pointerId)) return;
+  activePointers.set(e.pointerId, { x:e.clientX, y:e.clientY });
+
+  if(tapCandidate && distanceBetween({x:e.clientX,y:e.clientY}, tapCandidate) > TAP_MOVE_THRESHOLD){
+    gestureMoved = true;
+  }
+
+  if(activePointers.size === 2){
+    const pts = [...activePointers.values()];
+    const dist = distanceBetween(pts[0], pts[1]);
+    if(pinchStartDist){
+      const midX = (pts[0].x + pts[1].x) / 2 - viewport.getBoundingClientRect().left;
+      const midY = (pts[0].y + pts[1].y) / 2 - viewport.getBoundingClientRect().top;
+      const worldX = (midX - tx) / scale, worldY = (midY - ty) / scale;
+      scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, pinchStartScale * (dist / pinchStartDist)));
+      tx = midX - worldX * scale;
+      ty = midY - worldY * scale;
+      const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+      tx = rubberBand(tx, minTx, maxTx);
+      ty = rubberBand(ty, minTy, maxTy);
+      applyTransform();
+    }
+  }else if(activePointers.size === 1 && dragStart){
+    const rawTx = dragStart.tx + (e.clientX - dragStart.x);
+    const rawTy = dragStart.ty + (e.clientY - dragStart.y);
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+    tx = rubberBand(rawTx, minTx, maxTx);
+    ty = rubberBand(rawTy, minTy, maxTy);
+    applyTransform();
+    trackVelocity(e.clientX, e.clientY);
+  }
+});
+
+function endPointer(e){
+  if(!activePointers.has(e.pointerId)){
+    return;
+  }
+  activePointers.delete(e.pointerId);
+  viewport.classList.remove("dragging");
+  if(activePointers.size < 2) pinchStartDist = null;
+
+  if(activePointers.size === 1){
+    // ピンチ中に片方の指を離して1本指ドラッグに戻る場合、基準位置を
+    // 今の位置で取り直さないと直前のピンチ分だけ位置がジャンプしてしまう
+    const remaining = [...activePointers.values()][0];
+    dragStart = { x:remaining.x, y:remaining.y, tx, ty };
+    tapCandidate = null;
+    velTrack = [{ x:remaining.x, y:remaining.y, t:performance.now() }];
+  }
+
+  if(activePointers.size === 0){
+    const wasDragging = !!dragStart;
+    dragStart = null;
+    const { minTx, maxTx, minTy, maxTy } = panBoundsAt(scale);
+    const outOfBounds = tx < minTx - 0.5 || tx > maxTx + 0.5 || ty < minTy - 0.5 || ty > maxTy + 0.5;
+    if(outOfBounds){
+      // ラバーバンドで伸びた分を滑らかに戻す
+      animateTo(
+        Math.min(maxTx, Math.max(minTx, tx)),
+        Math.min(maxTy, Math.max(minTy, ty)),
+        scale,
+        260
+      );
+    }else if(wasDragging){
+      const { vx, vy } = getVelocity();
+      startMomentum(vx, vy);
+    }
+    velTrack = [];
+    // ドラッグせずにタップした場合は、pointer capture のせいで
+    // ネイティブのclickイベントが発火しないため、ここで手動判定する
+    if(tapCandidate && !gestureMoved){
+      const pinEl = tapCandidate.target.closest(".map-pin");
+      let areaEl = tapCandidate.target.closest(".map-area-shape");
+      if(pinEl && pinEl._pinData){
+        handlePinTap(pinEl._pinData);
+      }else if(mapEditTapCallback){
+        mapEditTapCallback(tapCandidate.x, tapCandidate.y);
+      }else{
+        // 縮小表示時は大エリアをタップしやすくするため小エリアのpointer-eventsを
+        // 無効化しているが、クジラ海など対応する大エリアが存在しない小エリアは
+        // 何もヒットせずタップが完全に無効になってしまう。elementFromPointで
+        // 何も見つからなかった場合は、図形の当たり判定（isPointInFill）で
+        // 直接ジオメトリを調べるフォールバックを行い、そうした小エリアも
+        // 従来通りタップできるようにする
+        if(!areaEl) areaEl = findAreaShapeAtPoint(tapCandidate.x, tapCandidate.y);
+        if(areaEl && areaEl._areaData){
+          showAreaInfo(areaEl._areaData, areaEl._areaKind);
+        }
+      }
+    }
+    tapCandidate = null;
+  }
+}
+viewport.addEventListener("pointerup", endPointer);
+viewport.addEventListener("pointercancel", endPointer);
+viewport.addEventListener("pointerleave", (e) => { if(activePointers.has(e.pointerId)) endPointer(e); });
+
+viewport.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  stopAnim();
+  stopMomentum();
+  const rect = viewport.getBoundingClientRect();
+  const cx = e.clientX - rect.left, cy = e.clientY - rect.top;
+  const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
+  const factor = e.deltaY < 0 ? 1.15 : 1/1.15;
+  scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * factor));
+  tx = cx - worldX * scale;
+  ty = cy - worldY * scale;
+  clampPan();
+  applyTransform();
+}, { passive:false });
+
+window.addEventListener("resize", () => { stopAnim(); stopMomentum(); clampPan(); applyTransform(); });
+
+// ── 座標登録ツール（?edit=1） ──
+if(urlParams.get("edit") === "1"){
+  document.getElementById("mapEditPanel").classList.add("show");
+  const select = document.getElementById("mapEditLocationSelect");
+  const unresolvedLocations = Object.keys(mapLocationLinks).filter(k => mapLocationLinks[k] === null);
+  select.innerHTML = `<option value="">-- 未登録の場所を選択 (${unresolvedLocations.length}件) --</option>` +
+    unresolvedLocations.map(k => `<option value="${k}">${k}</option>`).join("");
+
+  const collected = {};
+  function refreshOutput(){
+    const lines = Object.entries(collected).map(([k,v]) => `  ${JSON.stringify(k)}: { x:${v.x}, y:${v.y} },`);
+    document.getElementById("mapEditOutput").value = lines.join("\n");
+  }
+
+  function screenToPct(clientX, clientY){
+    const rect = viewport.getBoundingClientRect();
+    const cx = clientX - rect.left, cy = clientY - rect.top;
+    const worldX = (cx - tx) / scale, worldY = (cy - ty) / scale;
+    return {
+      x: Math.round((worldX / naturalW) * 10000) / 100,
+      y: Math.round((worldY / naturalH) * 10000) / 100,
+    };
+  }
+
+  // ── 既存ピンの位置修正ツール ──
+  const fixSelect = document.getElementById("mapEditFixSelect");
+  const fixGroups = [
+    ["NPC", (typeof mapNpcs !== "undefined" ? mapNpcs : []).map(p => ({ id:"npc:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["ショップ", (typeof mapShops !== "undefined" ? mapShops : []).map(p => ({ id:"shop:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["バス停", (typeof mapBusStops !== "undefined" ? mapBusStops : []).map((p,i) => ({ id:"busstop:"+i, label:"バス停 #"+(i+1), x:p.x, y:p.y }))],
+    ["動物", (typeof mapAnimals !== "undefined" ? mapAnimals : []).map(p => ({ id:"animal:"+p.key, label:p.name, x:p.x, y:p.y }))],
+    ["イベント", (typeof mapEvents !== "undefined" ? mapEvents : []).map(p => ({ id:"event:"+p.key, label:p.name, x:p.x, y:p.y }))],
+  ];
+  fixSelect.innerHTML = `<option value="">-- 修正するピンを選択 --</option>` +
+    fixGroups.map(([label, items]) => `<optgroup label="${label}">` +
+      items.map(it => `<option value="${it.id}">${it.label}（現在地: x:${it.x}, y:${it.y}）</option>`).join("") +
+      `</optgroup>`
+    ).join("");
+
+  const fixCollected = {};
+  function refreshFixOutput(){
+    const lines = Object.entries(fixCollected).map(([k,v]) => `  ${k}: { x:${v.x}, y:${v.y} },`);
+    document.getElementById("mapEditFixOutput").value = lines.join("\n");
+  }
+
+  mapEditTapCallback = (clientX, clientY) => {
+    if(select.value){
+      const locKey = select.value;
+      const p = screenToPct(clientX, clientY);
+      document.getElementById("mapEditCoord").textContent = `${locKey} → x:${p.x}, y:${p.y}`;
+      collected[locKey] = p;
+      refreshOutput();
+    }else if(fixSelect.value){
+      const id = fixSelect.value;
+      const label = fixSelect.options[fixSelect.selectedIndex].textContent;
+      const p = screenToPct(clientX, clientY);
+      document.getElementById("mapEditFixCoord").textContent = `${label} → x:${p.x}, y:${p.y}`;
+      fixCollected[id] = p;
+      refreshFixOutput();
+    }
+  };
+}
+
+renderPins();
+renderAreas();
+maybeStartPageTutorial(MAP_TUTORIAL_DONE_KEY, MAP_TUTORIAL_STEPS);
+document.addEventListener("langchange", renderPins);
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

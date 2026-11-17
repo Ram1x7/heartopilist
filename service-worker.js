@@ -1,0 +1,203 @@
+// キャッシュ名（更新時はバージョンを上げる）
+const CACHE_NAME = "hatopi-v2.591.0";
+
+// キャッシュするファイル一覧
+const CACHE_FILES = [
+  "./",
+  "./index.html",
+  "./foods.html",
+  "./garden.html",
+  "./pet.html",
+  "./shop.html",
+  "./order-trend.html",
+  "./codes.html",
+  "./events.html",
+  "./videos.html",
+  "./art-create.html",
+  "./art-convert.html",
+  "./music.html",
+  "./build.html",
+  "./faq.html",
+  "./achievements.html",
+  "./updates.html",
+  "./map.html",
+  "./profile-card.html",
+  "./card-maker.html",
+  "./legal.html",
+  "./css/style.css?v=42",
+  "./css/design-system.css?v=5",
+  "./css/art.css?v=68",
+  "./css/art-preview-panel.css?v=3",
+  "./css/music.css?v=49",
+  "./css/profile-card.css?v=3",
+  "./js/main.js?v=64",
+  "./js/toast.js",
+  "./js/tutorial.js",
+  "./js/bug-timer.js",
+  "./js/price-calc.js",
+  "./js/shop.js?v=12",
+  "./js/data-shop.js",
+  "./js/data-order-trend.js",
+  "./js/data-order-trend-apk.js?v=11",
+  "./js/data-order-trend-reviewed.js?v=9",
+  "./images/000.PNG",
+  "./js/order-trend.js?v=13",
+  "./js/data-sync.js",
+  "./js/weather-master.js",
+  "./js/data-weather.js",
+  "./js/data-fish.js",
+  "./js/data-bugs.js",
+  "./js/data-birds.js",
+  "./js/data-sand.js",
+  "./js/data-snow.js",
+  "./js/data-shell.js",
+  "./js/data-kabotya.js",
+  "./js/data-daily-spots.js",
+  "./js/data-daily-tasks.js",
+  "./js/data-weekly-tasks.js",
+  "./js/data-foods.js",
+  "./js/data-cats.js",
+  "./js/data-dogs.js",
+  "./js/data-crops.js",
+  "./js/data-flowers.js",
+  "./js/data-codes.js",
+  "./js/data-events.js",
+  "./js/data-faq.js",
+  "./js/data-videos.js",
+  "./js/data-achievements.js",
+  "./js/data-updates.js",
+  "./js/data-map.js",
+  "./js/data-map-locations.js",
+  "./js/data-map-areas.js",
+  "./js/art-config.js",
+  "./js/art-masks.js",
+  "./js/art-pixelate.js",
+  "./js/art-template-match.js",
+  "./js/art-screenshot-recovery.js?v=2",
+  "./js/lz-string.min.js",
+  "./js/qrcode.js",
+  "./js/art-share-code.js?v=2",
+  "./js/art-editor.js?v=3",
+  "./js/art-project.js?v=1",
+  "./js/art-3d-adapter.js?v=7",
+  "./js/art-3d-preview.js?v=7",
+  "./js/art-3d-export.js",
+  "./js/art-3d-models/garment.js",
+  "./js/art-3d-models/furniture.js",
+  "./js/art-3d-models/pattern-garment.js",
+  "./js/art-3d-models/pattern-helpers.js",
+  "./js/vendor/three/three.module.min.js",
+  "./js/art-paint-guide.js",
+  "./js/art-screenshot-import.js?v=3",
+  "./js/art-converter.js",
+  "./js/data-materials.js",
+  "./js/three.module.min.js",
+  "./js/build3d-scene.js",
+  "./js/build.js?v=30",
+  "./js/music-config.js",
+  "./js/music-editor.js",
+  "./js/music-hum.js",
+  "./js/music-midi-import.js",
+  "./js/music-presets.js",
+  "./js/edge-swipe-guard.js",
+  "./js/nav-scroll.js",
+  "./js/scroll-hint.js",
+  "./js/i18n.js",
+  "./js/icons.js",
+  "./js/icon-size.js",
+  "./js/currency-icons.js",
+  "./js/update-popup.js",
+  "./js/sw-register.js",
+  "./js/profile-card-storage.js",
+  "./js/profile-card-progress.js",
+  "./js/profile-card-progress-page.js",
+  "./js/profile-card-renderer.js",
+  "./js/profile-card.js",
+  "./fonts/NotoSerifJP-Digits-900.woff2",
+  "./fonts/NotoSerifJP-AchievementValue-800.woff2",
+  "./fonts/NotoSerifJP-CategoryCount-700.woff2",
+  "./locales/ja.json?v=89",
+  "./locales/en.json?v=89",
+  "./locales/ko.json?v=89",
+  "./locales/th.json?v=89",
+  "./locales/zh-CN.json?v=89",
+  "./locales/zh-TW.json?v=89",
+  "./manifest.json",
+];
+
+// インストール時：キャッシュを作成
+self.addEventListener("install", (e) => {
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(CACHE_FILES);
+    })
+  );
+  // 新しいSWをすぐに有効化
+  self.skipWaiting();
+});
+
+// 有効化時：古いキャッシュを削除
+self.addEventListener("activate", (e) => {
+  e.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      );
+    })
+  );
+  // すぐに全クライアントを制御下に置く
+  self.clients.claim();
+});
+
+// フェッチ時：ネットワーク優先（失敗時のみキャッシュを使う）
+self.addEventListener("fetch", (e) => {
+  // GETリクエスト以外はスルー
+  if(e.request.method !== "GET") return;
+
+  // 画像：キャッシュ優先＋裏で更新（stale-while-revalidate）
+  // 図鑑の画像は数が多く更新頻度も低いため、毎回ネットワークを待たせず
+  // キャッシュがあれば即座に表示し、裏で最新版に更新しておく
+  if(e.request.destination === "image"){
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        const networkFetch = fetch(e.request)
+          .then((response) => {
+            if(response && response.status === 200){
+              const cloned = response.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(e.request, cloned));
+            }
+            return response;
+          })
+          .catch(() => cached);
+        return cached || networkFetch;
+      })
+    );
+    return;
+  }
+
+  e.respondWith(
+    // cache:"no-store" でブラウザ自体のHTTPキャッシュを明示的にバイパスする。
+    // これを指定しないと、index.html等（バージョンクエリなし）がブラウザの
+    // 通常のHTTPキャッシュ側で有効期限内と判断され、SWの「ネットワーク優先」の
+    // つもりのfetch()がネットワークに出ずキャッシュ応答で済んでしまうことがあり、
+    // 新しいjs/css（?v=N）への参照に更新されないまま古い内容が延々と表示され続ける
+    // 不具合の原因になっていた（ホーム画面追加のPWAで特に顕著）
+    fetch(e.request, { cache: "no-store" })
+      .then((response) => {
+        // 正常なレスポンスならキャッシュを更新
+        if(response && response.status === 200){
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(e.request, cloned);
+          });
+        }
+        return response;
+      })
+      .catch(() => {
+        // オフライン時はキャッシュから返す
+        return caches.match(e.request);
+      })
+  );
+});

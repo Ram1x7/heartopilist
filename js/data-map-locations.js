@@ -1,0 +1,149 @@
+// 図鑑の location 文字列 -> マップ座標(%) のリンクデータ
+// マップ上のランドマーク名と直接対応が取れるものだけ先に登録済み。
+// null のものは対応するマップ上の地点が未登録（今後、座標登録ツールで追加予定）。
+// クエスト名（「」や『追加段階』を含むもの）は固定の場所を持たないため基本null。
+// ただし「海釣りクエスト」「虫コイコイクエスト」「巣ごもりクエスト」等、
+// js/data-map.jsのmapEventsに対応するイベントマーカーが存在するクエストは、
+// 下のmapLocationEventLinksで紐づける（固定座標ではなくイベントのピンを直接ハイライトするため）。
+
+const mapLocationLinks = {
+  "「アクターバト」クエスト(追加段階)": null,
+  "「スクリプター・ビー」クエスト(追加段階)": null,
+  "「氷晶の蝶」クエスト(追加段階)": null,
+  "そよ風の海": { x:48.69, y:79.15 }, // landmarks:Zephyr Sea
+  "そよ風の海の海辺": { x:48.69, y:79.15 }, // landmarks:Zephyr Sea
+  "エアーミツバチ虫寄せ装置": { x:50.5, y:23.0 }, // events:bait-the-insects
+  "ガーパイククエスト(追加段階)": null,
+  "クジラ海": { x:8.4, y:53.5 }, // landmarks:Whale Sea
+  "クジラ海の海辺": { x:8.4, y:53.5 }, // landmarks:Whale Sea
+  "ニシキコウチュウクエスト(追加段階)": null,
+  "ブランクの頭上": { x:56.85, y:53.5 }, // npcs:blanc
+  "ホーム": { x:30.09, y:52.14 }, // landmarks:Home Plots
+  "ヤツガシラクエスト(追加段階)": null,
+  "中心街": { x:49.31, y:53.33 }, // landmarks:Central Square
+  "冬季採録クエスト(追加段階)": null,
+  "川": null,
+  "川辺": null,
+  "巣ごもりクエスト": null, // mapLocationEventLinksでイベントマーカーにリンク
+  "巣ごもりクエスト(追加段階)": null, // mapLocationEventLinksでイベントマーカーにリンク
+  "巨木の川": { x:61.95, y:66.81 }, // landmarks:Giantwood River
+  "旧海": { x:50, y:5 }, // landmarks:Old Sea
+  "旧海の海辺": { x:50, y:5 }, // landmarks:Old Sea
+  // 「旧海・クジラ海」「東海・そよ風の海」は2つの海にまたがって出現する場所のため、
+  // 単一座標（中間点の近似）ではなくmapMultiAreaLocationsで両方をハイライトする
+  "東海": { x:97.7, y:52.42 }, // landmarks:East Sea
+  "東海の海辺": { x:97.7, y:52.42 }, // landmarks:East Sea
+  "森の湖": { x:76.1, y:49.66 }, // landmarks:Forest Lake
+  "森の湖畔": { x:76.1, y:49.66 }, // landmarks:Forest Lake
+  "森林": { x:79.4, y:51.5 }, // landmarks:Forest
+  "森林-コジカ塔": { x:81.45, y:36.0 }, // landmarks:Deer Tower
+  "森林-コジカ塔(木のてっぺん)": { x:81.45, y:36.0 }, // landmarks:Deer Tower
+  "森林-ジャンプステージ": { x:77.78, y:68.92 }, // landmarks:Jump Puzzle
+  "森林-不思議な松林": { x:80.11, y:53.21 }, // landmarks:Spirit Oak Pine Forest
+  "森林-森の島": { x:93.82, y:33.8 }, // landmarks:Forest Island
+  "水辺": null,
+  "浅水川": { x:66.86, y:33.88 }, // landmarks:Shallow River
+  "浅海の魚群クエスト(追加段階)": null,
+  "海": null,
+  "海洋清掃": null, // 貝殻の出現場所。マップ上に対応する固定地点が無いため地図で見るリンクは非表示のまま
+  "海洋清掃クエスト": null,
+  "海辺": null,
+  "海釣りクエスト": null, // mapLocationEventLinksでイベントマーカーにリンク
+  "温泉山": { x:49.1, y:19.8 }, // landmarks:Onsen Mountain
+  // 「温泉」のランドマーク座標は温泉山の湖の小さな池のすぐそばにあり、
+  // 池のポリゴンと重なってしまうため、地図で見る用にわずかにずらした座標を使う
+  "温泉山-温泉": { x:52.04, y:21.41 }, // landmarks:Onsen
+  "温泉山-温泉(崖の上)": { x:52.04, y:21.41 }, // landmarks:Onsen
+  "温泉山-火山湖": { x:38.38, y:17.93 }, // landmarks:Crater Lake
+  "温泉山-石海岸の崖": { x:61.88, y:20.57 }, // landmarks:Stone Cliff
+  "温泉山-遺跡": { x:29.3, y:18.25 }, // landmarks:Ruins
+  "温泉山-遺跡(崖の上)": { x:29.3, y:18.25 }, // landmarks:Ruins
+  "温泉山の湖": { x:53.76, y:25.99 }, // landmarks:Onsen Mountain Lake
+  "温泉山の湖畔": { x:53.76, y:25.99 }, // landmarks:Onsen Mountain Lake
+  "湖": null,
+  "漁村": { x:46.5, y:67.7 }, // landmarks:Fishing Village
+  "漁村-波止場": { x:41.4, y:68.09 }, // landmarks:Wharf
+  "漁村-漁村広場": { x:51.66, y:69.53 }, // landmarks:Fishing Village Square
+  "漁村-漁村東桟橋": { x:60.94, y:73.62 }, // landmarks:East Pier Fishing Village
+  "漁村-灯台": { x:38.69, y:78 }, // landmarks:Lighthouse
+  "特殊積み木虫クエスト": null,
+  "特殊積み木鳥クエスト": null,
+  "花畑": { x:18.5, y:53.1 }, // landmarks:Flower Field
+  "花畑-クジラ山": { x:18.81, y:41.47 }, // landmarks:Whale Mountain
+  "花畑-パープルビーチ": { x:21.6, y:72.75 }, // landmarks:Purple Light Beach
+  "花畑-風車の花畑": { x:18.7, y:63.33 }, // landmarks:Windmill Flower Field
+  "草原の湖": { x:23.43, y:53.36 }, // landmarks:Meadow Lake
+  "草原の湖畔": { x:23.43, y:53.36 }, // landmarks:Meadow Lake
+  "虫クエスト（追加段階）": null,
+  "虫コイコイクエスト": null,
+  "虫コイコイクエスト-遺跡(追加段階)": { x:29.3, y:18.25 }, // landmarks:Ruins
+  "郊外": { x:36, y:56 }, // landmarks:Suburbs
+  "郊外の湖": { x:50.08, y:59.76 }, // landmarks:Suburban Lake
+  "郊外の湖畔": { x:50.08, y:59.76 }, // landmarks:Suburban Lake
+  "郊外の湖街": { x:50.08, y:59.76 }, // landmarks:Suburban Lake
+  "郊外湖畔": { x:50.08, y:59.76 }, // landmarks:Suburban Lake
+  "霞川": { x:31.71, y:33.26 }, // landmarks:Rosy River
+  "静川": { x:36.11, y:67.72 }, // landmarks:Tranquil River（元の座標(36.25,67.92)は自身のポリゴン外で隣接する「漁村-波止場」に重なっていたため、ポリゴン内に補正）
+};
+
+// 「湖」「川」「海」など、特定の1地点に絞れない汎用locationは上記では null にしているが、
+// 実際にはどの湖・川・海でも出現するという意味のため、地図で見るを押すと該当する
+// エリア全てをハイライト表示する（js/main.jsのリンク表示判定と、map.htmlのハイライト
+// 処理の両方から参照）。キーはエリア側(js/data-map-areas.js)のkeyに合わせている
+// （「霞川」の地名は"Rosy River"表記だが、エリア側は"Rozy River"表記のため注意）。
+// 「川辺」「海辺」はそれぞれ「川」「海」と同じ対象。「水辺」は海辺を除いた
+// 水辺（湖＋川）が対象（ユーザー確認済み）。
+const mapMultiAreaLocations = {
+  "湖": ["Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake"],
+  "川": ["Giantwood River", "Tranquil River", "Shallow River", "Rozy River"],
+  "海": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  "川辺": ["Giantwood River", "Tranquil River", "Shallow River", "Rozy River"],
+  "海辺": ["Old Sea", "Whale Sea", "Zephyr Sea", "East Sea"],
+  "水辺": [
+    "Onsen Mountain Lake", "Meadow Lake", "Suburban Lake", "Forest Lake",
+    "Giantwood River", "Tranquil River", "Shallow River", "Rozy River",
+  ],
+  // 隣接する2つの海にまたがって出現する場所。単一座標（境界の近似）で持つと
+  // どちらのエリアの範囲にも入らない位置になりがちなため、両方をハイライトする
+  "旧海・クジラ海": ["Old Sea", "Whale Sea"],
+  "東海・そよ風の海": ["East Sea", "Zephyr Sea"],
+};
+
+// 「森林」「温泉山」「漁村」「花畑」「中心街」は、複数の小エリアをまとめた広域
+// ゾーン名（大エリア）で、その名前だけのlocationは特定の小エリア1つには絞れない。
+// 上のmapLocationLinksには（ランドマークのピン座標をそのまま使っているため）
+// 何らかの小エリアの座標が入ってしまっているが、それだと実際とは異なる特定の
+// 小エリアが地図で見るに表示されてしまう。そのため、これらは座標ではなく
+// 対応する大エリア（js/data-map-areas.jsのmapAreasBigのkey）を直接指定し、
+// 大エリア全体をハイライト表示する
+const mapGenericBigAreaLocations = {
+  "森林": "Forest",
+  "温泉山": "Onsen Mountain",
+  "漁村": "Fishing Village",
+  "花畑": "Flower Field",
+  "中心街": "Central District",
+};
+
+// 「固定の場所を持たないクエスト」のうち、js/data-map.jsのmapEventsに対応する
+// イベントマーカー（⭐アイコン）が存在するもの。地図で見るを押すと、周辺の
+// エリア（ランドマーク）ではなく、このイベントのピンそのものをハイライトする。
+// キーはmapEvents側のkeyに合わせている
+const mapLocationEventLinks = {
+  "海釣りクエスト": "sea-fishing",
+  "虫コイコイクエスト": "bait-the-insects",
+  "巣ごもりクエスト": "nest-of-hundreds",
+  "巣ごもりクエスト(追加段階)": "nest-of-hundreds",
+};
+
+// イベントマーカーの「くわしく見る」一覧（出現する魚・虫・野鳥）に含める
+// 出現場所名のプレフィックス。「虫コイコイクエスト-遺跡(追加段階)」のように、
+// クエスト名の後に地名や「(追加段階)」が続く派生locationも同じクエストの
+// 出現場所としてまとめて扱う。
+// ※「虫コイコイクエスト-遺跡(追加段階)」は固定座標(遺跡)を持つため、
+// その生物自身の「地図で見る」リンク先はmapLocationLinks側の遺跡座標のまま
+// （上のmapLocationEventLinksには含めない）。ここはあくまで一覧表示用
+const mapEventQuestNamePrefixes = {
+  "海釣りクエスト": "sea-fishing",
+  "虫コイコイクエスト": "bait-the-insects",
+  "巣ごもりクエスト": "nest-of-hundreds",
+};

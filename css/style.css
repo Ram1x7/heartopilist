@@ -1,0 +1,2798 @@
+:root{
+  /* 生成り（和紙）ベース */
+  --bg-top:#f7f2e7;
+  --bg-bottom:#ece2cf;
+
+  /* 墨色テキスト */
+  --text:#34302b;
+  /* card-sub(#f3ecdc)との組み合わせでWCAG AA(4.5:1)を満たすよう、
+     元の#7a7164よりわずかに明度を落としてある（card:5.38:1, card-sub:4.65:1） */
+  --text-sub:#71685c;
+
+  /* 藍・朱・金 アクセント */
+  --indigo:#3c5a6e;
+  --indigo-soft:#5a7d92;
+  --vermillion:#b1503b;
+  --vermillion-soft:#c97058;
+  --gold:#c8a86b;
+
+  --card:#fffdf7;
+  --card-sub:#f3ecdc;
+  --border:#e4d9c2;
+}
+
+/* Safari で body の背景がスクロール全域に伸びきらないことがあるため、
+   html側にも同じ背景を敷いて白い隙間が見えないようにする */
+html{
+  background:
+    linear-gradient(
+      180deg,
+      var(--bg-top) 0%,
+      var(--bg-bottom) 100%
+    );
+  /* 画面左右端でのオーバースクロールを、ブラウザの「前/次のページへ戻る・進む」
+     ジェスチャーとして扱わせない（touch-actionだけでは抑止しきれない場合の
+     追加対策。overscroll-behaviorは「スクロール領域の端に達した時の挙動」
+     そのものを制御するプロパティで、body側でも同様に指定する） */
+  overscroll-behavior-x:none;
+  /* ページ最上部で下にスワイプした時のバウンス（ラバーバンド効果）で、
+     本来の背景の上に隙間（余白）が見えてしまうのを防ぐ */
+  overscroll-behavior-y:none;
+}
+
+html.dark{
+  background:
+    linear-gradient(
+      180deg,
+      #25221d 0%,
+      #1a1814 100%
+    );
+}
+
+body{
+  margin:0;
+  padding:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:
+    linear-gradient(
+      180deg,
+      var(--bg-top) 0%,
+      var(--bg-bottom) 100%
+    );
+  color:var(--text);
+  overflow-x:hidden;
+  overscroll-behavior-x:none;
+  overscroll-behavior-y:none;
+  position:relative;
+  animation:fadeIn 0.2s ease;
+  /* PWA（ホーム画面追加）でピンチ操作すると画面全体が縮小され、周りに余白が
+     見えてしまうのを防ぐ（ページ全体のピンチズーム・ダブルタップズームを無効化）。
+     横方向のpanはここでは許可しない：pan-xを許可すると、画面左右端からの横スワイプが
+     ブラウザ（特にiOS Safari）に「戻る/進む」ジェスチャーとして扱われてしまうため。
+     縦スクロールはpan-yで引き続き可能。ナビバーなど、実際に横スクロールさせたい
+     要素側では個別にtouch-action:pan-x pan-yを指定して上書きする。
+     （touch-actionだけでは抑止しきれない場合に備え、overscroll-behavior-xと
+     js/edge-swipe-guard.jsでも重ねて対策している） */
+  touch-action:pan-y;
+}
+
+/* bodyのtouch-action:pan-y（画面端スワイプでの「戻る」誤爆防止）により、
+   横方向のドラッグ操作が必要なスライダーのつまみが操作できなくなってしまう
+   （iOS Safari等）ため、レンジ入力には全ページ共通でタップ・ドラッグを
+   許可し直す。ページ側の個別ルールで上書きしている場合はそちらが優先される */
+input[type="range"]{
+  touch-action:manipulation;
+}
+
+/* 画像の長押しによる保存メニュー（iOS Safariの「写真に保存」等）を抑止する。
+   Android Chrome等、OS側の長押しメニューはCSSだけでは完全には防げないが、
+   それでも長押しによるドラッグ開始・テキスト選択ハイライトは防げるため、
+   全ページ共通で画像に適用する */
+img{
+  -webkit-touch-callout:none;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+
+@keyframes fadeIn{
+  from{ opacity:0; }
+  to{ opacity:1; }
+}
+
+/* 背景のぼかし（控えめに） */
+body::before{
+  content:"";
+  position:fixed;
+  width:320px;
+  height:320px;
+  background:rgba(200,168,107,0.12);
+  border-radius:50%;
+  top:-120px;
+  right:-100px;
+  filter:blur(60px);
+  z-index:-1;
+}
+
+body::after{
+  content:"";
+  position:fixed;
+  width:260px;
+  height:260px;
+  background:rgba(60,90,110,0.08);
+  border-radius:50%;
+  bottom:-100px;
+  left:-80px;
+  filter:blur(60px);
+  z-index:-1;
+}
+
+/* ダークモード（墨色ベース）
+   個々のセレクタが参照するダーク用トークンをここでまとめて定義する */
+body.dark{
+  --dark-bg-top:#25221d;
+  --dark-bg-bottom:#1a1814;
+  --dark-text:#ece4d4;
+  --dark-text-sub:#b3a89a;
+  --dark-card:#2c2823;
+  --dark-card-alt:#383329;
+  --dark-border:#46423b;
+  --dark-accent:#e8d2a8;
+  --dark-highlight:#e07060;
+  --dark-thumb-bg:#2a2620;
+  --dark-decor-1:rgba(200,168,107,0.08);
+  --dark-decor-2:rgba(143,180,201,0.06);
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--dark-bg-top) 0%,
+      var(--dark-bg-bottom) 100%
+    );
+  color:var(--dark-text);
+}
+
+body.dark::before{
+  background:var(--dark-decor-1);
+}
+
+body.dark::after{
+  background:var(--dark-decor-2);
+}
+
+/* タイトルエリア */
+.title-bar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  row-gap:6px;
+  margin-bottom:10px;
+  min-height:40px;
+}
+
+.title-bar h1{
+  margin:0;
+  padding-left:4px;
+  flex-shrink:0;
+}
+
+
+/* ダークモードボタン */
+#darkToggle{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  line-height:1;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  transition:0.2s;
+}
+
+#darkToggle:active{
+  transform:scale(0.92);
+}
+
+/* ダーク時カード */
+body.dark .card,
+body.dark .item,
+body.dark .modal-box,
+body.dark .sticky{
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
+}
+
+/* ダーク時画像背景 */
+body.dark .item img,
+body.dark .modal-box img{
+  background:var(--dark-card-alt);
+}
+
+/* ダーク時入力 */
+body.dark .search,
+body.dark .mini-search{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  box-shadow:none;
+  border:1px solid var(--dark-border);
+}
+
+/* ダーク時ボタン */
+body.dark .filter button,
+body.dark .modal-box button,
+body.dark #darkToggle,
+body.dark #helpBtn,
+body.dark #minimizeBtn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
+}
+
+/* ダーク時ONボタン（藍色） */
+body.dark .active{
+  background:var(--indigo-soft) !important;
+  color:#fdf9ef !important;
+  border-color:var(--indigo-soft) !important;
+}
+
+/* タイトル右側ボタン群 */
+.title-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  align-items:center;
+  gap:8px;
+  margin-left:auto;
+}
+
+/* 言語セレクター */
+#lang-selector{
+  display:flex;
+  align-items:center;
+}
+
+#lang-select{
+  height:36px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:0 10px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  cursor:pointer;
+  text-align:center;
+}
+
+body.dark #lang-select{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
+}
+
+/* ヘルプボタン */
+#helpBtn{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  line-height:1;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  transition:0.2s;
+}
+
+#helpBtn:active{
+  transform:scale(0.92);
+}
+
+/* ダーク時文字 */
+body.dark .weather,
+body.dark .time,
+body.dark a,
+body.dark p,
+body.dark h3{
+  color:var(--dark-text);
+}
+
+.dark body::before,
+.dark body::after{
+  opacity:0.6;
+}
+
+/* タイトル */
+h1{
+  text-align:center;
+  font-size:23px;
+  font-family:'Shippori Mincho', serif;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.18em;
+  text-shadow:none;
+  margin-bottom:10px;
+}
+
+/* ダークモード時 */
+body.dark h1{
+  color:var(--dark-accent);
+  text-shadow:none;
+}
+
+/* ヘッダー */
+.page-header{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.page-header h1{
+  font-family:'Shippori Mincho', serif;
+  font-size:22px;
+  color:var(--indigo);
+  letter-spacing:0.14em;
+  margin-bottom:4px;
+}
+
+body.dark .page-header h1{
+  color:var(--dark-accent);
+}
+
+.page-subtitle{
+  margin:0;
+  font-size:11px;
+  text-align:center;
+  color:var(--text-sub);
+}
+
+/* チュートリアルを再生できるページの見出し下に添える、ヘルプボタンへの案内 */
+.page-tutorial-hint{
+  margin:4px 0 0;
+  font-size:11px;
+  text-align:center;
+  color:var(--text-sub);
+  opacity:0.8;
+}
+
+body.dark .page-tutorial-hint{
+  color:var(--dark-text-sub);
+}
+
+/* カード */
+.card{
+  background:var(--card);
+  border-radius:18px;
+  padding:14px;
+  margin-top:12px;
+  border:1px solid var(--border);
+  box-shadow:0 8px 22px rgba(52,48,43,0.07);
+}
+
+/* sticky */
+.sticky{
+  position:sticky;
+  top:8px;
+  z-index:100;
+  width:100%;
+  box-sizing:border-box;
+  background:var(--card);
+  /* 検索・絞り込みなど中身が多いと画面の高さを超えることがあり、
+     その場合でも下部のボタンまで届くようパネル内で縦スクロールできるようにする */
+  max-height:calc(100vh - 16px);
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* 天気 */
+.weather{
+  text-align:center;
+  font-size:18px;
+  margin-bottom:6px;
+  color:var(--text-sub);
+}
+
+/* 天気全体 */
+.weather-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:flex-end;
+  gap:4px 8px;
+  margin-bottom:8px;
+}
+
+/* 今の天気（狭い画面で「晴れ」等が文字単位で折り返されるのを防ぐ） */
+.weather-now{
+  font-size:18px;
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+/* 次の天気 */
+.weather-next{
+  font-size:11px;
+  opacity:0.8;
+  color:var(--text-sub);
+  margin-bottom:2px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+/* ダークモード */
+body.dark .weather-now{
+  color:var(--dark-accent);
+}
+
+body.dark .weather-next{
+  color:var(--dark-text-sub);
+}
+
+/* 天気の手動入力（公式データが「不明」の間だけ表示） */
+.weather-override-select{
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:8px;
+  border:1px solid var(--indigo);
+  background:#fff;
+  color:var(--indigo);
+}
+
+body.dark .weather-override-select{
+  border-color:var(--dark-accent);
+  background:#2a2a2e;
+  color:var(--dark-accent);
+}
+
+/* サーバー選択 */
+.server-select-wrap{
+  display:flex;
+  justify-content:center;
+  margin-bottom:6px;
+}
+
+.server-select{
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:5px 12px;
+  font-size:11px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  cursor:pointer;
+  text-align:center;
+}
+
+body.dark .server-select{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
+}
+
+/* 時間 */
+.time{
+  text-align:center;
+  font-size:28px;
+  font-family:'Shippori Mincho', serif;
+  letter-spacing:0.06em;
+  margin-bottom:10px;
+  color:var(--indigo);
+}
+
+/* 検索 */
+.search{
+  width:100%;
+  padding:12px 16px;
+  border:1px solid var(--border);
+  outline:none;
+  border-radius:999px;
+  background:var(--card);
+  box-shadow:inset 0 1px 3px rgba(52,48,43,0.05);
+  font-family:'Zen Maru Gothic', sans-serif;
+  box-sizing:border-box;
+  font-size:13px;
+  color:var(--text);
+}
+
+.search:focus,
+.mini-search:focus{
+  border-color:var(--indigo-soft);
+}
+
+/* 画像ラッパー */
+.img-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+}
+
+/* レベル表示 */
+.level-badge{
+  position:absolute;
+  top:6px;
+  left:6px;
+  z-index:5;
+  padding:1px 5px;
+  border-radius:999px;
+  font-size:6px;
+  color:#fdf9ef;
+  background:rgba(52,48,43,0.75);
+  backdrop-filter:blur(4px);
+}
+
+.shadow-badge{
+  position:absolute;
+  bottom:6px;
+  left:6px;
+  z-index:5;
+  padding:2px 5px;
+  border-radius:999px;
+  font-size:7px;
+  color:#fdf9ef;
+  background:rgba(52,48,43,0.7);
+}
+
+.shadow-gold{
+  background:
+    linear-gradient(
+      180deg,
+      #f0d199 0%,
+      var(--gold) 100%
+    );
+  color:#5c4300;
+}
+
+.shadow-blue{
+  background:
+    linear-gradient(
+      180deg,
+      var(--indigo-soft) 0%,
+      var(--indigo) 100%
+    );
+  color:#fdf9ef;
+}
+
+/* チェックボタン */
+.check-btn{
+  position:absolute;
+  top:6px;
+  right:6px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 6px rgba(52,48,43,0.1);
+  z-index:10;
+}
+
+/* ON状態（朱色） */
+.check-btn.checked{
+  background:var(--vermillion);
+  border-color:var(--vermillion);
+  color:#fdf9ef;
+}
+
+/* 名前 */
+.item-name{
+  height:34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1.2;
+  font-size:11px;
+}
+
+/* ×ボタン */
+#clearBtn{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  border:1px solid var(--border);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--card);
+  box-shadow:0 2px 6px rgba(52,48,43,0.08);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-sub);
+}
+
+body.dark #clearBtn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+/* フィルター */
+.filter{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.filter-4 button{
+  padding:8px 4px;
+  font-size:10px;
+}
+
+/* 出現モード・並び替えなど、ラベル長が不揃いなタブ用：折り返し対応 */
+.filter-wrap{
+  flex-wrap:wrap;
+}
+
+.filter-wrap button{
+  flex:1 1 auto;
+  min-width:60px;
+}
+
+/* 種類タブ専用（全部/魚/虫/野鳥/砂像/雪像/貝殻/かぼちゃ）：4列×2行の均等グリッドに整列 */
+#typeFilterRow{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+}
+
+#typeFilterRow button{
+  flex:none;
+  min-width:0;
+  padding:8px 4px;
+  gap:4px;
+  font-size:10.5px;
+}
+
+/* 出現モード専用（今出現するもの全て/今の天気限定/今は出現しない/すべて）：
+   ラベルの長さが不揃いなので、4分割ではなく2列×2行にして折り返しを安定させる */
+#weatherModeRow{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+}
+
+#weatherModeRow button{
+  flex:none;
+  min-width:0;
+  padding:10px 8px;
+  line-height:1.35;
+}
+
+#typeFilterRow button span:not(.btn-icon){
+  white-space:nowrap;
+}
+
+/* オーダーチケットの通貨絞り込み（すべて/コイン/ハート石/願い星）：
+   アイコン追加後も元の1行レイアウトを保つため、余白を詰めて折り返しを防ぐ */
+#otCurrencyRow button{
+  padding:10px 4px;
+  gap:3px;
+}
+
+#otCurrencyRow button span:not(.ot-currency-icon){
+  white-space:nowrap;
+}
+
+/* 売却額順のサブ選択（高い順/安い順・★1〜5） */
+.price-sort-sub{
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+
+.price-sort-sub button{
+  padding:6px 10px;
+  font-size:11px;
+  flex:0 0 auto;
+}
+
+.price-sort-sep{
+  width:1px;
+  align-self:stretch;
+  background:var(--border);
+  margin:2px 2px;
+}
+
+body.dark .price-sort-sep{
+  background:var(--dark-border);
+}
+
+/* 作り方セクション（砂像など） */
+.modal-make-steps{
+  display:none;
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:var(--card-sub);
+  font-size:12px;
+  text-align:left;
+}
+
+body.dark .modal-make-steps{
+  background:var(--dark-card-alt);
+}
+
+.modal-make-steps-title{
+  font-weight:700;
+  margin-bottom:6px;
+  color:var(--indigo);
+}
+
+body.dark .modal-make-steps-title{
+  color:var(--dark-accent);
+}
+
+.modal-make-steps-list{
+  margin:0;
+  padding-left:18px;
+  line-height:1.7;
+}
+
+.modal-craft-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:3px 0;
+  font-size:12px;
+}
+
+.modal-craft-label{
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+/* ── 蛍石・オークの木：今日の場所 ── */
+.daily-spot-card{
+  margin-bottom:14px;
+}
+
+.daily-spot-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+  font-weight:700;
+  font-size:13px;
+  color:var(--indigo);
+  margin-bottom:10px;
+}
+
+body.dark .daily-spot-header{
+  color:var(--dark-accent);
+}
+
+.daily-spot-header-btns{
+  display:flex;
+  flex-wrap:nowrap;
+  gap:6px;
+  min-width:0;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
+}
+
+.daily-spot-header-btns::-webkit-scrollbar{
+  display:none;
+}
+
+.daily-spot-calendar-btn{
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  padding:6px 12px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  white-space:nowrap;
+  flex-shrink:0;
+}
+
+body.dark .daily-spot-calendar-btn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+.daily-spot-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.daily-spot-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-radius:14px;
+  background:var(--card-sub);
+}
+
+body.dark .daily-spot-item{
+  background:var(--dark-card-alt);
+}
+
+.daily-spot-item img{
+  width:44px;
+  height:44px;
+  object-fit:contain;
+  border-radius:10px;
+  background:var(--card);
+  flex-shrink:0;
+}
+
+body.dark .daily-spot-item img{
+  background:var(--dark-card);
+}
+
+.daily-spot-item-info{
+  min-width:0;
+}
+
+.daily-spot-item-label{
+  font-size:10px;
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+body.dark .daily-spot-item-label{
+  color:var(--dark-text-sub);
+}
+
+.daily-spot-item-location{
+  font-size:13px;
+  font-weight:700;
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+body.dark .daily-spot-item-location{
+  color:var(--dark-text);
+}
+
+/* カレンダーモーダル */
+#dailySpotCalendarModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:2500;
+  overflow-y:auto;
+}
+
+.daily-spot-calendar-modal{
+  max-width:340px;
+  margin:40px auto;
+}
+
+/* 今日やることリスト モーダル */
+#dailyTasksModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:2500;
+  overflow-y:auto;
+  padding:20px 0;
+  box-sizing:border-box;
+}
+
+/* 週替わり商店リスト モーダル */
+#weeklyShopModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:2500;
+  overflow-y:auto;
+  padding:20px 0;
+  box-sizing:border-box;
+}
+
+.daily-tasks-modal{
+  max-width:360px;
+  margin:0 auto;
+}
+
+.daily-tasks-modal h3{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.daily-tasks-body{
+  max-height:60vh;
+  overflow-y:auto;
+  margin-bottom:12px;
+}
+
+.weekly-shop-hint{
+  font-size:11px;
+  color:var(--text-sub);
+  line-height:1.6;
+  margin:0 0 8px;
+}
+
+body.dark .weekly-shop-hint{
+  color:var(--dark-text-sub);
+}
+
+.weekly-shop-countdown{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:10px;
+}
+
+body.dark .weekly-shop-countdown{
+  color:var(--dark-accent);
+}
+
+/* ══════════════════════════════════════
+   出現カレンダー モーダル内「天気」タブ
+   （既存の蛍石/オークの木タブと同じdailySpotCalendarModalに統合）
+   ══════════════════════════════════════ */
+.weather-forecast-server-note{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-bottom:8px;
+  text-align:center;
+}
+body.dark .weather-forecast-server-note{ color:var(--dark-text-sub); }
+
+/* 天気タブの日別行（既存の.daily-spot-calendar-rowに、その日の天気アイコンを添える） */
+.weather-spot-row-icons{
+  display:flex;
+  gap:4px;
+  align-items:center;
+}
+.weather-spot-row-nodata{
+  font-size:11px;
+  color:var(--text-sub);
+}
+body.dark .weather-spot-row-nodata{ color:var(--dark-text-sub); }
+
+/* ── 日別1時間ごと詳細（天気タブの行をタップすると表示） ── */
+.weather-day-detail-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:14px;
+  font-weight:700;
+  color:var(--indigo);
+  text-align:center;
+  margin-bottom:10px;
+}
+body.dark .weather-day-detail-title{ color:var(--dark-accent); }
+
+.weather-day-back{
+  display:inline-flex;
+  margin-bottom:10px;
+  font-size:12px;
+}
+
+.weather-day-special{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:12px;
+}
+.weather-day-special-badge{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--vermillion-bg);
+  border-radius:12px;
+  padding:6px 10px;
+  font-size:11px;
+  color:var(--vermillion);
+  text-align:left;
+}
+body.dark .weather-day-special-badge{
+  background:#3a1f1a;
+  color:#e8907a;
+}
+
+.weather-day-nodata{
+  text-align:center;
+  padding:24px 12px;
+  color:var(--text-sub);
+  font-size:12px;
+}
+body.dark .weather-day-nodata{ color:var(--dark-text-sub); }
+
+.weather-hour-list{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  max-height:50vh;
+  overflow-y:auto;
+}
+.weather-hour-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  border-radius:10px;
+  background:var(--card);
+  border:1px solid var(--border);
+}
+body.dark .weather-hour-row{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+.weather-hour-row.current-hour{
+  border-color:var(--indigo);
+  border-width:2px;
+}
+body.dark .weather-hour-row.current-hour{ border-color:var(--dark-accent); }
+
+.weather-hour-time{
+  font-size:11px;
+  font-weight:700;
+  color:var(--text-sub);
+  width:44px;
+  flex-shrink:0;
+  text-align:left;
+}
+body.dark .weather-hour-time{ color:var(--dark-text-sub); }
+.weather-hour-emoji{ font-size:14px; width:20px; text-align:center; flex-shrink:0; }
+.weather-hour-name{ font-size:12px; color:var(--text); flex:1; text-align:left; }
+body.dark .weather-hour-name{ color:var(--dark-text); }
+.weather-hour-now-tag{
+  font-size:9px;
+  color:var(--on-fill);
+  background:var(--indigo);
+  border-radius:999px;
+  padding:2px 6px;
+}
+body.dark .weather-hour-now-tag{ background:var(--dark-accent); }
+
+/* ── 天気表示（今：/次：）下部の1時間ごとストリップ ── */
+.weather-hour-strip{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+  flex-wrap:wrap;
+}
+.weather-hour-chip{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  background:var(--card-sub);
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:11px;
+  color:var(--text);
+}
+body.dark .weather-hour-chip{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+}
+.weather-hour-chip-label{
+  font-weight:700;
+  color:var(--text-sub);
+}
+body.dark .weather-hour-chip-label{ color:var(--dark-text-sub); }
+.weather-hour-chip-time{
+  color:var(--text-sub);
+}
+body.dark .weather-hour-chip-time{ color:var(--dark-text-sub); }
+
+.daily-task-section{
+  margin-bottom:14px;
+}
+
+.daily-task-section-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-family:'Shippori Mincho', serif;
+  font-size:12.5px;
+  color:var(--indigo);
+  margin-bottom:6px;
+  padding-left:8px;
+  border-left:3px solid var(--gold);
+}
+
+.daily-task-section-title-main{
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.daily-task-section-title-right{
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+body.dark .daily-task-section-title{
+  color:var(--dark-accent);
+}
+
+.daily-task-checkbox{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+}
+
+.daily-task-checkbox input{
+  width:19px;
+  height:19px;
+  accent-color:var(--indigo);
+}
+
+body.dark .daily-task-checkbox input{
+  accent-color:var(--dark-accent);
+}
+
+.daily-task-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:7px 10px;
+  border-radius:10px;
+  background:var(--card-sub);
+  margin-bottom:5px;
+  font-size:12px;
+}
+
+body.dark .daily-task-row{
+  background:var(--dark-card-alt);
+}
+
+.daily-task-link{
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.daily-task-link .daily-task-label{
+  flex-direction:row;
+  align-items:center;
+  gap:5px;
+}
+
+.daily-task-label{
+  display:flex;
+  flex-direction:column;
+  text-align:left;
+  color:var(--text);
+  min-width:0;
+}
+
+body.dark .daily-task-label{
+  color:var(--dark-text);
+}
+
+.daily-task-sub{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-top:1px;
+}
+
+.daily-task-main{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+  flex:1;
+}
+
+.daily-task-thumb{
+  width:32px;
+  height:32px;
+  border-radius:8px;
+  object-fit:contain;
+  background:var(--card);
+  flex-shrink:0;
+}
+
+body.dark .daily-task-thumb{
+  background:var(--dark-thumb-bg);
+}
+
+.daily-task-value{
+  flex-shrink:0;
+  font-weight:700;
+  color:var(--indigo);
+  text-align:right;
+  white-space:nowrap;
+}
+
+body.dark .daily-task-value{
+  color:var(--dark-accent);
+}
+
+.daily-task-value.highlight{
+  color:var(--vermillion);
+}
+
+body.dark .daily-task-value.highlight{
+  color:var(--dark-highlight);
+}
+
+.daily-task-empty{
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  padding:10px 0;
+}
+
+.daily-spot-calendar-list{
+  max-height:50vh;
+  overflow-y:auto;
+  margin-bottom:12px;
+}
+
+.daily-spot-calendar-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 4px;
+  border-bottom:1px solid var(--border);
+  font-size:12px;
+}
+
+body.dark .daily-spot-calendar-row{
+  border-color:var(--dark-border);
+}
+
+.daily-spot-calendar-row.today{
+  font-weight:700;
+  color:var(--indigo);
+}
+
+body.dark .daily-spot-calendar-row.today{
+  color:var(--dark-accent);
+}
+
+.daily-spot-calendar-date{
+  color:var(--text-sub);
+  font-size:11px;
+}
+
+/* 出現カレンダー：月ごとのナビゲーション */
+.daily-cal-month-nav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin-bottom:8px;
+}
+.daily-cal-month-btn{
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--indigo);
+  border-radius:999px;
+  width:28px;
+  height:28px;
+  font-size:14px;
+  line-height:1;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.daily-cal-month-btn:disabled{
+  opacity:0.35;
+  cursor:default;
+}
+body.dark .daily-cal-month-btn{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-accent);
+}
+.daily-cal-month-label{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  font-weight:700;
+  color:var(--indigo);
+  min-width:80px;
+  text-align:center;
+}
+body.dark .daily-cal-month-label{ color:var(--dark-accent); }
+
+.daily-cal-day-nodata{
+  text-align:center;
+  font-size:12px;
+  color:var(--text-sub);
+  padding:24px 0;
+}
+body.dark .daily-cal-day-nodata{ color:var(--dark-text-sub); }
+
+/* 出現カレンダー：蛍石・オークの木・天気を日付ごとにまとめたカード（3日ごとに横並び） */
+.daily-cal-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:6px;
+}
+
+.daily-cal-day-card{
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:6px 4px;
+}
+body.dark .daily-cal-day-card{ border-color:var(--dark-border); }
+.daily-cal-day-card.today{
+  border-color:var(--indigo);
+  border-width:2px;
+}
+body.dark .daily-cal-day-card.today{ border-color:var(--dark-accent); }
+
+.daily-cal-day-date{
+  font-size:11px;
+  font-weight:700;
+  color:var(--indigo);
+  margin-bottom:3px;
+  text-align:center;
+}
+body.dark .daily-cal-day-date{ color:var(--dark-accent); }
+.daily-cal-day-date.is-sat{ color:#2f6fd1; }
+.daily-cal-day-date.is-sun{ color:#d1392f; }
+body.dark .daily-cal-day-date.is-sat{ color:#7cabf5; }
+body.dark .daily-cal-day-date.is-sun{ color:#ff8f85; }
+
+.daily-cal-day-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:4px;
+  padding:1px 0;
+  font-size:11px;
+}
+.daily-cal-day-icon{
+  flex-shrink:0;
+  font-size:11px;
+  display:flex;
+  align-items:center;
+}
+/* .modal-box img の共通ルール（padding:8px・margin-bottom:10px等）を打ち消し、
+   絵文字と同じ見た目のサイズに収める */
+.modal-box .daily-cal-day-icon-img{
+  width:11px;
+  height:11px;
+  padding:0;
+  margin:0;
+  object-fit:contain;
+  border-radius:3px;
+  background:var(--card);
+  flex-shrink:0;
+}
+body.dark .modal-box .daily-cal-day-icon-img{ background:var(--dark-card); }
+.daily-cal-day-value{
+  color:var(--text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+body.dark .daily-cal-day-value{ color:var(--dark-text); }
+
+.daily-cal-day-weather{
+  cursor:pointer;
+  border-top:1px solid var(--border);
+  margin-top:3px;
+  padding-top:3px;
+  display:flex;
+  justify-content:center;
+}
+body.dark .daily-cal-day-weather{ border-color:var(--dark-border); }
+.daily-cal-day-weather .weather-spot-row-icons{ gap:2px; }
+.daily-cal-day-weather .weather-spot-row-nodata{ font-size:10px; }
+
+/* ボタン */
+.filter button,
+.modal-box button{
+  flex:1;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:10px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  box-shadow:none;
+  transition:0.15s;
+}
+
+/* 押した時 */
+.filter button:active,
+.modal-box button:active{
+  transform:
+    translateY(1px)
+    scale(0.97);
+}
+
+/* モーダル下部の単独「閉じる」ボタン
+   .modal-box button の共通ルール（flex:1 / display:flex）を全て打ち消し、
+   ブロック要素として幅100%・中央配置にする */
+.modal-box .modal-close-btn{
+  display:flex !important;
+  flex:none !important;
+  width:100% !important;
+  max-width:100%;
+  margin:12px auto 0 !important;
+  box-sizing:border-box;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ON状態（藍色） */
+.active{
+  background:var(--indigo) !important;
+  color:#fdf9ef !important;
+  border-color:var(--indigo) !important;
+  font-weight:700;
+  box-shadow:0 4px 10px rgba(60,90,110,0.25);
+}
+
+/* グリッド */
+.grid{
+  display:grid;
+  grid-template-columns:
+    repeat(4,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+/* 表示サイズ切り替え（小/中/大）。既定の「中」は上のグリッドのままなので専用CSSを持たない */
+body[data-icon-size="small"] .grid{
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+
+body[data-icon-size="large"] .grid{
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+/* 終了フェス・シーズン セクション(図鑑「今は出現しない」用) */
+.section-label{
+  font-family:'Shippori Mincho', serif;
+  font-size:13px;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+  margin:18px 0 8px;
+  padding-left:10px;
+  border-left:3px solid var(--gold);
+}
+
+body.dark .section-label{ color:var(--dark-accent); }
+
+.event-ended-banner{
+  background:var(--card-sub);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:8px 14px;
+  font-size:11px;
+  color:var(--text-sub);
+  text-align:center;
+  margin-bottom:10px;
+}
+
+/* アイテム */
+.item{
+  background:var(--card);
+  border-radius:18px;
+  padding:10px;
+  text-align:center;
+  font-size:11px;
+  border:1px solid var(--border);
+  box-shadow:0 6px 16px rgba(52,48,43,0.06);
+  transition:0.15s;
+  position:relative;
+  overflow:hidden;
+}
+
+/* hover */
+.item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 20px rgba(52,48,43,0.1);
+}
+
+/* 押した時 */
+.item:active{
+  transform:scale(0.96);
+}
+
+/* 複数選択中 */
+.item.selected{
+  outline:3px solid var(--vermillion-soft);
+  outline-offset:-3px;
+}
+
+.item img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  background:var(--card-sub);
+  border-radius:14px;
+  padding:2px;
+  box-sizing:border-box;
+  margin-bottom:6px;
+  display:block;
+}
+
+/* 表示サイズ「小」：5列になる分、カード内の余白・文字サイズを詰める */
+body[data-icon-size="small"] .item{
+  padding:6px;
+  font-size:10px;
+}
+
+body[data-icon-size="small"] .item-name{
+  height:28px;
+  font-size:10px;
+}
+
+/* 表示サイズ「大」：3列になる分、カード内の余白にゆとりを持たせる */
+body[data-icon-size="large"] .item{
+  padding:13px;
+}
+
+/* 出現場所→マップ埋め込みモーダル（ページ遷移せずiframeでマップを表示する） */
+#mapEmbedModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(40,36,30,0.5);
+  backdrop-filter:blur(5px);
+  z-index:2500;
+}
+
+.map-embed-box{
+  position:relative;
+  width:94%;
+  max-width:480px;
+  height:88vh;
+  max-height:820px;
+  margin:3vh auto;
+  background:var(--card);
+  border-radius:22px;
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
+  overflow:hidden;
+}
+
+.map-embed-iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
+  /* touch-action:noneにするとマップ表示部分だけでなくiframe全体（下部の
+     情報カードにたどり着くためのスクロール操作も含む）でタッチ操作が
+     無効になってしまうため指定しない。マップ内部の操作自体は、
+     map.html側の.map-viewportに設定済みのtouch-action:noneで
+     すでに保護されている */
+}
+
+.map-embed-close{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:5;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:none;
+  background:var(--card);
+  color:var(--text-sub);
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+body.dark .map-embed-close{
+  background:var(--dark-card);
+  color:var(--dark-text-sub);
+}
+
+/* モーダル */
+#modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(40,36,30,0.5);
+  backdrop-filter:blur(5px);
+  z-index:999;
+  overflow-y:auto;
+}
+
+.modal-box{
+  background:var(--card);
+  margin:60px auto;
+  padding:18px;
+  width:90%;
+  max-width:320px;
+  border-radius:22px;
+  text-align:center;
+  border:1px solid var(--gold);
+  box-shadow:0 20px 40px rgba(52,48,43,0.15);
+  box-sizing:border-box;
+}
+
+/* モーダル画像 */
+.modal-box img{
+  background:var(--card-sub);
+  border-radius:14px;
+  padding:8px;
+  margin-bottom:10px;
+}
+
+#m_name{
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+}
+
+body.dark #m_name{
+  color:var(--dark-accent);
+}
+
+/* モーダル情報 */
+.modal-info{
+  margin-top:10px;
+  background:var(--card-sub);
+  border-radius:12px;
+  padding:10px 14px;
+  font-size:12px;
+  line-height:2;
+  text-align:left;
+}
+
+body.dark .modal-info{
+  background:#383329;
+}
+
+.modal-info-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:10px;
+}
+
+.modal-info-label{
+  color:var(--text-sub);
+  flex-shrink:0;
+}
+
+body.dark .modal-info-label{
+  color:var(--dark-text-sub);
+}
+
+.modal-info-value{
+  color:var(--text);
+  font-weight:700;
+  text-align:right;
+}
+
+body.dark .modal-info-value{
+  color:#ece4d4;
+}
+
+#m_time{
+  white-space:nowrap;
+}
+
+/* 図鑑モーダル「場所」欄のマップリンク */
+.modal-map-link{
+  display:inline-flex;
+  align-items:center;
+  gap:2px;
+  font-size:10.5px;
+  font-weight:700;
+  color:var(--indigo);
+  text-decoration:none;
+  vertical-align:middle;
+}
+
+body.dark .modal-map-link{
+  color:var(--dark-accent);
+}
+
+/* 売価テーブル（レア度・売価・フェスコイン） */
+.modal-price-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:11px;
+  margin-top:10px;
+  margin-bottom:12px;
+}
+
+.modal-price-table th{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  padding:5px 6px;
+  text-align:center;
+  font-weight:500;
+}
+
+body.dark .modal-price-table th{ background:#383329; }
+
+.modal-price-table td{
+  text-align:center;
+  padding:5px 6px;
+  border-top:1px solid var(--border);
+  color:var(--text);
+}
+
+body.dark .modal-price-table td{ color:#ece4d4; border-color:#46423b; }
+
+/* フェスコイン列は該当データがある場合のみ表示 */
+.modal-price-table th:nth-child(3),
+.modal-price-table td:nth-child(3){
+  display:none;
+}
+
+.modal-price-table.has-fes th:nth-child(3),
+.modal-price-table.has-fes td:nth-child(3){
+  display:table-cell;
+}
+
+/* 最小化 */
+.minimized .top-content{
+  display:none;
+}
+
+.update-popup-box{
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--gold);
+}
+
+body.dark .update-popup-box{
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
+}
+
+body.dark .update-popup-box p,
+body.dark .update-popup-box h3{
+  color:var(--dark-text);
+}
+
+/* ヘルプモーダル */
+.help-modal-box{
+  background:var(--card);
+  color:var(--text);
+  border:1px solid var(--gold);
+}
+
+.help-modal-box p,
+.art-help-box p,
+.music-help-box p,
+#helpModal .modal-box p{
+  white-space:pre-line;
+}
+
+/* 使い方モーダル系の段落間の余白を詰める（ブラウザ既定の段落マージンに
+   他の要素のマージンと混ざって想定より大きな空白になっていたのを解消） */
+.help-modal-box p,
+.art-help-box p,
+.music-help-box p,
+#helpModal .modal-box p,
+#modalBox p{
+  margin:0 0 14px;
+}
+
+.help-modal-box p:last-child,
+.art-help-box p:last-child,
+.music-help-box p:last-child,
+#helpModal .modal-box p:last-child,
+#modalBox p:last-child{
+  margin-bottom:0;
+}
+
+.help-modal-box h3,
+.art-help-box h3,
+.music-help-box h3{
+  margin:0 0 16px;
+}
+
+/* ダークモード */
+body.dark .help-modal-box{
+  background:var(--dark-card);
+  color:var(--dark-text);
+  border:1px solid var(--dark-border);
+}
+
+/* ヘルプ内の文字 */
+body.dark .help-modal-box p,
+body.dark .help-modal-box h3,
+body.dark .help-modal-box strong{
+  color:var(--dark-text);
+}
+
+h3{
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
+  letter-spacing:0.06em;
+}
+
+body.dark h3{
+  color:var(--dark-accent);
+}
+
+/* ボタン */
+#minimizeBtn{
+  border:1px solid var(--border);
+  border-radius:999px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  font-family:'Zen Maru Gothic', sans-serif;
+}
+
+/* 最小化時の情報 */
+.mini-header{
+  display:flex;
+  align-items:center;
+}
+
+.mini-info{
+  display:none;
+  align-items:center;
+  gap:8px;
+  margin-top:8px;
+  flex:1;
+}
+
+.minimized{
+  display:flex;
+  align-items:center;
+}
+
+.minimized .mini-info{
+  display:flex;
+}
+
+/* 検索欄 */
+.mini-search{
+  flex:1;
+  padding:8px 12px;
+  font-size:11px;
+}
+
+/* 時間・天気 */
+.mini-status{
+  text-align:right;
+  white-space:nowrap;
+  font-size:11px;
+  color:var(--text-sub);
+}
+
+body.dark .mini-status{
+  color:var(--dark-text-sub);
+}
+
+#miniTime{
+  font-size:14px;
+  font-family:'Shippori Mincho', serif;
+  color:var(--indigo);
+}
+
+#miniWeather{
+  font-size:10px;
+  opacity:0.8;
+}
+
+body.dark #miniTime{
+  color:var(--dark-accent);
+}
+
+/* リンク色 */
+a{
+  color:var(--vermillion);
+}
+
+/* 認証バッジ */
+.auth-btn{
+  position:absolute;
+  bottom:6px;
+  right:6px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:10;
+}
+
+.auth-btn.checked{
+  /* マスターバッジ画像自体がすでに独立した見た目のバッジのため、
+     背景の塗りつぶしはやめて丸枠だけ残し、その中に画像を収める */
+  background:var(--card);
+  border-color:var(--gold);
+}
+
+/* シェアボタン */
+#shareBtn{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  line-height:1;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  transition:0.2s;
+}
+
+#shareBtn:active{
+  transform:scale(0.92);
+}
+
+/* データ同期ボタン */
+#dataSyncBtn{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid var(--border);
+  border-radius:50%;
+  line-height:1;
+  background:var(--card);
+  color:var(--indigo);
+  box-shadow:0 3px 8px rgba(52,48,43,0.08);
+  transition:0.2s;
+}
+
+#dataSyncBtn:active{
+  transform:scale(0.92);
+}
+
+body.dark #dataSyncBtn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border-color:var(--dark-border);
+}
+
+body.dark #shareBtn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+  border-color:var(--dark-border);
+}
+
+/* ナビゲーションバー */
+.site-nav{
+  display:flex;
+  gap:6px;
+  margin-bottom:10px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
+}
+
+.site-nav::-webkit-scrollbar{
+  display:none;
+}
+
+.site-nav-item{
+  flex-shrink:0;
+  padding:7px 16px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  text-decoration:none;
+  transition:0.15s;
+}
+
+.site-nav-item.active{
+  background:var(--indigo);
+  border-color:var(--indigo);
+  color:#fdf9ef;
+  font-weight:700;
+}
+
+body.dark .site-nav-item{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+body.dark .site-nav-item.active{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+  color:#fdf9ef;
+}
+
+/* 横スクロール可能な要素（ナビ・各種フィルタータブ）が画面外に続いている
+   ことを示すフェード＋矢印。js/scroll-hint.jsが.scroll-hint-wrapを自動検出し、
+   スクロール位置に応じて.scroll-hint-left/.scroll-hint-rightを付け外しする。
+   フェードの色は背景がページ地（--bg-top）かカード内（--card）かで変わるため、
+   --sh-bg/--sh-bg-darkで上書きできるようにしてある（既定はページ地の色） */
+.scroll-hint-wrap{
+  position:relative;
+  min-width:0;
+}
+
+.scroll-hint-wrap::before,
+.scroll-hint-wrap::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:28px;
+  display:flex;
+  align-items:center;
+  font-size:16px;
+  color:var(--text-sub);
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 0.2s;
+  z-index:1;
+}
+
+.scroll-hint-wrap::before{
+  content:"‹";
+  left:0;
+  justify-content:flex-start;
+  background:linear-gradient(to right, var(--sh-bg, var(--bg-top)), transparent);
+}
+
+.scroll-hint-wrap::after{
+  content:"›";
+  right:0;
+  justify-content:flex-end;
+  background:linear-gradient(to left, var(--sh-bg, var(--bg-top)), transparent);
+}
+
+.scroll-hint-wrap.scroll-hint-left::before{ opacity:1; }
+.scroll-hint-wrap.scroll-hint-right::after{ opacity:1; }
+
+body.dark .scroll-hint-wrap::before,
+body.dark .scroll-hint-wrap::after{
+  color:var(--dark-text-sub);
+}
+
+body.dark .scroll-hint-wrap::before{
+  background:linear-gradient(to right, var(--sh-bg-dark, var(--dark-bg-top)), transparent);
+}
+
+body.dark .scroll-hint-wrap::after{
+  background:linear-gradient(to left, var(--sh-bg-dark, var(--dark-bg-top)), transparent);
+}
+
+/* カード内（.card内）で使う場合はページ地ではなくカード背景にフェードさせる */
+.card .scroll-hint-wrap{
+  --sh-bg:var(--card);
+  --sh-bg-dark:var(--dark-card);
+}
+
+/* ══════════════════════════════════════
+   SVGアイコン共通
+   ══════════════════════════════════════ */
+.icon{
+  display:inline-block;
+  vertical-align:middle;
+  flex-shrink:0;
+}
+
+/* 画像アイコン（天気・認証マスターなど）はSVGの線画と違い、
+   vertical-align:middleのままだとテキストと並べた時に浮いて見えるため
+   ベースラインに近づける。また.modal-box img（コンテンツ画像用の
+   背景・角丸・余白）が誤って効いてしまうのを打ち消す */
+img.icon{
+  vertical-align:-0.15em;
+  background:none;
+  border-radius:0;
+  padding:0;
+  margin:0;
+  box-shadow:none;
+  /* サイズはicon()側のインラインstyleで固定するため、ここでは
+     .item img等の既存スタイルが上書きしていた分だけ打ち消す */
+  aspect-ratio:auto;
+  object-fit:initial;
+}
+
+/* ダーク時「body.dark .item img」「body.dark .modal-box img」が
+   画像アイコンにも背景色を付けてしまう（認証バッジが黒い四角に
+   見える不具合）のを、同等の詳細度で個別に打ち消す */
+body.dark img.icon{
+  background:none;
+}
+
+/* 通貨アイコン（コイン・願い星）― テキスト表記に添える小アイコン
+   フォントサイズに連動させ、テキストの行の中に馴染むようベースラインを調整
+   （.modal-box img のpadding/背景/角丸がモーダル内で誤って効いてしまうため、
+   img.currency-iconで明示的に打ち消している） */
+img.currency-icon{
+  display:inline-block;
+  width:1.15em;
+  height:1.15em;
+  vertical-align:-0.25em;
+  margin:0 1px;
+  padding:0;
+  background:none;
+  border-radius:0;
+  box-shadow:none;
+}
+
+/* ヘッダーアイコンボタン（ヘルプ・シェア・データ同期・ダーク切替） */
+#helpBtn, #shareBtn, #dataSyncBtn, #darkToggle{
+  color:var(--indigo);
+}
+
+body.dark #helpBtn, body.dark #shareBtn, body.dark #dataSyncBtn, body.dark #darkToggle{
+  color:var(--dark-accent);
+}
+
+/* ボタン内アイコン＋テキストのレイアウト */
+.filter button,
+.accordion-toggle,
+.modal-box button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+}
+
+.btn-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.btn-icon .icon{
+  opacity:0.75;
+}
+
+.active .btn-icon .icon{
+  opacity:1;
+}
+
+/* 検索欄（アイコン付き） */
+.search-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.search-icon{
+  position:absolute;
+  left:14px;
+  display:flex;
+  align-items:center;
+  color:var(--text-sub);
+  pointer-events:none;
+}
+
+body.dark .search-icon{
+  color:var(--dark-text-sub);
+}
+
+.search-wrap .search{
+  padding-left:38px;
+}
+
+/* サーバー選択（アイコン付き） */
+.server-select-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.server-select-icon{
+  display:flex;
+  align-items:center;
+  color:var(--indigo);
+}
+
+body.dark .server-select-icon{
+  color:var(--dark-accent);
+}
+
+/* ══════════════════════════════════════
+   アコーディオン（絞り込み・並び替え / 複数選択・一括操作）
+   ══════════════════════════════════════ */
+.accordion{
+  margin-top:10px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  background:var(--card-sub);
+}
+
+body.dark .accordion{
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+}
+
+.accordion-toggle{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 14px;
+  border:none;
+  background:transparent;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  cursor:pointer;
+  border-radius:0;
+}
+
+body.dark .accordion-toggle{
+  color:var(--dark-text);
+}
+
+.accordion-toggle-label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.accordion-toggle-icon{
+  display:flex;
+  align-items:center;
+  color:var(--indigo);
+}
+
+body.dark .accordion-toggle-icon{
+  color:var(--dark-accent);
+}
+
+.accordion-chevron{
+  display:flex;
+  align-items:center;
+  color:var(--text-sub);
+  transition:transform 0.2s;
+}
+
+body.dark .accordion-chevron{
+  color:var(--dark-text-sub);
+}
+
+.accordion-toggle.open .accordion-chevron{
+  transform:rotate(180deg);
+}
+
+.accordion-body{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.25s ease, padding 0.25s ease;
+  padding:0 14px;
+}
+
+.accordion-body.open{
+  max-height:600px;
+  padding:2px 14px 14px;
+}
+
+.filter-group{
+  margin-top:12px;
+}
+
+.filter-group:first-child{
+  margin-top:2px;
+}
+
+.filter-group-label{
+  font-size:10.5px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+  padding-left:2px;
+}
+
+.filter-group-label-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+body.dark .filter-group-label,
+body.dark .filter-group-label-row{
+  color:var(--dark-text-sub);
+}
+
+/* 絞り込み状態の要約（アコーディオンを閉じても常に見える） */
+.filter-summary{
+  margin:10px 0 8px;
+}
+.filter-summary-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+.filter-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  min-height:32px;
+  padding:4px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  font-family:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  color:var(--text);
+  font-size:11.5px;
+  line-height:1.3;
+  white-space:nowrap;
+}
+.filter-chip .icon{ flex-shrink:0; }
+.filter-chip-clear-all{
+  border-color:var(--indigo);
+  color:var(--indigo);
+  background:none;
+  font-weight:600;
+}
+body.dark .filter-chip{
+  border-color:var(--dark-border);
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+}
+body.dark .filter-chip-clear-all{
+  border-color:var(--dark-accent);
+  color:var(--dark-accent);
+  background:none;
+}
+.filter-summary-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:6px;
+  font-size:11px;
+  color:var(--text-sub);
+}
+body.dark .filter-summary-meta{
+  color:var(--dark-text-sub);
+}
+.filter-summary-count{
+  font-weight:600;
+}
+.no-results-block{
+  grid-column:1 / -1;
+  text-align:center;
+  padding:18px 0;
+}
+.no-results-block button{
+  margin-top:10px;
+}
+
+/* 複数選択モードの状態・操作バー（アコーディオンを閉じても常に見える） */
+.bulk-status-bar{
+  margin:10px 0 8px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid var(--indigo);
+  background:var(--card-sub);
+}
+.bulk-status-top{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.bulk-status-count{
+  font-size:12px;
+  font-weight:700;
+  color:var(--indigo);
+}
+.bulk-status-top-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.bulk-action-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+.bulk-action-btn{
+  min-height:32px;
+  padding:4px 12px;
+  border-radius:999px;
+  border:1px solid var(--indigo);
+  background:var(--indigo);
+  color:#fdf9ef;
+  font-size:11.5px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.bulk-action-btn:disabled{
+  opacity:0.4;
+  cursor:not-allowed;
+}
+.bulk-undo-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:8px;
+  padding-top:8px;
+  border-top:1px dashed var(--border);
+  font-size:11.5px;
+  color:var(--text-sub);
+}
+.bulk-undo-btn{
+  min-height:28px;
+  padding:3px 10px;
+  border-radius:999px;
+  border:1px solid var(--indigo);
+  background:none;
+  color:var(--indigo);
+  font-size:11.5px;
+  font-weight:600;
+  font-family:inherit;
+  cursor:pointer;
+  white-space:nowrap;
+}
+body.dark .bulk-status-bar{
+  border-color:var(--dark-accent);
+  background:var(--dark-card-alt);
+}
+body.dark .bulk-status-count{
+  color:var(--dark-accent);
+}
+body.dark .bulk-action-btn{
+  border-color:var(--dark-accent);
+  background:var(--dark-accent);
+  color:var(--dark-card);
+}
+body.dark .bulk-undo-row{
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
+}
+body.dark .bulk-undo-btn{
+  border-color:var(--dark-accent);
+  color:var(--dark-accent);
+}
+.bulk-accordion-hint{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-top:6px;
+}
+body.dark .bulk-accordion-hint{
+  color:var(--dark-text-sub);
+}
+
+.level-slider{
+  width:100%;
+  display:block;
+  margin-top:4px;
+}
+
+/* 種類フィルター行は常時表示のまま、絞り込みセクションと視覚的に区切る */
+#typeFilterRow{
+  margin-bottom:2px;
+}
+
+/* ヘルプモーダル内のアイコン */
+.help-title-icon{
+  display:inline-flex;
+  vertical-align:middle;
+  margin-right:6px;
+  color:var(--indigo);
+}
+
+body.dark .help-title-icon{
+  color:var(--dark-accent);
+}
+
+.help-icon{
+  display:inline-flex;
+  vertical-align:middle;
+  margin-right:5px;
+  color:var(--indigo);
+}
+
+body.dark .help-icon{
+  color:var(--dark-accent);
+}
+
+/* お問い合わせ誘導（faq.html/updates.htmlと共通のスタイル） */
+.contact-box{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  text-align:center;
+  margin-top:16px;
+}
+
+body.dark .contact-box{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.contact-box p{
+  font-size:12px;
+  color:var(--text-sub);
+  margin-bottom:10px;
+  line-height:1.7;
+}
+
+body.dark .contact-box p{
+  color:var(--dark-text-sub);
+}
+
+.contact-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  padding:10px 24px;
+  border:1px solid var(--indigo);
+  border-radius:999px;
+  background:var(--indigo);
+  color:var(--on-fill);
+  font-size:12px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+body.dark .contact-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+/* ══════════════════════════════════════
+   虫リポップタイマー（図鑑ページ限定のフローティングウィジェット）
+   ══════════════════════════════════════ */
+.bug-timer-widget{
+  position:fixed;
+  right:14px;
+  bottom:14px;
+  z-index:500;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+}
+
+.bug-timer-fab-row{
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+}
+
+.bug-timer-toggle-btn{
+  width:32px;
+  height:32px;
+  padding:0;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--card);
+  color:var(--text-sub);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.15);
+  cursor:pointer;
+  transition:transform 0.15s;
+}
+
+.bug-timer-toggle-btn.active{ transform:rotate(180deg); }
+
+body.dark .bug-timer-toggle-btn{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
+}
+
+.bug-timer-capture-btn{
+  position:relative;
+  width:56px;
+  height:56px;
+  padding:0;
+  border-radius:50%;
+  border:none;
+  background:var(--indigo);
+  color:var(--on-fill);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  cursor:pointer;
+  transition:transform 0.1s;
+}
+
+.bug-timer-capture-btn:active{ transform:scale(0.94); }
+
+body.dark .bug-timer-capture-btn{ background:var(--indigo-soft); }
+
+.bug-timer-capture-icon svg{ width:24px; height:24px; display:block; }
+
+.bug-timer-capture-badge{
+  position:absolute;
+  top:-4px;
+  right:-4px;
+  min-width:20px;
+  height:20px;
+  padding:0 5px;
+  border-radius:999px;
+  background:var(--vermillion);
+  color:#fff;
+  font-size:11px;
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  line-height:1;
+}
+
+.bug-timer-panel{
+  width:220px;
+  max-height:60vh;
+  overflow-y:auto;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.2);
+}
+
+body.dark .bug-timer-panel{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.bug-timer-panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  margin-bottom:8px;
+}
+
+body.dark .bug-timer-panel-header{ color:var(--dark-text); }
+
+.bug-timer-panel-header button{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--card-sub);
+  color:var(--text-sub);
+  font-family:'Zen Maru Gothic', sans-serif;
+  cursor:pointer;
+}
+
+body.dark .bug-timer-panel-header button{
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
+}
+
+.bug-timer-clock{
+  font-size:10px;
+  color:var(--text-sub);
+  margin-bottom:6px;
+}
+
+body.dark .bug-timer-clock{ color:var(--dark-text-sub); }
+
+.bug-timer-clock.bug-timer-clock-emphasis{
+  color:var(--vermillion);
+  font-weight:700;
+}
+
+body.dark .bug-timer-clock.bug-timer-clock-emphasis{ color:var(--dark-highlight); }
+
+.bug-timer-count-row{
+  font-size:12px;
+  color:var(--text-sub);
+  margin-bottom:8px;
+  display:flex;
+  justify-content:space-between;
+}
+
+body.dark .bug-timer-count-row{ color:var(--dark-text-sub); }
+
+.bug-timer-count-row span:last-child{
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  color:var(--indigo);
+}
+
+body.dark .bug-timer-count-row span:last-child{ color:var(--dark-accent); }
+
+.bug-timer-list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.bug-timer-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-size:13px;
+  font-weight:700;
+  font-family:'Zen Maru Gothic', sans-serif;
+  padding:6px 10px;
+  border-radius:10px;
+  background:var(--card-sub);
+  color:var(--text);
+}
+
+body.dark .bug-timer-item{
+  background:var(--dark-card-alt);
+  color:var(--dark-text);
+}
+
+.bug-timer-item-remove{
+  border:none;
+  background:none;
+  color:var(--text-sub);
+  cursor:pointer;
+  font-size:11px;
+  padding:2px 4px;
+}
+
+body.dark .bug-timer-item-remove{ color:var(--dark-text-sub); }
+
+.bug-timer-empty-hint{
+  font-size:11px;
+  color:var(--text-sub);
+  line-height:1.6;
+  margin:0;
+}
+
+body.dark .bug-timer-empty-hint{ color:var(--dark-text-sub); }
+

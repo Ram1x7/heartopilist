@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>楽譜｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の楽器演奏用に、数字譜（簡譜）をブラウザ上で作成・保存し、練習できるツールです。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | 楽譜">
+<meta property="og:description" content="Heartopia向けの数字譜をブラウザ上で作成・保存・練習できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/music.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | 楽譜">
+<meta name="twitter:description" content="Heartopia向けの数字譜をブラウザ上で作成・保存・練習できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/music.css?v=49">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./faq.html">
+<link rel="prefetch" href="./updates.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="Help" data-i18n-aria-label="aria_help_label"></button>
+    <button id="darkToggle" aria-label="Toggle dark mode" data-i18n-aria-label="aria_dark_mode_label"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h1 data-i18n="music_page_title">楽譜</h1>
+  <p class="page-subtitle" data-i18n="music_page_subtitle">数字譜を作成・保存し、演奏を練習できます</p>
+</div>
+
+<div class="music-notice" data-i18n="music_coming_soon">
+  現在開発中の機能です。今後のアップデートで順次使えるようになります。
+</div>
+
+<div class="music-mode-tabs" role="tablist">
+  <button class="music-mode-btn active" id="musicModeEditBtn" role="tab" aria-selected="true" data-i18n="music_mode_edit">編集</button>
+  <button class="music-mode-btn" id="musicModePracticeBtn" role="tab" aria-selected="false" data-i18n="music_mode_practice">練習</button>
+  <button class="music-mode-btn" id="musicModeFollowBtn" role="tab" aria-selected="false" data-i18n="music_mode_follow">追従</button>
+  <button class="music-sound-btn" id="musicSoundToggleBtn" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+</div>
+
+<div class="music-edit-tabs" id="musicEditTabs" role="tablist">
+  <button class="music-edit-tab-btn active" id="musicEditTabPrepareBtn" role="tab" aria-selected="true" data-i18n="music_tab_prepare">準備</button>
+  <button class="music-edit-tab-btn" id="musicEditTabCreateBtn" role="tab" aria-selected="false" data-i18n="music_tab_create">作る</button>
+</div>
+
+<div class="music-layout" id="musicEditLayout">
+  <div class="music-edit-tab-panel" id="musicTabPanelPrepare">
+    <div class="music-panel-section">
+      <div class="music-panel-title" data-i18n="music_instrument_label">楽器</div>
+      <div class="music-instrument-buttons" id="musicInstrumentButtons"></div>
+      <label class="music-key-label-toggle-row" id="musicKeyLabelHint">
+        <span data-i18n="music_key_label_toggle">PCキーボードでも演奏できます（対応キーを表示）</span>
+        <input type="checkbox" id="musicKeyLabelToggle" checked>
+      </label>
+      <details class="music-advanced-settings" id="musicAdvancedSettings">
+        <summary data-i18n="music_advanced_settings_label">詳細設定（配置・半音表示）</summary>
+        <div class="music-layout-buttons" id="musicLayoutButtons" style="display:none"></div>
+        <label class="music-semitone-row" id="musicSemitoneRow" style="display:none">
+          <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+          <input type="checkbox" id="musicSemitoneToggle">
+        </label>
+      </details>
+    </div>
+
+    <div class="music-panel-section" id="musicEditControls">
+      <div class="music-panel-title" data-i18n="music_song_settings_label">曲の管理</div>
+      <div class="music-score-meta-row">
+        <input type="text" id="musicScoreNameInput" class="music-score-name-input" placeholder="曲名" data-i18n-placeholder="music_score_name_placeholder">
+        <div class="music-bpm-row">
+          <span data-i18n="music_bpm_label">テンポ</span>
+          <input type="number" id="musicBpmInput" class="music-bpm-input" min="40" max="220" value="100">
+          <span data-i18n="music_bpm_unit">BPM</span>
+        </div>
+        <div class="music-timesig-row">
+          <span data-i18n="music_timesig_label">拍子</span>
+          <select id="musicTimeSigSelect" class="music-timesig-select"></select>
+          <span class="music-freetiming-badge" id="musicTimeSigApproxBadge" style="display:none" data-i18n="music_freetiming_approx_badge">目安</span>
+        </div>
+      </div>
+      <p class="music-record-hint" id="musicFreeTimingHint" style="display:none" data-i18n="music_freetiming_hint">フリーテンポ譜面です。テンポを変えると、練習/追従モードでの再生速度がその比率で変わります。拍子は小節線の目安表示にのみ使われ、演奏タイミングには影響しません</p>
+      <div class="music-panel-btn-row" id="musicFreeTimingConvertRow" style="display:none">
+        <button class="music-header-btn music-btn-secondary" id="musicConvertToBarBtn" data-i18n="music_convert_to_bar_btn">拍子ベースの譜面に変換する</button>
+      </div>
+      <div class="music-panel-btn-row">
+        <button class="music-header-btn music-btn-secondary" id="musicNewBtn" data-i18n="music_new">新規作成</button>
+        <button class="music-header-btn" id="musicSaveBtn" data-i18n="music_save">保存する</button>
+        <button class="music-header-btn music-btn-secondary" id="musicOpenListBtn" data-i18n="music_open_library">譜面ライブラリ</button>
+        <button class="music-header-btn music-btn-secondary" id="musicMidiExportBtn" data-i18n="music_midi_export_btn">MIDIとして書き出す</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="music-edit-tab-panel" id="musicTabPanelCreate" style="display:none">
+    <div class="music-panel-section">
+      <div class="music-panel-title" data-i18n="music_melody_section_title">楽譜を自動生成</div>
+      <p class="music-step-hint" data-i18n="music_melody_section_hint">ハミング・音源ファイル・動画ファイルから、自動で譜面に変換します（β機能。初回のみ解析モデルの読み込みに通信が必要ですが、音声・動画データ自体は外部に送信されません）</p>
+      <div class="music-panel-btn-row">
+        <button class="music-header-btn" id="musicHumOpenBtn" data-i18n="music_hum_open">ハミングから作る</button>
+        <button class="music-header-btn" id="musicAudioOpenBtn" data-i18n="music_audio_open">音源から作る</button>
+        <button class="music-header-btn" id="musicVideoOpenBtn" data-i18n="music_video_open">動画から作る</button>
+      </div>
+    </div>
+
+    <div class="music-panel-section">
+      <div class="music-panel-title" data-i18n="music_manual_input_label">手入力・録音</div>
+      <div class="music-panel-btn-row" id="musicScoreEditRow">
+        <label class="music-record-toggle-row">
+          <span data-i18n="music_record_toggle">録音する</span>
+          <input type="checkbox" id="musicRecordToggle">
+        </label>
+        <button class="music-header-btn music-btn-secondary" id="musicRecordFullscreenBtn" style="display:none" data-i18n="music_record_fullscreen_btn">全画面で演奏する</button>
+        <p class="music-record-hint" id="musicRecordHint" data-i18n="music_record_hint" style="display:none">押している長さがそのまま音の長さになります。複数のボタンを同時に押すと和音になります</p>
+        <div class="music-duration-options" id="musicDurationOptions"></div>
+        <p class="music-record-hint" id="musicDurationHint" data-i18n="music_duration_hint">上で選んでいる長さが、演奏ボタンで入力する音符にも「休符を追加」の休符にも使われます</p>
+        <div class="music-panel-btn-row">
+          <button class="music-header-btn music-add-rest-btn" id="musicAddRestBtn" data-i18n="music_add_rest">休符を追加</button>
+          <button class="music-header-btn music-btn-danger" id="musicDeleteLastBtn" data-i18n="music_delete_last">最後を削除</button>
+          <button class="music-header-btn music-btn-danger" id="musicClearBtn" data-i18n="music_clear_all">全消去</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="music-panel-section" id="musicScoreSection">
+    <div class="music-score-header-row">
+      <div class="music-panel-title" data-i18n="music_score_label">譜面</div>
+      <div class="music-history-controls">
+        <span class="music-unsaved-indicator" id="musicUnsavedIndicator" data-i18n="music_unsaved_indicator" style="display:none">未保存の変更があります</span>
+        <button class="music-history-btn" id="musicUndoBtn" aria-label="Undo" data-i18n-aria-label="music_aria_undo" disabled></button>
+        <button class="music-history-btn" id="musicRedoBtn" aria-label="Redo" data-i18n-aria-label="music_aria_redo" disabled></button>
+      </div>
+    </div>
+    <div id="musicScoreDisplayAnchorEdit">
+      <div class="music-score-display" id="musicScoreDisplay"></div>
+    </div>
+    <div id="musicPlaybackAnchorEdit"></div>
+    <div class="music-review-banner" id="musicReviewBanner" style="display:none">
+      <span id="musicReviewBannerText"></span>
+      <button class="music-review-clear-btn" id="musicReviewClearBtn" data-i18n="music_review_clear">すべて確認済みにする</button>
+    </div>
+    <div class="music-note-toolbar" id="musicNoteToolbar" style="display:none">
+      <span class="music-note-toolbar-label" id="musicNoteToolbarLabel"></span>
+      <button class="music-header-btn music-btn-danger" id="musicNoteDeleteBtn" data-i18n="music_note_delete">この音を削除</button>
+      <button class="music-header-btn music-btn-secondary" id="musicNoteDeselectBtn" data-i18n="music_note_deselect">選択解除</button>
+    </div>
+    <p class="music-record-hint" id="musicNoteToolbarHint" data-i18n="music_note_toolbar_hint" style="display:none">そのまま音を弾くと、選んだ音がその音に置き換わります</p>
+    <div class="music-loop-row" id="musicLoopRow">
+      <button class="music-header-btn music-btn-secondary" id="musicLoopSelectBtn">区間を選ぶ</button>
+      <span class="music-loop-range" id="musicLoopRangeLabel" style="display:none"></span>
+      <label class="music-loop-toggle" id="musicLoopToggleRow" style="display:none">
+        <input type="checkbox" id="musicLoopToggle">
+        <span data-i18n="music_loop_enabled">この区間をループ</span>
+      </label>
+      <button class="music-header-btn music-btn-secondary" id="musicLoopClearBtn" style="display:none" data-i18n="music_loop_clear">解除</button>
+    </div>
+    <p class="music-record-hint" id="musicLoopHint" style="display:none">譜面の音をタップして、開始の音を選んでください</p>
+  </div>
+
+  <div class="music-panel-section" id="musicPerformSection">
+    <div class="music-panel-title" data-i18n="music_perform_label">演奏</div>
+    <div id="musicInstrumentGridAnchorEdit">
+      <div class="music-instrument-grid" id="musicInstrumentGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 「作る」タブの録音モード：任意で開ける全画面ステージ。練習モードと同じ構成
+     （演奏ボタン領域を画面全体に敷き、上部バー・譜面プレビューをその上に重ねる）
+     にすることで、練習モードの「実機画像に重ねる」調整機能（musicCalibToggleBtn
+     以下、js/music-editor.jsが調整時にstageに応じて付け替える）もそのまま
+     録音の全画面ステージで使えるようにする。端末が縦向きでもCSSで横画面表示にし、
+     実機と同じ大きさ・配置のボタンで演奏しながら録音できる
+     （「全画面で演奏する」ボタンで開閉） -->
+<div class="music-record-stage" id="musicRecordStage">
+  <div id="musicInstrumentGridAnchorRecord"></div>
+  <div class="music-practice-stage-overlay-top">
+    <div class="music-practice-stage-topbar">
+      <div class="music-record-stage-title" id="musicRecordStageName"></div>
+      <div class="music-practice-topbar-icons" id="musicRecordTopbarIcons">
+        <button class="music-sound-btn" id="musicSoundToggleBtnRecord" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+        <button class="music-practice-exit-btn" id="musicRecordExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
+      </div>
+    </div>
+    <div id="musicScoreDisplayAnchorRecord"></div>
+  </div>
+</div>
+
+<!-- 練習モード：全画面の専用ステージ。端末が縦向きでもCSSで横画面表示にする。
+     演奏ボタンの領域は画面全体を基準に中央寄せし、上部バー・譜面プレビューは
+     その上に重ねて表示する（どの配置でもボタンは画面上部約2/3には現れないため、
+     重ねても実際のボタンとは重ならない） -->
+<div class="music-practice-stage" id="musicPracticeStage">
+  <div id="musicInstrumentGridAnchorPractice">
+    <img id="musicCalibBgImage" alt="">
+  </div>
+  <div class="music-calib-catcher" id="musicCalibCatcher"></div>
+  <div class="music-calib-guide music-calib-guide-v" id="musicCalibGuideV"></div>
+  <div class="music-practice-stage-overlay-top">
+    <div class="music-practice-stage-topbar">
+      <div id="musicPlaybackAnchorPractice">
+        <div class="music-playback-row" id="musicPlaybackRow">
+          <div class="music-seek-row">
+            <input type="range" class="music-seek-slider" id="musicSeekSlider" min="0" max="1000" step="1" value="0" aria-label="Seek" data-i18n-aria-label="music_aria_seek">
+            <span class="music-seek-time" id="musicSeekTimeLabel">0:00 / 0:00</span>
+          </div>
+          <div class="music-playback-controls-row">
+            <button class="music-playpause-btn" id="musicPlayPauseBtn" aria-label="Play or pause" data-i18n-aria-label="music_aria_play_pause"></button>
+            <div class="music-speed-control">
+              <input type="range" id="musicSpeedSlider" min="0.1" max="1" step="0.05" value="1" aria-label="Playback speed" data-i18n-aria-label="music_aria_speed">
+              <span id="musicSpeedLabel">1.00倍</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="music-practice-stage-name" id="musicPracticeStageName"></div>
+      <div class="music-practice-accuracy" id="musicPracticeAccuracy"></div>
+      <div class="music-practice-topbar-icons" id="musicPracticeTopbarIcons">
+        <button class="music-calib-toggle-btn" id="musicCalibToggleBtn" aria-label="Match game screen" data-i18n-aria-label="music_calib_toggle_label" aria-pressed="false"></button>
+        <div class="music-calib-hint-bubble" id="musicCalibHintBubble" data-i18n="music_calib_hint_once">画面がずれる場合は、ここで「ゲーム画面に合わせる」を調整できます</div>
+        <button class="music-sound-btn" id="musicSoundToggleBtnStage" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+        <button class="music-practice-exit-btn" id="musicPracticeExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
+      </div>
+    </div>
+    <div id="musicScoreDisplayAnchorPractice"></div>
+  </div>
+  <div class="music-practice-song-info" id="musicPracticeSongInfo"></div>
+  <div class="music-calib-overlay" id="musicCalibOverlay">
+    <p class="music-calib-hint" data-i18n="music_calib_hint">ドラッグで移動、2本指ピンチで拡大縮小できます。この端末でのすべての楽器・配置に共通で適用されます</p>
+    <div class="music-calib-btn-row">
+      <label class="music-calib-btn" id="musicCalibBgLabel">
+        <input type="file" accept="image/*" id="musicCalibBgInput" style="display:none">
+        <span data-i18n="music_calib_bg_btn">実機画像を重ねる</span>
+      </label>
+      <button class="music-calib-btn" id="musicCalibResetBtn" data-i18n="music_calib_reset">リセット</button>
+      <button class="music-calib-btn music-calib-lock-btn" id="musicCalibLockBtn" data-i18n="music_calib_lock">ロックする</button>
+    </div>
+  </div>
+</div>
+
+<!-- 端末が縦向きの間だけ表示する、横向きを促す案内（ステージ本体は回転済みのため、
+     こちらは回転させず、縦向きのまま読める状態で表示する） -->
+<div class="music-rotate-prompt" id="musicRotatePrompt">
+  <div class="music-rotate-prompt-icon" id="musicRotatePromptIcon"></div>
+  <p data-i18n="music_rotate_hint">端末を横向きにすると、実機と同じ大きさで演奏ボタンが表示されます</p>
+</div>
+
+<!-- 追従モード：ボタンは出さず、大きな数字譜だけを自動スクロール表示する軽量画面。
+     実機の画面と分割画面(iPadのSplit Viewなど)で並べて使う想定なので、
+     練習モードと違って横画面には固定しない -->
+<div class="music-follow-stage" id="musicFollowStage">
+  <div class="music-practice-stage-topbar">
+    <button class="music-practice-exit-btn" id="musicFollowExitBtn" aria-label="Close" data-i18n-aria-label="music_close"></button>
+    <div class="music-practice-stage-name" id="musicFollowStageName"></div>
+    <button class="music-sound-btn" id="musicSoundToggleBtnFollow" aria-label="Toggle sound" data-i18n-aria-label="music_aria_sound_toggle" aria-pressed="false"></button>
+  </div>
+  <div class="music-follow-display" id="musicFollowDisplay"></div>
+  <div id="musicPlaybackAnchorFollow"></div>
+  <p class="music-practice-hint" data-i18n="music_follow_hint">実機の画面と並べて表示し、実際に演奏しながら次の音を確認できます。効果音はミュートすることをおすすめします。</p>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<div id="musicSavedListModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='musicSavedListModal') closeSavedListModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box music-saved-box">
+    <h3 data-i18n="music_library_title">譜面ライブラリ</h3>
+    <div class="music-saved-list" id="musicSavedList"></div>
+    <button class="modal-close-btn" onclick="closeSavedListModal()" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="musicNewScoreTypeModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='musicNewScoreTypeModal') closeNewScoreTypeModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+  <div class="modal-box music-onboarding-box">
+    <h3 data-i18n="music_new_type_title">譜面の種類を選ぶ</h3>
+    <p class="music-onboard-hint" data-i18n="music_new_type_hint">あとから「拍子ベースの譜面に変換する」でフリーテンポ→拍子ベースへの変換はできます（逆方向はできません）</p>
+    <button class="music-onboard-choice-btn" id="musicNewScoreTypeBarBtn">
+      <strong data-i18n="music_new_type_bar_title">拍子あり譜面</strong>
+      <span data-i18n="music_new_type_bar_body">テンポ・拍子をもとに、音の長さを一定の単位（4分音符など）で管理します</span>
+    </button>
+    <button class="music-onboard-choice-btn" id="musicNewScoreTypeFreeBtn">
+      <strong data-i18n="music_new_type_free_title">フリーテンポ譜面</strong>
+      <span data-i18n="music_new_type_free_body">テンポに縛られず、実際の音の長さをそのまま記録します。MIDI・音源・動画からの自動生成に向いています</span>
+    </button>
+    <button class="modal-close-btn" id="musicNewScoreTypeCloseBtn" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="musicOnboardingModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+  <div class="modal-box music-onboarding-box">
+    <div class="music-onboarding-progress">
+      <span class="music-onboarding-dot" data-step="1"></span>
+      <span class="music-onboarding-dot" data-step="2"></span>
+      <span class="music-onboarding-dot" data-step="3"></span>
+    </div>
+
+    <div id="musicOnboardStep1">
+      <h3 data-i18n="music_onboard_step1_title">① 楽器を選ぶ</h3>
+      <p class="music-onboard-hint" data-i18n="music_onboard_step1_hint">練習したい楽器を選んでください。あとからいつでも変更できます</p>
+      <div class="music-onboard-instrument-buttons" id="musicOnboardInstrumentButtons"></div>
+    </div>
+
+    <div id="musicOnboardStep2" style="display:none">
+      <h3 data-i18n="music_onboard_step2_title">② テンポを決める</h3>
+      <p class="music-onboard-hint" data-i18n="music_onboard_step2_hint">目安のテンポと拍子を選んでください。わからなければそのままで大丈夫です</p>
+      <div class="music-onboard-tempo-row">
+        <span data-i18n="music_bpm_label">テンポ</span>
+        <input type="number" id="musicOnboardBpmInput" class="music-bpm-input" min="40" max="220" value="100">
+        <span data-i18n="music_bpm_unit">BPM</span>
+      </div>
+      <div class="music-onboard-tempo-row">
+        <span data-i18n="music_timesig_label">拍子</span>
+        <select id="musicOnboardTimeSigSelect" class="music-timesig-select"></select>
+      </div>
+    </div>
+
+    <div id="musicOnboardStep3" style="display:none">
+      <h3 data-i18n="music_onboard_step3_title">③ 録音か手入力かを選ぶ</h3>
+      <p class="music-onboard-hint" data-i18n="music_onboard_step3_hint">どちらもあとからいつでも切り替えられます</p>
+      <button class="music-onboard-choice-btn" id="musicOnboardChoiceRecord">
+        <strong data-i18n="music_onboard_choice_record_title">演奏しながら録音する</strong>
+        <span data-i18n="music_onboard_choice_record_body">演奏ボタンを押した長さがそのまま音の長さになります</span>
+      </button>
+      <button class="music-onboard-choice-btn" id="musicOnboardChoiceManual">
+        <strong data-i18n="music_onboard_choice_manual_title">音符を1つずつ入力する</strong>
+        <span data-i18n="music_onboard_choice_manual_body">長さを選んでから演奏ボタンを押すと、その音が譜面に追加されます</span>
+      </button>
+    </div>
+
+    <div class="music-onboard-nav">
+      <button class="music-header-btn music-btn-secondary" id="musicOnboardSkipBtn" data-i18n="music_onboard_skip">スキップ</button>
+      <button class="music-header-btn music-btn-secondary" id="musicOnboardBackBtn" data-i18n="music_onboard_back" style="display:none">戻る</button>
+      <button class="music-header-btn" id="musicOnboardNextBtn" data-i18n="music_onboard_next">次へ</button>
+    </div>
+  </div>
+</div>
+
+<div id="musicHumModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box music-hum-box">
+    <h3 id="musicHumModalTitle" data-i18n="music_hum_modal_title">ハミングから作る</h3>
+    <p class="music-hum-caution" id="musicHumCautionText" data-i18n="music_hum_caution">ゆっくり・はっきりと、1音ずつ鼻歌を歌うと綺麗に変換されます。速い曲や和音、伴奏が混ざった音源はうまく認識できないことがあります。初回のみ解析モデルの読み込みに通信が必要ですが、録音・アップロードした音声はこの端末のブラウザ内だけで解析され、外部に送信されることはありません</p>
+
+    <div class="music-hum-source-row" id="musicHumSourceRow">
+      <button class="music-header-btn" id="musicHumRecordBtn" data-i18n="music_hum_record_start">録音する</button>
+      <label class="music-header-btn music-hum-upload-label" id="musicHumUploadLabel">
+        <input type="file" accept="audio/*,video/*" id="musicHumFileInput" style="display:none">
+        <span id="musicHumUploadText" data-i18n="music_hum_upload">音声ファイルを選ぶ</span>
+      </label>
+    </div>
+    <div class="music-hum-recording-row" id="musicHumRecordingRow" style="display:none">
+      <span class="music-hum-rec-dot"></span>
+      <span id="musicHumRecordingTime">0:00</span>
+      <button class="music-header-btn music-btn-secondary" id="musicHumStopBtn" data-i18n="music_hum_record_stop">録音を止める</button>
+    </div>
+    <div class="music-hum-pitch-row" id="musicHumPitchRow" style="display:none">
+      <span class="music-hum-pitch-value" id="musicHumLivePitch">-</span>
+    </div>
+    <div class="music-hum-file-row" id="musicHumFileRow" style="display:none">
+      <span id="musicHumFileName"></span>
+    </div>
+
+    <div class="music-bpm-row" id="musicHumMaxNotesRow" style="display:none">
+      <span data-i18n="music_maxnotes_label">同時に押す指の本数</span>
+      <input type="number" id="musicHumMaxNotesInput" class="music-bpm-input" min="1" max="10" value="4">
+      <span data-i18n="music_maxnotes_unit">本</span>
+    </div>
+    <p class="music-record-hint" id="musicHumMaxNotesHint" style="display:none" data-i18n="music_maxnotes_hint">推奨: 2〜4本。検出した和音がこの本数を超える場合は、主旋律・低音を優先して自動的に間引きます</p>
+
+    <div class="music-hum-progress-row" id="musicHumProgressRow" style="display:none">
+      <div class="music-hum-progress-bar"><div class="music-hum-progress-fill" id="musicHumProgressFill"></div></div>
+      <span class="music-hum-progress-label" id="musicHumProgressLabel"></span>
+      <button class="music-header-btn music-btn-secondary" id="musicHumCancelBtn" data-i18n="music_midi_preview_cancel">変換をキャンセル</button>
+    </div>
+    <p class="music-hum-error" id="musicHumError"></p>
+
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicHumAnalyzeBtn" data-i18n="music_hum_analyze" disabled>解析して譜面にする</button>
+    </div>
+    <button class="modal-close-btn" id="musicHumCloseBtn" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="musicMidiTrackModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2001;">
+  <div class="modal-box music-hum-box">
+    <h3 data-i18n="music_midi_track_modal_title">トラックを選択</h3>
+    <p class="music-step-hint" data-i18n="music_midi_track_modal_hint">複数のトラックが見つかりました。すべてまとめて1つの譜面（和音）にするか、いずれか1つのトラックだけを選んで変換できます</p>
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicMidiMergeAllBtn" data-i18n="music_midi_merge_all_btn">全トラックをまとめて変換</button>
+    </div>
+    <div class="music-saved-list" id="musicMidiTrackList"></div>
+    <button class="modal-close-btn" id="musicMidiTrackCloseBtn" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="musicMidiPreviewModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2002;">
+  <div class="modal-box music-hum-box">
+    <h3 data-i18n="music_midi_preview_title">変換結果のプレビュー</h3>
+    <p class="music-step-hint" id="musicMidiPreviewSourceLabel"></p>
+
+    <div class="music-panel-title" data-i18n="music_midi_preview_instrument_label">使用楽器</div>
+    <div class="music-instrument-buttons" id="musicMidiPreviewInstrumentButtons"></div>
+    <div class="music-layout-buttons" id="musicMidiPreviewLayoutButtons"></div>
+    <label class="music-semitone-row" id="musicMidiPreviewSemitoneRow" style="display:none">
+      <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+      <input type="checkbox" id="musicMidiPreviewSemitoneToggle">
+    </label>
+
+    <div class="music-bpm-row" id="musicMidiPreviewMaxNotesRow">
+      <span data-i18n="music_maxnotes_label">同時に押す指の本数</span>
+      <input type="number" id="musicMidiPreviewMaxNotesInput" class="music-bpm-input" min="1" max="10" value="4">
+      <span data-i18n="music_maxnotes_unit">本</span>
+    </div>
+
+    <div class="music-bpm-row" id="musicMidiPreviewOctaveRow">
+      <span data-i18n="music_midi_preview_octave_label">オクターブ調整</span>
+      <button class="music-header-btn music-btn-secondary" id="musicMidiPreviewOctaveDownBtn" aria-label="Octave down" data-i18n-aria-label="music_midi_octave_down">－1</button>
+      <span id="musicMidiPreviewOctaveValue">自動</span>
+      <button class="music-header-btn music-btn-secondary" id="musicMidiPreviewOctaveUpBtn" aria-label="Octave up" data-i18n-aria-label="music_midi_octave_up">＋1</button>
+    </div>
+
+    <div class="music-midi-preview-stats" id="musicMidiPreviewStats"></div>
+    <ul class="music-midi-preview-warnings" id="musicMidiPreviewWarnings"></ul>
+
+    <p class="music-record-hint" data-i18n="music_midi_preview_apply_hint">「現在の譜面へ反映」を選ぶと、今編集中の譜面が上書きされます（この操作はUndoで戻せません）。譜面を残しておきたい場合は「新しい譜面として保存」をお使いください</p>
+
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicMidiPreviewApplyBtn" data-i18n="music_midi_preview_apply">現在の譜面へ反映</button>
+      <button class="music-header-btn music-btn-secondary" id="musicMidiPreviewSaveNewBtn" data-i18n="music_midi_preview_save_new">新しい譜面として保存</button>
+    </div>
+    <button class="modal-close-btn" id="musicMidiPreviewCancelBtn" data-i18n="music_midi_preview_cancel">変換をキャンセル</button>
+  </div>
+</div>
+
+<div id="musicMelodyPreviewModal" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2002;">
+  <div class="modal-box music-hum-box">
+    <h3 data-i18n="music_midi_preview_title">変換結果のプレビュー</h3>
+    <p class="music-step-hint" id="musicMelodyPreviewSourceLabel"></p>
+
+    <div class="music-panel-title" data-i18n="music_midi_preview_instrument_label">使用楽器</div>
+    <div class="music-instrument-buttons" id="musicMelodyPreviewInstrumentButtons"></div>
+    <div class="music-layout-buttons" id="musicMelodyPreviewLayoutButtons"></div>
+    <label class="music-semitone-row" id="musicMelodyPreviewSemitoneRow" style="display:none">
+      <span data-i18n="music_semitone_toggle">演奏時に半音を表示する</span>
+      <input type="checkbox" id="musicMelodyPreviewSemitoneToggle">
+    </label>
+
+    <div class="music-bpm-row" id="musicMelodyPreviewMaxNotesRow">
+      <span data-i18n="music_maxnotes_label">同時に押す指の本数</span>
+      <input type="number" id="musicMelodyPreviewMaxNotesInput" class="music-bpm-input" min="1" max="10" value="4">
+      <span data-i18n="music_maxnotes_unit">本</span>
+    </div>
+
+    <div class="music-bpm-row" id="musicMelodyPreviewOctaveRow">
+      <span data-i18n="music_midi_preview_octave_label">オクターブ調整</span>
+      <button class="music-header-btn music-btn-secondary" id="musicMelodyPreviewOctaveDownBtn" aria-label="Octave down" data-i18n-aria-label="music_midi_octave_down">－1</button>
+      <span id="musicMelodyPreviewOctaveValue">自動</span>
+      <button class="music-header-btn music-btn-secondary" id="musicMelodyPreviewOctaveUpBtn" aria-label="Octave up" data-i18n-aria-label="music_midi_octave_up">＋1</button>
+    </div>
+
+    <div class="music-midi-preview-stats" id="musicMelodyPreviewStats"></div>
+    <ul class="music-midi-preview-warnings" id="musicMelodyPreviewWarnings"></ul>
+
+    <p class="music-record-hint" data-i18n="music_midi_preview_apply_hint">「現在の譜面へ反映」を選ぶと、今編集中の譜面が上書きされます（この操作はUndoで戻せません）。譜面を残しておきたい場合は「新しい譜面として保存」をお使いください</p>
+
+    <div class="music-panel-btn-row">
+      <button class="music-header-btn" id="musicMelodyPreviewApplyBtn" data-i18n="music_midi_preview_apply">現在の譜面へ反映</button>
+      <button class="music-header-btn music-btn-secondary" id="musicMelodyPreviewSaveNewBtn" data-i18n="music_midi_preview_save_new">新しい譜面として保存</button>
+    </div>
+    <button class="modal-close-btn" id="musicMelodyPreviewCancelBtn" data-i18n="music_midi_preview_cancel">変換をキャンセル</button>
+  </div>
+</div>
+
+<div id="helpModal" role="dialog" aria-modal="true" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box music-help-box">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="music_help_title">使い方</h3>
+
+    <p><strong data-i18n="music_help_onboard_title">はじめての案内</strong>
+    <span data-i18n="music_help_onboard_body">初めてこのページを開いたときは、①楽器を選ぶ、②テンポを決める、③録音か手入力かを選ぶ、という3ステップの案内が表示されます。あとから見直したいときは、下のボタンからいつでも呼び出せます。</span></p>
+    <button class="modal-close-btn" id="musicOnboardReplayBtn" onclick="closeHelpModal(); openOnboarding();" style="margin-top:8px;" data-i18n="music_onboard_replay">案内をもう一度見る</button>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_instrument_title">楽器</strong>
+    <span data-i18n="music_help_instrument_body">ピアノ・ギター/ベース・オカリナ/ほら貝の3種類から選べます。ゲーム内の実際の演奏画面と同じボタン配置です。ピアノとギター/ベースは「詳細設定」を開くと「15鍵（2列）」「15鍵（3列）」などの配置を切り替えられます。ピアノの「22キー」配置では、半音（♯）を表示するかも選べます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_humming_title">ハミングから作る（試験提供中の機能）</strong>
+    <span data-i18n="music_help_humming_body">鼻歌を録音するか、音声ファイルをアップロードすると、自動で音の高さ・長さを検出して譜面に変換します。
+検出したメロディの音域は、今選んでいる楽器・配置が実際に鳴らせる音域にオクターブ単位で自動的に合わせられ、その楽器で選べない音（黒鍵の無い配置での半音など）は一番近い音に自動で置き換えられます。
+ゆっくり・はっきりと1音ずつ歌うほど綺麗に変換されます（単旋律を前提とした変換のため、和音には対応していません）。変換後は聴きながら手直ししてください。
+初回利用時のみ、解析モデル自体をネットワーク経由で読み込むための通信が発生します（エディター本体はこの機能を使わない限りオフラインのままです）。モデルの読み込み後の解析処理はブラウザ内だけで完結し、録音・アップロードした音声データがどこかに送信されることはありません。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_audio_title">音源・動画から作る（試験提供中の機能）</strong>
+    <span data-i18n="music_help_audio_body">音声ファイル・動画ファイルをアップロードすると、自動で音の高さ・長さを検出して譜面に変換します。ハミングとは異なり和音や複数の音が同時に鳴る音源にも対応しており、同時に検出した音はそのまま和音として譜面に反映されます。
+検出した音域は、今選んでいる楽器・配置が実際に鳴らせる音域にオクターブ単位で自動的に合わせられ、その楽器で選べない音は一番近い音に自動で置き換えられます。ボーカルや主旋律がはっきり聞こえる音源ほど綺麗に変換されますが、伴奏やドラム、効果音が強く混ざっている場合は誤検出が増えることがあるので、変換後は聴きながら手直ししてください。
+MIDIファイル（.mid）をアップロードした場合は、解析モデルを使わずそのままピッチ・タイミング情報を読み取って変換します。初回利用時のみ、解析モデル自体をネットワーク経由で読み込むための通信が必要ですが（MIDIファイルの場合は不要です）、解析処理・データはこの端末のブラウザ内だけで完結し、外部に送信されることはありません。
+これらの機能で作った譜面は既定で「フリーテンポ譜面」（下記参照）として生成されます。テンポ・拍子に無理やり当てはめず、検出した実際の音の長さをそのまま使うためです。
+変換前に「同時に押す指の本数（1〜10、推奨2〜4本）」を指定できます。検出した和音がこの本数を超える場合は、主旋律（最も高い音）・低音（最も低い音）を優先して自動的に間引きます（実際に演奏ボタンで同時に押せる指の本数を超えないようにするための設定です）。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_freetempo_title">フリーテンポ譜面</strong>
+    <span data-i18n="music_help_freetempo_body">「新規作成」時に選べるもう1つの譜面の種類です。通常の「拍子あり譜面」がテンポ・拍子をもとに音の長さを一定の単位（4分音符など）で管理するのに対し、フリーテンポ譜面は実際の音の長さをそのまま記録します。テンポの概念に縛られない曲や、MIDI・音源・動画からの自動生成に向いています。
+テンポの入力欄は、生成・記録した時点の速さを基準に、練習・追従モードでの実際の再生速度を左右します（基準のテンポのままなら生成・記録した通りの速さで再生され、テンポを上げ下げするとその比率で再生速度も変わります。音同士の相対的な長さの関係は変わりません）。
+拍子の入力欄は小節線の位置の目安表示専用で、演奏・再生のタイミングには影響しません。あとから「拍子ベースの譜面に変換する」ボタンで、その時点のテンポ・拍子をもとに拍子ベースの譜面に変換できます（フリーテンポから拍子ベースへの一方向のみで、逆はできません）。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_edit_title">編集モード</strong>
+    <span data-i18n="music_help_edit_body">「音の長さ」を選んでから演奏ボタンを押すと、その音が譜面に追加されます。音を出さない「休符」を入れたいときは「休符を追加」を押すと、選んでいる長さの休符が譜面の最後に追加されます（数字譜では「0」で表示されます）。「最後を削除」で1つ前に戻せます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_record_title">録音する</strong>
+    <span data-i18n="music_help_record_body">オンにすると、演奏ボタンを押している長さがそのまま音の長さになります（一番近い長さに自動調整されます）。実際に演奏しながらそのまま譜面を作りたいときに使えます。複数のボタンを同時に押すと和音として記録されます。
+録音中は演奏ボタンの配置も、押し間違いを減らせるよう練習モードと同じ実機の配置に切り替わります。「全画面で演奏する」を押すと、練習モードと同じ全画面表示（端末を横向きにすると画面いっぱいの実機サイズ）で演奏しながら録音でき、右上のレンチのアイコンでの位置調整（下記「位置調整」参照）も使えます。閉じても録音は続いたままで、いつでも開き直せます。
+テンポ・拍子が初期値のまま一度も変更されていない状態で録音を始めようとすると、先に確認するかどうかの案内が出ます（音の長さの自動判定に影響するため）。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_tempo_title">テンポ・拍子</strong>
+    <span data-i18n="music_help_tempo_body">BPM（1分間の拍数）と拍子（4/4・3/4など）を設定できます。練習モードの再生速度はテンポを基準にした倍率です。小節線は拍子をもとに自動で表示されます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_loop_title">区間リピート</strong>
+    <span data-i18n="music_help_loop_body">「区間を選ぶ」を押してから譜面の音を2つタップすると、その間を区間として選べます。開始の音を選んだ直後は、その音が点線の枠で点滅表示され、次にどこをタップすればよいか分かりやすくなっています。
+「この区間をループ」をオンにすると、練習モード・追従モードの再生（タップでの先取りも含む）が、区間の終わりに来ると自動で区間の始めに戻ります。苦手な部分だけを集中して繰り返し練習できます。「解除」でいつでも区間を消せます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_practice_title">練習モード</strong>
+    <span data-i18n="music_help_practice_body">「練習」をタップすると、譜面と演奏ボタンだけの全画面表示に切り替わります。演奏ボタンは、その譜面を保存したときの楽器・配置（15鍵2列・22キーなど）がそのまま自動で使われます。
+ボタンの大きさ・間隔は実機の演奏画面と同じ指の感覚になるように表示され、端末を横向きにすると画面いっぱいに表示されます（縦向きのままでもCSSで横向き表示になりますが、実際に端末を横向きにすることをおすすめします）。
+次に弾くべき音の演奏ボタンが薄く光るので、迷わず次の音を確認できます（和音の場合は該当するボタンすべてが光ります）。そのボタンを正しく押すと、一瞬強く光ってから譜面のハイライトが先へ進みます。この先読みの点灯は、再生を止めている間もそのまま表示され続けます。
+譜面を0.1〜1.0倍速で自動再生でき、演奏ボタンは押している間だけ音が鳴ります。休符（押すボタンが無い音）は自動的に読み飛ばされます。採点はありません。左上の×で編集モードに戻れます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_keyboard_title">キーボードでの演奏</strong>
+    <span data-i18n="music_help_keyboard_body">PCで開いている場合、キーボードでも演奏ボタンを操作できます（編集モード・練習モードのみ。追従モードは対象外です）。対応するキーは各演奏ボタンに小さく表示されます（「楽器」の下にあるチェックで表示・非表示を切り替えられます）。楽器・配置を変えると対応キーも変わります。
+半音（♯）ボタンにはキー割り当てがなく、タッチ操作のみです。複数のキーを同時に押すと和音として扱われ、譜面作成中の入力・保存内容もタッチ操作と同じです。Ctrl+Z（元に戻す）・Ctrl+Y（やり直す）などブラウザの既存のショートカットとは干渉しません。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_position_title">位置調整</strong>
+    <span data-i18n="music_help_position_body">練習モード右上、または録音モードで「全画面で演奏する」を開いたときのレンチのアイコンで、演奏ボタンの大きさ・位置を自分の端末に合わせて微調整できます。
+1本指ドラッグで移動、2本指ピンチで拡大縮小でき、「実機画像を重ねる」で実際のゲーム画面のスクリーンショットを背景に薄く表示しながら位置合わせすることもできます（画像は保存されず、その場限りの参考表示です）。
+「ロックする」で調整を確定すると、この端末・ブラウザに記憶され、次回から自動で適用されます（練習モード・録音モードのどちらで調整しても、もう一方にも同じ調整が反映されます）。「リセット」でいつでも初期値に戻せます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_follow_title">追従モード</strong>
+    <span data-i18n="music_help_follow_body">「追従」をタップすると、演奏ボタンを出さず、今弾く音と次の音だけを大きく表示する全画面表示に切り替わります。実際のゲーム画面と並べて表示しながら、実機で演奏しつつ次の音を確認する使い方を想定しています（iPadの「Split View」＝画面を2つに分割して複数アプリを並べて表示する機能などと組み合わせると便利です）。
+練習モードと違って横画面には固定されません。譜面を0.1〜1.0倍速で自動再生し、テンポに合わせて表示が進みます。効果音が実機の音と重ならないよう、ミュートしての利用をおすすめします。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_sound_title">音</strong>
+    <span data-i18n="music_help_sound_body">簡易的な合成音が鳴ります（ゲーム内の実際の音とは異なります）。右上のボタンでオン・オフを切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="music_help_save_title">保存</strong>
+    <span data-i18n="music_help_save_body">「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。ログイン不要で、ブラウザ内にのみ保存されます。</span></p>
+
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="music_close">閉じる</button>
+  </div>
+</div>
+
+<div id="musicToast" role="status" aria-live="polite"></div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/toast.js"></script>
+<script>
+
+document.getElementById("helpBtn").innerHTML = icon("help");
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+function forceRepaint(){
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// 多言語ヘルパー
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+
+</script>
+<script src="js/music-config.js"></script>
+<script src="js/music-hum.js"></script>
+<script src="js/music-midi-import.js"></script>
+<script src="js/music-presets.js"></script>
+<script src="js/music-editor.js"></script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

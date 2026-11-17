@@ -1,0 +1,85 @@
+// 通貨アイコン（コイン・願い星）を文字列表記の直前に挿入する共通ヘルパー
+// ※このコインはshop.htmlの「トレンドコイン」とは別の通貨のため、
+//   「トレンドコイン」表記には反応しないようにしている
+
+const CURRENCY_ICON_SRC = {
+  coin: "images/currency/coin.png",
+  negaiboshi: "images/currency/negaiboshi.png",
+  fescoin: "images/currency/fescoin.png",
+  azuki: "images/currency/azuki.png",
+  chef_salad: "images/currency/chef_salad.png",
+  coffee_mame: "images/currency/coffee_mame.png",
+  heart_ishi: "images/currency/heart_ishi.png",
+  hiryo: "images/currency/hiryo.png",
+  ine_seed: "images/currency/ine_seed.png",
+  kawaii_panda: "images/currency/kawaii_panda.png",
+  kuro_panda: "images/currency/kuro_panda.png",
+  muku_hotaruishi: "images/currency/muku_hotaruishi.png",
+  niji_hanabi: "images/currency/niji_hanabi.png",
+  niku: "images/currency/niku.png",
+  rainbow_powder: "images/currency/rainbow_powder.png",
+  ringo: "images/currency/ringo.png",
+  ryoshitsu_mokuzai: "images/currency/ryoshitsu_mokuzai.png",
+  senshokuzai: "images/currency/senshokuzai.png",
+  shuribako: "images/currency/shuribako.png",
+  teiboku_eda: "images/currency/teiboku_eda.png",
+  tsuki_houseki: "images/currency/tsuki_houseki.png",
+  tsurutsuru_oak: "images/currency/tsurutsuru_oak.png",
+  seed_wheat: "images/currency/seed_wheat.png",
+  seed_kabotya: "images/currency/seed_kabotya.png",
+  ryoshitsu_hiryo: "images/currency/ryoshitsu_hiryo.png",
+  milk: "images/currency/milk.png",
+  mermaid_shippo: "images/currency/mermaid_shippo.png",
+  kaifuku: "images/currency/kaifuku.png",
+  yuuyafes_coin: "images/currency/yuuyafes_coin.png",
+  tenjikaipass: "images/currency/tenjikaipass.png",
+  orderticket: "images/currency/orderticket.png",
+  waribiki_5: "images/currency/waribiki_5.png",
+  waribiki_30: "images/currency/waribiki_30.png",
+  eiyouzai: "images/currency/eiyouzai.png",
+  r_hiryo: "images/currency/r_hiryo.png",
+};
+
+function currencyIcon(type) {
+  const src = CURRENCY_ICON_SRC[type];
+  if (!src) return "";
+  return `<img src="${src}" class="currency-icon" alt="" loading="lazy">`;
+}
+
+function injectCurrencyIcons(text, overrides) {
+  if (!text) return text;
+  overrides = overrides || {};
+  return text
+    .replace(/展示会パス/g, `${currencyIcon("tenjikaipass")}展示会パス`)
+    .replace(/フェスコイン/g, `${currencyIcon("fescoin")}フェスコイン`)
+    .replace(/マーメイドの魚寄せ装置/g, `${currencyIcon("mermaid_shippo")}マーメイドの魚寄せ装置`)
+    .replace(/(?<!トレンド)(?<!フェス)コイン/g, `${currencyIcon("coin")}コイン`)
+    .replace(/願い星/g, `${currencyIcon("negaiboshi")}願い星`)
+    .replace(/シェフ特製サラダ/g, `${currencyIcon("chef_salad")}シェフ特製サラダ`)
+    .replace(/コーヒー豆/g, `${currencyIcon("coffee_mame")}コーヒー豆`)
+    .replace(/ハート石/g, `${currencyIcon("heart_ishi")}ハート石`)
+    .replace(/稲の種/g, `${currencyIcon("ine_seed")}稲の種`)
+    .replace(/小麦の種/g, `${currencyIcon("seed_wheat")}小麦の種`)
+    .replace(/かぼちゃの種/g, `${currencyIcon("seed_kabotya")}かぼちゃの種`)
+    .replace(/良質肥料/g, `${currencyIcon(overrides.ryoshitsu_hiryo || "ryoshitsu_hiryo")}良質肥料`)
+    .replace(/牛乳/g, `${currencyIcon("milk")}牛乳`)
+    .replace(/可愛いパンダのシャボン玉液/g, `${currencyIcon("kawaii_panda")}可愛いパンダのシャボン玉液`)
+    .replace(/黒顔パンダのシャボン玉液/g, `${currencyIcon("kuro_panda")}黒顔パンダのシャボン玉液`)
+    .replace(/無垢な蛍石/g, `${currencyIcon("muku_hotaruishi")}無垢な蛍石`)
+    .replace(/虹の花火ツリー/g, `${currencyIcon("niji_hanabi")}虹の花火ツリー`)
+    .replace(/レインボー育成パウダー/g, `${currencyIcon("rainbow_powder")}レインボー育成パウダー`)
+    .replace(/良質木材/g, `${currencyIcon("ryoshitsu_mokuzai")}良質木材`)
+    .replace(/染色剤/g, `${currencyIcon("senshokuzai")}染色剤`)
+    .replace(/修理箱/g, `${currencyIcon("shuribako")}修理箱`)
+    .replace(/低木の枝/g, `${currencyIcon("teiboku_eda")}低木の枝`)
+    .replace(/月の水晶/g, `${currencyIcon("tsuki_houseki")}月の水晶`)
+    .replace(/ツルツルオーク/g, `${currencyIcon("tsurutsuru_oak")}ツルツルオーク`)
+    .replace(/あずき/g, `${currencyIcon("azuki")}あずき`)
+    .replace(/(?<!良質)肥料/g, `${currencyIcon("hiryo")}肥料`)
+    .replace(/肉/g, `${currencyIcon("niku")}肉`)
+    .replace(/りんご/g, `${currencyIcon("ringo")}りんご`)
+    .replace(/栄養剤/g, `${currencyIcon("eiyouzai")}栄養剤`);
+}
+
+window.currencyIcon = currencyIcon;
+window.injectCurrencyIcons = injectCurrencyIcons;

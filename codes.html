@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>ギフトコード一覧｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の有効なギフトコード一覧。報酬内容・期限を確認できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | ギフトコード一覧">
+<meta property="og:description" content="Heartopiaの有効なギフトコード一覧。報酬内容・期限を確認できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/codes.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | ギフトコード一覧">
+<meta name="twitter:description" content="Heartopiaの有効なギフトコード一覧。報酬内容・期限を確認できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./updates.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* codes.html 専用CSS（共通の見た目はcss/style.cssを参照） */
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{ min-height:100vh; }
+
+/* タブ（.ds-tab は css/design-system.css 参照） */
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:14px;
+}
+
+/* コードカード */
+.code-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.code-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px 16px;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .code-card{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.code-card.expired{
+  opacity:0.5;
+}
+
+.code-card-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:8px;
+}
+
+.code-value{
+  font-family:'Shippori Mincho', serif;
+  font-size:17px;
+  font-weight:700;
+  color:var(--indigo);
+  letter-spacing:0.08em;
+}
+
+body.dark .code-value{
+  color:var(--dark-accent);
+}
+
+.code-badge{
+  font-size:10px;
+  padding:3px 10px;
+  border-radius:999px;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.badge-active{
+  background:var(--green-bg);
+  color:var(--green);
+  border:1px solid var(--green);
+}
+
+body.dark .badge-active{
+  background:#1e3328;
+  color:var(--green-dark-text);
+  border-color:var(--green);
+}
+
+.badge-expired{
+  background:var(--card-sub);
+  color:var(--text-sub);
+  border:1px solid var(--border);
+}
+
+body.dark .badge-expired{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+.code-reward{
+  font-size:12px;
+  color:var(--text);
+  margin-bottom:6px;
+  line-height:1.6;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+body.dark .code-reward{
+  color:var(--dark-text);
+}
+
+.code-meta{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.code-expiry{
+  font-size:10px;
+  color:var(--text-sub);
+}
+
+body.dark .code-expiry{
+  color:var(--dark-text-sub);
+}
+
+/* コピーボタン */
+.copy-btn{
+  padding:6px 14px;
+  border:1px solid var(--indigo);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--indigo);
+  color:var(--on-fill);
+  cursor:pointer;
+  transition:0.15s;
+  white-space:nowrap;
+}
+
+.copy-btn:active{
+  opacity:0.75;
+  transform:scale(0.97);
+}
+
+body.dark .copy-btn{
+  background:var(--indigo-soft);
+  border-color:var(--indigo-soft);
+}
+
+.copy-btn.copied{
+  background:var(--green);
+  border-color:var(--green);
+}
+
+.code-card.expired .copy-btn{
+  background:var(--card-sub);
+  border-color:var(--border);
+  color:var(--text-sub);
+  pointer-events:none;
+}
+
+body.dark .code-card.expired .copy-btn{
+  background:var(--dark-card-alt);
+  border-color:var(--dark-border);
+  color:var(--dark-text-sub);
+}
+
+/* 空表示 */
+.empty{
+  text-align:center;
+  padding:40px 0;
+  color:var(--text-sub);
+  font-size:13px;
+}
+
+body.dark .empty{
+  color:var(--dark-text-sub);
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+body.dark .footer{
+  color:var(--dark-text-sub);
+}
+
+/* 受け取り済みカード */
+.code-card.received{
+  border-color:var(--green);
+  background:var(--green-bg);
+}
+
+body.dark .code-card.received{
+  border-color:var(--green);
+  background:#1e3328;
+}
+
+/* 受取ボタン */
+.receive-btn{
+  padding:6px 12px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-family:'Zen Maru Gothic', sans-serif;
+  font-size:11px;
+  background:var(--card-sub);
+  color:var(--text-sub);
+  cursor:pointer;
+  transition:0.15s;
+  white-space:nowrap;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+body.dark .receive-btn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+.receive-btn.received{
+  background:var(--green-bg);
+  border-color:var(--green);
+  color:var(--green);
+  font-weight:700;
+}
+
+body.dark .receive-btn.received{
+  background:#1e3328;
+  border-color:var(--green);
+  color:var(--green-dark-text);
+}
+
+.receive-btn:active{
+  transform:scale(0.97);
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item active" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+
+<div class="page-header">
+  <h1 data-i18n="codes_page_title">ギフトコード</h1>
+  <p class="page-subtitle" data-i18n="codes_page_subtitle">コードをタップしてコピーできます</p>
+</div>
+
+<div class="tabs">
+  <button class="ds-tab ds-tab-grow active" id="tab-active" onclick="setTab('active')" data-i18n="codes_tab_active">有効なコード</button>
+  <button class="ds-tab ds-tab-grow" id="tab-expired" onclick="setTab('expired')" data-i18n="codes_tab_expired">期限切れ</button>
+</div>
+
+<div class="code-list" id="codeList"></div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="codes_help_title">ギフトコードの使い方</h3>
+
+    <p><strong data-i18n="codes_help_tab_title">タブ切り替え</strong>
+    <span data-i18n="codes_help_tab_body">「有効なコード」「期限切れ」を切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="codes_help_copy_title">コードをコピー</strong>
+    <span data-i18n="codes_help_copy_body">コードをタップするとクリップボードにコピーされます。ゲーム内の交換画面に貼り付けてご利用ください。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(CODES_TUTORIAL_DONE_KEY, CODES_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="codes_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです<br>
+  コードに関する不具合はゲーム公式へお問い合わせください
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/currency-icons.js"></script>
+<script src="js/data-codes.js"></script>
+<script>
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const CODES_TUTORIAL_DONE_KEY = "hatopiCodes_tutorialDone";
+const CODES_TUTORIAL_STEPS = [
+  { selector: ".tabs", titleKey: "tutorial_codes_step1_title", titleFallback: "① タブを切り替え", textKey: "tutorial_codes_step1_body", textFallback: "「有効なコード」「期限切れ」を切り替えられます。" },
+  { selector: "#codeList", titleKey: "tutorial_codes_step2_title", titleFallback: "② コードをタップしてコピー", textKey: "tutorial_codes_step2_body", textFallback: "コードをタップするとクリップボードにコピーされます。ゲーム内の交換画面に貼り付けてご利用ください。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// タブ
+let currentTab = "active";
+function setTab(tab){
+  currentTab = tab;
+  ["active","expired"].forEach(t=>{
+    document.getElementById("tab-"+t).classList.toggle("active", t === tab);
+  });
+  renderCodes();
+}
+
+// 期限チェック
+function isExpired(expiry){
+  if(!expiry) return false;
+  // "YYYY-MM-DD HH:MM" → そのままDateに渡せるよう":"はそのままでOK
+  return new Date(expiry) < new Date();
+}
+
+// 残り日数（期限までの日数を切り上げ、最低1日）
+function daysRemaining(expiry){
+  const diffMs = new Date(expiry) - new Date();
+  return Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+}
+
+// 多言語ヘルパー
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+function displayReward(c){
+  const lang = currentLang();
+  const text = (c.rewardI18n && c.rewardI18n[lang]) || c.reward;
+  return injectCurrencyIcons(text, { ryoshitsu_hiryo: "r_hiryo" });
+}
+
+
+// コード描画
+// チェック状態の読み込み
+let receivedCodes =
+  JSON.parse(localStorage.getItem("receivedCodes") || "{}");
+
+function renderCodes(){
+  const el = document.getElementById("codeList");
+  el.innerHTML = "";
+
+  const list = codesData
+  .filter(c =>
+    currentTab === "active"
+      ? !isExpired(c.expiry) && c.active
+      : isExpired(c.expiry) || !c.active
+  )
+  .sort((a, b) => {
+    const ar = receivedCodes[a.code] ? 1 : 0;
+    const br = receivedCodes[b.code] ? 1 : 0;
+    return ar - br;
+  });
+
+  if(list.length === 0){
+    el.innerHTML = `<div class="empty">${
+      currentTab === "active"
+        ? T("codes_no_active","現在有効なコードはありません")
+        : T("codes_no_expired","期限切れのコードはありません")
+    }</div>`;
+    return;
+  }
+
+  list.forEach(c=>{
+    const expired = isExpired(c.expiry) || !c.active;
+    const received = !!receivedCodes[c.code];
+    const div = document.createElement("div");
+    div.className = "code-card" + (expired ? " expired" : "") + (received ? " received" : "");
+    div.innerHTML = `
+      <div class="code-card-top">
+        <span class="code-value">${c.code}</span>
+        <span class="code-badge ${expired ? "badge-expired" : "badge-active"}">
+          ${expired
+            ? T("codes_badge_expired","期限切れ")
+            : (c.expiry
+              ? T("codes_badge_days_left","あと{n}日",{n:daysRemaining(c.expiry)})
+              : T("codes_badge_active","有効"))}
+        </span>
+      </div>
+      <div class="code-reward">${icon("gift",{size:13})} ${displayReward(c)}</div>
+      <div class="code-meta">
+        <span class="code-expiry">
+           ${c.expiry ? T("codes_expiry_label","期限：") + formatExpiry(c.expiry) : T("codes_expiry_none","期限：なし")}
+        </span>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button
+            class="receive-btn ${received ? "received" : ""}"
+            onclick="toggleReceived('${c.code}')"
+            title="${T("codes_receive_title","受け取り済みにする")}"
+          >${received ? `${icon("check",{size:12})} ${T("codes_received","受取済")}` : T("codes_not_received","○ 未受取")}</button>
+          <button
+            class="copy-btn ${expired ? "" : ""}"
+            onclick="copyCode('${c.code}', this)"
+            ${expired ? "disabled" : ""}
+          >${expired ? T("codes_badge_expired","期限切れ") : T("codes_copy","コピー")}</button>
+        </div>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function toggleReceived(code){
+  receivedCodes[code] = !receivedCodes[code];
+  localStorage.setItem("receivedCodes", JSON.stringify(receivedCodes));
+  renderCodes();
+}
+
+
+// コピー
+function copyCode(code, btn){
+  navigator.clipboard.writeText(code).then(()=>{
+    btn.textContent = T("codes_copied","コピー済み");
+    btn.classList.add("copied");
+    setTimeout(()=>{
+      btn.textContent = T("codes_copy","コピー");
+      btn.classList.remove("copied");
+    }, 2000);
+    showToast(T("codes_copied_toast","コピーしました！"));
+  }).catch(()=>{
+    // フォールバック
+    const ta = document.createElement("textarea");
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    showToast(T("codes_copied_toast","コピーしました！"));
+  });
+}
+
+function formatExpiry(expiry){
+  if(!expiry) return T("codes_expiry_none","なし");
+  const d = new Date(expiry);
+  const yyyy = d.getFullYear();
+  const mm = d.getMonth() + 1;
+  const dd = d.getDate();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  const suffix = T("codes_expiry_until","まで");
+  return suffix ? `${yyyy}/${mm}/${dd} ${hh}:${min}${suffix}` : `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+}
+
+renderCodes();
+maybeStartPageTutorial(CODES_TUTORIAL_DONE_KEY, CODES_TUTORIAL_STEPS);
+
+// 言語切替時に再描画
+document.addEventListener("langchange", renderCodes);
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

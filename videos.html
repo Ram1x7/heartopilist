@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>場所動画｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）のピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | 場所動画">
+<meta property="og:description" content="ピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/videos.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | 場所動画">
+<meta name="twitter:description" content="ピンクバブル・虹の日・流星雨の発生記録動画をまとめて視聴できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./updates.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* videos.html 専用CSS（共通の見た目はcss/style.cssを参照） */
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{ min-height:100vh; }
+
+/* ページヘッダー */
+.page-header{
+  margin-bottom:6px;
+}
+
+.page-header h2{
+  font-family:'Shippori Mincho', serif;
+  font-size:20px;
+  color:var(--indigo);
+  letter-spacing:0.12em;
+}
+
+body.dark .page-header h2{
+  color:var(--dark-accent);
+}
+
+.page-header p{
+  font-size:11px;
+  color:var(--text-sub);
+  margin-top:4px;
+}
+
+body.dark .page-header p{
+  color:var(--dark-text-sub);
+}
+
+/* カテゴリタブ */
+.cat-tabs{
+  display:flex;
+  gap:6px;
+  margin:14px 0 16px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  /* bodyの既定はpan-y限定（画面端スワイプでの「戻る」誤爆防止）だが、
+     ここは実際に横スクロールさせたい要素なので個別に許可し直す */
+  touch-action:pan-x pan-y;
+}
+
+.cat-tabs::-webkit-scrollbar{ display:none; }
+
+.cat-tabs .ds-tab{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+/* リスト */
+.video-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* カード */
+.video-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(52,48,43,0.06);
+}
+
+body.dark .video-card{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+.video-question{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  cursor:pointer;
+}
+
+.video-icon{
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  color:var(--indigo);
+}
+
+body.dark .video-icon{ color:var(--dark-accent); }
+
+.video-title{
+  flex:1;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--text);
+  letter-spacing:0.02em;
+}
+
+body.dark .video-title{
+  color:var(--dark-text);
+}
+
+.video-arrow{
+  flex-shrink:0;
+  font-size:11px;
+  color:var(--text-sub);
+  transition:transform 0.2s;
+}
+
+body.dark .video-arrow{
+  color:var(--dark-text-sub);
+}
+
+.video-card.open .video-arrow{
+  transform:rotate(180deg);
+}
+
+.video-answer{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.25s ease;
+}
+
+.video-card.open .video-answer{
+  max-height:900px;
+}
+
+.video-answer-inner{
+  padding:0 16px 16px;
+}
+
+.video-embed{
+  position:relative;
+  width:100%;
+  max-width:360px;
+  margin:0 auto;
+  aspect-ratio:9/16;
+  border-radius:10px;
+  overflow:hidden;
+  background:#000;
+}
+
+.video-embed iframe{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  border:none;
+}
+
+.video-note{
+  font-size:12px;
+  color:var(--text-sub);
+  line-height:1.7;
+  margin-top:10px;
+  white-space:pre-wrap;
+}
+
+body.dark .video-note{
+  color:var(--dark-text-sub);
+}
+
+/* 空表示 */
+.empty{
+  text-align:center;
+  padding:48px 0;
+  color:var(--text-sub);
+  font-size:13px;
+  line-height:2;
+}
+
+body.dark .empty{
+  color:var(--dark-text-sub);
+}
+
+/* フッター */
+.footer{
+  text-align:center;
+  margin-top:24px;
+  font-size:10px;
+  color:var(--text-sub);
+  opacity:0.6;
+  line-height:1.8;
+}
+
+body.dark .footer{
+  color:var(--dark-text-sub);
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item active" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h2 data-i18n="videos_page_title">場所動画</h2>
+  <p data-i18n="videos_page_subtitle">ピンクバブル・虹の日・流星雨の発生記録動画</p>
+</div>
+
+<div class="scroll-hint-wrap">
+<div class="cat-tabs">
+  <button class="ds-tab active" id="cat-pink_bubble" onclick="setCat('pink_bubble')"></button>
+  <button class="ds-tab" id="cat-rainbow_day" onclick="setCat('rainbow_day')"></button>
+  <button class="ds-tab" id="cat-meteor_shower" onclick="setCat('meteor_shower')"></button>
+</div>
+</div>
+
+<div class="video-list" id="videoList"></div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="videos_help_title">場所動画の使い方</h3>
+
+    <p><strong data-i18n="videos_help_cat_title">現象を切り替え</strong>
+    <span data-i18n="videos_help_cat_body">ピンクバブル・虹の日・流星雨のタブを切り替えられます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="videos_help_play_title">タップで動画再生</strong>
+    <span data-i18n="videos_help_play_body">日付をタップすると、その日の発生記録動画が展開表示されます。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(VIDEOS_TUTORIAL_DONE_KEY, VIDEOS_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="videos_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/data-videos.js"></script>
+<script>
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+};
+
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const VIDEOS_TUTORIAL_DONE_KEY = "hatopiVideos_tutorialDone";
+const VIDEOS_TUTORIAL_STEPS = [
+  { selector: ".cat-tabs", titleKey: "tutorial_videos_step1_title", titleFallback: "① 現象を切り替え", textKey: "tutorial_videos_step1_body", textFallback: "ピンクバブル・虹の日・流星雨のタブを切り替えられます。" },
+  { selector: "#videoList", titleKey: "tutorial_videos_step2_title", titleFallback: "② タップで動画再生", textKey: "tutorial_videos_step2_body", textFallback: "日付をタップすると、その日の発生記録動画が展開表示されます。" },
+];
+document.getElementById("helpBtn").innerHTML = icon("help");
+function openHelpModal(){
+  document.getElementById("helpModal").style.display = "block";
+}
+function closeHelpModal(){
+  document.getElementById("helpModal").style.display = "none";
+}
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// 多言語ヘルパー
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+
+// カテゴリ定義
+const CATS = {
+  pink_bubble:   { label:()=>T("videos_cat_pink_bubble","ピンクバブル"), icon:"bubbles" },
+  rainbow_day:   { label:()=>T("videos_cat_rainbow_day","虹の日"),       icon:"weatherRainbow" },
+  meteor_shower: { label:()=>T("videos_cat_meteor_shower","流星雨"),     icon:"weatherMeteor" },
+};
+
+// 日付フォーマット（YYYY-MM-DD → YYYY/M/D）
+function formatDate(str){
+  const d = new Date(str + "T00:00:00");
+  if(isNaN(d.getTime())) return str;
+  return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+}
+
+// カテゴリ内の動画を新しい順に並べたリストを返す
+// ※同じ日付でも実際の発生開始時刻（メモから読み取り）が新しいものを上に表示する
+//   （例：流星雨の同日「18:00~24:00」と「24:00~30:00」なら後者が上）
+function getSortedList(cat){
+  return (typeof videoData !== "undefined" ? videoData : [])
+    .filter(v => v.category === cat)
+    .slice()
+    .sort((a, b) => {
+      const sa = computeEventEnd(a)?.start ?? 0;
+      const sb = computeEventEnd(b)?.start ?? 0;
+      return sb - sa;
+    });
+}
+
+function idOf(v, i){
+  return v.category + "_" + v.date + "_" + i;
+}
+
+// "YYYY-MM-DD"（JST基準のカレンダー日付）を、そのJST 0:00に対応する絶対時刻(ms)に変換
+// ※ブラウザのローカルタイムゾーンに依存させないため、UTC解釈から9時間分を差し引く
+function jstMidnight(dateStr){
+  const t = Date.parse(dateStr + "T00:00:00Z");
+  return isNaN(t) ? NaN : t - 9 * 3600000;
+}
+
+// 各動画の「対象期間の開始・終了時刻」を求める（自動展開の判定に使用）
+// ・ピンクバブル：dateの6:00始まり〜7日後6:00まで（メモは使わない）
+// ・虹の日/流星雨：メモ内の「H:MM~H:MM」から開始・終了時刻を読み取る（読めない場合は当日いっぱいとみなす）
+function computeEventEnd(v){
+  const base = jstMidnight(v.date);
+  if(isNaN(base)) return null;
+  const HOUR = 3600000;
+
+  if(v.category === "pink_bubble"){
+    const start = base + 6 * HOUR;
+    return { start, end: start + 7 * 24 * HOUR, windowMs: 0 };
+  }
+
+  const m = /^(\d{1,2}):(\d{2})\s*~\s*(\d{1,2}):(\d{2})/.exec(v.note || "");
+  const start = m ? base + (parseInt(m[1], 10) * 60 + parseInt(m[2], 10)) * 60000 : base;
+  const end = m ? base + (parseInt(m[3], 10) * 60 + parseInt(m[4], 10)) * 60000 : base + 24 * HOUR;
+  const windowMs = v.category === "meteor_shower" ? 24 * HOUR : 6 * HOUR;
+  return { start, end, windowMs };
+}
+
+// タブを開いた直後、その動画を展開表示にすべきか（流星雨=開始から過去24時間、虹の日=開始から過去6時間、ピンクバブル=当該週内）
+function isDefaultOpen(v){
+  const info = computeEventEnd(v);
+  if(!info) return false;
+  const now = Date.now();
+  if(info.windowMs === 0) return now >= info.start && now < info.end;
+  return now >= info.start && now < info.start + info.windowMs;
+}
+
+// カテゴリ内で直近性の条件を満たす動画のidを全て返す（複数あれば全て開く）
+function computeDefaultOpenIds(cat){
+  const list = getSortedList(cat);
+  const ids = [];
+  list.forEach((v, i) => {
+    if(isDefaultOpen(v)) ids.push(idOf(v, i));
+  });
+  return ids;
+}
+
+// 状態（他ページの「今日やること」などから ?cat=カテゴリ名 で直接開けるようにする）
+const urlCat = new URLSearchParams(location.search).get("cat");
+let currentCat = (urlCat && CATS[urlCat]) ? urlCat : "pink_bubble";
+let openIds = new Set();
+
+function setCat(cat){
+  currentCat = cat;
+  openIds = new Set(computeDefaultOpenIds(cat));
+  Object.keys(CATS).forEach(c=>{
+    document.getElementById("cat-"+c).classList.toggle("active", c === cat);
+  });
+  renderVideos();
+}
+
+function renderCatTabs(){
+  Object.keys(CATS).forEach(c=>{
+    const btn = document.getElementById("cat-"+c);
+    btn.innerHTML = `${icon(CATS[c].icon,{size:14})} ${CATS[c].label()}`;
+  });
+}
+
+// 描画
+function renderVideos(){
+  renderCatTabs();
+  const el = document.getElementById("videoList");
+  el.innerHTML = "";
+
+  const list = getSortedList(currentCat);
+
+  if(list.length === 0){
+    el.innerHTML = `<div class="empty">${T("videos_no_results","まだ動画がありません")}</div>`;
+    return;
+  }
+
+  list.forEach((v, i) => {
+    const id = idOf(v, i);
+    const isOpen = openIds.has(id);
+    const div = document.createElement("div");
+    div.className = "video-card" + (isOpen ? " open" : "");
+    div.innerHTML = `
+      <div class="video-question" onclick="toggleVideo('${id}')">
+        <span class="video-icon">${icon("calendar", {size:15})}</span>
+        <span class="video-title">${formatDate(v.date)}</span>
+        <span class="video-arrow">▼</span>
+      </div>
+      <div class="video-answer">
+        <div class="video-answer-inner">
+          ${isOpen ? `
+            <div class="video-embed">
+              <iframe
+                src="https://www.youtube-nocookie.com/embed/${v.videoId}"
+                title="${formatDate(v.date)}"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+                loading="lazy"
+              ></iframe>
+            </div>
+            ${v.note ? `<div class="video-note">${v.note}</div>` : ""}
+          ` : ""}
+        </div>
+      </div>
+    `;
+    el.appendChild(div);
+  });
+}
+
+function toggleVideo(id){
+  if(openIds.has(id)) openIds.delete(id);
+  else openIds.add(id);
+  renderVideos();
+}
+
+setCat(currentCat);
+maybeStartPageTutorial(VIDEOS_TUTORIAL_DONE_KEY, VIDEOS_TUTORIAL_STEPS);
+
+// 言語切替時に再描画
+document.addEventListener("langchange", renderVideos);
+
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>

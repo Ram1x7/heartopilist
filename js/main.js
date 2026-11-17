@@ -1,0 +1,2474 @@
+const APP_VERSION = "3.2.0";
+
+// ── サーバー設定 ──
+// weatherData や生き物の出現時間帯（time配列）は Asia(UTC+9) 基準で入力されている。
+// 選択中サーバーのオフセットに応じて「今が何時・何ゾーンか」を計算し直すことで、
+// 天気判定・出現判定・時計表示すべてを選択サーバーに合わせる。
+const SERVERS = {
+  asia:     { label:"Asia",     short:"JP",  offset: 9  },
+  tw_hk_mo: { label:"TW/HK/MO", short:"TW",  offset: 8  },
+  sea:      { label:"SEA",      short:"SEA", offset: 7  },
+  global:   { label:"Global",   short:"EU",  offset: 1  },
+  america:  { label:"America",  short:"US",  offset: -5 },
+};
+let currentServer = localStorage.getItem("gameServer") || "asia";
+if(!SERVERS[currentServer]) currentServer = "asia";
+
+let currentFilter="all";
+let currentSort = "book";
+let priceSortStar = Math.min(5, Math.max(1, parseInt(localStorage.getItem("priceSortStar"), 10) || 1));
+let priceSortOrder = localStorage.getItem("priceSortOrder") === "asc" ? "asc" : "desc";
+let limitedOnly = false;
+let weatherMode = "current";
+// "current" = 今の天気で出るやつ全部
+// "only" = 今の天気でしか出ないやつ
+let multiSelectMode = false;
+let selectedItems = {};
+let _lastVisibleNames = null;
+let activeBulkUndo = null;
+
+let currentZone="";
+let currentWeather="";
+// 天気の手動入力（運営者様のデータ入力が間に合わず「不明」になっている間だけ、
+// この端末上でユーザー自身が現在の天気を仮に選べるようにする。他のユーザーとは
+// 共有されず、この端末のlocalStorageにのみ保存する。運営者様の公式データが
+// 入力され次第、そちらを優先して自動的に手動入力は表示されなくなる
+let currentWeatherIsManual = false;
+let currentWeatherDateKey = "";
+
+let minLevel = 1;
+let maxLevel = 14;
+  // チェック保存
+let checkedData =
+  JSON.parse(localStorage.getItem("checkedData") || "{}");
+// 認証マスター記録
+let authData =
+  JSON.parse(localStorage.getItem("authData") || "{}");
+
+// 「未完了順」「未認証順」ソート中はチェック/認証をつけた直後に対象が
+// リストの下へ移動し、別の項目が同じ画面位置に入れ替わる。連続タップ時に
+// 意図しない項目を巻き込んで切り替えてしまわないよう、切り替え直後は
+// 短時間だけ再操作を無視する。
+let toggleGuard = false;
+function guardToggle(){
+  if(toggleGuard) return true;
+  toggleGuard = true;
+  setTimeout(()=>{ toggleGuard = false; }, 400);
+  return false;
+}
+
+// 天気データは js/data-weather.js の weatherData を使用（毎日手入力・別ファイル管理）
+
+const ALL_WEATHER = ["晴れ","雨","虹"];
+const ALL_TIME = ["6-12","12-18","18-0","0-6"];
+
+// ── 天気の手動入力（「不明」の間だけ使える、この端末限定の仮設定） ──
+const MANUAL_WEATHER_KEY = "manualWeatherOverrides";
+const MANUAL_WEATHER_OPTIONS = ["晴れ","雨","虹","流星雨"];
+
+function loadManualWeatherOverrides(){
+  try { return JSON.parse(localStorage.getItem(MANUAL_WEATHER_KEY) || "{}"); }
+  catch(e){ return {}; }
+}
+
+// 運営者様の公式データ(weatherData)が入っている間は、そちらを常に優先する
+// （officialWeatherがある場合はこの関数自体を呼ばない）ため、公式データが
+// 後から入力されると自動的に手動入力より優先される
+function getManualWeatherOverride(dateKey, zone){
+  const overrides = loadManualWeatherOverrides();
+  return overrides[`${dateKey}_${zone}`] || null;
+}
+
+function setManualWeatherOverride(dateKey, zone, value){
+  const overrides = loadManualWeatherOverrides();
+  if(value) overrides[`${dateKey}_${zone}`] = value;
+  else delete overrides[`${dateKey}_${zone}`];
+  localStorage.setItem(MANUAL_WEATHER_KEY, JSON.stringify(overrides));
+}
+
+// #weatherNowの下に、天気が「不明」（公式データ未入力）の間だけ選択欄を表示する。
+// 選択するとこの端末にだけ保存され、他のユーザーには共有されない
+//
+// updateTime()は1秒ごとに呼ばれるが、その都度innerHTMLで<select>を作り直すと、
+// ユーザーがプルダウンを開いている最中でも1秒ごとに要素が作り直されて閉じてしまい、
+// 天気を選択しづらくなる不具合があった。dateKey・zone・選択中の値が前回描画時から
+// 変わっていない場合は再描画自体をスキップし、操作中の要素に触れないようにする。
+let lastWeatherOverrideSignature = null;
+function renderWeatherOverrideControl(officialWeather, dateKey, zone){
+  const wrap = document.getElementById("weatherOverrideWrap");
+  if(!wrap) return;
+
+  if(officialWeather){
+    if(lastWeatherOverrideSignature !== null){
+      wrap.style.display = "none";
+      wrap.innerHTML = "";
+      lastWeatherOverrideSignature = null;
+    }
+    return;
+  }
+
+  const current = getManualWeatherOverride(dateKey, zone) || "";
+  const signature = `${dateKey}_${zone}_${current}`;
+  if(signature === lastWeatherOverrideSignature) return;
+  lastWeatherOverrideSignature = signature;
+
+  const options = [`<option value="">${T("weather_manual_placeholder","天気を選択")}</option>`]
+    .concat(MANUAL_WEATHER_OPTIONS.map(w => `<option value="${w}"${w === current ? " selected" : ""}>${translateWeatherWord(w)}</option>`))
+    .join("");
+  wrap.innerHTML = `<select id="weatherOverrideSelect" class="weather-override-select" onchange="onWeatherOverrideChange(this.value)">${options}</select>`;
+  wrap.style.display = "";
+}
+
+function onWeatherOverrideChange(value){
+  setManualWeatherOverride(currentWeatherDateKey, currentZone, value);
+  updateTime();
+}
+
+// 最後にまとめる（超重要）
+const creatures = [
+ ...fishData,
+ ...bugData,
+ ...birdData,
+ ...(typeof sandData  !== "undefined" ? sandData  : []),
+ ...(typeof snowData  !== "undefined" ? snowData  : []),
+ ...(typeof shellData !== "undefined" ? shellData : []),
+ ...(typeof kabotyaData !== "undefined" ? kabotyaData : [])
+];
+
+// サーバーのUTCオフセット（時間）
+function getServerOffset(){
+  return (SERVERS[currentServer] || SERVERS.asia).offset;
+}
+
+// 実際のUTC時刻（ブラウザのタイムゾーンに依存しない）に、
+// 選択中サーバーのオフセットを足した「サーバー上の今」を返す。
+// ※ これは【表示専用】（時計の表示・生き物の出現時間帯の表示ラベル用）。
+//   天気判定・出現判定は下のgetZone/getDateKeyの通り常にJST(UTC+9)固定。
+// ※ 以降は必ず getUTCHours() / getUTCDate() など UTC系メソッドで読むこと。
+//   （getHours()等で読むとブラウザのタイムゾーンが二重に適用されてしまう）
+function getServerDate(){
+  return new Date(Date.now() + getServerOffset() * 3600 * 1000);
+}
+
+// 実際のJST(UTC+9)の「今」を返す（天気データ・出現判定はこれが基準＝サーバー選択の影響を受けない）
+function getJstDate(){
+  return new Date(Date.now() + 9 * 3600 * 1000);
+}
+
+// 出現カレンダー専用：JST 0:00を基準にした日付キー（YYYY-MM-DD）。
+// 今日のやることリスト等（6:00更新＝getDailySpotDateKey）とは区切りを分けたいという
+// 要望のため、出現カレンダーの「今日」判定・月送り・表示対象日の絞り込みはこちらを使う
+function getCalendarTodayKey(offsetDays = 0){
+  const d = getJstDate();
+  d.setUTCDate(d.getUTCDate() + offsetDays);
+  return d.toISOString().slice(0, 10);
+}
+
+// 時間帯取得（天気判定・出現判定用／常にJST固定）
+function getZone(){
+ const h = getJstDate().getUTCHours();
+ if(h>=6&&h<12)return"6-12";
+ if(h>=12&&h<18)return"12-18";
+ if(h>=18&&h<24)return"18-0";
+ return"0-6";
+}
+
+// 天気データ(weatherData[date].windows)のキー順。「今：/次：」の6時間ウィンドウ計算に使う
+const WEATHER_WINDOW_ORDER = ["00-06","06-12","12-18","18-24"];
+function weatherWindowKeyForHour(h){
+  if(h < 6) return "00-06";
+  if(h < 12) return "06-12";
+  if(h < 18) return "12-18";
+  return "18-24";
+}
+
+// i18n連携用ヘルパー（i18n未準備時は日本語フォールバックを返す）
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  let text = fallback;
+  if(vars){
+    Object.entries(vars).forEach(([k,v])=>{
+      text = text.replaceAll(`{${k}}`,v);
+    });
+  }
+  return text;
+}
+
+// 生き物名・場所名の表示用翻訳（未整備の言語は日本語にフォールバック）
+function currentLang(){
+  return (window.i18n && typeof window.i18n.getCurrentLang === "function")
+    ? window.i18n.getCurrentLang()
+    : "ja";
+}
+
+function displayName(c){
+  if(!c.nameI18n) return c.name;
+  const lang = currentLang();
+  return c.nameI18n[lang] || c.name;
+}
+
+function displayLocation(c){
+  if(!c.locationI18n) return c.location || "";
+  const lang = currentLang();
+  return c.locationI18n[lang] || c.location || "";
+}
+
+// 残り分数を「◯日◯時間◯分」形式の文字列に整形
+function formatMinutesUntil(minutes){
+  if(minutes == null || isNaN(minutes) || minutes < 0) return "";
+  const days = Math.floor(minutes / 1440);
+  const hours = Math.floor((minutes % 1440) / 60);
+  const mins = Math.floor(minutes % 60);
+  if(days > 0) return `${days}日${hours}時間`;
+  if(hours > 0) return `${hours}時間${mins}分`;
+  return `${mins}分`;
+}
+
+// フォーマット
+function formatTime(arr){
+
+  const order = ["0-6","6-12","12-18","18-0"];
+
+  // 全部ある場合
+  if(arr.length === 4) return T("time_all","全時間");
+
+  // 並び順に揃える
+  const sorted = order.filter(t => arr.includes(t));
+
+  // 連続をまとめる
+  let result = [];
+  let start = null;
+  let prev = null;
+
+  const convert = (t) => {
+    if(t === "0-6") return 0;
+    if(t === "6-12") return 6;
+    if(t === "12-18") return 12;
+    if(t === "18-0") return 18;
+  };
+
+  for(let i=0;i<sorted.length;i++){
+    const cur = sorted[i];
+
+    if(start === null){
+      start = cur;
+      prev = cur;
+      continue;
+    }
+
+    // 連続しているかチェック
+    const prevIndex = order.indexOf(prev);
+    const curIndex = order.indexOf(cur);
+
+    if(curIndex === prevIndex + 1){
+      prev = cur;
+    } else {
+      result.push(`${start.replace("-", "〜").split("〜")[0]}〜${prev.replace("-", "〜").split("〜")[1]}`);
+      start = cur;
+      prev = cur;
+    }
+  }
+
+  if(start){
+    result.push(`${start.replace("-", "〜").split("〜")[0]}〜${prev.replace("-", "〜").split("〜")[1]}`);
+  }
+
+  return result.join("/");
+}
+
+// 生き物の出現時間帯（JST基準のゾーン配列）を、選択中サーバーの現地時間に変換する
+function shiftedHourRanges(arr){
+  const zoneHours = { "0-6":[0,6], "6-12":[6,12], "12-18":[12,18], "18-0":[18,24] };
+  const delta = getServerOffset() - 9; // Asiaとの差分（時間）
+
+  const covered = new Array(24).fill(false);
+  arr.forEach(z => {
+    const range = zoneHours[z];
+    if(!range) return;
+    const [s,e] = range;
+    for(let h=s; h<e; h++){
+      const shifted = ((h + delta) % 24 + 24) % 24;
+      covered[shifted] = true;
+    }
+  });
+
+  if(covered.every(v => v)) return [[0,24]];
+  if(covered.every(v => !v)) return [];
+
+  const ranges = [];
+  let start = null;
+  for(let h=0; h<24; h++){
+    if(covered[h] && start === null) start = h;
+    if(!covered[h] && start !== null){ ranges.push([start,h]); start = null; }
+  }
+  if(start !== null) ranges.push([start,24]);
+
+  // 深夜0時をまたいで連続している場合（末尾と先頭がどちらも埋まっている）は1つに繋げる
+  if(ranges.length > 1 && ranges[0][0] === 0 && ranges[ranges.length-1][1] === 24){
+    const first = ranges.shift();
+    const last = ranges[ranges.length-1];
+    last[1] = 24 + first[1];
+  }
+
+  return ranges;
+}
+
+// 出現時間帯を選択中サーバーの現地時間表記にして返す（Asia選択時はformatTimeと同じ表記）
+function formatTimeForServer(arr){
+  if(arr.length === 4) return T("time_all","全時間");
+
+  const delta = getServerOffset() - 9;
+  if(delta === 0) return formatTime(arr);
+
+  const ranges = shiftedHourRanges(arr);
+  if(ranges.length === 0) return "";
+
+  return ranges
+    .map(([s,e]) => `${s % 24}〜${e % 24}`)
+    .join("/");
+}
+
+function formatWeather(arr){
+ const all=["晴れ","雨","虹"];
+ if(arr.length===all.length)return T("weather_all","全天気");
+ const map = { "晴れ":"weather_sunny", "雨":"weather_rain", "虹":"weather_rainbow" };
+ return arr.map(w => T(map[w], w)).join("・");
+}
+
+// 単一の天気ワード（晴れ/雨/虹/流星雨/不明）をi18n翻訳
+// 天気名(晴れ/くもり/小雨/流星雨1など。js/weather-master.js参照)をi18n翻訳する。
+// マスター未登録の名前（今後増える想定）は翻訳キーが無いため生の文字列をそのまま返す
+function translateWeatherWord(w){
+ if(w === "不明") return T("weather_unknown", w);
+ const key = typeof weatherI18nKey === "function" ? weatherI18nKey(w) : null;
+ return key ? T(key, w) : w;
+}
+
+// weatherIconHTML()の実体はjs/weather-master.js（図鑑・天気予報カレンダー共通）。
+// 晴れ/虹/雨/流星雨(1-3含む)は既存のゲーム内アイコン画像を、それ以外（くもり等、
+// 専用アイコン未提供の天気）は絵文字にフォールバックする
+
+const searchInput = document.getElementById("search");
+const miniSearch = document.getElementById("miniSearch");
+const clearBtn = document.getElementById("clearBtn");
+clearBtn.innerHTML = icon("close", {size:13});
+
+const searchIconEl = document.querySelector(".search-icon");
+if(searchIconEl) searchIconEl.innerHTML = icon("search", {size:15});
+const serverSelectIconEl = document.querySelector(".server-select-icon");
+if(serverSelectIconEl) serverSelectIconEl.innerHTML = icon("globe", {size:13});
+
+// data-icon 属性を持つ .btn-icon / .help-icon 要素にまとめてSVGを流し込む
+document.querySelectorAll(".btn-icon[data-icon]").forEach(el=>{
+  el.innerHTML = icon(el.dataset.icon, {size:13});
+});
+document.querySelectorAll(".help-icon[data-icon]").forEach(el=>{
+  el.innerHTML = icon(el.dataset.icon, {size:14});
+});
+const helpTitleIconEl = document.getElementById("helpTitleIcon");
+if(helpTitleIconEl) helpTitleIconEl.innerHTML = icon("info", {size:17});
+
+// ══════════════════════════════════════
+// アコーディオン（絞り込み・並び替え / 複数選択・一括操作）
+// ══════════════════════════════════════
+function setupAccordion(toggleId, bodyId, storageKey, iconSelector, defaultOpen){
+  const toggle = document.getElementById(toggleId);
+  const body   = document.getElementById(bodyId);
+  if(!toggle || !body) return;
+
+  const iconEl = toggle.querySelector(iconSelector);
+  if(iconEl) iconEl.innerHTML = icon("chevronDown", {size:15, className:"accordion-chevron-svg"});
+
+  const saved = localStorage.getItem(storageKey);
+  const isOpen = saved !== null ? saved === "true" : defaultOpen;
+  toggle.classList.toggle("open", isOpen);
+  body.classList.toggle("open", isOpen);
+
+  toggle.addEventListener("click", ()=>{
+    const nowOpen = !body.classList.contains("open");
+    toggle.classList.toggle("open", nowOpen);
+    body.classList.toggle("open", nowOpen);
+    localStorage.setItem(storageKey, nowOpen);
+  });
+}
+
+setupAccordion("filterAccordionToggle", "filterAccordionBody", "filterAccordionOpen", ".accordion-chevron", false);
+setupAccordion("bulkAccordionToggle", "bulkAccordionBody", "bulkAccordionOpen", ".accordion-chevron", false);
+
+const filterAccordionIconEl = document.querySelector("#filterAccordionToggle .accordion-toggle-icon");
+if(filterAccordionIconEl) filterAccordionIconEl.innerHTML = icon("level", {size:15});
+const bulkAccordionIconEl = document.querySelector("#bulkAccordionToggle .accordion-toggle-icon");
+if(bulkAccordionIconEl) bulkAccordionIconEl.innerHTML = icon("checkSquare", {size:15});
+
+// 入力時
+let searchTimer;
+
+// 通常検索バー
+searchInput.addEventListener("input", ()=>{
+
+  miniSearch.value = searchInput.value;
+
+  clearBtn.style.display =
+    searchInput.value ? "flex" : "none";
+
+  localStorage.setItem(
+    "searchKeyword",
+    searchInput.value
+  );
+
+  clearTimeout(searchTimer);
+
+  searchTimer = setTimeout(()=>{
+    render();
+  },180);
+
+});
+
+// 最小化検索バー
+miniSearch.addEventListener("input", ()=>{
+
+  searchInput.value = miniSearch.value;
+
+  clearBtn.style.display =
+    miniSearch.value ? "flex" : "none";
+
+  localStorage.setItem(
+    "searchKeyword",
+    miniSearch.value
+  );
+
+  render();
+
+});
+
+// ×ボタン
+clearBtn.onclick = ()=>{
+  searchInput.value = "";
+  miniSearch.value = "";
+  localStorage.removeItem("searchKeyword");
+  clearBtn.style.display = "none";
+  render();
+};
+
+// 共通フィルター（タイプ・検索キーワード・レベル範囲）
+function applyCommonFilters(arr){
+  let out = arr;
+
+  if(currentFilter !== "all"){
+    out = out.filter(c => c.type === currentFilter);
+  } else {
+    // かぼちゃの彫刻は「かぼちゃ」タブ選択時のみ表示し、「全部」タブには出さない
+    out = out.filter(c => c.type !== "pumpkin");
+  }
+
+  if(limitedOnly){
+    // 「開催中のシーズン・フェス限定のみ」の絞り込み。
+    // season/fesが終了済み（ended:true）のものは除外する
+    // （砂像・雪像・かぼちゃの彫刻はseason/fesフラグを持たないため、この絞り込みには元から出てこない）
+    out = out.filter(c => (c.season || c.fes) && !c.ended);
+  }
+
+  const keyword = document.getElementById("search").value;
+  if(keyword){
+    const kw = keyword.toLowerCase();
+    out = out.filter(c => {
+      // 表示中の言語に関わらず、登録済みの全言語名（英語名など）でも検索できるようにする
+      const i18nMatch = c.nameI18n && Object.values(c.nameI18n).some(n => (n || "").toLowerCase().includes(kw));
+      return (c.name || "").toLowerCase().includes(kw) ||
+        (c.location || "").toLowerCase().includes(kw) ||
+        displayName(c).toLowerCase().includes(kw) ||
+        displayLocation(c).toLowerCase().includes(kw) ||
+        i18nMatch;
+    });
+  }
+
+  out = out.filter(c =>
+    c.level >= minLevel &&
+    c.level <= maxLevel
+  );
+
+  return out;
+}
+
+// 並び替え
+function sortList(arr){
+  let out = arr.slice();
+
+  if(currentSort === "level"){
+    out.sort((a,b)=>{
+      const typeOrder = { fish:0, bug:1, bird:2, sand:3, snow:4, shell:5 };
+
+      if(typeOrder[a.type] !== typeOrder[b.type]){
+        return typeOrder[a.type] - typeOrder[b.type];
+      }
+
+      return a.level - b.level;
+    });
+  }
+
+  if(currentSort === "unchecked"){
+    out.sort((a,b)=>{
+      const aChecked = checkedData[a.name] ? 1 : 0;
+      const bChecked = checkedData[b.name] ? 1 : 0;
+
+      // まず未コンプ優先
+      if(aChecked !== bChecked){
+        return aChecked - bChecked;
+      }
+
+      const typeOrder = { fish:0, bug:1, bird:2, sand:3, snow:4, shell:5 };
+
+      // 次に種類順
+      if(typeOrder[a.type] !== typeOrder[b.type]){
+        return typeOrder[a.type] - typeOrder[b.type];
+      }
+
+      // 最後に図鑑順
+      return a.bookIndex - b.bookIndex;
+    });
+  }
+
+  if(currentSort === "price"){
+    out = out
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => {
+        const pa = priceAtStar(a.c, priceSortStar);
+        const pb = priceAtStar(b.c, priceSortStar);
+
+        // 価格が無いものは常に後ろへ
+        if(pa == null && pb == null) return a.i - b.i;
+        if(pa == null) return 1;
+        if(pb == null) return -1;
+
+        return priceSortOrder === "asc" ? pa - pb : pb - pa;
+      })
+      .map(x => x.c);
+  }
+
+  if(currentSort === "unauth"){
+    out = out
+      .map((c, i) => ({ c, i }))
+      .sort((a, b) => {
+
+        // 認証マスターの仕様が無い生き物は後ろへ
+        const aEligible = a.c.auth !== false ? 0 : 1;
+        const bEligible = b.c.auth !== false ? 0 : 1;
+        if(aEligible !== bEligible){
+          return aEligible - bEligible;
+        }
+
+        // 未認証優先
+        const aAuth = authData[a.c.name] ? 1 : 0;
+        const bAuth = authData[b.c.name] ? 1 : 0;
+        if(aAuth !== bAuth){
+          return aAuth - bAuth;
+        }
+
+        const typeOrder = { fish:0, bug:1, bird:2, sand:3, snow:4, shell:5 };
+        if(typeOrder[a.c.type] !== typeOrder[b.c.type]){
+          return typeOrder[a.c.type] - typeOrder[b.c.type];
+        }
+
+        // 元の表示順を保持
+        return a.i - b.i;
+      })
+      .map(x => x.c);
+  }
+
+  return out;
+}
+
+// 現在適用中の絞り込み条件を、解除可能なチップのリストとして返す。
+// 並び替え・サーバー・言語・テーマ・表示サイズ・進捗記録は対象外（既定値のまま個別解除しない）
+const TYPE_FILTER_FALLBACKS = { fish:"魚", bug:"虫", bird:"野鳥", sand:"砂像", snow:"雪像", shell:"貝殻", pumpkin:"かぼちゃ" };
+function getActiveFilterChips(){
+  const chips = [];
+
+  if(currentFilter !== "all"){
+    chips.push({
+      label: T("filter_"+currentFilter, TYPE_FILTER_FALLBACKS[currentFilter] || currentFilter),
+      onClear: () => setFilter("all"),
+    });
+  }
+
+  if(weatherMode !== "current"){
+    const modeLabel = weatherMode === "only"
+      ? T("weather_only","今の天気限定")
+      : weatherMode === "hidden"
+      ? T("weather_hidden","今は出現しない")
+      : T("weather_mode_all","すべて");
+    chips.push({ label: modeLabel, onClear: () => setWeatherMode("current") });
+  }
+
+  if(limitedOnly){
+    chips.push({
+      label: T("filter_limited_only","シーズン・フェス限定のみ"),
+      onClear: () => setLimitedOnly(false),
+    });
+  }
+
+  if(minLevel > 1 || maxLevel < 14){
+    chips.push({
+      label: T("level_range_text", `Lv.${minLevel}〜${maxLevel}`, {min:minLevel, max:maxLevel}),
+      onClear: () => {
+        levelMin.value = 1;
+        levelMax.value = 14;
+        updateLevelRange();
+      },
+    });
+  }
+
+  const keyword = searchInput.value;
+  if(keyword){
+    chips.push({
+      label: T("filter_summary_search", `検索：${keyword}`, {keyword}),
+      onClear: () => clearBtn.onclick(),
+    });
+  }
+
+  return chips;
+}
+
+// 絞り込み条件のみ既定値へ戻す（並び替え・サーバー・言語・テーマ・表示サイズ・進捗記録は対象外）
+function clearAllFilters(){
+  setFilter("all");
+  setWeatherMode("current");
+  setLimitedOnly(false);
+  searchInput.value = "";
+  miniSearch.value = "";
+  localStorage.removeItem("searchKeyword");
+  clearBtn.style.display = "none";
+  levelMin.value = 1;
+  levelMax.value = 14;
+  updateLevelRange();
+}
+
+const SORT_LABEL_FALLBACKS = {
+  book: "図鑑順",
+  level: "レベル順",
+  unchecked: "未コンプ順",
+  unauth: "未認証順",
+  price: "売却額順",
+};
+// 絞り込みチップ・結果件数・現在の並び替えを表示する（絞り込みパネルを閉じていても常に見える）
+function renderFilterSummary(activeChips, resultCount){
+  const chipsEl = document.getElementById("filterSummaryChips");
+  const countEl = document.getElementById("filterSummaryCount");
+  const sortEl = document.getElementById("filterSummarySort");
+  if(!chipsEl || !countEl || !sortEl) return;
+
+  chipsEl.innerHTML = activeChips.map((c,i) => `
+    <button type="button" class="filter-chip" data-chip-index="${i}" aria-label="${T("filter_chip_remove_aria", `${c.label}の絞り込みを解除`, {label:c.label})}">
+      <span>${c.label}</span>${icon("close",{size:10})}
+    </button>
+  `).join("") + (activeChips.length ? `<button type="button" class="filter-chip filter-chip-clear-all" id="clearAllFiltersBtn">${T("filter_clear_all","絞り込みを解除")}</button>` : "");
+
+  chipsEl.querySelectorAll(".filter-chip[data-chip-index]").forEach(btn => {
+    btn.onclick = () => activeChips[Number(btn.dataset.chipIndex)].onClear();
+  });
+  const clearAllBtn = document.getElementById("clearAllFiltersBtn");
+  if(clearAllBtn) clearAllBtn.onclick = clearAllFilters;
+
+  sortEl.textContent = T("filter_summary_sort", `並び替え：${T("sort_"+currentSort, SORT_LABEL_FALLBACKS[currentSort])}`, {
+    sort: T("sort_"+currentSort, SORT_LABEL_FALLBACKS[currentSort]),
+  });
+  countEl.textContent = T("filter_result_count", `${resultCount}件`, {count:resultCount});
+}
+
+// 一覧カード用の軽量サムネイル画像パスを返す（詳細モーダルは元画像のまま）
+function thumbSrc(path){
+  if(!path) return path;
+  const normalized = path.startsWith("./") ? path.slice(2) : path;
+  if(!normalized.startsWith("images/")) return path;
+  return normalized
+    .replace(/^images\//, "images/thumb/")
+    .replace(/\.[^./]+$/, ".jpg");
+}
+
+// カード生成
+function createCard(c){
+  const div=document.createElement("div");
+  div.className =
+  "item" +
+  (selectedItems[c.name]
+    ? " selected"
+    : "");
+
+  div.innerHTML=`
+
+  <div class="img-wrap">
+
+  <div class="level-badge">
+    Lv.${c.level ?? "-"}
+  </div>
+
+ ${c.shadow ? `
+  <div class="
+    shadow-badge
+    ${c.shadow === "金" ? "shadow-gold" : ""}
+    ${c.shadow === "青" ? "shadow-blue" : ""}
+  ">
+    ${c.shadow}
+  </div>
+` : ""}
+
+  <button class="
+    check-btn
+    ${checkedData[c.name] ? "checked" : ""}
+  " aria-pressed="${checkedData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_check_label","コンプ済みにする")}">
+    ${icon(checkedData[c.name] ? "star" : "starOutline", {size:13})}
+  </button>
+
+  ${c.auth !== false ? `
+  <button class="
+    auth-btn
+    ${authData[c.name] ? "checked" : ""}
+  " aria-pressed="${authData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_auth_label","認証マスターにする")}">
+    ${icon(authData[c.name] ? "medal" : "medalOutline", {size:16})}
+  </button>
+` : ""}
+
+  <img src="${thumbSrc(c.img)}" alt="${displayName(c)}" loading="lazy" decoding="async">
+
+</div>
+
+  <div class="item-name">
+    ${displayName(c)}
+  </div>
+
+`;
+  // モーダル
+  div.onclick = ()=>{
+    if(multiSelectMode){
+      selectedItems[c.name] =
+        !selectedItems[c.name];
+      div.classList.toggle(
+        "selected",
+        selectedItems[c.name]
+      );
+      updateBulkStatusBar();
+      return;
+    }
+    openModal(c);
+  };
+
+  // チェックボタン
+  const checkBtn = div.querySelector(".check-btn");
+
+  checkBtn.onclick = (e)=>{
+    e.stopPropagation();
+    // 複数選択中は星ボタン無効
+    if(multiSelectMode){
+      return;
+    }
+    if(guardToggle()) return;
+    checkedData[c.name] = !checkedData[c.name];
+    localStorage.setItem(
+      "checkedData",
+      JSON.stringify(checkedData)
+    );
+    invalidateBulkUndo();
+    render();
+  };
+
+  const authBtn = div.querySelector(".auth-btn");
+
+  if(authBtn){
+    authBtn.onclick = (e)=>{
+      e.stopPropagation();
+      if(multiSelectMode) return;
+      if(guardToggle()) return;
+      authData[c.name] = !authData[c.name];
+      localStorage.setItem("authData", JSON.stringify(authData));
+      invalidateBulkUndo();
+      render();
+    };
+  }
+
+  return div;
+}
+
+// 終了したフェス・シーズン セクション生成（園芸・料理ページと同じ表示方法）
+function buildEndedSection(items, kind){
+  const wrap = document.createElement("div");
+
+  const lbl = document.createElement("div");
+  lbl.className = "section-label";
+  lbl.innerHTML = kind === "season"
+    ? `${icon("calendar", {size:15})} ${T("label_season_limited","シーズン限定")}`
+    : `${icon("calendar", {size:15})} ${T("label_fes_limited","フェス限定")}`;
+  wrap.appendChild(lbl);
+
+  const banner = document.createElement("div");
+  banner.className = "event-ended-banner";
+  banner.innerHTML =
+    `${icon("warning", {size:14})} ` +
+    (kind === "season"
+    ? T("banner_season_ended_note","現在このシーズンは終了しています")
+    : T("banner_fes_ended_note","現在このフェスは終了しています"));
+  wrap.appendChild(banner);
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  items.forEach(c => grid.appendChild(createCard(c)));
+  wrap.appendChild(grid);
+
+  return wrap;
+}
+
+// 表示
+function render(){
+
+ if(!currentWeather || !currentZone) return;
+
+ let list = creatures.filter(c => {
+
+  // 終了したフェス・シーズン限定は別セクションで表示するためここでは除外
+  if (c.ended) return false;
+
+  // かぼちゃの彫刻は出現時間帯・出現天気の概念が無いため、出現モード
+  // （今出現するもの全て／今の天気限定／今は出現しない／すべて）の影響を受けず常に表示する
+  if (c.type === "pumpkin") return true;
+
+  // 天気名(晴れ/くもり/小雨/流星雨1など)を出現判定用の粗いカテゴリ(晴れ/雨/虹)へ変換する
+  // （js/weather-master.js。流星雨・オーロラ・雪・猛暑・花吹雪等は晴れ扱い）。
+  // 天気が「不明」（データ無し・手動入力もされていない）の間は変換せずそのままにし、
+  // 天気限定の生き物を誤って「今出現中」扱いしない（従来通りの安全側デフォルト）
+  const weatherForCheck =
+    currentWeather === "不明" ? currentWeather : weatherDexCategory(currentWeather);
+
+  // 天気一致
+  const weatherMatch =
+    c.weather.length === ALL_WEATHER.length ||
+    c.weather.includes(weatherForCheck);
+
+  // 時間一致
+  const timeMatch =
+    c.time.length === ALL_TIME.length ||
+    c.time.includes(currentZone);
+
+  // 今出現しているか
+  const isNow = weatherMatch && timeMatch;
+
+  // モード分岐
+  if (weatherMode === "current") {
+    return isNow;
+  }
+
+  if (weatherMode === "only") {
+  // 全天気は除外
+  if (c.weather.length === ALL_WEATHER.length) {
+    return false;
+  }
+  // 晴れ・流星雨
+  if (weatherForCheck === "晴れ") {
+    return (
+      c.weather.length === 2 &&
+      c.weather.includes("晴れ") &&
+      c.weather.includes("虹") &&
+      timeMatch
+    );
+  }
+  // 雨
+  if (weatherForCheck === "雨") {
+    return (
+      c.weather.length === 2 &&
+      c.weather.includes("雨") &&
+      c.weather.includes("虹") &&
+      timeMatch
+    );
+  }
+  // 虹
+  if (weatherForCheck === "虹") {
+    return (
+      c.weather.length === 1 &&
+      c.weather.includes("虹") &&
+      timeMatch
+    );
+  }
+  return false;
+}
+
+  if (weatherMode === "hidden") {
+    // 今出現していないもの全部
+    return !isNow;
+  }
+
+  if (weatherMode === "all") {
+    // 出現状況に関わらず全部
+    return true;
+  }
+
+  return false;
+});
+ list = applyCommonFilters(list);
+ list = sortList(list);
+
+ // 検索・種類変更などで一覧の中身が変わった場合は、選択中の対象を見失わないよう選択を解除する
+ // （見えなくなった対象を意図せず一括更新しないため）
+ if(multiSelectMode && _lastVisibleNames){
+   const hasSelection = Object.keys(selectedItems).some(name => selectedItems[name]);
+   if(hasSelection){
+     const newNames = new Set(list.map(c => c.name));
+     const stillAllVisible = Object.keys(selectedItems).every(
+       name => !selectedItems[name] || newNames.has(name)
+     );
+     if(!stillAllVisible){
+       selectedItems = {};
+       showToast(T("bulk_selection_cleared_by_filter","一覧が変わったため選択を解除しました"));
+     }
+   }
+ }
+ _lastVisibleNames = new Set(list.map(c => c.name));
+
+ const el=document.getElementById("list");
+ el.innerHTML="";
+
+ const activeChips = getActiveFilterChips();
+
+ // 出現なし
+ if(list.length===0){
+  el.innerHTML = activeChips.length
+   ? `<div class="no-results-block"><p>${T("no_results_filtered","条件に合う生き物がいません")}</p><button type="button" class="filter-chip filter-chip-clear-all" onclick="clearAllFilters()">${T("filter_clear_all","絞り込みを解除")}</button></div>`
+   : `<p class="no-results-block">${T("no_results","出現なし")}</p>`;
+ } else {
+  list.forEach(c => el.appendChild(createCard(c)));
+ }
+
+ renderFilterSummary(activeChips, list.length);
+ updateBulkStatusBar();
+
+ // 終了したフェス・シーズン限定（「今は出現しない」「すべて」表示時のみ、最下部に表示）
+ const endedEl = document.getElementById("endedList");
+ endedEl.innerHTML = "";
+
+ if(weatherMode === "hidden" || weatherMode === "all"){
+  let ended = creatures.filter(c => c.ended === true);
+  ended = applyCommonFilters(ended);
+  ended = sortList(ended);
+
+  const seasonEnded = ended.filter(c => c.season);
+  const fesEnded    = ended.filter(c => c.fes && !c.season);
+
+  if(seasonEnded.length) endedEl.appendChild(buildEndedSection(seasonEnded, "season"));
+  if(fesEnded.length)    endedEl.appendChild(buildEndedSection(fesEnded, "fes"));
+ }
+}
+
+let lastZone=getZone();
+
+// サーバー切替
+function setServer(server){
+  if(!SERVERS[server]) return;
+  currentServer = server;
+  localStorage.setItem("gameServer", server);
+  updateTime();
+
+  // モーダル表示中なら出現時間の表記を再計算して反映
+  if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
+    const target = creatures.find(c => c.name === modal.dataset.currentCreature);
+    if(target) openModal(target);
+  }
+
+  // 出現カレンダーが表示中なら、時刻ラベル（サーバー時間）を再計算して反映
+  if(dailySpotCalendarModal && dailySpotCalendarModal.style.display === "block"){
+    renderDailySpotCalendar();
+  }
+}
+
+function updateTime(){
+ const now = getServerDate();
+ const zone = getZone();
+
+ const todayKey = getDateKey(0);
+ const jstHour = getJstDate().getUTCHours();
+ const jstHH = String(jstHour).padStart(2,"0");
+
+ const todayData = weatherData[todayKey];
+
+ // 「今：/次：」・図鑑の出現判定は6時間ウィンドウの天気（晴れ/雨/虹/流星雨の4択のみ）で行う。
+ // くもり・小雨・天気雨等はこの4つのいずれかのバリエーションに過ぎないため、
+ // weatherWindowCategory()で畳み込んでから使う（1時間ごとの内訳は下のhour-stripでのみ使用）
+ const currentWindowKey = weatherWindowKeyForHour(jstHour);
+ const todayWindows = (todayData && todayData.windows) || {};
+ const rawOfficialWindow = todayWindows[currentWindowKey];
+ const officialWeather = rawOfficialWindow ? weatherWindowCategory(rawOfficialWindow) : null;
+
+ // 公式データが無い間だけ、この端末の手動入力（あれば）を使う。
+ // 公式データが入力されると、次にこの関数が呼ばれた時点で自動的にそちらへ切り替わる
+ const manualWeather = !officialWeather ? getManualWeatherOverride(todayKey, zone) : null;
+ const weather = officialWeather || manualWeather || "不明";
+
+ // ここで変化チェック
+ const changed = (zone !== currentZone) || (weather !== currentWeather);
+
+ currentZone = zone;
+ currentWeather = weather;
+ currentWeatherIsManual = !officialWeather && !!manualWeather;
+ currentWeatherDateKey = todayKey;
+
+ // 次の天気：次の6時間ウィンドウ（日をまたぐ場合は翌日の"00-06"）
+ const nextWindowIndex = (WEATHER_WINDOW_ORDER.indexOf(currentWindowKey) + 1) % WEATHER_WINDOW_ORDER.length;
+ const nextWindowKey = WEATHER_WINDOW_ORDER[nextWindowIndex];
+ const nextWindowDateKey = nextWindowKey === "00-06" ? getDateKey(1) : todayKey;
+ const nextWindowData = weatherData[nextWindowDateKey];
+ const rawNextWindow = nextWindowData && nextWindowData.windows && nextWindowData.windows[nextWindowKey];
+ const nextWeather = rawNextWindow ? weatherWindowCategory(rawNextWindow) : "不明";
+
+ // hour-stripは1時間ごとの実際の天気（生の値、畳み込みしない）を表示する
+ const todayHourly = (todayData && todayData.hourly) || {};
+ const hourlyWeather = todayHourly[jstHH] || "不明";
+ const nextHour = (jstHour + 1) % 24;
+ const nextHH = String(nextHour).padStart(2,"0");
+ const nextHourDateKey = nextHour === 0 ? getDateKey(1) : todayKey;
+ const nextHourData = weatherData[nextHourDateKey];
+ const nextHourlyWeather = (nextHourData && nextHourData.hourly && nextHourData.hourly[nextHH]) || "不明";
+
+ const hh = String(now.getUTCHours()).padStart(2,"0");
+ const mm = String(now.getUTCMinutes()).padStart(2,"0");
+ const ss = String(now.getUTCSeconds()).padStart(2,"0");
+
+ document.getElementById("time").innerText = `${hh}:${mm}:${ss}`;
+ // リポップタイマー（js/bug-timer.js）の時計・カウントダウンは、ここでの更新と
+ // 同じタイミングで同期させる（独立したsetIntervalだと発火順序がズレて
+ // 表示上の秒数がズレて見えることがあるため、ここから直接呼び出す）
+ if(typeof tickBugTimer === "function") tickBugTimer();
+ document.getElementById("weatherNow").innerText =
+  `${T("weather_now_label","今：")}${translateWeatherWord(weather)}${currentWeatherIsManual ? T("weather_manual_suffix","（手動入力）") : ""}`;
+ document.getElementById("weatherNext").innerText =
+  `${T("weather_next_label","次：")}${translateWeatherWord(nextWeather)}`;
+ renderWeatherHourStrip(jstHour, hourlyWeather, nextHour, nextHourlyWeather);
+ renderWeatherOverrideControl(officialWeather, todayKey, zone);
+ document.getElementById("miniTime").innerText = `${hh}:${mm}`;
+
+document.getElementById("miniWeather").innerText =
+  weather;
+
+ // 👇 変化した時だけrender
+ if(changed){
+   render();
+ }
+}
+
+// 「今：/次：」の下に、現在の1時間区間・次の1時間区間の天気を時刻付きで表示する
+// （選択中サーバーのオフセットに合わせた時刻表示。データのルックアップは常にJST基準のまま）
+//
+// updateTime()は1秒ごとに呼ばれるが、中身（時刻・天気・サーバー）が前回描画時から
+// 変わっていなければ再描画をスキップする。ここをスキップしないと、天気アイコン（<img>）が
+// 1秒ごとに作り直されてチラつく原因になる
+let lastWeatherHourStripSignature = null;
+function renderWeatherHourStrip(jstHour, weather, nextJstHour, nextWeather){
+  const el = document.getElementById("weatherHourStrip");
+  if(!el) return;
+
+  const signature = `${jstHour}_${weather}_${nextJstHour}_${nextWeather}_${currentServer}_${currentLang()}`;
+  if(signature === lastWeatherHourStripSignature) return;
+  lastWeatherHourStripSignature = signature;
+
+  const chip = (label, hour, w) => {
+    const start = typeof jstHourToServerDisplayHour === "function" ? jstHourToServerDisplayHour(hour) : hour;
+    const end = (start + 1) % 24;
+    return `
+      <span class="weather-hour-chip">
+        <span class="weather-hour-chip-label">${label}</span>
+        ${weatherIconHTML(w, {size:13, hour})}
+        <span class="weather-hour-chip-time">${start}:00〜${end}:00</span>
+        <span>${translateWeatherWord(w)}</span>
+      </span>
+    `;
+  };
+  el.innerHTML =
+    chip(T("weather_now_label","今："), jstHour, weather) +
+    chip(T("weather_next_label","次："), nextJstHour, nextWeather);
+}
+
+// 今日の日付取得（天気データのルックアップ用／常にJST固定）
+function getDateKey(offset=0){
+  const d = getJstDate();
+  d.setUTCDate(d.getUTCDate() + offset);
+  return d.toISOString().slice(0,10);
+}
+  
+// 切替関数
+function setWeatherMode(mode){
+  weatherMode = mode;
+  localStorage.setItem("weatherMode", mode);
+  ["current","only","hidden","all"].forEach(x=>{
+    document.getElementById("w_"+x).classList.remove("active");
+  });
+
+  document.getElementById("w_"+mode).classList.add("active");
+
+  render();
+}
+
+// フィルター
+function setFilter(t){
+ currentFilter=t;
+ localStorage.setItem("currentFilter", t);
+ ["all","fish","bug","bird","sand","snow","shell","pumpkin"].forEach(x=>{
+  document.getElementById("f_"+x).classList.remove("active");
+ });
+ document.getElementById("f_"+t).classList.add("active");
+ render();
+}
+
+function setSort(type){
+  currentSort = type;
+  localStorage.setItem("currentSort", type);
+  ["book","level","unchecked","unauth","price"].forEach(x=>{
+    document.getElementById("s_"+x).classList.remove("active");
+  });
+  document.getElementById("s_"+type).classList.add("active");
+  const priceSortRow = document.getElementById("priceSortRow");
+  if(priceSortRow) priceSortRow.style.display = type === "price" ? "" : "none";
+  render();
+}
+
+// 売却額順のサブ選択（高い順/安い順）
+function setPriceSortOrder(order){
+  priceSortOrder = order;
+  localStorage.setItem("priceSortOrder", order);
+  ["desc","asc"].forEach(x=>{
+    document.getElementById("po_"+x).classList.toggle("active", x === order);
+  });
+  render();
+}
+
+// 売却額順のサブ選択（★1〜5）
+function setPriceSortStar(star){
+  priceSortStar = star;
+  localStorage.setItem("priceSortStar", star);
+  [1,2,3,4,5].forEach(n=>{
+    document.getElementById("ps_"+n).classList.toggle("active", n === star);
+  });
+  render();
+}
+
+// シーズン・フェス限定のみ表示
+function setLimitedOnly(v){
+  limitedOnly = v;
+  localStorage.setItem("limitedOnly", v ? "1" : "");
+  document.getElementById("limitedOnlyBtn").classList.toggle("active", v);
+  render();
+}
+
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+
+// 保存確認
+const savedDark = localStorage.getItem("darkMode");
+
+// 初回
+if(savedDark === "true"){
+
+  document.body.classList.add("dark");
+
+}else if(savedDark === null){
+
+  // 端末設定
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+
+}
+
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")){
+  forceRepaint();
+}
+
+// ボタン
+darkToggle.onclick = ()=>{
+  // 切替
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  // 保存
+  localStorage.setItem(
+    "darkMode",
+    document.body.classList.contains("dark")
+  );
+  // ボタン更新
+  updateDarkButton();
+  // Safari再描画対策
+  forceRepaint();
+};
+
+// ボタン表示
+function updateDarkButton(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark")
+    ? icon("sun")
+    : icon("moon");
+}
+updateDarkButton();
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  // 強制reflow
+  document.body.offsetHeight;
+  document.body.style.display = "";
+
+}
+
+// マップ機能（map.html）を一般公開
+const MAP_FEATURE_PUBLIC = true;
+
+// 野鳥だけ特殊計算
+function birdStar2(base){
+  const value = base * 4;
+  // 小さい値はそのまま
+  if(value <= 16){
+    return value;
+  }
+  // 10単位切り上げ
+  return Math.ceil(value / 10) * 10;
+}
+
+function calcStars(base, isBird){
+  if(!base) return [null,null,null,null,null];
+  if(isBird){
+    const star2 = birdStar2(base);
+    return [base, star2, star2 * 2, star2 * 4, star2 * 8];
+  }
+  return [base, Math.floor(base * 1.5), Math.floor(base * 2), Math.floor(base * 4), Math.floor(base * 8)];
+}
+
+// 売却額順ソート用：指定した★（1〜5）での売価を返す（存在しない場合はnull）
+function priceAtStar(c, star){
+  if(c.star1Only === true && star > 1) return null;
+  const basePrice = c.price ?? 0;
+  const isBird = c.type === "bird";
+  const prices = Array.isArray(c.prices) ? c.prices : calcStars(basePrice, isBird);
+  return prices[star - 1] ?? null;
+}
+
+// モーダル
+function openModal(c){
+ modal.style.display="block";
+ modal.dataset.currentCreature = c.name;
+ m_name.innerText=displayName(c);
+ m_img.src=c.img;
+ m_img.alt=displayName(c);
+ let locHtml = displayLocation(c);
+ if(c.seasonName){
+   locHtml += (locHtml ? "　" : "") + `<span class="modal-season-tag">${icon("calendar",{size:12})}${c.seasonName}</span>`;
+ }
+ const hasMapLink = c.location && (
+   (typeof mapLocationLinks !== "undefined" && mapLocationLinks[c.location]) ||
+   (typeof mapMultiAreaLocations !== "undefined" && mapMultiAreaLocations[c.location]) ||
+   (typeof mapGenericBigAreaLocations !== "undefined" && mapGenericBigAreaLocations[c.location]) ||
+   (typeof mapLocationEventLinks !== "undefined" && mapLocationEventLinks[c.location])
+ );
+ if(MAP_FEATURE_PUBLIC && hasMapLink){
+   // ページ遷移せず、埋め込みモーダルでマップを開く（hrefはJS無効時のフォールバック）
+   locHtml += ` <a class="modal-map-link" href="map.html?loc=${encodeURIComponent(c.location)}" onclick='event.preventDefault(); openMapEmbed(${JSON.stringify(c.location)});'>${icon("pin",{size:11})}${T("modal_view_on_map","地図で見る")}</a>`;
+ }
+ m_loc.innerHTML = locHtml;
+ m_weather.innerText = formatWeather(c.weather);
+ m_time.innerText = formatTimeForServer(c.time);
+ const basePrice = c.price ?? 0;
+
+ // 星1しか存在しないアイテム（失敗作・壊れ物など）は★2〜5を非表示にする
+ const star1Only = c.star1Only === true;
+
+ // 売価セルの表示（コイン/フェスコインどちらも文字は出さずアイコン＋数字のみ）
+ function fmtCell(value, currencyType){
+   return value != null ? `${currencyIcon(currencyType)}${value.toLocaleString()}` : "-";
+ }
+
+ const isBird = c.type === "bird";
+ // 標準の倍率計算に乗らない例外（フンチュウ系統など）のため、
+ // ★1〜5を個別指定するpricesが存在する場合はそちらを優先する
+ const prices = Array.isArray(c.prices) ? c.prices : calcStars(basePrice, isBird);
+ const priceEls = [m_price1, m_price2, m_price3, m_price4, m_price5];
+ priceEls.forEach((el, i) => { el.innerHTML = fmtCell(prices[i], "coin"); });
+
+ // フェス限定：フェスコインでの売却価格（通常コインと同じ計算方法で★1〜5を算出）
+ const hasFesField = c.fesCoinPrice !== undefined;
+ m_priceTable.classList.toggle("has-fes", hasFesField);
+ // フェスコインも同様に、標準の倍率計算に乗らない例外のためfesPricesがあれば優先する
+ const fesPrices = hasFesField
+   ? (Array.isArray(c.fesPrices) ? c.fesPrices : calcStars(c.fesCoinPrice ?? 0, isBird))
+   : [null,null,null,null,null];
+ const fesPriceEls = [m_fesPrice1, m_fesPrice2, m_fesPrice3, m_fesPrice4, m_fesPrice5];
+ // フェスによってフェスコインのアイコンが異なるため、データ側にfesCoinIconが
+ // 指定されていればそれを使う（未指定時は従来通り共通の"fescoin"）
+ const fesCoinIconType = c.fesCoinIcon || "fescoin";
+ fesPriceEls.forEach((el, i) => { el.innerHTML = hasFesField ? fmtCell(fesPrices[i], fesCoinIconType) : ""; });
+
+ // 星1しか存在しない場合は★2〜5の行を隠す
+ [m_priceRow2, m_priceRow3, m_priceRow4, m_priceRow5].forEach(el=>{
+   el.style.display = star1Only ? "none" : "";
+ });
+
+ m_star5.innerHTML = c.star5 || "";
+ m_star5Row.style.display = c.star5 ? "" : "none";
+
+ // 認証マスターに必要な捕獲・発見数（対象外の生き物や、まだ判明していない数値は非表示にする）
+ m_authCount.innerHTML = c.authCount ? `${icon("medal",{size:14})} ${c.authCount.toLocaleString()}` : "";
+ m_authCountRow.style.display = c.authCount ? "" : "none";
+
+ // 作り方情報（砂像のデザイン形状・三択回答など）
+ const craftEl = document.getElementById("m_craftInfo");
+ if(craftEl){
+   const craftRows = [];
+   if(c.designShape){
+     craftRows.push(`<div class="modal-craft-row"><span class="modal-craft-label">${T("modal_craft_design_label","デザイン形状")}</span><span>${c.designShape}</span></div>`);
+   }
+   if(c.craftAnswer){
+     craftRows.push(`<div class="modal-craft-row"><span class="modal-craft-label">${T("modal_craft_answer_label","三択回答")}</span><span>${c.craftAnswer}</span></div>`);
+   }
+   if(craftRows.length){
+     craftEl.innerHTML = `
+       <div class="modal-make-steps-title">${T("modal_craft_info_title","作り方情報")}</div>
+       ${craftRows.join("")}
+     `;
+     craftEl.style.display = "block";
+   } else {
+     craftEl.innerHTML = "";
+     craftEl.style.display = "none";
+   }
+ }
+
+ // 作り方（砂像など、決まった手順があるもの用）
+ const stepsEl = document.getElementById("m_makeSteps");
+ const stepsList = (c.makeStepsI18n && c.makeStepsI18n[i18n.getCurrentLang()] && c.makeStepsI18n[i18n.getCurrentLang()].length)
+   ? c.makeStepsI18n[i18n.getCurrentLang()]
+   : c.makeSteps;
+
+ if(stepsList && stepsList.length){
+   stepsEl.innerHTML = `
+     <div class="modal-make-steps-title">${T("modal_make_steps_title","作り方")}</div>
+     <ol class="modal-make-steps-list">
+       ${stepsList.map(s => `<li>${s.replace(/^\d+\.\s*/, "")}</li>`).join("")}
+     </ol>
+   `;
+   stepsEl.style.display = "block";
+ } else {
+   stepsEl.innerHTML = "";
+   stepsEl.style.display = "none";
+ }
+}
+  
+function closeModal(){
+ modal.style.display="none";
+}
+
+document.getElementById("mapEmbedModal").querySelector(".map-embed-close").innerHTML = icon("close",{size:14});
+
+// 出現場所→マップ埋め込みモーダル（ページ遷移せず、iframeでmap.htmlを表示する）
+// display:noneの（＝レイアウトが確定していない）iframeにsrcを設定すると、
+// 読み込みが開始されないまま止まってしまうことがある。モーダルを表示した直後は
+// まだレイアウトが再計算されていない可能性があるため、offsetHeightを読んで
+// 強制的にレイアウトを確定させてからsrcを設定する
+// モーダルを開いている間は背景ページのスクロールを止める。iOS Safariでは
+// 固定表示のモーダルの裏でページがスクロールできる状態だと、内部のiframeの
+// 描画が乱れる（残像のような線が入る）ことや、タッチ操作がマップ側ではなく
+// 背景のスクロールとして扱われてタップが効かなくなることがあるため
+let bodyScrollLockY = 0;
+function lockBodyScroll(){
+  bodyScrollLockY = window.scrollY;
+  document.body.style.position = "fixed";
+  document.body.style.top = -bodyScrollLockY + "px";
+  document.body.style.width = "100%";
+}
+function unlockBodyScroll(){
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.width = "";
+  window.scrollTo(0, bodyScrollLockY);
+}
+
+function openMapEmbed(location){
+  const modalEl = document.getElementById("mapEmbedModal");
+  const frame = document.getElementById("mapEmbedFrame");
+  lockBodyScroll();
+  modalEl.style.display = "block";
+  void frame.offsetHeight; // 強制リフロー（iframe自体のレイアウトを確定させる）
+  frame.src = "map.html?embed=1&loc=" + encodeURIComponent(location);
+  void frame.offsetHeight;
+}
+function closeMapEmbed(){
+  document.getElementById("mapEmbedModal").style.display = "none";
+  // 次回開いた時に確実に再読み込みされるよう、srcをクリアしておく
+  // （空文字だと現在のページ自身を指すURLとして解釈され、iframe内で
+  // このページ自体が再読み込みされてしまうため、about:blankを使う）
+  document.getElementById("mapEmbedFrame").src = "about:blank";
+  unlockBodyScroll();
+}
+
+// 複数選択機能の説明は、ヘルプモーダルに埋もれさせず、この機能を
+// 初めて開いた場面で一度だけ短く表示する（初回案内の3点には含めない）
+const BULK_SELECT_TUTORIAL_DONE_KEY = "hatopiIndex_bulkSelectTutorialDone";
+const BULK_SELECT_TUTORIAL_STEPS = [
+  { selector: "#bulkStatusBar", titleKey: "tutorial_bulk_step1_title", titleFallback: "複数選択の使い方", textKey: "tutorial_bulk_step1_body", textFallback: "選択した生き物をまとめて★5達成・認証済みにできます。操作はこのバーから行えます。" },
+];
+
+function toggleMultiSelect(){
+  multiSelectMode = !multiSelectMode;
+  document.getElementById("multiBtn")
+    .classList.toggle("active", multiSelectMode);
+  if(!multiSelectMode){
+    selectedItems = {};
+    invalidateBulkUndo();
+  }
+  render();
+  if(multiSelectMode){
+    maybeStartPageTutorial(BULK_SELECT_TUTORIAL_DONE_KEY, BULK_SELECT_TUTORIAL_STEPS);
+  }
+}
+
+// 選択は解除するが、複数選択モード自体は終了しない
+function clearBulkSelection(){
+  selectedItems = {};
+  document.querySelectorAll("#list .item.selected").forEach(el=>{
+    el.classList.remove("selected");
+  });
+  updateBulkStatusBar();
+}
+
+// 複数選択モード・選択件数・一括操作バーの表示を常に最新状態に保つ
+// （絞り込みパネルやアコーディオンを閉じていても状態が分かるようにするため）
+function updateBulkStatusBar(){
+  const bar = document.getElementById("bulkStatusBar");
+  const hint = document.getElementById("bulkAccordionHint");
+  if(!bar) return;
+
+  if(!multiSelectMode){
+    bar.style.display = "none";
+    if(hint) hint.style.display = "none";
+    return;
+  }
+
+  bar.style.display = "block";
+  if(hint){
+    hint.style.display = "block";
+    hint.textContent = T("bulk_accordion_hint","選択中の操作は一覧の上に表示される操作バーから行えます。");
+  }
+
+  const count = Object.values(selectedItems).filter(Boolean).length;
+  document.getElementById("bulkStatusCount").textContent =
+    T("bulk_selected_count", `${count}件選択中`, {count});
+
+  document.getElementById("bulkClearSelectionBtn").textContent =
+    T("bulk_clear_selection","選択を解除");
+  document.getElementById("bulkExitModeBtn").textContent =
+    T("bulk_exit_mode","選択終了");
+  document.getElementById("bulkCheckBtnBar").textContent =
+    T("bulk_star_check_label","★5達成にする");
+  document.getElementById("bulkUncheckBtnBar").textContent =
+    T("bulk_star_uncheck_label","★5記録を解除");
+  document.getElementById("bulkAuthCheckBtnBar").textContent =
+    T("bulk_auth_check_label","認証済みにする");
+  document.getElementById("bulkAuthUncheckBtnBar").textContent =
+    T("bulk_auth_uncheck_label","認証記録を解除");
+
+  const disabled = count === 0;
+  ["bulkCheckBtnBar","bulkUncheckBtnBar","bulkAuthCheckBtnBar","bulkAuthUncheckBtnBar"].forEach(id=>{
+    document.getElementById(id).disabled = disabled;
+  });
+}
+
+// 一括操作の「元に戻す」が、後から行われた別の記録変更を巻き戻してしまわないよう無効化する
+function invalidateBulkUndo(){
+  activeBulkUndo = null;
+  const row = document.getElementById("bulkUndoRow");
+  if(row) row.style.display = "none";
+}
+
+// ★5・認証の一括設定/解除の共通処理。
+// 対象ごとの変更前の値を保存しておき、「元に戻す」で一律反転ではなく元の値へ復元できるようにする
+function applyBulkAction(kind, newValue){
+  const names = Object.keys(selectedItems).filter(name => selectedItems[name]);
+  if(names.length === 0) return;
+
+  const store = kind === "auth" ? authData : checkedData;
+  const storageKey = kind === "auth" ? "authData" : "checkedData";
+  const snapshot = {};
+  let changedCount = 0;
+
+  names.forEach(name=>{
+    if(kind === "auth"){
+      const c = creatures.find(cr => cr.name === name);
+      if(!c || c.auth === false) return;
+    }
+    snapshot[name] = !!store[name];
+    store[name] = newValue;
+    changedCount++;
+  });
+
+  if(changedCount === 0) return;
+
+  localStorage.setItem(storageKey, JSON.stringify(store));
+  selectedItems = {};
+  render();
+
+  if(changedCount > 0){
+    showBulkUndoBar(kind, storageKey, snapshot, newValue, changedCount);
+  }
+}
+
+function showBulkUndoBar(kind, storageKey, snapshot, newValue, count){
+  const row = document.getElementById("bulkUndoRow");
+  const textEl = document.getElementById("bulkUndoText");
+  const btn = document.getElementById("bulkUndoBtn");
+  if(!row || !textEl || !btn) return;
+
+  const messageKey = kind === "auth"
+    ? (newValue ? "bulk_result_auth_check" : "bulk_result_auth_uncheck")
+    : (newValue ? "bulk_result_star_check" : "bulk_result_star_uncheck");
+  const messageFallback = kind === "auth"
+    ? (newValue ? `${count}件を認証済みにしました` : `${count}件の認証記録を解除しました`)
+    : (newValue ? `${count}件を★5達成にしました` : `${count}件の★5記録を解除しました`);
+
+  textEl.textContent = T(messageKey, messageFallback, {count});
+  btn.textContent = T("bulk_undo","元に戻す");
+  row.style.display = "flex";
+
+  activeBulkUndo = { storageKey, snapshot };
+
+  clearTimeout(row._hideTimer);
+  row._hideTimer = setTimeout(()=>{
+    row.style.display = "none";
+    activeBulkUndo = null;
+  }, 6000);
+
+  btn.onclick = ()=>{
+    if(!activeBulkUndo || activeBulkUndo.snapshot !== snapshot) return;
+    const store = storageKey === "authData" ? authData : checkedData;
+    Object.keys(snapshot).forEach(name=>{
+      store[name] = snapshot[name];
+    });
+    localStorage.setItem(storageKey, JSON.stringify(store));
+    clearTimeout(row._hideTimer);
+    row.style.display = "none";
+    activeBulkUndo = null;
+    render();
+  };
+}
+
+function bulkCheck(){ applyBulkAction("star", true); }
+function bulkUncheck(){ applyBulkAction("star", false); }
+function bulkAuthCheck(){ applyBulkAction("auth", true); }
+function bulkAuthUncheck(){ applyBulkAction("auth", false); }
+
+
+const shareBtn = document.getElementById("shareBtn");
+shareBtn.innerHTML = icon("trophy");
+
+shareBtn.onclick = () => {
+  location.href = "./profile-card.html";
+};
+
+function loadScriptOnce(src) {
+  return new Promise((resolve) => {
+    // すでに読み込み済みならスキップ
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = resolve; // 失敗してもブロックしない
+    document.head.appendChild(s);
+  });
+}
+
+
+// 集計
+function getStats() {
+
+  // ── 図鑑 ──
+  const total = creatures.length;
+  const done  = creatures.filter(c => checkedData[c.name]).length;
+
+  const byType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const totalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  creatures.forEach(c => {
+    totalByType[c.type]++;
+    if (checkedData[c.name]) byType[c.type]++;
+  });
+
+  const authEligible    = creatures.filter(c => c.auth !== false);
+  const authByType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const authTotalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  authEligible.forEach(c => {
+    authTotalByType[c.type]++;
+    if (authData[c.name]) authByType[c.type]++;
+  });
+  const authCount = authEligible.filter(c => authData[c.name]).length;
+  const authTotal = authEligible.length;
+
+  // ── 料理 ──
+  const foodChecked     = JSON.parse(localStorage.getItem("food_checked") || "{}");
+  const foodAuth        = JSON.parse(localStorage.getItem("food_auth")    || "{}");
+  const foodAll         = typeof foodsData !== "undefined" ? foodsData : [];
+  const foodDone        = foodAll.filter(f => foodChecked[f.name]).length;
+  const foodTotal       = foodAll.length;
+  const foodAuthElig    = foodAll.filter(f => f.auth !== false);
+  const foodAuthDone    = foodAuthElig.filter(f => foodAuth[f.name]).length;
+  const foodAuthTotal   = foodAuthElig.length;
+
+  // ── 園芸：作物 ──
+  // 認証データは園芸専用の "garden_auth" キー（図鑑の authData とは分離済み）
+  const gardenChecked   = JSON.parse(localStorage.getItem("garden_checked") || "{}");
+  const gardenAuth      = JSON.parse(localStorage.getItem("garden_auth")    || "{}");
+  const cropAll         = typeof cropData   !== "undefined" ? cropData   : [];
+  const flowerAll       = typeof flowerData !== "undefined" ? flowerData : [];
+
+  const cropDone        = cropAll.filter(g => gardenChecked[g.name]).length;
+  const cropTotal       = cropAll.length;
+  const cropAuthElig    = cropAll.filter(g => g.auth !== false);
+  const cropAuthDone    = cropAuthElig.filter(g => gardenAuth[g.name]).length;
+  const cropAuthTotal   = cropAuthElig.length;
+
+  // ── 園芸：花 ──
+  const flowerDone      = flowerAll.filter(g => gardenChecked[g.name]).length;
+  const flowerTotal     = flowerAll.length;
+  const flowerAuthElig  = flowerAll.filter(g => g.auth !== false);
+  const flowerAuthDone  = flowerAuthElig.filter(g => gardenAuth[g.name]).length;
+  const flowerAuthTotal = flowerAuthElig.length;
+
+  // ── 園芸：合計 ──
+  const gardenDone      = cropDone  + flowerDone;
+  const gardenTotal     = cropTotal + flowerTotal;
+  const gardenAuthDone  = cropAuthDone  + flowerAuthDone;
+  const gardenAuthTotal = cropAuthTotal + flowerAuthTotal;
+
+  return {
+    // 図鑑
+    total, done, byType, totalByType,
+    authCount, authTotal, authByType, authTotalByType,
+    // 料理
+    foodDone, foodTotal, foodAuthDone, foodAuthTotal,
+    // 園芸
+    gardenDone, gardenTotal, gardenAuthDone, gardenAuthTotal,
+    cropDone,   cropTotal,   cropAuthDone,   cropAuthTotal,
+    flowerDone, flowerTotal, flowerAuthDone, flowerAuthTotal,
+  };
+}
+
+const levelMin = document.getElementById("levelMin");
+const levelMax = document.getElementById("levelMax");
+const levelRangeText =
+  document.getElementById("levelRangeText");
+
+function updateLevelRange(){
+
+  minLevel = Number(levelMin.value);
+  maxLevel = Number(levelMax.value);
+
+  // 入れ替わり防止
+  if(minLevel > maxLevel){
+    [minLevel,maxLevel] =
+    [maxLevel,minLevel];
+  }
+
+  levelRangeText.textContent =
+    T("level_range_text", `Lv.${minLevel}〜${maxLevel}`, {min:minLevel, max:maxLevel});
+
+  localStorage.setItem("minLevel", minLevel);
+  localStorage.setItem("maxLevel", maxLevel);
+  
+  render();
+}
+
+levelMin.addEventListener(
+  "input",
+  updateLevelRange
+);
+
+levelMax.addEventListener(
+  "input",
+  updateLevelRange
+);
+
+const topPanel =
+  document.getElementById("topPanel");
+
+const minimizeBtn =
+  document.getElementById("minimizeBtn");
+
+// 保存読み込み
+if(localStorage.getItem("topMinimized") === "true"){
+  topPanel.classList.add("minimized");
+  minimizeBtn.innerHTML = icon("chevronDown");
+}else{
+  minimizeBtn.innerHTML = icon("minus");
+}
+
+// ボタン
+minimizeBtn.onclick = ()=>{
+  topPanel.classList.toggle("minimized");
+  const minimized =
+    topPanel.classList.contains("minimized");
+  minimizeBtn.innerHTML =
+    minimized
+    ? icon("chevronDown")
+    : icon("minus");
+  localStorage.setItem(
+    "topMinimized",
+    minimized
+  );
+};
+
+const helpBtn = document.getElementById("helpBtn");
+const helpModal = document.getElementById("helpModal");
+helpBtn.innerHTML = icon("help");
+helpBtn.onclick = ()=>{
+  helpModal.style.display = "block";
+};
+
+function closeHelpModal(){
+  helpModal.style.display = "none";
+}
+
+helpModal.onclick = (e)=>{
+  if(e.target === helpModal){
+    closeHelpModal();
+  }
+};
+
+const dataSyncBtn = document.getElementById("dataSyncBtn");
+const dataSyncModal = document.getElementById("dataSyncModal");
+if(dataSyncBtn){
+  dataSyncBtn.innerHTML = icon("archive");
+  dataSyncBtn.onclick = ()=>{
+    dataSyncModal.style.display = "block";
+  };
+}
+if(dataSyncModal){
+  const dataSyncTitleIconEl = document.getElementById("dataSyncTitleIcon");
+  if(dataSyncTitleIconEl) dataSyncTitleIconEl.innerHTML = icon("archive", {size:17});
+  dataSyncModal.onclick = (e)=>{
+    if(e.target === dataSyncModal){
+      closeDataSyncModal();
+    }
+  };
+}
+
+// ── 初回チュートリアル（スポットライト形式、js/tutorial.js） ──
+const INDEX_TUTORIAL_DONE_KEY = "hatopiIndex_tutorialDone";
+// 初回案内は要点を3つに絞る（検索・種類切り替え等の細かい操作説明は
+// ヘルプモーダル（#helpBtn）に残したままなので、ここでは繰り返さない）
+const INDEX_TUTORIAL_STEPS = [
+  { selector: "#list", titleKey: "tutorial_index_step1_title", titleFallback: "①今、捕まえられる生き物を探せる", textKey: "tutorial_index_step1_body", textFallback: "天気や時間に合わせて、今出現する生き物の一覧が表示されます。上の検索や絞り込みで、探したい生き物だけに絞ることもできます。" },
+  { selector: ".check-btn", titleKey: "tutorial_index_step2_title", titleFallback: "②★5・認証の進捗を記録できる", textKey: "tutorial_index_step2_body", textFallback: "カードの★ボタンで★5達成、認証バッジのボタンで認証マスターを記録できます。記録はこの端末に保存されます。" },
+  { selector: "#dailyTasksBtn", titleKey: "tutorial_index_step3_title", titleFallback: "③今日やることを確認できる", textKey: "tutorial_index_step3_body", textFallback: "今日の天気・場所や、期限が近いイベントなど、今日やることをまとめて確認できます。" },
+];
+
+// 初期化
+updateTime();
+// 保存データ読込
+searchInput.value =
+  localStorage.getItem("searchKeyword") || "";
+miniSearch.value = searchInput.value;
+clearBtn.style.display =
+  searchInput.value ? "flex" : "none";
+levelMin.value =
+  localStorage.getItem("minLevel") || 1;
+levelMax.value =
+  localStorage.getItem("maxLevel") || 14;
+updateLevelRange();
+setFilter(
+  localStorage.getItem("currentFilter") || "all"
+);
+setSort(
+  localStorage.getItem("currentSort") || "book"
+);
+setPriceSortOrder(priceSortOrder);
+setPriceSortStar(priceSortStar);
+setWeatherMode(
+  localStorage.getItem("weatherMode") || "current"
+);
+setLimitedOnly(
+  localStorage.getItem("limitedOnly") === "1"
+);
+
+// サーバー選択の初期化
+const serverSelect = document.getElementById("serverSelect");
+if(serverSelect){
+  serverSelect.value = currentServer;
+  serverSelect.addEventListener("change", (e)=>{
+    setServer(e.target.value);
+  });
+}
+
+setInterval(updateTime,1000);
+
+document.getElementById("version").textContent =
+  "Ver " + APP_VERSION;
+
+document.getElementById("disclaimer").textContent =
+  T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
+
+document.getElementById("lastUpdate").textContent =
+  T("last_update_label","最終更新") + " 2026/11/16";
+
+// 更新通知（js/update-popup.js）の表示要否が決まった後にチュートリアルを開始する
+// （更新通知とチュートリアルが同時に重なって表示されるのを防ぐ。
+// 通知が出ない場合も、出て閉じられた場合も、必ず一度だけ"hatopiUpdatePopupDone"が飛んでくる）
+document.addEventListener("hatopiUpdatePopupDone", function(){
+  maybeStartPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);
+}, { once: true });
+
+// 言語切替時に動的コンテンツを再描画
+document.addEventListener("langchange", ()=>{
+  updateTime();
+  updateLevelRange();
+  document.getElementById("disclaimer").textContent =
+    T("disclaimer","※本ツールは個人が制作した非公式のものです。ゲーム公式とは一切関係ありません。");
+  document.getElementById("lastUpdate").textContent =
+    T("last_update_label","最終更新") + " 2026/11/16";
+
+  // モーダル表示中なら翻訳を反映して再表示
+  if(modal && modal.style.display === "block" && modal.dataset.currentCreature){
+    const target = creatures.find(c => c.name === modal.dataset.currentCreature);
+    if(target) openModal(target);
+  }
+
+  renderDailySpots();
+  if(dailySpotCalendarModal && dailySpotCalendarModal.style.display === "block"){
+    renderDailySpotCalendar();
+  }
+});
+
+// ══════════════════════════════════════
+// 蛍石・オークの木：今日の場所
+// ══════════════════════════════════════
+
+function dailySpotLabel(key){
+  const spot = dailySpots[key];
+  if(!spot) return key;
+  const lang = i18n.getCurrentLang();
+  return (spot.labelI18n && spot.labelI18n[lang]) ? spot.labelI18n[lang] : spot.label;
+}
+
+function renderDailySpots(){
+  const grid = document.getElementById("dailySpotGrid");
+  if(!grid || typeof dailySpots === "undefined") return;
+
+  const pinIconEl = document.getElementById("dailySpotPinIcon");
+  if(pinIconEl) pinIconEl.innerHTML = icon("pin", {size:15});
+  const calIconEl = document.getElementById("dailySpotCalIcon");
+  if(calIconEl) calIconEl.innerHTML = icon("calendar", {size:13});
+  const calTitleIconEl = document.getElementById("dailySpotCalTitleIcon");
+  if(calTitleIconEl) calTitleIconEl.innerHTML = icon("calendar", {size:16});
+  const tasksIconEl = document.getElementById("dailyTasksIcon");
+  if(tasksIconEl) tasksIconEl.innerHTML = icon("checklist", {size:13});
+  const tasksTitleIconEl = document.getElementById("dailyTasksTitleIcon");
+  if(tasksTitleIconEl) tasksTitleIconEl.innerHTML = icon("checklist", {size:16});
+  const weeklyShopIconEl = document.getElementById("weeklyShopIcon");
+  if(weeklyShopIconEl) weeklyShopIconEl.innerHTML = icon("gift", {size:13});
+  const weeklyShopTitleIconEl = document.getElementById("weeklyShopTitleIcon");
+  if(weeklyShopTitleIconEl) weeklyShopTitleIconEl.innerHTML = icon("gift", {size:16});
+
+  grid.innerHTML = Object.keys(dailySpots).map(key => {
+    const today = getDailySpotFor(key, 0);
+    const spot = dailySpots[key];
+    if(!today) return "";
+
+    const img = today.image || spot.itemImg || "";
+
+    return `
+      <div class="daily-spot-item">
+        ${img ? `<img src="${img}" alt="${dailySpotLabel(key)}" onerror="this.style.display='none'">` : ""}
+        <div class="daily-spot-item-info">
+          <div class="daily-spot-item-label">${dailySpotLabel(key)}</div>
+          <div class="daily-spot-item-location">${today.location}</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+// ── カレンダーモーダル（蛍石・オークの木・天気を、カテゴリ別タブではなく日付ごとにまとめて表示） ──
+const dailySpotCalendarModal = document.getElementById("dailySpotCalendarModal");
+const dailySpotCalendarBtn   = document.getElementById("dailySpotCalendarBtn");
+
+if(dailySpotCalendarBtn){
+  dailySpotCalendarBtn.onclick = () => {
+    weatherCalendarDetailDate = null; // 開く度に一覧表示から始める
+    weatherCalendarViewYM = null;     // 開く度に「今日を含む月」から始める
+    renderDailySpotCalendar();
+    dailySpotCalendarModal.style.display = "block";
+  };
+}
+
+function closeDailySpotCalendar(){
+  if(dailySpotCalendarModal) dailySpotCalendarModal.style.display = "none";
+}
+
+// 行をタップするとその日の1時間ごとの天気詳細に切り替わる（nullなら一覧表示）
+let weatherCalendarDetailDate = null;
+
+// 出現カレンダーで現在表示中の年月（{year, month}、monthは1〜12）。
+// nullの場合は「今日を含む月」として扱う（renderCombinedSpotCalendarList内で解決する）
+let weatherCalendarViewYM = null;
+
+function renderDailySpotCalendar(){
+  const listEl = document.getElementById("dailySpotCalendarList");
+  if(!listEl) return;
+
+  if(weatherCalendarDetailDate){
+    renderWeatherCalendarDayDetail(listEl, weatherCalendarDetailDate);
+  }else{
+    renderCombinedSpotCalendarList(listEl);
+  }
+}
+
+// 選択中の月の中で、各日ごとに「蛍石・オークの木・天気」をまとめてカード表示する（3日ごとに横並び）。
+// 過ぎた日付（今日より前）は表示しない。月送りナビゲーションで他の月にも移動できる
+// （今日を含む月より前には戻れない）。
+// 蛍石・オークの木は`getDailySpotFor`で確定的に算出できるため常に表示できるが、
+// 天気は収集済みの期間のみ（未収集の日は「準備中」）
+function renderCombinedSpotCalendarList(listEl){
+  if(typeof getDailySpotFor === "undefined"){ listEl.innerHTML = ""; return; }
+
+  // カレンダーの日付区切りはJST 0:00基準（today = 実際の暦日）。
+  // 蛍石・オークの木は本来6:00(JST)更新のゲーム内日付だが、カレンダー表示上は
+  // 6:00を待たずにカレンダーの日付（0:00切り替え）に合わせて表示してよいとのことなので、
+  // 各カードはそのカードの日付（dateKey）の場所をそのまま表示する
+  const todayKey = getCalendarTodayKey(0);
+  const [todayYear, todayMonth] = todayKey.split("-").map(Number);
+  if(!weatherCalendarViewYM) weatherCalendarViewYM = { year: todayYear, month: todayMonth };
+  const { year, month } = weatherCalendarViewYM;
+  const isAtStartMonth = (year === todayYear && month === todayMonth);
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+
+  // 天気データが収集済みの最新月より先には進めない（未収集の月を延々とめくれてしまうのを防ぐ）
+  const collectedMonths = typeof weatherData !== "undefined" ? Object.keys(weatherData).map(k => k.slice(0, 7)) : [];
+  const latestCollectedYM = collectedMonths.length ? collectedMonths.sort()[collectedMonths.length - 1] : null;
+  const viewYM = `${year}-${String(month).padStart(2,"0")}`;
+  const isAtEndMonth = latestCollectedYM ? viewYM >= latestCollectedYM : false;
+
+  const wkFallback = ["日","月","火","水","木","金","土"];
+  const wkKeys = ["weekday_sun","weekday_mon","weekday_tue","weekday_wed","weekday_thu","weekday_fri","weekday_sat"];
+
+  const cards = [];
+  for(let d = 1; d <= daysInMonth; d++){
+    const dateKey = `${year}-${String(month).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    if(dateKey < todayKey) continue; // 過ぎた日付は表示しない
+    const isToday = dateKey === todayKey;
+    const weekday = new Date(dateKey + "T00:00:00Z").getUTCDay();
+    const wkLabel = T(wkKeys[weekday], wkFallback[weekday]);
+    const dateColorClass = weekday === 6 ? "is-sat" : weekday === 0 ? "is-sun" : "";
+    const dateLabel = `${month}/${d}(${wkLabel})`;
+
+    const spotRows = ["hotaru","oak"].map(key => {
+      const spot = getDailySpotForDateKey(key, dateKey);
+      if(!spot) return "";
+      const spotImg = spot.image || (dailySpots[key] && dailySpots[key].itemImg) || "";
+      const spotIcon = spotImg
+        ? `<img class="daily-cal-day-icon-img" src="${spotImg}" alt="${dailySpotLabel(key)}">`
+        : "";
+      return `
+        <div class="daily-cal-day-row">
+          <span class="daily-cal-day-icon">${spotIcon}</span>
+          <span class="daily-cal-day-value">${spot.location}</span>
+        </div>
+      `;
+    }).join("");
+
+    const dayData = typeof weatherData !== "undefined" ? weatherData[dateKey] : null;
+    const weatherBody = dayData && dayData.windows
+      ? `<span class="weather-spot-row-icons">${["00-06","06-12","12-18","18-24"].map(wk => {
+          if(!dayData.windows[wk]) return "";
+          // ウィンドウの代表アイコンは、そのウィンドウ内の1時間ごとの天気から算出する
+          // （weatherWindowIcons。晴れ/くもりしかなければ晴れ、雨があれば雨…等の優先度判定）
+          const [startH, endH] = wk.split("-").map(Number);
+          const hourly = dayData.hourly || {};
+          const hoursInWindow = [];
+          for(let h = startH; h < endH; h++) hoursInWindow.push(hourly[String(h).padStart(2,"0")]);
+          const iconNames = weatherWindowIcons(hoursInWindow);
+          return iconNames.map(name => weatherIconHTML(name, {size:12, hour:startH})).join("");
+        }).join("")}</span>`
+      : `<span class="weather-spot-row-nodata">${T("forecast_no_data","準備中")}</span>`;
+
+    cards.push(`
+      <div class="daily-cal-day-card ${isToday ? "today" : ""}">
+        <div class="daily-cal-day-date ${dateColorClass}">${dateLabel}</div>
+        ${spotRows}
+        <div class="daily-cal-day-weather" data-weather-date="${dateKey}">
+          ${weatherBody}
+        </div>
+      </div>
+    `);
+  }
+  const monthLabel = T("forecast_month_label", "{y}年{m}月", { y: year, m: month });
+  const navHTML = `
+    <div class="daily-cal-month-nav">
+      <button type="button" class="daily-cal-month-btn" id="weatherCalPrevMonth" ${isAtStartMonth ? "disabled" : ""} aria-label="${T("forecast_prev_month","前の月")}">‹</button>
+      <span class="daily-cal-month-label">${monthLabel}</span>
+      <button type="button" class="daily-cal-month-btn" id="weatherCalNextMonth" ${isAtEndMonth ? "disabled" : ""} aria-label="${T("forecast_next_month","次の月")}">›</button>
+    </div>
+  `;
+  const bodyHTML = cards.length
+    ? `<div class="daily-cal-grid">${cards.join("")}</div>`
+    : `<div class="daily-cal-day-nodata">${T("forecast_no_data_month","この月に表示できる日付はありません")}</div>`;
+  listEl.innerHTML = navHTML + bodyHTML;
+
+  const prevBtn = document.getElementById("weatherCalPrevMonth");
+  const nextBtn = document.getElementById("weatherCalNextMonth");
+  if(prevBtn) prevBtn.addEventListener("click", () => {
+    if(isAtStartMonth) return;
+    let { year, month } = weatherCalendarViewYM;
+    month -= 1;
+    if(month < 1){ month = 12; year -= 1; }
+    weatherCalendarViewYM = { year, month };
+    renderDailySpotCalendar();
+  });
+  if(nextBtn) nextBtn.addEventListener("click", () => {
+    if(isAtEndMonth) return;
+    let { year, month } = weatherCalendarViewYM;
+    month += 1;
+    if(month > 12){ month = 1; year += 1; }
+    weatherCalendarViewYM = { year, month };
+    renderDailySpotCalendar();
+  });
+
+  listEl.querySelectorAll("[data-weather-date]").forEach(row => {
+    row.addEventListener("click", () => {
+      weatherCalendarDetailDate = row.dataset.weatherDate;
+      renderDailySpotCalendar();
+    });
+  });
+}
+
+// 特定の日の1時間ごとの天気（時刻は選択中サーバーのオフセットで表示）
+function renderWeatherCalendarDayDetail(listEl, dateKey){
+  const [y, m, d] = dateKey.split("-").map(Number);
+  const weekday = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  const wkKeys = ["weekday_sun","weekday_mon","weekday_tue","weekday_wed","weekday_thu","weekday_fri","weekday_sat"];
+  const wkFallback = ["日","月","火","水","木","金","土"];
+  const dayLabel = T("forecast_day_label","{y}年{m}月{d}日（{wk}）",
+    { y, m, d, wk: T(wkKeys[weekday], wkFallback[weekday]) });
+
+  const dayData = weatherData[dateKey];
+  let bodyHTML;
+  if(!dayData || !dayData.hourly){
+    bodyHTML = `<div class="weather-day-nodata">${T("forecast_no_data_day","この日の天気データはまだ収集していません（準備中）")}</div>`;
+  }else{
+    const hourly = dayData.hourly;
+    const isToday = dateKey === getCalendarTodayKey(0);
+    const currentJstHour = isToday ? getJstDate().getUTCHours() : -1;
+
+    let hasMeteor = false, hasRainbow = false;
+    Object.values(hourly).forEach(w => {
+      if(isMeteorWeather(w)) hasMeteor = true;
+      if(isRainbowWeather(w)) hasRainbow = true;
+    });
+    const badges = [];
+    if(hasMeteor) badges.push([weatherIconHTML("流星雨",{size:14}), T("forecast_badge_meteor","この日は流星雨が発生します")]);
+    if(hasRainbow) badges.push([weatherIconHTML("虹",{size:14}), T("forecast_badge_rainbow","この日は虹が見られます")]);
+    const badgesHTML = badges.map(([iconHtml,label]) =>
+      `<div class="weather-day-special-badge"><span>${iconHtml}</span><span>${label}</span></div>`
+    ).join("");
+
+    let rowsHTML = "";
+    for(let h = 0; h < 24; h++){
+      const hh = String(h).padStart(2,"0");
+      const w = hourly[hh] || "不明";
+      const isNow = h === currentJstHour;
+      const displayHour = typeof jstHourToServerDisplayHour === "function" ? jstHourToServerDisplayHour(h) : h;
+      // 流星雨1〜3は出現判定上は同じ扱いだが、1時間ごとの表示では強さの区別が
+      // 分かるよう元データの末尾数字をそのまま残す（他の天気名はtranslateWeatherWordのみ）
+      const meteorVariant = /^流星雨([123])$/.exec(w);
+      const hourWeatherLabel = meteorVariant ? `${translateWeatherWord(w)}${meteorVariant[1]}` : translateWeatherWord(w);
+      rowsHTML += `
+        <div class="weather-hour-row ${isNow ? "current-hour" : ""}">
+          <span class="weather-hour-time">${displayHour}:00</span>
+          <span class="weather-hour-emoji">${weatherIconHTML(w,{size:14, hour:h})}</span>
+          <span class="weather-hour-name">${hourWeatherLabel}</span>
+          ${isNow ? `<span class="weather-hour-now-tag">${T("forecast_now_tag","今")}</span>` : ""}
+        </div>
+      `;
+    }
+    bodyHTML = `${badgesHTML ? `<div class="weather-day-special">${badgesHTML}</div>` : ""}<div class="weather-hour-list">${rowsHTML}</div>`;
+  }
+
+  listEl.innerHTML = `
+    <button class="ds-btn ds-btn-secondary weather-day-back" id="weatherDayBackBtn">${T("forecast_back_to_calendar","← カレンダーに戻る")}</button>
+    <div class="weather-day-detail-title">${dayLabel}</div>
+    ${bodyHTML}
+  `;
+  const backBtn = document.getElementById("weatherDayBackBtn");
+  if(backBtn) backBtn.addEventListener("click", () => {
+    weatherCalendarDetailDate = null;
+    renderDailySpotCalendar();
+  });
+}
+
+// 初期描画
+renderDailySpots();
+
+// ══════════════════════════════════════
+// 今日やることリスト ダッシュボード
+// ══════════════════════════════════════
+const dailyTasksModal = document.getElementById("dailyTasksModal");
+const dailyTasksBtn   = document.getElementById("dailyTasksBtn");
+
+if(dailyTasksBtn){
+  dailyTasksBtn.onclick = async () => {
+    await Promise.all([
+      loadScriptOnce("js/data-daily-tasks.js"),
+      loadScriptOnce("js/data-events.js"),
+      loadScriptOnce("js/data-codes.js"),
+    ]);
+    renderDailyTasks();
+    dailyTasksModal.style.display = "block";
+  };
+}
+
+function closeDailyTasksModal(){
+  if(dailyTasksModal) dailyTasksModal.style.display = "none";
+}
+
+// ══════════════════════════════════════
+// 週替わり商店リスト（毎週土曜AM6:00(JST)リセット）
+// ══════════════════════════════════════
+const weeklyShopModal = document.getElementById("weeklyShopModal");
+const weeklyShopBtn   = document.getElementById("weeklyShopBtn");
+
+if(weeklyShopBtn){
+  weeklyShopBtn.onclick = async () => {
+    await loadScriptOnce("js/data-weekly-tasks.js");
+    renderWeeklyShopList();
+    weeklyShopModal.style.display = "block";
+  };
+}
+
+function closeWeeklyShopModal(){
+  if(weeklyShopModal) weeklyShopModal.style.display = "none";
+}
+
+// 直近の「今週の更新（毎週土曜6:00 JST）」の開始時刻をYYYY-MM-DD文字列で返す。
+// この文字列をチェック状態のキーにすることで、次のリセットを跨ぐと自動的に未チェック扱いに戻る
+function getWeeklyCycleKey(){
+  const jstNow = getJstDate();
+  for(let offset = 0; offset <= 7; offset++){
+    const candidate = new Date(jstNow);
+    candidate.setUTCDate(candidate.getUTCDate() - offset);
+    candidate.setUTCHours(6, 0, 0, 0);
+    if(candidate.getUTCDay() === 6 && candidate.getTime() <= jstNow.getTime()){
+      return candidate.toISOString().slice(0,10);
+    }
+  }
+  return jstNow.toISOString().slice(0,10); // 理論上は到達しない保険
+}
+
+// 次回の土曜6:00(JST)までの残り時間
+function getNextWeeklyResetMinutes(){
+  const jstNow = getJstDate();
+  for(let offset = 0; offset <= 7; offset++){
+    const candidate = new Date(jstNow);
+    candidate.setUTCDate(candidate.getUTCDate() + offset);
+    candidate.setUTCHours(6, 0, 0, 0);
+    if(candidate.getUTCDay() === 6 && candidate.getTime() > jstNow.getTime()){
+      return Math.round((candidate.getTime() - jstNow.getTime()) / 60000);
+    }
+  }
+  return null;
+}
+
+function renderWeeklyShopList(){
+  const body = document.getElementById("weeklyShopBody");
+  const countdownEl = document.getElementById("weeklyShopCountdown");
+  if(!body) return;
+
+  const nextMinutes = getNextWeeklyResetMinutes();
+  if(countdownEl){
+    countdownEl.textContent = nextMinutes != null
+      ? T("weekly_shop_countdown", `次のリセットまで：${formatMinutesUntil(nextMinutes)}`, { time: formatMinutesUntil(nextMinutes) })
+      : "";
+  }
+
+  if(typeof weeklyShops === "undefined" || weeklyShops.length === 0){
+    body.innerHTML = `<div class="daily-task-empty">${T("daily_tasks_no_data","データ未登録")}</div>`;
+    return;
+  }
+
+  const cycleKey = getWeeklyCycleKey();
+  const checks = JSON.parse(localStorage.getItem("weeklyShopChecks") || "{}");
+
+  const sections = weeklyShops.map(shop => {
+    const shopLabel = shop.shopI18n && shop.shopI18n[currentLang()] ? shop.shopI18n[currentLang()] : shop.shop;
+    const rows = shop.items.map((item, i) => {
+      const key = `${shop.id}_${i}`;
+      const isChecked = checks[key] === cycleKey;
+      const label = item.nameI18n && item.nameI18n[currentLang()] ? item.nameI18n[currentLang()] : item.name;
+      const detail = item.detailI18n && item.detailI18n[currentLang()] ? item.detailI18n[currentLang()] : item.detail;
+      const detailWithIcons = injectCurrencyIcons(detail);
+      const thumb = item.img ? `<img class="daily-task-thumb" src="${item.img}" alt="" loading="lazy">` : "";
+      return `
+        <div class="daily-task-row">
+          <div class="daily-task-main">
+            ${thumb}
+            <span class="daily-task-label">${label}<span class="daily-task-sub">${detailWithIcons}</span></span>
+          </div>
+          <label class="daily-task-checkbox">
+            <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleWeeklyShopCheck(this, '${key}')">
+          </label>
+        </div>
+      `;
+    }).join("");
+    return sectionHTML("gift", shopLabel, rows);
+  });
+
+  body.innerHTML = sections.join("");
+}
+
+function toggleWeeklyShopCheck(checkboxEl, key){
+  const checks = JSON.parse(localStorage.getItem("weeklyShopChecks") || "{}");
+  const cycleKey = getWeeklyCycleKey();
+  if(checkboxEl.checked){
+    checks[key] = cycleKey;
+  } else {
+    delete checks[key];
+  }
+  localStorage.setItem("weeklyShopChecks", JSON.stringify(checks));
+}
+
+function renderDailyTasks(){
+  const body = document.getElementById("dailyTasksBody");
+  if(!body) return;
+
+  const todayWeekday = getJstDate().getUTCDay();
+  // 毎日更新系の曜日指定は6:00〜5:59を1日とみなして判定する（更新サイクルの境目に合わせるため）
+  const resetDayWeekday = new Date(getJstDate().getTime() - 6 * 3600000).getUTCDay();
+  let sectionSpots, sectionWeather, sectionQuests, sectionUpdates, sectionEnding, sectionVideos;
+
+  // 蛍石・オークの木
+  if(typeof dailySpots !== "undefined" && typeof getDailySpotFor === "function"){
+    const spotRows = Object.keys(dailySpots).map(key => {
+      const today = getDailySpotFor(key, 0);
+      if(!today) return "";
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${dailySpotLabel(key)}</span>
+          <span class="daily-task-value">${today.location}</span>
+        </div>
+      `;
+    }).join("");
+    sectionSpots = sectionHTML("pin", T("daily_tasks_section_spots","蛍石・オークの木"), spotRows);
+  }
+
+  // 今日の天気予報（windows=4時間帯の代表天気。天気予報ページと同じ区分）
+  if(typeof weatherData !== "undefined"){
+    const todayKey = getDateKey(0);
+    const todayWindows = (weatherData[todayKey] && weatherData[todayKey].windows) || {};
+    // [windowsキー, JST開始時, JST終了時]
+    const windowDefs = [
+      ["00-06", 0, 6],
+      ["06-12", 6, 12],
+      ["12-18", 12, 18],
+      ["18-24", 18, 24],
+    ];
+    const weatherRows = windowDefs.map(([wk, startH, endH]) => {
+      const w = todayWindows[wk] || "不明";
+      return `
+      <div class="daily-task-row">
+        <span class="daily-task-label">${formatServerZoneLabel(startH, endH)}</span>
+        <span class="daily-task-value">${weatherIconHTML(w, {hour:startH})}${translateWeatherWord(w)}</span>
+      </div>
+    `;
+    }).join("");
+    sectionWeather = sectionHTML(null, T("daily_tasks_section_weather","今日の天気"), weatherRows);
+  }
+
+  // 場所動画への誘導（流星雨・虹の日は天気から、ピンクバブルは曜日から判定。タップでvideos.htmlの該当カテゴリへ）
+  {
+    const HOUR = 3600000;
+    const now = Date.now();
+
+    // "YYYY-MM-DD"（JST基準のカレンダー日付）の指定時(0-23)に対応する絶対時刻(ms)に変換
+    // ※ブラウザのローカルタイムゾーンに依存させないため、UTC解釈から9時間分を差し引く
+    const jstHourStart = (dateStr, h) => {
+      const t = Date.parse(dateStr + "T00:00:00Z");
+      return isNaN(t) ? NaN : t - 9 * HOUR + h * HOUR;
+    };
+
+    // matchFnに一致する天気が、過去windowHours時間以内(hourly単位)に発生していたか（今日・昨日の2日分を走査）
+    const isRecentWeather = (matchFn, windowHours) => {
+      if(typeof weatherData === "undefined") return false;
+      for(let offset = 0; offset <= 1; offset++){
+        const dateKey = getDateKey(-offset);
+        const day = weatherData[dateKey];
+        if(!day || !day.hourly) continue;
+        for(let h = 0; h < 24; h++){
+          const hh = String(h).padStart(2,"0");
+          if(!matchFn(day.hourly[hh])) continue;
+          const start = jstHourStart(dateKey, h);
+          if(now >= start && now < start + windowHours * HOUR) return true;
+        }
+      }
+      return false;
+    };
+
+    const videoLinkRow = (iconName, label, cat) => `
+      <a class="daily-task-row daily-task-link" href="videos.html?cat=${cat}">
+        <span class="daily-task-label">${icon(iconName,{size:13})} ${label}</span>
+        <span class="daily-task-value">›</span>
+      </a>
+    `;
+
+    let videoRows = "";
+    if(isRecentWeather(isMeteorWeather, 24)){
+      videoRows += videoLinkRow("weatherMeteor", T("daily_tasks_video_meteor","流星雨の欠片が拾えます"), "meteor_shower");
+    }
+    if(isRecentWeather(isRainbowWeather, 6)){
+      videoRows += videoLinkRow("weatherRainbow", T("daily_tasks_video_rainbow","虹の日が発生中です"), "rainbow_day");
+    }
+    if(todayWeekday === 5){
+      videoRows += videoLinkRow("bubbles", T("daily_tasks_video_pink_bubble","明日までのピンクバブルはこちら"), "pink_bubble");
+    }
+    if(videoRows){
+      sectionVideos = sectionHTML("play", T("daily_tasks_section_videos","場所動画"), videoRows);
+    }
+  }
+
+  // 定時クエスト
+  if(typeof dailyQuests !== "undefined" && dailyQuests.length > 0){
+    const questRows = dailyQuests
+      .filter(q => !q.weekdays || q.weekdays.includes(todayWeekday))
+      .map(q => {
+        const next = getNextQuestTime(q);
+        const label = q.nameI18n && q.nameI18n[currentLang()] ? q.nameI18n[currentLang()] : q.name;
+        // 末尾の「（〇〇主催）」部分は見やすいよう改行する
+        const labelWithBreak = label.replace(/(.+?)(（[^）]*）)$/, "$1<br>$2");
+        // 表示時刻は選択中サーバーのタイムゾーンに変換する（開催判定自体はJST固定のまま）
+        const timesLabel = (q.times || []).map(jstTimeStrToServerDisplay).join(" / ");
+        return `
+          <div class="daily-task-row">
+            <span class="daily-task-label">${labelWithBreak}<span class="daily-task-sub">${timesLabel}</span></span>
+            <span class="daily-task-value">${next ? formatMinutesUntil(next.minutesUntil) : "-"}</span>
+          </div>
+        `;
+      }).join("");
+    sectionQuests = sectionHTML("clock", T("daily_tasks_section_quests","定時クエスト"), questRows);
+  }
+
+  // 毎日更新系
+  if(typeof dailyUpdates !== "undefined" && dailyUpdates.length > 0){
+    const visibleUpdates = dailyUpdates.filter(u => !u.weekdays || u.weekdays.includes(resetDayWeekday));
+    const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
+
+    // 表示中の項目はほぼ全て同じ更新時刻（デフォルト6:00）なので、
+    // 一番近い次回更新までの時間をタイトル右側にまとめて表示する
+    const nextTimes = visibleUpdates
+      .map(getNextUpdateTime)
+      .filter(Boolean)
+      .sort((a,b) => a.minutesUntil - b.minutesUntil);
+    const titleCountdown = nextTimes.length ? formatMinutesUntil(nextTimes[0].minutesUntil) : "";
+
+    const updateRows = visibleUpdates.map(u => {
+      const label = u.nameI18n && u.nameI18n[currentLang()] ? u.nameI18n[currentLang()] : u.name;
+      const cycleKey = getUpdateCycleKey(u.resetTime);
+      const isChecked = checks[u.name] === cycleKey;
+      return `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${label}</span>
+          <label class="daily-task-checkbox">
+            <input type="checkbox" ${isChecked ? "checked" : ""} onchange="toggleDailyUpdateCheck(this, '${u.name}', ${u.resetTime ? `'${u.resetTime}'` : "undefined"})">
+          </label>
+        </div>
+      `;
+    }).join("");
+    sectionUpdates = sectionHTML("sprout", T("daily_tasks_section_updates","毎日更新系"), updateRows, titleCountdown);
+  }
+
+  // もうすぐ終わるもの
+  if(typeof getEndingSoonItems === "function"){
+    const endingSoon = getEndingSoonItems(3);
+    if(endingSoon.length > 0){
+      const typeLabel = {
+        event_end: T("daily_tasks_type_event_end","イベント終了"),
+        event_exchange: T("daily_tasks_type_event_exchange","交換期限"),
+        code_expiry: T("daily_tasks_type_code_expiry","コード期限"),
+      };
+      const endingRows = endingSoon.map(item => `
+        <div class="daily-task-row">
+          <span class="daily-task-label">${item.name}<span class="daily-task-sub">${typeLabel[item.type] || ""}</span></span>
+          <span class="daily-task-value highlight">${T("daily_tasks_days_left","あと{n}日").replace("{n}", item.daysLeft)}</span>
+        </div>
+      `).join("");
+      sectionEnding = sectionHTML("warning", T("daily_tasks_section_ending","もうすぐ終わるもの"), endingRows);
+    }
+  }
+
+  // 表示順: もうすぐ終わるもの → 場所動画 → 蛍石・オークの木 → 今日の天気 → 毎日更新系 → 定時クエスト
+  const sections = [sectionEnding, sectionVideos, sectionSpots, sectionWeather, sectionUpdates, sectionQuests].filter(Boolean);
+
+  body.innerHTML = sections.length
+    ? sections.join("")
+    : `<div class="daily-task-empty">${T("daily_tasks_empty","現在表示できる情報がありません")}</div>`;
+}
+
+function sectionHTML(iconName, title, rowsHTML, titleRight){
+  return `
+    <div class="daily-task-section">
+      <div class="daily-task-section-title">
+        <span class="daily-task-section-title-main">${icon(iconName,{size:14})} ${title}</span>
+        ${titleRight ? `<span class="daily-task-section-title-right">${titleRight}</span>` : ""}
+      </div>
+      ${rowsHTML || `<div class="daily-task-empty">${T("daily_tasks_no_data","データ未登録")}</div>`}
+    </div>
+  `;
+}
+
+// JST基準の時刻(0〜24)を、現在選択中サーバーのタイムゾーンでの時刻に変換（表示専用）
+// ※ 出現判定・更新判定などのロジックには使わないこと（常にJST固定のため）
+function jstHourToServerDisplayHour(hour){
+  const diff = getServerOffset() - 9;
+  return ((hour + diff) % 24 + 24) % 24;
+}
+
+// "HH:MM"（JST）をサーバー選択に応じた表示用の "H:MM" に変換
+function jstTimeStrToServerDisplay(hhmm){
+  const [h, m] = hhmm.split(":").map(Number);
+  const displayHour = jstHourToServerDisplayHour(h);
+  return `${displayHour}:${String(m).padStart(2,"0")}`;
+}
+
+// 天気の時間帯（開始・終了ともJST）を、サーバー選択に応じた表示ラベルに変換
+// 終了時刻がちょうど0時になる場合は「24:00」表記にする（既存の表記に合わせるため）
+function formatServerZoneLabel(startHourJst, endHourJst){
+  const start = jstHourToServerDisplayHour(startHourJst);
+  let end = jstHourToServerDisplayHour(endHourJst);
+  if(end === 0) end = 24;
+  return `${start}:00〜${end}:00`;
+}
+
+// ── 毎日更新系チェックボックス ──
+// 更新サイクル（resetTimeの時刻を境に切り替わる「今のサイクル」を表すYYYY-MM-DD）を計算
+function getUpdateCycleKey(resetTime){
+  const [h, m] = (resetTime || "06:00").split(":").map(Number);
+  const jstNow = getJstDate();
+  const base = new Date(jstNow);
+  base.setUTCHours(h, m, 0, 0);
+  const d = new Date(jstNow);
+  if(jstNow.getTime() < base.getTime()){
+    d.setUTCDate(d.getUTCDate() - 1);
+  }
+  return d.toISOString().slice(0,10);
+}
+
+function toggleDailyUpdateCheck(checkboxEl, name, resetTime){
+  const checks = JSON.parse(localStorage.getItem("dailyUpdateChecks") || "{}");
+  const cycleKey = getUpdateCycleKey(resetTime);
+  if(checkboxEl.checked){
+    checks[name] = cycleKey;
+  } else {
+    delete checks[name];
+  }
+  localStorage.setItem("dailyUpdateChecks", JSON.stringify(checks));
+}

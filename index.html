@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<meta name="google-site-verification" content="ArpxDq17vjcCMAKguhuYBzlX73v2H_Or4xo-cuSvXJw" />
+  <!-- Webクリップアイコン -->
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+
+<title>はとぴ図鑑｜Heartopia(ハートピアスローライフ)非公式攻略ツール集</title>
+<meta
+ name="description"
+ content="Heartopia（ハートピアスローライフ）の非公式攻略ツール集。魚・虫・野鳥図鑑、ワールドマップ、料理レシピ、園芸、ペットのエサ管理、実績、トレンド商店、ギフトコード、イベント情報、建築・アート・楽譜作成ツールなどを無料で利用できます。"
+/>
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑">
+<meta property="og:description" content="魚・虫・野鳥図鑑、マップ、料理レシピ、園芸、実績など、Heartopia（ハートピアスローライフ）を遊び尽くすための非公式ツール集">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑">
+<meta name="twitter:description" content="魚・虫・野鳥図鑑、マップ、料理レシピ、園芸、実績など、Heartopia（ハートピアスローライフ）を遊び尽くすための非公式ツール集">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<!-- テーマカラー -->
+<meta name="theme-color" content="#3c5a6e">
+
+<!-- 構造化データ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "はとぴ図鑑",
+  "alternateName": "Hatopi Dex",
+  "url": "https://ram1x7.github.io/heartopilist/",
+  "description": "Heartopia（ハートピアスローライフ）の非公式攻略ツール集。魚・虫・野鳥図鑑、マップ、料理レシピ、園芸、ペット管理、実績、商店、ギフトコード、イベント情報、建築・アート・楽譜作成ツールなどを提供。",
+  "inLanguage": ["ja", "en", "ko", "th", "zh-CN", "zh-TW"]
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="css/style.css?v=42">
+<link rel="stylesheet" href="css/design-system.css?v=5">
+
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./updates.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+</head>
+
+<body>
+<div class="title-bar">
+
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+
+  <div class="title-buttons">
+   <button id="helpBtn" aria-label="help"></button>
+   <button id="shareBtn" aria-label="progress check"></button>
+   <button id="dataSyncBtn" aria-label="backup and device transfer"></button>
+   <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+    
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item active" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h1 data-i18n="page_header_title">リアルタイム図鑑</h1>
+  <p class="page-subtitle" data-i18n="page_header_subtitle">
+    ハートピアの天気と今の時間に合わせた図鑑表示
+  </p>
+</div>
+
+<!-- 蛍石・オークの木：今日の場所 -->
+<div class="card daily-spot-card">
+  <div class="daily-spot-header">
+    <span class="daily-spot-title"><span id="dailySpotPinIcon"></span><span data-i18n="daily_spot_title">今日の場所</span></span>
+    <div class="scroll-hint-wrap">
+    <div class="daily-spot-header-btns">
+      <button id="dailyTasksBtn" class="daily-spot-calendar-btn">
+        <span id="dailyTasksIcon"></span><span data-i18n="daily_tasks_btn">今日やることリスト</span>
+      </button>
+      <button id="dailySpotCalendarBtn" class="daily-spot-calendar-btn">
+        <span id="dailySpotCalIcon"></span><span data-i18n="daily_spot_calendar_btn">カレンダー</span>
+      </button>
+      <button id="weeklyShopBtn" class="daily-spot-calendar-btn">
+        <span id="weeklyShopIcon"></span><span data-i18n="weekly_shop_btn">週替わり商店リスト</span>
+      </button>
+    </div>
+    </div>
+  </div>
+  <div class="daily-spot-grid" id="dailySpotGrid">
+    <!-- JSで動的生成 -->
+  </div>
+</div>
+
+<!-- 今日やることリスト モーダル -->
+<div id="dailyTasksModal" onclick="if(event.target.id==='dailyTasksModal')closeDailyTasksModal()">
+  <div class="modal-box daily-tasks-modal">
+    <h3><span id="dailyTasksTitleIcon"></span><span data-i18n="daily_tasks_title">今日やることリスト</span></h3>
+    <div class="daily-tasks-body" id="dailyTasksBody"></div>
+    <button class="modal-close-btn" onclick="closeDailyTasksModal()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<!-- 週替わり商店リスト モーダル -->
+<div id="weeklyShopModal" onclick="if(event.target.id==='weeklyShopModal')closeWeeklyShopModal()">
+  <div class="modal-box daily-tasks-modal">
+    <h3><span id="weeklyShopTitleIcon"></span><span data-i18n="weekly_shop_title">週替わり商店リスト</span></h3>
+    <p class="weekly-shop-hint" data-i18n="weekly_shop_hint">毎週土曜AM6:00（日本時間）に購入回数がリセットされます。買い忘れがないかチェックしてください</p>
+    <div class="weekly-shop-countdown" id="weeklyShopCountdown"></div>
+    <div class="daily-tasks-body" id="weeklyShopBody"></div>
+    <button class="modal-close-btn" onclick="closeWeeklyShopModal()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<!-- カレンダーモーダル -->
+<div id="dailySpotCalendarModal" onclick="if(event.target.id==='dailySpotCalendarModal')closeDailySpotCalendar()">
+  <div class="modal-box daily-spot-calendar-modal">
+    <h3><span id="dailySpotCalTitleIcon"></span><span data-i18n="daily_spot_calendar_title">出現カレンダー</span></h3>
+    <p class="weather-forecast-server-note" id="weatherForecastServerNote" data-i18n="forecast_server_time_note">時刻は選択中のサーバー時間で表示しています</p>
+    <div class="daily-spot-calendar-list" id="dailySpotCalendarList"></div>
+    <button class="modal-close-btn" onclick="closeDailySpotCalendar()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+  
+<div class="card sticky" id="topPanel">
+<button id="minimizeBtn" aria-label="minimize"></button>
+
+<div class="mini-info">
+  <input
+    type="text"
+    id="miniSearch"
+    class="search mini-search"
+    placeholder="名前・場所で検索"
+    data-i18n-placeholder="search_placeholder"
+  >
+
+  <div class="mini-status">
+    <div id="miniTime"></div>
+    <div id="miniWeather"></div>
+  </div>
+</div>
+
+<div class="top-content">
+    <div class="server-select-wrap">
+      <span class="server-select-icon"></span>
+      <select id="serverSelect" class="server-select">
+        <option value="asia">Asia (UTC+9)</option>
+        <option value="tw_hk_mo">TW/HK/MO (UTC+8)</option>
+        <option value="sea">SEA (UTC+7)</option>
+        <option value="global">Global (UTC+1)</option>
+        <option value="america">America (UTC-5)</option>
+      </select>
+    </div>
+    <div id="time" class="time"></div>
+  <div class="weather-wrap">
+  <div id="weatherNow" class="weather-now"></div>
+  <div id="weatherNext" class="weather-next"></div>
+  <div id="weatherOverrideWrap" class="weather-override-wrap" style="display:none"></div>
+  <div id="weatherHourStrip" class="weather-hour-strip"></div>
+</div>
+<div class="search-wrap">
+  <span class="search-icon"></span>
+  <input type="text" id="search" class="search" placeholder="名前・場所で検索" data-i18n-placeholder="search_placeholder">
+  <button id="clearBtn" aria-label="clear search"></button>
+</div>
+
+  <div class="filter filter-wrap" id="typeFilterRow">
+    <button onclick="setFilter('all')" id="f_all"><span class="btn-icon" data-icon="all"></span><span data-i18n="filter_all">全部</span></button>
+    <button onclick="setFilter('fish')" id="f_fish"><span class="btn-icon" data-icon="fish"></span><span data-i18n="filter_fish">魚</span></button>
+    <button onclick="setFilter('bug')" id="f_bug"><span class="btn-icon" data-icon="bug"></span><span data-i18n="filter_bug">虫</span></button>
+    <button onclick="setFilter('bird')" id="f_bird"><span class="btn-icon" data-icon="bird"></span><span data-i18n="filter_bird">野鳥</span></button>
+    <button onclick="setFilter('sand')" id="f_sand"><span class="btn-icon" data-icon="sand"></span><span data-i18n="filter_sand">砂像</span></button>
+    <button onclick="setFilter('snow')" id="f_snow"><span class="btn-icon" data-icon="snow"></span><span data-i18n="filter_snow">雪像</span></button>
+    <button onclick="setFilter('shell')" id="f_shell"><span class="btn-icon" data-icon="shell"></span><span data-i18n="filter_shell">貝殻</span></button>
+    <button onclick="setFilter('pumpkin')" id="f_pumpkin"><span class="btn-icon" data-icon="pumpkin"></span><span data-i18n="filter_pumpkin">かぼちゃ</span></button>
+  </div>
+
+  <!-- ── 絞り込みセクション（アコーディオン） ── -->
+  <div class="accordion" id="filterAccordion">
+    <button class="accordion-toggle" id="filterAccordionToggle" type="button">
+      <span class="accordion-toggle-label">
+        <span class="accordion-toggle-icon"></span>
+        <span data-i18n="section_filter_title">絞り込み・並び替え</span>
+      </span>
+      <span class="accordion-chevron"></span>
+    </button>
+    <div class="accordion-body" id="filterAccordionBody">
+
+      <div class="filter-group">
+        <div class="filter-group-label" data-i18n="group_weather_mode">出現モード</div>
+        <div class="filter filter-wrap" id="weatherModeRow">
+          <button onclick="setWeatherMode('current')" id="w_current"><span class="btn-icon" data-icon="weatherSun"></span><span data-i18n="weather_current">今出現するもの全て</span></button>
+          <button onclick="setWeatherMode('only')" id="w_only"><span class="btn-icon" data-icon="weatherRainbow"></span><span data-i18n="weather_only">今の天気限定</span></button>
+          <button onclick="setWeatherMode('hidden')" id="w_hidden"><span class="btn-icon" data-icon="close"></span><span data-i18n="weather_hidden">今は出現しない</span></button>
+          <button onclick="setWeatherMode('all')" id="w_all"><span class="btn-icon" data-icon="book"></span><span data-i18n="weather_mode_all">すべて</span></button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label" data-i18n="group_limited">表示範囲</div>
+        <div class="filter">
+          <button onclick="setLimitedOnly(!limitedOnly)" id="limitedOnlyBtn"><span class="btn-icon" data-icon="calendar"></span><span data-i18n="filter_limited_only">シーズン・フェス限定のみ</span></button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label" data-i18n="group_sort">並び替え</div>
+        <div class="filter filter-4 filter-wrap">
+          <button onclick="setSort('book')" id="s_book"><span class="btn-icon" data-icon="sortBook"></span><span data-i18n="sort_book">図鑑順</span></button>
+          <button onclick="setSort('level')" id="s_level"><span class="btn-icon" data-icon="sortLevel"></span><span data-i18n="sort_level">レベル順</span></button>
+          <button onclick="setSort('unchecked')" id="s_unchecked"><span class="btn-icon" data-icon="sortStar"></span><span data-i18n="sort_unchecked">未コンプ順</span></button>
+          <button onclick="setSort('unauth')" id="s_unauth"><span class="btn-icon" data-icon="sortMedal"></span><span data-i18n="sort_unauth">未認証順</span></button>
+          <button onclick="setSort('price')" id="s_price"><span class="btn-icon" data-icon="coin"></span><span data-i18n="sort_price">売却額順</span></button>
+        </div>
+        <div class="filter price-sort-sub" id="priceSortRow" style="display:none;">
+          <button onclick="setPriceSortOrder('desc')" id="po_desc" data-i18n="price_sort_high">高い順</button>
+          <button onclick="setPriceSortOrder('asc')" id="po_asc" data-i18n="price_sort_low">安い順</button>
+          <span class="price-sort-sep"></span>
+          <button onclick="setPriceSortStar(1)" id="ps_1">★1</button>
+          <button onclick="setPriceSortStar(2)" id="ps_2">★2</button>
+          <button onclick="setPriceSortStar(3)" id="ps_3">★3</button>
+          <button onclick="setPriceSortStar(4)" id="ps_4">★4</button>
+          <button onclick="setPriceSortStar(5)" id="ps_5">★5</button>
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label-row">
+          <span data-i18n="level_range_label">レベル範囲</span>
+          <span id="levelRangeText">Lv.1〜14</span>
+        </div>
+        <input type="range" id="levelMin" min="1" max="14" value="1" class="level-slider">
+        <input type="range" id="levelMax" min="1" max="14" value="13" class="level-slider">
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-group-label" data-i18n="group_icon_size">表示サイズ</div>
+        <div class="filter">
+          <button onclick="setIconSize('small')" id="sz_small" data-i18n="icon_size_small">小</button>
+          <button onclick="setIconSize('medium')" id="sz_medium" data-i18n="icon_size_medium">中</button>
+          <button onclick="setIconSize('large')" id="sz_large" data-i18n="icon_size_large">大</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 一括操作セクション（アコーディオン） ── -->
+  <div class="accordion" id="bulkAccordion">
+    <button class="accordion-toggle" id="bulkAccordionToggle" type="button">
+      <span class="accordion-toggle-label">
+        <span class="accordion-toggle-icon"></span>
+        <span data-i18n="section_bulk_title">複数選択・一括操作</span>
+      </span>
+      <span class="accordion-chevron"></span>
+    </button>
+    <div class="accordion-body" id="bulkAccordionBody">
+
+      <div class="filter">
+        <button id="multiBtn" onclick="toggleMultiSelect()">
+          <span class="btn-icon" data-icon="checkSquare"></span><span data-i18n="multi_select">複数選択</span>
+        </button>
+      </div>
+
+      <p class="bulk-accordion-hint" id="bulkAccordionHint" style="display:none;"></p>
+
+    </div>
+  </div>
+
+</div>
+
+</div>
+
+  <!-- ── 絞り込み状態の要約（アコーディオンを閉じても常に見える） ── -->
+  <div class="filter-summary" id="filterSummary">
+    <div class="filter-summary-chips" id="filterSummaryChips"></div>
+    <div class="filter-summary-meta">
+      <span class="filter-summary-sort" id="filterSummarySort"></span>
+      <span class="filter-summary-count" id="filterSummaryCount"></span>
+    </div>
+  </div>
+
+  <!-- ── 複数選択モード中の状態・操作バー（アコーディオンを閉じても常に見える） ── -->
+  <div class="bulk-status-bar" id="bulkStatusBar" style="display:none;">
+    <div class="bulk-status-top">
+      <span class="bulk-status-count" id="bulkStatusCount"></span>
+      <div class="bulk-status-top-actions">
+        <button type="button" class="filter-chip" id="bulkClearSelectionBtn" onclick="clearBulkSelection()"></button>
+        <button type="button" class="filter-chip filter-chip-clear-all" id="bulkExitModeBtn" onclick="toggleMultiSelect()"></button>
+      </div>
+    </div>
+    <div class="bulk-action-row">
+      <button type="button" class="bulk-action-btn" id="bulkCheckBtnBar" onclick="bulkCheck()"></button>
+      <button type="button" class="bulk-action-btn" id="bulkUncheckBtnBar" onclick="bulkUncheck()"></button>
+      <button type="button" class="bulk-action-btn" id="bulkAuthCheckBtnBar" onclick="bulkAuthCheck()"></button>
+      <button type="button" class="bulk-action-btn" id="bulkAuthUncheckBtnBar" onclick="bulkAuthUncheck()"></button>
+    </div>
+    <div class="bulk-undo-row" id="bulkUndoRow" style="display:none;">
+      <span id="bulkUndoText"></span>
+      <button type="button" class="bulk-undo-btn" id="bulkUndoBtn"></button>
+    </div>
+  </div>
+
+  <div id="list" class="grid"></div>
+  <div id="endedList"></div>
+
+<!-- モーダル -->
+<div id="modal" onclick="if(event.target.id==='modal')closeModal()">
+  <div class="modal-box">
+    <h3 id="m_name"></h3>
+    <img id="m_img" style="width:100%;height:100px;object-fit:contain;">
+    <div class="modal-info">
+     <div class="modal-info-row">
+       <span class="modal-info-label" data-i18n="modal_loc_label">場所</span>
+       <span class="modal-info-value" id="m_loc"></span>
+     </div>
+     <div class="modal-info-row">
+       <span class="modal-info-label" data-i18n="modal_weather_label">天気</span>
+       <span class="modal-info-value" id="m_weather"></span>
+     </div>
+     <div class="modal-info-row">
+       <span class="modal-info-label" data-i18n="modal_time_label">時間</span>
+       <span class="modal-info-value" id="m_time"></span>
+     </div>
+     <div class="modal-info-row" id="m_star5Row">
+       <span class="modal-info-label" data-i18n="modal_star5_col_label">★5条件</span>
+       <span class="modal-info-value" id="m_star5"></span>
+     </div>
+     <div class="modal-info-row" id="m_authCountRow">
+       <span class="modal-info-label" data-i18n="modal_auth_count_col_label">認証に必要な数</span>
+       <span class="modal-info-value" id="m_authCount"></span>
+     </div>
+    </div>
+    <table class="modal-price-table" id="m_priceTable">
+      <tr>
+        <th data-i18n="modal_price_col_rarity">レア度</th>
+        <th data-i18n="modal_price_col_price">売価</th>
+        <th data-i18n="modal_price_col_fes">フェスコイン</th>
+      </tr>
+      <tr id="m_priceRow1"><td>★1</td><td id="m_price1"></td><td id="m_fesPrice1"></td></tr>
+      <tr id="m_priceRow2"><td>★2</td><td id="m_price2"></td><td id="m_fesPrice2"></td></tr>
+      <tr id="m_priceRow3"><td>★3</td><td id="m_price3"></td><td id="m_fesPrice3"></td></tr>
+      <tr id="m_priceRow4"><td>★4</td><td id="m_price4"></td><td id="m_fesPrice4"></td></tr>
+      <tr id="m_priceRow5"><td>★5</td><td id="m_price5"></td><td id="m_fesPrice5"></td></tr>
+    </table>
+    <div id="m_craftInfo" class="modal-make-steps"></div>
+    <div id="m_makeSteps" class="modal-make-steps"></div>
+    <button class="modal-close-btn" onclick="closeModal()" data-i18n="modal_close">閉じる</button>
+  </div>
+</div>
+
+<!-- 出現場所→マップ埋め込みモーダル（ページ遷移せずマップを確認できるようにする） -->
+<div id="mapEmbedModal" onclick="if(event.target.id==='mapEmbedModal')closeMapEmbed()">
+  <div class="map-embed-box">
+    <button class="map-embed-close" onclick="closeMapEmbed()" aria-label="close"></button>
+    <iframe id="mapEmbedFrame" class="map-embed-iframe" title="マップ"></iframe>
+  </div>
+</div>
+
+<div style="font-size:12px; padding:10px; opacity:0.8;">
+
+<p>
+<a href="./legal.html" data-i18n="legal_link_label">プライバシーポリシー・使用ライセンスはこちら</a>
+</p>
+
+<h3 data-i18n="contact_title">お問い合わせ</h3>
+<p>
+<span data-i18n="contact_x_label">X（旧Twitter）：</span>
+<a href="https://x.com/_ram1x?s=21" target="_blank">
+  @_Ram1x
+</a>
+</p>
+
+<div class="contact-box">
+  <p style="margin-top:0;" data-i18n="contact_form_label">
+    不具合報告・機能リクエスト・感想などはこちら
+  </p>
+  <a class="contact-btn" href="https://forms.gle/Ns7ZrJyv4b45v5QNA" target="_blank">
+    <span class="btn-icon" data-icon="mail"></span><span data-i18n="contact_form_btn">匿名で送る</span>
+  </a>
+</div>
+  
+<p id="disclaimer" style="font-size:10px; opacity:0.5; text-align:center; margin-top:20px;">
+</p>
+
+<div style="
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  font-size:10px;
+  opacity:0.4;
+  margin-top:20px;
+">
+  <p id="lastUpdate"></p>
+  <p id="version"></p>
+ </div>
+</div>
+
+<div id="helpModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(4px);
+z-index:3000;
+">
+
+<div class="help-modal-box" style="
+width:90%;
+max-width:340px;
+margin:50px auto;
+padding:20px;
+border-radius:28px;
+max-height:80vh;
+overflow-y:auto;
+text-align:left;
+">
+
+<h3 class="help-modal-title" style="text-align:center;"><span id="helpTitleIcon" class="help-title-icon"></span><span data-i18n="help_title">はとぴ図鑑の使い方</span></h3>
+
+<p><strong><span class="help-icon" data-icon="search"></span><span data-i18n="help_search_title">検索</span></strong>
+<span data-i18n="help_search_body">名前や場所で検索できます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="fish"></span><span data-i18n="help_type_title">種類</span></strong>
+<span data-i18n="help_type_body">魚・虫・野鳥に加えて、季節限定の砂像・雪像・貝殻の表示にも切り替えられます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="weatherSun"></span><span data-i18n="help_mode_title">出現モード</span></strong>
+<span data-i18n="help_mode_body">「今出現するもの全て」は、今の天気・時間に出現する生き物だけを表示します。<br>
+「今の天気でしか出現しない」は、普段は出ない天気限定の生き物だけに絞り込みます。<br>
+「今は出現しない」は、今は見られない生き物を確認できます。<br>
+「すべて」は、出現状況に関係なく図鑑の全品目を表示します。</span></p>
+
+<p><strong><span class="help-icon" data-icon="sortBook"></span><span data-i18n="help_sort_title">並び替え</span></strong>
+<span data-i18n="help_sort_body">図鑑順・レベル順・未コンプ順・未認証順・売却額順の5種類から選べます。売却額順を選ぶと、金額が高い順か安い順か、★1〜★5のどのレア度の金額を基準にするかも選べます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="globe"></span><span data-i18n="help_server_title">サーバー・表示時間</span></strong>
+<span data-i18n="help_server_body">上部のサーバー選択で表示時刻を切り替えられます。出現判定自体は常に日本時間（JST）基準で、表示のみ選んだサーバーの時間帯に変換されます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="pin"></span><span data-i18n="help_spot_title">今日の場所</span></strong>
+<span data-i18n="help_spot_body">蛍石とオークの木、それぞれ今日出現する場所を表示します。カレンダーボタンから数日先の予定も確認できます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="checklist"></span><span data-i18n="help_tasks_title">今日やることリスト</span></strong>
+<span data-i18n="help_tasks_body">今日の天気予報、定時クエストの次回開催までの時間、毎日更新される項目のチェックリスト、もうすぐ終わるイベント・コードの情報をまとめて確認できます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="star"></span><span data-i18n="help_star_title">星5チェック機能</span></strong>
+<span data-i18n="help_star_body">右上の〇ボタンをタップでチェックできます。<br>
+複数選択モードを使えば、まとめてチェックすることもできます（詳しくは下記の「複数選択機能」をご覧ください）。</span></p>
+
+<p><strong><span class="help-icon" data-icon="medal"></span><span data-i18n="help_auth_title">マスターチェック機能</span></strong>
+<span data-i18n="help_auth_body">右下の〇ボタンをタップでチェックできます。<br>
+複数選択モードを使えば、まとめてチェックすることもできます（詳しくは下記の「複数選択機能」をご覧ください）。</span></p>
+
+<p><strong><span class="help-icon" data-icon="checkSquare"></span><span data-i18n="help_multi_title">複数選択機能</span></strong>
+<span data-i18n="help_multi_body_1">複数選択機能の使い方を説明します。</span><br>
+<span data-i18n="help_multi_body_2">１．複数選択を押すと複数選択モードになります。</span><br>
+<span data-i18n="help_multi_body_3">２．複数選択モードの状態で、対象の生き物を全部タップします（選択中の件数が一覧の上に表示されます）。</span><br>
+<span data-i18n="help_multi_body_4">３．タップし終えたら、一覧の上に表示される操作バーから「★5達成にする」「認証済みにする」などを押します。</span><br>
+<span data-i18n="help_multi_body_5">４．間違えた場合は、操作バーに表示される「元に戻す」を押すと直前の変更を取り消せます。</span><br>
+<span data-i18n="help_multi_body_6">５．終わったら操作バーの「選択終了」を押すと複数選択モードが終わります。</span><br>
+<span data-i18n="help_multi_body_7">★5と認証は同時にチェックはできないのでご了承ください。</span></p>
+
+<p><strong><span class="help-icon" data-icon="level"></span><span data-i18n="help_level_title">レベル範囲</span></strong>
+<span data-i18n="help_level_body">表示するLvを絞り込めます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="weatherMeteor"></span><span data-i18n="help_meteor_title">流星雨</span></strong>
+<span data-i18n="help_meteor_body">流星雨は晴れ扱いで判定しています。</span></p>
+
+<p><strong><span class="help-icon" data-icon="minus"></span><span data-i18n="help_minimize_title">最小化</span></strong>
+<span data-i18n="help_minimize_body">上部パネルは折りたたみボタンで開閉できます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="share"></span><span data-i18n="help_share_title">シェア</span></strong>
+<span data-i18n="help_share_body">シェアボタンを押すとプロフィールカードメーカーが開きます。<br>
+図鑑・料理・園芸・実績の進捗をまとめたシェア画像を作成できます。</span></p>
+
+<p><strong><span class="help-icon" data-icon="download"></span><span data-i18n="help_sync_title">バックアップ・端末移行</span></strong>
+<span data-i18n="help_sync_body">上部のボタンから、コンプ状況や設定などのデータをファイルに書き出したり読み込んだりできます。自動では同期されないため、機種変更やブラウザの変更時は、あらかじめバックアップを書き出しておいてください。</span></p>
+
+<p><strong><span class="help-icon" data-icon="moon"></span><span data-i18n="help_theme_title">ダークモード・言語</span></strong>
+<span data-i18n="help_theme_body">上部のボタンでダークモードを切り替えられます。言語は日本語 / English / 한국어 / ไทย / 简体中文 / 繁體中文に対応しています。</span></p>
+
+<p><strong><span class="help-icon" data-icon="mail"></span><span data-i18n="help_contact_title">お問い合わせ</span></strong>
+<span data-i18n="help_contact_body">ページ最下部にてお問い合わせが可能です。<br>
+完全匿名で送信できますのでご利用ください。</span></p>
+<span data-i18n="help_contact_note">（回答掲載用のQ&Aページ追加予定です。）</span>
+
+<p><strong><span class="help-icon" data-icon="warning"></span><span data-i18n="help_notice_title">注意</span></strong>
+<span data-i18n="help_notice_body">こちらのサイトでは、サイトを閉じる時の状態が保存されます。<br>
+開き直した際には、前に開いていた時の状態が引き継がれます。</span></p>
+  
+<div style="text-align:center; margin-top:20px;">
+<button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(INDEX_TUTORIAL_DONE_KEY, INDEX_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+<button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="help_close">
+閉じる
+</button>
+</div>
+
+</div>
+</div>
+
+<!-- データ同期（手動バックアップ） -->
+<input
+  type="file"
+  id="dataSyncFile"
+  accept=".json,application/json"
+  style="display:none"
+  onchange="importAllData(event)">
+
+<div id="dataSyncModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(4px);
+z-index:3000;
+">
+
+<div class="modal-box" style="
+width:90%;
+max-width:340px;
+margin:50px auto;
+padding:20px;
+border-radius:28px;
+max-height:80vh;
+overflow-y:auto;
+text-align:left;
+">
+
+<h3 style="text-align:center;"><span id="dataSyncTitleIcon"></span><span data-i18n="data_sync_title">バックアップ・端末移行</span></h3>
+
+<p style="font-size:12px; line-height:1.7;" data-i18n="data_sync_body">
+このサイトのデータ（コンプ状況・認証記録・料理計算機・園芸通知設定・ペット・ギフトコード受取状況・今日やることリストのチェックなど）は、自動で他の端末と同期されることはなく、この端末のこのブラウザにのみ保存されています。別の端末に移したり、ブラウザのデータを消してしまう前にバックアップしたい場合は、以下から書き出し・読み込みができます。
+</p>
+
+<button onclick="exportAllData()">
+<span class="btn-icon" data-icon="download"></span><span data-i18n="data_sync_export">バックアップを書き出す</span>
+</button>
+
+<button onclick="document.getElementById('dataSyncFile').click()">
+<span class="btn-icon" data-icon="upload"></span><span data-i18n="data_sync_import">バックアップを読み込む（上書き）</span>
+</button>
+
+<p style="font-size:10px; opacity:0.6; margin-top:10px;" data-i18n="data_sync_note">
+読み込むと現在のデータは上書きされます。通知設定（fcmToken）は端末固有のため引き継がれません。
+</p>
+
+<div style="text-align:center; margin-top:16px;">
+<button class="modal-close-btn" onclick="closeDataSyncModal()" data-i18n="modal_close">閉じる</button>
+</div>
+
+</div>
+</div>
+
+<!-- バックアップ読み込み前の確認（上書きされることと、先にバックアップを取る選択肢を明示する） -->
+<div id="dataSyncImportConfirmModal" style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.45);
+backdrop-filter:blur(4px);
+z-index:3100;
+">
+
+<div class="modal-box" style="
+width:90%;
+max-width:340px;
+margin:70px auto;
+padding:20px;
+border-radius:28px;
+text-align:left;
+">
+
+<h3 style="text-align:center;" data-i18n="data_sync_import_confirm_title">読み込みの確認</h3>
+
+<p style="font-size:12px; line-height:1.7;" data-i18n="data_sync_import_confirm_body">
+読み込むと現在のデータは上書きされます。必要であれば、読み込む前に今のデータをバックアップとして書き出せます。
+</p>
+
+<button onclick="confirmImportWithBackup()">
+<span class="btn-icon" data-icon="download"></span><span data-i18n="data_sync_import_backup_first">バックアップしてから読み込む</span>
+</button>
+
+<button onclick="confirmImportProceed()">
+<span class="btn-icon" data-icon="upload"></span><span data-i18n="data_sync_import_proceed">そのまま読み込む</span>
+</button>
+
+<div style="text-align:center; margin-top:16px;">
+<button class="modal-close-btn" onclick="cancelPendingImport()" data-i18n="data_sync_import_cancel">キャンセル</button>
+</div>
+
+</div>
+</div>
+
+<div id="bugTimerWidget" class="bug-timer-widget">
+  <div class="bug-timer-panel" id="bugTimerPanel" hidden>
+    <div class="bug-timer-panel-header">
+      <span data-i18n="bug_timer_title">虫リポップタイマー</span>
+      <button type="button" id="bugTimerResetBtn" data-i18n="bug_timer_reset">リセット</button>
+    </div>
+    <div class="bug-timer-clock" id="bugTimerClock"></div>
+    <div class="bug-timer-count-row">
+      <span data-i18n="bug_timer_count_label">捕獲回数</span>
+      <span id="bugTimerCountValue">0</span>
+    </div>
+    <div class="bug-timer-list" id="bugTimerList"></div>
+    <p class="bug-timer-empty-hint" id="bugTimerEmptyHint" data-i18n="bug_timer_empty_hint">下のボタンを押すと、捕獲した瞬間から1分のカウントダウンが始まります</p>
+  </div>
+  <div class="bug-timer-fab-row">
+    <button type="button" class="bug-timer-toggle-btn" id="bugTimerToggleBtn" data-i18n-aria-label="bug_timer_toggle_aria" aria-label="toggle bug timer list"></button>
+    <button type="button" class="bug-timer-capture-btn" id="bugTimerCaptureBtn" data-i18n-aria-label="bug_timer_capture_aria" aria-label="start bug respawn timer">
+      <span class="bug-timer-capture-icon"></span>
+      <span class="bug-timer-capture-badge" id="bugTimerBadge">0</span>
+    </button>
+  </div>
+</div>
+
+
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/weather-master.js"></script>
+<script src="js/data-weather.js"></script>
+<script src="js/data-fish.js"></script>
+<script src="js/data-bugs.js"></script>
+<script src="js/data-birds.js"></script>
+<script src="js/data-sand.js"></script>
+<script src="js/data-snow.js"></script>
+<script src="js/data-shell.js"></script>
+<script src="js/data-kabotya.js"></script>
+<script src="js/data-daily-spots.js"></script>
+<script src="js/data-map-locations.js"></script>
+<script src="js/data-sync.js"></script>
+<script src="js/icon-size.js"></script>
+<script src="js/currency-icons.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/bug-timer.js"></script>
+<script src="js/main.js?v=64"></script>
+
+<script src="js/sw-register.js"></script>
+</body>
+</html>

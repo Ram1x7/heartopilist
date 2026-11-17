@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>オーダーチケット｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）の商品注文（オーダーチケット）で過去に入荷したトレンドアイテムの一覧。名称・画像・購入価格・入荷日数をまとめて確認できます。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | オーダーチケット">
+<meta property="og:description" content="商品注文（オーダーチケット）で過去に入荷したトレンドアイテムの一覧。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/order-trend.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | オーダーチケット">
+<meta name="twitter:description" content="商品注文（オーダーチケット）で過去に入荷したトレンドアイテムの一覧。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./art-create.html">
+<link rel="prefetch" href="./updates.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+
+<style>
+/* オーダーチケットページ専用（他ページの.gridには影響しない） */
+.ot-controls{
+  margin-bottom:14px;
+}
+
+/* シーズン絞り込み：シーズン名の長さがまちまちなため、.filterの
+   「均等幅flex:1」ではなく.site-navと同様の横スクロール方式にする */
+#otSeasonRow{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  margin-bottom:8px;
+}
+
+#otSeasonRow::-webkit-scrollbar{
+  display:none;
+}
+
+#otSeasonRow button{
+  flex:none;
+  white-space:nowrap;
+  padding:8px 14px;
+}
+
+.ot-controls .search-wrap{
+  margin-bottom:8px;
+}
+
+#otClearBtn{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  border:1px solid var(--border);
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background:var(--card);
+  box-shadow:0 2px 6px rgba(52,48,43,0.08);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  color:var(--text-sub);
+}
+
+body.dark #otClearBtn{
+  background:var(--dark-card-alt);
+  color:var(--dark-text-sub);
+  border-color:var(--dark-border);
+}
+
+.ot-grid{
+  display:grid;
+  /* minmax(0,1fr)：列の最小幅を0にしないと、折り返さない長いテキストが
+     列幅を押し広げ、グリッド全体が画面からはみ出す（小サイズ4列で顕著） */
+  grid-template-columns:repeat(3, minmax(0,1fr));
+  gap:10px;
+  margin-top:10px;
+}
+
+body[data-icon-size="small"] .ot-grid{
+  grid-template-columns:repeat(4, minmax(0,1fr));
+  gap:8px;
+}
+body[data-icon-size="large"] .ot-grid{
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:12px;
+}
+
+.ot-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:8px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+}
+
+body.dark .ot-card{
+  background:var(--dark-card);
+  border-color:var(--dark-border);
+}
+
+/* チェック済み（入手済み）は薄暗くして一覧の最後にまとめる */
+.ot-card.ot-owned{
+  opacity:0.5;
+}
+
+.ot-card .img-wrap > img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  border-radius:10px;
+  background:var(--card-sub);
+}
+
+body.dark .ot-card .img-wrap > img{
+  background:var(--dark-card-alt);
+}
+
+.ot-item-name{
+  margin-top:6px;
+  font-size:11px;
+  line-height:1.3;
+  min-height:28px;
+}
+
+.ot-item-name.unconfirmed{
+  color:var(--text-sub);
+  font-style:italic;
+}
+
+body.dark .ot-item-name.unconfirmed{
+  color:var(--dark-text-sub);
+}
+
+.ot-item-price{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:3px 4px;
+  flex-wrap:wrap;
+  font-size:11px;
+  font-weight:700;
+  color:var(--vermillion);
+  /* 名前の行数に関わらず、価格以下を常にカード下端に揃える */
+  margin-top:auto;
+  padding-top:6px;
+}
+
+body.dark .ot-item-price{ color:var(--dark-highlight); }
+
+.ot-item-price .ot-original{
+  font-weight:400;
+  font-size:9.5px;
+  text-decoration:line-through;
+  color:var(--text-sub);
+}
+
+body.dark .ot-item-price .ot-original{ color:var(--dark-text-sub); }
+
+.ot-item-price .ot-discount{
+  font-size:9px;
+  font-weight:700;
+  color:#fff;
+  background:var(--vermillion);
+  border-radius:999px;
+  padding:1px 5px;
+}
+
+.ot-data-note{ margin:0 0 10px; font-size:11px; line-height:1.6; color:var(--text-sub); }
+body.dark .ot-data-note{ color:var(--dark-text-sub); }
+
+.ot-item-sub{
+  margin-top:3px;
+  font-size:9px;
+  color:var(--text-sub);
+  line-height:1.5;
+  /* 項目が無いアイテムでも高さを確保し、価格欄の位置がずれないようにする */
+  min-height:1.5em;
+}
+
+body.dark .ot-item-sub{ color:var(--dark-text-sub); }
+
+.ot-empty{
+  text-align:center;
+  padding:30px 10px;
+  color:var(--text-sub);
+  font-size:12px;
+}
+
+body.dark .ot-empty{ color:var(--dark-text-sub); }
+
+.ot-season-block + .ot-season-block{
+  margin-top:24px;
+  padding-top:20px;
+  border-top:1px dashed var(--border);
+}
+
+body.dark .ot-season-block + .ot-season-block{
+  border-top-color:var(--dark-border);
+}
+
+.ot-season-title{
+  font-family:'Shippori Mincho', serif;
+  font-size:15px;
+  font-weight:700;
+  color:var(--indigo);
+  margin:0 0 6px;
+}
+
+body.dark .ot-season-title{ color:var(--dark-accent); }
+
+.ot-pack-note{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  margin-left:8px;
+  font-family:inherit;
+  font-size:11px;
+  font-weight:400;
+  color:var(--text-sub);
+  vertical-align:middle;
+}
+
+body.dark .ot-pack-note{ color:var(--dark-text-sub); }
+
+.ot-pack-icon{
+  width:20px;
+  height:20px;
+  object-fit:contain;
+  vertical-align:middle;
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item active" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h1 data-i18n="order_trend_page_title">オーダーチケット</h1>
+  <p class="page-subtitle" data-i18n="order_trend_page_subtitle">商品注文で過去に入荷したトレンドアイテムの一覧です</p>
+</div>
+
+<div class="ot-controls">
+  <p class="ot-data-note" data-i18n="order_trend_help_details_body">材料パック数は製作・配置1個分です。木材などが別途必要な場合があります。</p>
+  <div class="search-wrap">
+    <span class="search-icon"></span>
+    <input type="text" id="otSearch" class="search" data-i18n-placeholder="order_trend_search_placeholder" placeholder="アイテム名で検索">
+    <button id="otClearBtn" aria-label="clear search"></button>
+  </div>
+
+  <div class="scroll-hint-wrap">
+    <div class="filter" id="otSeasonRow"></div>
+  </div>
+
+  <div class="filter" id="otCategoryRow">
+    <button id="otCat_all" class="active" onclick="setOtCategory('all')" data-i18n="order_trend_cat_all">すべて</button>
+    <button id="otCat_clothing" onclick="setOtCategory('clothing')" data-i18n="order_trend_cat_clothing">服</button>
+    <button id="otCat_furniture" onclick="setOtCategory('furniture')" data-i18n="order_trend_cat_furniture">家具</button>
+    <button id="otCat_other" onclick="setOtCategory('other')" data-i18n="order_trend_cat_other">その他</button>
+  </div>
+
+  <div class="filter" id="otCurrencyRow">
+    <button id="otCur_all" class="active" onclick="setOtCurrency('all')" data-i18n="order_trend_currency_all">すべて</button>
+    <button id="otCur_coin" onclick="setOtCurrency('coin')"><span class="ot-currency-icon" data-currency-icon="coin"></span><span data-i18n="order_trend_currency_coin">コイン</span></button>
+    <button id="otCur_heart_ishi" onclick="setOtCurrency('heart_ishi')"><span class="ot-currency-icon" data-currency-icon="heart_ishi"></span><span data-i18n="order_trend_currency_heart">ハート石</span></button>
+    <button id="otCur_negaiboshi" onclick="setOtCurrency('negaiboshi')"><span class="ot-currency-icon" data-currency-icon="negaiboshi"></span><span data-i18n="order_trend_currency_negaiboshi">願い星</span></button>
+  </div>
+
+  <div class="filter">
+    <button id="sz_small" onclick="setIconSize('small')" data-i18n="icon_size_small">小</button>
+    <button id="sz_medium" onclick="setIconSize('medium')" data-i18n="icon_size_medium">中</button>
+    <button id="sz_large" onclick="setIconSize('large')" data-i18n="icon_size_large">大</button>
+  </div>
+</div>
+
+<div id="otContent"></div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="help-modal-box" style="width:90%; max-width:340px; margin:50px auto; padding:20px; border-radius:28px; max-height:80vh; overflow-y:auto; text-align:left;">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="order_trend_help_title">オーダーチケットの使い方</h3>
+
+    <p><strong data-i18n="order_trend_help_about_title">このページについて</strong>
+    <span data-i18n="order_trend_help_about_body">商品注文（オーダーチケット）で過去に入荷したトレンドアイテムをまとめた一覧です。名称・画像・購入価格・入荷までの日数を確認できます。</span></p>
+
+
+    <p style="margin-top:10px;"><strong data-i18n="shop_help_search_title">検索</strong>
+    <span data-i18n="order_trend_help_search_body">アイテム名で検索できます（名称未確認のアイテムは検索対象外です）。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="order_trend_help_season_title">シーズン絞り込み</strong>
+    <span data-i18n="order_trend_help_season_body">トレンドシーズンごとに絞り込みできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="order_trend_help_filter_title">カテゴリ絞り込み</strong>
+    <span data-i18n="order_trend_help_filter_body">服・家具・その他で絞り込みできます。「すべて」選択時は服→家具→その他の順にまとまります。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="order_trend_help_currency_title">必要アイテム絞り込み</strong>
+    <span data-i18n="order_trend_help_currency_body">コイン・ハート石・願い星のどれで購入するアイテムかで絞り込みできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="order_trend_help_check_title">入手済みチェック</strong>
+    <span data-i18n="order_trend_help_check_body">画像左上のボタンをタップすると入手済みとしてチェックできます。チェックしたアイテムは薄暗く表示され、自動的に一覧の最後に移動します。もう一度タップすると解除できます。</span></p>
+
+    <div style="text-align:center; margin-top:20px;">
+      <button class="modal-close-btn" onclick="closeHelpModal(); replayPageTutorial(ORDER_TREND_TUTORIAL_DONE_KEY, ORDER_TREND_TUTORIAL_STEPS);" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+      <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="shop_help_close">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/currency-icons.js"></script>
+<script src="js/toast.js"></script>
+<script src="js/icon-size.js"></script>
+<script src="js/tutorial.js"></script>
+<script src="js/data-order-trend.js"></script>
+<script src="js/data-order-trend-apk.js?v=11"></script>
+<script src="js/data-order-trend-reviewed.js?v=9"></script>
+<script src="js/order-trend.js?v=13"></script>
+
+<script src="js/sw-register.js"></script>
+</body>
+</html>

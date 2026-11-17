@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
+<link rel="icon" type="image/png" href="./images/favicon.png?v=1">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=10">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#3c5a6e">
+<title>アート｜はとぴ図鑑</title>
+<meta name="description" content="Heartopia（ハートピアスローライフ）向けのドット絵デザインを、ブラウザ上で作成・保存できるお絵かきツールです。">
+
+<!-- OGP -->
+<meta property="og:title" content="はとぴ図鑑 | アート">
+<meta property="og:description" content="Heartopia向けのドット絵デザインをブラウザ上で作成・保存できます。">
+<meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+<meta property="og:url" content="https://ram1x7.github.io/heartopilist/art-create.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="はとぴ図鑑">
+
+<!-- X(Twitter) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="はとぴ図鑑 | アート">
+<meta name="twitter:description" content="Heartopia向けのドット絵デザインをブラウザ上で作成・保存できます。">
+<meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
+
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/style.css?v=42">
+<link rel="stylesheet" href="./css/art.css?v=68">
+<link rel="stylesheet" href="./css/art-preview-panel.css?v=3">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+
+<link rel="prefetch" href="./index.html">
+<link rel="prefetch" href="./foods.html">
+<link rel="prefetch" href="./garden.html">
+<link rel="prefetch" href="./pet.html">
+<link rel="prefetch" href="./achievements.html">
+<link rel="prefetch" href="./order-trend.html">
+<link rel="prefetch" href="./shop.html">
+<link rel="prefetch" href="./codes.html">
+<link rel="prefetch" href="./events.html">
+<link rel="prefetch" href="./videos.html">
+<link rel="prefetch" href="./updates.html">
+<link rel="prefetch" href="./faq.html">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-92DMJB0KET"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-92DMJB0KET');
+</script>
+</head>
+
+<body>
+
+<div class="title-bar">
+  <h1 data-i18n="site_title">はとぴ図鑑</h1>
+  <div class="title-buttons">
+    <button id="helpBtn" onclick="openHelpModal()" aria-label="help"></button>
+    <button id="darkToggle" aria-label="toggle dark mode"></button>
+  </div>
+</div>
+
+<div class="scroll-hint-wrap">
+<nav class="site-nav">
+  <a href="./index.html" class="site-nav-item" data-i18n="nav_zukan">図鑑</a>
+  <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
+  <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
+  <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
+  <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
+  <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
+  <a href="./shop.html" class="site-nav-item" data-i18n="nav_shop">商店</a>
+  <a href="./codes.html" class="site-nav-item" data-i18n="nav_code">コード</a>
+  <a href="./events.html" class="site-nav-item" data-i18n="nav_event">イベント</a>
+  <a href="./videos.html" class="site-nav-item" data-i18n="nav_videos">場所動画</a>
+  <a href="./art-create.html" class="site-nav-item active" data-i18n="nav_art">アート</a>
+  <a href="./faq.html" class="site-nav-item" data-i18n="nav_faq">Q&A</a>
+  <a href="./updates.html" class="site-nav-item" data-i18n="nav_updates">アプデ履歴</a>
+</nav>
+</div>
+
+<div class="page-header">
+  <h1 data-i18n="art_page_title">アート</h1>
+  <p class="page-subtitle" data-i18n="art_page_subtitle">ドット絵デザインをブラウザで作成・保存</p>
+  <p class="page-tutorial-hint" data-i18n="art_tutorial_hint">使い方やチュートリアルは、画面右上の「？」からいつでも確認できます</p>
+</div>
+
+<div class="art-header-actions">
+  <a href="./art-convert.html" class="art-header-btn">
+    <span id="artConvertIcon"></span>
+    <span data-i18n="art_from_image">画像から作る</span>
+  </a>
+</div>
+
+<div class="art-notice" data-i18n="art_coming_soon">
+  一部の機能は試験公開中です。より使いやすくなるよう順次改善していきます。
+</div>
+
+<div class="art-offline-banner" id="artOfflineBanner" style="display:none;">
+  <span class="art-offline-banner-icon" id="artOfflineBannerIcon"></span>
+  <p data-i18n="art_offline_banner_text">ログイン不要・データはこの端末だけに保存されます。電波が悪くても引き続き使えます。</p>
+  <button class="art-offline-banner-close" id="artOfflineBannerCloseBtn" aria-label="close"></button>
+</div>
+
+<div class="art-canvas-status-bar" id="artCanvasStatusBar">
+  <button class="art-edit-mode-btn" id="artEditModeBtn" data-i18n="art_edit_mode_on">編集する</button>
+  <button class="art-lock-btn" id="artLockBtn" data-i18n="art_lock">固定する</button>
+  <button class="art-edit-mode-btn" id="art3DOpenBtn" hidden>3Dプレビュー</button>
+</div>
+
+<div id="artPartTabs" class="hatopi-part-tabs" hidden></div>
+<div class="art-layout">
+  <div class="art-toolbar" id="artToolbar"></div>
+  <div class="art-canvas-area">
+    <div class="art-coord-readout" id="artCoordReadout"></div>
+    <canvas id="artCanvas" width="320" height="320"></canvas>
+  </div>
+  <div class="art-panel" id="artPanel">
+    <div class="art-panel-section" id="artBrushSizeSection">
+      <div class="art-panel-title" data-i18n="art_brush_size_label">太さ</div>
+      <div class="art-brush-size-options" id="artBrushSizeOptions"></div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_zoom_label">拡大率</div>
+      <div class="art-zoom-controls" id="artZoomControls"></div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_usage_label">使用色</div>
+      <div class="art-color-usage" id="artColorUsage"></div>
+    </div>
+    <div class="art-panel-section" id="artTransformSection">
+      <div class="art-panel-title" data-i18n="art_transform_label">反転・移動</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artFlipHBtn" data-i18n="art_flip_h_btn">左右反転</button>
+        <button class="art-header-btn" id="artFlipVBtn" data-i18n="art_flip_v_btn">上下反転</button>
+      </div>
+      <div class="art-nudge-pad" id="artNudgePad">
+        <button class="art-nudge-btn art-nudge-up" data-dir="up" data-i18n-title="art_nudge_up" title="上へ移動"></button>
+        <button class="art-nudge-btn art-nudge-left" data-dir="left" data-i18n-title="art_nudge_left" title="左へ移動"></button>
+        <button class="art-nudge-btn art-nudge-right" data-dir="right" data-i18n-title="art_nudge_right" title="右へ移動"></button>
+        <button class="art-nudge-btn art-nudge-down" data-dir="down" data-i18n-title="art_nudge_down" title="下へ移動"></button>
+      </div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_paint_guide_label">ぬり方ガイド</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artPaintGuideBtn" data-i18n="art_paint_guide_btn">効率のいい順番を見る</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_mydesigns_label">マイデザイン</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artNewCanvasBtn" data-i18n="art_new_canvas">新規作成</button>
+        <button class="art-header-btn" id="artSaveBtn" data-i18n="art_save_design">保存する</button>
+        <button class="art-header-btn" id="artMyDesignsBtn" data-i18n="art_open_mydesigns">一覧を見る</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_export_label">エクスポート・共有</div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artExportBtn" data-i18n="art_export_png">PNGで保存</button>
+        <button class="art-header-btn" id="artShareBtn" data-i18n="art_share_design">共有する</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_share_code_label">共有コード</div>
+      <p class="art-step-hint" data-i18n="art_share_code_hint">アカウント登録なしで、デザインを文字列としてやり取りできます。機種変更前のバックアップにも使えます</p>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artShareCodeBtn" data-i18n="art_share_code_generate">コードを発行する</button>
+        <button class="art-header-btn" id="artImportCodeBtn" data-i18n="art_share_code_import">コードを読み込む</button>
+      </div>
+    </div>
+    <div class="art-panel-section">
+      <div class="art-panel-title" data-i18n="art_display_label">表示</div>
+      <label class="art-toggle-row">
+        <span data-i18n="art_show_color_numbers">色番号</span>
+        <input type="checkbox" id="artColorNumberToggle">
+      </label>
+      <label class="art-toggle-row">
+        <span data-i18n="art_show_cell_numbers">マス番号</span>
+        <input type="checkbox" id="artCellNumberToggle">
+      </label>
+      <label class="art-toggle-row">
+        <span data-i18n="art_block_mode">10×10ブロック表示</span>
+        <input type="checkbox" id="artBlockModeToggle">
+      </label>
+      <div class="art-block-list" id="artBlockList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="art-floating-palette" id="artFloatingPalette" style="display:none;">
+  <div class="art-floating-palette-handle" id="artFloatingPaletteHandle">
+    <span data-i18n="art_palette_label">カラー</span>
+    <button class="art-floating-palette-close" id="artFloatingPaletteCloseBtn" aria-label="close">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="art-floating-palette-body">
+    <div class="art-color-replace-banner" id="artColorReplaceBanner" style="display:none;">
+      <span class="art-color-replace-banner-swatch" id="artColorReplaceBannerSwatch"></span>
+      <span class="art-color-replace-banner-text" data-i18n="art_color_replace_banner">この色をパレットから選んで置き換え先にしてください</span>
+      <button class="art-color-replace-banner-cancel" onclick="cancelColorReplace()" data-i18n="art_color_replace_cancel">やめる</button>
+    </div>
+    <div class="art-panel-section" id="artRecentColorsSection" style="display:none;">
+      <div class="art-panel-title" data-i18n="art_recent_colors_label">最近使った色</div>
+      <div class="art-palette" id="artRecentColors"></div>
+    </div>
+    <div class="art-palette-current" id="artPaletteCurrent"></div>
+    <div class="art-palette-subs-row" id="artPaletteSubs"></div>
+  </div>
+</div>
+
+<div class="footer">
+  ※本サイトは非公式のファンツールです
+</div>
+
+<div id="gridSizeModal" onclick="if(event.target.id==='gridSizeModal') closeNewCanvasModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-newcanvas-box">
+    <div id="gridSizeStep1">
+      <h3 data-i18n="art_gridsize_title">キャンバスサイズを選択</h3>
+
+      <div class="art-entry-options" id="artEntryOptions">
+        <a href="./art-convert.html" class="art-entry-card art-entry-card-primary">
+          <span class="art-entry-icon" id="artEntryConvertIcon"></span>
+          <span class="art-entry-label" data-i18n="art_entry_from_image">画像から作る</span>
+        </a>
+        <button type="button" class="art-entry-card" id="artEntryOpenSavedBtn" style="display:none;">
+          <span class="art-entry-icon" id="artEntrySavedIcon"></span>
+          <span class="art-entry-label" data-i18n="art_entry_open_saved">保存したデザインを開く</span>
+        </button>
+        <button type="button" class="art-entry-card" id="artEntryHelpBtn">
+          <span class="art-entry-icon" id="artEntryHelpIcon"></span>
+          <span class="art-entry-label" data-i18n="art_entry_help">使い方を見る</span>
+        </button>
+      </div>
+
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_entry_new_canvas">新しく作る（キャンバスサイズを選ぶ）</div>
+      <div class="art-panel-btn-row art-ssi-entry-row">
+        <button class="art-header-btn art-ssi-entry-btn" id="artScreenshotImportOpenBtn" data-i18n="art_ssi_entry_btn">スクショから取り込む</button>
+      </div>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ratio_select_label">比率</div>
+      <div class="art-gridsize-options art-ratio-grid" id="artRatioOptions"></div>
+      <div class="art-gridsize-options art-frame-grid" id="artFrameItemOptions"></div>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_size_select_label">サイズ</div>
+      <div class="art-gridsize-options art-frame-grid art-level-grid" id="artLevelOptions"></div>
+    </div>
+    <div id="gridSizeStep2" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="showFrameStep1()">
+        <span id="artFrameBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <h3 data-i18n="art_gridsize_step2_title">キャンバスを選択</h3>
+      <div class="art-gridsize-options art-frame-grid art-part-grid" id="artFramePartOptions"></div>
+    </div>
+    <div id="gridSizeCancelWrap" style="display:none;">
+      <button class="modal-close-btn" onclick="closeNewCanvasModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="artSsiModal" onclick="if(event.target.id==='artSsiModal') closeScreenshotImportModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2100;">
+  <div class="modal-box art-newcanvas-box art-ssi-box">
+    <h3 data-i18n="art_ssi_title">スクショから取り込む</h3>
+
+    <div id="artSsiStepUpload">
+      <p class="art-step-hint" data-i18n="art_ssi_upload_hint">ゲーム内のデザイン編集画面で、型紙全体と補助線が見えるスクリーンショットを選んでください。衣装・家具・本に対応しています。</p>
+      <div class="art-panel-btn-row">
+        <label class="art-header-btn" for="artSsiFileInput" data-i18n="art_ssi_upload_btn">画像を選ぶ</label>
+      </div>
+      <input type="file" id="artSsiFileInput" accept="image/*" style="display:none">
+      <div class="art-ssi-error" id="artSsiUploadError"></div>
+    </div>
+
+    <div id="artSsiStepCandidates" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('upload')">
+        <span id="artSsiCandidatesBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <p class="art-step-hint" data-i18n="art_ssi_auto_detect_hint">補助線から候補を探しました。型紙と切り取り位置を確認してください。一致の目安は正解率を表すものではありません。</p>
+      <div id="artSsiCandidateAutoWrap">
+        <p class="art-step-hint" data-i18n="art_ssi_candidate_hint">このキャンバスで合っていますか？</p>
+        <div class="art-ssi-candidate-list" id="artSsiCandidateList"></div>
+      </div>
+      <p class="art-step-hint" id="artSsiLowConfidenceHint" style="display:none" data-i18n="art_ssi_low_confidence">キャンバスを自動判定できませんでした。一覧から選んでください</p>
+      <a class="art-back-link" href="javascript:void(0)" id="artSsiManualPickLink" data-i18n="art_ssi_manual_pick_link">別のキャンバスを選択</a>
+      <div class="art-gridsize-options art-frame-grid" id="artSsiManualFrameOptions" style="display:none"></div>
+    </div>
+
+    <div id="artSsiStepPart" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('candidates')">
+        <span id="artSsiPartBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <h3 data-i18n="art_gridsize_step2_title">キャンバスを選択</h3>
+      <div class="art-gridsize-options art-frame-grid art-part-grid" id="artSsiPartOptions"></div>
+    </div>
+
+    <div id="artSsiStepAdjust" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('candidates')">
+        <span id="artSsiAdjustBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <p class="art-step-hint" data-i18n="art_ssi_adjust_hint">検出した範囲がずれている場合は、枠をドラッグして動かしたり、四隅をドラッグして大きさを調整してください</p>
+      <div class="art-ssi-adjust-wrap" id="artSsiAdjustWrap">
+        <img id="artSsiAdjustImg" alt="" draggable="false">
+        <canvas id="artSsiAdjustOverlay"></canvas>
+      </div>
+      <label class="art-toggle-row"><span data-i18n="art_ssi_grid_label">マス目を表示</span><input type="checkbox" id="artSsiGridToggle" checked></label>
+      <p class="art-step-hint" id="artSsiAlignInfo" role="status"></p>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSsiAutoAlignBtn" data-i18n="art_ssi_auto_align">マス位置を自動補正</button>
+        <button class="art-header-btn" id="artSsiAdjustConfirmBtn" data-i18n="art_ssi_adjust_confirm">この範囲で次へ</button>
+      </div>
+    </div>
+
+    <div id="artSsiStepSettings" style="display:none">
+      <a class="art-back-link" href="javascript:void(0)" onclick="ssiGoToStep('adjust')">
+        <span id="artSsiSettingsBackIcon"></span>
+        <span data-i18n="art_gridsize_back">戻る</span>
+      </a>
+      <p class="art-step-hint" data-i18n="art_ssi_settings_hint">色数を制限せず、マスごとの色を復元します。減色やディザリングは必要な場合だけ使用してください。</p>
+      <div class="art-ssi-preview-row">
+        <div class="art-ssi-preview-col">
+          <div class="art-ssi-preview-label" data-i18n="art_ssi_preview_original">元の範囲</div>
+          <canvas id="artSsiPreviewOriginal"></canvas>
+        </div>
+        <div class="art-ssi-preview-col">
+          <div class="art-ssi-preview-label" data-i18n="art_ssi_preview_result">変換後</div>
+          <canvas id="artSsiPreviewResult"></canvas>
+        </div>
+      </div>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ssi_colors_label">色数</div>
+      <div class="art-gridsize-options" id="artSsiColorOptions"></div>
+      <label class="art-toggle-row">
+        <span data-i18n="art_ssi_dither_label">ディザリング</span>
+        <input type="checkbox" id="artSsiDitherToggle">
+      </label>
+      <div class="art-panel-title art-newcanvas-section-title" data-i18n="art_ssi_bg_label">背景の扱い</div>
+      <div class="art-gridsize-options" id="artSsiBgOptions"></div>
+      <label class="art-toggle-row"><span data-i18n="art_ssi_guide_label">補助線の影響を抑える</span><input type="checkbox" id="artSsiGuideToggle" checked></label>
+      <p class="art-step-hint" data-i18n="art_ssi_guide_hint">補助線を避け、同じマス内の色を読み取ります。読み取れないマスは透明になります。細部が変わる場合はOFFにして比較してください。</p>
+      <label class="art-toggle-row"><span data-i18n="art_ssi_stability_label">圧縮による色のばらつきを抑える</span><input type="checkbox" id="artSsiColorStabilityToggle" checked></label>
+      <p class="art-step-hint" data-i18n="art_ssi_stability_hint">繰り返し使われる色を参考に、近い色を補正します。細かな色の違いが消える場合はOFFにしてください。</p>
+      <p class="art-step-hint" id="artSsiRecoveryInfo" role="status"></p>
+      <div class="art-ssi-error" id="artSsiSettingsError"></div>
+      <div class="art-panel-btn-row">
+        <button class="art-header-btn" id="artSsiApplyBtn" data-i18n="art_ssi_apply_btn">この内容で取り込む</button>
+      </div>
+    </div>
+
+    <p class="art-step-hint" id="artSsiProgress" style="display:none" data-i18n="art_ssi_processing">処理中…</p>
+
+    <div>
+      <button class="modal-close-btn" onclick="closeScreenshotImportModal()" data-i18n="art_close" style="margin-top:14px;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div id="artModeWizardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-mode-wizard-box">
+    <h3 data-i18n="art_mode_wizard_title">作業の進め方を選んでください</h3>
+    <p class="art-step-hint" data-i18n="art_mode_wizard_hint">あとからいつでも切り替えられます</p>
+    <div class="art-mode-wizard-options">
+      <button class="art-mode-wizard-option is-recommended" id="artModeWizardBlockBtn">
+        <span class="art-mode-wizard-badge" data-i18n="art_mode_wizard_recommended">初心者におすすめ</span>
+        <span class="art-mode-wizard-option-title" data-i18n="art_mode_wizard_block_title">ブロック作業モード</span>
+        <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_block_desc">10×10マスずつ区切って、1ブロックずつ集中して塗り進められます</span>
+      </button>
+      <button class="art-mode-wizard-option" id="artModeWizardNormalBtn">
+        <span class="art-mode-wizard-option-title" data-i18n="art_mode_wizard_normal_title">通常作業モード</span>
+        <span class="art-mode-wizard-option-desc" data-i18n="art_mode_wizard_normal_desc">キャンバス全体を見ながら、自由な順番で塗り進められます</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="myDesignsModal" onclick="if(event.target.id==='myDesignsModal') closeMyDesignsModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-mydesigns-box">
+    <h3 data-i18n="art_mydesigns_title">マイデザイン</h3>
+    <p class="art-mydesigns-storage-note" data-i18n="art_mydesigns_storage_note">保存したデザインはこの端末のブラウザだけに残ります（アカウント登録不要）。機種変更・買い替えの前には「共有コード」でバックアップしておきましょう。</p>
+    <div class="art-mydesigns-filters" id="artMyDesignsFilters"></div>
+    <div class="art-mydesigns-list" id="artMyDesignsList"></div>
+    <button class="modal-close-btn" onclick="closeMyDesignsModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div id="artShareCodeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-share-code-box">
+    <h3 data-i18n="art_share_code_modal_title">共有コード</h3>
+    <p class="art-step-hint" data-i18n="art_share_code_modal_hint">下のコードかURLを、Discordやメモアプリなどに貼って共有できます。「コードを読み込む」から貼り付ければ、いつでも復元できます。</p>
+
+    <div class="art-share-code-field">
+      <label class="art-panel-title" data-i18n="art_share_code_field_label">コード</label>
+      <textarea id="artShareCodeText" class="art-share-code-textarea" readonly rows="3"></textarea>
+      <button class="art-header-btn" id="artShareCodeCopyBtn" data-i18n="art_copy">コピー</button>
+    </div>
+
+    <div class="art-share-code-field">
+      <label class="art-panel-title" data-i18n="art_share_url_field_label">共有URL</label>
+      <textarea id="artShareUrlText" class="art-share-code-textarea" readonly rows="2"></textarea>
+      <button class="art-header-btn" id="artShareUrlCopyBtn" data-i18n="art_copy">コピー</button>
+    </div>
+
+    <div class="art-share-qr" id="artShareQr"></div>
+
+    <button class="modal-close-btn" id="artShareCodeCloseBtn" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div id="artImportCodeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-share-code-box">
+    <h3 data-i18n="art_share_code_import_title">コードを読み込む</h3>
+    <p class="art-step-hint" data-i18n="art_share_code_import_hint">共有されたコードを貼り付けてください。今のデザインは上書きされるため、必要なら先に保存してください。</p>
+    <textarea id="artImportCodeInput" class="art-share-code-textarea" rows="4" placeholder=""></textarea>
+    <p class="art-share-code-error" id="artImportCodeError"></p>
+    <div class="art-panel-btn-row">
+      <button class="art-header-btn" id="artImportCodeSubmitBtn" data-i18n="art_share_code_import_submit">読み込む</button>
+    </div>
+    <button class="modal-close-btn" id="artImportCodeCloseBtn" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div id="helpModal" onclick="if(event.target.id==='helpModal') closeHelpModal()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); z-index:2000;">
+  <div class="modal-box art-help-box">
+    <h3 class="help-modal-title" style="text-align:center;" data-i18n="art_create_help_title">使い方</h3>
+
+    <ul class="art-help-quickstart">
+      <li><strong data-i18n="art_create_quick_tap_title">タップ</strong>：<span data-i18n="art_create_quick_tap_body">マスを塗る（ペン・消しゴム・バケツ選択中）</span></li>
+      <li><strong data-i18n="art_create_quick_drag_title">ドラッグ</strong>：<span data-i18n="art_create_quick_drag_body">連続して塗る</span></li>
+      <li><strong data-i18n="art_create_quick_pinch_title">ピンチ</strong>：<span data-i18n="art_create_quick_pinch_body">拡大・縮小</span></li>
+      <li><strong data-i18n="art_create_quick_hold_title">長押し</strong>：<span data-i18n="art_create_quick_hold_body">そのマスの色・座標を確認</span></li>
+      <li><strong data-i18n="art_create_quick_undo_title">元に戻す・やり直す</strong>：<span data-i18n="art_create_quick_undo_body">直前の操作を取り消す・再実行する</span></li>
+    </ul>
+
+    <details class="art-help-details">
+    <summary data-i18n="art_help_details_summary">すべての機能を見る</summary>
+
+    <p><strong data-i18n="art_create_help_guide_title">ぬり方ガイド（おすすめ）</strong>
+    <span data-i18n="art_create_help_guide_body">「効率のいい順番を見る」を押すと、「10×10ブロック表示」と同じ番号のブロックを1つずつ順番にめぐり、ブロックごとに色別の塗り方を案内します。
+
+    画面は案内中のブロックへ自動でズームするので、全体図の中から探す必要はありません（右上のボタンでいつでも全体表示に戻せます）。
+
+    ゲーム内のバケツ（塗りつぶし）ツールは、隙間なく囲まれた範囲をまとめて塗る仕組みです。そのため、周囲8マス（斜めを含む）のどこかに違う色・未着色・キャンバスの外があるマスを先に塗って「壁」を作っておかないと、バケツで塗った色がその隙間から意図した範囲の外まで広がってしまいます（キャンバスの一番外側も同じように壁が必要です）。
+
+    このガイドでは、そうした境目のマスを丸印で示し、1マスずつ個別にタップする場所として案内します。周囲8マスが全て同じ色で埋まっている「内側のマス」は、境目を塗り終えたあとバケツでまとめて塗れる場所として示します。
+
+    画面上部には残り時間の目安が表示され、実際に進めるペースに合わせて自動で更新されます。ブロックを塗り終えるたびに軽い通知（振動を含む）でお知らせし、最後まで塗り終えると、かかった時間と塗ったマス数をまとめた画面が表示されます。そのままPNGでの保存や共有コードの発行に進むこともできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_edit_title">編集する・固定する</strong>
+    <span data-i18n="art_create_help_edit_body">「編集する」をオンにしている間だけ、キャンバスをタップしてペン・消しゴム・バケツが使えます（誤タップ防止のためです）。「固定する」をオンにすると、編集モードに関わらず一切の描画を受け付けなくなり、「編集する」ボタンもグレーアウトして押せなくなります。固定を解除すればまた編集できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_tools_title">ツール</strong>
+    <span data-i18n="art_create_help_tools_body">ペン・消しゴム・バケツ（塗りつぶし）・スポイト（色を拾う）が使えます。ペン・消しゴムは「太さ」欄で1〜4マスの太さに変更できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_color_title">カラー</strong>
+    <span data-i18n="art_create_help_color_body">ゲーム内で実際に選べる色と完全に一致したパレットから選びます。メインカラーをタップすると、さらに詳しいサブカラーが表示されます。現在選んでいる色は、パレット上に枠付きでマークされます。直近に選んだ色は「最近使った色」にも並ぶので、切り替えたい時はそこからワンタップで選べます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_usedcolor_title">使用色</strong>
+    <span data-i18n="art_create_help_usedcolor_body">今のキャンバスで使われている色の一覧です。行をタップするとその色のマスがキャンバス上でハイライトされます。色の四角い部分だけをタップすると、ハイライトではなくその色をすぐに選択できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_inspect_title">マスを調べる</strong>
+    <span data-i18n="art_create_help_inspect_body">キャンバス上のマスをタップすると、そのマスがハイライト表示され、左上に座標と使用色（色番号）が表示されます。編集モードがオフでも確認だけならいつでもできます。編集モードがオンのままでも、マスを動かさずに長押しすると、塗らずにそのマスだけ確認できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_zoom_title">拡大率</strong>
+    <span data-i18n="art_create_help_zoom_body">スライダーで自由に拡大・縮小できます。タッチ操作の場合は2本指でつまむ操作でも拡大縮小できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_outline_title">デザイン枠の輪郭線</strong>
+    <span data-i18n="art_create_help_outline_body">デザイン枠（衣装・家具など）で作成すると、実際に使われる部分を示す輪郭線が表示されます。輪郭線の外側もゲーム内の仕様どおり塗ることができます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_mydesign_title">マイデザイン</strong>
+    <span data-i18n="art_create_help_mydesign_body">「保存する」で名前を付けて保存し、「一覧を見る」からいつでも呼び出せます。一覧では未着手・作業中・完了で絞り込め、進捗（%）も表示されます。作業中のデザインは常に一覧の上に固定されるので、続きから再開しやすくなっています。「新規作成」から別サイズのキャンバスも作成できます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_offline_title">オフライン・データの保存について</strong>
+    <span data-i18n="art_create_help_offline_body">「アート」機能はアカウント登録・ログインが一切不要です。作成したデザインはサーバーには送信されず、この端末のブラウザ内だけに保存されます。一度開いたページはオフラインでも引き続き使えるので、電波の弱い場所でも安心して作業を続けられます。ただし、ブラウザのデータを消去したり機種変更をしたりすると、保存したデザインも一緒に失われてしまいます。大事なデザインは「共有コード」を使ってバックアップしておくことをおすすめします。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_export_title">エクスポート・共有</strong>
+    <span data-i18n="art_create_help_export_body">完成したデザインをPNG画像として保存したり、共有したりできます。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_sharecode_title">共有コード</strong>
+    <span data-i18n="art_create_help_sharecode_body">アカウント登録なしで、デザインを短い文字列（コード）やURL、QRコードとしてやり取りできます。「コードを発行する」で作った文字列は、Discordやメモアプリなどにそのまま貼り付けられます。「コードを読み込む」から貼り付ければ、いつでも同じデザインを復元できます。機種変更前のバックアップとしてもお使いください（この機能はサーバーに一切データを送信せず、ブラウザの中だけで完結します）。</span></p>
+
+    <p style="margin-top:10px;"><strong data-i18n="art_create_help_block_title">10×10ブロック表示</strong>
+    <span data-i18n="art_create_help_block_body">10×10マスごとの区切り線は、オン・オフに関わらず常に薄く表示されます。オンにすると各ブロックに色分けと番号が付き、タップすると未着手・作業中・完了の3段階で進捗を記録できます。</span></p>
+
+    </details>
+
+    <button class="modal-close-btn" onclick="replayTutorial()" style="margin-top:14px;" data-i18n="tutorial_replay_btn">チュートリアルをもう一度見る</button>
+    <button class="modal-close-btn" onclick="closeHelpModal()" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div class="art-tutorial-backdrop" id="artTutorialBackdrop" style="display:none;"></div>
+<div class="art-tutorial-highlight" id="artTutorialHighlight" style="display:none;"></div>
+<div class="art-tutorial-popup" id="artTutorialPopup" style="display:none;">
+  <div class="art-tutorial-step" id="artTutorialStepLabel"></div>
+  <div class="art-tutorial-text" id="artTutorialText"></div>
+  <div class="art-tutorial-actions">
+    <button class="art-tutorial-skip" id="artTutorialSkipBtn" data-i18n="tutorial_skip">スキップ</button>
+    <button class="art-tutorial-next" id="artTutorialNextBtn">次へ</button>
+  </div>
+</div>
+
+<div class="art-guide-overlay" id="artGuideOverlay" style="display:none;">
+  <div class="art-guide-block-flash" id="artGuideBlockFlash">
+    <span id="artGuideBlockFlashIcon"></span>
+    <span id="artGuideBlockFlashText"></span>
+  </div>
+  <div class="art-guide-topbar">
+    <div class="art-guide-progress-wrap">
+      <div class="art-guide-progress-label" id="artGuideProgressLabel"></div>
+      <div class="art-guide-progress-bar"><div class="art-guide-progress-fill" id="artGuideProgressFill"></div></div>
+      <div class="art-guide-estimate" id="artGuideEstimate"></div>
+    </div>
+    <button class="art-guide-zoom-btn" id="artGuideZoomBtn"></button>
+    <button class="art-guide-close-btn" id="artGuideCloseBtn" aria-label="close"></button>
+  </div>
+  <div class="art-guide-canvas-wrap">
+    <canvas id="artGuideCanvas"></canvas>
+  </div>
+  <div class="art-guide-instruction">
+    <div class="art-guide-color-chip" id="artGuideColorChip"></div>
+    <div class="art-guide-info">
+      <div class="art-guide-method-badges" id="artGuideMethodBadges"></div>
+      <div class="art-guide-detail" id="artGuideDetail"></div>
+    </div>
+  </div>
+  <div class="art-guide-controls">
+    <button class="art-guide-nav-btn" id="artGuidePrevBtn" data-i18n="art_paint_guide_prev">戻る</button>
+    <button class="art-guide-nav-btn art-guide-nav-btn-primary" id="artGuideNextBtn" data-i18n="art_paint_guide_next">次へ</button>
+  </div>
+</div>
+
+<div class="art-guide-complete-overlay" id="artGuideCompleteOverlay" style="display:none;">
+  <div class="art-guide-complete-box">
+    <div class="art-guide-complete-icon" id="artGuideCompleteIcon"></div>
+    <h3 data-i18n="art_guide_complete_title">ぬり終わりました！</h3>
+    <div class="art-guide-complete-stats">
+      <div class="art-guide-complete-stat">
+        <div class="art-guide-complete-stat-value" id="artGuideCompleteTime"></div>
+        <div class="art-guide-complete-stat-label" data-i18n="art_guide_complete_time_label">かかった時間</div>
+      </div>
+      <div class="art-guide-complete-stat">
+        <div class="art-guide-complete-stat-value" id="artGuideCompleteCells"></div>
+        <div class="art-guide-complete-stat-label" data-i18n="art_guide_complete_cells_label">塗ったマス数</div>
+      </div>
+    </div>
+    <div class="art-panel-btn-row">
+      <button class="art-header-btn" id="artGuideCompleteExportBtn" data-i18n="art_export_png">PNGで保存</button>
+      <button class="art-header-btn" id="artGuideCompleteShareBtn" data-i18n="art_share_code_generate">コードを発行する</button>
+    </div>
+    <button class="modal-close-btn" id="artGuideCompleteCloseBtn" data-i18n="art_close">閉じる</button>
+  </div>
+</div>
+
+<div id="artToast"></div>
+
+<script src="js/edge-swipe-guard.js"></script>
+<script src="js/nav-scroll.js"></script>
+<script src="js/scroll-hint.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/data-updates.js"></script>
+<script src="js/update-popup.js"></script>
+<script src="js/toast.js"></script>
+<script>
+
+document.getElementById("artConvertIcon").innerHTML = icon("upload", { size: 15 });
+document.getElementById("artFrameBackIcon").innerHTML = icon("chevronDown", { size: 14, className: "art-back-icon" });
+document.getElementById("helpBtn").innerHTML = icon("help");
+document.getElementById("artGuideBlockFlashIcon").innerHTML = icon("check", { size: 20 });
+document.getElementById("artGuideCompleteIcon").innerHTML = icon("trophy", { size: 40 });
+document.getElementById("artOfflineBannerIcon").innerHTML = icon("globe", { size: 18 });
+document.getElementById("artOfflineBannerCloseBtn").innerHTML = icon("close", { size: 14 });
+
+// 「ログイン不要・オフラインでも使える」バナー（初回のみ表示。閉じたら二度と出さない）
+const OFFLINE_BANNER_SEEN_KEY = "hatopiArt_offlineBannerSeen";
+if(!localStorage.getItem(OFFLINE_BANNER_SEEN_KEY)){
+  document.getElementById("artOfflineBanner").style.display = "flex";
+}
+document.getElementById("artOfflineBannerCloseBtn").addEventListener("click", () => {
+  localStorage.setItem(OFFLINE_BANNER_SEEN_KEY, "1");
+  document.getElementById("artOfflineBanner").style.display = "none";
+  // バナーが消えてキャンバス表示領域より上の高さが変わるため測り直す
+  if(typeof adjustMobileCanvasAreaHeight === "function") adjustMobileCanvasAreaHeight();
+});
+
+// ダークモード
+const darkToggle = document.getElementById("darkToggle");
+const savedDark = localStorage.getItem("darkMode");
+if(savedDark === "true"){
+  document.body.classList.add("dark");
+}else if(savedDark === null){
+  if(window.matchMedia("(prefers-color-scheme: dark)").matches){
+    document.body.classList.add("dark");
+  }
+}
+// html側にもクラスを反映（Safariでbodyの背景がスクロール全域に伸びきらない対策）
+document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+
+// 初回表示時もSafari再描画対策を行う（ページ遷移直後に背景が反映されない不具合対策）
+if(document.body.classList.contains("dark")) forceRepaint();
+
+function updateDarkBtn(){
+  darkToggle.innerHTML =
+    document.body.classList.contains("dark") ? icon("sun") : icon("moon");
+}
+updateDarkBtn();
+darkToggle.onclick = ()=>{
+  document.body.classList.toggle("dark");
+  document.documentElement.classList.toggle("dark", document.body.classList.contains("dark"));
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  updateDarkBtn();
+  forceRepaint();
+  if(typeof renderCanvas === "function") renderCanvas();
+};
+
+function forceRepaint(){
+  // Safari/iPad再描画バグ対策
+  document.body.style.display = "none";
+  document.body.offsetHeight;
+  document.body.style.display = "";
+}
+
+// 多言語ヘルパー
+function T(key, fallback, vars){
+  if(window.i18n && typeof window.i18n.isReady === "function" && window.i18n.isReady()){
+    return window.i18n.t(key, vars, fallback);
+  }
+  return fallback;
+}
+
+</script>
+<script src="js/art-config.js"></script>
+<script src="js/art-masks.js"></script>
+<script src="js/art-pixelate.js"></script>
+<script src="js/art-screenshot-recovery.js?v=2"></script>
+<script src="js/art-template-match.js"></script>
+<script src="js/lz-string.min.js"></script>
+<script src="js/qrcode.js"></script>
+<script src="js/art-share-code.js?v=2"></script>
+<script src="js/art-project.js?v=1"></script>
+<script src="js/art-3d-adapter.js?v=7"></script>
+<script src="js/art-editor.js?v=3"></script>
+<script src="js/art-paint-guide.js"></script>
+<script src="js/art-screenshot-import.js?v=3"></script>
+<script>
+</script>
+<script src="js/sw-register.js"></script>
+</body>
+</html>
