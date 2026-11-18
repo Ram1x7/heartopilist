@@ -1,7 +1,6 @@
 // js/profile-card-progress-page.js
 // 進捗確認ページ（星5・認証）専用スクリプト。
 // 旧プロフィールカードメーカー内にあった「詳細進捗」セクションを独立ページ化したもの。
-// プロフィールカードメーカー本体（card-maker.html／js/profile-card.js）とは別物で、
 // 依存するのは js/profile-card-progress.js の集計ロジックと各種data-*.jsのみ。
 
 (function () {
