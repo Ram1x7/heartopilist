@@ -1,9 +1,12 @@
 // 実績データ
 // hidden:true の実績は「隠し実績」。未達成の間は名前を???として表示する。
 // flavorText/flavorTextI18n は隠し実績の達成前から見えるヒント文（実際の達成条件はcondition側に別途持つ）。
+// img はゲーム内のバッジ画像を切り抜いたもの。未設定の場合は汎用のトロフィーアイコンで代替表示する
+// （hidden:trueの実績は、達成前の実物バッジ画像が入手できないため共通のロック画像を使う。achievements.html側で分岐）。
 const achievementsData = [
   {
     id: 1,
+    img: "./images/achievements/1.png",
     name: "不屈の心",
     nameI18n: {"ja":"不屈の心", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「釣り」がLv.10に到達する",
@@ -13,6 +16,7 @@ const achievementsData = [
   },
   {
     id: 2,
+    img: "./images/achievements/2.png",
     name: "秘境で釣る者",
     nameI18n: {"ja":"秘境で釣る者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "釣りクエストで秘密ステップが累計10回現れる。",
@@ -22,6 +26,7 @@ const achievementsData = [
   },
   {
     id: 3,
+    img: "./images/achievements/3.png",
     name: "漁獲の祝福",
     nameI18n: {"ja":"漁獲の祝福", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "釣りクエストで「魚群」が累計100回現れる。",
@@ -31,6 +36,7 @@ const achievementsData = [
   },
   {
     id: 4,
+    img: "./images/achievements/4.png",
     name: "力持ち",
     nameI18n: {"ja":"力持ち", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "100kg以上の魚を2回連続で釣り上げる。",
@@ -40,6 +46,7 @@ const achievementsData = [
   },
   {
     id: 5,
+    img: "./images/achievements/5.png",
     name: "双魚到来",
     nameI18n: {"ja":"双魚到来", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1分以内に星5の魚を2匹釣り上げる。",
@@ -49,6 +56,7 @@ const achievementsData = [
   },
   {
     id: 6,
+    img: "./images/achievements/6.png",
     name: "重量級漁獲機",
     nameI18n: {"ja":"重量級漁獲機", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "100kg以上の魚を累計50匹釣り上げる。",
@@ -58,6 +66,7 @@ const achievementsData = [
   },
   {
     id: 7,
+    img: "./images/achievements/7.png",
     name: "漂うサメの気配",
     nameI18n: {"ja":"漂うサメの気配", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の海釣りで、金色の魚影の中からサメを3匹釣り上げる。",
@@ -67,6 +76,7 @@ const achievementsData = [
   },
   {
     id: 8,
+    img: "./images/achievements/8.png",
     name: "潮を呼ぶ者",
     nameI18n: {"ja":"潮を呼ぶ者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の釣りクエストで「魚群」が3回現れる。",
@@ -76,6 +86,7 @@ const achievementsData = [
   },
   {
     id: 9,
+    img: "./images/achievements/9.png",
     name: "星明かりの漁師",
     nameI18n: {"ja":"星明かりの漁師", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の釣りクエストで星5の魚を4匹釣り上げる。",
@@ -85,6 +96,7 @@ const achievementsData = [
   },
   {
     id: 10,
+    img: "./images/achievements/10.png",
     name: "街の料理王",
     nameI18n: {"ja":"街の料理王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「クッキング」がLv.10に到達する",
@@ -94,6 +106,7 @@ const achievementsData = [
   },
   {
     id: 11,
+    img: "./images/achievements/11.png",
     name: "早くてうまい",
     nameI18n: {"ja":"早くてうまい", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "60秒以内に星5の食べ物を2つ作る。",
@@ -103,6 +116,7 @@ const achievementsData = [
   },
   {
     id: 12,
+    img: "./images/achievements/12.png",
     name: "園芸マスター",
     nameI18n: {"ja":"園芸マスター", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「園芸」がLv.10に到達する",
@@ -112,6 +126,7 @@ const achievementsData = [
   },
   {
     id: 13,
+    img: "./images/achievements/13.png",
     name: "大豊作",
     nameI18n: {"ja":"大豊作", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "豊作時に星5の農作物を収穫する",
@@ -121,6 +136,7 @@ const achievementsData = [
   },
   {
     id: 14,
+    img: "./images/achievements/14.png",
     name: "レインボーラック",
     nameI18n: {"ja":"レインボーラック", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の広範囲水やりで「レインボー育成祝福」が2回発動する",
@@ -130,6 +146,7 @@ const achievementsData = [
   },
   {
     id: 15,
+    img: "./images/achievements/15.png",
     name: "飼育マスター",
     nameI18n: {"ja":"飼育マスター", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「猫の飼育」がLv.10に到達する",
@@ -139,6 +156,7 @@ const achievementsData = [
   },
   {
     id: 16,
+    img: "./images/achievements/16.png",
     name: "ニャンコ食堂",
     nameI18n: {"ja":"ニャンコ食堂", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "累計5匹のネコに好きな食べ物をあげる。",
@@ -148,6 +166,7 @@ const achievementsData = [
   },
   {
     id: 17,
+    img: "./images/achievements/17.png",
     name: "ドッグトレーナーのエース",
     nameI18n: {"ja":"ドッグトレーナーのエース", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「犬の飼育」がLv.10に到達する",
@@ -157,6 +176,7 @@ const achievementsData = [
   },
   {
     id: 18,
+    img: "./images/achievements/18.png",
     name: "ワンコ食堂",
     nameI18n: {"ja":"ワンコ食堂", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "累計3匹のイヌに好きな食べ物をあげる。",
@@ -166,8 +186,9 @@ const achievementsData = [
   },
   {
     id: 19,
-    name: "虫の司令塔",
-    nameI18n: {"ja":"虫の司令塔", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    img: "./images/achievements/19.png",
+    name: "虫の司令官",
+    nameI18n: {"ja":"虫の司令官", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「虫捕り」がLv.10に到達する",
     conditionI18n: {"ja":"趣味「虫捕り」がLv.10に到達する", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     rewardTitle: "虫マスター",
@@ -175,6 +196,7 @@ const achievementsData = [
   },
   {
     id: 20,
+    img: "./images/achievements/20.png",
     name: "秘境の探索者",
     nameI18n: {"ja":"秘境の探索者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "虫捕りクエストで秘密ステップが累計10回現れる。",
@@ -184,6 +206,7 @@ const achievementsData = [
   },
   {
     id: 21,
+    img: "./images/achievements/21.png",
     name: "虫たちの指揮官",
     nameI18n: {"ja":"虫たちの指揮官", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "「虫大量発生」が累計100回起こる。",
@@ -193,6 +216,7 @@ const achievementsData = [
   },
   {
     id: 22,
+    img: "./images/achievements/22.png",
     name: "虫捕りマシン",
     nameI18n: {"ja":"虫捕りマシン", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の虫取りバブルで虫を3匹捕獲する",
@@ -202,6 +226,7 @@ const achievementsData = [
   },
   {
     id: 23,
+    img: "./images/achievements/23.png",
     name: "五虫到来",
     nameI18n: {"ja":"五虫到来", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の虫捕りクエストで星5の虫を5匹捕獲する",
@@ -211,6 +236,7 @@ const achievementsData = [
   },
   {
     id: 24,
+    img: "./images/achievements/24.png",
     name: "歩く虫寄せ装置",
     nameI18n: {"ja":"歩く虫寄せ装置", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回のクエストで「虫大量発生」が4回起こる。",
@@ -220,8 +246,9 @@ const achievementsData = [
   },
   {
     id: 25,
-    name: "鳥語に使い手",
-    nameI18n: {"ja":"鳥語に使い手", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    img: "./images/achievements/25.png",
+    name: "鳥語の使い手",
+    nameI18n: {"ja":"鳥語の使い手", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「野鳥観察」がLv.10に到達する",
     conditionI18n: {"ja":"趣味「野鳥観察」がLv.10に到達する", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     rewardTitle: "鳥語の使い手",
@@ -229,6 +256,7 @@ const achievementsData = [
   },
   {
     id: 26,
+    img: "./images/achievements/26.png",
     name: "雲間からのお客さん",
     nameI18n: {"ja":"雲間からのお客さん", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "野鳥観察クエストで秘密ステップが累計10回現れる。",
@@ -238,6 +266,7 @@ const achievementsData = [
   },
   {
     id: 27,
+    img: "./images/achievements/27.png",
     name: "風との共鳴",
     nameI18n: {"ja":"風との共鳴", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "野鳥観察で「鳥の大群」が累計100回現れる。",
@@ -247,6 +276,7 @@ const achievementsData = [
   },
   {
     id: 28,
+    img: "./images/achievements/28.png",
     name: "魂の熱唱",
     nameI18n: {"ja":"魂の熱唱", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の野鳥観察クエストで「鳥の大群」が3回現れる。",
@@ -256,6 +286,7 @@ const achievementsData = [
   },
   {
     id: 29,
+    img: "./images/achievements/29.png",
     name: "決定的瞬間",
     nameI18n: {"ja":"決定的瞬間", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の野鳥観察クエストで星5の情報カードを10枚獲得する。",
@@ -265,6 +296,7 @@ const achievementsData = [
   },
   {
     id: 30,
+    img: "./images/achievements/30.png",
     name: "砂像芸術家",
     nameI18n: {"ja":"砂像芸術家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「砂像作り」がLv.5に到達する",
@@ -274,6 +306,7 @@ const achievementsData = [
   },
   {
     id: 31,
+    img: "./images/achievements/31.png",
     name: "かぼちゃダルマ",
     nameI18n: {"ja":"かぼちゃダルマ", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「かぼちゃの彫刻」がLv.5に到達する",
@@ -283,6 +316,7 @@ const achievementsData = [
   },
   {
     id: 32,
+    img: "./images/achievements/32.png",
     name: "スノーキング",
     nameI18n: {"ja":"スノーキング", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「雪像」がLv.5に到達する",
@@ -292,6 +326,7 @@ const achievementsData = [
   },
   {
     id: 33,
+    img: "./images/achievements/33.png",
     name: "海洋清掃のプロ",
     nameI18n: {"ja":"海洋清掃のプロ", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "趣味「海洋清掃」がLv.10に到達する。",
@@ -301,6 +336,7 @@ const achievementsData = [
   },
   {
     id: 34,
+    img: "./images/achievements/34.png",
     name: "死角なし",
     nameI18n: {"ja":"死角なし", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "海洋清掃クエストで秘密ステップが累計10回現れる。",
@@ -310,6 +346,7 @@ const achievementsData = [
   },
   {
     id: 35,
+    img: "./images/achievements/35.png",
     name: "有資格者",
     nameI18n: {"ja":"有資格者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "海洋清掃クエストで、累計巨大汚染物の清掃に60回参加する。",
@@ -319,6 +356,7 @@ const achievementsData = [
   },
   {
     id: 36,
+    img: "./images/achievements/36.png",
     name: "生命満ちる海",
     nameI18n: {"ja":"生命満ちる海", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "任意の海底平頂山の生体魚群レベルが「生命満ちる海」に達する。",
@@ -328,6 +366,7 @@ const achievementsData = [
   },
   {
     id: 37,
+    img: "./images/achievements/37.png",
     name: "収集家",
     nameI18n: {"ja":"収集家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "収集レベルがプロに到達する",
@@ -337,6 +376,7 @@ const achievementsData = [
   },
   {
     id: 38,
+    img: "./images/achievements/38.png",
     name: "ロケットスポンサー",
     nameI18n: {"ja":"ロケットスポンサー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "コイン商人アルバート二世のところでアイテムを売却し、累計50万コインを獲得する",
@@ -346,6 +386,7 @@ const achievementsData = [
   },
   {
     id: 39,
+    img: "./images/achievements/39.png",
     name: "開拓者",
     nameI18n: {"ja":"開拓者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "開拓者レベルがLv.30に到達する",
@@ -355,6 +396,7 @@ const achievementsData = [
   },
   {
     id: 40,
+    img: "./images/achievements/40.png",
     name: "パズルの芸術家",
     nameI18n: {"ja":"パズルの芸術家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "マイドリーム「パズル」がパズルの芸術家に到達する",
@@ -364,6 +406,7 @@ const achievementsData = [
   },
   {
     id: 41,
+    img: "./images/achievements/41.png",
     name: "弛まぬ筆",
     nameI18n: {"ja":"弛まぬ筆", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "執筆のドリームが「文豪の筆」に到達する",
@@ -373,6 +416,7 @@ const achievementsData = [
   },
   {
     id: 42,
+    img: "./images/achievements/42.png",
     name: "「ミリオンセラー」",
     nameI18n: {"ja":"「ミリオンセラー」", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "音楽のドリームが「ゴールデンレコード」に到達する",
@@ -382,6 +426,7 @@ const achievementsData = [
   },
   {
     id: 43,
+    img: "./images/achievements/43.png",
     name: "動物の隣人",
     nameI18n: {"ja":"動物の隣人", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "8種類の動物の群れとの親密度がLv.10に到達する",
@@ -391,6 +436,7 @@ const achievementsData = [
   },
   {
     id: 44,
+    img: "./images/achievements/44.png",
     name: "スターダストコレクター",
     nameI18n: {"ja":"スターダストコレクター", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "スターメテオの欠片を60個採集する",
@@ -400,6 +446,7 @@ const achievementsData = [
   },
   {
     id: 45,
+    img: "./images/achievements/45.png",
     name: "動物飼育員",
     nameI18n: {"ja":"動物飼育員", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "8種類の動物の群れの好物を解放する",
@@ -409,6 +456,7 @@ const achievementsData = [
   },
   {
     id: 46,
+    img: "./images/achievements/46.png",
     name: "氷上の精霊",
     nameI18n: {"ja":"氷上の精霊", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "フィギュアスケートのドリームが「氷上の精霊」に到達する。",
@@ -418,6 +466,7 @@ const achievementsData = [
   },
   {
     id: 47,
+    img: "./images/achievements/47.png",
     name: "ビルダービー",
     nameI18n: {"ja":"ビルダービー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "建築祭に累計4回参加し、作品を展示フェーズまで進出させる。",
@@ -427,6 +476,7 @@ const achievementsData = [
   },
   {
     id: 48,
+    img: "./images/achievements/48.png",
     name: "サポートビー",
     nameI18n: {"ja":"サポートビー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "建築祭にて、「新鮮な若芽」を累計5000個蓄える。",
@@ -436,6 +486,7 @@ const achievementsData = [
   },
   {
     id: 49,
+    img: "./images/achievements/49.png",
     name: "アイデア王",
     nameI18n: {"ja":"アイデア王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "パーティークラフターのドリームが「アイデア王」に到達する。",
@@ -445,6 +496,7 @@ const achievementsData = [
   },
   {
     id: 50,
+    img: "./images/achievements/50.png",
     name: "パーティーマニア",
     nameI18n: {"ja":"パーティーマニア", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "パーティープレイヤーのドリームが「パーティーマニア」に到達する。",
@@ -454,6 +506,7 @@ const achievementsData = [
   },
   {
     id: 51,
+    img: "./images/achievements/51.png",
     name: "早撃ちのルーキー",
     nameI18n: {"ja":"早撃ちのルーキー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回のかくれんぼパーティーで、調査記者としてゲーム開始60秒以内に変形ゴーストを3体見つけた。",
@@ -463,6 +516,7 @@ const achievementsData = [
   },
   {
     id: 52,
+    img: "./images/achievements/52.png",
     name: "名手の第一歩",
     nameI18n: {"ja":"名手の第一歩", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回のかくれんぼパーティーで調査記者として2回連続で特殊映像の撮影に成功した。",
@@ -472,6 +526,7 @@ const achievementsData = [
   },
   {
     id: 53,
+    img: "./images/achievements/53.png",
     name: "一心同体",
     nameI18n: {"ja":"一心同体", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回のかくれんぼパーティーで、憑依した変形ゴーストが4分間調査記者に見つかることなく生き延びた。",
@@ -481,6 +536,7 @@ const achievementsData = [
   },
   {
     id: 54,
+    img: "./images/achievements/54.png",
     name: "大胆不敵",
     nameI18n: {"ja":"大胆不敵", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回のかくれんぼパーティーで、憑依した変形ゴーストがオーラバブルを20個破った。",
@@ -490,6 +546,7 @@ const achievementsData = [
   },
   {
     id: 55,
+    img: "./images/achievements/55.png",
     hidden: true,
     name: "変形ゴーストの家",
     nameI18n: {"ja":"変形ゴーストの家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -502,9 +559,10 @@ const achievementsData = [
   },
   {
     id: 56,
+    img: "./images/achievements/56.png",
     hidden: true,
-    name: "海の大量王",
-    nameI18n: {"ja":"海の大量王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    name: "海の大漁王",
+    nameI18n: {"ja":"海の大漁王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     flavorText: "ヴァンニアと釣り愛好家から尊敬されるだろう。",
     flavorTextI18n: {"ja":"ヴァンニアと釣り愛好家から尊敬されるだろう。", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "海釣り日常クエストの称号をすべて獲得する",
@@ -514,6 +572,7 @@ const achievementsData = [
   },
   {
     id: 57,
+    img: "./images/achievements/57.png",
     hidden: true,
     name: "グルメ外交官",
     nameI18n: {"ja":"グルメ外交官", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -526,6 +585,7 @@ const achievementsData = [
   },
   {
     id: 58,
+    img: "./images/achievements/58.png",
     hidden: true,
     name: "温泉山の虫捕り王",
     nameI18n: {"ja":"温泉山の虫捕り王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -538,6 +598,7 @@ const achievementsData = [
   },
   {
     id: 59,
+    img: "./images/achievements/59.png",
     hidden: true,
     name: "虫捕りパーティー",
     nameI18n: {"ja":"虫捕りパーティー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -550,6 +611,7 @@ const achievementsData = [
   },
   {
     id: 60,
+    img: "./images/achievements/60.png",
     hidden: true,
     name: "草むらおろし売り業者",
     nameI18n: {"ja":"草むらおろし売り業者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -562,6 +624,7 @@ const achievementsData = [
   },
   {
     id: 61,
+    img: "./images/achievements/61.png",
     hidden: true,
     name: "虹花ボランティア",
     nameI18n: {"ja":"虹花ボランティア", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -574,6 +637,7 @@ const achievementsData = [
   },
   {
     id: 62,
+    img: "./images/achievements/62.png",
     hidden: true,
     name: "修理のプロ",
     nameI18n: {"ja":"修理のプロ", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -586,6 +650,7 @@ const achievementsData = [
   },
   {
     id: 63,
+    img: "./images/achievements/63.png",
     hidden: true,
     name: "人気スター",
     nameI18n: {"ja":"人気スター", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -598,6 +663,7 @@ const achievementsData = [
   },
   {
     id: 64,
+    img: "./images/achievements/64.png",
     hidden: true,
     name: "温泉の友",
     nameI18n: {"ja":"温泉の友", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -610,6 +676,7 @@ const achievementsData = [
   },
   {
     id: 65,
+    img: "./images/achievements/65.png",
     hidden: true,
     name: "流れ星の下の友情",
     nameI18n: {"ja":"流れ星の下の友情", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -622,6 +689,7 @@ const achievementsData = [
   },
   {
     id: 66,
+    img: "./images/achievements/66.png",
     hidden: true,
     name: "ベストセラー作家",
     nameI18n: {"ja":"ベストセラー作家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -634,6 +702,7 @@ const achievementsData = [
   },
   {
     id: 67,
+    img: "./images/achievements/67.png",
     hidden: true,
     name: "大文豪",
     nameI18n: {"ja":"大文豪", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -646,6 +715,7 @@ const achievementsData = [
   },
   {
     id: 68,
+    img: "./images/achievements/68.png",
     hidden: true,
     name: "書籍収集家",
     nameI18n: {"ja":"書籍収集家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -673,6 +743,7 @@ const achievementsData = [
   },
   {
     id: 69,
+    img: "./images/achievements/69.png",
     hidden: true,
     name: "ロマンアイスフレンド",
     nameI18n: {"ja":"ロマンアイスフレンド", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -685,6 +756,7 @@ const achievementsData = [
   },
   {
     id: 70,
+    img: "./images/achievements/70.png",
     hidden: true,
     name: "リーダービー",
     nameI18n: {"ja":"リーダービー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -697,6 +769,7 @@ const achievementsData = [
   },
   {
     id: 71,
+    img: "./images/achievements/71.png",
     hidden: true,
     name: "大掃除を極めし者",
     nameI18n: {"ja":"大掃除を極めし者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -709,6 +782,7 @@ const achievementsData = [
   },
   {
     id: 72,
+    img: "./images/achievements/72.png",
     hidden: true,
     name: "大空に想いを馳せて",
     nameI18n: {"ja":"大空に想いを馳せて", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -721,6 +795,7 @@ const achievementsData = [
   },
   {
     id: 73,
+    img: "./images/achievements/73.png",
     hidden: true,
     name: "風に乗って",
     nameI18n: {"ja":"風に乗って", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -730,5 +805,15 @@ const achievementsData = [
     conditionI18n: null,
     rewardTitle: "イースターエッグ",
     rewardTitleI18n: {"ja":"イースターエッグ", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+  },
+  {
+    id: 74,
+    img: "./images/achievements/74.png",
+    name: "とことん踊る",
+    nameI18n: {"ja":"とことん踊る", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    condition: "ダンスのドリームがLv.5に到達する",
+    conditionI18n: {"ja":"ダンスのドリームがLv.5に到達する", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    rewardTitle: "ダンサー",
+    rewardTitleI18n: {"ja":"ダンサー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
   },
 ];
