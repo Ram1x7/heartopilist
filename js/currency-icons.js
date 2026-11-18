@@ -6,6 +6,7 @@ const CURRENCY_ICON_SRC = {
   coin: "images/currency/coin.png",
   negaiboshi: "images/currency/negaiboshi.png",
   fescoin: "images/currency/fescoin.png",
+  trendcoin: "images/currency/trendcoin.png",
   azuki: "images/currency/azuki.png",
   chef_salad: "images/currency/chef_salad.png",
   coffee_mame: "images/currency/coffee_mame.png",

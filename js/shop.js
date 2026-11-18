@@ -224,8 +224,8 @@ function createShopCard(item){
   // フェスコインはフェス(シーズン)ごとにデザインが変わるため、
   // shopSeasonsのfescoinIconで指定されたアイコンを使う（未指定は汎用アイコンにフォールバック）
   const fesIconKey = (typeof shopSeasons !== "undefined" && shopSeasons[item.season] && shopSeasons[item.season].fescoinIcon) || "fescoin";
-  const currencyIconHTML = isFesCurrency && typeof currencyIcon === "function"
-    ? currencyIcon(fesIconKey)
+  const currencyIconHTML = typeof currencyIcon === "function"
+    ? currencyIcon(isFesCurrency ? fesIconKey : "trendcoin")
     : icon("coin",{size:11});
   // フェスコインはアイコンで通貨が分かるため、数字のみ表示する
   const currencyLabel = isFesCurrency ? "" : T("shop_currency","トレンドコイン");
