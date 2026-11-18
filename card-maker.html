@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="はとぴ図鑑">
 <link rel="icon" type="image/png" href="./images/favicon.png?v=1">
@@ -10,11 +10,11 @@
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#3c5a6e">
 <title>プロフィールカードメーカー｜はとぴ図鑑</title>
-<meta name="description" content="Heartopia（ハートピアスローライフ）の図鑑・料理・園芸・実績の進捗から、SNSでシェアできるプロフィールカードを作成できます。">
+<meta name="description" content="Heartopia（ハートピアスローライフ）のプレイヤー名や好きな遊び方、アバターを入れて、SNSでシェアできる自己紹介カードを作成できます。">
 
 <!-- OGP -->
 <meta property="og:title" content="はとぴ図鑑 | プロフィールカードメーカー">
-<meta property="og:description" content="図鑑・料理・園芸・実績の進捗から、SNSでシェアできるプロフィールカードを作成できます。">
+<meta property="og:description" content="プレイヤー名や好きな遊び方、アバターを入れて、SNSでシェアできる自己紹介カードを作成できます。">
 <meta property="og:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 <meta property="og:url" content="https://ram1x7.github.io/heartopilist/card-maker.html">
 <meta property="og:type" content="website">
@@ -23,13 +23,13 @@
 <!-- X(Twitter) -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="はとぴ図鑑 | プロフィールカードメーカー">
-<meta name="twitter:description" content="図鑑・料理・園芸・実績の進捗から、SNSでシェアできるプロフィールカードを作成できます。">
+<meta name="twitter:description" content="プレイヤー名や好きな遊び方、アバターを入れて、SNSでシェアできる自己紹介カードを作成できます。">
 <meta name="twitter:image" content="https://github.com/Ram1x7/heartopilist/blob/main/images/OGP.jpg?raw=true">
 
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./css/style.css?v=42">
-<link rel="stylesheet" href="./css/design-system.css?v=4">
-<link rel="stylesheet" href="./css/profile-card.css?v=3">
+<link rel="stylesheet" href="./css/design-system.css?v=5">
+<link rel="stylesheet" href="./css/profile-card.css?v=4">
 
 <link rel="prefetch" href="./index.html">
 <link rel="prefetch" href="./foods.html">
@@ -60,6 +60,7 @@
   <a href="./foods.html" class="site-nav-item" data-i18n="nav_food">料理</a>
   <a href="./garden.html" class="site-nav-item" data-i18n="nav_garden">園芸</a>
   <a href="./map.html" class="site-nav-item" data-i18n="nav_map">マップ</a>
+  <a href="./card-maker.html" class="site-nav-item active" data-i18n="nav_profile_card" aria-current="page">カード</a>
   <a href="./pet.html" class="site-nav-item" data-i18n="nav_pet">ペット</a>
   <a href="./achievements.html" class="site-nav-item" data-i18n="nav_achievement">実績</a>
   <a href="./order-trend.html" class="site-nav-item" data-i18n="nav_order_trend">オーダー</a>
@@ -77,19 +78,20 @@
   <h2 data-i18n="pc_page_title">プロフィールカードメーカー</h2>
 </div>
 <div class="pc-disclaimer" data-i18n="pc_disclaimer">※このプロフィールカードメーカーは非公式ファンツールです。入力内容とアバター画像はすべて端末内（このブラウザ）にのみ保存され、外部へ送信されることはありません。</div>
-<div class="pc-paused-notice" data-i18n="pc_card_maker_paused_notice">※現在カード作成機能は一時的に非公開にしています。再開まで今しばらくお待ちください。</div>
-
-<!-- プロフィールカード作成機能：一旦非公開（準備が整い次第再開予定）。コードは温存し、CSSで非表示にしているだけ -->
-<div id="pcCardMakerWrap" hidden>
+<main>
 <div class="pc-layout">
   <div class="pc-preview-col">
     <div class="pc-preview-wrap">
       <div class="pc-preview-canvas-area">
-        <canvas id="pcPreviewCanvas" width="1672" height="941" role="img" aria-label="プロフィールカードのプレビュー"></canvas>
-        <div class="pc-preview-loading" id="pcPreviewLoading">画像を読み込み中…</div>
+        <canvas id="pcPreviewCanvas" width="1600" height="1000" role="img" aria-label="プロフィールカードのプレビュー" data-i18n-aria-label="pc_preview_label"></canvas>
+        <div class="pc-preview-loading" id="pcPreviewLoading" data-i18n="pc_preview_loading">プレビューを準備中…</div>
       </div>
-      <div class="pc-preview-error" id="pcPreviewError" hidden></div>
+      <div class="pc-preview-error" id="pcPreviewError" role="alert" hidden></div>
 
+      <div class="pc-layout-toggle-row" role="group" aria-label="カードの種類" data-i18n-aria-label="pc_card_type">
+        <button type="button" class="ds-tab ds-tab-grow" id="pcModeIntro" data-i18n="pc_mode_intro">自己紹介</button>
+        <button type="button" class="ds-tab ds-tab-grow" id="pcModeProgress" data-i18n="pc_mode_progress">図鑑進捗つき</button>
+      </div>
       <div class="pc-layout-toggle-row" role="group" aria-label="レイアウト切り替え">
         <button type="button" class="ds-tab ds-tab-grow" id="pcLayoutLandscape" data-i18n="pc_layout_landscape">横型</button>
         <button type="button" class="ds-tab ds-tab-grow" id="pcLayoutPortrait" data-i18n="pc_layout_portrait">縦型</button>
@@ -98,8 +100,8 @@
       <div class="pc-theme-row" role="group" aria-label="テーマ切り替え" id="pcThemeRow"></div>
 
       <div class="pc-actions-row">
-        <button type="button" class="ds-btn ds-btn-primary" id="pcSaveBtn" data-i18n="pc_save_png">PNGを保存</button>
-        <button type="button" class="ds-btn ds-btn-secondary" id="pcShareBtn" data-i18n="pc_share_sns">SNSへ共有</button>
+        <button type="button" class="ds-btn ds-btn-primary" id="pcSaveBtn" disabled data-i18n="pc_save_png">PNGを保存</button>
+        <button type="button" class="ds-btn ds-btn-secondary" id="pcShareBtn" disabled data-i18n="pc_share_sns">SNSへ共有</button>
       </div>
       <div aria-live="polite" class="pc-char-count" id="pcActionStatus"></div>
     </div>
@@ -121,7 +123,7 @@
         </div>
         <div class="pc-field">
           <label for="pcLevel" data-i18n="pc_field_level">開拓者レベル</label>
-          <input type="number" id="pcLevel" min="1" max="999" value="1">
+          <input type="number" id="pcLevel" min="1" max="999" step="1">
         </div>
         <div class="pc-field">
           <label for="pcServer" data-i18n="pc_field_server">サーバー</label>
@@ -130,6 +132,19 @@
         <div class="pc-field">
           <label for="pcActivityTime" data-i18n="pc_field_activity">主な活動時間</label>
           <input type="text" id="pcActivityTime" maxlength="20" data-i18n-placeholder="pc_field_activity_placeholder" placeholder="例：平日夜・週末">
+        </div>
+        <div class="pc-field" data-intro-only>
+          <label for="pcWeekendTime" data-i18n="pc_field_weekend">休日の活動時間</label>
+          <input type="text" id="pcWeekendTime" maxlength="20" data-i18n-placeholder="pc_field_weekend_placeholder" placeholder="例：土日の午後">
+        </div>
+        <div class="pc-field" data-intro-only>
+          <label for="pcFriends" data-i18n="pc_field_friends">フレンド募集</label>
+          <select id="pcFriends">
+            <option value="" data-i18n="pc_friends_hidden">表示しない</option>
+            <option value="open" data-i18n="pc_friends_open">募集中</option>
+            <option value="ask" data-i18n="pc_friends_ask">ひと声かけてから</option>
+            <option value="closed" data-i18n="pc_friends_closed">現在は募集していません</option>
+          </select>
         </div>
         <div class="pc-field">
           <label for="pcSnsX" data-i18n="pc_field_sns_x">Xのユーザー名</label>
@@ -160,13 +175,13 @@
             <input type="range" id="pcAvatarZoom" min="1" max="3" step="0.01" value="1" aria-label="拡大縮小">
           </div>
           <div class="pc-avatar-buttons">
-            <label class="ds-btn ds-btn-secondary" for="pcAvatarInput" style="cursor:pointer;" data-i18n="pc_avatar_change">画像を選ぶ</label>
+            <button type="button" class="ds-btn ds-btn-secondary" id="pcAvatarChoose" data-i18n="pc_avatar_change">画像を選ぶ</button>
             <input type="file" id="pcAvatarInput" accept="image/png,image/jpeg,image/webp" hidden>
             <button type="button" class="ds-btn ds-btn-secondary" id="pcAvatarRecenter" data-i18n="pc_avatar_recenter">中央へ戻す</button>
             <button type="button" class="ds-btn ds-btn-danger" id="pcAvatarDelete" data-i18n="pc_avatar_delete">削除</button>
           </div>
           <div class="pc-avatar-hint" data-i18n="pc_avatar_hint">ドラッグ（スマホはタッチ）で位置を調整できます</div>
-          <div class="pc-preview-error" id="pcAvatarError" hidden></div>
+          <div class="pc-preview-error" id="pcAvatarError" role="alert" hidden></div>
         </div>
       </div>
     </section>
@@ -196,7 +211,7 @@
     </section>
 
     <!-- 4. 図鑑進捗 -->
-    <section class="pc-section" id="pcSectionProgress">
+    <section class="pc-section" id="pcSectionProgress" hidden>
       <button type="button" class="pc-section-head"><span data-i18n="pc_section_progress">図鑑進捗</span><span class="pc-chevron">▾</span></button>
       <div class="pc-section-body">
         <div class="pc-field">
@@ -236,14 +251,14 @@
     <section class="pc-section" id="pcSectionSave">
       <button type="button" class="pc-section-head"><span data-i18n="pc_section_save">保存・共有</span><span class="pc-chevron">▾</span></button>
       <div class="pc-section-body">
-        <p style="font-size:12px; color:var(--text-sub); margin:0;" data-i18n="pc_save_hint">入力内容はこの端末に自動保存されます。プレビュー右上のボタンからPNG保存・SNS共有ができます。</p>
+        <p style="font-size:12px; color:var(--text-sub); margin:0;" data-i18n="pc_save_hint">入力内容はこの端末に自動保存されます。プレビュー下のボタンからPNG保存・SNS共有ができます。</p>
         <button type="button" class="ds-btn ds-btn-danger" id="pcResetBtn" data-i18n="pc_reset_all">入力内容を初期化</button>
       </div>
     </section>
 
   </div>
 </div>
-</div>
+</main>
 
 <script src="js/edge-swipe-guard.js"></script>
 <script src="js/nav-scroll.js"></script>
@@ -265,6 +280,7 @@
 <script src="js/profile-card-storage.js"></script>
 <script src="js/profile-card-progress.js"></script>
 <script src="js/profile-card-renderer.js"></script>
+<script src="js/profile-card-intro.js"></script>
 <script src="js/profile-card.js"></script>
 <script src="js/sw-register.js"></script>
 </body>

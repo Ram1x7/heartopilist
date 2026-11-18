@@ -26,18 +26,7 @@ body.dark .pc-page-header h2{ color:var(--dark-accent); }
 }
 body.dark .pc-disclaimer{ color:var(--dark-text-sub); }
 
-.pc-paused-notice{
-  text-align:center;
-  font-size:12px;
-  font-weight:bold;
-  color:var(--indigo);
-  background:var(--indigo-soft);
-  border-radius:10px;
-  padding:8px 12px;
-  max-width:1200px;
-  margin:0 auto 16px;
-}
-body.dark .pc-paused-notice{ color:var(--dark-accent); background:var(--dark-card-alt); }
+.pc-form-col [hidden]{ display:none; }
 
 .pc-layout{
   display:flex;
@@ -84,7 +73,7 @@ body.dark .pc-preview-wrap{ background:var(--dark-card); border-color:var(--dark
   max-width:100%;
   height:auto;
   border-radius:8px;
-  touch-action:none; /* アバターのドラッグ操作をブラウザのスクロール・ズームと競合させない */
+  touch-action:pan-y pinch-zoom;
   cursor:grab;
 }
 #pcPreviewCanvas:active{ cursor:grabbing; }
@@ -189,7 +178,7 @@ body.dark .pc-field label{ color:var(--dark-text-sub); }
 .pc-field select,
 .pc-field textarea{
   font-family:inherit;
-  font-size:15px; /* iOSでの自動ズームを防ぐため16px未満は避ける（実測15pxで確認済みのフォントとの兼ね合いのため16pxを推奨） */
+  font-size:16px;
   padding:9px 10px;
   border-radius:10px;
   border:1px solid var(--border);
@@ -395,3 +384,7 @@ body.dark .pc-avatar-hint{ color:var(--dark-text-sub); }
 @media (max-width:520px){
   .pc-category-grid{ grid-template-columns:1fr; }
 }
+
+/* 縦型プレビューがフォームより先に画面を埋めないようにする。 */
+#pcPreviewCanvas{ max-height:min(58vh, 700px); object-fit:contain; width:auto; }
+.pc-preview-col{ min-width:0; }

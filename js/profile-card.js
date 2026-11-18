@@ -30,19 +30,31 @@
     forceRepaint();
   };
 
-  const PLAY_STYLE_PRESETS = ["まったり", "建築メイン", "収集メイン", "釣り好き", "園芸好き", "料理好き", "写真好き", "交流好き", "夜更かし", "初心者"];
-  const TAG_PRESETS = ["まったり", "建築メイン", "収集メイン", "釣り好き", "園芸好き", "料理好き", "写真好き", "交流好き", "夜更かし", "初心者"];
+  const PRESET_KEYS = {
+    "まったり": "relaxed", "建築メイン": "build", "収集メイン": "collect",
+    "釣り好き": "fish", "園芸好き": "garden", "料理好き": "cook",
+    "写真好き": "photo", "交流好き": "social", "夜更かし": "night", "初心者": "new",
+    "虫捕り": "bugs", "野鳥観察": "birds", "ペット": "pets", "アート": "art",
+  };
+  const PLAY_STYLE_PRESETS = Object.keys(PRESET_KEYS).slice(0, 10);
+  const TAG_PRESETS = Object.keys(PRESET_KEYS);
+  const translate = (key, fallback, vars) => i18n.t(key, vars, fallback);
+  const translatePreset = label => Object.hasOwn(PRESET_KEYS, label)
+    ? translate(`pc_preset_${PRESET_KEYS[label]}`, label)
+    : label;
   const MAX_TAGS = 5;
 
   let state = loadProfileCardState();
   let avatarImg = null;       // 現在表示中のアバターHTMLImageElement（Object URL）
   let avatarObjectUrl = null;
+  let avatarTask;
   let mascotImg = new Image();
   mascotImg.src = "./apple-touch-icon.png?v=10";
   let bgImgCache = new Map(); // key: `${theme}_${layout}` -> Promise<HTMLImageElement>
   let medalFrameImgCache = new Map(); // key: theme -> Promise<HTMLImageElement>（横型・縦型で共通）
   let profilePartsImgCache = new Map(); // key: theme -> Promise<{avatarFrame,infoId,infoLevel,infoStyle,tagFrame: HTMLImageElement}>
   let renderPending = false;
+  let renderRevision = 0;
   let renderRaf = null;
 
   const canvas = document.getElementById("pcPreviewCanvas");
@@ -50,6 +62,14 @@
   const loadingEl = document.getElementById("pcPreviewLoading");
   const errorEl = document.getElementById("pcPreviewError");
   const actionStatusEl = document.getElementById("pcActionStatus");
+  const saveBtn = document.getElementById("pcSaveBtn");
+  const shareBtn = document.getElementById("pcShareBtn");
+  const currentLayouts = () => state.mode === "progress" ? PROFILE_CARD_LAYOUTS : PROFILE_CARD_INTRO_LAYOUTS;
+
+  function setExportEnabled(enabled) {
+    saveBtn.disabled = !enabled;
+    shareBtn.disabled = !enabled;
+  }
 
   function showPreviewError(msg) {
     errorEl.textContent = msg;
@@ -232,40 +252,48 @@
   // 再描画（フォント読み込み・背景画像読み込みを待ってから描画する）
   // ============================================================
   function scheduleRender() {
-    if (renderRaf) cancelAnimationFrame(renderRaf);
+    renderRevision++;
+    setExportEnabled(false);
+    if (renderPending || renderRaf !== null) return;
     renderRaf = requestAnimationFrame(() => { renderRaf = null; renderNow(); });
   }
 
   async function renderNow() {
     if (renderPending) return;
     renderPending = true;
+    const revision = renderRevision;
+    const layout = currentLayouts()[state.layout];
+    const { mode, theme, layout: layoutKey } = state;
+    let rendered = false;
     loadingEl.hidden = false;
     clearPreviewError();
     try {
-      try { await loadMedalDigitFont(); } catch (e) { /* フォールバックフォントで続行 */ }
-      try { await loadAchievementValueFont(); } catch (e) { /* フォールバックフォントで続行 */ }
-      try { await loadCategoryCountFont(); } catch (e) { /* フォールバックフォントで続行 */ }
-      try { await loadShipporiMinchoFonts(); } catch (e) { /* フォールバックフォントで続行 */ }
-      try { await document.fonts.ready; } catch (e) { /* Safari等で失敗しても続行 */ }
-      const layout = PROFILE_CARD_LAYOUTS[state.layout];
-      canvas.width = layout.width;
-      canvas.height = layout.height;
-
-      let bgImg;
-      try {
-        bgImg = await getThemeBackgroundImage(state.theme, state.layout);
-      } catch (e) {
-        showPreviewError(`背景画像を読み込めませんでした（${e.message}）。ファイルの配置をご確認ください。`);
-        loadingEl.hidden = true;
-        renderPending = false;
+      if (mode === "intro") {
+        try {
+          await document.fonts.ready;
+        } catch (e) { /* フォールバックフォントで続行 */ }
+        if (revision !== renderRevision) return;
+        canvas.width = layout.width;
+        canvas.height = layout.height;
+        renderIntroCard(ctx, state, { avatarImg, mascotImg }, translate, translatePreset);
+        rendered = true;
         return;
       }
+
+      const [bgImg] = await Promise.all([
+        getThemeBackgroundImage(theme, layoutKey),
+        loadMedalDigitFont(),
+        loadAchievementValueFont(),
+        loadCategoryCountFont(),
+        loadShipporiMinchoFonts(),
+      ]);
+      await document.fonts.ready;
 
       // メダル枠画像は補助アセットのため、読み込みに失敗してもカード全体は表示する
       // （renderer側にCanvas手描画のフォールバックがある）
       let medalFrameImg = null;
       try {
-        medalFrameImg = await getThemeMedalFrameImage(state.theme);
+        medalFrameImg = await getThemeMedalFrameImage(theme);
       } catch (e) {
         console.warn("[profile-card] メダル枠画像を読み込めませんでした。手描画にフォールバックします", e);
       }
@@ -274,7 +302,7 @@
       // 読み込み失敗時はnullのままrendererへ渡し、Canvas手描きフォールバックを使わせる
       let profileParts = null;
       try {
-        profileParts = await getThemeProfilePartsImages(state.theme);
+        profileParts = await getThemeProfilePartsImages(theme);
       } catch (e) {
         console.warn("[profile-card] プロフィールパーツ画像を読み込めませんでした。手描画にフォールバックします", e);
       }
@@ -298,13 +326,22 @@
         console.warn("[profile-card] ブランドロゴ画像を読み込めませんでした。手描画にフォールバックします", e);
       }
 
+      if (revision !== renderRevision) return;
+      canvas.width = layout.width;
+      canvas.height = layout.height;
       const stats = computeProfileCardStats();
       renderProfileCard(ctx, state, { bgImg, avatarImg, mascotImg, medalFrameImg, profileParts, categoryImages, brandLogoImg }, stats);
+      rendered = true;
     } catch (e) {
-      showPreviewError("カードの描画中にエラーが発生しました。" + (e && e.message ? e.message : ""));
+      if (revision === renderRevision) {
+        showPreviewError(translate("pc_render_failed", "カードを描画できませんでした。"));
+        console.error(e);
+      }
     } finally {
       loadingEl.hidden = true;
       renderPending = false;
+      if (revision !== renderRevision) scheduleRender();
+      else setExportEnabled(rendered);
     }
   }
 
@@ -317,9 +354,9 @@
 
   function bindText(id, key, opts = {}) {
     const el = document.getElementById(id);
-    el.value = state[key] || (opts.isNumber ? 1 : "");
+    el.value = state[key] ?? "";
     el.addEventListener("input", () => {
-      state[key] = opts.isNumber ? (parseInt(el.value, 10) || 1) : el.value;
+      state[key] = opts.isNumber ? (el.value && el.validity.valid ? el.valueAsNumber : "") : el.value;
       persist();
       scheduleRender();
     });
@@ -329,6 +366,8 @@
   bindText("pcLevel", "level", { isNumber: true });
   bindText("pcServer", "server");
   bindText("pcActivityTime", "activityTime");
+  bindText("pcWeekendTime", "weekendTime");
+  bindText("pcFriends", "friends");
   bindText("pcSnsX", "snsX");
   bindText("pcSnsTiktok", "snsTiktok");
   bindText("pcSnsYoutube", "snsYoutube");
@@ -376,7 +415,7 @@
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "pc-tag-chip";
-    btn.textContent = label;
+    btn.dataset.preset = label;
     btn.setAttribute("aria-pressed", "false");
     btn.addEventListener("click", () => {
       state.playStyle = state.playStyle === label ? "" : label;
@@ -388,7 +427,8 @@
   });
   function renderPlayStyleRow() {
     [...playStyleRow.children].forEach(btn => {
-      const active = btn.textContent === state.playStyle;
+      btn.textContent = translatePreset(btn.dataset.preset);
+      const active = btn.dataset.preset === state.playStyle;
       btn.classList.toggle("active", active);
       btn.setAttribute("aria-pressed", String(active));
     });
@@ -404,7 +444,7 @@
       const btn = document.createElement("button");
       btn.type = "button";
       btn.className = "pc-tag-chip";
-      btn.textContent = label;
+      btn.textContent = translatePreset(label);
       const active = state.tags.includes(label);
       btn.classList.toggle("active", active);
       btn.setAttribute("aria-pressed", String(active));
@@ -413,7 +453,7 @@
           state.tags = state.tags.filter(t => t !== label);
         } else {
           if (state.tags.length >= MAX_TAGS) {
-            showToastIfAvailable(`タグは最大${MAX_TAGS}個までです`);
+            showToastIfAvailable(translate("pc_tag_limit", "タグは最大{max}個までです", { max: MAX_TAGS }));
             return;
           }
           state.tags = [...state.tags, label];
@@ -438,7 +478,7 @@
     if (!v) return;
     if (state.tags.includes(v)) { tagCustomInput.value = ""; return; }
     if (state.tags.length >= MAX_TAGS) {
-      showToastIfAvailable(`タグは最大${MAX_TAGS}個までです`);
+      showToastIfAvailable(translate("pc_tag_limit", "タグは最大{max}個までです", { max: MAX_TAGS }));
       return;
     }
     state.tags = [...state.tags, v];
@@ -495,12 +535,41 @@
   renderCategorySelects();
 
   // ── レイアウト・テーマ ──
+  const modeButtons = {
+    intro: document.getElementById("pcModeIntro"),
+    progress: document.getElementById("pcModeProgress"),
+  };
+  function renderMode() {
+    for (const [mode, button] of Object.entries(modeButtons)) {
+      const active = state.mode === mode;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    }
+    document.getElementById("pcSectionProgress").hidden = state.mode !== "progress";
+    document.querySelectorAll("[data-intro-only]").forEach(el => {
+      el.hidden = state.mode !== "intro";
+    });
+  }
+  for (const [mode, button] of Object.entries(modeButtons)) {
+    button.addEventListener("click", () => {
+      state.mode = mode;
+      renderMode();
+      persist();
+      scheduleRender();
+    });
+  }
+  renderMode();
+
   const layoutBtns = {
     landscape: document.getElementById("pcLayoutLandscape"),
     portrait: document.getElementById("pcLayoutPortrait"),
   };
   function renderLayoutButtons() {
-    Object.entries(layoutBtns).forEach(([key, btn]) => btn.classList.toggle("active", state.layout === key));
+    Object.entries(layoutBtns).forEach(([key, btn]) => {
+      const active = state.layout === key;
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
   }
   layoutBtns.landscape.addEventListener("click", () => { state.layout = "landscape"; renderLayoutButtons(); persist(); scheduleRender(); });
   layoutBtns.portrait.addEventListener("click", () => { state.layout = "portrait"; renderLayoutButtons(); persist(); scheduleRender(); });
@@ -519,7 +588,11 @@
     themeRow.appendChild(btn);
   });
   function renderThemeRow() {
-    [...themeRow.children].forEach((btn, i) => btn.classList.toggle("active", PROFILE_CARD_THEME_IDS[i] === state.theme));
+    [...themeRow.children].forEach((btn, i) => {
+      const active = PROFILE_CARD_THEME_IDS[i] === state.theme;
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", String(active));
+    });
   }
   renderThemeRow();
 
@@ -601,7 +674,7 @@
     scheduleRender();
   });
 
-  document.getElementById("pcAvatarDelete").addEventListener("click", async () => {
+  async function removeAvatar() {
     avatarImg = null;
     if (avatarObjectUrl) { URL.revokeObjectURL(avatarObjectUrl); avatarObjectUrl = null; }
     state.avatar = { offsetX: 0.5, offsetY: 0.5, zoom: 1 };
@@ -610,24 +683,29 @@
     renderAvatarStage();
     persist();
     scheduleRender();
+  }
+  document.getElementById("pcAvatarDelete").addEventListener("click", () => {
+    avatarTask = avatarTask.then(removeAvatar);
   });
 
   const MAX_AVATAR_DIMENSION = 1600;
   const MAX_AVATAR_FILE_BYTES = 15 * 1024 * 1024; // 15MB（縮小前の入力上限。ここより大きい画像処理は端末負荷が大きいため事前に断る）
 
   async function downscaleImageFile(file) {
-    const bitmap = await createImageBitmap(file).catch(() => null);
-    if (!bitmap) throw new Error("画像を読み込めませんでした");
-    const scale = Math.min(1, MAX_AVATAR_DIMENSION / Math.max(bitmap.width, bitmap.height));
-    const w = Math.round(bitmap.width * scale), h = Math.round(bitmap.height * scale);
-    const off = document.createElement("canvas");
-    off.width = w; off.height = h;
-    const octx = off.getContext("2d");
-    octx.drawImage(bitmap, 0, 0, w, h);
-    bitmap.close && bitmap.close();
-    return new Promise((resolve, reject) => {
-      off.toBlob(blob => blob ? resolve(blob) : reject(new Error("画像の変換に失敗しました")), "image/png", 0.92);
-    });
+    const url = URL.createObjectURL(file);
+    try {
+      const image = await loadImg(url);
+      const scale = Math.min(1, MAX_AVATAR_DIMENSION / Math.max(image.naturalWidth, image.naturalHeight));
+      const off = document.createElement("canvas");
+      off.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      off.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      off.getContext("2d").drawImage(image, 0, 0, off.width, off.height);
+      return await new Promise((resolve, reject) => {
+        off.toBlob(blob => blob ? resolve(blob) : reject(new Error("画像の変換に失敗しました")), "image/png");
+      });
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   async function handleAvatarFile(file) {
@@ -663,9 +741,11 @@
     if (avatarObjectUrl) URL.revokeObjectURL(avatarObjectUrl);
     avatarObjectUrl = URL.createObjectURL(blob);
     const img = new Image();
+    const url = avatarObjectUrl;
     img.onload = () => {
+      if (url !== avatarObjectUrl) return;
       avatarImg = img;
-      avatarImgEl.src = avatarObjectUrl;
+      avatarImgEl.src = url;
       clampAvatarOffsets();
       renderAvatarStage();
       scheduleRender();
@@ -676,9 +756,10 @@
     img.src = avatarObjectUrl;
   }
 
+  document.getElementById("pcAvatarChoose").addEventListener("click", () => avatarInput.click());
   avatarInput.addEventListener("change", () => {
     const file = avatarInput.files && avatarInput.files[0];
-    handleAvatarFile(file);
+    if (file) avatarTask = avatarTask.then(() => handleAvatarFile(file));
     avatarInput.value = "";
   });
 
@@ -757,8 +838,8 @@
   // メインプレビューCanvas上でも同じ操作でアバター位置を調整できるようにする
   let canvasDragLastCenter = null;
   canvas.addEventListener("pointerdown", (e) => {
-    if (!avatarImg) return;
-    const layout = PROFILE_CARD_LAYOUTS[state.layout];
+    if (!avatarImg || e.pointerType === "touch") return;
+    const layout = currentLayouts()[state.layout];
     const rect = canvas.getBoundingClientRect();
     const scaleX = layout.width / rect.width;
     const scaleY = layout.height / rect.height;
@@ -771,7 +852,7 @@
   });
   canvas.addEventListener("pointermove", (e) => {
     if (!canvasDragLastCenter || !avatarImg) return;
-    const layout = PROFILE_CARD_LAYOUTS[state.layout];
+    const layout = currentLayouts()[state.layout];
     const rect = canvas.getBoundingClientRect();
     const scaleX = layout.width / rect.width;
     const scaleY = layout.height / rect.height;
@@ -814,72 +895,58 @@
     });
   }
 
-  document.getElementById("pcSaveBtn").addEventListener("click", async () => {
-    if (saveBusy) return;
-    saveBusy = true;
-    actionStatusEl.textContent = "保存中…";
-    try {
-      await renderNow();
-      const blob = await canvasToBlob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = buildFileName();
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 4000);
-      actionStatusEl.textContent = "保存しました";
-    } catch (e) {
-      actionStatusEl.textContent = "";
-      showPreviewError("PNGの保存に失敗しました。" + (e && e.message ? e.message : ""));
-    } finally {
-      saveBusy = false;
-    }
-  });
+  function downloadPng(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
 
-  document.getElementById("pcShareBtn").addEventListener("click", async () => {
+  async function exportCard(share) {
     if (saveBusy) return;
     saveBusy = true;
-    actionStatusEl.textContent = "共有準備中…";
+    actionStatusEl.textContent = translate("pc_export_working", "画像を準備中…");
     try {
-      await renderNow();
+      const filename = buildFileName();
       const blob = await canvasToBlob();
-      const file = new File([blob], buildFileName(), { type: "image/png" });
-      if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: "ハートピア プロフィールカード",
-            text: "はとぴ図鑑でプロフィールカードを作りました！",
-          });
-          actionStatusEl.textContent = "共有しました";
-        } catch (shareErr) {
-          if (shareErr && shareErr.name === "AbortError") {
-            actionStatusEl.textContent = ""; // ユーザーによるキャンセルはエラー表示しない
-          } else {
-            throw shareErr;
+      if (share && navigator.share && navigator.canShare) {
+        const file = new File([blob], filename, { type: "image/png" });
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: translate("pc_page_title", "プロフィールカード") });
+            actionStatusEl.textContent = translate("pc_export_shared", "共有しました");
+            return;
+          } catch (error) {
+            if (error.name === "AbortError") {
+              actionStatusEl.textContent = "";
+              return;
+            }
+            if (error.name !== "NotAllowedError") throw error;
           }
         }
-      } else {
-        // 非対応環境はPNG保存へフォールバック
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = buildFileName();
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 4000);
-        actionStatusEl.textContent = "SNS共有に対応していない環境のため、PNGを保存しました";
       }
-    } catch (e) {
-      actionStatusEl.textContent = "";
-      showPreviewError("共有に失敗しました。" + (e && e.message ? e.message : ""));
+      downloadPng(blob, filename);
+      actionStatusEl.textContent = share
+        ? translate("pc_export_fallback", "共有メニューを開けなかったため、PNGを保存しました")
+        : translate("pc_export_saved", "PNGを保存しました");
+    } catch (error) {
+      actionStatusEl.textContent = translate("pc_export_failed", "画像を保存・共有できませんでした。");
+      console.error(error);
     } finally {
       saveBusy = false;
     }
-  });
+  }
+
+  saveBtn.addEventListener("click", () => exportCard(false));
+  shareBtn.addEventListener("click", () => exportCard(true));
 
   document.getElementById("pcResetBtn").addEventListener("click", async () => {
-    if (!confirm("入力内容をすべて初期化します。よろしいですか？（図鑑・料理・園芸・実績のデータは削除されません）")) return;
+    if (!confirm(translate("pc_reset_confirm", "カードの入力内容とアバター画像を削除しますか？"))) return;
+    await avatarTask;
     clearProfileCardState();
     try { await deleteAvatarBlob(); } catch (e) { /* no-op */ }
     location.reload();
@@ -899,7 +966,12 @@
     renderAvatarStage();
     scheduleRender();
   }
-  init();
+  mascotImg.addEventListener("load", scheduleRender);
+  avatarTask = init();
 
-  window.addEventListener("i18n:ready", scheduleRender);
+  document.addEventListener("langchange", () => {
+    renderPlayStyleRow();
+    renderTagRow();
+    scheduleRender();
+  });
 })();
