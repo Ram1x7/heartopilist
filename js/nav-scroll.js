@@ -11,18 +11,8 @@
  */
 (function(){
   var nav = document.querySelector(".site-nav");
-  if(!nav) return;
-  const petLink = nav.querySelector('a[href="./pet.html"]');
-  if(petLink && !nav.querySelector('a[href="./card-maker.html"]')){
-    const link = document.createElement("a");
-    link.href = "./card-maker.html";
-    link.className = "site-nav-item";
-    link.dataset.i18n = "nav_profile_card";
-    link.textContent = "カード";
-    petLink.before(link);
-  }
-  var active = nav.querySelector(".site-nav-item.active");
-  if(!active) return;
+  var active = nav ? nav.querySelector(".site-nav-item.active") : null;
+  if(!nav || !active) return;
 
   var navRect = nav.getBoundingClientRect();
   var activeRect = active.getBoundingClientRect();
