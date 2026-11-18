@@ -1006,7 +1006,7 @@ const fishData = [
  nameI18n:{"ja":"アカマンボウ","en":"Moonfish","zh-CN":"月鱼","zh-TW":"月魚","ko":"붉은개복치","th":"ปลาพระจันทร์"},
  level:9,
  authCount:180,
- shadow:"大",
+ shadow:"金",
  price:850,
  weather:["晴れ","雨","虹"],
  time:["18-0","0-6"],
@@ -1236,19 +1236,6 @@ const fishData = [
  img:"images/fish/096.PNG"
 },
 {
- name:"レナーズラス",
- nameI18n:{"ja":"レナーズラス","en":"Rainbow Wrasse","zh-CN":"西澳梦幻龙鱼","zh-TW":"西澳夢幻龍魚","ko":"레나르디놀래기","th":"ปลาหมอทะเลเลนนาร์ด"},
- level:14,
- authCount:180,
- shadow:"中",
- price:610,
- weather:["晴れ","虹"],
- time:["6-12","12-18","18-0"],
- location:"東海",
- locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
- img:"images/fish/098.PNG"
-},
-{
  name:"シリキルリスズメダイ",
  nameI18n:{"ja":"シリキルリスズメダイ","en":"Yellowtail Blue Damselfish","zh-CN":"半蓝金翅雀鲷","zh-TW":"半藍金翅雀鯛","ko":"아주르담셀","th":"ปลาสลิดหินครึ่งฟ้า"},
  level:14,
@@ -1260,6 +1247,19 @@ const fishData = [
  location:"そよ風の海",
  locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/097.PNG"
+},
+{
+ name:"レナーズラス",
+ nameI18n:{"ja":"レナーズラス","en":"Rainbow Wrasse","zh-CN":"西澳梦幻龙鱼","zh-TW":"西澳夢幻龍魚","ko":"레나르디놀래기","th":"ปลาหมอทะเลเลนนาร์ด"},
+ level:14,
+ authCount:180,
+ shadow:"中",
+ price:610,
+ weather:["晴れ","虹"],
+ time:["6-12","12-18","18-0"],
+ location:"東海",
+ locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
+ img:"images/fish/098.PNG"
 },
 {
  name:"氷晶のタラバガニ",

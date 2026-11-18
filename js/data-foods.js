@@ -1258,12 +1258,12 @@ const foodsData = [
   time:0,
   rarity: [true,true,true,true,true],
   prices:[570],
-  materials:["牛乳(@50)","牛乳(@50)","あずき(@50)","キンモクセイジャム(@100)"],
+  materials:["牛乳(@50)","牛乳(@50)","紅茶(@50)","キンモクセイジャム(@100)"],
   level:1,
   materials_image:[
     { image:"./images/materials/milk.jpg" },
     { image:"./images/materials/milk.jpg" },
-    { image:"./images/materials/azuki.jpg" },
+    { image:"./images/materials/kotya.jpg" },
     { image:"./images/materials/jam_kinmokusei.jpg" }
   ],
   authTarget: null, // 認証マスターに必要な累計作成数（例: 720）。未設定はnull
