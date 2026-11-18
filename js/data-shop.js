@@ -2811,13 +2811,17 @@ const shopSeasons = {
     start: "2026-08-29 06:00",
     end: "2026-10-10 05:59",
     categorized: false,
+    fescoinIcon: "fescoin",
   },
   // フェス「幽夜の集い」（2026-10-10開始）
+  // フェスコインはフェスごとにデザインが変わるため、専用アイコンをfescoinIconで指定する
+  // （指定が無いシーズンはfescoin.png＝汎用アイコンにフォールバックする）
   yuya_2026: {
     label: "幽夜の集い",
     labelI18n: {"ja":"幽夜の集い","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     start: "2026-10-10 06:00",
     end: "2026-11-21 05:59",
     categorized: false,
+    fescoinIcon: "yuuyafes_coin",
   },
 };

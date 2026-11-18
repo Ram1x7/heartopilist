@@ -221,8 +221,11 @@ function createShopCard(item){
     : `<span class="shop-item-limit">${T("shop_limit_label","上限{n}個").replace("{n}", item.limit)}</span>`;
 
   const isFesCurrency = item.currency === "フェスコイン";
+  // フェスコインはフェス(シーズン)ごとにデザインが変わるため、
+  // shopSeasonsのfescoinIconで指定されたアイコンを使う（未指定は汎用アイコンにフォールバック）
+  const fesIconKey = (typeof shopSeasons !== "undefined" && shopSeasons[item.season] && shopSeasons[item.season].fescoinIcon) || "fescoin";
   const currencyIconHTML = isFesCurrency && typeof currencyIcon === "function"
-    ? currencyIcon("fescoin")
+    ? currencyIcon(fesIconKey)
     : icon("coin",{size:11});
   // フェスコインはアイコンで通貨が分かるため、数字のみ表示する
   const currencyLabel = isFesCurrency ? "" : T("shop_currency","トレンドコイン");
