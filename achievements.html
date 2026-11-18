@@ -239,6 +239,27 @@ body.dark .ach-modal-close-x{ background:var(--dark-card-alt); color:var(--dark-
 
 .ach-banner-flag.locked .ach-banner-badge-icon{ color:#5c554c; }
 
+/* 実物バッジ画像がある場合は、円形メダル枠を使わず画像そのものを表示する */
+.ach-banner-badge-frame.has-img{
+  width:auto;
+  height:auto;
+  background:none;
+  border:none;
+  box-shadow:none;
+  margin-bottom:6px;
+}
+.ach-banner-badge-img{
+  width:92px;
+  height:92px;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,0.25));
+}
+.ach-icon-img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
 .ach-banner-name{
   font-family:'Shippori Mincho', serif;
   font-size:17px;
@@ -487,6 +508,14 @@ function displayName(a){
   return displayField(a,"name");
 }
 
+// 隠し実績は達成前の実物バッジ画像が無いため、共通のロック画像を使う。
+// 画像が無い実績（スクショ未取得分）はnullを返し、呼び出し側で汎用アイコンにフォールバックする
+const ACH_HIDDEN_BADGE_IMG = "./images/achievements/hidden.png";
+function badgeImgSrc(a){
+  if(a.hidden && !isObtained(a)) return ACH_HIDDEN_BADGE_IMG;
+  return a.img || null;
+}
+
 // 達成条件の補足（箇条書き）。無ければnull
 function displayConditionNotes(a){
   if(!a.conditionNotes) return null;
@@ -538,7 +567,7 @@ function render(){
           ${icon(obtained ? "star" : "starOutline", {size:13})}
         </button>
         <div class="ach-icon-wrap ${obtained ? "" : "ach-icon-locked"}" style="width:100%;aspect-ratio:1/1;background:var(--card-sub);border-radius:14px;padding:2px;box-sizing:border-box;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:var(--gold);">
-          ${icon(a.icon || "trophy", {size:36})}
+          ${badgeImgSrc(a) ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-icon-img">` : icon(a.icon || "trophy", {size:36})}
         </div>
       </div>
       <div class="item-name">${displayName(a)}</div>
@@ -623,8 +652,10 @@ function renderAchModal(){
       <div class="ach-banner-pole"></div>
       <div class="ach-banner-flag ${obtained ? "" : "locked"}">
         ${laurelSvg("ach-laurel-left")}
-        <div class="ach-banner-badge-frame">
-          <div class="ach-banner-badge-icon">${icon(a.icon || "trophy", {size:34})}</div>
+        <div class="ach-banner-badge-frame ${badgeImgSrc(a) ? "has-img" : ""}">
+          ${badgeImgSrc(a)
+            ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-banner-badge-img ${obtained ? "" : "ach-icon-locked"}">`
+            : `<div class="ach-banner-badge-icon">${icon(a.icon || "trophy", {size:34})}</div>`}
         </div>
         <div class="ach-banner-name">${displayName(a)}</div>
         <div class="ach-banner-sub">${subText}</div>
