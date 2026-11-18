@@ -229,7 +229,7 @@ const cropData = [
     seedPrice: 10,
     prices: [30],
     weedCount: 3,
-    auth: false,
+    auth: true,
     isEvent: false,
     eventName: null,
     bookIndex: 15,
