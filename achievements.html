@@ -566,7 +566,7 @@ function render(){
         <button class="check-btn ${obtained ? "checked" : ""}" aria-pressed="${obtained ? "true" : "false"}" aria-label="${displayName(a)} ${T("aria_check_label","コンプ済みにする")}">
           ${icon(obtained ? "star" : "starOutline", {size:13})}
         </button>
-        <div class="ach-icon-wrap ${obtained ? "" : "ach-icon-locked"}" style="width:100%;aspect-ratio:1/1;background:var(--card-sub);border-radius:14px;padding:2px;box-sizing:border-box;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:var(--gold);">
+        <div class="ach-icon-wrap ${obtained ? "" : "ach-icon-locked"}" style="width:100%;aspect-ratio:1/1;background:var(--card-sub);border-radius:14px;padding:${badgeImgSrc(a) ? "12%" : "2px"};box-sizing:border-box;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:var(--gold);">
           ${badgeImgSrc(a) ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-icon-img">` : icon(a.icon || "trophy", {size:36})}
         </div>
       </div>
