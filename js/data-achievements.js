@@ -76,6 +76,7 @@ const achievementsData = [
   },
   {
     id: 8,
+    img: "./images/achievements/8.png",
     name: "潮を呼ぶ者",
     nameI18n: {"ja":"潮を呼ぶ者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の釣りクエストで「魚群」が3回現れる。",
@@ -275,6 +276,7 @@ const achievementsData = [
   },
   {
     id: 28,
+    img: "./images/achievements/28.png",
     name: "魂の熱唱",
     nameI18n: {"ja":"魂の熱唱", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "1回の野鳥観察クエストで「鳥の大群」が3回現れる。",
@@ -544,6 +546,7 @@ const achievementsData = [
   },
   {
     id: 55,
+    img: "./images/achievements/55.png",
     hidden: true,
     name: "変形ゴーストの家",
     nameI18n: {"ja":"変形ゴーストの家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -556,9 +559,10 @@ const achievementsData = [
   },
   {
     id: 56,
+    img: "./images/achievements/56.png",
     hidden: true,
-    name: "海の大量王",
-    nameI18n: {"ja":"海の大量王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
+    name: "海の大漁王",
+    nameI18n: {"ja":"海の大漁王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     flavorText: "ヴァンニアと釣り愛好家から尊敬されるだろう。",
     flavorTextI18n: {"ja":"ヴァンニアと釣り愛好家から尊敬されるだろう。", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "海釣り日常クエストの称号をすべて獲得する",
@@ -568,6 +572,7 @@ const achievementsData = [
   },
   {
     id: 57,
+    img: "./images/achievements/57.png",
     hidden: true,
     name: "グルメ外交官",
     nameI18n: {"ja":"グルメ外交官", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -580,6 +585,7 @@ const achievementsData = [
   },
   {
     id: 58,
+    img: "./images/achievements/58.png",
     hidden: true,
     name: "温泉山の虫捕り王",
     nameI18n: {"ja":"温泉山の虫捕り王", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -592,6 +598,7 @@ const achievementsData = [
   },
   {
     id: 59,
+    img: "./images/achievements/59.png",
     hidden: true,
     name: "虫捕りパーティー",
     nameI18n: {"ja":"虫捕りパーティー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -604,6 +611,7 @@ const achievementsData = [
   },
   {
     id: 60,
+    img: "./images/achievements/60.png",
     hidden: true,
     name: "草むらおろし売り業者",
     nameI18n: {"ja":"草むらおろし売り業者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -616,6 +624,7 @@ const achievementsData = [
   },
   {
     id: 61,
+    img: "./images/achievements/61.png",
     hidden: true,
     name: "虹花ボランティア",
     nameI18n: {"ja":"虹花ボランティア", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -628,6 +637,7 @@ const achievementsData = [
   },
   {
     id: 62,
+    img: "./images/achievements/62.png",
     hidden: true,
     name: "修理のプロ",
     nameI18n: {"ja":"修理のプロ", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -640,6 +650,7 @@ const achievementsData = [
   },
   {
     id: 63,
+    img: "./images/achievements/63.png",
     hidden: true,
     name: "人気スター",
     nameI18n: {"ja":"人気スター", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -652,6 +663,7 @@ const achievementsData = [
   },
   {
     id: 64,
+    img: "./images/achievements/64.png",
     hidden: true,
     name: "温泉の友",
     nameI18n: {"ja":"温泉の友", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -664,6 +676,7 @@ const achievementsData = [
   },
   {
     id: 65,
+    img: "./images/achievements/65.png",
     hidden: true,
     name: "流れ星の下の友情",
     nameI18n: {"ja":"流れ星の下の友情", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -676,6 +689,7 @@ const achievementsData = [
   },
   {
     id: 66,
+    img: "./images/achievements/66.png",
     hidden: true,
     name: "ベストセラー作家",
     nameI18n: {"ja":"ベストセラー作家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -688,6 +702,7 @@ const achievementsData = [
   },
   {
     id: 67,
+    img: "./images/achievements/67.png",
     hidden: true,
     name: "大文豪",
     nameI18n: {"ja":"大文豪", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -700,6 +715,7 @@ const achievementsData = [
   },
   {
     id: 68,
+    img: "./images/achievements/68.png",
     hidden: true,
     name: "書籍収集家",
     nameI18n: {"ja":"書籍収集家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -727,6 +743,7 @@ const achievementsData = [
   },
   {
     id: 69,
+    img: "./images/achievements/69.png",
     hidden: true,
     name: "ロマンアイスフレンド",
     nameI18n: {"ja":"ロマンアイスフレンド", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -739,6 +756,7 @@ const achievementsData = [
   },
   {
     id: 70,
+    img: "./images/achievements/70.png",
     hidden: true,
     name: "リーダービー",
     nameI18n: {"ja":"リーダービー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -751,6 +769,7 @@ const achievementsData = [
   },
   {
     id: 71,
+    img: "./images/achievements/71.png",
     hidden: true,
     name: "大掃除を極めし者",
     nameI18n: {"ja":"大掃除を極めし者", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -763,6 +782,7 @@ const achievementsData = [
   },
   {
     id: 72,
+    img: "./images/achievements/72.png",
     hidden: true,
     name: "大空に想いを馳せて",
     nameI18n: {"ja":"大空に想いを馳せて", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -775,6 +795,7 @@ const achievementsData = [
   },
   {
     id: 73,
+    img: "./images/achievements/73.png",
     hidden: true,
     name: "風に乗って",
     nameI18n: {"ja":"風に乗って", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
