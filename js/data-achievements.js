@@ -897,6 +897,7 @@ const achievementsData = [
   },
   {
     id: 77,
+    img: "./images/achievements/77.png",
     hidden: true,
     name: "ダンス・ノーテーション収集家",
     nameI18n: {"ja":"ダンス・ノーテーション収集家", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
