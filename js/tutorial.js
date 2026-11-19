@@ -62,6 +62,9 @@ function maybeStartPageTutorial(doneKey, steps){
 
 // 開始前にフォーカスされていた要素。閉じたときにここへフォーカスを戻す
 let _tutReturnFocusEl = null;
+// 開始前のスクロール位置。終了時にここへ戻す（一覧全体などを指す最後のステップで
+// 大きく下までスクロールされたまま終わり、手動で上に戻す手間が発生していたため）
+let _tutReturnScrollY = 0;
 
 function startPageTutorial(doneKey, steps){
   ensureTutorialDom();
@@ -69,6 +72,7 @@ function startPageTutorial(doneKey, steps){
   _tutSteps = steps;
   _tutStep = 0;
   _tutReturnFocusEl = document.activeElement;
+  _tutReturnScrollY = window.scrollY;
   document.getElementById("dsTutorialBackdrop").style.display = "block";
   document.getElementById("dsTutorialHighlight").style.display = "block";
   document.getElementById("dsTutorialPopup").style.display = "block";
@@ -98,8 +102,12 @@ function renderTutorialStep(){
   document.getElementById("dsTutorialNextBtn").textContent =
     _tutStep === _tutSteps.length - 1 ? tutT("tutorial_start", "はじめる") : tutT("tutorial_next", "次へ");
   // スムーススクロールだとアニメーション完了前に位置を確定してしまい枠がズレるため、
-  // 即座にジャンプさせてからレイアウト確定後（次の描画フレーム）に位置を合わせる
-  target.scrollIntoView({ block: "center", behavior: "auto" });
+  // 即座にジャンプさせてからレイアウト確定後（次の描画フレーム）に位置を合わせる。
+  // 一覧全体のようにビューポートより縦に長い対象を"center"で合わせようとすると、
+  // 本来の目的（先頭付近を見せる）から外れて中央の途中位置まで大きくスクロール
+  // してしまうため、対象がビューポートより高い場合は上端に合わせる
+  const block = target.offsetHeight > window.innerHeight ? "start" : "center";
+  target.scrollIntoView({ block, behavior: "auto" });
   requestAnimationFrame(() => requestAnimationFrame(() => positionTutorialElements(target)));
 }
 
@@ -150,6 +158,9 @@ function endPageTutorial(){
     _tutReturnFocusEl.focus();
   }
   _tutReturnFocusEl = null;
+  // 最後のステップで一覧全体など縦に長い対象を指していた場合、ページが大きく
+  // スクロールされたまま終わってしまうため、開始前のスクロール位置へ戻す
+  window.scrollTo({ top: _tutReturnScrollY, left: 0, behavior: "auto" });
 }
 
 // ヘルプモーダル等からの手動再生（既読フラグを消してから開始）
