@@ -528,7 +528,7 @@ const ACH_HIDDEN_BADGE_IMG = "./images/achievements/hidden.png";
 // バッジ画像はファイル名を変えずに中身を差し替えることがあるため、Service
 // Workerの画像キャッシュ（cache-first）が古い中身を返し続けないよう、
 // クエリ文字列でキャッシュを明示的にバストする。画像を差し替えた際はこの値を上げる
-const ACH_IMG_CACHE_BUST = "3";
+const ACH_IMG_CACHE_BUST = "4";
 function withCacheBust(src){
   return src ? (src + "?v=" + ACH_IMG_CACHE_BUST) : src;
 }
