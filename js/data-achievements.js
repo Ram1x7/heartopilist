@@ -524,7 +524,7 @@ const achievementsData = [
   {
     id: 47,
     img: "./images/achievements/47.png",
-    imgLocked: "./images/achievements/47.png",
+    imgLocked: "./images/achievements/47_locked.png",
     name: "ビルダービー",
     nameI18n: {"ja":"ビルダービー", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
     condition: "建築祭に累計4回参加し、作品を展示フェーズまで進出させる。",
@@ -873,6 +873,7 @@ const achievementsData = [
   },
   {
     id: 75,
+    img: "./images/achievements/75.png",
     hidden: true,
     name: "振付の名手",
     nameI18n: {"ja":"振付の名手", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
@@ -885,6 +886,7 @@ const achievementsData = [
   },
   {
     id: 76,
+    img: "./images/achievements/76.png",
     hidden: true,
     name: "振付マスター",
     nameI18n: {"ja":"振付マスター", "en":"", "zh-CN":"", "zh-TW":"", "ko":"", "th":""},
