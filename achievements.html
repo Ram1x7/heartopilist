@@ -90,10 +90,18 @@ body.dark .ach-progress-summary strong{ color:var(--dark-highlight); }
   margin-bottom:14px;
 }
 
-/* 未獲得時のグレーアウト */
+/* 未獲得時の減光。未達成専用画像（ゲーム内ロック表示）は既にそれ自体で
+   見分けがつくデザインのため減光のみ、達成後画像の流用時のみ下のグレースケールも重ねる */
 .ach-icon-locked{
-  filter:grayscale(1);
   opacity:0.55;
+}
+
+.ach-icon-fallback-gray{
+  filter:grayscale(1);
+}
+
+.ach-banner-badge-img.ach-icon-fallback-gray{
+  filter:grayscale(1) drop-shadow(0 4px 8px rgba(0,0,0,0.25));
 }
 
 .achievements-footer{
@@ -519,7 +527,18 @@ function displayName(a){
 const ACH_HIDDEN_BADGE_IMG = "./images/achievements/hidden.png";
 function badgeImgSrc(a){
   if(a.hidden && !isObtained(a)) return ACH_HIDDEN_BADGE_IMG;
+  if(!isObtained(a) && a.imgLocked) return a.imgLocked;
   return a.img || null;
+}
+
+// true: badgeImgSrc()が「未達成専用の見た目」（ゲーム内の未達成バッジ画像、
+// または隠し実績の共通ロック画像）を返している状態。これらは既にそれ自体で
+// 未達成らしい単色デザインになっているため、グレースケール加工は不要。
+// false: 未達成専用の画像が無く、達成後の実物バッジ画像をそのまま流用している
+// フォールバック状態のため、グレースケールで見分けをつける。
+function isLockedStyleImg(a){
+  if(isObtained(a)) return false;
+  return !!(a.hidden || a.imgLocked);
 }
 
 // 達成条件の補足（箇条書き）。無ければnull
@@ -573,7 +592,7 @@ function render(){
           ${icon(obtained ? "star" : "starOutline", {size:13})}
         </button>
         <div class="ach-icon-wrap ${obtained ? "" : "ach-icon-locked"}" style="width:100%;aspect-ratio:1/1;background:var(--card-sub);border-radius:14px;padding:${badgeImgSrc(a) ? "12%" : "2px"};box-sizing:border-box;margin-bottom:6px;display:flex;align-items:center;justify-content:center;color:var(--gold);">
-          ${badgeImgSrc(a) ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-icon-img">` : icon(a.icon || "trophy", {size:36})}
+          ${badgeImgSrc(a) ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-icon-img ${(!obtained && !isLockedStyleImg(a)) ? "ach-icon-fallback-gray" : ""}">` : icon(a.icon || "trophy", {size:36})}
         </div>
       </div>
       <div class="item-name">${displayName(a)}</div>
@@ -660,7 +679,7 @@ function renderAchModal(){
         ${laurelSvg("ach-laurel-left")}
         <div class="ach-banner-badge-frame ${badgeImgSrc(a) ? "has-img" : ""}">
           ${badgeImgSrc(a)
-            ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-banner-badge-img ${obtained ? "" : "ach-icon-locked"}">`
+            ? `<img src="${badgeImgSrc(a)}" alt="" class="ach-banner-badge-img ${obtained ? "" : "ach-icon-locked"} ${(!obtained && !isLockedStyleImg(a)) ? "ach-icon-fallback-gray" : ""}">`
             : `<div class="ach-banner-badge-icon">${icon(a.icon || "trophy", {size:34})}</div>`}
         </div>
         <div class="ach-banner-name">${displayName(a)}</div>
