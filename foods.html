@@ -1022,6 +1022,29 @@ function forceRepaint(){
 let checkedData = JSON.parse(localStorage.getItem("food_checked") || "{}");
 let authData    = JSON.parse(localStorage.getItem("food_auth") || "{}");
 
+// 表記ゆれ修正で名前が変わった際、以前は名前文字列をキーにチェック/認証済み記録を
+// 保存していたため記録が迷子になっていた問題への対応。固定IDをキーにする形へ移行し、
+// 既存データ（名前キー）が残っていればIDキーへコピーする（一度移行すれば古いキーは消える）
+(function migrateFoodDataToIds(){
+  let checkedChanged = false;
+  let authChanged = false;
+  foodsData.forEach(f => {
+    if(!f.id || !f.name) return;
+    if(checkedData[f.id] === undefined && checkedData[f.name] !== undefined){
+      checkedData[f.id] = checkedData[f.name];
+      delete checkedData[f.name];
+      checkedChanged = true;
+    }
+    if(authData[f.id] === undefined && authData[f.name] !== undefined){
+      authData[f.id] = authData[f.name];
+      delete authData[f.name];
+      authChanged = true;
+    }
+  });
+  if(checkedChanged) localStorage.setItem("food_checked", JSON.stringify(checkedData));
+  if(authChanged) localStorage.setItem("food_auth", JSON.stringify(authData));
+})();
+
 // 「未完了順」「未認証順」ソート中はチェック/認証をつけた直後に対象が
 // リストの下へ移動し、別の項目が同じ画面位置に入れ替わる。連続タップ時に
 // 意図しない項目を巻き込んで切り替えてしまわないよう、切り替え直後は
@@ -1194,8 +1217,8 @@ function renderSection(items, type = "normal"){
     const div = document.createElement("div");
     div.className = "item";
 
-    const checked = !!checkedData[f.name];
-    const authed  = !!authData[f.name];
+    const checked = !!checkedData[f.id];
+    const authed  = !!authData[f.id];
 
     div.innerHTML = `
       <div class="img-wrap">
@@ -1221,7 +1244,7 @@ function renderSection(items, type = "normal"){
     div.querySelector(".check-btn").onclick = (e)=>{
       e.stopPropagation();
       if(guardToggle()) return;
-      checkedData[f.name] = !checkedData[f.name];
+      checkedData[f.id] = !checkedData[f.id];
       localStorage.setItem("food_checked", JSON.stringify(checkedData));
       render();
     };
@@ -1231,7 +1254,7 @@ function renderSection(items, type = "normal"){
       authBtn.onclick = (e)=>{
         e.stopPropagation();
         if(guardToggle()) return;
-        authData[f.name] = !authData[f.name];
+        authData[f.id] = !authData[f.id];
         localStorage.setItem("food_auth", JSON.stringify(authData));
         render();
       };
@@ -1279,8 +1302,8 @@ function render(){
       return list.slice().sort((a,b) => (a.level||99) - (b.level||99));
     } else if(currentSort === "unchecked"){
       return list.slice().sort((a,b) => {
-        const ac = checkedData[a.name] ? 1 : 0;
-        const bc = checkedData[b.name] ? 1 : 0;
+        const ac = checkedData[a.id] ? 1 : 0;
+        const bc = checkedData[b.id] ? 1 : 0;
         if(ac !== bc) return ac - bc;
         return foodsData.indexOf(a) - foodsData.indexOf(b);
       });
@@ -1289,8 +1312,8 @@ function render(){
         const ae = a.auth !== false ? 0 : 1;
         const be = b.auth !== false ? 0 : 1;
         if(ae !== be) return ae - be;
-        const aa = authData[a.name] ? 1 : 0;
-        const ba = authData[b.name] ? 1 : 0;
+        const aa = authData[a.id] ? 1 : 0;
+        const ba = authData[b.id] ? 1 : 0;
         if(aa !== ba) return aa - ba;
         return foodsData.indexOf(a) - foodsData.indexOf(b);
       });

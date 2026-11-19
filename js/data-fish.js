@@ -1,6 +1,6 @@
 // 魚
 const fishData = [
-{
+{id:"fish_1",
  name:"ヨーロピアンパーチ",
  nameI18n:{"ja":"ヨーロピアンパーチ","en":"European Perch","zh-CN":"河鲈","zh-TW":"河鱸","ko":"민물배스","th":"ปลากะพงแม่น้ำ"},
  level:1,
@@ -13,7 +13,7 @@ const fishData = [
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/001.PNG"
 },
-{
+{id:"fish_2",
  name:"ヨーロッパトノサマガエル",
  nameI18n:{"ja":"ヨーロッパトノサマガエル","en":"Edible Frog","zh-CN":"欧洲水蛙","zh-TW":"歐洲水蛙","ko":"유럽참개구리","th":"กบยุโรป"},
  level:4,
@@ -26,7 +26,7 @@ const fishData = [
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/002.PNG"
 },
-{
+{id:"fish_3",
  name:"チャブ",
  nameI18n:{"ja":"チャブ","en":"Common Chub","zh-CN":"欧鲢","zh-TW":"歐鰱","ko":"유럽처브","th":"ปลาช่อนยุโรป"},
  level:1,
@@ -39,7 +39,7 @@ const fishData = [
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/003.PNG"
 },
-{
+{id:"fish_4",
  name:"シマドジョウ",
  nameI18n:{"ja":"シマドジョウ","en":"Spined Loach","zh-CN":"花鳅","zh-TW":"花鰍","ko":"하늘종개","th":"ปลาสไปน์ล็อช"},
  level:1,
@@ -52,7 +52,7 @@ const fishData = [
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/004.PNG"
 },
-{
+{id:"fish_5",
  name:"バーベル",
  nameI18n:{"ja":"バーベル","en":"Barbel","zh-CN":"鲃鱼","zh-TW":"鲃魚","ko":"바벨","th":"ปลาบาร์เบล"},
  level:1,
@@ -65,7 +65,7 @@ const fishData = [
  locationI18n:{"ja":"浅水川","en":"Shallow River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/005.PNG"
 },
-{
+{id:"fish_6",
  name:"ダヌープストレバー",
  nameI18n:{"ja":"ダヌープストレバー","en":"Streber","zh-CN":"大斑金吉鲈","zh-TW":"大斑金吉鱸","ko":"큰얼룩배스","th":"ปลากะพงจุดทอง"},
  level:1,
@@ -78,7 +78,7 @@ const fishData = [
  locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/006.PNG"
 },
-{
+{id:"fish_7",
  name:"ミノー",
  nameI18n:{"ja":"ミノー","en":"Minnow","zh-CN":"米诺鱼","zh-TW":"米諾魚","ko":"미노우","th":"ปลาซิว"},
  level:1,
@@ -91,7 +91,7 @@ const fishData = [
  locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/007.PNG"
 },
-{
+{id:"fish_8",
  name:"ティラピア",
  nameI18n:{"ja":"ティラピア","en":"Tilapia","zh-CN":"罗非鱼","zh-TW":"羅非魚","ko":"틸라피아","th":"ปลาทิลาเพีย"},
  level:4,
@@ -104,7 +104,7 @@ const fishData = [
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/008.PNG"
 },
-{
+{id:"fish_9",
  name:"テンチ",
  nameI18n:{"ja":"テンチ","en":"Tench","zh-CN":"丁鳜","zh-TW":"丁鱖","ko":"텐치","th":"ปลาเทนช์"},
  level:1,
@@ -117,7 +117,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/009.PNG"
 },
-{
+{id:"fish_10",
  name:"ホワイトフィッシュ",
  nameI18n:{"ja":"ホワイトフィッシュ","en":"Common Whitefish","zh-CN":"真白鲑","zh-TW":"真白鮭","ko":"극지연어","th":"ปลาไวท์ฟิช"},
  level:1,
@@ -130,7 +130,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/010.PNG"
 },
-{
+{id:"fish_11",
  name:"マブナ",
  nameI18n:{"ja":"マブナ","en":"Crucian Carp","zh-CN":"黑鲫","zh-TW":"黑鯽","ko":"붕어","th":"คาร์ปดำ"},
  level:1,
@@ -143,7 +143,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/011.PNG"
 },
-{
+{id:"fish_12",
  name:"ブリーク",
  nameI18n:{"ja":"ブリーク","en":"Common Bleak","zh-CN":"欧白鱼","zh-TW":"歐白魚","ko":"유럽백조어","th":"ปลากะพงขาว"},
  level:1,
@@ -156,7 +156,7 @@ const fishData = [
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/012.PNG"
 },
-{
+{id:"fish_13",
  name:"シュナイダー",
  nameI18n:{"ja":"シュナイダー","en":"Schneider","zh-CN":"拟白鱼","zh-TW":"擬白魚","ko":"백조어","th":"ปลาตะเพียนขาว"},
  level:1,
@@ -169,7 +169,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/013.PNG"
 },
-{
+{id:"fish_14",
  name:"コウライエビ",
  nameI18n:{"ja":"コウライエビ","en":"Oriental Shrimp","zh-CN":"青虾","zh-TW":"青蝦","ko":"왕새우","th":"กุ้งแม่น้ำขาว"},
  level:1,
@@ -182,7 +182,7 @@ const fishData = [
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/014.PNG"
 },
-{
+{id:"fish_15",
  name:"ニシイワシ",
  nameI18n:{"ja":"ニシイワシ","en":"Sardine","zh-CN":"沙丁鱼","zh-TW":"沙丁魚","ko":"정어리","th":"ปลาซาร์ดีน"},
  level:1,
@@ -195,7 +195,7 @@ const fishData = [
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/015.PNG"
 },
-{
+{id:"fish_16",
  name:"スズキ",
  nameI18n:{"ja":"スズキ","en":"Sea Bass","zh-CN":"海鲈鱼","zh-TW":"海鱸魚","ko":"배스","th":"ปลากะพงทะเล"},
  level:1,
@@ -208,7 +208,7 @@ const fishData = [
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/016.PNG"
 },
-{
+{id:"fish_17",
  name:"カツオ",
  nameI18n:{"ja":"カツオ","en":"Skipjack Tuna","zh-CN":"鲣鱼","zh-TW":"鰹魚","ko":"가다랑어","th":"ปลาคัตสึโอะ"},
  level:1,
@@ -221,7 +221,7 @@ const fishData = [
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/017.PNG"
 },
-{
+{id:"fish_18",
  name:"タチウオ",
  nameI18n:{"ja":"タチウオ","en":"Beltfish","zh-CN":"白带鱼","zh-TW":"白帶魚","ko":"갈치","th":"ปลาดาบเงิน"},
  level:1,
@@ -234,7 +234,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/018.PNG"
 },
-{
+{id:"fish_19",
  name:"ウミエビ",
  nameI18n:{"ja":"ウミエビ","en":"Common Prawn","zh-CN":"海虾","zh-TW":"海蝦","ko":"바다새우","th":"กุ้งทะเล"},
  level:1,
@@ -247,7 +247,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/019.PNG"
 },
-{
+{id:"fish_20",
  name:"マアジ",
  nameI18n:{"ja":"マアジ","en":"Scad","zh-CN":"竹荚鱼","zh-TW":"竹莢魚","ko":"전갱이","th":"ปลาอาจิ"},
  level:1,
@@ -260,7 +260,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/020.PNG"
 },
-{
+{id:"fish_21",
  name:"カイブツギンザメ",
  nameI18n:{"ja":"カイブツギンザメ","en":"Rabbit Fish","zh-CN":"大西洋银鲛鱼","zh-TW":"大西洋銀鮫魚","ko":"대서양은상어","th":"ฉลามเงินแอตแลนติก"},
  level:4,
@@ -273,7 +273,7 @@ const fishData = [
  locationI18n:{"ja":"海","en":"Ocean","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/021.PNG"
 },
-{
+{id:"fish_22",
  name:"ウミトゲウオ",
  nameI18n:{"ja":"ウミトゲウオ","en":"Sea Stickleback","zh-CN":"海棘鱼","zh-TW":"海棘魚","ko":"바다가시고기","th":"ปลาสแปรต"},
  level:1,
@@ -286,7 +286,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/022.PNG"
 },
-{
+{id:"fish_23",
  name:"ストライプトレッドマレット",
  nameI18n:{"ja":"ストライプトレッドマレット","en":"Striped Red Mullet","zh-CN":"纵带羊鱼","zh-TW":"縱帶羊魚","ko":"노랑촉수","th":"ปลากระบอกแดงลาย"},
  level:1,
@@ -299,7 +299,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/023.PNG"
 },
-{
+{id:"fish_24",
  name:"イシドジョウ",
  nameI18n:{"ja":"イシドジョウ","en":"Stone Loach","zh-CN":"石鳅","zh-TW":"石鰍","ko":"돌마자","th":"ปลาไหลหิน"},
  level:2,
@@ -312,7 +312,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/024.PNG"
 },
-{
+{id:"fish_25",
  name:"マッドサンフィッシュ",
  nameI18n:{"ja":"マッドサンフィッシュ","en":"Mud Sunfish","zh-CN":"刺臀鱼","zh-TW":"刺臀魚","ko":"머드개복치","th":"ปลาหมอทะเลโคลน"},
  level:2,
@@ -325,7 +325,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/025.PNG"
 },
-{
+{id:"fish_26",
  name:"キュウリウオ",
  nameI18n:{"ja":"キュウリウオ","en":"European Smelt","zh-CN":"胡瓜鱼","zh-TW":"胡瓜魚","ko":"바다빙어","th":"ปลากะตัก"},
  level:2,
@@ -338,7 +338,7 @@ const fishData = [
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/026.PNG"
 },
-{
+{id:"fish_27",
  name:"ラッフ",
  nameI18n:{"ja":"ラッフ","en":"Ruffe","zh-CN":"梅花鲈","zh-TW":"梅花鱸","ko":"매화농어","th":"ปลากะพงขาวยูเรเซีย"},
  level:2,
@@ -351,7 +351,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/027.PNG"
 },
-{
+{id:"fish_28",
  name:"フランスアジ",
  nameI18n:{"ja":"フランスアジ","en":"False Scad","zh-CN":"玫鲹","zh-TW":"玫鰺","ko":"노란전갱이","th":"ปลาสปอตฟิน"},
  level:2,
@@ -364,7 +364,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/028.PNG"
 },
-{
+{id:"fish_29",
  name:"タツノオトシゴ",
  nameI18n:{"ja":"タツノオトシゴ","en":"Seahorse","zh-CN":"海马","zh-TW":"海馬","ko":"해마","th":"ม้าน้ำ"},
  level:2,
@@ -377,7 +377,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/029.PNG"
 },
-{
+{id:"fish_30",
  name:"アンコウ",
  nameI18n:{"ja":"アンコウ","en":"Anglerfish","zh-CN":"安康鱼","zh-TW":"安康魚","ko":"아귀","th":"ปลาแองเกลอร์"},
  level:2,
@@ -390,7 +390,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/030.PNG"
 },
-{
+{id:"fish_31",
  name:"イガイ",
  nameI18n:{"ja":"イガイ","en":"Mussel","zh-CN":"贻贝","zh-TW":"貽貝","ko":"홍합","th":"หอยแมลงภู่"},
  level:3,
@@ -403,7 +403,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/031.PNG"
 },
-{
+{id:"fish_32",
  name:"パイクパーチ",
  nameI18n:{"ja":"パイクパーチ","en":"Zander","zh-CN":"白梭吻鲈","zh-TW":"白梭吻鱸","ko":"민물잰더","th":"ปลาไพค์เพิร์ช"},
  level:3,
@@ -416,7 +416,7 @@ const fishData = [
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/032.PNG"
 },
-{
+{id:"fish_33",
  name:"オタマジャクシ",
  nameI18n:{"ja":"オタマジャクシ","en":"Tadpole","zh-CN":"蝌蚪","zh-TW":"蝌蚪","ko":"올챙이","th":"ลูกอ๊อด"},
  level:3,
@@ -429,7 +429,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/033.PNG"
 },
-{
+{id:"fish_34",
  name:"北欧アカザエビ",
  nameI18n:{"ja":"北欧アカザエビ","en":"European Crayfish","zh-CN":"北欧鳌虾","zh-TW":"北歐螯蝦","ko":"유럽민물가재","th":"กุ้งเครย์ฟิชนอร์ส"},
  level:3,
@@ -442,7 +442,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/034.PNG"
 },
-{
+{id:"fish_35",
  name:"マダコ",
  nameI18n:{"ja":"マダコ","en":"Common Octopus","zh-CN":"真蛸","zh-TW":"真蛸","ko":"참문어","th":"หมึกยักษ์ญี่ปุ่น"}, 
  level:4,
@@ -455,7 +455,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/035.PNG"
 },
-{
+{id:"fish_36",
  name:"タイセイヨウサケ",
  nameI18n:{"ja":"タイセイヨウサケ","en":"Atlantic Salmon","zh-CN":"大西洋鲑","zh-TW":"大西洋鮭","ko":"대서양연어","th":"แซลมอนแอตแลนติก"},
  level:3,
@@ -468,7 +468,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/036.PNG"
 },
-{
+{id:"fish_37",
  name:"ピグミータコ",
  nameI18n:{"ja":"ピグミータコ","en":"Atlantic Pygmy Octopus","zh-CN":"大西洋侏儒章","zh-TW":"大西洋侏儒章","ko":"대서양난쟁이문어","th":"หมึกแคระแอตแลนติก"},
  level:1,
@@ -481,7 +481,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/037.PNG"
 },
-{
+{id:"fish_38",
  name:"ヤドカリ",
  nameI18n:{"ja":"ヤドカリ","en":"Hermit Crab","zh-CN":"寄居蟹","zh-TW":"寄居蟹","ko":"소라게","th":"ปูเสฉวน"},
  level:3,
@@ -494,7 +494,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/038.PNG"
 },
-{
+{id:"fish_39",
  name:"カクレクマノミ",
  nameI18n:{"ja":"カクレクマノミ","en":"Clownfish","zh-CN":"小丑鱼","zh-TW":"小丑魚","ko":"흰동가리","th":"ปลาการ์ตูน"},
  level:3,
@@ -507,7 +507,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/039.PNG"
 },
-{
+{id:"fish_40",
  name:"オオクチバス",
  nameI18n:{"ja":"オオクチバス","en":"Largemouth Bass","zh-CN":"大口黑鲈","zh-TW":"大口黑鱸","ko":"큰입배스","th":"ปลากะพงปากกว้าง"},
  level:4,
@@ -520,7 +520,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/040.PNG"
 },
-{
+{id:"fish_41",
  name:"ヨーロッパコイ",
  nameI18n:{"ja":"ヨーロッパコイ","en":"Common Carp","zh-CN":"欧洲鲤","zh-TW":"歐洲鯉","ko":"유럽잉어","th":"ปลาคาร์ปยุโรป"},
  level:4,
@@ -533,7 +533,7 @@ const fishData = [
  locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/041.PNG"
 },
-{
+{id:"fish_42",
  name:"カワメンタイ",
  nameI18n:{"ja":"カワメンタイ","en":"Burbot","zh-CN":"江鳕","zh-TW":"江鱈","ko":"민물대구","th":"ปลาเบอร์บ็อต"},
  level:4,
@@ -546,7 +546,7 @@ const fishData = [
  locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/042.PNG"
 },
-{
+{id:"fish_43",
  name:"ハゼ",
  nameI18n:{"ja":"ハゼ","en":"Goby","zh-CN":"虾虎鱼","zh-TW":"蝦虎魚","ko":"망둥어","th":"ปลาบู่"},
  level:4,
@@ -559,7 +559,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/043.PNG"
 },
-{
+{id:"fish_44",
  name:"サワガニ",
  nameI18n:{"ja":"サワガニ","en":"River Crab","zh-CN":"溪蟹","zh-TW":"溪蟹","ko":"민물게","th":"ปูน้ำจืด"},
  level:4,
@@ -572,7 +572,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/044.PNG"
 },
-{
+{id:"fish_45",
  name:"イシビラメ",
  nameI18n:{"ja":"イシビラメ","en":"Turbot","zh-CN":"大菱鲆","zh-TW":"大菱鮃","ko":"대문짝넙치","th":"ปลาลิ้นหมาใหญ่"},
  level:3,
@@ -585,7 +585,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/045.PNG"
 },
-{
+{id:"fish_46",
  name:"ヨーロッパヒラメ",
  nameI18n:{"ja":"ヨーロッパヒラメ","en":"European Plaice","zh-CN":"欧洲鲽","zh-TW":"歐洲鰈","ko":"유럽가자미","th":"ปลาลิ้นหมายุโรป"},
  level:4,
@@ -598,7 +598,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/046.PNG"
 },
-{
+{id:"fish_47",
  name:"レッドベリーピラニア",
  nameI18n:{"ja":"レッドベリーピラニア","en":"Red-Bellied Piranha","zh-CN":"红腹水虎鱼","zh-TW":"紅腹水虎魚","ko":"레드벨리피라냐","th":"ปลาปิรันย่าท้องแดง"},
  level:4,
@@ -611,7 +611,7 @@ const fishData = [
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/047.PNG"
 },
-{
+{id:"fish_48",
  name:"バタフライコイ",
  nameI18n:{"ja":"バタフライコイ","en":"Butterfly Koi","zh-CN":"蝴蝶鲤","zh-TW":"蝴蝶鯉","ko":"나비잉어","th":"ปลาคาร์ปผีเสื้อ"},
  level:4,
@@ -624,7 +624,7 @@ const fishData = [
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/048.PNG"
 },
-{
+{id:"fish_49",
  name:"カワギンポ",
  nameI18n:{"ja":"カワギンポ","en":"Freshwater Blenny","zh-CN":"河鳚","zh-TW":"河鳚","ko":"민물베도라치","th":"ปลาค้อ"},
  level:5,
@@ -637,7 +637,7 @@ const fishData = [
  locationI18n:{"ja":"霞川","en":"Rosy River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/049.PNG"
 },
-{
+{id:"fish_50",
  name:"マス",
  nameI18n:{"ja":"マス","en":"Trout","zh-CN":"鳟鱼","zh-TW":"鱒魚","ko":"송어","th":"ปลาเทราต์"},
  level:5,
@@ -650,7 +650,7 @@ const fishData = [
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/050.PNG"
 },
-{
+{id:"fish_51",
  name:"ラッド",
  nameI18n:{"ja":"ラッド","en":"Common Rudd","zh-CN":"红眼鱼","zh-TW":"紅眼魚","ko":"루드","th":"ปลารัดด์"},
  level:5,
@@ -663,7 +663,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/051.PNG"
 },
-{
+{id:"fish_52",
  name:"タイセイヨウサバ",
  nameI18n:{"ja":"タイセイヨウサバ","en":"Atlantic Mackerel","zh-CN":"大西洋鲭","zh-TW":"大西洋鯖","ko":"대서양고등어","th":"แมคเคอเรลแอตแลนติก"},
  level:5,
@@ -676,7 +676,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/052.PNG"
 },
-{
+{id:"fish_53",
  name:"ヨーロッパロブスター",
  nameI18n:{"ja":"ヨーロッパロブスター","en":"European Lobster","zh-CN":"欧洲螯龙虾","zh-TW":"歐洲螯龍蝦","ko":"유럽가재","th":"กุ้งล็อบสเตอร์ยุโรป"},
  level:5,
@@ -689,7 +689,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/053.PNG"
 },
-{
+{id:"fish_54",
  name:"ヨーロッパスルメイカ",
  nameI18n:{"ja":"ヨーロッパスルメイカ","en":"European Flying Squid","zh-CN":"欧洲飞鱿","zh-TW":"歐洲飛魷","ko":"유럽날오징어","th":"หมึกไดมอนด์ยุโรป"},
  level:5,
@@ -702,7 +702,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/054.PNG"
 },
-{
+{id:"fish_55",
  name:"シンジュガイ",
  nameI18n:{"ja":"シンジュガイ","en":"Large Pearl Mussel","zh-CN":"大珍珠蚌","zh-TW":"大珍珠蚌","ko":"큰진주조개","th":"หอยมุกยักษ์"},
  level:6,
@@ -715,7 +715,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/055.PNG"
 },
-{
+{id:"fish_56",
  name:"フグ",
  nameI18n:{"ja":"フグ","en":"Puffer Fish","zh-CN":"河鲀","zh-TW":"河魨","ko":"복어","th":"ปลาปักเป้า"},
  level:6,
@@ -728,7 +728,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/056.PNG"
 },
-{
+{id:"fish_57",
  name:"シロザケ",
  nameI18n:{"ja":"シロザケ","en":"Chum Salmon","zh-CN":"大马哈鱼","zh-TW":"大馬哈魚","ko":"첨 연어","th":"ปลาแซลมอนเกต้า"},
  level:6,
@@ -741,7 +741,7 @@ const fishData = [
  locationI18n:{"ja":"静川","en":"Tranquil River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/057.PNG"
 },
-{
+{id:"fish_58",
  name:"カワヒメマス",
  nameI18n:{"ja":"カワヒメマス","en":"Grayling","zh-CN":"茴鱼","zh-TW":"茴魚","ko":"사루기","th":"ปลาเทราต์สีน้ำตาล"},
  level:6,
@@ -754,7 +754,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/058.PNG"
 },
-{
+{id:"fish_59",
  name:"タブ・ガーナード",
  nameI18n:{"ja":"タブ・ガーナード","en":"Tub Gurnard","zh-CN":"细鳞绿鳍鱼","zh-TW":"細鱗綠鰭魚","ko":"등불성대","th":"ปลาซีโรบิ้น"},
  level:6,
@@ -767,7 +767,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/059.PNG"
 },
-{
+{id:"fish_60",
  name:"ネコザメ",
  nameI18n:{"ja":"ネコザメ","en":"Nursehound","zh-CN":"猫鲨","zh-TW":"貓鯊","ko":"두툽상어","th":"ฉลามแมว"},
  level:6,
@@ -780,7 +780,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/060.PNG"
 },
-{
+{id:"fish_61",
  name:"イトヨ",
  nameI18n:{"ja":"イトヨ","en":"Three-Spined Stickleback","zh-CN":"三刺鱼","zh-TW":"三刺魚","ko":"큰가시고기","th":"ปลาสติกเกิลแบ็คสามแฉก"},
  level:7,
@@ -793,7 +793,7 @@ const fishData = [
  locationI18n:{"ja":"浅水川","en":"Shallow River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/061.PNG"
 },
-{
+{id:"fish_62",
  name:"アプロケイルス",
  nameI18n:{"ja":"アプロケイルス","en":"Mediterranean Killifish","zh-CN":"斑条鱂鱼","zh-TW":"斑條鱂魚","ko":"줄무늬송사리","th":"ปลาคิลลี่ฟิช"},
  level:7,
@@ -806,7 +806,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/062.PNG"
 },
-{
+{id:"fish_63",
  name:"カジカ",
  nameI18n:{"ja":"カジカ","en":"Mottled Sculpin","zh-CN":"杜父鱼","zh-TW":"杜父魚","ko":"둑중개","th":"ปลาคอตตัส"},
  level:7,
@@ -819,7 +819,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/063.PNG"
 },
-{
+{id:"fish_64",
  name:"リュウグウノツカイ",
  nameI18n:{"ja":"リュウグウノツカイ","en":"Giant Oarfish","zh-CN":"皇带鱼","zh-TW":"皇帶魚","ko":"산갈치","th":"ปลาออร์"},
  level:7,
@@ -832,7 +832,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/064.PNG"
 },
-{
+{id:"fish_65",
  name:"スペインダイ",
  nameI18n:{"ja":"スペインダイ","en":"Blackspot Seabream","zh-CN":"黑斑小鲷","zh-TW":"黑斑小鯛","ko":"검은점돔","th":"ปลาสลิดหินปากดำ"},
  level:7,
@@ -845,7 +845,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/065.PNG"
 },
-{
+{id:"fish_66",
  name:"ヨーロッパウナギ",
  nameI18n:{"ja":"ヨーロッパウナギ","en":"European Eel","zh-CN":"欧洲鳗鲡","zh-TW":"歐洲鰻鱺","ko":"유럽장어","th":"ปลาไหลยุโรป"},
  level:7,
@@ -858,7 +858,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/066.PNG"
 },
-{
+{id:"fish_67",
  name:"黄金タラバガニ",
  nameI18n:{"ja":"黄金タラバガニ","en":"Golden King Crab","zh-CN":"黄金帝王蟹","zh-TW":"黃金帝王蟹","ko":"황금 킹크랩","th":"เรดคิงแครบทองคำ"},
  level:8,
@@ -871,7 +871,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/067.PNG"
 },
-{
+{id:"fish_68",
  name:"マッドミノー",
  nameI18n:{"ja":"マッドミノー","en":"European Mudminnow","zh-CN":"荫鱼","zh-TW":"蔭魚","ko":"펄고기","th":"ปลาดุกทะเลยุโรป"},
  level:8,
@@ -884,7 +884,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/068.PNG"
 },
-{
+{id:"fish_69",
  name:"北欧ブルーアカザエビ",
  nameI18n:{"ja":"北欧ブルーアカザエビ","en":"Blue European Crayfish","zh-CN":"蓝色北欧鳌虾","zh-TW":"藍色北歐螯蝦","ko":"북유럽파란가재","th":"กุ้งเครย์ฟิชนอร์สสีน้ำเงิน"},
  level:8,
@@ -897,7 +897,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/069.PNG"
 },
-{
+{id:"fish_70",
  name:"キンギョ",
  nameI18n:{"ja":"キンギョ","en":"Goldfish","zh-CN":"金鱼","zh-TW":"金魚","ko":"금붕어","th":"ปลาทอง"},
  level:8,
@@ -910,7 +910,7 @@ const fishData = [
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/070.PNG"
 },
-{
+{id:"fish_71",
  name:"タラバガニ",
  nameI18n:{"ja":"タラバガニ","en":"King Crab","zh-CN":"帝王蟹","zh-TW":"帝王蟹","ko":"킹크랩","th":"เรดคิงแครบ"},
  level:8,
@@ -923,7 +923,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/071.PNG"
 },
-{
+{id:"fish_72",
  name:"モンツキダラ",
  nameI18n:{"ja":"モンツキダラ","en":"Haddock","zh-CN":"黑线鳕","zh-TW":"黑線鱈","ko":"해덕대구","th":"ปลาแฮดด็อค"},
  level:8,
@@ -936,7 +936,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/072.PNG"
 },
-{
+{id:"fish_73",
  name:"ノーザンパイク",
  nameI18n:{"ja":"ノーザンパイク","en":"Northern Pike","zh-CN":"白斑狗鱼","zh-TW":"白斑狗魚","ko":"강꼬치고기","th":"นอร์ทเทิร์นไพค์"},
  level:9,
@@ -949,7 +949,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/073.PNG"
 },
-{
+{id:"fish_74",
  name:"パンプキンシード",
  nameI18n:{"ja":"パンプキンシード","en":"Pumpkinseed","zh-CN":"驼背太阳鱼","zh-TW":"駝背太陽魚","ko":"펌프킨시드","th":"ปลาซันฟิชหลังโก่ง"},
  level:9,
@@ -962,7 +962,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/074.PNG"
 },
-{
+{id:"fish_75",
  name:"ドナウイトウ",
  nameI18n:{"ja":"ドナウイトウ","en":"Huchen","zh-CN":"多瑙罗哲鱼","zh-TW":"多瑙羅哲魚","ko":"후첸","th":"ปลาฮูเชน"},
  level:9,
@@ -975,7 +975,7 @@ const fishData = [
  locationI18n:{"ja":"巨木の川","en":"Giantwood River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/075.PNG"
 },
-{
+{id:"fish_76",
  name:"ミナミマグロ",
  nameI18n:{"ja":"ミナミマグロ","en":"Bluefin Tuna","zh-CN":"蓝鳍金枪鱼","zh-TW":"藍鰭金槍魚","ko":"참다랑어","th":"ปลาทูน่าครีบน้ำเงิน"},
  level:9,
@@ -988,7 +988,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Zephyr Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/076.PNG"
 },
-{
+{id:"fish_77",
  name:"マンボウ",
  nameI18n:{"ja":"マンボウ","en":"Ocean Sunfish","zh-CN":"翻车鱼","zh-TW":"翻車魚","ko":"개복치","th":"ปลาแสงอาทิตย์"},
  level:9,
@@ -1001,7 +1001,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/077.PNG"
 },
-{
+{id:"fish_78",
  name:"アカマンボウ",
  nameI18n:{"ja":"アカマンボウ","en":"Moonfish","zh-CN":"月鱼","zh-TW":"月魚","ko":"붉은개복치","th":"ปลาพระจันทร์"},
  level:9,
@@ -1014,7 +1014,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/078.PNG"
 },
-{
+{id:"fish_79",
  name:"ヨーロッパナマズ",
  nameI18n:{"ja":"ヨーロッパナマズ","en":"Wels Catfish","zh-CN":"欧洲鲶鱼","zh-TW":"歐洲鯰魚","ko":"유럽메기","th":"ปลาดุกยุโรป"},
  level:10,
@@ -1027,7 +1027,7 @@ const fishData = [
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/079.PNG"
 },
-{
+{id:"fish_80",
  name:"ブルーギル",
  nameI18n:{"ja":"ブルーギル","en":"Bluegill","zh-CN":"蓝鳃太阳鱼","zh-TW":"藍鰓太陽魚","ko":"블루길","th":"ปลาซันฟิชเหงือกน้ำเงิน"},
  level:10,
@@ -1040,7 +1040,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/080.PNG"
 },
-{
+{id:"fish_81",
  name:"ホッキョクイワナ",
  nameI18n:{"ja":"ホッキョクイワナ","en":"Arctic Char","zh-CN":"北极红点鲑","zh-TW":"北極紅點鮭","ko":"북극곤들매기","th":"ปลาชาร์อาร์กติก"},
  level:10,
@@ -1053,7 +1053,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/081.PNG"
 },
-{
+{id:"fish_82",
  name:"メカジキ",
  nameI18n:{"ja":"メカジキ","en":"Swordfish","zh-CN":"剑鱼","zh-TW":"劍魚","ko":"황새치","th":"ปลากระโทงดาบ"},
  level:10,
@@ -1066,7 +1066,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/082.PNG"
 },
-{
+{id:"fish_83",
  name:"シュモクザメ",
  nameI18n:{"ja":"シュモクザメ","en":"Smooth Hammerhead","zh-CN":"锤头鲨","zh-TW":"錘頭鯊","ko":"귀상어","th":"ปลาฉลามหัวค้อน"},
  level:10,
@@ -1079,7 +1079,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/083.PNG"
 },
-{
+{id:"fish_84",
  name:"アオザメ",
  nameI18n:{"ja":"アオザメ","en":"Shortfin Mako Shark","zh-CN":"尖吻鲭鲨","zh-TW":"尖吻鯖鯊","ko":"청상아리","th":"ฉลามมาโกครีบสั้น"},
  level:10,
@@ -1092,7 +1092,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing ","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/084.PNG"
 },
-{
+{id:"fish_85",
  name:"ライオンヘッド",
  nameI18n:{"ja":"ライオンヘッド","en":"Lionhead","zh-CN":"狮子头金鱼","zh-TW":"獅子頭金魚","ko":"사자머리금붕어","th":"ปลาทองสิงห์จีน"},
  level:11,
@@ -1105,7 +1105,7 @@ const fishData = [
  locationI18n:{"ja":"温泉山の湖","en":"Onsen Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/086.PNG"
 },
-{
+{id:"fish_86",
  name:"アジアアロワナ",
  nameI18n:{"ja":"アジアアロワナ","en":"Asian Arowana","zh-CN":"金龙鱼","zh-TW":"金龍魚","ko":"골드아로와나","th":"ปลามังกรทอง"},
  level:11,
@@ -1118,7 +1118,7 @@ const fishData = [
  locationI18n:{"ja":"草原の湖","en":"Meadow Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/085.PNG"
 },
-{
+{id:"fish_87",
  name:"シマスズメダイ",
  nameI18n:{"ja":"シマスズメダイ","en":"Sergeant Major Damselfish","zh-CN":"豆娘鱼","zh-TW":"豆娘魚","ko":"줄자돔","th":"ปลาสลิดหินจุดดำ"},
  level:11,
@@ -1131,7 +1131,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/087.PNG"
 },
-{
+{id:"fish_88",
  name:"ジンベエザメ",
  nameI18n:{"ja":"ジンベエザメ","en":"Whale Shark","zh-CN":"鲸鲨","zh-TW":"鯨鯊","ko":"고래상어","th":"ฉลามวาฬ"},
  level:11,
@@ -1144,7 +1144,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/088.PNG"
 },
-{
+{id:"fish_89",
  name:"ベタ",
  nameI18n:{"ja":"ベタ","en":"Betta","zh-CN":"斗鱼","zh-TW":"鬥魚","ko":"베타","th":"ปลากัด"},
  level:12,
@@ -1157,7 +1157,7 @@ const fishData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/090.PNG"
 },
-{
+{id:"fish_90",
  name:"エンゼルフィッシュ",
  nameI18n:{"ja":"エンゼルフィッシュ","en":"Angelfish","zh-CN":"神仙鱼","zh-TW":"神仙魚","ko":"엔젤피시","th":"ปลาเทวดา"},
  level:12,
@@ -1170,7 +1170,7 @@ const fishData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/094.PNG"
 },
-{
+{id:"fish_91",
  name:"ミズクラゲ",
  nameI18n:{"ja":"ミズクラゲ","en":"Moon Jellyfish","zh-CN":"海月水母","zh-TW":"海月水母","ko":"해파리","th":"แมงกะพรุนพระจันทร์"},
  level:12,
@@ -1183,7 +1183,7 @@ const fishData = [
  locationI18n:{"ja":"海釣りクエスト","en":"Sea Fishing Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/091.PNG"
 },
-{
+{id:"fish_92",
  name:"アオウミガメ",
  nameI18n:{"ja":"アオウミガメ","en":"Green Sea Turtle","zh-CN":"绿海龟","zh-TW":"綠海龜","ko":"바다거북","th":"เต่าตนุ"},
  level:12,
@@ -1196,7 +1196,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/092.PNG"
 },
-{
+{id:"fish_93",
  name:"シイラ",
  nameI18n:{"ja":"シイラ","en":"Mahi-mahi","zh-CN":"鲯鳅","zh-TW":"鯕鳅","ko":"만새기","th":"ปลาอีโต้มอญ"},
  level:12,
@@ -1209,7 +1209,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/093.PNG"
 },
-{
+{id:"fish_94",
  name:"ニザダイ",
  nameI18n:{"ja":"ニザダイ","en":"Surgeonfish","zh-CN":"倒吊鱼","zh-TW":"倒吊魚","ko":"양쥐돔","th":"ปลาผ่าเหลือง"},
  level:13,
@@ -1222,7 +1222,7 @@ const fishData = [
  locationI18n:{"ja":"旧海","en":"Old Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/095.PNG"
 },
-{
+{id:"fish_95",
  name:"ミノカサゴ",
  nameI18n:{"ja":"ミノカサゴ","en":"Lionfish","zh-CN":"狮子鱼","zh-TW":"獅子魚","ko":"쏠배감펭","th":"ปลาสิงโต"},
  level:13,
@@ -1235,7 +1235,7 @@ const fishData = [
  locationI18n:{"ja":"クジラ海","en":"Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/096.PNG"
 },
-{
+{id:"fish_96",
  name:"シリキルリスズメダイ",
  nameI18n:{"ja":"シリキルリスズメダイ","en":"Yellowtail Blue Damselfish","zh-CN":"半蓝金翅雀鲷","zh-TW":"半藍金翅雀鯛","ko":"아주르담셀","th":"ปลาสลิดหินครึ่งฟ้า"},
  level:14,
@@ -1248,7 +1248,7 @@ const fishData = [
  locationI18n:{"ja":"そよ風の海","en":"Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/097.PNG"
 },
-{
+{id:"fish_97",
  name:"レナーズラス",
  nameI18n:{"ja":"レナーズラス","en":"Rainbow Wrasse","zh-CN":"西澳梦幻龙鱼","zh-TW":"西澳夢幻龍魚","ko":"레나르디놀래기","th":"ปลาหมอทะเลเลนนาร์ด"},
  level:14,
@@ -1261,7 +1261,7 @@ const fishData = [
  locationI18n:{"ja":"東海","en":"East Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/fish/098.PNG"
 },
-{
+{id:"fish_98",
  name:"氷晶のタラバガニ",
  nameI18n:{"ja":"氷晶のタラバガニ","en":"Frostspore King Crab","zh-CN":"冰晶帝王蟹","zh-TW":"冰晶帝王蟹","ko":"얼음 결정 킹크랩","th":"เรดคิงแครบอลาสก้าคริสตัล"},
  season:true,
@@ -1276,7 +1276,7 @@ const fishData = [
  img:"images/fish/1006.PNG",
  auth:false
 },
-{
+{id:"fish_99",
  name:"氷晶のマンボウ",
  nameI18n:{"ja":"氷晶のマンボウ","en":"Frostspore Ocean Sunfish","zh-CN":"冰晶翻车鱼","zh-TW":"冰晶翻車魚","ko":"얼음 결정 개복치","th":"ปลาแสงอาทิตย์คริสตัล"},
  season:true,
@@ -1291,7 +1291,7 @@ const fishData = [
  img:"images/fish/1007.PNG",
  auth:false
 },
-{
+{id:"fish_100",
  name:"氷晶のフグ",
  nameI18n:{"ja":"氷晶のフグ","en":"Frostspore Puffer Fish","zh-CN":"冰晶河鲀","zh-TW":"冰晶河魨","ko":"얼음 결정 복어","th":"ปลาปักเป้าคริสตัล"},
  season:true,
@@ -1306,7 +1306,7 @@ const fishData = [
  img:"images/fish/1008.PNG",
  auth:false
 },
-{
+{id:"fish_101",
  name:"氷晶のタツノオトシゴ",
  nameI18n:{"ja":"氷晶のタツノオトシゴ","en":"Frostspore Seahorse","zh-CN":"冰晶海马","zh-TW":"冰晶海馬","ko":"얼음 결정 해마","th":"ม้าน้ำเทศกาลแฟชั่นฤดูหนาว"},
  season:true,
@@ -1321,7 +1321,7 @@ const fishData = [
  img:"images/fish/1009.PNG",
  auth:false
 },
-{
+{id:"fish_102",
  name:"氷晶のジンベエザメ",
  nameI18n:{"ja":"氷晶のジンベエザメ","en":"Frostspore Whale Shark","zh-CN":"冰晶鲸鲨","zh-TW":"冰晶鯨鯊","ko":"얼음 결정 고래상어","th":"ฉลามวาฬคริสตัล"},
  season:true,
@@ -1336,7 +1336,7 @@ const fishData = [
  img:"images/fish/1010.PNG",
  auth:false
 },
-{
+{id:"fish_103",
  name:"紺色帽のディレクタコ",
  nameI18n:{"ja":"紺色帽のディレクタコ","en":"Director Pygmy Octopus w/Navy Hat","zh-CN":"绀帽导演侏儒章","zh-TW":"紺帽導演侏儒章","ko":"감청색 감독 난쟁이문어","th":"หมึกแคระผู้กำกับหมวกกรมท่า"},
  fes:true,
@@ -1351,7 +1351,7 @@ const fishData = [
  img:"images/fish/1011.PNG",
  auth:false
 },
-{
+{id:"fish_104",
  name:"茶色帽のディレクタコ",
  nameI18n:{"ja":"茶色帽のディレクタコ","en":"Director Pygmy Octopus w/Brown Hat","zh-CN":"棕帽导演侏儒章","zh-TW":"棕帽導演侏儒章","ko":"갈색 감독 난쟁이문어","th":"หมึกแคระผู้กำกับหมวกน้ำตาล"},
  fes:true,
@@ -1366,7 +1366,7 @@ const fishData = [
  img:"images/fish/1012.PNG",
  auth:false
 },
-{
+{id:"fish_105",
  name:"青色帽のディレクタコ",
  nameI18n:{"ja":"青色帽のディレクタコ","en":"Director Pygmy Octopus w/Cyan Hat","zh-CN":"青帽导演侏儒章","zh-TW":"青帽導演侏儒章","ko":"청록색 감독 난쟁이문어","th":"หมึกแคระผู้กำกับหมวกเขียว"},
  fes:true,
@@ -1381,7 +1381,7 @@ const fishData = [
  img:"images/fish/1013.PNG",
  auth:false
 },
-{
+{id:"fish_106",
  name:"褐色帽のディレクタマダコ",
  nameI18n:{"ja":"褐色帽のディレクタマダコ","en":"Director Common Octopus w/Cinnamon Hat","zh-CN":"褐帽导演真蛸","zh-TW":"褐帽導演真蛸","ko":"갈색 감독 참문어","th":"หมึกยักษ์ผู้กำกับหมวกสีน้ำตาล"},
  fes:true,
@@ -1396,7 +1396,7 @@ const fishData = [
  img:"images/fish/1014.PNG",
  auth:false
 },
-{
+{id:"fish_107",
  name:"柄帽のディレクタマダコ",
  nameI18n:{"ja":"柄帽のディレクタマダコ","en":"Director Common Octopus w/Patterned Hat","zh-CN":"花帽导演真蛸","zh-TW":"花帽導演真蛸","ko":"꽃무늬 감독 참문어","th":"หมึกยักษ์ผู้กำกับหมวกลาย"},
  fes:true,
@@ -1411,7 +1411,7 @@ const fishData = [
  img:"images/fish/1015.PNG",
  auth:false
 },
-{
+{id:"fish_108",
  name:"積み木カクレクマノミ(青)",
  nameI18n:{"ja":"積み木カクレクマノミ(青)","en":"Blue Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1426,7 +1426,7 @@ const fishData = [
  img:"images/fish/1001.PNG",
  auth:false
 },
-{
+{id:"fish_109",
  name:"積み木カクレクマノミ(赤)",
  nameI18n:{"ja":"積み木カクレクマノミ(赤)","en":"Red Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1441,7 +1441,7 @@ const fishData = [
  img:"images/fish/1002.PNG",
  auth:false
 },
-{
+{id:"fish_110",
  name:"積み木カクレクマノミ(青緑)",
  nameI18n:{"ja":"積み木カクレクマノミ(青緑)","en":"Green Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1456,7 +1456,7 @@ const fishData = [
  img:"images/fish/1003.PNG",
  auth:false
 },
-{
+{id:"fish_111",
  name:"積み木カクレクマノミ(紫)",
  nameI18n:{"ja":"積み木カクレクマノミ(紫)","en":"Purple Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1471,7 +1471,7 @@ const fishData = [
  img:"images/fish/1004.PNG",
  auth:false
 },
-{
+{id:"fish_112",
  name:"積み木カクレクマノミ(虹)",
  nameI18n:{"ja":"積み木カクレクマノミ(虹)","en":"Colorful Brick Clownfish","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1486,7 +1486,7 @@ const fishData = [
  img:"images/fish/1005.PNG",
  auth:false
 },
-{
+{id:"fish_113",
  name:"ホタテ",
  nameI18n:{"ja":"ホタテ","en":"Scallop","zh-CN":"扇贝","zh-TW":"扇貝","ko":"가리비","th":"หอยสแกลอป"},
  season:true,
@@ -1501,7 +1501,7 @@ const fishData = [
  img:"images/fish/1016.PNG",
  auth:false
 },
-{
+{id:"fish_114",
  name:"ニシキテグリ",
  nameI18n:{"ja":"ニシキテグリ","en":"Mandarin Fish","zh-CN":"曼陀铃鱼","zh-TW":"曼陀鈴魚","ko":"만다린피시","th":"ปลาแมนดาริน"},
  season:true,
@@ -1516,7 +1516,7 @@ const fishData = [
  img:"images/fish/1017.PNG",
  auth:false
 },
-{
+{id:"fish_115",
  name:"ウミウシ",
  nameI18n:{"ja":"ウミウシ","en":"Sea Slug","zh-CN":"海蛞蝓","zh-TW":"海蛞蝓","ko":"갯민숭달팽이","th":"ทากทะเล"},
  season:true,
@@ -1531,7 +1531,7 @@ const fishData = [
  img:"images/fish/1018.PNG",
  auth:false
 },
-{
+{id:"fish_116",
  name:"スルメイカ",
  nameI18n:{"ja":"スルメイカ","en":"Japanese Flying Squid","zh-CN":"太平洋褶鱿鱼","zh-TW":"太平洋褶魷魚","ko":"살오징어","th":"หมึกบินแปซิฟิก"},
  season:true,
@@ -1546,7 +1546,7 @@ const fishData = [
  img:"images/fish/1019.PNG",
  auth:false
 },
-{
+{id:"fish_117",
  name:"ホタルイカ",
  nameI18n:{"ja":"ホタルイカ","en":"Firefly Squid","zh-CN":"萤火鱿","zh-TW":"螢火魷","ko":"매오징어","th":"หมึกหิ่งห้อย"},
  season:true,
@@ -1561,7 +1561,7 @@ const fishData = [
  img:"images/fish/1020.PNG",
  auth:false
 },
-{
+{id:"fish_118",
  name:"ヒラタウミガメ",
  nameI18n:{"ja":"ヒラタウミガメ","en":"Flatback Turtle","zh-CN":"平背龟","zh-TW":"平背龜","ko":"납작등바다거북","th":"เต่าหลังแบน"},
  season:true,
@@ -1576,7 +1576,7 @@ const fishData = [
  img:"images/fish/1021.PNG",
  auth:false
 },
-{
+{id:"fish_119",
  name:"太平洋ヒメウミガメ",
  nameI18n:{"ja":"太平洋ヒメウミガメ","en":"Olive Ridley Turtle","zh-CN":"太平洋丽龟","zh-TW":"太平洋麗龜","ko":"올리브바다거북","th":"เต่าโอลิฟริดลีย์"},
  season:true,
@@ -1591,7 +1591,7 @@ const fishData = [
  img:"images/fish/1022.PNG",
  auth:false
 },
-{
+{id:"fish_120",
  name:"ペールゴールドガーパイク",
  nameI18n:{"ja":"ペールゴールドガーパイク","en":"Pale Gold Garfish","zh-CN":"淡金雀鳝","zh-TW":"淡金雀鱔","ko":"연금색 가아피쉬","th":"ปลาการ์สีทองอ่อน"},
  fes:true,
@@ -1607,7 +1607,7 @@ const fishData = [
  img:"images/fish/1023.PNG",
  auth:false
 },
-{
+{id:"fish_121",
  name:"ブラウンブロッチガーパイク",
  nameI18n:{"ja":"ブラウンブロッチガーパイク","en":"Brown Garfish","zh-CN":"棕斑雀鳝","zh-TW":"棕斑雀鱔","ko":"갈색 얼룩 가아피쉬","th":"ปลาการ์ลายจุดสีน้ำตาล"},
  fes:true,
@@ -1623,7 +1623,7 @@ const fishData = [
  img:"images/fish/1024.PNG",
  auth:false
 },
-{
+{id:"fish_122",
  name:"シルバーガーパイク",
  nameI18n:{"ja":"シルバーガーパイク","en":"Silver Garfish","zh-CN":"银白雀鳝","zh-TW":"銀白雀鱔","ko":"은색 가아피쉬","th":"ปลาการ์สีเงินขาว"},
  fes:true,
@@ -1639,7 +1639,7 @@ const fishData = [
  img:"images/fish/1025.PNG",
  auth:false
 },
-{
+{id:"fish_123",
  name:"ブラックスポットガーパイク",
  nameI18n:{"ja":"ブラックスポットガーパイク","en":"Black Garfish","zh-CN":"黑斑雀鳝","zh-TW":"黑斑雀鱔","ko":"검은 얼룩 가아피쉬","th":"ปลาการ์ลายจุดสีดำ"},
  fes:true,
@@ -1655,7 +1655,7 @@ const fishData = [
  img:"images/fish/1026.PNG",
  auth:false
 },
-{
+{id:"fish_124",
  name:"ゴールデンガーパイク",
  nameI18n:{"ja":"ゴールデンガーパイク","en":"Golden Garfish","zh-CN":"黄金雀鳝","zh-TW":"黃金雀鱔","ko":"황금 가아피쉬","th":"ปลาการ์สีทอง"},
  fes:true,
@@ -1671,7 +1671,7 @@ const fishData = [
  img:"images/fish/1027.PNG",
  auth:false
 },
-{
+{id:"fish_125",
  // イベント「幽夜の集い」2026-10-10開始
  name:"シリヤケイカ",
  nameI18n:{"ja":"シリヤケイカ","en":"Spineless Cuttlefish","zh-CN":"无针乌贼","zh-TW":"無針烏賊","ko":"쇠갑오징어","th":"หมึกกระดองไร้หนาม"},
@@ -1688,7 +1688,7 @@ const fishData = [
  img:"images/fish/1028.PNG",
  auth:false
 },
-{
+{id:"fish_126",
  // イベント「幽夜の集い」2026-10-10開始
  name:"トラフコウイカ",
  nameI18n:{"ja":"トラフコウイカ","en":"Pharaoh Cuttlefish","zh-CN":"虎斑乌贼","zh-TW":"虎斑烏賊","ko":"호랑무늬갑오징어","th":"หมึกกระดองลายเสือ"},
@@ -1705,7 +1705,7 @@ const fishData = [
  img:"images/fish/1029.PNG",
  auth:false
 },
-{
+{id:"fish_127",
  // イベント「幽夜の集い」2026-10-10開始
  name:"コウイカ",
  nameI18n:{"ja":"コウイカ","en":"Golden Cuttlefish","zh-CN":"金乌贼","zh-TW":"金烏賊","ko":"참갑오징어","th":"หมึกกระดองทอง"},
@@ -1722,7 +1722,7 @@ const fishData = [
  img:"images/fish/1030.PNG",
  auth:false
 },
-{
+{id:"fish_128",
  // イベント「幽夜の集い」2026-10-10開始
  name:"ブルークリオネ",
  nameI18n:{"ja":"ブルークリオネ","en":"Blue Sea Angel","zh-CN":"蓝光海天使","zh-TW":"藍光海天使","ko":"푸른빛 클리오네","th":"Blue Sea Angel"},
@@ -1739,7 +1739,7 @@ const fishData = [
  img:"images/fish/1031.PNG",
  auth:false
 },
-{
+{id:"fish_129",
  // イベント「幽夜の集い」2026-10-10開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"グリーンクリオネ",
@@ -1757,7 +1757,7 @@ const fishData = [
  img:"images/fish/1032.PNG",
  auth:false
 },
-{
+{id:"fish_130",
  // イベント「幽夜の集い」2026-10-10開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"パープルクリオネ",

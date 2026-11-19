@@ -15,7 +15,7 @@
 const flowerData = [
 
   // ── 通常の花 ────────────────────────
-  {
+  {id:"flower_1",
     name: "ヒナギク",
     nameI18n:{"ja":"ヒナギク","en":"Daisy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/hinagiku.PNG",
@@ -30,7 +30,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 1,
   },
-  {
+  {id:"flower_2",
     name: "パンジー",
     nameI18n:{"ja":"パンジー","en":"Pansy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/pansy.PNG",
@@ -45,7 +45,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 2,
   },
-  {
+  {id:"flower_3",
     name: "アンスリウム",
     nameI18n:{"ja":"アンスリウム","en":"Anthurium","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/anthurium.PNG",
@@ -60,7 +60,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 3,
   },
-  {
+  {id:"flower_4",
     name: "ヒナゲシ",
     nameI18n:{"ja":"ヒナゲシ","en":"Poppy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/hinageshi.PNG",
@@ -75,7 +75,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 4,
   },
-  {
+  {id:"flower_5",
     name: "オランダカイウ",
     nameI18n:{"ja":"オランダカイウ","en":"Calla Lily","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/oranda_kaiu.PNG",
@@ -90,7 +90,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 5,
   },
-  {
+  {id:"flower_6",
     name: "アサガオ",
     nameI18n:{"ja":"アサガオ","en":"Morning Glory","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/asagao.PNG",
@@ -105,7 +105,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 6,
   },
-  {
+  {id:"flower_7",
     name: "カーネーション",
     nameI18n:{"ja":"カーネーション","en":"Carnation","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/carnation.PNG",
@@ -120,7 +120,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 7,
   },
-  {
+  {id:"flower_8",
     name: "チューリップ",
     nameI18n:{"ja":"チューリップ","en":"Tulip","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/tulip.PNG",
@@ -135,7 +135,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 8,
   },
-  {
+  {id:"flower_9",
     name: "ユリ",
     nameI18n:{"ja":"ユリ","en":"Lily","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/yuri.PNG",
@@ -150,7 +150,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 9,
   },
-  {
+  {id:"flower_10",
     name: "バラ",
     nameI18n:{"ja":"バラ","en":"Rose","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/bara.PNG",
@@ -165,7 +165,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 10,
   },
-  {
+  {id:"flower_11",
     name: "ヒヤシンス",
     nameI18n:{"ja":"ヒヤシンス","en":"Hyacinth","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/hyacinth.PNG",
@@ -180,7 +180,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 11,
   },
-  {
+  {id:"flower_12",
     name: "コチョウラン",
     nameI18n:{"ja":"コチョウラン","en":"Moth Orchid","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/kochoран.PNG",
@@ -195,7 +195,7 @@ const flowerData = [
     eventName: null,
     bookIndex: 12,
   },
-  {
+  {id:"flower_13",
     name: "ゼラニウム",
     nameI18n:{"ja":"ゼラニウム","en":"Geranium","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/geranium.PNG",
@@ -212,7 +212,7 @@ const flowerData = [
   },
 
   // ── イベントの花 ────────────────────────
-  {
+  {id:"flower_14",
     name: "メコノプシス",
     nameI18n:{"ja":"メコノプシス","en":"Himalayan Blue Poppy","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/mekonopsis.PNG",
@@ -228,7 +228,7 @@ const flowerData = [
     eventName: "スノーシーズン",
     bookIndex: 14,
   },
-  {
+  {id:"flower_15",
     name: "タンポポ",
     nameI18n:{"ja":"タンポポ","en":"Dandelion","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/tanpopo.PNG",
@@ -244,7 +244,7 @@ const flowerData = [
     eventName: "ドリームライト",
     bookIndex: 15,
   },
-  {
+  {id:"flower_16",
     name: "積み木フラワー",
     nameI18n:{"ja":"積み木フラワー","en":"Building Block Flower","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/tsumiki_flower.PNG",
@@ -261,7 +261,7 @@ const flowerData = [
     bookIndex: 16,
   },
   
-  {
+  {id:"flower_17",
     name: "スイセン",
     nameI18n:{"ja":"スイセン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/suisen.PNG",
@@ -277,7 +277,7 @@ const flowerData = [
     eventName: "ホエールシーズン",
     bookIndex: 17,
   },
-  {
+  {id:"flower_18",
     name: "リュウカデンドロン・サマーサン",
     nameI18n:{"ja":"リュウカデンドロン・サマーサン","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/summer.PNG",
@@ -294,7 +294,7 @@ const flowerData = [
     eventName: "原始の呼び声",
     bookIndex: 18,
   },
-  {
+  {id:"flower_19",
     name: "ヒガンバナ",
     nameI18n:{"ja":"ヒガンバナ","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
     img: "./images/flowers/higanbana.PNG",
