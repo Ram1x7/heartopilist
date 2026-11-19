@@ -804,6 +804,8 @@ const CONVERT_TUTORIAL_STEPS = [
 ];
 let convertTutorialStep = 0;
 let convertTutorialActive = false;
+// チュートリアル開始前のスクロール位置。一通り終わったタイミングでここへ戻す
+let _convertTutorialReturnScrollY = 0;
 
 // phase（upload/crop/panel）の最初のステップから開始する。既にそのフェーズ以降まで
 // 進んでいる場合は巻き戻さない（「位置を調整する」で後からcrop画面に戻った場合など）
@@ -812,6 +814,7 @@ function maybeStartConvertTutorialPhase(phase){
   const firstIdx = CONVERT_TUTORIAL_STEPS.findIndex((s) => s.phase === phase);
   if(firstIdx === -1) return;
   if(convertTutorialActive && convertTutorialStep >= firstIdx) return;
+  if(!convertTutorialActive) _convertTutorialReturnScrollY = window.scrollY;
   convertTutorialStep = firstIdx;
   convertTutorialActive = true;
   document.getElementById("artTutorialBackdrop").style.display = "block";
@@ -832,7 +835,8 @@ function renderConvertTutorialStep(){
   document.getElementById("artTutorialStepLabel").textContent = `${convertTutorialStep + 1} / ${CONVERT_TUTORIAL_STEPS.length}`;
   document.getElementById("artTutorialText").innerHTML = `<strong>${T(step.titleKey, step.titleFallback)}</strong><br>${T(step.textKey, step.textFallback)}`;
   document.getElementById("artTutorialNextBtn").textContent = convertTutorialStep === CONVERT_TUTORIAL_STEPS.length - 1 ? T("tutorial_start", "はじめる") : T("tutorial_next", "次へ");
-  target.scrollIntoView({ block: "center", behavior: "auto" });
+  const block = target.offsetHeight > window.innerHeight ? "start" : "center";
+  target.scrollIntoView({ block, behavior: "auto" });
   requestAnimationFrame(() => requestAnimationFrame(() => positionConvertTutorialElements(target)));
 }
 
@@ -876,6 +880,9 @@ function endConvertTutorial(done){
   document.getElementById("artTutorialBackdrop").style.display = "none";
   document.getElementById("artTutorialHighlight").style.display = "none";
   document.getElementById("artTutorialPopup").style.display = "none";
+  // 完了扱いの場合のみ、開始前のスクロール位置へ戻す（フェーズ待ちの一時停止では、
+  // これから表示される次フェーズの画面に合わせたいため動かさない）
+  if(done) window.scrollTo({ top: _convertTutorialReturnScrollY, left: 0, behavior: "auto" });
 }
 
 function skipConvertTutorial(){

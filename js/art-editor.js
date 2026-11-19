@@ -2493,6 +2493,8 @@ const TUTORIAL_STEPS = [
   { selector: "#artSaveBtn", titleKey: "art_create_tutorial_step7_title", titleFallback: "⑦ 保存する", textKey: "art_create_tutorial_step7_body", textFallback: "名前を付けて保存すると、「一覧を見る」からいつでも呼び出せます。エクスポートからPNG画像として保存したり、共有したりすることもできます。" },
 ];
 let tutorialStep = 0;
+// 開始前のスクロール位置。終了時にここへ戻す
+let _tutorialReturnScrollY = 0;
 
 // gridSizeModal表示中（＝まだキャンバスを作成していない）はチュートリアルを開始しない。
 // キャンバス作成完了（createCanvas）のタイミングで呼び直される
@@ -2508,6 +2510,7 @@ function maybeStartTutorial(){
 
 function startTutorial(){
   tutorialStep = 0;
+  _tutorialReturnScrollY = window.scrollY;
   document.getElementById("artTutorialBackdrop").style.display = "block";
   document.getElementById("artTutorialHighlight").style.display = "block";
   document.getElementById("artTutorialPopup").style.display = "block";
@@ -2531,8 +2534,11 @@ function renderTutorialStep(){
   document.getElementById("artTutorialText").innerHTML = `<strong>${T(step.titleKey, step.titleFallback)}</strong><br>${T(step.textKey, step.textFallback)}`;
   document.getElementById("artTutorialNextBtn").textContent = tutorialStep === TUTORIAL_STEPS.length - 1 ? T("tutorial_start", "はじめる") : T("tutorial_next", "次へ");
   // スムーススクロールだとアニメーション完了前に位置を確定してしまい枠がズレるため、
-  // 即座にジャンプさせてからレイアウト確定後（次の描画フレーム）に位置を合わせる
-  target.scrollIntoView({ block: "center", behavior: "auto" });
+  // 即座にジャンプさせてからレイアウト確定後（次の描画フレーム）に位置を合わせる。
+  // 対象がビューポートより高い場合は"center"だと中途半端な位置まで大きくスクロール
+  // してしまうため、その場合は上端に合わせる
+  const block = target.offsetHeight > window.innerHeight ? "start" : "center";
+  target.scrollIntoView({ block, behavior: "auto" });
   requestAnimationFrame(() => requestAnimationFrame(() => positionTutorialElements(target)));
 }
 
@@ -2573,6 +2579,7 @@ function endTutorial(){
   document.getElementById("artTutorialBackdrop").style.display = "none";
   document.getElementById("artTutorialHighlight").style.display = "none";
   document.getElementById("artTutorialPopup").style.display = "none";
+  window.scrollTo({ top: _tutorialReturnScrollY, left: 0, behavior: "auto" });
 }
 
 function replayTutorial(){
