@@ -1,6 +1,6 @@
 // 野鳥
 const birdData = [
-{
+{id:"bird_1",
  name:"コマドリ",
  nameI18n:{"ja":"コマドリ","en":"Japanese Robin","zh-CN":"知更鸟","zh-TW":"知更鳥","ko":"꼬까울새","th":"นกโรบิน"},
  level:1,
@@ -13,7 +13,7 @@ const birdData = [
  locationI18n:{"ja":"中心街","en":"Downtown","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/001.PNG"
 },
-{
+{id:"bird_2",
  name:"シジュウカラ",
  nameI18n:{"ja":"シジュウカラ","en":"Japanese Tit","zh-CN":"大山雀","zh-TW":"大山雀","ko":"노랑배박새","th":"นกติ๊ดใหญ่"},
  level:1,
@@ -26,7 +26,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/002.PNG"
 },
-{
+{id:"bird_3",
  name:"ミソサザイ",
  nameI18n:{"ja":"ミソサザイ","en":"Eurasian Wren","zh-CN":"鹪鹩","zh-TW":"鷦鷯","ko":"굴뚝새","th":"นกกระจิบ"},
  level:1,
@@ -39,7 +39,7 @@ const birdData = [
  locationI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/003.PNG"
 },
-{
+{id:"bird_4",
  name:"ウソ",
  nameI18n:{"ja":"ウソ","en":"Eurasian Bullfinch","zh-CN":"红腹灰雀","zh-TW":"紅腹灰雀","ko":"멋쟁이새","th":"นกกระจอกท้องแดง"},
  level:1,
@@ -52,7 +52,7 @@ const birdData = [
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/004.PNG"
 },
-{
+{id:"bird_5",
  name:"ズアオアトリ",
  nameI18n:{"ja":"ズアオアトリ","en":"Common Chaffinch","zh-CN":"苍头燕雀","zh-TW":"蒼頭燕雀","ko":"푸른머리되새","th":"นกจาบปีกอ่อนหัวเทาอกชมพู"},
  level:1,
@@ -65,7 +65,7 @@ const birdData = [
  locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/005.PNG"
 },
-{
+{id:"bird_6",
  name:"ルリコンゴウインコ",
  nameI18n:{"ja":"ルリコンゴウインコ","en":"Blue-and-yellow Macaw","zh-CN":"琉璃金刚鹦鹉","zh-TW":"琉璃金剛鸚鵡","ko":"청금강앵무","th":"นกมาคอว์สีน้ำเงินและ เหลือง"},
  level:1,
@@ -78,7 +78,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/006.PNG"
 },
-{
+{id:"bird_7",
  name:"ヒメモリバト",
  nameI18n:{"ja":"ヒメモリバト","en":"Stock Dove","zh-CN":"欧鸽","zh-TW":"歐鴿","ko":"분홍가슴비둘기","th":"นกพิราบยุโรป"},
  level:1,
@@ -91,7 +91,7 @@ const birdData = [
  locationI18n:{"ja":"中心街","en":"Downtown","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/007.PNG"
 },
-{
+{id:"bird_8",
  name:"シラコバト",
  nameI18n:{"ja":"シラコバト","en":"Eurasian Collared Dove","zh-CN":"灰斑鸠","zh-TW":"灰斑鳩","ko":"염주비둘기","th":"นกเขาไฟ"},
  level:1,
@@ -104,7 +104,7 @@ const birdData = [
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/008.PNG"
 },
-{
+{id:"bird_9",
  name:"ソデグロバト",
  nameI18n:{"ja":"ソデグロバト","en":"White-winged Pigeon","zh-CN":"斑皇鸠","zh-TW":"斑皇鳩","ko":"얼룩비둘기","th":"นกลุมพูขาว"},
  level:1,
@@ -117,7 +117,7 @@ const birdData = [
  locationI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/009.PNG"
 },
-{
+{id:"bird_10",
  name:"オオフラミンゴ",
  nameI18n:{"ja":"オオフラミンゴ","en":"Greater Flamingo","zh-CN":"大火烈鸟","zh-TW":"大火烈鳥","ko":"큰홍학","th":"นกฟลามิงโก้ใหญ่"},
  level:1,
@@ -130,7 +130,7 @@ const birdData = [
  locationI18n:{"ja":"水辺","en":"Waterside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/010.PNG"
 },
-{
+{id:"bird_11",
  name:"インドクジャク",
  nameI18n:{"ja":"インドクジャク","en":"Indian Peafowl","zh-CN":"蓝孔雀","zh-TW":"藍孔雀","ko":"청공작","th":"นกยูงสีน้ำเงิน"},
  level:1,
@@ -143,7 +143,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/011.PNG"
 },
-{
+{id:"bird_12",
  name:"マガモ",
  nameI18n:{"ja":"マガモ","en":"Mallard","zh-CN":"绿头鸭","zh-TW":"綠頭鴨","ko":"청둥오리","th":"เป็ดหัวเขียว"},
  level:1,
@@ -156,7 +156,7 @@ const birdData = [
  locationI18n:{"ja":"湖","en":"Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/012.PNG"
 },
-{
+{id:"bird_13",
  name:"エナガ",
  nameI18n:{"ja":"エナガ","en":"Long-tailed Tit","zh-CN":"北长尾山雀","zh-TW":"北長尾山雀","ko":"오목눈이","th":"นกชิมาเอนากะ"},
  level:2,
@@ -169,7 +169,7 @@ const birdData = [
  img:"images/birds/013.PNG",
  auth:false
 },
-{
+{id:"bird_14",
  name:"ゴジュウカラ",
  nameI18n:{"ja":"ゴジュウカラ","en":"Eurasian Nuthatch","zh-CN":"五子雀","zh-TW":"五子雀","ko":"동고비","th":"นกกระจอกห้าสี"},
  level:2,
@@ -182,7 +182,7 @@ const birdData = [
  locationI18n:{"ja":"漁村","en":"Fishing Village","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/014.PNG"
 },
-{
+{id:"bird_15",
  name:"ヒゲガラ",
  nameI18n:{"ja":"ヒゲガラ","en":"Bearded Reedling","zh-CN":"文须雀","zh-TW":"文鬚雀","ko":"수염오목눈이","th":"นกอีแอ่นเครา"},
  level:2,
@@ -195,7 +195,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山","en":"Hot Spring Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/015.PNG"
 },
-{
+{id:"bird_16",
  name:"ズアカモズ",
  nameI18n:{"ja":"ズアカモズ","en":"Woodchat Shrike","zh-CN":"林䳭伯劳","zh-TW":"林䳭伯勞","ko":"빨간머리때까치","th":"นกอีเสือเล็กน้ำตาล"},
  level:2,
@@ -208,7 +208,7 @@ const birdData = [
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/016.PNG"
 },
-{
+{id:"bird_17",
  name:"ウォンガバト",
  nameI18n:{"ja":"ウォンガバト","en":"Wonga Pigeon","zh-CN":"巨地鸠","zh-TW":"巨地鳩","ko":"웡가비둘기","th":"นกพิราบยักษ์"},
  level:2,
@@ -221,7 +221,7 @@ const birdData = [
  locationI18n:{"ja":"森林","en":"Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/017.PNG"
 },
-{
+{id:"bird_18",
  name:"コアオバト",
  nameI18n:{"ja":"コアオバト","en":"Little Green Pigeon","zh-CN":"红颈绿鸠","zh-TW":"紅頸綠鳩","ko":"분홍목녹색비둘기","th":"นกเปล้าคอสีม่วง"},
  level:2,
@@ -234,7 +234,7 @@ const birdData = [
  locationI18n:{"ja":"花畑","en":"Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/018.PNG"
 },
-{
+{id:"bird_19",
  name:"ヒドリガモ",
  nameI18n:{"ja":"ヒドリガモ","en":"Eurasian Wigeon","zh-CN":"赤颈鸭","zh-TW":"赤頸鴨","ko":"홍머리오리","th":"เป็ดปากสั้น"},
  level:2,
@@ -247,7 +247,7 @@ const birdData = [
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/019.PNG"
 },
-{
+{id:"bird_20",
  name:"カモメ",
  nameI18n:{"ja":"カモメ","en":"Common Gull","zh-CN":"海鸥","zh-TW":"海鷗","ko":"바다갈매기","th":"นกนางนวล"},
  level:2,
@@ -260,7 +260,7 @@ const birdData = [
  locationI18n:{"ja":"海辺","en":"Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/020.PNG"
 },
-{
+{id:"bird_21",
  name:"ニシコウライウグイス",
  nameI18n:{"ja":"ニシコウライウグイス","en":"Eurasian Golden Oriole","zh-CN":"金黄鹂","zh-TW":"金黃鸝","ko":"유럽꾀꼬리","th":"นกขมิ้นเหลืองอ่อน"},
  level:3,
@@ -273,7 +273,7 @@ const birdData = [
  locationI18n:{"ja":"ホーム","en":"Home","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/021.PNG"
 },
-{
+{id:"bird_22",
  name:"カノコスズメ",
  nameI18n:{"ja":"カノコスズメ","en":"Scaly-breasted Munia","zh-CN":"双斑草雀","zh-TW":"雙斑草雀","ko":"녹자작","th":"นกกระจิบหญ้าสองจุด"},
  level:3,
@@ -286,7 +286,7 @@ const birdData = [
  locationI18n:{"ja":"漁村-灯台","en":"Fishing Village - Lighthouse","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/022.PNG"
 },
-{
+{id:"bird_23",
  name:"シマエナガ",
  nameI18n:{"ja":"シマエナガ","en":"Japanese Long-tailed Tit","zh-CN":"银喉山雀","zh-TW":"銀喉山雀","ko":"검은턱오목눈이","th":"นกติ๊ดหางยาว"},
  level:3,
@@ -299,7 +299,7 @@ const birdData = [
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/023.PNG"
 },
-{
+{id:"bird_24",
  name:"ベニコンゴウインコ",
  nameI18n:{"ja":"ベニコンゴウインコ","en":"Scarlet Macaw","zh-CN":"红绿金刚鹦鹉","zh-TW":"紅綠金剛鸚鵡","ko":"홍금강앵무","th":"นกมาคอว์สีแดงและเขียว"},
  level:3,
@@ -312,7 +312,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/024.PNG"
 },
-{
+{id:"bird_25",
  name:"アカツクシガモ",
  nameI18n:{"ja":"アカツクシガモ","en":"Ruddy Shelduck","zh-CN":"赤麻鸭","zh-TW":"赤麻鴨","ko":"황오리","th":"เป็ดพม่า"},
  level:3,
@@ -325,7 +325,7 @@ const birdData = [
  locationI18n:{"ja":"郊外の湖街","en":"Suburban Lake Town","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/025.PNG"
 },
-{
+{id:"bird_26",
  name:"ケワタガモ",
  nameI18n:{"ja":"ケワタガモ","en":"Common Eider","zh-CN":"王绒鸭","zh-TW":"王絨鴨","ko":"호사북방오리","th":"เป็ดทะเลคิงอีเดอร์"},
  level:3,
@@ -338,7 +338,7 @@ const birdData = [
  locationI18n:{"ja":"川","en":"River","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/026.PNG"
 },
-{
+{id:"bird_27",
  name:"オデュアンカモメ",
  nameI18n:{"ja":"オデュアンカモメ","en":"Audouin's Gull","zh-CN":"奥杜安海鸥","zh-TW":"奧杜安海鷗","ko":"오두앵갈매기","th":"นกนางนวลออดูแอน"},
  level:3,
@@ -351,7 +351,7 @@ const birdData = [
  locationI18n:{"ja":"クジラ海の海辺","en":"Whale Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/027.PNG"
 },
-{
+{id:"bird_28",
  name:"ヨーロッパヒメウ",
  nameI18n:{"ja":"ヨーロッパヒメウ","en":"European Shag","zh-CN":"欧洲绿鸬鹚","zh-TW":"歐洲綠鸕鶿","ko":"유럽가마우지","th":"นกกระทุงเขียวยุโรป"},
  level:3,
@@ -364,7 +364,7 @@ const birdData = [
  locationI18n:{"ja":"海","en":"Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/028.PNG"
 },
-{
+{id:"bird_29",
  name:"タイリクハクセキレイ",
  nameI18n:{"ja":"タイリクハクセキレイ","en":"White Wagtail","zh-CN":"白鹡鸰","zh-TW":"白鶺鴒","ko":"알락할미새","th":"นกอุ้มบาตร"},
  level:4,
@@ -377,7 +377,7 @@ const birdData = [
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/029.PNG"
 },
-{
+{id:"bird_30",
  name:"ハイズキンダルマエナガ",
  nameI18n:{"ja":"ハイズキンダルマエナガ","en":"Gray-hooded Bushtit","zh-CN":"灰冠红雀","zh-TW":"灰冠紅雀","ko":"회색머리붉은참새","th":"นกคาร์ดินัลหัวเทา"},
  level:4,
@@ -390,7 +390,7 @@ const birdData = [
  locationI18n:{"ja":"漁村-漁村広場","en":"Fishing Village - Village Square","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/030.PNG"
 },
-{
+{id:"bird_31",
  name:"ギンザンマシコ",
  nameI18n:{"ja":"ギンザンマシコ","en":"Pine Grosbeak","zh-CN":"松雀","zh-TW":"松雀","ko":"솔양진이","th":"นกไพน์กรอสบีค"},
  level:4,
@@ -403,7 +403,7 @@ const birdData = [
  locationI18n:{"ja":"森林-森の島","en":"Forest - Forest Island","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/031.PNG"
 },
-{
+{id:"bird_32",
  name:"フウチョウモドキ",
  nameI18n:{"ja":"フウチョウモドキ","en":"Bowerbird","zh-CN":"黄头辉亭鸟","zh-TW":"黃頭輝亭鳥","ko":"노란머리바우어새","th":"นกไพรหัวเหลือง"},
  level:4,
@@ -416,7 +416,7 @@ const birdData = [
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/032.PNG"
 },
-{
+{id:"bird_33",
  name:"キンミノヒメアオバト",
  nameI18n:{"ja":"キンミノヒメアオバト","en":"Golden-mantled Green Pigeon","zh-CN":"金果鸠","zh-TW":"金果鳩","ko":"황금과일비둘기","th":"นกพิราบผลไม้สีทอง"},
  level:4,
@@ -429,7 +429,7 @@ const birdData = [
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/033.PNG"
 },
-{
+{id:"bird_34",
  name:"ギンケイ",
  nameI18n:{"ja":"ギンケイ","en":"Silver Pheasant","zh-CN":"白腹锦鸡","zh-TW":"白腹錦雞","ko":"은계","th":"ไก่ฟ้าท้องขาว"},
  level:4,
@@ -442,7 +442,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-遺跡","en":"Hot Spring Mountain - Ruins","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/034.PNG"
 },
-{
+{id:"bird_35",
  name:"ミコアイサ",
  nameI18n:{"ja":"ミコアイサ","en":"Smew","zh-CN":"白秋沙鸭","zh-TW":"白秋沙鴨","ko":"흰비오리","th":"เป็ดสมูว์"},
  level:4,
@@ -455,7 +455,7 @@ const birdData = [
  locationI18n:{"ja":"森の湖","en":"Forest Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/035.PNG"
 },
-{
+{id:"bird_36",
  name:"キバラメジロハエトリ",
  nameI18n:{"ja":"キバラメジロハエトリ","en":"Yellow-bellied Flycatcher","zh-CN":"黄腹纹霸鹟","zh-TW":"黃腹紋霸鶲","ko":"노랑배딱새","th":"นกจับแมลงท้องเหลือง"},
  level:5,
@@ -468,7 +468,7 @@ const birdData = [
  locationI18n:{"ja":"漁村-波止場","en":"Fishing Village - Pier","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/036.PNG"
 },
-{
+{id:"bird_37",
  name:"ヨーロッパハチクイ",
  nameI18n:{"ja":"ヨーロッパハチクイ","en":"European Bee-eater","zh-CN":"黄喉蜂虎","zh-TW":"黃喉蜂虎","ko":"유럽벌잡이새","th":"นกจาบคาหัวทอง"},
  level:5,
@@ -481,7 +481,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山の湖畔","en":"Hot Spring Mountain Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/037.PNG"
 },
-{
+{id:"bird_38",
  name:"ヒワコンゴウインコ",
  nameI18n:{"ja":"ヒワコンゴウインコ","en":"Green-winged Macaw","zh-CN":"大绿金刚鹦鹉","zh-TW":"大綠金剛鸚鵡","ko":"초록금강앵무","th":"นกแก้วมาคอว์สีเขียวใหญ่"},
  level:5,
@@ -494,7 +494,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/038.PNG"
 },
-{
+{id:"bird_39",
  name:"オリーブバト",
  nameI18n:{"ja":"オリーブバト","en":"Olive Pigeon","zh-CN":"黄眼鸽","zh-TW":"黃眼鴿","ko":"올리브비둘기","th":"นกพิราบตาเหลือง"},
  level:5,
@@ -507,7 +507,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-温泉","en":"Hot Spring Mountain - Hot Spring","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/039.PNG"
 },
-{
+{id:"bird_40",
  name:"コフラミンゴ",
  nameI18n:{"ja":"コフラミンゴ","en":"Lesser Flamingo","zh-CN":"小火烈鸟","zh-TW":"小火烈鳥","ko":"작은홍학","th":"นกฟลามิงโก้น้อย"},
  level:5,
@@ -520,7 +520,7 @@ const birdData = [
  locationI18n:{"ja":"森の湖畔","en":"Forest Lakeside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/040.PNG"
 },
-{
+{id:"bird_41",
  name:"クロアジサシ",
  nameI18n:{"ja":"クロアジサシ","en":"Sooty Tern","zh-CN":"白顶玄燕鸥","zh-TW":"白頂玄燕鷗","ko":"검정제비갈매기","th":"นกน็อดดี้"},
  level:5,
@@ -533,7 +533,7 @@ const birdData = [
  locationI18n:{"ja":"旧海の海辺","en":"Old Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/041.PNG"
 },
-{
+{id:"bird_42",
  name:"シメ",
  nameI18n:{"ja":"シメ","en":"Hawfinch","zh-CN":"锡嘴雀","zh-TW":"錫嘴雀","ko":"콩새","th":"นกฮอว์ฟินช์"},
  level:6,
@@ -546,7 +546,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/042.PNG"
 },
-{
+{id:"bird_43",
  name:"キンムネバト",
  nameI18n:{"ja":"キンムネバト","en":"Golden-breasted Dove","zh-CN":"红喉鸡鸠","zh-TW":"紅喉雞鳩","ko":"황금가슴비둘기","th":"นกเขาสีชาด"},
  level:6,
@@ -559,7 +559,7 @@ const birdData = [
  locationI18n:{"ja":"漁村-漁村東桟橋","en":"Fishing Village - East Pier","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/043.PNG"
 },
-{
+{id:"bird_44",
  name:"チシマウガラス",
  nameI18n:{"ja":"チシマウガラス","en":"Red-faced Cormorant","zh-CN":"红脸鸬鹚","zh-TW":"紅臉鸕鶿","ko":"붉은뺨가마우지","th":"นกกระทุงหน้าแดง"},
  level:6,
@@ -572,7 +572,7 @@ const birdData = [
  locationI18n:{"ja":"旧海・クジラ海","en":"Old Sea / Whale Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/044.PNG"
 },
-{
+{id:"bird_45",
  name:"トラフズク",
  nameI18n:{"ja":"トラフズク","en":"Long-eared Owl","zh-CN":"长耳鸮","zh-TW":"長耳鴞","ko":"칡부엉이","th":"นกเค้าแมวหูยาว"},
  level:6,
@@ -585,7 +585,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-石海岸の崖","en":"Hot Spring Mountain - Rocky Coast Cliff","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/045.PNG"
 },
-{
+{id:"bird_46",
  name:"ルリガラ",
  nameI18n:{"ja":"ルリガラ","en":"Azure Tit","zh-CN":"灰蓝山雀","zh-TW":"灰藍山雀","ko":"푸른박새","th":"นกติ๊ดสีเทา"},
  level:7,
@@ -598,7 +598,7 @@ const birdData = [
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/046.PNG"
 },
-{
+{id:"bird_47",
  name:"スミレコンゴウインコ",
  nameI18n:{"ja":"スミレコンゴウインコ","en":"Hyacinth Macaw","zh-CN":"靛蓝金刚鹦鹉","zh-TW":"靛藍金剛鸚鵡","ko":"히아신스금강앵무","th":"นกแก้วมาคอว์ไฮยาซินธ์"},
  level:7,
@@ -611,7 +611,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト","en":"Nesting Quest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/047.PNG"
 },
-{
+{id:"bird_48",
  name:"ボタンバト",
  nameI18n:{"ja":"ボタンバト","en":"Diamond Dove","zh-CN":"粉头果鸠","zh-TW":"粉頭果鳩","ko":"잠부과일비둘기","th":"นกเปล้าหน้าแดง"},
  level:7,
@@ -624,7 +624,7 @@ const birdData = [
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/048.PNG"
 },
-{
+{id:"bird_49",
  name:"アジサシ",
  nameI18n:{"ja":"アジサシ","en":"Common Tern","zh-CN":"燕鸥","zh-TW":"燕鷗","ko":"제비갈매기","th":"นกนางนวลแกลบ"},
  level:7,
@@ -637,7 +637,7 @@ const birdData = [
  locationI18n:{"ja":"東海の海辺","en":"East Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/049.PNG"
 },
-{
+{id:"bird_50",
  name:"チョウゲンボウ",
  nameI18n:{"ja":"チョウゲンボウ","en":"Common Kestrel","zh-CN":"红隼","zh-TW":"紅隼","ko":"황조롱이","th":"เหยี่ยวเคสเตรล"},
  level:7,
@@ -650,7 +650,7 @@ const birdData = [
  locationI18n:{"ja":"森林-コジカ塔(木のてっぺん)","en":"Forest - Fawn Tower (Treetop)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/050.PNG"
 },
-{
+{id:"bird_51",
  name:"ルリツグミ",
  nameI18n:{"ja":"ルリツグミ","en":"Siberian Blue Robin","zh-CN":"东蓝鸲","zh-TW":"東藍鴝","ko":"동부 파랑새","th":"นกบลูเบิร์ดตะวันออก"},
  level:8,
@@ -663,7 +663,7 @@ const birdData = [
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/051.PNG"
 },
-{
+{id:"bird_52",
  name:"ベニヒワ",
  nameI18n:{"ja":"ベニヒワ","en":"Common Redpoll","zh-CN":"白腰朱顶雀","zh-TW":"白腰朱頂雀","ko":"홍방울새","th":"นกเรดโพลล์"},
  level:8,
@@ -676,7 +676,7 @@ const birdData = [
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/052.PNG"
 },
-{
+{id:"bird_53",
  name:"モモイロバト",
  nameI18n:{"ja":"モモイロバト","en":"Pink Pigeon","zh-CN":"粉鸽","zh-TW":"粉鴿","ko":"분홍비둘기","th":"นกพิราบสีชมพู"},
  level:8,
@@ -689,7 +689,7 @@ const birdData = [
  locationI18n:{"ja":"花畑-クジラ山","en":"Flower Field - Whale Mountain","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/053.PNG"
 },
-{
+{id:"bird_54",
  name:"ハヤブサ",
  nameI18n:{"ja":"ハヤブサ","en":"Peregrine Falcon","zh-CN":"游隼","zh-TW":"遊隼","ko":"매","th":"เหยี่ยวเพเรกริน"},
  level:8,
@@ -702,7 +702,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-温泉(崖の上)","en":"Hot Spring Mountain - Hot Spring (Cliff Top)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/054.PNG"
 },
-{
+{id:"bird_55",
  name:"ナナイロフウキンチョウ",
  nameI18n:{"ja":"ナナイロフウキンチョウ","en":"Paradise Tanager","zh-CN":"仙靓唐纳雀","zh-TW":"仙靚唐納雀","ko":"극락풍금조","th":"นกนางแอ่นสวรรค์"},
  level:9,
@@ -715,7 +715,7 @@ const birdData = [
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/055.PNG"
 },
-{
+{id:"bird_56",
  name:"ベニイロフラミンゴ",
  nameI18n:{"ja":"ベニイロフラミンゴ","en":"American Flamingo","zh-CN":"美洲火烈鸟","zh-TW":"美洲火烈鳥","ko":"아메리카홍학","th":"นกฟลามิงโกอเมริกา"},
  level:9,
@@ -728,7 +728,7 @@ const birdData = [
  locationI18n:{"ja":"花畑-パープルビーチ","en":"Flower Field - Purple Beach","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/056.PNG"
 },
-{
+{id:"bird_57",
  name:"マクジャク",
  nameI18n:{"ja":"マクジャク","en":"Green Peafowl","zh-CN":"绿孔雀","zh-TW":"綠孔雀","ko":"녹공작","th":"นกยูงสีเขียว"},
  level:9,
@@ -741,7 +741,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/057.PNG"
 },
-{
+{id:"bird_58",
  name:"カオジロオタテガモ",
  nameI18n:{"ja":"カオジロオタテガモ","en":"White-headed Duck","zh-CN":"白头硬尾鸭","zh-TW":"白頭硬尾鴨","ko":"흰머리오리","th":"เป็ดหัวขาว"},
  level:9,
@@ -754,7 +754,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/058.PNG"
 },
-{
+{id:"bird_59",
  name:"インペリアルシャグ",
  nameI18n:{"ja":"インペリアルシャグ","en":"Imperial Shag","zh-CN":"皇帝鸬鹚","zh-TW":"皇帝鸕鶿","ko":"황제가마우지","th":"นกกระทุงจักรพรรดิ"},
  level:9,
@@ -767,7 +767,7 @@ const birdData = [
  locationI18n:{"ja":"東海・そよ風の海","en":"East Sea / Breeze Sea","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/059.PNG"
 },
-{
+{id:"bird_60",
  name:"アゾレスウソ",
  nameI18n:{"ja":"アゾレスウソ","en":"Azores Bullfinch","zh-CN":"圣米格尔雀","zh-TW":"聖米格爾雀","ko":"아조레스멋쟁이새","th":"นกกระจอกเซนต์มิเกล"},
  level:10,
@@ -780,7 +780,7 @@ const birdData = [
  locationI18n:{"ja":"漁村-灯台","en":"Fishing Village - Lighthouse","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/060.PNG"
 },
-{
+{id:"bird_61",
  name:"ロクショウヒタキ",
  nameI18n:{"ja":"ロクショウヒタキ","en":"Verditer Flycatcher","zh-CN":"铜蓝鹟","zh-TW":"銅藍鶲","ko":"파랑딱새","th":"นกจับแมลงสีฟ้า"},
  level:10,
@@ -793,7 +793,7 @@ const birdData = [
  locationI18n:{"ja":"森林-ジャンプステージ","en":"Forest - Jump Stage","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/061.PNG"
 },
-{
+{id:"bird_62",
  name:"アカアシチョウゲンボウ",
  nameI18n:{"ja":"アカアシチョウゲンボウ","en":"Red-footed Falcon","zh-CN":"红脚隼","zh-TW":"紅腳隼","ko":"비둘기조롱이","th":"เหยี่ยวตีนแดง"},
  level:10,
@@ -806,7 +806,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-遺跡(崖の上)","en":"Hot Spring Mountain - Ruins (Cliff Top)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/062.PNG"
 },
-{
+{id:"bird_63",
  name:"ワシミミズク",
  nameI18n:{"ja":"ワシミミズク","en":"Eurasian Eagle-Owl","zh-CN":"雕鸮","zh-TW":"雕鴞","ko":"수리부엉이","th":"นกเค้าอินทรียูเรเซีย"},
  level:10,
@@ -819,7 +819,7 @@ const birdData = [
  locationI18n:{"ja":"森林-コジカ塔(木のてっぺん)","en":"Forest - Fawn Tower (Treetop)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/063.PNG"
 }, 
-{
+{id:"bird_64",
  name:"シロハラムクドリ",
  nameI18n:{"ja":"シロハラムクドリ","en":"White-shouldered Starling","zh-CN":"白腹紫椋鸟","zh-TW":"白腹紫椋鳥","ko":"보라등찌르레기","th":"นกกิ้งโครงหลังม่วง"},
  level:11,
@@ -832,7 +832,7 @@ const birdData = [
  locationI18n:{"ja":"花畑-風車の花畑","en":"Flower Field - Windmill Flower Field","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/064.PNG"
 }, 
-{
+{id:"bird_65",
  name:"クロヒゲバト",
  nameI18n:{"ja":"クロヒゲバト","en":"Black-collared Dove","zh-CN":"蓝头鹑鸠","zh-TW":"藍頭鶉鳩","ko":"푸른머리비둘기","th":"นกคุ่มอกลายหัวน้ำเงิน"},
  level:11,
@@ -845,7 +845,7 @@ const birdData = [
  locationI18n:{"ja":"郊外","en":"Suburbs","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/065.PNG"
 }, 
-{
+{id:"bird_66",
  name:"シロクジャク",
  nameI18n:{"ja":"シロクジャク","en":"White Peafowl","zh-CN":"白孔雀","zh-TW":"白孔雀","ko":"백공작","th":"นกยูงสีขาว"},
  level:11,
@@ -858,7 +858,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/066.JPG"
 }, 
-{
+{id:"bird_67",
  name:"トモエガモ",
  nameI18n:{"ja":"トモエガモ","en":"Baikal Teal","zh-CN":"花脸鸭","zh-TW":"花臉鴨","ko":"가창오리","th":"เป็ดหน้าลาย"},
  level:11,
@@ -871,7 +871,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山の湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/067.PNG"
 }, 
-{
+{id:"bird_68",
  name:"インカアジサシ",
  nameI18n:{"ja":"インカアジサシ","en":"Inca Tern","zh-CN":"印加燕鸥","zh-TW":"印加燕鷗","ko":"잉카제비갈매기","th":"นกนางนวลอินคา"},
  level:11,
@@ -884,7 +884,7 @@ const birdData = [
  locationI18n:{"ja":"旧海の海辺","en":"Old Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/068.PNG"
 },
-{
+{id:"bird_69",
  name:"フヨウチョウ",
  nameI18n:{"ja":"フヨウチョウ","en":"Bird-of-Paradise","zh-CN":"红眉火尾雀","zh-TW":"紅眉火尾雀","ko":"붉은눈썹핀치","th":"นกฟินช์คิ้วแดง"},
  level:12,
@@ -897,7 +897,7 @@ const birdData = [
  locationI18n:{"ja":"温泉山-火山湖","en":"Hot Spring Mountain - Volcanic Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/069.PNG"
 },
-{
+{id:"bird_70",
  name:"ニシツノメドリ",
  nameI18n:{"ja":"ニシツノメドリ","en":"Atlantic Puffin","zh-CN":"北极海鹦","zh-TW":"北極海鸚","ko":"코뿔바다오리","th":"นกพัฟฟินแอตแลนติก"},
  level:12,
@@ -910,7 +910,7 @@ const birdData = [
  locationI18n:{"ja":"クジラ海の海辺","en":"Whale Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/070.PNG"
 },
-{
+{id:"bird_71",
  name:"アオアシカツオドリ",
  nameI18n:{"ja":"アオアシカツオドリ","en":"Blue-footed Booby","zh-CN":"蓝脚鲣鸟","zh-TW":"藍腳鰹鳥","ko":"푸른발얼가니새","th":"นกบูบีตีนฟ้า"},
  level:12,
@@ -923,7 +923,7 @@ const birdData = [
  locationI18n:{"ja":"そよ風の海の海辺","en":"Breeze Sea Seaside","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/071.PNG"
 },
-{
+{id:"bird_72",
  name:"シロフクロウ",
  nameI18n:{"ja":"シロフクロウ","en":"Snowy Owl","zh-CN":"雪鸮","zh-TW":"雪鴞","ko":"흰올빼미","th":"นกฮูกหิมะ"},
  level:12,
@@ -936,7 +936,7 @@ const birdData = [
  locationI18n:{"ja":"森林-不思議な松林","en":"Forest - Mysterious Pine Forest","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/072.JPG"
 },
-{
+{id:"bird_73",
  name:"クロクジャク",
  nameI18n:{"ja":"クロクジャク","en":"Black-shouldered Peafowl","zh-CN":"黑孔雀","zh-TW":"黑孔雀","ko":"흑공작","th":"นกยูงสีดำ"},
  level:13,
@@ -949,7 +949,7 @@ const birdData = [
  locationI18n:{"ja":"巣ごもりクエスト(追加段階)","en":"Nesting Quest (Extra Stage)","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/073.JPG"
 },
-{
+{id:"bird_74",
  name:"オオハクチョウ",
  nameI18n:{"ja":"オオハクチョウ","en":"Whooper Swan","zh-CN":"大天鹅","zh-TW":"大天鵝","ko":"큰고니","th":"หงส์ขาว"},
  level:13,
@@ -962,7 +962,7 @@ const birdData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/074.PNG"
 },
-{
+{id:"bird_75",
  name:"コクチョウ",
  nameI18n:{"ja":"コクチョウ","en":"Black Swan","zh-CN":"黑天鹅","zh-TW":"黑天鵝","ko":"흑고니","th":"หงส์ดำ"},
  level:13,
@@ -975,7 +975,7 @@ const birdData = [
  locationI18n:{"ja":"郊外の湖","en":"Suburban Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/075.JPG"
 },
-{
+{id:"bird_76",
  name:"ナベコウ",
  nameI18n:{"ja":"ナベコウ","en":"Black Stork","zh-CN":"黑鹳","zh-TW":"黑鸛","ko":"먹황새","th":"นกกาบบัว"},
  level:14,
@@ -988,7 +988,7 @@ const birdData = [
  locationI18n:{"ja":"草原の湖","en":"Grassland Lake","zh-CN":"","zh-TW":"","ko":"","th":""},
  img:"images/birds/076.PNG"
 },
-{
+{id:"bird_77",
  name:"メガネフクロウ",
  nameI18n:{"ja":"メガネフクロウ","en":"Spectacled Owl","zh-CN":"眼镜鸮","zh-TW":"眼鏡鴞","ko":"안경올빼미","th":"นกฮูกแว่น"},
  level:14,
@@ -1002,7 +1002,7 @@ const birdData = [
  img:"images/birds/077.PNG"
 },
 
-{
+{id:"bird_78",
  name:"冬服・オオフラミンゴ",
  nameI18n:{"ja":"冬服・オオフラミンゴ","en":"Winter Coat Greater Flamingo","zh-CN":"冬装大火烈鸟","zh-TW":"冬裝大火烈鳥","ko":"겨울 옷 큰홍학","th":"นกฟลามิงโก้ชุดฤดูหนาว"},
  season:true,
@@ -1017,7 +1017,7 @@ const birdData = [
  img:"images/birds/1006.PNG",
  auth:false
 },
-{
+{id:"bird_79",
  name:"冬服・マガモ",
  nameI18n:{"ja":"冬服・マガモ","en":"Winter Coat Mallard","zh-CN":"冬装绿头鸭","zh-TW":"冬裝綠頭鴨","ko":"겨울 옷 청둥오리","th":"เป็ดหัวเขียวชุดฤดูหนาว"},
  season:true,
@@ -1033,7 +1033,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_80",
  name:"冬服・ミコアイサ",
  nameI18n:{"ja":"冬服・ミコアイサ","en":"Winter Coat Smew","zh-CN":"冬装白秋沙鸭","zh-TW":"冬裝白秋沙鴨","ko":"겨울 옷 흰비오리","th":"เป็ดสมูว์ชุดฤดูหนาว"},
  season:true,
@@ -1049,7 +1049,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_81",
  name:"冬服・ヒドリガモ",
  nameI18n:{"ja":"冬服・ヒドリガモ","en":"Winter Coat Eurasian Wigeon","zh-CN":"冬装赤颈鸭","zh-TW":"冬裝赤頸鴨","ko":"겨울 옷 홍머리오리","th":"เป็ดปากสั้นชุดฤดูหนาว"},
  season:true,
@@ -1065,7 +1065,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_82",
  name:"冬服・オシドリ",
  nameI18n:{"ja":"冬服・オシドリ","en":"Winter Coat Mandarin Duck","zh-CN":"冬装鸳鸯","zh-TW":"冬裝鴛鴦","ko":"겨울 옷 원앙","th":"เป็ดแมนดารินชุดฤดูหนาว"},
  season:true,
@@ -1081,7 +1081,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_83",
  name:"紳士チビアオバト",
  nameI18n:{"ja":"紳士チビアオバト","en":"Gentleman Chibi Green Dove","zh-CN":"绅士小绿鸽","zh-TW":"紳士小綠鴿","ko":"신사 초록 비둘기","th":"พิราบมาดแมนสีเขียว"},
  fes:true,
@@ -1097,7 +1097,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_84",
  name:"紳士チビアイバト",
  nameI18n:{"ja":"紳士チビアイバト","en":"Gentleman Chibi Indigo Dove","zh-CN":"绅士小蓝鸽","zh-TW":"紳士小藍鴿","ko":"신사 파랑 비둘기","th":"พิราบมาดแมนสีน้ำเงิน"},
  fes:true,
@@ -1113,7 +1113,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_85",
  name:"紳士チビハイバト",
  nameI18n:{"ja":"紳士チビハイバト","en":"Gentleman Chibi Gray Dove","zh-CN":"绅士小灰鸽","zh-TW":"紳士小灰鴿","ko":"신사 회색 비둘기","th":"พิราบมาดแมนสีเทา"},
  fes:true,
@@ -1129,7 +1129,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_86",
  name:"紳士チビアカバト",
  nameI18n:{"ja":"紳士チビアカバト","en":"Gentleman Chibi Red Dove","zh-CN":"绅士小红鸽","zh-TW":"紳士小紅鴿","ko":"신사 빨강 비둘기","th":"พิราบมาดแมนสีแดง"},
  fes:true,
@@ -1145,7 +1145,7 @@ const birdData = [
  auth:false
 },
 
-{
+{id:"bird_87",
  name:"紳士チビハナバト",
  nameI18n:{"ja":"紳士チビハナバト","en":"Gentleman Chibi Blossom Dove","zh-CN":"绅士小花鸽","zh-TW":"紳士小花鴿","ko":"신사 무늬 비둘기","th":"พิราบมาดแมนสีลาย"},
  fes:true,
@@ -1160,7 +1160,7 @@ const birdData = [
  img:"images/birds/1015.PNG",
  auth:false
 },
-{
+{id:"bird_88",
  name:"積み木スズメ(ピンク)",
  nameI18n:{"ja":"積み木スズメ(ピンク)","en":"Building Block Sparrow (Pink)","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1175,7 +1175,7 @@ const birdData = [
  img:"images/birds/1001.PNG",
  auth:false
 },
-{
+{id:"bird_89",
  name:"積み木スズメ(青)",
  nameI18n:{"ja":"積み木スズメ(青)","en":"Building Block Sparrow (Blue)","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1190,7 +1190,7 @@ const birdData = [
  img:"images/birds/1002.PNG",
  auth:false
 },
-{
+{id:"bird_90",
  name:"積み木スズメ(緑)",
  nameI18n:{"ja":"積み木スズメ(緑)","en":"Building Block Sparrow (Green)","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1205,7 +1205,7 @@ const birdData = [
  img:"images/birds/1003.PNG",
  auth:false
 },
-{
+{id:"bird_91",
  name:"積み木スズメ(紫)",
  nameI18n:{"ja":"積み木スズメ(紫)","en":"Building Block Sparrow (Purple)","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1220,7 +1220,7 @@ const birdData = [
  img:"images/birds/1004.PNG",
  auth:false
 },
-{
+{id:"bird_92",
  name:"積み木スズメ(虹)",
  nameI18n:{"ja":"積み木スズメ(虹)","en":"Building Block Sparrow (Rainbow)","zh-CN":"","zh-TW":"","ko":"","th":""},
  fes:true,
@@ -1235,7 +1235,7 @@ const birdData = [
  img:"images/birds/1005.PNG",
  auth:false
 },
-{
+{id:"bird_93",
  name:"ハジロクロハラアジサシ",
  nameI18n:{"ja":"ハジロクロハラアジサシ","en":"White-Winged Tern","zh-CN":"白翅浮鸥","zh-TW":"白翅浮鷗","ko":"흰죽지제비갈매기","th":"นกนางนวลแกลบดำปีกขาว"},
  season:true,
@@ -1250,7 +1250,7 @@ const birdData = [
  img:"images/birds/1016.PNG",
  auth:false
 },
-{
+{id:"bird_94",
  name:"トウゾクカモメ",
  nameI18n:{"ja":"トウゾクカモメ","en":"Pomarine Skua","zh-CN":"中贼鸥","zh-TW":"中賊鷗","ko":"도둑갈매기","th":"นกสกัว"},
  season:true,
@@ -1265,7 +1265,7 @@ const birdData = [
  img:"images/birds/1017.PNG",
  auth:false
 },
-{
+{id:"bird_95",
  name:"ベニヘラサギ",
  nameI18n:{"ja":"ベニヘラサギ","en":"Roseate Spoonbill","zh-CN":"","zh-TW":"","ko":"","th":""},
  season:true,
@@ -1280,7 +1280,7 @@ const birdData = [
  img:"images/birds/1021.PNG",
  auth:false
 },
-{
+{id:"bird_96",
  name:"ヘラサギ",
  nameI18n:{"ja":"ヘラサギ","en":"White Spoonbill","zh-CN":"白琵鹭","zh-TW":"白琵鷺","ko":"흰 저어새","th":"นกปากช้อน"},
  season:true,
@@ -1295,7 +1295,7 @@ const birdData = [
  img:"images/birds/1018.PNG",
  auth:false
 },
-{
+{id:"bird_97",
  name:"ワタリアホウドリ",
  nameI18n:{"ja":"ワタリアホウドリ","en":"Wandering Albatross","zh-CN":"漂泊信天翁","zh-TW":"漂泊信天翁","ko":"나그네알바트로스","th":"นกอัลบาทรอสพเนจร"},
  season:true,
@@ -1310,7 +1310,7 @@ const birdData = [
  img:"images/birds/1019.PNG",
  auth:false
 },
-{
+{id:"bird_98",
  name:"ハイイロアホウドリ",
  nameI18n:{"ja":"ハイイロアホウドリ","en":"Grey-mantled Albatross","zh-CN":"灰背信天翁","zh-TW":"灰背信天翁","ko":"검은등알바트로스","th":"นกอัลบาทรอสหลังเทา"},
  season:true,
@@ -1325,7 +1325,7 @@ const birdData = [
  img:"images/birds/1020.PNG",
  auth:false
 },
-{
+{id:"bird_99",
  name:"オレンジ羽のヤツガシラ",
  nameI18n:{"ja":"オレンジ羽のヤツガシラ","en":"Orange Hoopoe","zh-CN":"橙羽戴胜","zh-TW":"橙羽戴勝","ko":"주황깃 후투티","th":"นกกะรางหัวขวานขนสีส้ม"},
  fes:true,
@@ -1341,7 +1341,7 @@ const birdData = [
  img:"images/birds/1022.PNG",
  auth:false
 },
-{
+{id:"bird_100",
  name:"青い羽のヤツガシラ",
  nameI18n:{"ja":"青い羽のヤツガシラ","en":"Blue Hoopoe","zh-CN":"蓝羽戴胜","zh-TW":"藍羽戴勝","ko":"파랑깃 후투티","th":"นกกะรางหัวขวานขนสีฟ้า"},
  fes:true,
@@ -1357,7 +1357,7 @@ const birdData = [
  img:"images/birds/1023.PNG",
  auth:false
 },
-{
+{id:"bird_101",
  name:"緑羽のヤツガシラ",
  nameI18n:{"ja":"緑羽のヤツガシラ","en":"Green Hoopoe","zh-CN":"绿羽戴胜","zh-TW":"綠羽戴勝","ko":"초록깃 후투티","th":"นกกะรางหัวขวานขนสีเขียว"},
  fes:true,
@@ -1373,7 +1373,7 @@ const birdData = [
  img:"images/birds/1024.PNG",
  auth:false
 },
-{
+{id:"bird_102",
  name:"赤い羽のヤツガシラ",
  nameI18n:{"ja":"赤い羽のヤツガシラ","en":"Red Hoopoe","zh-CN":"红羽戴胜","zh-TW":"紅羽戴勝","ko":"빨강깃 후투티","th":"นกกะรางหัวขวานขนสีแดง"},
  fes:true,
@@ -1389,7 +1389,7 @@ const birdData = [
  img:"images/birds/1025.PNG",
  auth:false
 },
-{
+{id:"bird_103",
  name:"カラフルなヤツガシラ",
  nameI18n:{"ja":"カラフルなヤツガシラ","en":"Colorful Hoopoe","zh-CN":"彩羽戴胜","zh-TW":"彩羽戴勝","ko":"무지개깃 후투티","th":"นกกะรางหัวขวานขนหลากสี"},
  fes:true,
@@ -1405,7 +1405,7 @@ const birdData = [
  img:"images/birds/1026.PNG",
  auth:false
 },
-{
+{id:"bird_104",
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"リンゴワタリガラス",
  nameI18n:{"ja":"リンゴワタリガラス","en":"Apple Raven","zh-CN":"苹果渡鸦","zh-TW":"蘋果渡鴉","ko":"사과 큰까마귀","th":"นกเรเวนแอปเปิล"},
@@ -1423,7 +1423,7 @@ const birdData = [
  img:"images/birds/1027.PNG",
  auth:false
 },
-{
+{id:"bird_105",
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"ミカンワタリガラス",
  nameI18n:{"ja":"ミカンワタリガラス","en":"Mandarin Raven","zh-CN":"橘子渡鸦","zh-TW":"橘子渡鴉","ko":"오렌지 큰까마귀","th":"นกเรเวนส้ม"},
@@ -1441,7 +1441,7 @@ const birdData = [
  img:"images/birds/1028.PNG",
  auth:false
 },
-{
+{id:"bird_106",
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"イチゴワタリガラス",
  nameI18n:{"ja":"イチゴワタリガラス","en":"Strawberry Raven","zh-CN":"草莓渡鸦","zh-TW":"草莓渡鴉","ko":"딸기 큰까마귀","th":"นกเรเวนสตรอว์เบอร์รี่"},
@@ -1459,7 +1459,7 @@ const birdData = [
  img:"images/birds/1029.PNG",
  auth:false
 },
-{
+{id:"bird_107",
  // イベント「幽夜の集い」2026-10-17出現開始
  name:"カボチャワタリガラス",
  nameI18n:{"ja":"カボチャワタリガラス","en":"Pumpkin Raven","zh-CN":"南瓜渡鸦","zh-TW":"南瓜渡鴉","ko":"호박 큰까마귀","th":"นกเรเวนฟักทอง"},
@@ -1477,7 +1477,7 @@ const birdData = [
  img:"images/birds/1030.PNG",
  auth:false
 },
-{
+{id:"bird_108",
  // イベント「幽夜の集い」2026-10-17出現開始
  // 特殊入手イベント名（ユーザー確認済み）
  name:"トリュフワタリガラス",
@@ -1493,7 +1493,7 @@ const birdData = [
  img:"images/birds/1031.PNG",
  auth:false
 },
-{
+{id:"bird_109",
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"タンザニアウーリーコウモリ",
  nameI18n:{"ja":"タンザニアウーリーコウモリ","en":"Tanzanian Woolly Bat","zh-CN":"绒彩蝠","zh-TW":"絨彩蝠","ko":"양털박쥐","th":"ค้างคาวขนปุยหลากสี"},
@@ -1510,7 +1510,7 @@ const birdData = [
  img:"images/birds/1035.PNG",
  auth:false
 },
-{
+{id:"bird_110",
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"シロヘラコウモリ",
  nameI18n:{"ja":"シロヘラコウモリ","en":"Honduran White Bat","zh-CN":"洪都拉斯白蝙蝠","zh-TW":"洪都拉斯白蝙蝠","ko":"온두라스흰박쥐","th":"ค้างคาวขาวฮอนดูรัส"},
@@ -1527,7 +1527,7 @@ const birdData = [
  img:"images/birds/1036.PNG",
  auth:false
 },
-{
+{id:"bird_111",
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"パナイスンダオオコウモリ",
  nameI18n:{"ja":"パナイスンダオオコウモリ","en":"Long-Toothed Fruit Bat","zh-CN":"利齿狐蝠","zh-TW":"利齒狐蝠","ko":"황금볏과일박쥐","th":"ค้างคาวแม่ไก่ฟันแหลม"},
@@ -1544,7 +1544,7 @@ const birdData = [
  img:"images/birds/1037.PNG",
  auth:false
 },
-{
+{id:"bird_112",
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"アメリカオオコノハズク",
  nameI18n:{"ja":"アメリカオオコノハズク","en":"Eastern Screech Owl","zh-CN":"东美角鸮","zh-TW":"東美角鴞","ko":"동부소쩍새","th":"นกฮูกสกรีชตะวันออก"},
@@ -1561,7 +1561,7 @@ const birdData = [
  img:"images/birds/1032.PNG",
  auth:false
 },
-{
+{id:"bird_113",
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"アフリカオオコノハズク",
  nameI18n:{"ja":"アフリカオオコノハズク","en":"Northern White-Faced Owl","zh-CN":"白脸角鸮","zh-TW":"白臉角鴞","ko":"흰얼굴소쩍새","th":"นกเค้าหน้าขาวแอฟริกาเหนือ"},
@@ -1578,7 +1578,7 @@ const birdData = [
  img:"images/birds/1033.PNG",
  auth:false
 },
-{
+{id:"bird_114",
  // イベント「幽夜の集い」2026-10-17出現開始 / 森の島の成熟した空洞樹・うろのある木に関連
  name:"カキイロコノハズク",
  nameI18n:{"ja":"カキイロコノハズク","en":"Palau Scops Owl","zh-CN":"帕劳角鸮","zh-TW":"帛琉角鴞","ko":"팔라우소쩍새","th":"นกฮูกพาเลา"},

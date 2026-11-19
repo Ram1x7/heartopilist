@@ -888,9 +888,9 @@ function guardToggle(){
   return false;
 }
 
-function toggleChecked(name){
+function toggleChecked(id){
   if(guardToggle()) return;
-  checkedData[name] = !checkedData[name];
+  checkedData[id] = !checkedData[id];
   localStorage.setItem("garden_checked", JSON.stringify(checkedData));
   renderContent();
 }
@@ -922,12 +922,39 @@ function toggleChecked(name){
 })();
 let authData = JSON.parse(localStorage.getItem("garden_auth") || "{}");
 
-function toggleAuth(name){
+function toggleAuth(id){
   if(guardToggle()) return;
-  authData[name] = !authData[name];
+  authData[id] = !authData[id];
   localStorage.setItem("garden_auth", JSON.stringify(authData));
   renderContent();
 }
+
+// 表記ゆれ修正で名前が変わった際、以前は名前文字列をキーにチェック/認証済み記録を
+// 保存していたため記録が迷子になっていた問題への対応。固定IDをキーにする形へ移行し、
+// 既存データ（名前キー）が残っていればIDキーへコピーする（一度移行すれば古いキーは消える）
+(function migrateGardenDataToIds(){
+  const gardenItems = [
+    ...(typeof cropData   !== "undefined" ? cropData   : []),
+    ...(typeof flowerData !== "undefined" ? flowerData : []),
+  ];
+  let checkedChanged = false;
+  let authChanged = false;
+  gardenItems.forEach(item => {
+    if(!item.id || !item.name) return;
+    if(checkedData[item.id] === undefined && checkedData[item.name] !== undefined){
+      checkedData[item.id] = checkedData[item.name];
+      delete checkedData[item.name];
+      checkedChanged = true;
+    }
+    if(authData[item.id] === undefined && authData[item.name] !== undefined){
+      authData[item.id] = authData[item.name];
+      delete authData[item.name];
+      authChanged = true;
+    }
+  });
+  if(checkedChanged) localStorage.setItem("garden_checked", JSON.stringify(checkedData));
+  if(authChanged) localStorage.setItem("garden_auth", JSON.stringify(authData));
+})();
 
 // ── 画像プリロード（IntersectionObserver方式） ──
 const gardenImgObserver = new IntersectionObserver((entries, obs) => {
@@ -1142,8 +1169,8 @@ function renderSection(label, items, eventStatus = null){
     // シーズン・フェス限定は開催中のみ通知・タイマー機能を利用可能（終了後は非表示）
     const notifAllowed = !isEventItem || !item.ended;
     const hasNotif = notifAllowed && (isNotifSet(item,"normal") || isNotifSet(item,"weed"));
-    const isAuthed = item.auth !== false && !!authData[item.name];
-    const isChecked = !!checkedData[item.name];
+    const isAuthed = item.auth !== false && !!authData[item.id];
+    const isChecked = !!checkedData[item.id];
 
     div.innerHTML = `
       <div class="img-wrap">
@@ -1172,14 +1199,14 @@ function renderSection(label, items, eventStatus = null){
     const checkBtn = div.querySelector(".check-btn");
     checkBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      toggleChecked(item.name);
+      toggleChecked(item.id);
     });
 
     const authBtn = div.querySelector(".auth-btn");
     if(authBtn){
       authBtn.addEventListener("click", (e) => {
         e.stopPropagation();
-        toggleAuth(item.name);
+        toggleAuth(item.id);
       });
     }
 

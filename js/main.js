@@ -135,6 +135,30 @@ const creatures = [
  ...(typeof kabotyaData !== "undefined" ? kabotyaData : [])
 ];
 
+// 表記ゆれ修正で名前が変わった際、以前は名前文字列をキーにチェック/認証済み記録を
+// 保存していたため記録が迷子になっていた問題への対応。固定IDをキーにする形へ移行し、
+// 既存データ（名前キー）が残っていればIDキーへコピーする（一度移行すれば古いキーは消える）
+function migrateCheckedAuthDataToIds(){
+  let checkedChanged = false;
+  let authChanged = false;
+  creatures.forEach(c => {
+    if(!c.id || !c.name) return;
+    if(checkedData[c.id] === undefined && checkedData[c.name] !== undefined){
+      checkedData[c.id] = checkedData[c.name];
+      delete checkedData[c.name];
+      checkedChanged = true;
+    }
+    if(authData[c.id] === undefined && authData[c.name] !== undefined){
+      authData[c.id] = authData[c.name];
+      delete authData[c.name];
+      authChanged = true;
+    }
+  });
+  if(checkedChanged) localStorage.setItem("checkedData", JSON.stringify(checkedData));
+  if(authChanged) localStorage.setItem("authData", JSON.stringify(authData));
+}
+migrateCheckedAuthDataToIds();
+
 // サーバーのUTCオフセット（時間）
 function getServerOffset(){
   return (SERVERS[currentServer] || SERVERS.asia).offset;
@@ -510,8 +534,8 @@ function sortList(arr){
 
   if(currentSort === "unchecked"){
     out.sort((a,b)=>{
-      const aChecked = checkedData[a.name] ? 1 : 0;
-      const bChecked = checkedData[b.name] ? 1 : 0;
+      const aChecked = checkedData[a.id] ? 1 : 0;
+      const bChecked = checkedData[b.id] ? 1 : 0;
 
       // まず未コンプ優先
       if(aChecked !== bChecked){
@@ -560,8 +584,8 @@ function sortList(arr){
         }
 
         // 未認証優先
-        const aAuth = authData[a.c.name] ? 1 : 0;
-        const bAuth = authData[b.c.name] ? 1 : 0;
+        const aAuth = authData[a.c.id] ? 1 : 0;
+        const bAuth = authData[b.c.id] ? 1 : 0;
         if(aAuth !== bAuth){
           return aAuth - bAuth;
         }
@@ -692,7 +716,7 @@ function createCard(c){
   const div=document.createElement("div");
   div.className =
   "item" +
-  (selectedItems[c.name]
+  (selectedItems[c.id]
     ? " selected"
     : "");
 
@@ -716,17 +740,17 @@ function createCard(c){
 
   <button class="
     check-btn
-    ${checkedData[c.name] ? "checked" : ""}
-  " aria-pressed="${checkedData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_check_label","コンプ済みにする")}">
-    ${icon(checkedData[c.name] ? "star" : "starOutline", {size:13})}
+    ${checkedData[c.id] ? "checked" : ""}
+  " aria-pressed="${checkedData[c.id] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_check_label","コンプ済みにする")}">
+    ${icon(checkedData[c.id] ? "star" : "starOutline", {size:13})}
   </button>
 
   ${c.auth !== false ? `
   <button class="
     auth-btn
-    ${authData[c.name] ? "checked" : ""}
-  " aria-pressed="${authData[c.name] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_auth_label","認証マスターにする")}">
-    ${icon(authData[c.name] ? "medal" : "medalOutline", {size:16})}
+    ${authData[c.id] ? "checked" : ""}
+  " aria-pressed="${authData[c.id] ? "true" : "false"}" aria-label="${displayName(c)} ${T("aria_auth_label","認証マスターにする")}">
+    ${icon(authData[c.id] ? "medal" : "medalOutline", {size:16})}
   </button>
 ` : ""}
 
@@ -742,11 +766,11 @@ function createCard(c){
   // モーダル
   div.onclick = ()=>{
     if(multiSelectMode){
-      selectedItems[c.name] =
-        !selectedItems[c.name];
+      selectedItems[c.id] =
+        !selectedItems[c.id];
       div.classList.toggle(
         "selected",
-        selectedItems[c.name]
+        selectedItems[c.id]
       );
       updateBulkStatusBar();
       return;
@@ -764,7 +788,7 @@ function createCard(c){
       return;
     }
     if(guardToggle()) return;
-    checkedData[c.name] = !checkedData[c.name];
+    checkedData[c.id] = !checkedData[c.id];
     localStorage.setItem(
       "checkedData",
       JSON.stringify(checkedData)
@@ -780,7 +804,7 @@ function createCard(c){
       e.stopPropagation();
       if(multiSelectMode) return;
       if(guardToggle()) return;
-      authData[c.name] = !authData[c.name];
+      authData[c.id] = !authData[c.id];
       localStorage.setItem("authData", JSON.stringify(authData));
       invalidateBulkUndo();
       render();
@@ -909,11 +933,11 @@ function render(){
  // 検索・種類変更などで一覧の中身が変わった場合は、選択中の対象を見失わないよう選択を解除する
  // （見えなくなった対象を意図せず一括更新しないため）
  if(multiSelectMode && _lastVisibleNames){
-   const hasSelection = Object.keys(selectedItems).some(name => selectedItems[name]);
+   const hasSelection = Object.keys(selectedItems).some(id => selectedItems[id]);
    if(hasSelection){
-     const newNames = new Set(list.map(c => c.name));
+     const newIds = new Set(list.map(c => c.id));
      const stillAllVisible = Object.keys(selectedItems).every(
-       name => !selectedItems[name] || newNames.has(name)
+       id => !selectedItems[id] || newIds.has(id)
      );
      if(!stillAllVisible){
        selectedItems = {};
@@ -921,7 +945,7 @@ function render(){
      }
    }
  }
- _lastVisibleNames = new Set(list.map(c => c.name));
+ _lastVisibleNames = new Set(list.map(c => c.id));
 
  const el=document.getElementById("list");
  el.innerHTML="";
@@ -1487,21 +1511,21 @@ function invalidateBulkUndo(){
 // ★5・認証の一括設定/解除の共通処理。
 // 対象ごとの変更前の値を保存しておき、「元に戻す」で一律反転ではなく元の値へ復元できるようにする
 function applyBulkAction(kind, newValue){
-  const names = Object.keys(selectedItems).filter(name => selectedItems[name]);
-  if(names.length === 0) return;
+  const ids = Object.keys(selectedItems).filter(id => selectedItems[id]);
+  if(ids.length === 0) return;
 
   const store = kind === "auth" ? authData : checkedData;
   const storageKey = kind === "auth" ? "authData" : "checkedData";
   const snapshot = {};
   let changedCount = 0;
 
-  names.forEach(name=>{
+  ids.forEach(id=>{
     if(kind === "auth"){
-      const c = creatures.find(cr => cr.name === name);
+      const c = creatures.find(cr => cr.id === id);
       if(!c || c.auth === false) return;
     }
-    snapshot[name] = !!store[name];
-    store[name] = newValue;
+    snapshot[id] = !!store[id];
+    store[id] = newValue;
     changedCount++;
   });
 
@@ -1589,13 +1613,13 @@ function getStats() {
 
   // ── 図鑑 ──
   const total = creatures.length;
-  const done  = creatures.filter(c => checkedData[c.name]).length;
+  const done  = creatures.filter(c => checkedData[c.id]).length;
 
   const byType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   const totalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   creatures.forEach(c => {
     totalByType[c.type]++;
-    if (checkedData[c.name]) byType[c.type]++;
+    if (checkedData[c.id]) byType[c.type]++;
   });
 
   const authEligible    = creatures.filter(c => c.auth !== false);
@@ -1603,9 +1627,9 @@ function getStats() {
   const authTotalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
   authEligible.forEach(c => {
     authTotalByType[c.type]++;
-    if (authData[c.name]) authByType[c.type]++;
+    if (authData[c.id]) authByType[c.type]++;
   });
-  const authCount = authEligible.filter(c => authData[c.name]).length;
+  const authCount = authEligible.filter(c => authData[c.id]).length;
   const authTotal = authEligible.length;
 
   // ── 料理 ──
