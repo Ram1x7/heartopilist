@@ -13,8 +13,9 @@
 //（NIGHT_ICON_OVERRIDESを参照）。
 //
 // dexCategory: 既存の図鑑出現判定（c.weather配列、"晴れ"/"雨"/"虹"の3値のみ）に渡すための
-// 粗いカテゴリ。流星雨・オーロラ・雪・猛暑・花吹雪など、出現条件データ側に存在しない特殊気象は
-// 便宜上すべて「晴れ」（＝雨でも虹でもない）に丸めている。今後これらの天気で出現条件が
+// 粗いカテゴリ。流星雨・オーロラ・猛暑・花吹雪など、出現条件データ側に存在しない特殊気象は
+// 便宜上すべて「晴れ」（＝雨でも虹でもない）に丸めている。雪（弱い雪/大雪/豪雪）はゲーム内の
+// 出現判定上「雨」として扱われるため、ここも「雨」にしている。今後これらの天気で出現条件が
 // 追加される場合は、ここにカテゴリを増やすのではなく、まずc.weather側の値域を確認すること。
 //
 // 天気名は今後増える可能性があるため、未知の名前が来てもUNKNOWN_WEATHERへ安全にフォールバックし、
@@ -42,9 +43,9 @@ const WEATHER_MASTER = {
   "オーロラ1": { emoji: "🌌", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_aurora" },
   "オーロラ2": { emoji: "🌌", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_aurora" },
   "オーロラ3": { emoji: "🌌", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_aurora" },
-  "弱い雪":   { emoji: "❄️", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_light_snow" },
-  "大雪":     { emoji: "❄️", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_heavy_snow" },
-  "豪雪":     { emoji: "❄️", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_blizzard" },
+  "弱い雪":   { emoji: "❄️", gameIcon: null, dexCategory: "雨",   i18nKey: "weather_light_snow" },
+  "大雪":     { emoji: "❄️", gameIcon: null, dexCategory: "雨",   i18nKey: "weather_heavy_snow" },
+  "豪雪":     { emoji: "❄️", gameIcon: null, dexCategory: "雨",   i18nKey: "weather_blizzard" },
   "猛暑":     { emoji: "🔥", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_heatwave" },
   "花吹雪":   { emoji: "🌸", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_sakura_blizzard" },
 };
@@ -114,12 +115,15 @@ function isRainbowWeather(name) {
   return name === "虹" || name === "月虹";
 }
 
-// 6時間ウィンドウの「本当の」天気（晴れ/雨/虹/流星雨の4択のみ）。
-// くもり・小雨・大雨・豪雨・天気雨・月雨・月虹などは、これら4つのいずれかを構成する
-// バリエーションに過ぎないため、ここで畳み込む。「今：/次：」の表示と図鑑の出現判定は
-// 常にこの4値経由で行うこと（1時間ごとの内訳表示にはこの関数を使わない）
+// 6時間ウィンドウの「本当の」天気（晴れ/雨/虹/流星雨/弱い雪/大雪/豪雪の7択）。
+// くもり・小雨・大雨・豪雨・天気雨・月雨・月虹などは、これらのいずれかを構成する
+// バリエーションに過ぎないため、ここで畳み込む。「今：/次：」の表示はこの関数の
+// 戻り値をそのまま使う（1時間ごとの内訳表示にはこの関数を使わない）。
+// 図鑑の出現判定（render()側）はこの戻り値をさらにweatherDexCategory()へ通すため、
+// 雪はそこで「雨」として扱われる（ゲーム内の出現判定上、雪は雨判定のため）
 function weatherWindowCategory(name) {
   if (isMeteorWeather(name)) return "流星雨";
+  if (name === "大雪" || name === "豪雪" || name === "弱い雪") return name;
   return weatherDexCategory(name);
 }
 
@@ -128,8 +132,8 @@ function weatherWindowCategory(name) {
 // 優先順位: 流星雨 > 虹 > 雨 > 雪 > 晴れ（くもり等はすべて晴れ扱い）。
 // ただし「雨」と「流星雨」が両方含まれる場合だけは、流星雨だけに丸めず両方を返す
 // （雨のち流星雨のような日に、雨の情報が消えてしまわないようにするため）。
-// 雪（弱い雪/大雪/豪雪）はdexCategory上は「晴れ」に丸めているが、アイコン表示まで
-// 晴れにしてしまうと雪の日が太陽・月アイコンになってしまうため、ここでは別枠で判定する
+// 雪（弱い雪/大雪/豪雪）はdexCategory上は「雨」に丸めているが、アイコン表示まで
+// 雨にしてしまうと雪の日が傘アイコンになってしまうため、ここでは別枠で判定する
 function weatherWindowIcons(hourlyNames) {
   let hasRain = false, hasRainbow = false, hasMeteor = false;
   let hasHeavySnow = false, hasLightSnow = false;

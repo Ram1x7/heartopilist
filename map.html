@@ -1314,7 +1314,7 @@ function getManualWeatherOverride(dateKey, zone){
   }
 }
 
-// 天気は6時間ウィンドウの天気（晴れ/雨/虹/流星雨の4択）で判定する。ルックアップは常にJST基準
+// 天気は6時間ウィンドウの天気（晴れ/雨/虹/流星雨/弱い雪/大雪/豪雪）で判定する。ルックアップは常にJST基準
 // （js/main.jsのupdateTimeと同じロジック。weatherWindowCategory()でくもり等を畳み込む）
 function getCurrentWeatherAndZone(){
   const zone = getZone();
