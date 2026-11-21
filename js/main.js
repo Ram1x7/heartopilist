@@ -857,7 +857,7 @@ function render(){
   if (c.type === "pumpkin") return true;
 
   // 天気名(晴れ/くもり/小雨/流星雨1など)を出現判定用の粗いカテゴリ(晴れ/雨/虹)へ変換する
-  // （js/weather-master.js。流星雨・オーロラ・雪・猛暑・花吹雪等は晴れ扱い）。
+  // （js/weather-master.js。流星雨・オーロラ・猛暑・花吹雪等は晴れ扱い、雪は雨扱い）。
   // 天気が「不明」（データ無し・手動入力もされていない）の間は変換せずそのままにし、
   // 天気限定の生き物を誤って「今出現中」扱いしない（従来通りの安全側デフォルト）
   const weatherForCheck =
@@ -1012,9 +1012,11 @@ function updateTime(){
 
  const todayData = weatherData[todayKey];
 
- // 「今：/次：」・図鑑の出現判定は6時間ウィンドウの天気（晴れ/雨/虹/流星雨の4択のみ）で行う。
- // くもり・小雨・天気雨等はこの4つのいずれかのバリエーションに過ぎないため、
- // weatherWindowCategory()で畳み込んでから使う（1時間ごとの内訳は下のhour-stripでのみ使用）
+ // 「今：/次：」・図鑑の出現判定は6時間ウィンドウの天気（晴れ/雨/虹/流星雨/弱い雪/大雪/豪雪）で行う。
+ // くもり・小雨・天気雨等はこれらいずれかのバリエーションに過ぎないため、
+ // weatherWindowCategory()で畳み込んでから使う（1時間ごとの内訳は下のhour-stripでのみ使用）。
+ // なお図鑑の出現判定（render()側）はこの値をさらにweatherDexCategory()へ通すため、
+ // 雪は「雨」として扱われる（ゲーム内の出現判定上、雪は雨判定のため）
  const currentWindowKey = weatherWindowKeyForHour(jstHour);
  const todayWindows = (todayData && todayData.windows) || {};
  const rawOfficialWindow = todayWindows[currentWindowKey];
