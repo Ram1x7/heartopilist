@@ -48,6 +48,9 @@ const WEATHER_MASTER = {
   "豪雪":     { emoji: "❄️", gameIcon: null, dexCategory: "雨",   i18nKey: "weather_blizzard" },
   "猛暑":     { emoji: "🔥", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_heatwave" },
   "花吹雪":   { emoji: "🌸", gameIcon: null, dexCategory: "晴れ", i18nKey: "weather_sakura_blizzard" },
+  // 「今：/次：」の6時間ウィンドウ表示専用の統一カテゴリ（weatherWindowCategory()参照）。
+  // 弱い雪/大雪/豪雪を区別せず「雪」とだけ表示してよいとのことなので、ここに代表値として定義する
+  "雪":       { emoji: "❄️", gameIcon: null, dexCategory: "雨",   i18nKey: "weather_snow" },
 };
 
 const UNKNOWN_WEATHER = { emoji: "", gameIcon: null, dexCategory: "晴れ", i18nKey: null };
@@ -115,15 +118,16 @@ function isRainbowWeather(name) {
   return name === "虹" || name === "月虹";
 }
 
-// 6時間ウィンドウの「本当の」天気（晴れ/雨/虹/流星雨/弱い雪/大雪/豪雪の7択）。
+// 6時間ウィンドウの「本当の」天気（晴れ/雨/虹/流星雨/雪の5択）。
 // くもり・小雨・大雨・豪雨・天気雨・月雨・月虹などは、これらのいずれかを構成する
 // バリエーションに過ぎないため、ここで畳み込む。「今：/次：」の表示はこの関数の
 // 戻り値をそのまま使う（1時間ごとの内訳表示にはこの関数を使わない）。
+// 雪（弱い雪/大雪/豪雪）は「今：/次：」表示上は区別せず「雪」に統一する。
 // 図鑑の出現判定（render()側）はこの戻り値をさらにweatherDexCategory()へ通すため、
 // 雪はそこで「雨」として扱われる（ゲーム内の出現判定上、雪は雨判定のため）
 function weatherWindowCategory(name) {
   if (isMeteorWeather(name)) return "流星雨";
-  if (name === "大雪" || name === "豪雪" || name === "弱い雪") return name;
+  if (name === "大雪" || name === "豪雪" || name === "弱い雪") return "雪";
   return weatherDexCategory(name);
 }
 
