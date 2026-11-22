@@ -36,7 +36,9 @@ function profileCardSplitStat(items, checkedMap, authMap, keyField = "name") {
     // 図鑑（魚・虫・野鳥・貝殻・雪像・砂像・かぼちゃ）は固定ID、
     // 料理・園芸は従来どおり名前をキーに保存している。
     const key = item[keyField] || item.name;
-    return !!map[key];
+    // 旧バージョンで名前キー保存された記録も、IDキーが無い場合に限り引き継ぐ。
+    const value = map[key];
+    return value !== undefined ? !!value : !!map[item.name];
   };
   const starTotal = items.length;
   const starDone = items.filter(x => isRecorded(checkedMap, x)).length;
