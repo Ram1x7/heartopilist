@@ -31,18 +31,24 @@ function profileCardSafeJsonParse(key) {
 }
 
 // 星5進捗・認証進捗をそれぞれ分けて返す（auth:falseの項目は認証側の分母・分子から除外）
-function profileCardSplitStat(items, checkedMap, authMap) {
+function profileCardSplitStat(items, checkedMap, authMap, keyField = "name") {
+  const isRecorded = (map, item) => {
+    // 図鑑（魚・虫・野鳥・貝殻・雪像・砂像・かぼちゃ）は固定ID、
+    // 料理・園芸は従来どおり名前をキーに保存している。
+    const key = item[keyField] || item.name;
+    return !!map[key];
+  };
   const starTotal = items.length;
-  const starDone = items.filter(x => checkedMap[x.name]).length;
+  const starDone = items.filter(x => isRecorded(checkedMap, x)).length;
   const authEligible = items.filter(x => x.auth !== false);
   const authTotal = authEligible.length;
-  const authDone = authEligible.filter(x => authMap[x.name]).length;
+  const authDone = authEligible.filter(x => isRecorded(authMap, x)).length;
   return { starDone, starTotal, authDone, authTotal };
 }
 
 // 「星5取得数+認証取得数」「星5対象数+認証対象数」を合算する（カード本体の表示用）
-function profileCardCombineStat(items, checkedMap, authMap) {
-  const s = profileCardSplitStat(items, checkedMap, authMap);
+function profileCardCombineStat(items, checkedMap, authMap, keyField = "name") {
+  const s = profileCardSplitStat(items, checkedMap, authMap, keyField);
   return { done: s.starDone + s.authDone, total: s.starTotal + s.authTotal };
 }
 
@@ -84,7 +90,7 @@ function computeProfileCardStats() {
 
   const stats = {};
   for (const type of Object.keys(src.creatureArraysByType)) {
-    stats[type] = profileCardCombineStat(src.creatureArraysByType[type], src.checkedData, src.authData);
+    stats[type] = profileCardCombineStat(src.creatureArraysByType[type], src.checkedData, src.authData, "id");
   }
 
   stats.food = profileCardCombineStat(src.foodAll, src.foodChecked, src.foodAuth);
@@ -107,7 +113,7 @@ function computeProfileCardStatsDetailed() {
 
   const stats = {};
   for (const type of Object.keys(src.creatureArraysByType)) {
-    stats[type] = profileCardSplitStat(src.creatureArraysByType[type], src.checkedData, src.authData);
+    stats[type] = profileCardSplitStat(src.creatureArraysByType[type], src.checkedData, src.authData, "id");
   }
 
   stats.food = profileCardSplitStat(src.foodAll, src.foodChecked, src.foodAuth);
