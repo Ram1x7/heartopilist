@@ -1617,16 +1617,16 @@ function getStats() {
   const total = creatures.length;
   const done  = creatures.filter(c => checkedData[c.id]).length;
 
-  const byType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
-  const totalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const byType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0, pumpkin:0 };
+  const totalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0, pumpkin:0 };
   creatures.forEach(c => {
     totalByType[c.type]++;
     if (checkedData[c.id]) byType[c.type]++;
   });
 
   const authEligible    = creatures.filter(c => c.auth !== false);
-  const authByType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
-  const authTotalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0 };
+  const authByType      = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0, pumpkin:0 };
+  const authTotalByType = { fish:0, bug:0, bird:0, sand:0, snow:0, shell:0, pumpkin:0 };
   authEligible.forEach(c => {
     authTotalByType[c.type]++;
     if (authData[c.id]) authByType[c.type]++;
