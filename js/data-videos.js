@@ -61,7 +61,7 @@ const videoData = [
   { category:"pink_bubble", date:"2026-10-31", videoId:"l3CZTZmUBTY", note:"10/31~11/6" },
   { category:"pink_bubble", date:"2026-11-07", videoId:"drUdzYD8RFM", note:"11/7~11/13" },
   { category:"pink_bubble", date:"2026-11-14", videoId:"9ESqUUAHCTw", note:"11/14~11/20" },
-  { category:"pink_bubble", date:"2026-11-21", videoId:"m4uVYwF8evc", note:"11/14~11/27" },
+  { category:"pink_bubble", date:"2026-11-21", videoId:"m4uVYwF8evc", note:"11/21~11/27" },
   { category:"meteor_shower", date:"2026-01-24", videoId:"NseJtUPwK7g", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-02-07", videoId:"gCBvEQ_Anzc", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-02-14", videoId:"eIPZGHHw0kQ", note:"18:00~24:00" },
@@ -100,5 +100,5 @@ const videoData = [
   { category:"meteor_shower", date:"2026-10-09", videoId:"7phPN7aiZlU", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-10-21", videoId:"GkAfEDTu_a4", note:"18:00~24:00" },
   { category:"meteor_shower", date:"2026-10-22", videoId:"PDeBMDtUynw", note:"18:00~24:00" },
-  { category:"meteor_shower", date:"2026-10-22", videoId:"O25zrsmYW", note:"18:00~24:00" },
+  { category:"meteor_shower", date:"2026-11-18", videoId:"O25zrsmYW-o", note:"18:00~24:00" },
 ];
