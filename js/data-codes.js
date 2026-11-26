@@ -400,6 +400,13 @@ const codesData = [
     expiry: "2027-01-01 00:59",
     active: true,
   },
+  {
+    code: "GRATEFUL11",
+    reward: "月の水晶×10",
+    rewardI18n:{"ja":"月の水晶×10","en":"","zh-CN":"","zh-TW":"","ko":"","th":""},
+    expiry: "2027-12-24 12:00",
+    active: true,
+  },
   // 以下、コードを追加していく
   // {
   //   code: "SPRING2026",
